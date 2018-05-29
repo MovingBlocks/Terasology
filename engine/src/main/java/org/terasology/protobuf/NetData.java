@@ -6,11 +6,17 @@ package org.terasology.protobuf;
 public final class NetData {
   private NetData() {}
   public static void registerAllExtensions(
+      com.google.protobuf.ExtensionRegistryLite registry) {
+  }
+
+  public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
+    registerAllExtensions(
+        (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   public interface NetMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:NetMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<NetMessage> {
 
     /**
@@ -341,27 +347,27 @@ public final class NetData {
     org.terasology.protobuf.NetData.JoinCompleteMessageOrBuilder getJoinCompleteOrBuilder();
 
     /**
-     * <code>optional .HandshakeHello handshakeHello = 100;</code>
-     *
      * <pre>
      * Authentication
      * </pre>
+     *
+     * <code>optional .HandshakeHello handshakeHello = 100;</code>
      */
     boolean hasHandshakeHello();
     /**
-     * <code>optional .HandshakeHello handshakeHello = 100;</code>
-     *
      * <pre>
      * Authentication
      * </pre>
+     *
+     * <code>optional .HandshakeHello handshakeHello = 100;</code>
      */
     org.terasology.protobuf.NetData.HandshakeHello getHandshakeHello();
     /**
-     * <code>optional .HandshakeHello handshakeHello = 100;</code>
-     *
      * <pre>
      * Authentication
      * </pre>
+     *
+     * <code>optional .HandshakeHello handshakeHello = 100;</code>
      */
     org.terasology.protobuf.NetData.HandshakeHelloOrBuilder getHandshakeHelloOrBuilder();
 
@@ -407,38 +413,39 @@ public final class NetData {
   /**
    * Protobuf type {@code NetMessage}
    */
-  public static final class NetMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class NetMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         NetMessage> implements
       // @@protoc_insertion_point(message_implements:NetMessage)
       NetMessageOrBuilder {
     // Use NetMessage.newBuilder() to construct.
-    private NetMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.NetMessage, ?> builder) {
+    private NetMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.NetMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private NetMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final NetMessage defaultInstance;
-    public static NetMessage getDefaultInstance() {
-      return defaultInstance;
+    private NetMessage() {
+      chunkInfo_ = java.util.Collections.emptyList();
+      invalidateChunk_ = java.util.Collections.emptyList();
+      blockChange_ = java.util.Collections.emptyList();
+      createEntity_ = java.util.Collections.emptyList();
+      removeEntity_ = java.util.Collections.emptyList();
+      updateEntity_ = java.util.Collections.emptyList();
+      event_ = java.util.Collections.emptyList();
+      time_ = 0L;
+      biomeChange_ = java.util.Collections.emptyList();
+      blockFamilyRegistered_ = java.util.Collections.emptyList();
+      moduleRequest_ = java.util.Collections.emptyList();
     }
 
-    public NetMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private NetMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -462,7 +469,8 @@ public final class NetData {
                 chunkInfo_ = new java.util.ArrayList<org.terasology.protobuf.EntityData.ChunkStore>();
                 mutable_bitField0_ |= 0x00000001;
               }
-              chunkInfo_.add(input.readMessage(org.terasology.protobuf.EntityData.ChunkStore.PARSER, extensionRegistry));
+              chunkInfo_.add(
+                  input.readMessage(org.terasology.protobuf.EntityData.ChunkStore.PARSER, extensionRegistry));
               break;
             }
             case 26: {
@@ -470,7 +478,8 @@ public final class NetData {
                 invalidateChunk_ = new java.util.ArrayList<org.terasology.protobuf.NetData.InvalidateChunkMessage>();
                 mutable_bitField0_ |= 0x00000002;
               }
-              invalidateChunk_.add(input.readMessage(org.terasology.protobuf.NetData.InvalidateChunkMessage.PARSER, extensionRegistry));
+              invalidateChunk_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.InvalidateChunkMessage.PARSER, extensionRegistry));
               break;
             }
             case 34: {
@@ -478,7 +487,8 @@ public final class NetData {
                 blockChange_ = new java.util.ArrayList<org.terasology.protobuf.NetData.BlockChangeMessage>();
                 mutable_bitField0_ |= 0x00000004;
               }
-              blockChange_.add(input.readMessage(org.terasology.protobuf.NetData.BlockChangeMessage.PARSER, extensionRegistry));
+              blockChange_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.BlockChangeMessage.PARSER, extensionRegistry));
               break;
             }
             case 42: {
@@ -486,7 +496,8 @@ public final class NetData {
                 createEntity_ = new java.util.ArrayList<org.terasology.protobuf.NetData.CreateEntityMessage>();
                 mutable_bitField0_ |= 0x00000008;
               }
-              createEntity_.add(input.readMessage(org.terasology.protobuf.NetData.CreateEntityMessage.PARSER, extensionRegistry));
+              createEntity_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.CreateEntityMessage.PARSER, extensionRegistry));
               break;
             }
             case 50: {
@@ -494,7 +505,8 @@ public final class NetData {
                 removeEntity_ = new java.util.ArrayList<org.terasology.protobuf.NetData.RemoveEntityMessage>();
                 mutable_bitField0_ |= 0x00000010;
               }
-              removeEntity_.add(input.readMessage(org.terasology.protobuf.NetData.RemoveEntityMessage.PARSER, extensionRegistry));
+              removeEntity_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.RemoveEntityMessage.PARSER, extensionRegistry));
               break;
             }
             case 58: {
@@ -502,7 +514,8 @@ public final class NetData {
                 updateEntity_ = new java.util.ArrayList<org.terasology.protobuf.NetData.UpdateEntityMessage>();
                 mutable_bitField0_ |= 0x00000020;
               }
-              updateEntity_.add(input.readMessage(org.terasology.protobuf.NetData.UpdateEntityMessage.PARSER, extensionRegistry));
+              updateEntity_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.UpdateEntityMessage.PARSER, extensionRegistry));
               break;
             }
             case 66: {
@@ -510,7 +523,8 @@ public final class NetData {
                 event_ = new java.util.ArrayList<org.terasology.protobuf.NetData.EventMessage>();
                 mutable_bitField0_ |= 0x00000040;
               }
-              event_.add(input.readMessage(org.terasology.protobuf.NetData.EventMessage.PARSER, extensionRegistry));
+              event_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.EventMessage.PARSER, extensionRegistry));
               break;
             }
             case 72: {
@@ -523,7 +537,8 @@ public final class NetData {
                 biomeChange_ = new java.util.ArrayList<org.terasology.protobuf.NetData.BiomeChangeMessage>();
                 mutable_bitField0_ |= 0x00000100;
               }
-              biomeChange_.add(input.readMessage(org.terasology.protobuf.NetData.BiomeChangeMessage.PARSER, extensionRegistry));
+              biomeChange_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.BiomeChangeMessage.PARSER, extensionRegistry));
               break;
             }
             case 122: {
@@ -557,7 +572,8 @@ public final class NetData {
                 blockFamilyRegistered_ = new java.util.ArrayList<org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage>();
                 mutable_bitField0_ |= 0x00000800;
               }
-              blockFamilyRegistered_.add(input.readMessage(org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage.PARSER, extensionRegistry));
+              blockFamilyRegistered_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage.PARSER, extensionRegistry));
               break;
             }
             case 146: {
@@ -578,7 +594,8 @@ public final class NetData {
                 moduleRequest_ = new java.util.ArrayList<org.terasology.protobuf.NetData.ModuleRequest>();
                 mutable_bitField0_ |= 0x00002000;
               }
-              moduleRequest_.add(input.readMessage(org.terasology.protobuf.NetData.ModuleRequest.PARSER, extensionRegistry));
+              moduleRequest_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.ModuleRequest.PARSER, extensionRegistry));
               break;
             }
             case 162: {
@@ -678,7 +695,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
           chunkInfo_ = java.util.Collections.unmodifiableList(chunkInfo_);
@@ -719,26 +736,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_NetMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_NetMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.NetMessage.class, org.terasology.protobuf.NetData.NetMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<NetMessage> PARSER =
-        new com.google.protobuf.AbstractParser<NetMessage>() {
-      public NetMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new NetMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<NetMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -1049,13 +1051,13 @@ public final class NetData {
      * <code>optional .ServerInfoRequest serverInfoRequest = 15;</code>
      */
     public org.terasology.protobuf.NetData.ServerInfoRequest getServerInfoRequest() {
-      return serverInfoRequest_;
+      return serverInfoRequest_ == null ? org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance() : serverInfoRequest_;
     }
     /**
      * <code>optional .ServerInfoRequest serverInfoRequest = 15;</code>
      */
     public org.terasology.protobuf.NetData.ServerInfoRequestOrBuilder getServerInfoRequestOrBuilder() {
-      return serverInfoRequest_;
+      return serverInfoRequest_ == null ? org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance() : serverInfoRequest_;
     }
 
     public static final int SERVERINFO_FIELD_NUMBER = 16;
@@ -1070,13 +1072,13 @@ public final class NetData {
      * <code>optional .ServerInfoMessage serverInfo = 16;</code>
      */
     public org.terasology.protobuf.NetData.ServerInfoMessage getServerInfo() {
-      return serverInfo_;
+      return serverInfo_ == null ? org.terasology.protobuf.NetData.ServerInfoMessage.getDefaultInstance() : serverInfo_;
     }
     /**
      * <code>optional .ServerInfoMessage serverInfo = 16;</code>
      */
     public org.terasology.protobuf.NetData.ServerInfoMessageOrBuilder getServerInfoOrBuilder() {
-      return serverInfo_;
+      return serverInfo_ == null ? org.terasology.protobuf.NetData.ServerInfoMessage.getDefaultInstance() : serverInfo_;
     }
 
     public static final int BLOCKFAMILYREGISTERED_FIELD_NUMBER = 17;
@@ -1126,13 +1128,13 @@ public final class NetData {
      * <code>optional .JoinMessage join = 18;</code>
      */
     public org.terasology.protobuf.NetData.JoinMessage getJoin() {
-      return join_;
+      return join_ == null ? org.terasology.protobuf.NetData.JoinMessage.getDefaultInstance() : join_;
     }
     /**
      * <code>optional .JoinMessage join = 18;</code>
      */
     public org.terasology.protobuf.NetData.JoinMessageOrBuilder getJoinOrBuilder() {
-      return join_;
+      return join_ == null ? org.terasology.protobuf.NetData.JoinMessage.getDefaultInstance() : join_;
     }
 
     public static final int MODULEREQUEST_FIELD_NUMBER = 19;
@@ -1182,13 +1184,13 @@ public final class NetData {
      * <code>optional .ModuleDataHeader moduleDataHeader = 20;</code>
      */
     public org.terasology.protobuf.NetData.ModuleDataHeader getModuleDataHeader() {
-      return moduleDataHeader_;
+      return moduleDataHeader_ == null ? org.terasology.protobuf.NetData.ModuleDataHeader.getDefaultInstance() : moduleDataHeader_;
     }
     /**
      * <code>optional .ModuleDataHeader moduleDataHeader = 20;</code>
      */
     public org.terasology.protobuf.NetData.ModuleDataHeaderOrBuilder getModuleDataHeaderOrBuilder() {
-      return moduleDataHeader_;
+      return moduleDataHeader_ == null ? org.terasology.protobuf.NetData.ModuleDataHeader.getDefaultInstance() : moduleDataHeader_;
     }
 
     public static final int MODULEDATA_FIELD_NUMBER = 21;
@@ -1203,13 +1205,13 @@ public final class NetData {
      * <code>optional .ModuleData moduleData = 21;</code>
      */
     public org.terasology.protobuf.NetData.ModuleData getModuleData() {
-      return moduleData_;
+      return moduleData_ == null ? org.terasology.protobuf.NetData.ModuleData.getDefaultInstance() : moduleData_;
     }
     /**
      * <code>optional .ModuleData moduleData = 21;</code>
      */
     public org.terasology.protobuf.NetData.ModuleDataOrBuilder getModuleDataOrBuilder() {
-      return moduleData_;
+      return moduleData_ == null ? org.terasology.protobuf.NetData.ModuleData.getDefaultInstance() : moduleData_;
     }
 
     public static final int JOINCOMPLETE_FIELD_NUMBER = 22;
@@ -1224,46 +1226,46 @@ public final class NetData {
      * <code>optional .JoinCompleteMessage joinComplete = 22;</code>
      */
     public org.terasology.protobuf.NetData.JoinCompleteMessage getJoinComplete() {
-      return joinComplete_;
+      return joinComplete_ == null ? org.terasology.protobuf.NetData.JoinCompleteMessage.getDefaultInstance() : joinComplete_;
     }
     /**
      * <code>optional .JoinCompleteMessage joinComplete = 22;</code>
      */
     public org.terasology.protobuf.NetData.JoinCompleteMessageOrBuilder getJoinCompleteOrBuilder() {
-      return joinComplete_;
+      return joinComplete_ == null ? org.terasology.protobuf.NetData.JoinCompleteMessage.getDefaultInstance() : joinComplete_;
     }
 
     public static final int HANDSHAKEHELLO_FIELD_NUMBER = 100;
     private org.terasology.protobuf.NetData.HandshakeHello handshakeHello_;
     /**
-     * <code>optional .HandshakeHello handshakeHello = 100;</code>
-     *
      * <pre>
      * Authentication
      * </pre>
+     *
+     * <code>optional .HandshakeHello handshakeHello = 100;</code>
      */
     public boolean hasHandshakeHello() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional .HandshakeHello handshakeHello = 100;</code>
-     *
      * <pre>
      * Authentication
      * </pre>
+     *
+     * <code>optional .HandshakeHello handshakeHello = 100;</code>
      */
     public org.terasology.protobuf.NetData.HandshakeHello getHandshakeHello() {
-      return handshakeHello_;
+      return handshakeHello_ == null ? org.terasology.protobuf.NetData.HandshakeHello.getDefaultInstance() : handshakeHello_;
     }
     /**
-     * <code>optional .HandshakeHello handshakeHello = 100;</code>
-     *
      * <pre>
      * Authentication
      * </pre>
+     *
+     * <code>optional .HandshakeHello handshakeHello = 100;</code>
      */
     public org.terasology.protobuf.NetData.HandshakeHelloOrBuilder getHandshakeHelloOrBuilder() {
-      return handshakeHello_;
+      return handshakeHello_ == null ? org.terasology.protobuf.NetData.HandshakeHello.getDefaultInstance() : handshakeHello_;
     }
 
     public static final int NEWIDENTITYREQUEST_FIELD_NUMBER = 101;
@@ -1278,13 +1280,13 @@ public final class NetData {
      * <code>optional .NewIdentityRequest newIdentityRequest = 101;</code>
      */
     public org.terasology.protobuf.NetData.NewIdentityRequest getNewIdentityRequest() {
-      return newIdentityRequest_;
+      return newIdentityRequest_ == null ? org.terasology.protobuf.NetData.NewIdentityRequest.getDefaultInstance() : newIdentityRequest_;
     }
     /**
      * <code>optional .NewIdentityRequest newIdentityRequest = 101;</code>
      */
     public org.terasology.protobuf.NetData.NewIdentityRequestOrBuilder getNewIdentityRequestOrBuilder() {
-      return newIdentityRequest_;
+      return newIdentityRequest_ == null ? org.terasology.protobuf.NetData.NewIdentityRequest.getDefaultInstance() : newIdentityRequest_;
     }
 
     public static final int PROVISIONIDENTITY_FIELD_NUMBER = 102;
@@ -1299,13 +1301,13 @@ public final class NetData {
      * <code>optional .ProvisionIdentity provisionIdentity = 102;</code>
      */
     public org.terasology.protobuf.NetData.ProvisionIdentity getProvisionIdentity() {
-      return provisionIdentity_;
+      return provisionIdentity_ == null ? org.terasology.protobuf.NetData.ProvisionIdentity.getDefaultInstance() : provisionIdentity_;
     }
     /**
      * <code>optional .ProvisionIdentity provisionIdentity = 102;</code>
      */
     public org.terasology.protobuf.NetData.ProvisionIdentityOrBuilder getProvisionIdentityOrBuilder() {
-      return provisionIdentity_;
+      return provisionIdentity_ == null ? org.terasology.protobuf.NetData.ProvisionIdentity.getDefaultInstance() : provisionIdentity_;
     }
 
     public static final int HANDSHAKEVERIFICATION_FIELD_NUMBER = 103;
@@ -1320,38 +1322,15 @@ public final class NetData {
      * <code>optional .HandshakeVerification handshakeVerification = 103;</code>
      */
     public org.terasology.protobuf.NetData.HandshakeVerification getHandshakeVerification() {
-      return handshakeVerification_;
+      return handshakeVerification_ == null ? org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance() : handshakeVerification_;
     }
     /**
      * <code>optional .HandshakeVerification handshakeVerification = 103;</code>
      */
     public org.terasology.protobuf.NetData.HandshakeVerificationOrBuilder getHandshakeVerificationOrBuilder() {
-      return handshakeVerification_;
+      return handshakeVerification_ == null ? org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance() : handshakeVerification_;
     }
 
-    private void initFields() {
-      chunkInfo_ = java.util.Collections.emptyList();
-      invalidateChunk_ = java.util.Collections.emptyList();
-      blockChange_ = java.util.Collections.emptyList();
-      createEntity_ = java.util.Collections.emptyList();
-      removeEntity_ = java.util.Collections.emptyList();
-      updateEntity_ = java.util.Collections.emptyList();
-      event_ = java.util.Collections.emptyList();
-      time_ = 0L;
-      biomeChange_ = java.util.Collections.emptyList();
-      serverInfoRequest_ = org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance();
-      serverInfo_ = org.terasology.protobuf.NetData.ServerInfoMessage.getDefaultInstance();
-      blockFamilyRegistered_ = java.util.Collections.emptyList();
-      join_ = org.terasology.protobuf.NetData.JoinMessage.getDefaultInstance();
-      moduleRequest_ = java.util.Collections.emptyList();
-      moduleDataHeader_ = org.terasology.protobuf.NetData.ModuleDataHeader.getDefaultInstance();
-      moduleData_ = org.terasology.protobuf.NetData.ModuleData.getDefaultInstance();
-      joinComplete_ = org.terasology.protobuf.NetData.JoinCompleteMessage.getDefaultInstance();
-      handshakeHello_ = org.terasology.protobuf.NetData.HandshakeHello.getDefaultInstance();
-      newIdentityRequest_ = org.terasology.protobuf.NetData.NewIdentityRequest.getDefaultInstance();
-      provisionIdentity_ = org.terasology.protobuf.NetData.ProvisionIdentity.getDefaultInstance();
-      handshakeVerification_ = org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1488,10 +1467,9 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.NetMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.NetMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       for (int i = 0; i < chunkInfo_.size(); i++) {
         output.writeMessage(2, chunkInfo_.get(i));
       }
@@ -1520,48 +1498,47 @@ public final class NetData {
         output.writeMessage(10, biomeChange_.get(i));
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(15, serverInfoRequest_);
+        output.writeMessage(15, getServerInfoRequest());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(16, serverInfo_);
+        output.writeMessage(16, getServerInfo());
       }
       for (int i = 0; i < blockFamilyRegistered_.size(); i++) {
         output.writeMessage(17, blockFamilyRegistered_.get(i));
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(18, join_);
+        output.writeMessage(18, getJoin());
       }
       for (int i = 0; i < moduleRequest_.size(); i++) {
         output.writeMessage(19, moduleRequest_.get(i));
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeMessage(20, moduleDataHeader_);
+        output.writeMessage(20, getModuleDataHeader());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeMessage(21, moduleData_);
+        output.writeMessage(21, getModuleData());
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeMessage(22, joinComplete_);
+        output.writeMessage(22, getJoinComplete());
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeMessage(100, handshakeHello_);
+        output.writeMessage(100, getHandshakeHello());
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeMessage(101, newIdentityRequest_);
+        output.writeMessage(101, getNewIdentityRequest());
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeMessage(102, provisionIdentity_);
+        output.writeMessage(102, getProvisionIdentity());
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeMessage(103, handshakeVerification_);
+        output.writeMessage(103, getHandshakeVerification());
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -1603,11 +1580,11 @@ public final class NetData {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(15, serverInfoRequest_);
+          .computeMessageSize(15, getServerInfoRequest());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(16, serverInfo_);
+          .computeMessageSize(16, getServerInfo());
       }
       for (int i = 0; i < blockFamilyRegistered_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -1615,7 +1592,7 @@ public final class NetData {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(18, join_);
+          .computeMessageSize(18, getJoin());
       }
       for (int i = 0; i < moduleRequest_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -1623,43 +1600,227 @@ public final class NetData {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(20, moduleDataHeader_);
+          .computeMessageSize(20, getModuleDataHeader());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(21, moduleData_);
+          .computeMessageSize(21, getModuleData());
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(22, joinComplete_);
+          .computeMessageSize(22, getJoinComplete());
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(100, handshakeHello_);
+          .computeMessageSize(100, getHandshakeHello());
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(101, newIdentityRequest_);
+          .computeMessageSize(101, getNewIdentityRequest());
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(102, provisionIdentity_);
+          .computeMessageSize(102, getProvisionIdentity());
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(103, handshakeVerification_);
+          .computeMessageSize(103, getHandshakeVerification());
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.NetMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.NetMessage other = (org.terasology.protobuf.NetData.NetMessage) obj;
+
+      boolean result = true;
+      result = result && getChunkInfoList()
+          .equals(other.getChunkInfoList());
+      result = result && getInvalidateChunkList()
+          .equals(other.getInvalidateChunkList());
+      result = result && getBlockChangeList()
+          .equals(other.getBlockChangeList());
+      result = result && getCreateEntityList()
+          .equals(other.getCreateEntityList());
+      result = result && getRemoveEntityList()
+          .equals(other.getRemoveEntityList());
+      result = result && getUpdateEntityList()
+          .equals(other.getUpdateEntityList());
+      result = result && getEventList()
+          .equals(other.getEventList());
+      result = result && (hasTime() == other.hasTime());
+      if (hasTime()) {
+        result = result && (getTime()
+            == other.getTime());
+      }
+      result = result && getBiomeChangeList()
+          .equals(other.getBiomeChangeList());
+      result = result && (hasServerInfoRequest() == other.hasServerInfoRequest());
+      if (hasServerInfoRequest()) {
+        result = result && getServerInfoRequest()
+            .equals(other.getServerInfoRequest());
+      }
+      result = result && (hasServerInfo() == other.hasServerInfo());
+      if (hasServerInfo()) {
+        result = result && getServerInfo()
+            .equals(other.getServerInfo());
+      }
+      result = result && getBlockFamilyRegisteredList()
+          .equals(other.getBlockFamilyRegisteredList());
+      result = result && (hasJoin() == other.hasJoin());
+      if (hasJoin()) {
+        result = result && getJoin()
+            .equals(other.getJoin());
+      }
+      result = result && getModuleRequestList()
+          .equals(other.getModuleRequestList());
+      result = result && (hasModuleDataHeader() == other.hasModuleDataHeader());
+      if (hasModuleDataHeader()) {
+        result = result && getModuleDataHeader()
+            .equals(other.getModuleDataHeader());
+      }
+      result = result && (hasModuleData() == other.hasModuleData());
+      if (hasModuleData()) {
+        result = result && getModuleData()
+            .equals(other.getModuleData());
+      }
+      result = result && (hasJoinComplete() == other.hasJoinComplete());
+      if (hasJoinComplete()) {
+        result = result && getJoinComplete()
+            .equals(other.getJoinComplete());
+      }
+      result = result && (hasHandshakeHello() == other.hasHandshakeHello());
+      if (hasHandshakeHello()) {
+        result = result && getHandshakeHello()
+            .equals(other.getHandshakeHello());
+      }
+      result = result && (hasNewIdentityRequest() == other.hasNewIdentityRequest());
+      if (hasNewIdentityRequest()) {
+        result = result && getNewIdentityRequest()
+            .equals(other.getNewIdentityRequest());
+      }
+      result = result && (hasProvisionIdentity() == other.hasProvisionIdentity());
+      if (hasProvisionIdentity()) {
+        result = result && getProvisionIdentity()
+            .equals(other.getProvisionIdentity());
+      }
+      result = result && (hasHandshakeVerification() == other.hasHandshakeVerification());
+      if (hasHandshakeVerification()) {
+        result = result && getHandshakeVerification()
+            .equals(other.getHandshakeVerification());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getChunkInfoCount() > 0) {
+        hash = (37 * hash) + CHUNKINFO_FIELD_NUMBER;
+        hash = (53 * hash) + getChunkInfoList().hashCode();
+      }
+      if (getInvalidateChunkCount() > 0) {
+        hash = (37 * hash) + INVALIDATECHUNK_FIELD_NUMBER;
+        hash = (53 * hash) + getInvalidateChunkList().hashCode();
+      }
+      if (getBlockChangeCount() > 0) {
+        hash = (37 * hash) + BLOCKCHANGE_FIELD_NUMBER;
+        hash = (53 * hash) + getBlockChangeList().hashCode();
+      }
+      if (getCreateEntityCount() > 0) {
+        hash = (37 * hash) + CREATEENTITY_FIELD_NUMBER;
+        hash = (53 * hash) + getCreateEntityList().hashCode();
+      }
+      if (getRemoveEntityCount() > 0) {
+        hash = (37 * hash) + REMOVEENTITY_FIELD_NUMBER;
+        hash = (53 * hash) + getRemoveEntityList().hashCode();
+      }
+      if (getUpdateEntityCount() > 0) {
+        hash = (37 * hash) + UPDATEENTITY_FIELD_NUMBER;
+        hash = (53 * hash) + getUpdateEntityList().hashCode();
+      }
+      if (getEventCount() > 0) {
+        hash = (37 * hash) + EVENT_FIELD_NUMBER;
+        hash = (53 * hash) + getEventList().hashCode();
+      }
+      if (hasTime()) {
+        hash = (37 * hash) + TIME_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getTime());
+      }
+      if (getBiomeChangeCount() > 0) {
+        hash = (37 * hash) + BIOMECHANGE_FIELD_NUMBER;
+        hash = (53 * hash) + getBiomeChangeList().hashCode();
+      }
+      if (hasServerInfoRequest()) {
+        hash = (37 * hash) + SERVERINFOREQUEST_FIELD_NUMBER;
+        hash = (53 * hash) + getServerInfoRequest().hashCode();
+      }
+      if (hasServerInfo()) {
+        hash = (37 * hash) + SERVERINFO_FIELD_NUMBER;
+        hash = (53 * hash) + getServerInfo().hashCode();
+      }
+      if (getBlockFamilyRegisteredCount() > 0) {
+        hash = (37 * hash) + BLOCKFAMILYREGISTERED_FIELD_NUMBER;
+        hash = (53 * hash) + getBlockFamilyRegisteredList().hashCode();
+      }
+      if (hasJoin()) {
+        hash = (37 * hash) + JOIN_FIELD_NUMBER;
+        hash = (53 * hash) + getJoin().hashCode();
+      }
+      if (getModuleRequestCount() > 0) {
+        hash = (37 * hash) + MODULEREQUEST_FIELD_NUMBER;
+        hash = (53 * hash) + getModuleRequestList().hashCode();
+      }
+      if (hasModuleDataHeader()) {
+        hash = (37 * hash) + MODULEDATAHEADER_FIELD_NUMBER;
+        hash = (53 * hash) + getModuleDataHeader().hashCode();
+      }
+      if (hasModuleData()) {
+        hash = (37 * hash) + MODULEDATA_FIELD_NUMBER;
+        hash = (53 * hash) + getModuleData().hashCode();
+      }
+      if (hasJoinComplete()) {
+        hash = (37 * hash) + JOINCOMPLETE_FIELD_NUMBER;
+        hash = (53 * hash) + getJoinComplete().hashCode();
+      }
+      if (hasHandshakeHello()) {
+        hash = (37 * hash) + HANDSHAKEHELLO_FIELD_NUMBER;
+        hash = (53 * hash) + getHandshakeHello().hashCode();
+      }
+      if (hasNewIdentityRequest()) {
+        hash = (37 * hash) + NEWIDENTITYREQUEST_FIELD_NUMBER;
+        hash = (53 * hash) + getNewIdentityRequest().hashCode();
+      }
+      if (hasProvisionIdentity()) {
+        hash = (37 * hash) + PROVISIONIDENTITY_FIELD_NUMBER;
+        hash = (53 * hash) + getProvisionIdentity().hashCode();
+      }
+      if (hasHandshakeVerification()) {
+        hash = (37 * hash) + HANDSHAKEVERIFICATION_FIELD_NUMBER;
+        hash = (53 * hash) + getHandshakeVerification().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.NetMessage parseFrom(
@@ -1685,46 +1846,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.NetMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.NetMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.NetMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.NetMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.NetMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.NetMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.NetMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.NetMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -1732,7 +1904,7 @@ public final class NetData {
      * Protobuf type {@code NetMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.NetMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:NetMessage)
         org.terasology.protobuf.NetData.NetMessageOrBuilder {
@@ -1741,7 +1913,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_NetMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_NetMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -1754,12 +1926,13 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getChunkInfoFieldBuilder();
           getInvalidateChunkFieldBuilder();
           getBlockChangeFieldBuilder();
@@ -1782,10 +1955,6 @@ public final class NetData {
           getHandshakeVerificationFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         if (chunkInfoBuilder_ == null) {
@@ -1839,13 +2008,13 @@ public final class NetData {
           biomeChangeBuilder_.clear();
         }
         if (serverInfoRequestBuilder_ == null) {
-          serverInfoRequest_ = org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance();
+          serverInfoRequest_ = null;
         } else {
           serverInfoRequestBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000200);
         if (serverInfoBuilder_ == null) {
-          serverInfo_ = org.terasology.protobuf.NetData.ServerInfoMessage.getDefaultInstance();
+          serverInfo_ = null;
         } else {
           serverInfoBuilder_.clear();
         }
@@ -1857,7 +2026,7 @@ public final class NetData {
           blockFamilyRegisteredBuilder_.clear();
         }
         if (joinBuilder_ == null) {
-          join_ = org.terasology.protobuf.NetData.JoinMessage.getDefaultInstance();
+          join_ = null;
         } else {
           joinBuilder_.clear();
         }
@@ -1869,52 +2038,48 @@ public final class NetData {
           moduleRequestBuilder_.clear();
         }
         if (moduleDataHeaderBuilder_ == null) {
-          moduleDataHeader_ = org.terasology.protobuf.NetData.ModuleDataHeader.getDefaultInstance();
+          moduleDataHeader_ = null;
         } else {
           moduleDataHeaderBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00004000);
         if (moduleDataBuilder_ == null) {
-          moduleData_ = org.terasology.protobuf.NetData.ModuleData.getDefaultInstance();
+          moduleData_ = null;
         } else {
           moduleDataBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00008000);
         if (joinCompleteBuilder_ == null) {
-          joinComplete_ = org.terasology.protobuf.NetData.JoinCompleteMessage.getDefaultInstance();
+          joinComplete_ = null;
         } else {
           joinCompleteBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00010000);
         if (handshakeHelloBuilder_ == null) {
-          handshakeHello_ = org.terasology.protobuf.NetData.HandshakeHello.getDefaultInstance();
+          handshakeHello_ = null;
         } else {
           handshakeHelloBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00020000);
         if (newIdentityRequestBuilder_ == null) {
-          newIdentityRequest_ = org.terasology.protobuf.NetData.NewIdentityRequest.getDefaultInstance();
+          newIdentityRequest_ = null;
         } else {
           newIdentityRequestBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00040000);
         if (provisionIdentityBuilder_ == null) {
-          provisionIdentity_ = org.terasology.protobuf.NetData.ProvisionIdentity.getDefaultInstance();
+          provisionIdentity_ = null;
         } else {
           provisionIdentityBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00080000);
         if (handshakeVerificationBuilder_ == null) {
-          handshakeVerification_ = org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance();
+          handshakeVerification_ = null;
         } else {
           handshakeVerificationBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00100000);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -2117,6 +2282,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.NetMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.NetMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.NetMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.NetMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.NetMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.NetMessage)other);
@@ -2147,7 +2361,7 @@ public final class NetData {
               chunkInfo_ = other.chunkInfo_;
               bitField0_ = (bitField0_ & ~0x00000001);
               chunkInfoBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getChunkInfoFieldBuilder() : null;
             } else {
               chunkInfoBuilder_.addAllMessages(other.chunkInfo_);
@@ -2173,7 +2387,7 @@ public final class NetData {
               invalidateChunk_ = other.invalidateChunk_;
               bitField0_ = (bitField0_ & ~0x00000002);
               invalidateChunkBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getInvalidateChunkFieldBuilder() : null;
             } else {
               invalidateChunkBuilder_.addAllMessages(other.invalidateChunk_);
@@ -2199,7 +2413,7 @@ public final class NetData {
               blockChange_ = other.blockChange_;
               bitField0_ = (bitField0_ & ~0x00000004);
               blockChangeBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getBlockChangeFieldBuilder() : null;
             } else {
               blockChangeBuilder_.addAllMessages(other.blockChange_);
@@ -2225,7 +2439,7 @@ public final class NetData {
               createEntity_ = other.createEntity_;
               bitField0_ = (bitField0_ & ~0x00000008);
               createEntityBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getCreateEntityFieldBuilder() : null;
             } else {
               createEntityBuilder_.addAllMessages(other.createEntity_);
@@ -2251,7 +2465,7 @@ public final class NetData {
               removeEntity_ = other.removeEntity_;
               bitField0_ = (bitField0_ & ~0x00000010);
               removeEntityBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getRemoveEntityFieldBuilder() : null;
             } else {
               removeEntityBuilder_.addAllMessages(other.removeEntity_);
@@ -2277,7 +2491,7 @@ public final class NetData {
               updateEntity_ = other.updateEntity_;
               bitField0_ = (bitField0_ & ~0x00000020);
               updateEntityBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getUpdateEntityFieldBuilder() : null;
             } else {
               updateEntityBuilder_.addAllMessages(other.updateEntity_);
@@ -2303,7 +2517,7 @@ public final class NetData {
               event_ = other.event_;
               bitField0_ = (bitField0_ & ~0x00000040);
               eventBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getEventFieldBuilder() : null;
             } else {
               eventBuilder_.addAllMessages(other.event_);
@@ -2332,7 +2546,7 @@ public final class NetData {
               biomeChange_ = other.biomeChange_;
               bitField0_ = (bitField0_ & ~0x00000100);
               biomeChangeBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getBiomeChangeFieldBuilder() : null;
             } else {
               biomeChangeBuilder_.addAllMessages(other.biomeChange_);
@@ -2364,7 +2578,7 @@ public final class NetData {
               blockFamilyRegistered_ = other.blockFamilyRegistered_;
               bitField0_ = (bitField0_ & ~0x00000800);
               blockFamilyRegisteredBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getBlockFamilyRegisteredFieldBuilder() : null;
             } else {
               blockFamilyRegisteredBuilder_.addAllMessages(other.blockFamilyRegistered_);
@@ -2393,7 +2607,7 @@ public final class NetData {
               moduleRequest_ = other.moduleRequest_;
               bitField0_ = (bitField0_ & ~0x00002000);
               moduleRequestBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getModuleRequestFieldBuilder() : null;
             } else {
               moduleRequestBuilder_.addAllMessages(other.moduleRequest_);
@@ -2422,133 +2636,113 @@ public final class NetData {
           mergeHandshakeVerification(other.getHandshakeVerification());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         for (int i = 0; i < getChunkInfoCount(); i++) {
           if (!getChunkInfo(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getInvalidateChunkCount(); i++) {
           if (!getInvalidateChunk(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getBlockChangeCount(); i++) {
           if (!getBlockChange(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getCreateEntityCount(); i++) {
           if (!getCreateEntity(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getRemoveEntityCount(); i++) {
           if (!getRemoveEntity(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getUpdateEntityCount(); i++) {
           if (!getUpdateEntity(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getEventCount(); i++) {
           if (!getEvent(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getBiomeChangeCount(); i++) {
           if (!getBiomeChange(i).isInitialized()) {
-            
             return false;
           }
         }
         if (hasServerInfoRequest()) {
           if (!getServerInfoRequest().isInitialized()) {
-            
             return false;
           }
         }
         if (hasServerInfo()) {
           if (!getServerInfo().isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getBlockFamilyRegisteredCount(); i++) {
           if (!getBlockFamilyRegistered(i).isInitialized()) {
-            
             return false;
           }
         }
         if (hasJoin()) {
           if (!getJoin().isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getModuleRequestCount(); i++) {
           if (!getModuleRequest(i).isInitialized()) {
-            
             return false;
           }
         }
         if (hasModuleDataHeader()) {
           if (!getModuleDataHeader().isInitialized()) {
-            
             return false;
           }
         }
         if (hasModuleData()) {
           if (!getModuleData().isInitialized()) {
-            
             return false;
           }
         }
         if (hasJoinComplete()) {
           if (!getJoinComplete().isInitialized()) {
-            
             return false;
           }
         }
         if (hasHandshakeHello()) {
           if (!getHandshakeHello().isInitialized()) {
-            
             return false;
           }
         }
         if (hasNewIdentityRequest()) {
           if (!getNewIdentityRequest().isInitialized()) {
-            
             return false;
           }
         }
         if (hasProvisionIdentity()) {
           if (!getProvisionIdentity().isInitialized()) {
-            
             return false;
           }
         }
         if (hasHandshakeVerification()) {
           if (!getHandshakeVerification().isInitialized()) {
-            
             return false;
           }
         }
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -2563,7 +2757,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.NetMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -2582,7 +2776,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.EntityData.ChunkStore, org.terasology.protobuf.EntityData.ChunkStore.Builder, org.terasology.protobuf.EntityData.ChunkStoreOrBuilder> chunkInfoBuilder_;
 
       /**
@@ -2798,11 +2992,11 @@ public final class NetData {
            getChunkInfoBuilderList() {
         return getChunkInfoFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.EntityData.ChunkStore, org.terasology.protobuf.EntityData.ChunkStore.Builder, org.terasology.protobuf.EntityData.ChunkStoreOrBuilder> 
           getChunkInfoFieldBuilder() {
         if (chunkInfoBuilder_ == null) {
-          chunkInfoBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          chunkInfoBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.EntityData.ChunkStore, org.terasology.protobuf.EntityData.ChunkStore.Builder, org.terasology.protobuf.EntityData.ChunkStoreOrBuilder>(
                   chunkInfo_,
                   ((bitField0_ & 0x00000001) == 0x00000001),
@@ -2822,7 +3016,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.InvalidateChunkMessage, org.terasology.protobuf.NetData.InvalidateChunkMessage.Builder, org.terasology.protobuf.NetData.InvalidateChunkMessageOrBuilder> invalidateChunkBuilder_;
 
       /**
@@ -3038,11 +3232,11 @@ public final class NetData {
            getInvalidateChunkBuilderList() {
         return getInvalidateChunkFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.InvalidateChunkMessage, org.terasology.protobuf.NetData.InvalidateChunkMessage.Builder, org.terasology.protobuf.NetData.InvalidateChunkMessageOrBuilder> 
           getInvalidateChunkFieldBuilder() {
         if (invalidateChunkBuilder_ == null) {
-          invalidateChunkBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          invalidateChunkBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.InvalidateChunkMessage, org.terasology.protobuf.NetData.InvalidateChunkMessage.Builder, org.terasology.protobuf.NetData.InvalidateChunkMessageOrBuilder>(
                   invalidateChunk_,
                   ((bitField0_ & 0x00000002) == 0x00000002),
@@ -3062,7 +3256,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.BlockChangeMessage, org.terasology.protobuf.NetData.BlockChangeMessage.Builder, org.terasology.protobuf.NetData.BlockChangeMessageOrBuilder> blockChangeBuilder_;
 
       /**
@@ -3278,11 +3472,11 @@ public final class NetData {
            getBlockChangeBuilderList() {
         return getBlockChangeFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.BlockChangeMessage, org.terasology.protobuf.NetData.BlockChangeMessage.Builder, org.terasology.protobuf.NetData.BlockChangeMessageOrBuilder> 
           getBlockChangeFieldBuilder() {
         if (blockChangeBuilder_ == null) {
-          blockChangeBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          blockChangeBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.BlockChangeMessage, org.terasology.protobuf.NetData.BlockChangeMessage.Builder, org.terasology.protobuf.NetData.BlockChangeMessageOrBuilder>(
                   blockChange_,
                   ((bitField0_ & 0x00000004) == 0x00000004),
@@ -3302,7 +3496,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.CreateEntityMessage, org.terasology.protobuf.NetData.CreateEntityMessage.Builder, org.terasology.protobuf.NetData.CreateEntityMessageOrBuilder> createEntityBuilder_;
 
       /**
@@ -3518,11 +3712,11 @@ public final class NetData {
            getCreateEntityBuilderList() {
         return getCreateEntityFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.CreateEntityMessage, org.terasology.protobuf.NetData.CreateEntityMessage.Builder, org.terasology.protobuf.NetData.CreateEntityMessageOrBuilder> 
           getCreateEntityFieldBuilder() {
         if (createEntityBuilder_ == null) {
-          createEntityBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          createEntityBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.CreateEntityMessage, org.terasology.protobuf.NetData.CreateEntityMessage.Builder, org.terasology.protobuf.NetData.CreateEntityMessageOrBuilder>(
                   createEntity_,
                   ((bitField0_ & 0x00000008) == 0x00000008),
@@ -3542,7 +3736,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.RemoveEntityMessage, org.terasology.protobuf.NetData.RemoveEntityMessage.Builder, org.terasology.protobuf.NetData.RemoveEntityMessageOrBuilder> removeEntityBuilder_;
 
       /**
@@ -3758,11 +3952,11 @@ public final class NetData {
            getRemoveEntityBuilderList() {
         return getRemoveEntityFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.RemoveEntityMessage, org.terasology.protobuf.NetData.RemoveEntityMessage.Builder, org.terasology.protobuf.NetData.RemoveEntityMessageOrBuilder> 
           getRemoveEntityFieldBuilder() {
         if (removeEntityBuilder_ == null) {
-          removeEntityBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          removeEntityBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.RemoveEntityMessage, org.terasology.protobuf.NetData.RemoveEntityMessage.Builder, org.terasology.protobuf.NetData.RemoveEntityMessageOrBuilder>(
                   removeEntity_,
                   ((bitField0_ & 0x00000010) == 0x00000010),
@@ -3782,7 +3976,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.UpdateEntityMessage, org.terasology.protobuf.NetData.UpdateEntityMessage.Builder, org.terasology.protobuf.NetData.UpdateEntityMessageOrBuilder> updateEntityBuilder_;
 
       /**
@@ -3998,11 +4192,11 @@ public final class NetData {
            getUpdateEntityBuilderList() {
         return getUpdateEntityFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.UpdateEntityMessage, org.terasology.protobuf.NetData.UpdateEntityMessage.Builder, org.terasology.protobuf.NetData.UpdateEntityMessageOrBuilder> 
           getUpdateEntityFieldBuilder() {
         if (updateEntityBuilder_ == null) {
-          updateEntityBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          updateEntityBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.UpdateEntityMessage, org.terasology.protobuf.NetData.UpdateEntityMessage.Builder, org.terasology.protobuf.NetData.UpdateEntityMessageOrBuilder>(
                   updateEntity_,
                   ((bitField0_ & 0x00000020) == 0x00000020),
@@ -4022,7 +4216,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.EventMessage, org.terasology.protobuf.NetData.EventMessage.Builder, org.terasology.protobuf.NetData.EventMessageOrBuilder> eventBuilder_;
 
       /**
@@ -4238,11 +4432,11 @@ public final class NetData {
            getEventBuilderList() {
         return getEventFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.EventMessage, org.terasology.protobuf.NetData.EventMessage.Builder, org.terasology.protobuf.NetData.EventMessageOrBuilder> 
           getEventFieldBuilder() {
         if (eventBuilder_ == null) {
-          eventBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          eventBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.EventMessage, org.terasology.protobuf.NetData.EventMessage.Builder, org.terasology.protobuf.NetData.EventMessageOrBuilder>(
                   event_,
                   ((bitField0_ & 0x00000040) == 0x00000040),
@@ -4294,7 +4488,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.BiomeChangeMessage, org.terasology.protobuf.NetData.BiomeChangeMessage.Builder, org.terasology.protobuf.NetData.BiomeChangeMessageOrBuilder> biomeChangeBuilder_;
 
       /**
@@ -4510,11 +4704,11 @@ public final class NetData {
            getBiomeChangeBuilderList() {
         return getBiomeChangeFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.BiomeChangeMessage, org.terasology.protobuf.NetData.BiomeChangeMessage.Builder, org.terasology.protobuf.NetData.BiomeChangeMessageOrBuilder> 
           getBiomeChangeFieldBuilder() {
         if (biomeChangeBuilder_ == null) {
-          biomeChangeBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          biomeChangeBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.BiomeChangeMessage, org.terasology.protobuf.NetData.BiomeChangeMessage.Builder, org.terasology.protobuf.NetData.BiomeChangeMessageOrBuilder>(
                   biomeChange_,
                   ((bitField0_ & 0x00000100) == 0x00000100),
@@ -4525,8 +4719,8 @@ public final class NetData {
         return biomeChangeBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.ServerInfoRequest serverInfoRequest_ = org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.ServerInfoRequest serverInfoRequest_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ServerInfoRequest, org.terasology.protobuf.NetData.ServerInfoRequest.Builder, org.terasology.protobuf.NetData.ServerInfoRequestOrBuilder> serverInfoRequestBuilder_;
       /**
        * <code>optional .ServerInfoRequest serverInfoRequest = 15;</code>
@@ -4539,7 +4733,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.ServerInfoRequest getServerInfoRequest() {
         if (serverInfoRequestBuilder_ == null) {
-          return serverInfoRequest_;
+          return serverInfoRequest_ == null ? org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance() : serverInfoRequest_;
         } else {
           return serverInfoRequestBuilder_.getMessage();
         }
@@ -4580,6 +4774,7 @@ public final class NetData {
       public Builder mergeServerInfoRequest(org.terasology.protobuf.NetData.ServerInfoRequest value) {
         if (serverInfoRequestBuilder_ == null) {
           if (((bitField0_ & 0x00000200) == 0x00000200) &&
+              serverInfoRequest_ != null &&
               serverInfoRequest_ != org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance()) {
             serverInfoRequest_ =
               org.terasology.protobuf.NetData.ServerInfoRequest.newBuilder(serverInfoRequest_).mergeFrom(value).buildPartial();
@@ -4598,7 +4793,7 @@ public final class NetData {
        */
       public Builder clearServerInfoRequest() {
         if (serverInfoRequestBuilder_ == null) {
-          serverInfoRequest_ = org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance();
+          serverInfoRequest_ = null;
           onChanged();
         } else {
           serverInfoRequestBuilder_.clear();
@@ -4621,17 +4816,18 @@ public final class NetData {
         if (serverInfoRequestBuilder_ != null) {
           return serverInfoRequestBuilder_.getMessageOrBuilder();
         } else {
-          return serverInfoRequest_;
+          return serverInfoRequest_ == null ?
+              org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance() : serverInfoRequest_;
         }
       }
       /**
        * <code>optional .ServerInfoRequest serverInfoRequest = 15;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ServerInfoRequest, org.terasology.protobuf.NetData.ServerInfoRequest.Builder, org.terasology.protobuf.NetData.ServerInfoRequestOrBuilder> 
           getServerInfoRequestFieldBuilder() {
         if (serverInfoRequestBuilder_ == null) {
-          serverInfoRequestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          serverInfoRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.ServerInfoRequest, org.terasology.protobuf.NetData.ServerInfoRequest.Builder, org.terasology.protobuf.NetData.ServerInfoRequestOrBuilder>(
                   getServerInfoRequest(),
                   getParentForChildren(),
@@ -4641,8 +4837,8 @@ public final class NetData {
         return serverInfoRequestBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.ServerInfoMessage serverInfo_ = org.terasology.protobuf.NetData.ServerInfoMessage.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.ServerInfoMessage serverInfo_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ServerInfoMessage, org.terasology.protobuf.NetData.ServerInfoMessage.Builder, org.terasology.protobuf.NetData.ServerInfoMessageOrBuilder> serverInfoBuilder_;
       /**
        * <code>optional .ServerInfoMessage serverInfo = 16;</code>
@@ -4655,7 +4851,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.ServerInfoMessage getServerInfo() {
         if (serverInfoBuilder_ == null) {
-          return serverInfo_;
+          return serverInfo_ == null ? org.terasology.protobuf.NetData.ServerInfoMessage.getDefaultInstance() : serverInfo_;
         } else {
           return serverInfoBuilder_.getMessage();
         }
@@ -4696,6 +4892,7 @@ public final class NetData {
       public Builder mergeServerInfo(org.terasology.protobuf.NetData.ServerInfoMessage value) {
         if (serverInfoBuilder_ == null) {
           if (((bitField0_ & 0x00000400) == 0x00000400) &&
+              serverInfo_ != null &&
               serverInfo_ != org.terasology.protobuf.NetData.ServerInfoMessage.getDefaultInstance()) {
             serverInfo_ =
               org.terasology.protobuf.NetData.ServerInfoMessage.newBuilder(serverInfo_).mergeFrom(value).buildPartial();
@@ -4714,7 +4911,7 @@ public final class NetData {
        */
       public Builder clearServerInfo() {
         if (serverInfoBuilder_ == null) {
-          serverInfo_ = org.terasology.protobuf.NetData.ServerInfoMessage.getDefaultInstance();
+          serverInfo_ = null;
           onChanged();
         } else {
           serverInfoBuilder_.clear();
@@ -4737,17 +4934,18 @@ public final class NetData {
         if (serverInfoBuilder_ != null) {
           return serverInfoBuilder_.getMessageOrBuilder();
         } else {
-          return serverInfo_;
+          return serverInfo_ == null ?
+              org.terasology.protobuf.NetData.ServerInfoMessage.getDefaultInstance() : serverInfo_;
         }
       }
       /**
        * <code>optional .ServerInfoMessage serverInfo = 16;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ServerInfoMessage, org.terasology.protobuf.NetData.ServerInfoMessage.Builder, org.terasology.protobuf.NetData.ServerInfoMessageOrBuilder> 
           getServerInfoFieldBuilder() {
         if (serverInfoBuilder_ == null) {
-          serverInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          serverInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.ServerInfoMessage, org.terasology.protobuf.NetData.ServerInfoMessage.Builder, org.terasology.protobuf.NetData.ServerInfoMessageOrBuilder>(
                   getServerInfo(),
                   getParentForChildren(),
@@ -4766,7 +4964,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage.Builder, org.terasology.protobuf.NetData.BlockFamilyRegisteredMessageOrBuilder> blockFamilyRegisteredBuilder_;
 
       /**
@@ -4982,11 +5180,11 @@ public final class NetData {
            getBlockFamilyRegisteredBuilderList() {
         return getBlockFamilyRegisteredFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage.Builder, org.terasology.protobuf.NetData.BlockFamilyRegisteredMessageOrBuilder> 
           getBlockFamilyRegisteredFieldBuilder() {
         if (blockFamilyRegisteredBuilder_ == null) {
-          blockFamilyRegisteredBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          blockFamilyRegisteredBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage.Builder, org.terasology.protobuf.NetData.BlockFamilyRegisteredMessageOrBuilder>(
                   blockFamilyRegistered_,
                   ((bitField0_ & 0x00000800) == 0x00000800),
@@ -4997,8 +5195,8 @@ public final class NetData {
         return blockFamilyRegisteredBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.JoinMessage join_ = org.terasology.protobuf.NetData.JoinMessage.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.JoinMessage join_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.JoinMessage, org.terasology.protobuf.NetData.JoinMessage.Builder, org.terasology.protobuf.NetData.JoinMessageOrBuilder> joinBuilder_;
       /**
        * <code>optional .JoinMessage join = 18;</code>
@@ -5011,7 +5209,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.JoinMessage getJoin() {
         if (joinBuilder_ == null) {
-          return join_;
+          return join_ == null ? org.terasology.protobuf.NetData.JoinMessage.getDefaultInstance() : join_;
         } else {
           return joinBuilder_.getMessage();
         }
@@ -5052,6 +5250,7 @@ public final class NetData {
       public Builder mergeJoin(org.terasology.protobuf.NetData.JoinMessage value) {
         if (joinBuilder_ == null) {
           if (((bitField0_ & 0x00001000) == 0x00001000) &&
+              join_ != null &&
               join_ != org.terasology.protobuf.NetData.JoinMessage.getDefaultInstance()) {
             join_ =
               org.terasology.protobuf.NetData.JoinMessage.newBuilder(join_).mergeFrom(value).buildPartial();
@@ -5070,7 +5269,7 @@ public final class NetData {
        */
       public Builder clearJoin() {
         if (joinBuilder_ == null) {
-          join_ = org.terasology.protobuf.NetData.JoinMessage.getDefaultInstance();
+          join_ = null;
           onChanged();
         } else {
           joinBuilder_.clear();
@@ -5093,17 +5292,18 @@ public final class NetData {
         if (joinBuilder_ != null) {
           return joinBuilder_.getMessageOrBuilder();
         } else {
-          return join_;
+          return join_ == null ?
+              org.terasology.protobuf.NetData.JoinMessage.getDefaultInstance() : join_;
         }
       }
       /**
        * <code>optional .JoinMessage join = 18;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.JoinMessage, org.terasology.protobuf.NetData.JoinMessage.Builder, org.terasology.protobuf.NetData.JoinMessageOrBuilder> 
           getJoinFieldBuilder() {
         if (joinBuilder_ == null) {
-          joinBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          joinBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.JoinMessage, org.terasology.protobuf.NetData.JoinMessage.Builder, org.terasology.protobuf.NetData.JoinMessageOrBuilder>(
                   getJoin(),
                   getParentForChildren(),
@@ -5122,7 +5322,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.ModuleRequest, org.terasology.protobuf.NetData.ModuleRequest.Builder, org.terasology.protobuf.NetData.ModuleRequestOrBuilder> moduleRequestBuilder_;
 
       /**
@@ -5338,11 +5538,11 @@ public final class NetData {
            getModuleRequestBuilderList() {
         return getModuleRequestFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.ModuleRequest, org.terasology.protobuf.NetData.ModuleRequest.Builder, org.terasology.protobuf.NetData.ModuleRequestOrBuilder> 
           getModuleRequestFieldBuilder() {
         if (moduleRequestBuilder_ == null) {
-          moduleRequestBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          moduleRequestBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.ModuleRequest, org.terasology.protobuf.NetData.ModuleRequest.Builder, org.terasology.protobuf.NetData.ModuleRequestOrBuilder>(
                   moduleRequest_,
                   ((bitField0_ & 0x00002000) == 0x00002000),
@@ -5353,8 +5553,8 @@ public final class NetData {
         return moduleRequestBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.ModuleDataHeader moduleDataHeader_ = org.terasology.protobuf.NetData.ModuleDataHeader.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.ModuleDataHeader moduleDataHeader_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ModuleDataHeader, org.terasology.protobuf.NetData.ModuleDataHeader.Builder, org.terasology.protobuf.NetData.ModuleDataHeaderOrBuilder> moduleDataHeaderBuilder_;
       /**
        * <code>optional .ModuleDataHeader moduleDataHeader = 20;</code>
@@ -5367,7 +5567,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.ModuleDataHeader getModuleDataHeader() {
         if (moduleDataHeaderBuilder_ == null) {
-          return moduleDataHeader_;
+          return moduleDataHeader_ == null ? org.terasology.protobuf.NetData.ModuleDataHeader.getDefaultInstance() : moduleDataHeader_;
         } else {
           return moduleDataHeaderBuilder_.getMessage();
         }
@@ -5408,6 +5608,7 @@ public final class NetData {
       public Builder mergeModuleDataHeader(org.terasology.protobuf.NetData.ModuleDataHeader value) {
         if (moduleDataHeaderBuilder_ == null) {
           if (((bitField0_ & 0x00004000) == 0x00004000) &&
+              moduleDataHeader_ != null &&
               moduleDataHeader_ != org.terasology.protobuf.NetData.ModuleDataHeader.getDefaultInstance()) {
             moduleDataHeader_ =
               org.terasology.protobuf.NetData.ModuleDataHeader.newBuilder(moduleDataHeader_).mergeFrom(value).buildPartial();
@@ -5426,7 +5627,7 @@ public final class NetData {
        */
       public Builder clearModuleDataHeader() {
         if (moduleDataHeaderBuilder_ == null) {
-          moduleDataHeader_ = org.terasology.protobuf.NetData.ModuleDataHeader.getDefaultInstance();
+          moduleDataHeader_ = null;
           onChanged();
         } else {
           moduleDataHeaderBuilder_.clear();
@@ -5449,17 +5650,18 @@ public final class NetData {
         if (moduleDataHeaderBuilder_ != null) {
           return moduleDataHeaderBuilder_.getMessageOrBuilder();
         } else {
-          return moduleDataHeader_;
+          return moduleDataHeader_ == null ?
+              org.terasology.protobuf.NetData.ModuleDataHeader.getDefaultInstance() : moduleDataHeader_;
         }
       }
       /**
        * <code>optional .ModuleDataHeader moduleDataHeader = 20;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ModuleDataHeader, org.terasology.protobuf.NetData.ModuleDataHeader.Builder, org.terasology.protobuf.NetData.ModuleDataHeaderOrBuilder> 
           getModuleDataHeaderFieldBuilder() {
         if (moduleDataHeaderBuilder_ == null) {
-          moduleDataHeaderBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          moduleDataHeaderBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.ModuleDataHeader, org.terasology.protobuf.NetData.ModuleDataHeader.Builder, org.terasology.protobuf.NetData.ModuleDataHeaderOrBuilder>(
                   getModuleDataHeader(),
                   getParentForChildren(),
@@ -5469,8 +5671,8 @@ public final class NetData {
         return moduleDataHeaderBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.ModuleData moduleData_ = org.terasology.protobuf.NetData.ModuleData.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.ModuleData moduleData_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ModuleData, org.terasology.protobuf.NetData.ModuleData.Builder, org.terasology.protobuf.NetData.ModuleDataOrBuilder> moduleDataBuilder_;
       /**
        * <code>optional .ModuleData moduleData = 21;</code>
@@ -5483,7 +5685,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.ModuleData getModuleData() {
         if (moduleDataBuilder_ == null) {
-          return moduleData_;
+          return moduleData_ == null ? org.terasology.protobuf.NetData.ModuleData.getDefaultInstance() : moduleData_;
         } else {
           return moduleDataBuilder_.getMessage();
         }
@@ -5524,6 +5726,7 @@ public final class NetData {
       public Builder mergeModuleData(org.terasology.protobuf.NetData.ModuleData value) {
         if (moduleDataBuilder_ == null) {
           if (((bitField0_ & 0x00008000) == 0x00008000) &&
+              moduleData_ != null &&
               moduleData_ != org.terasology.protobuf.NetData.ModuleData.getDefaultInstance()) {
             moduleData_ =
               org.terasology.protobuf.NetData.ModuleData.newBuilder(moduleData_).mergeFrom(value).buildPartial();
@@ -5542,7 +5745,7 @@ public final class NetData {
        */
       public Builder clearModuleData() {
         if (moduleDataBuilder_ == null) {
-          moduleData_ = org.terasology.protobuf.NetData.ModuleData.getDefaultInstance();
+          moduleData_ = null;
           onChanged();
         } else {
           moduleDataBuilder_.clear();
@@ -5565,17 +5768,18 @@ public final class NetData {
         if (moduleDataBuilder_ != null) {
           return moduleDataBuilder_.getMessageOrBuilder();
         } else {
-          return moduleData_;
+          return moduleData_ == null ?
+              org.terasology.protobuf.NetData.ModuleData.getDefaultInstance() : moduleData_;
         }
       }
       /**
        * <code>optional .ModuleData moduleData = 21;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ModuleData, org.terasology.protobuf.NetData.ModuleData.Builder, org.terasology.protobuf.NetData.ModuleDataOrBuilder> 
           getModuleDataFieldBuilder() {
         if (moduleDataBuilder_ == null) {
-          moduleDataBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          moduleDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.ModuleData, org.terasology.protobuf.NetData.ModuleData.Builder, org.terasology.protobuf.NetData.ModuleDataOrBuilder>(
                   getModuleData(),
                   getParentForChildren(),
@@ -5585,8 +5789,8 @@ public final class NetData {
         return moduleDataBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.JoinCompleteMessage joinComplete_ = org.terasology.protobuf.NetData.JoinCompleteMessage.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.JoinCompleteMessage joinComplete_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.JoinCompleteMessage, org.terasology.protobuf.NetData.JoinCompleteMessage.Builder, org.terasology.protobuf.NetData.JoinCompleteMessageOrBuilder> joinCompleteBuilder_;
       /**
        * <code>optional .JoinCompleteMessage joinComplete = 22;</code>
@@ -5599,7 +5803,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.JoinCompleteMessage getJoinComplete() {
         if (joinCompleteBuilder_ == null) {
-          return joinComplete_;
+          return joinComplete_ == null ? org.terasology.protobuf.NetData.JoinCompleteMessage.getDefaultInstance() : joinComplete_;
         } else {
           return joinCompleteBuilder_.getMessage();
         }
@@ -5640,6 +5844,7 @@ public final class NetData {
       public Builder mergeJoinComplete(org.terasology.protobuf.NetData.JoinCompleteMessage value) {
         if (joinCompleteBuilder_ == null) {
           if (((bitField0_ & 0x00010000) == 0x00010000) &&
+              joinComplete_ != null &&
               joinComplete_ != org.terasology.protobuf.NetData.JoinCompleteMessage.getDefaultInstance()) {
             joinComplete_ =
               org.terasology.protobuf.NetData.JoinCompleteMessage.newBuilder(joinComplete_).mergeFrom(value).buildPartial();
@@ -5658,7 +5863,7 @@ public final class NetData {
        */
       public Builder clearJoinComplete() {
         if (joinCompleteBuilder_ == null) {
-          joinComplete_ = org.terasology.protobuf.NetData.JoinCompleteMessage.getDefaultInstance();
+          joinComplete_ = null;
           onChanged();
         } else {
           joinCompleteBuilder_.clear();
@@ -5681,17 +5886,18 @@ public final class NetData {
         if (joinCompleteBuilder_ != null) {
           return joinCompleteBuilder_.getMessageOrBuilder();
         } else {
-          return joinComplete_;
+          return joinComplete_ == null ?
+              org.terasology.protobuf.NetData.JoinCompleteMessage.getDefaultInstance() : joinComplete_;
         }
       }
       /**
        * <code>optional .JoinCompleteMessage joinComplete = 22;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.JoinCompleteMessage, org.terasology.protobuf.NetData.JoinCompleteMessage.Builder, org.terasology.protobuf.NetData.JoinCompleteMessageOrBuilder> 
           getJoinCompleteFieldBuilder() {
         if (joinCompleteBuilder_ == null) {
-          joinCompleteBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          joinCompleteBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.JoinCompleteMessage, org.terasology.protobuf.NetData.JoinCompleteMessage.Builder, org.terasology.protobuf.NetData.JoinCompleteMessageOrBuilder>(
                   getJoinComplete(),
                   getParentForChildren(),
@@ -5701,39 +5907,39 @@ public final class NetData {
         return joinCompleteBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.HandshakeHello handshakeHello_ = org.terasology.protobuf.NetData.HandshakeHello.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.HandshakeHello handshakeHello_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.HandshakeHello, org.terasology.protobuf.NetData.HandshakeHello.Builder, org.terasology.protobuf.NetData.HandshakeHelloOrBuilder> handshakeHelloBuilder_;
       /**
-       * <code>optional .HandshakeHello handshakeHello = 100;</code>
-       *
        * <pre>
        * Authentication
        * </pre>
+       *
+       * <code>optional .HandshakeHello handshakeHello = 100;</code>
        */
       public boolean hasHandshakeHello() {
         return ((bitField0_ & 0x00020000) == 0x00020000);
       }
       /**
-       * <code>optional .HandshakeHello handshakeHello = 100;</code>
-       *
        * <pre>
        * Authentication
        * </pre>
+       *
+       * <code>optional .HandshakeHello handshakeHello = 100;</code>
        */
       public org.terasology.protobuf.NetData.HandshakeHello getHandshakeHello() {
         if (handshakeHelloBuilder_ == null) {
-          return handshakeHello_;
+          return handshakeHello_ == null ? org.terasology.protobuf.NetData.HandshakeHello.getDefaultInstance() : handshakeHello_;
         } else {
           return handshakeHelloBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .HandshakeHello handshakeHello = 100;</code>
-       *
        * <pre>
        * Authentication
        * </pre>
+       *
+       * <code>optional .HandshakeHello handshakeHello = 100;</code>
        */
       public Builder setHandshakeHello(org.terasology.protobuf.NetData.HandshakeHello value) {
         if (handshakeHelloBuilder_ == null) {
@@ -5749,11 +5955,11 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>optional .HandshakeHello handshakeHello = 100;</code>
-       *
        * <pre>
        * Authentication
        * </pre>
+       *
+       * <code>optional .HandshakeHello handshakeHello = 100;</code>
        */
       public Builder setHandshakeHello(
           org.terasology.protobuf.NetData.HandshakeHello.Builder builderForValue) {
@@ -5767,15 +5973,16 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>optional .HandshakeHello handshakeHello = 100;</code>
-       *
        * <pre>
        * Authentication
        * </pre>
+       *
+       * <code>optional .HandshakeHello handshakeHello = 100;</code>
        */
       public Builder mergeHandshakeHello(org.terasology.protobuf.NetData.HandshakeHello value) {
         if (handshakeHelloBuilder_ == null) {
           if (((bitField0_ & 0x00020000) == 0x00020000) &&
+              handshakeHello_ != null &&
               handshakeHello_ != org.terasology.protobuf.NetData.HandshakeHello.getDefaultInstance()) {
             handshakeHello_ =
               org.terasology.protobuf.NetData.HandshakeHello.newBuilder(handshakeHello_).mergeFrom(value).buildPartial();
@@ -5790,15 +5997,15 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>optional .HandshakeHello handshakeHello = 100;</code>
-       *
        * <pre>
        * Authentication
        * </pre>
+       *
+       * <code>optional .HandshakeHello handshakeHello = 100;</code>
        */
       public Builder clearHandshakeHello() {
         if (handshakeHelloBuilder_ == null) {
-          handshakeHello_ = org.terasology.protobuf.NetData.HandshakeHello.getDefaultInstance();
+          handshakeHello_ = null;
           onChanged();
         } else {
           handshakeHelloBuilder_.clear();
@@ -5807,11 +6014,11 @@ public final class NetData {
         return this;
       }
       /**
-       * <code>optional .HandshakeHello handshakeHello = 100;</code>
-       *
        * <pre>
        * Authentication
        * </pre>
+       *
+       * <code>optional .HandshakeHello handshakeHello = 100;</code>
        */
       public org.terasology.protobuf.NetData.HandshakeHello.Builder getHandshakeHelloBuilder() {
         bitField0_ |= 0x00020000;
@@ -5819,31 +6026,32 @@ public final class NetData {
         return getHandshakeHelloFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .HandshakeHello handshakeHello = 100;</code>
-       *
        * <pre>
        * Authentication
        * </pre>
+       *
+       * <code>optional .HandshakeHello handshakeHello = 100;</code>
        */
       public org.terasology.protobuf.NetData.HandshakeHelloOrBuilder getHandshakeHelloOrBuilder() {
         if (handshakeHelloBuilder_ != null) {
           return handshakeHelloBuilder_.getMessageOrBuilder();
         } else {
-          return handshakeHello_;
+          return handshakeHello_ == null ?
+              org.terasology.protobuf.NetData.HandshakeHello.getDefaultInstance() : handshakeHello_;
         }
       }
       /**
-       * <code>optional .HandshakeHello handshakeHello = 100;</code>
-       *
        * <pre>
        * Authentication
        * </pre>
+       *
+       * <code>optional .HandshakeHello handshakeHello = 100;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.HandshakeHello, org.terasology.protobuf.NetData.HandshakeHello.Builder, org.terasology.protobuf.NetData.HandshakeHelloOrBuilder> 
           getHandshakeHelloFieldBuilder() {
         if (handshakeHelloBuilder_ == null) {
-          handshakeHelloBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          handshakeHelloBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.HandshakeHello, org.terasology.protobuf.NetData.HandshakeHello.Builder, org.terasology.protobuf.NetData.HandshakeHelloOrBuilder>(
                   getHandshakeHello(),
                   getParentForChildren(),
@@ -5853,8 +6061,8 @@ public final class NetData {
         return handshakeHelloBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.NewIdentityRequest newIdentityRequest_ = org.terasology.protobuf.NetData.NewIdentityRequest.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.NewIdentityRequest newIdentityRequest_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.NewIdentityRequest, org.terasology.protobuf.NetData.NewIdentityRequest.Builder, org.terasology.protobuf.NetData.NewIdentityRequestOrBuilder> newIdentityRequestBuilder_;
       /**
        * <code>optional .NewIdentityRequest newIdentityRequest = 101;</code>
@@ -5867,7 +6075,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.NewIdentityRequest getNewIdentityRequest() {
         if (newIdentityRequestBuilder_ == null) {
-          return newIdentityRequest_;
+          return newIdentityRequest_ == null ? org.terasology.protobuf.NetData.NewIdentityRequest.getDefaultInstance() : newIdentityRequest_;
         } else {
           return newIdentityRequestBuilder_.getMessage();
         }
@@ -5908,6 +6116,7 @@ public final class NetData {
       public Builder mergeNewIdentityRequest(org.terasology.protobuf.NetData.NewIdentityRequest value) {
         if (newIdentityRequestBuilder_ == null) {
           if (((bitField0_ & 0x00040000) == 0x00040000) &&
+              newIdentityRequest_ != null &&
               newIdentityRequest_ != org.terasology.protobuf.NetData.NewIdentityRequest.getDefaultInstance()) {
             newIdentityRequest_ =
               org.terasology.protobuf.NetData.NewIdentityRequest.newBuilder(newIdentityRequest_).mergeFrom(value).buildPartial();
@@ -5926,7 +6135,7 @@ public final class NetData {
        */
       public Builder clearNewIdentityRequest() {
         if (newIdentityRequestBuilder_ == null) {
-          newIdentityRequest_ = org.terasology.protobuf.NetData.NewIdentityRequest.getDefaultInstance();
+          newIdentityRequest_ = null;
           onChanged();
         } else {
           newIdentityRequestBuilder_.clear();
@@ -5949,17 +6158,18 @@ public final class NetData {
         if (newIdentityRequestBuilder_ != null) {
           return newIdentityRequestBuilder_.getMessageOrBuilder();
         } else {
-          return newIdentityRequest_;
+          return newIdentityRequest_ == null ?
+              org.terasology.protobuf.NetData.NewIdentityRequest.getDefaultInstance() : newIdentityRequest_;
         }
       }
       /**
        * <code>optional .NewIdentityRequest newIdentityRequest = 101;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.NewIdentityRequest, org.terasology.protobuf.NetData.NewIdentityRequest.Builder, org.terasology.protobuf.NetData.NewIdentityRequestOrBuilder> 
           getNewIdentityRequestFieldBuilder() {
         if (newIdentityRequestBuilder_ == null) {
-          newIdentityRequestBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          newIdentityRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.NewIdentityRequest, org.terasology.protobuf.NetData.NewIdentityRequest.Builder, org.terasology.protobuf.NetData.NewIdentityRequestOrBuilder>(
                   getNewIdentityRequest(),
                   getParentForChildren(),
@@ -5969,8 +6179,8 @@ public final class NetData {
         return newIdentityRequestBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.ProvisionIdentity provisionIdentity_ = org.terasology.protobuf.NetData.ProvisionIdentity.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.ProvisionIdentity provisionIdentity_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ProvisionIdentity, org.terasology.protobuf.NetData.ProvisionIdentity.Builder, org.terasology.protobuf.NetData.ProvisionIdentityOrBuilder> provisionIdentityBuilder_;
       /**
        * <code>optional .ProvisionIdentity provisionIdentity = 102;</code>
@@ -5983,7 +6193,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.ProvisionIdentity getProvisionIdentity() {
         if (provisionIdentityBuilder_ == null) {
-          return provisionIdentity_;
+          return provisionIdentity_ == null ? org.terasology.protobuf.NetData.ProvisionIdentity.getDefaultInstance() : provisionIdentity_;
         } else {
           return provisionIdentityBuilder_.getMessage();
         }
@@ -6024,6 +6234,7 @@ public final class NetData {
       public Builder mergeProvisionIdentity(org.terasology.protobuf.NetData.ProvisionIdentity value) {
         if (provisionIdentityBuilder_ == null) {
           if (((bitField0_ & 0x00080000) == 0x00080000) &&
+              provisionIdentity_ != null &&
               provisionIdentity_ != org.terasology.protobuf.NetData.ProvisionIdentity.getDefaultInstance()) {
             provisionIdentity_ =
               org.terasology.protobuf.NetData.ProvisionIdentity.newBuilder(provisionIdentity_).mergeFrom(value).buildPartial();
@@ -6042,7 +6253,7 @@ public final class NetData {
        */
       public Builder clearProvisionIdentity() {
         if (provisionIdentityBuilder_ == null) {
-          provisionIdentity_ = org.terasology.protobuf.NetData.ProvisionIdentity.getDefaultInstance();
+          provisionIdentity_ = null;
           onChanged();
         } else {
           provisionIdentityBuilder_.clear();
@@ -6065,17 +6276,18 @@ public final class NetData {
         if (provisionIdentityBuilder_ != null) {
           return provisionIdentityBuilder_.getMessageOrBuilder();
         } else {
-          return provisionIdentity_;
+          return provisionIdentity_ == null ?
+              org.terasology.protobuf.NetData.ProvisionIdentity.getDefaultInstance() : provisionIdentity_;
         }
       }
       /**
        * <code>optional .ProvisionIdentity provisionIdentity = 102;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.ProvisionIdentity, org.terasology.protobuf.NetData.ProvisionIdentity.Builder, org.terasology.protobuf.NetData.ProvisionIdentityOrBuilder> 
           getProvisionIdentityFieldBuilder() {
         if (provisionIdentityBuilder_ == null) {
-          provisionIdentityBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          provisionIdentityBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.ProvisionIdentity, org.terasology.protobuf.NetData.ProvisionIdentity.Builder, org.terasology.protobuf.NetData.ProvisionIdentityOrBuilder>(
                   getProvisionIdentity(),
                   getParentForChildren(),
@@ -6085,8 +6297,8 @@ public final class NetData {
         return provisionIdentityBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.HandshakeVerification handshakeVerification_ = org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.HandshakeVerification handshakeVerification_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.HandshakeVerification, org.terasology.protobuf.NetData.HandshakeVerification.Builder, org.terasology.protobuf.NetData.HandshakeVerificationOrBuilder> handshakeVerificationBuilder_;
       /**
        * <code>optional .HandshakeVerification handshakeVerification = 103;</code>
@@ -6099,7 +6311,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.HandshakeVerification getHandshakeVerification() {
         if (handshakeVerificationBuilder_ == null) {
-          return handshakeVerification_;
+          return handshakeVerification_ == null ? org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance() : handshakeVerification_;
         } else {
           return handshakeVerificationBuilder_.getMessage();
         }
@@ -6140,6 +6352,7 @@ public final class NetData {
       public Builder mergeHandshakeVerification(org.terasology.protobuf.NetData.HandshakeVerification value) {
         if (handshakeVerificationBuilder_ == null) {
           if (((bitField0_ & 0x00100000) == 0x00100000) &&
+              handshakeVerification_ != null &&
               handshakeVerification_ != org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance()) {
             handshakeVerification_ =
               org.terasology.protobuf.NetData.HandshakeVerification.newBuilder(handshakeVerification_).mergeFrom(value).buildPartial();
@@ -6158,7 +6371,7 @@ public final class NetData {
        */
       public Builder clearHandshakeVerification() {
         if (handshakeVerificationBuilder_ == null) {
-          handshakeVerification_ = org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance();
+          handshakeVerification_ = null;
           onChanged();
         } else {
           handshakeVerificationBuilder_.clear();
@@ -6181,17 +6394,18 @@ public final class NetData {
         if (handshakeVerificationBuilder_ != null) {
           return handshakeVerificationBuilder_.getMessageOrBuilder();
         } else {
-          return handshakeVerification_;
+          return handshakeVerification_ == null ?
+              org.terasology.protobuf.NetData.HandshakeVerification.getDefaultInstance() : handshakeVerification_;
         }
       }
       /**
        * <code>optional .HandshakeVerification handshakeVerification = 103;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.HandshakeVerification, org.terasology.protobuf.NetData.HandshakeVerification.Builder, org.terasology.protobuf.NetData.HandshakeVerificationOrBuilder> 
           getHandshakeVerificationFieldBuilder() {
         if (handshakeVerificationBuilder_ == null) {
-          handshakeVerificationBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          handshakeVerificationBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.HandshakeVerification, org.terasology.protobuf.NetData.HandshakeVerification.Builder, org.terasology.protobuf.NetData.HandshakeVerificationOrBuilder>(
                   getHandshakeVerification(),
                   getParentForChildren(),
@@ -6200,21 +6414,58 @@ public final class NetData {
         }
         return handshakeVerificationBuilder_;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:NetMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:NetMessage)
+    private static final org.terasology.protobuf.NetData.NetMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new NetMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.NetMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:NetMessage)
+    public static org.terasology.protobuf.NetData.NetMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<NetMessage>
+        PARSER = new com.google.protobuf.AbstractParser<NetMessage>() {
+      public NetMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new NetMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<NetMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<NetMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.NetMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface HandshakeHelloOrBuilder extends
       // @@protoc_insertion_point(interface_extends:HandshakeHello)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<HandshakeHello> {
 
     /**
@@ -6251,38 +6502,30 @@ public final class NetData {
   /**
    * Protobuf type {@code HandshakeHello}
    */
-  public static final class HandshakeHello extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class HandshakeHello extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         HandshakeHello> implements
       // @@protoc_insertion_point(message_implements:HandshakeHello)
       HandshakeHelloOrBuilder {
     // Use HandshakeHello.newBuilder() to construct.
-    private HandshakeHello(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.HandshakeHello, ?> builder) {
+    private HandshakeHello(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.HandshakeHello, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private HandshakeHello(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final HandshakeHello defaultInstance;
-    public static HandshakeHello getDefaultInstance() {
-      return defaultInstance;
+    private HandshakeHello() {
+      random_ = com.google.protobuf.ByteString.EMPTY;
+      timestamp_ = 0L;
     }
 
-    public HandshakeHello getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private HandshakeHello(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -6330,7 +6573,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -6341,26 +6584,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_HandshakeHello_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_HandshakeHello_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.HandshakeHello.class, org.terasology.protobuf.NetData.HandshakeHello.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<HandshakeHello> PARSER =
-        new com.google.protobuf.AbstractParser<HandshakeHello>() {
-      public HandshakeHello parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new HandshakeHello(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<HandshakeHello> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -6391,13 +6619,13 @@ public final class NetData {
      * <code>optional .Certificate certificate = 2;</code>
      */
     public org.terasology.protobuf.NetData.Certificate getCertificate() {
-      return certificate_;
+      return certificate_ == null ? org.terasology.protobuf.NetData.Certificate.getDefaultInstance() : certificate_;
     }
     /**
      * <code>optional .Certificate certificate = 2;</code>
      */
     public org.terasology.protobuf.NetData.CertificateOrBuilder getCertificateOrBuilder() {
-      return certificate_;
+      return certificate_ == null ? org.terasology.protobuf.NetData.Certificate.getDefaultInstance() : certificate_;
     }
 
     public static final int TIMESTAMP_FIELD_NUMBER = 3;
@@ -6415,11 +6643,6 @@ public final class NetData {
       return timestamp_;
     }
 
-    private void initFields() {
-      random_ = com.google.protobuf.ByteString.EMPTY;
-      certificate_ = org.terasology.protobuf.NetData.Certificate.getDefaultInstance();
-      timestamp_ = 0L;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -6442,26 +6665,24 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.HandshakeHello>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.HandshakeHello>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, random_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, certificate_);
+        output.writeMessage(2, getCertificate());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeSInt64(3, timestamp_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -6471,23 +6692,75 @@ public final class NetData {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, certificate_);
+          .computeMessageSize(2, getCertificate());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeSInt64Size(3, timestamp_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.HandshakeHello)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.HandshakeHello other = (org.terasology.protobuf.NetData.HandshakeHello) obj;
+
+      boolean result = true;
+      result = result && (hasRandom() == other.hasRandom());
+      if (hasRandom()) {
+        result = result && getRandom()
+            .equals(other.getRandom());
+      }
+      result = result && (hasCertificate() == other.hasCertificate());
+      if (hasCertificate()) {
+        result = result && getCertificate()
+            .equals(other.getCertificate());
+      }
+      result = result && (hasTimestamp() == other.hasTimestamp());
+      if (hasTimestamp()) {
+        result = result && (getTimestamp()
+            == other.getTimestamp());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasRandom()) {
+        hash = (37 * hash) + RANDOM_FIELD_NUMBER;
+        hash = (53 * hash) + getRandom().hashCode();
+      }
+      if (hasCertificate()) {
+        hash = (37 * hash) + CERTIFICATE_FIELD_NUMBER;
+        hash = (53 * hash) + getCertificate().hashCode();
+      }
+      if (hasTimestamp()) {
+        hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getTimestamp());
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.HandshakeHello parseFrom(
@@ -6513,46 +6786,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.HandshakeHello parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.HandshakeHello parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.HandshakeHello parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.HandshakeHello parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.HandshakeHello parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.HandshakeHello parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.HandshakeHello prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.HandshakeHello prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -6560,7 +6844,7 @@ public final class NetData {
      * Protobuf type {@code HandshakeHello}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.HandshakeHello, Builder> implements
         // @@protoc_insertion_point(builder_implements:HandshakeHello)
         org.terasology.protobuf.NetData.HandshakeHelloOrBuilder {
@@ -6569,7 +6853,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_HandshakeHello_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_HandshakeHello_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -6582,25 +6866,22 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getCertificateFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         random_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000001);
         if (certificateBuilder_ == null) {
-          certificate_ = org.terasology.protobuf.NetData.Certificate.getDefaultInstance();
+          certificate_ = null;
         } else {
           certificateBuilder_.clear();
         }
@@ -6608,10 +6889,6 @@ public final class NetData {
         timestamp_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -6656,6 +6933,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.HandshakeHello, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.HandshakeHello, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.HandshakeHello, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.HandshakeHello, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.HandshakeHello) {
           return mergeFrom((org.terasology.protobuf.NetData.HandshakeHello)other);
@@ -6677,19 +7003,18 @@ public final class NetData {
           setTimestamp(other.getTimestamp());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (hasCertificate()) {
           if (!getCertificate().isInitialized()) {
-            
             return false;
           }
         }
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -6704,7 +7029,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.HandshakeHello) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -6749,8 +7074,8 @@ public final class NetData {
         return this;
       }
 
-      private org.terasology.protobuf.NetData.Certificate certificate_ = org.terasology.protobuf.NetData.Certificate.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.Certificate certificate_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Certificate, org.terasology.protobuf.NetData.Certificate.Builder, org.terasology.protobuf.NetData.CertificateOrBuilder> certificateBuilder_;
       /**
        * <code>optional .Certificate certificate = 2;</code>
@@ -6763,7 +7088,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.Certificate getCertificate() {
         if (certificateBuilder_ == null) {
-          return certificate_;
+          return certificate_ == null ? org.terasology.protobuf.NetData.Certificate.getDefaultInstance() : certificate_;
         } else {
           return certificateBuilder_.getMessage();
         }
@@ -6804,6 +7129,7 @@ public final class NetData {
       public Builder mergeCertificate(org.terasology.protobuf.NetData.Certificate value) {
         if (certificateBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              certificate_ != null &&
               certificate_ != org.terasology.protobuf.NetData.Certificate.getDefaultInstance()) {
             certificate_ =
               org.terasology.protobuf.NetData.Certificate.newBuilder(certificate_).mergeFrom(value).buildPartial();
@@ -6822,7 +7148,7 @@ public final class NetData {
        */
       public Builder clearCertificate() {
         if (certificateBuilder_ == null) {
-          certificate_ = org.terasology.protobuf.NetData.Certificate.getDefaultInstance();
+          certificate_ = null;
           onChanged();
         } else {
           certificateBuilder_.clear();
@@ -6845,17 +7171,18 @@ public final class NetData {
         if (certificateBuilder_ != null) {
           return certificateBuilder_.getMessageOrBuilder();
         } else {
-          return certificate_;
+          return certificate_ == null ?
+              org.terasology.protobuf.NetData.Certificate.getDefaultInstance() : certificate_;
         }
       }
       /**
        * <code>optional .Certificate certificate = 2;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Certificate, org.terasology.protobuf.NetData.Certificate.Builder, org.terasology.protobuf.NetData.CertificateOrBuilder> 
           getCertificateFieldBuilder() {
         if (certificateBuilder_ == null) {
-          certificateBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          certificateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.Certificate, org.terasology.protobuf.NetData.Certificate.Builder, org.terasology.protobuf.NetData.CertificateOrBuilder>(
                   getCertificate(),
                   getParentForChildren(),
@@ -6896,21 +7223,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:HandshakeHello)
     }
 
+    // @@protoc_insertion_point(class_scope:HandshakeHello)
+    private static final org.terasology.protobuf.NetData.HandshakeHello DEFAULT_INSTANCE;
     static {
-      defaultInstance = new HandshakeHello(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.HandshakeHello();
     }
 
-    // @@protoc_insertion_point(class_scope:HandshakeHello)
+    public static org.terasology.protobuf.NetData.HandshakeHello getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<HandshakeHello>
+        PARSER = new com.google.protobuf.AbstractParser<HandshakeHello>() {
+      public HandshakeHello parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new HandshakeHello(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<HandshakeHello> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<HandshakeHello> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.HandshakeHello getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface NewIdentityRequestOrBuilder extends
       // @@protoc_insertion_point(interface_extends:NewIdentityRequest)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<NewIdentityRequest> {
 
     /**
@@ -6934,38 +7298,30 @@ public final class NetData {
   /**
    * Protobuf type {@code NewIdentityRequest}
    */
-  public static final class NewIdentityRequest extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class NewIdentityRequest extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         NewIdentityRequest> implements
       // @@protoc_insertion_point(message_implements:NewIdentityRequest)
       NewIdentityRequestOrBuilder {
     // Use NewIdentityRequest.newBuilder() to construct.
-    private NewIdentityRequest(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.NewIdentityRequest, ?> builder) {
+    private NewIdentityRequest(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.NewIdentityRequest, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private NewIdentityRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final NewIdentityRequest defaultInstance;
-    public static NewIdentityRequest getDefaultInstance() {
-      return defaultInstance;
+    private NewIdentityRequest() {
+      preMasterSecret_ = com.google.protobuf.ByteString.EMPTY;
+      random_ = com.google.protobuf.ByteString.EMPTY;
     }
 
-    public NewIdentityRequest getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private NewIdentityRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -7000,7 +7356,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -7011,26 +7367,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_NewIdentityRequest_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_NewIdentityRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.NewIdentityRequest.class, org.terasology.protobuf.NetData.NewIdentityRequest.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<NewIdentityRequest> PARSER =
-        new com.google.protobuf.AbstractParser<NewIdentityRequest>() {
-      public NewIdentityRequest parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new NewIdentityRequest(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<NewIdentityRequest> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -7064,10 +7405,6 @@ public final class NetData {
       return random_;
     }
 
-    private void initFields() {
-      preMasterSecret_ = com.google.protobuf.ByteString.EMPTY;
-      random_ = com.google.protobuf.ByteString.EMPTY;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -7084,10 +7421,9 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.NewIdentityRequest>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.NewIdentityRequest>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, preMasterSecret_);
       }
@@ -7095,12 +7431,11 @@ public final class NetData {
         output.writeBytes(2, random_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -7113,16 +7448,58 @@ public final class NetData {
           .computeBytesSize(2, random_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.NewIdentityRequest)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.NewIdentityRequest other = (org.terasology.protobuf.NetData.NewIdentityRequest) obj;
+
+      boolean result = true;
+      result = result && (hasPreMasterSecret() == other.hasPreMasterSecret());
+      if (hasPreMasterSecret()) {
+        result = result && getPreMasterSecret()
+            .equals(other.getPreMasterSecret());
+      }
+      result = result && (hasRandom() == other.hasRandom());
+      if (hasRandom()) {
+        result = result && getRandom()
+            .equals(other.getRandom());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasPreMasterSecret()) {
+        hash = (37 * hash) + PREMASTERSECRET_FIELD_NUMBER;
+        hash = (53 * hash) + getPreMasterSecret().hashCode();
+      }
+      if (hasRandom()) {
+        hash = (37 * hash) + RANDOM_FIELD_NUMBER;
+        hash = (53 * hash) + getRandom().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.NewIdentityRequest parseFrom(
@@ -7148,46 +7525,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.NewIdentityRequest parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.NewIdentityRequest parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.NewIdentityRequest parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.NewIdentityRequest parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.NewIdentityRequest parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.NewIdentityRequest parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.NewIdentityRequest prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.NewIdentityRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -7195,7 +7583,7 @@ public final class NetData {
      * Protobuf type {@code NewIdentityRequest}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.NewIdentityRequest, Builder> implements
         // @@protoc_insertion_point(builder_implements:NewIdentityRequest)
         org.terasology.protobuf.NetData.NewIdentityRequestOrBuilder {
@@ -7204,7 +7592,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_NewIdentityRequest_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_NewIdentityRequest_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -7217,18 +7605,15 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         preMasterSecret_ = com.google.protobuf.ByteString.EMPTY;
@@ -7236,10 +7621,6 @@ public final class NetData {
         random_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -7276,6 +7657,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.NewIdentityRequest, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.NewIdentityRequest, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.NewIdentityRequest, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.NewIdentityRequest, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.NewIdentityRequest) {
           return mergeFrom((org.terasology.protobuf.NetData.NewIdentityRequest)other);
@@ -7294,13 +7724,13 @@ public final class NetData {
           setRandom(other.getRandom());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -7315,7 +7745,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.NewIdentityRequest) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -7394,21 +7824,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:NewIdentityRequest)
     }
 
+    // @@protoc_insertion_point(class_scope:NewIdentityRequest)
+    private static final org.terasology.protobuf.NetData.NewIdentityRequest DEFAULT_INSTANCE;
     static {
-      defaultInstance = new NewIdentityRequest(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.NewIdentityRequest();
     }
 
-    // @@protoc_insertion_point(class_scope:NewIdentityRequest)
+    public static org.terasology.protobuf.NetData.NewIdentityRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<NewIdentityRequest>
+        PARSER = new com.google.protobuf.AbstractParser<NewIdentityRequest>() {
+      public NewIdentityRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new NewIdentityRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<NewIdentityRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<NewIdentityRequest> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.NewIdentityRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ProvisionIdentityOrBuilder extends
       // @@protoc_insertion_point(interface_extends:ProvisionIdentity)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<ProvisionIdentity> {
 
     /**
@@ -7423,38 +7890,29 @@ public final class NetData {
   /**
    * Protobuf type {@code ProvisionIdentity}
    */
-  public static final class ProvisionIdentity extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class ProvisionIdentity extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         ProvisionIdentity> implements
       // @@protoc_insertion_point(message_implements:ProvisionIdentity)
       ProvisionIdentityOrBuilder {
     // Use ProvisionIdentity.newBuilder() to construct.
-    private ProvisionIdentity(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.ProvisionIdentity, ?> builder) {
+    private ProvisionIdentity(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.ProvisionIdentity, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ProvisionIdentity(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ProvisionIdentity defaultInstance;
-    public static ProvisionIdentity getDefaultInstance() {
-      return defaultInstance;
+    private ProvisionIdentity() {
+      encryptedCertificates_ = com.google.protobuf.ByteString.EMPTY;
     }
 
-    public ProvisionIdentity getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ProvisionIdentity(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -7484,7 +7942,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -7495,26 +7953,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_ProvisionIdentity_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_ProvisionIdentity_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.ProvisionIdentity.class, org.terasology.protobuf.NetData.ProvisionIdentity.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<ProvisionIdentity> PARSER =
-        new com.google.protobuf.AbstractParser<ProvisionIdentity>() {
-      public ProvisionIdentity parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ProvisionIdentity(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ProvisionIdentity> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -7533,9 +7976,6 @@ public final class NetData {
       return encryptedCertificates_;
     }
 
-    private void initFields() {
-      encryptedCertificates_ = com.google.protobuf.ByteString.EMPTY;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -7552,20 +7992,18 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.ProvisionIdentity>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.ProvisionIdentity>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, encryptedCertificates_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -7574,16 +8012,49 @@ public final class NetData {
           .computeBytesSize(1, encryptedCertificates_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.ProvisionIdentity)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.ProvisionIdentity other = (org.terasology.protobuf.NetData.ProvisionIdentity) obj;
+
+      boolean result = true;
+      result = result && (hasEncryptedCertificates() == other.hasEncryptedCertificates());
+      if (hasEncryptedCertificates()) {
+        result = result && getEncryptedCertificates()
+            .equals(other.getEncryptedCertificates());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasEncryptedCertificates()) {
+        hash = (37 * hash) + ENCRYPTEDCERTIFICATES_FIELD_NUMBER;
+        hash = (53 * hash) + getEncryptedCertificates().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.ProvisionIdentity parseFrom(
@@ -7609,46 +8080,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.ProvisionIdentity parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ProvisionIdentity parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ProvisionIdentity parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ProvisionIdentity parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ProvisionIdentity parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ProvisionIdentity parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.ProvisionIdentity prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.ProvisionIdentity prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -7656,7 +8138,7 @@ public final class NetData {
      * Protobuf type {@code ProvisionIdentity}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.ProvisionIdentity, Builder> implements
         // @@protoc_insertion_point(builder_implements:ProvisionIdentity)
         org.terasology.protobuf.NetData.ProvisionIdentityOrBuilder {
@@ -7665,7 +8147,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_ProvisionIdentity_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_ProvisionIdentity_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -7678,27 +8160,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         encryptedCertificates_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -7731,6 +8206,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ProvisionIdentity, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ProvisionIdentity, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ProvisionIdentity, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ProvisionIdentity, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.ProvisionIdentity) {
           return mergeFrom((org.terasology.protobuf.NetData.ProvisionIdentity)other);
@@ -7746,13 +8270,13 @@ public final class NetData {
           setEncryptedCertificates(other.getEncryptedCertificates());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -7767,7 +8291,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.ProvisionIdentity) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -7811,21 +8335,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:ProvisionIdentity)
     }
 
+    // @@protoc_insertion_point(class_scope:ProvisionIdentity)
+    private static final org.terasology.protobuf.NetData.ProvisionIdentity DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ProvisionIdentity(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.ProvisionIdentity();
     }
 
-    // @@protoc_insertion_point(class_scope:ProvisionIdentity)
+    public static org.terasology.protobuf.NetData.ProvisionIdentity getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ProvisionIdentity>
+        PARSER = new com.google.protobuf.AbstractParser<ProvisionIdentity>() {
+      public ProvisionIdentity parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ProvisionIdentity(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ProvisionIdentity> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ProvisionIdentity> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.ProvisionIdentity getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface CertificateSetOrBuilder extends
       // @@protoc_insertion_point(interface_extends:CertificateSet)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<CertificateSet> {
 
     /**
@@ -7853,38 +8414,29 @@ public final class NetData {
   /**
    * Protobuf type {@code CertificateSet}
    */
-  public static final class CertificateSet extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class CertificateSet extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         CertificateSet> implements
       // @@protoc_insertion_point(message_implements:CertificateSet)
       CertificateSetOrBuilder {
     // Use CertificateSet.newBuilder() to construct.
-    private CertificateSet(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.CertificateSet, ?> builder) {
+    private CertificateSet(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.CertificateSet, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private CertificateSet(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final CertificateSet defaultInstance;
-    public static CertificateSet getDefaultInstance() {
-      return defaultInstance;
+    private CertificateSet() {
+      privateExponent_ = com.google.protobuf.ByteString.EMPTY;
     }
 
-    public CertificateSet getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private CertificateSet(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -7927,7 +8479,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -7938,26 +8490,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_CertificateSet_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_CertificateSet_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.CertificateSet.class, org.terasology.protobuf.NetData.CertificateSet.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<CertificateSet> PARSER =
-        new com.google.protobuf.AbstractParser<CertificateSet>() {
-      public CertificateSet parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CertificateSet(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<CertificateSet> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -7973,13 +8510,13 @@ public final class NetData {
      * <code>optional .Certificate publicCertificate = 1;</code>
      */
     public org.terasology.protobuf.NetData.Certificate getPublicCertificate() {
-      return publicCertificate_;
+      return publicCertificate_ == null ? org.terasology.protobuf.NetData.Certificate.getDefaultInstance() : publicCertificate_;
     }
     /**
      * <code>optional .Certificate publicCertificate = 1;</code>
      */
     public org.terasology.protobuf.NetData.CertificateOrBuilder getPublicCertificateOrBuilder() {
-      return publicCertificate_;
+      return publicCertificate_ == null ? org.terasology.protobuf.NetData.Certificate.getDefaultInstance() : publicCertificate_;
     }
 
     public static final int PRIVATEEXPONENT_FIELD_NUMBER = 2;
@@ -7997,10 +8534,6 @@ public final class NetData {
       return privateExponent_;
     }
 
-    private void initFields() {
-      publicCertificate_ = org.terasology.protobuf.NetData.Certificate.getDefaultInstance();
-      privateExponent_ = com.google.protobuf.ByteString.EMPTY;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -8023,45 +8556,85 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.CertificateSet>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.CertificateSet>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, publicCertificate_);
+        output.writeMessage(1, getPublicCertificate());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(2, privateExponent_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, publicCertificate_);
+          .computeMessageSize(1, getPublicCertificate());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, privateExponent_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.CertificateSet)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.CertificateSet other = (org.terasology.protobuf.NetData.CertificateSet) obj;
+
+      boolean result = true;
+      result = result && (hasPublicCertificate() == other.hasPublicCertificate());
+      if (hasPublicCertificate()) {
+        result = result && getPublicCertificate()
+            .equals(other.getPublicCertificate());
+      }
+      result = result && (hasPrivateExponent() == other.hasPrivateExponent());
+      if (hasPrivateExponent()) {
+        result = result && getPrivateExponent()
+            .equals(other.getPrivateExponent());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasPublicCertificate()) {
+        hash = (37 * hash) + PUBLICCERTIFICATE_FIELD_NUMBER;
+        hash = (53 * hash) + getPublicCertificate().hashCode();
+      }
+      if (hasPrivateExponent()) {
+        hash = (37 * hash) + PRIVATEEXPONENT_FIELD_NUMBER;
+        hash = (53 * hash) + getPrivateExponent().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.CertificateSet parseFrom(
@@ -8087,46 +8660,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.CertificateSet parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.CertificateSet parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.CertificateSet parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.CertificateSet parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.CertificateSet parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.CertificateSet parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.CertificateSet prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.CertificateSet prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -8134,7 +8718,7 @@ public final class NetData {
      * Protobuf type {@code CertificateSet}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.CertificateSet, Builder> implements
         // @@protoc_insertion_point(builder_implements:CertificateSet)
         org.terasology.protobuf.NetData.CertificateSetOrBuilder {
@@ -8143,7 +8727,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_CertificateSet_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_CertificateSet_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -8156,23 +8740,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getPublicCertificateFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         if (publicCertificateBuilder_ == null) {
-          publicCertificate_ = org.terasology.protobuf.NetData.Certificate.getDefaultInstance();
+          publicCertificate_ = null;
         } else {
           publicCertificateBuilder_.clear();
         }
@@ -8180,10 +8761,6 @@ public final class NetData {
         privateExponent_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -8224,6 +8801,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.CertificateSet, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.CertificateSet, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.CertificateSet, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.CertificateSet, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.CertificateSet) {
           return mergeFrom((org.terasology.protobuf.NetData.CertificateSet)other);
@@ -8242,19 +8868,18 @@ public final class NetData {
           setPrivateExponent(other.getPrivateExponent());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (hasPublicCertificate()) {
           if (!getPublicCertificate().isInitialized()) {
-            
             return false;
           }
         }
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -8269,7 +8894,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.CertificateSet) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -8279,8 +8904,8 @@ public final class NetData {
       }
       private int bitField0_;
 
-      private org.terasology.protobuf.NetData.Certificate publicCertificate_ = org.terasology.protobuf.NetData.Certificate.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.Certificate publicCertificate_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Certificate, org.terasology.protobuf.NetData.Certificate.Builder, org.terasology.protobuf.NetData.CertificateOrBuilder> publicCertificateBuilder_;
       /**
        * <code>optional .Certificate publicCertificate = 1;</code>
@@ -8293,7 +8918,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.Certificate getPublicCertificate() {
         if (publicCertificateBuilder_ == null) {
-          return publicCertificate_;
+          return publicCertificate_ == null ? org.terasology.protobuf.NetData.Certificate.getDefaultInstance() : publicCertificate_;
         } else {
           return publicCertificateBuilder_.getMessage();
         }
@@ -8334,6 +8959,7 @@ public final class NetData {
       public Builder mergePublicCertificate(org.terasology.protobuf.NetData.Certificate value) {
         if (publicCertificateBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              publicCertificate_ != null &&
               publicCertificate_ != org.terasology.protobuf.NetData.Certificate.getDefaultInstance()) {
             publicCertificate_ =
               org.terasology.protobuf.NetData.Certificate.newBuilder(publicCertificate_).mergeFrom(value).buildPartial();
@@ -8352,7 +8978,7 @@ public final class NetData {
        */
       public Builder clearPublicCertificate() {
         if (publicCertificateBuilder_ == null) {
-          publicCertificate_ = org.terasology.protobuf.NetData.Certificate.getDefaultInstance();
+          publicCertificate_ = null;
           onChanged();
         } else {
           publicCertificateBuilder_.clear();
@@ -8375,17 +9001,18 @@ public final class NetData {
         if (publicCertificateBuilder_ != null) {
           return publicCertificateBuilder_.getMessageOrBuilder();
         } else {
-          return publicCertificate_;
+          return publicCertificate_ == null ?
+              org.terasology.protobuf.NetData.Certificate.getDefaultInstance() : publicCertificate_;
         }
       }
       /**
        * <code>optional .Certificate publicCertificate = 1;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Certificate, org.terasology.protobuf.NetData.Certificate.Builder, org.terasology.protobuf.NetData.CertificateOrBuilder> 
           getPublicCertificateFieldBuilder() {
         if (publicCertificateBuilder_ == null) {
-          publicCertificateBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          publicCertificateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.Certificate, org.terasology.protobuf.NetData.Certificate.Builder, org.terasology.protobuf.NetData.CertificateOrBuilder>(
                   getPublicCertificate(),
                   getParentForChildren(),
@@ -8429,21 +9056,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:CertificateSet)
     }
 
+    // @@protoc_insertion_point(class_scope:CertificateSet)
+    private static final org.terasology.protobuf.NetData.CertificateSet DEFAULT_INSTANCE;
     static {
-      defaultInstance = new CertificateSet(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.CertificateSet();
     }
 
-    // @@protoc_insertion_point(class_scope:CertificateSet)
+    public static org.terasology.protobuf.NetData.CertificateSet getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<CertificateSet>
+        PARSER = new com.google.protobuf.AbstractParser<CertificateSet>() {
+      public CertificateSet parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new CertificateSet(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CertificateSet> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CertificateSet> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.CertificateSet getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface HandshakeVerificationOrBuilder extends
       // @@protoc_insertion_point(interface_extends:HandshakeVerification)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<HandshakeVerification> {
 
     /**
@@ -8458,38 +9122,29 @@ public final class NetData {
   /**
    * Protobuf type {@code HandshakeVerification}
    */
-  public static final class HandshakeVerification extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class HandshakeVerification extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         HandshakeVerification> implements
       // @@protoc_insertion_point(message_implements:HandshakeVerification)
       HandshakeVerificationOrBuilder {
     // Use HandshakeVerification.newBuilder() to construct.
-    private HandshakeVerification(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.HandshakeVerification, ?> builder) {
+    private HandshakeVerification(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.HandshakeVerification, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private HandshakeVerification(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final HandshakeVerification defaultInstance;
-    public static HandshakeVerification getDefaultInstance() {
-      return defaultInstance;
+    private HandshakeVerification() {
+      signature_ = com.google.protobuf.ByteString.EMPTY;
     }
 
-    public HandshakeVerification getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private HandshakeVerification(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -8519,7 +9174,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -8530,26 +9185,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_HandshakeVerification_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_HandshakeVerification_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.HandshakeVerification.class, org.terasology.protobuf.NetData.HandshakeVerification.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<HandshakeVerification> PARSER =
-        new com.google.protobuf.AbstractParser<HandshakeVerification>() {
-      public HandshakeVerification parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new HandshakeVerification(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<HandshakeVerification> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -8568,9 +9208,6 @@ public final class NetData {
       return signature_;
     }
 
-    private void initFields() {
-      signature_ = com.google.protobuf.ByteString.EMPTY;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -8587,20 +9224,18 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.HandshakeVerification>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.HandshakeVerification>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, signature_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -8609,16 +9244,49 @@ public final class NetData {
           .computeBytesSize(1, signature_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.HandshakeVerification)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.HandshakeVerification other = (org.terasology.protobuf.NetData.HandshakeVerification) obj;
+
+      boolean result = true;
+      result = result && (hasSignature() == other.hasSignature());
+      if (hasSignature()) {
+        result = result && getSignature()
+            .equals(other.getSignature());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasSignature()) {
+        hash = (37 * hash) + SIGNATURE_FIELD_NUMBER;
+        hash = (53 * hash) + getSignature().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.HandshakeVerification parseFrom(
@@ -8644,46 +9312,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.HandshakeVerification parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.HandshakeVerification parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.HandshakeVerification parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.HandshakeVerification parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.HandshakeVerification parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.HandshakeVerification parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.HandshakeVerification prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.HandshakeVerification prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -8691,7 +9370,7 @@ public final class NetData {
      * Protobuf type {@code HandshakeVerification}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.HandshakeVerification, Builder> implements
         // @@protoc_insertion_point(builder_implements:HandshakeVerification)
         org.terasology.protobuf.NetData.HandshakeVerificationOrBuilder {
@@ -8700,7 +9379,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_HandshakeVerification_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_HandshakeVerification_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -8713,27 +9392,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         signature_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -8766,6 +9438,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.HandshakeVerification, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.HandshakeVerification, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.HandshakeVerification, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.HandshakeVerification, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.HandshakeVerification) {
           return mergeFrom((org.terasology.protobuf.NetData.HandshakeVerification)other);
@@ -8781,13 +9502,13 @@ public final class NetData {
           setSignature(other.getSignature());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -8802,7 +9523,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.HandshakeVerification) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -8846,21 +9567,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:HandshakeVerification)
     }
 
+    // @@protoc_insertion_point(class_scope:HandshakeVerification)
+    private static final org.terasology.protobuf.NetData.HandshakeVerification DEFAULT_INSTANCE;
     static {
-      defaultInstance = new HandshakeVerification(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.HandshakeVerification();
     }
 
-    // @@protoc_insertion_point(class_scope:HandshakeVerification)
+    public static org.terasology.protobuf.NetData.HandshakeVerification getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<HandshakeVerification>
+        PARSER = new com.google.protobuf.AbstractParser<HandshakeVerification>() {
+      public HandshakeVerification parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new HandshakeVerification(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<HandshakeVerification> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<HandshakeVerification> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.HandshakeVerification getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface CertificateOrBuilder extends
       // @@protoc_insertion_point(interface_extends:Certificate)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<Certificate> {
 
     /**
@@ -8907,38 +9665,32 @@ public final class NetData {
   /**
    * Protobuf type {@code Certificate}
    */
-  public static final class Certificate extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class Certificate extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         Certificate> implements
       // @@protoc_insertion_point(message_implements:Certificate)
       CertificateOrBuilder {
     // Use Certificate.newBuilder() to construct.
-    private Certificate(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.Certificate, ?> builder) {
+    private Certificate(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.Certificate, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private Certificate(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Certificate defaultInstance;
-    public static Certificate getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public Certificate getDefaultInstanceForType() {
-      return defaultInstance;
+    private Certificate() {
+      id_ = "";
+      modulus_ = com.google.protobuf.ByteString.EMPTY;
+      exponent_ = com.google.protobuf.ByteString.EMPTY;
+      signature_ = com.google.protobuf.ByteString.EMPTY;
     }
 
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private Certificate(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -8984,7 +9736,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -8995,31 +9747,16 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_Certificate_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_Certificate_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.Certificate.class, org.terasology.protobuf.NetData.Certificate.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<Certificate> PARSER =
-        new com.google.protobuf.AbstractParser<Certificate>() {
-      public Certificate parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Certificate(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Certificate> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int ID_FIELD_NUMBER = 1;
-    private java.lang.Object id_;
+    private volatile java.lang.Object id_;
     /**
      * <code>optional string id = 1;</code>
      */
@@ -9105,12 +9842,6 @@ public final class NetData {
       return signature_;
     }
 
-    private void initFields() {
-      id_ = "";
-      modulus_ = com.google.protobuf.ByteString.EMPTY;
-      exponent_ = com.google.protobuf.ByteString.EMPTY;
-      signature_ = com.google.protobuf.ByteString.EMPTY;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -9127,12 +9858,11 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.Certificate>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.Certificate>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getIdBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(2, modulus_);
@@ -9144,18 +9874,16 @@ public final class NetData {
         output.writeBytes(4, signature_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getIdBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -9170,16 +9898,76 @@ public final class NetData {
           .computeBytesSize(4, signature_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.Certificate)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.Certificate other = (org.terasology.protobuf.NetData.Certificate) obj;
+
+      boolean result = true;
+      result = result && (hasId() == other.hasId());
+      if (hasId()) {
+        result = result && getId()
+            .equals(other.getId());
+      }
+      result = result && (hasModulus() == other.hasModulus());
+      if (hasModulus()) {
+        result = result && getModulus()
+            .equals(other.getModulus());
+      }
+      result = result && (hasExponent() == other.hasExponent());
+      if (hasExponent()) {
+        result = result && getExponent()
+            .equals(other.getExponent());
+      }
+      result = result && (hasSignature() == other.hasSignature());
+      if (hasSignature()) {
+        result = result && getSignature()
+            .equals(other.getSignature());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      if (hasModulus()) {
+        hash = (37 * hash) + MODULUS_FIELD_NUMBER;
+        hash = (53 * hash) + getModulus().hashCode();
+      }
+      if (hasExponent()) {
+        hash = (37 * hash) + EXPONENT_FIELD_NUMBER;
+        hash = (53 * hash) + getExponent().hashCode();
+      }
+      if (hasSignature()) {
+        hash = (37 * hash) + SIGNATURE_FIELD_NUMBER;
+        hash = (53 * hash) + getSignature().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.Certificate parseFrom(
@@ -9205,46 +9993,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.Certificate parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.Certificate parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.Certificate parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.Certificate parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.Certificate parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.Certificate parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.Certificate prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.Certificate prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -9252,7 +10051,7 @@ public final class NetData {
      * Protobuf type {@code Certificate}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.Certificate, Builder> implements
         // @@protoc_insertion_point(builder_implements:Certificate)
         org.terasology.protobuf.NetData.CertificateOrBuilder {
@@ -9261,7 +10060,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_Certificate_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_Certificate_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -9274,18 +10073,15 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         id_ = "";
@@ -9297,10 +10093,6 @@ public final class NetData {
         signature_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -9345,6 +10137,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.Certificate, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.Certificate, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.Certificate, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.Certificate, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.Certificate) {
           return mergeFrom((org.terasology.protobuf.NetData.Certificate)other);
@@ -9371,13 +10212,13 @@ public final class NetData {
           setSignature(other.getSignature());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -9392,7 +10233,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.Certificate) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -9582,27 +10423,64 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:Certificate)
     }
 
+    // @@protoc_insertion_point(class_scope:Certificate)
+    private static final org.terasology.protobuf.NetData.Certificate DEFAULT_INSTANCE;
     static {
-      defaultInstance = new Certificate(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.Certificate();
     }
 
-    // @@protoc_insertion_point(class_scope:Certificate)
+    public static org.terasology.protobuf.NetData.Certificate getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<Certificate>
+        PARSER = new com.google.protobuf.AbstractParser<Certificate>() {
+      public Certificate parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new Certificate(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Certificate> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Certificate> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.Certificate getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface BlockFamilyRegisteredMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:BlockFamilyRegisteredMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<BlockFamilyRegisteredMessage> {
 
     /**
      * <code>repeated string blockUri = 1;</code>
      */
-    com.google.protobuf.ProtocolStringList
+    java.util.List<java.lang.String>
         getBlockUriList();
     /**
      * <code>repeated string blockUri = 1;</code>
@@ -9634,38 +10512,30 @@ public final class NetData {
   /**
    * Protobuf type {@code BlockFamilyRegisteredMessage}
    */
-  public static final class BlockFamilyRegisteredMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class BlockFamilyRegisteredMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         BlockFamilyRegisteredMessage> implements
       // @@protoc_insertion_point(message_implements:BlockFamilyRegisteredMessage)
       BlockFamilyRegisteredMessageOrBuilder {
     // Use BlockFamilyRegisteredMessage.newBuilder() to construct.
-    private BlockFamilyRegisteredMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, ?> builder) {
+    private BlockFamilyRegisteredMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private BlockFamilyRegisteredMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final BlockFamilyRegisteredMessage defaultInstance;
-    public static BlockFamilyRegisteredMessage getDefaultInstance() {
-      return defaultInstance;
+    private BlockFamilyRegisteredMessage() {
+      blockUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      blockId_ = java.util.Collections.emptyList();
     }
 
-    public BlockFamilyRegisteredMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private BlockFamilyRegisteredMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -9720,7 +10590,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
           blockUri_ = blockUri_.getUnmodifiableView();
@@ -9737,26 +10607,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_BlockFamilyRegisteredMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_BlockFamilyRegisteredMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage.class, org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<BlockFamilyRegisteredMessage> PARSER =
-        new com.google.protobuf.AbstractParser<BlockFamilyRegisteredMessage>() {
-      public BlockFamilyRegisteredMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new BlockFamilyRegisteredMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<BlockFamilyRegisteredMessage> getParserForType() {
-      return PARSER;
     }
 
     public static final int BLOCKURI_FIELD_NUMBER = 1;
@@ -9810,10 +10665,6 @@ public final class NetData {
       return blockId_.get(index);
     }
 
-    private void initFields() {
-      blockUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      blockId_ = java.util.Collections.emptyList();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -9830,31 +10681,28 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       for (int i = 0; i < blockUri_.size(); i++) {
-        output.writeBytes(1, blockUri_.getByteString(i));
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, blockUri_.getRaw(i));
       }
       for (int i = 0; i < blockId_.size(); i++) {
         output.writeInt32(2, blockId_.get(i));
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       {
         int dataSize = 0;
         for (int i = 0; i < blockUri_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(blockUri_.getByteString(i));
+          dataSize += computeStringSizeNoTag(blockUri_.getRaw(i));
         }
         size += dataSize;
         size += 1 * getBlockUriList().size();
@@ -9869,16 +10717,52 @@ public final class NetData {
         size += 1 * getBlockIdList().size();
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage other = (org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage) obj;
+
+      boolean result = true;
+      result = result && getBlockUriList()
+          .equals(other.getBlockUriList());
+      result = result && getBlockIdList()
+          .equals(other.getBlockIdList());
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getBlockUriCount() > 0) {
+        hash = (37 * hash) + BLOCKURI_FIELD_NUMBER;
+        hash = (53 * hash) + getBlockUriList().hashCode();
+      }
+      if (getBlockIdCount() > 0) {
+        hash = (37 * hash) + BLOCKID_FIELD_NUMBER;
+        hash = (53 * hash) + getBlockIdList().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage parseFrom(
@@ -9904,46 +10788,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -9951,7 +10846,7 @@ public final class NetData {
      * Protobuf type {@code BlockFamilyRegisteredMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:BlockFamilyRegisteredMessage)
         org.terasology.protobuf.NetData.BlockFamilyRegisteredMessageOrBuilder {
@@ -9960,7 +10855,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_BlockFamilyRegisteredMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_BlockFamilyRegisteredMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -9973,18 +10868,15 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         blockUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
@@ -9992,10 +10884,6 @@ public final class NetData {
         blockId_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -10032,6 +10920,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage)other);
@@ -10064,13 +11001,13 @@ public final class NetData {
           onChanged();
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -10085,7 +11022,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -10253,21 +11190,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:BlockFamilyRegisteredMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:BlockFamilyRegisteredMessage)
+    private static final org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new BlockFamilyRegisteredMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:BlockFamilyRegisteredMessage)
+    public static org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<BlockFamilyRegisteredMessage>
+        PARSER = new com.google.protobuf.AbstractParser<BlockFamilyRegisteredMessage>() {
+      public BlockFamilyRegisteredMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new BlockFamilyRegisteredMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<BlockFamilyRegisteredMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<BlockFamilyRegisteredMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.BlockFamilyRegisteredMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface InvalidateChunkMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:InvalidateChunkMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<InvalidateChunkMessage> {
 
     /**
@@ -10286,38 +11260,28 @@ public final class NetData {
   /**
    * Protobuf type {@code InvalidateChunkMessage}
    */
-  public static final class InvalidateChunkMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class InvalidateChunkMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         InvalidateChunkMessage> implements
       // @@protoc_insertion_point(message_implements:InvalidateChunkMessage)
       InvalidateChunkMessageOrBuilder {
     // Use InvalidateChunkMessage.newBuilder() to construct.
-    private InvalidateChunkMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.InvalidateChunkMessage, ?> builder) {
+    private InvalidateChunkMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.InvalidateChunkMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private InvalidateChunkMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final InvalidateChunkMessage defaultInstance;
-    public static InvalidateChunkMessage getDefaultInstance() {
-      return defaultInstance;
+    private InvalidateChunkMessage() {
     }
 
-    public InvalidateChunkMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private InvalidateChunkMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -10355,7 +11319,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -10366,26 +11330,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_InvalidateChunkMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_InvalidateChunkMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.InvalidateChunkMessage.class, org.terasology.protobuf.NetData.InvalidateChunkMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<InvalidateChunkMessage> PARSER =
-        new com.google.protobuf.AbstractParser<InvalidateChunkMessage>() {
-      public InvalidateChunkMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new InvalidateChunkMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<InvalidateChunkMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -10401,18 +11350,15 @@ public final class NetData {
      * <code>optional .Vector3iData pos = 1;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iData getPos() {
-      return pos_;
+      return pos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
     }
     /**
      * <code>optional .Vector3iData pos = 1;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iDataOrBuilder getPosOrBuilder() {
-      return pos_;
+      return pos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
     }
 
-    private void initFields() {
-      pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -10429,38 +11375,69 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.InvalidateChunkMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.InvalidateChunkMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, pos_);
+        output.writeMessage(1, getPos());
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, pos_);
+          .computeMessageSize(1, getPos());
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.InvalidateChunkMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.InvalidateChunkMessage other = (org.terasology.protobuf.NetData.InvalidateChunkMessage) obj;
+
+      boolean result = true;
+      result = result && (hasPos() == other.hasPos());
+      if (hasPos()) {
+        result = result && getPos()
+            .equals(other.getPos());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasPos()) {
+        hash = (37 * hash) + POS_FIELD_NUMBER;
+        hash = (53 * hash) + getPos().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.InvalidateChunkMessage parseFrom(
@@ -10486,46 +11463,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.InvalidateChunkMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.InvalidateChunkMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.InvalidateChunkMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.InvalidateChunkMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.InvalidateChunkMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.InvalidateChunkMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.InvalidateChunkMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.InvalidateChunkMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -10533,7 +11521,7 @@ public final class NetData {
      * Protobuf type {@code InvalidateChunkMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.InvalidateChunkMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:InvalidateChunkMessage)
         org.terasology.protobuf.NetData.InvalidateChunkMessageOrBuilder {
@@ -10542,7 +11530,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_InvalidateChunkMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_InvalidateChunkMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -10555,32 +11543,25 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getPosFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         if (posBuilder_ == null) {
-          pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          pos_ = null;
         } else {
           posBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -10617,6 +11598,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.InvalidateChunkMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.InvalidateChunkMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.InvalidateChunkMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.InvalidateChunkMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.InvalidateChunkMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.InvalidateChunkMessage)other);
@@ -10632,13 +11662,13 @@ public final class NetData {
           mergePos(other.getPos());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -10653,7 +11683,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.InvalidateChunkMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -10663,8 +11693,8 @@ public final class NetData {
       }
       private int bitField0_;
 
-      private org.terasology.protobuf.NetData.Vector3iData pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.Vector3iData pos_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> posBuilder_;
       /**
        * <code>optional .Vector3iData pos = 1;</code>
@@ -10677,7 +11707,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.Vector3iData getPos() {
         if (posBuilder_ == null) {
-          return pos_;
+          return pos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
         } else {
           return posBuilder_.getMessage();
         }
@@ -10718,6 +11748,7 @@ public final class NetData {
       public Builder mergePos(org.terasology.protobuf.NetData.Vector3iData value) {
         if (posBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              pos_ != null &&
               pos_ != org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance()) {
             pos_ =
               org.terasology.protobuf.NetData.Vector3iData.newBuilder(pos_).mergeFrom(value).buildPartial();
@@ -10736,7 +11767,7 @@ public final class NetData {
        */
       public Builder clearPos() {
         if (posBuilder_ == null) {
-          pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          pos_ = null;
           onChanged();
         } else {
           posBuilder_.clear();
@@ -10759,17 +11790,18 @@ public final class NetData {
         if (posBuilder_ != null) {
           return posBuilder_.getMessageOrBuilder();
         } else {
-          return pos_;
+          return pos_ == null ?
+              org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
         }
       }
       /**
        * <code>optional .Vector3iData pos = 1;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> 
           getPosFieldBuilder() {
         if (posBuilder_ == null) {
-          posBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          posBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder>(
                   getPos(),
                   getParentForChildren(),
@@ -10778,21 +11810,58 @@ public final class NetData {
         }
         return posBuilder_;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:InvalidateChunkMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:InvalidateChunkMessage)
+    private static final org.terasology.protobuf.NetData.InvalidateChunkMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new InvalidateChunkMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.InvalidateChunkMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:InvalidateChunkMessage)
+    public static org.terasology.protobuf.NetData.InvalidateChunkMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<InvalidateChunkMessage>
+        PARSER = new com.google.protobuf.AbstractParser<InvalidateChunkMessage>() {
+      public InvalidateChunkMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new InvalidateChunkMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<InvalidateChunkMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<InvalidateChunkMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.InvalidateChunkMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface BlockChangeMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:BlockChangeMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<BlockChangeMessage> {
 
     /**
@@ -10820,38 +11889,29 @@ public final class NetData {
   /**
    * Protobuf type {@code BlockChangeMessage}
    */
-  public static final class BlockChangeMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class BlockChangeMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         BlockChangeMessage> implements
       // @@protoc_insertion_point(message_implements:BlockChangeMessage)
       BlockChangeMessageOrBuilder {
     // Use BlockChangeMessage.newBuilder() to construct.
-    private BlockChangeMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.BlockChangeMessage, ?> builder) {
+    private BlockChangeMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.BlockChangeMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private BlockChangeMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final BlockChangeMessage defaultInstance;
-    public static BlockChangeMessage getDefaultInstance() {
-      return defaultInstance;
+    private BlockChangeMessage() {
+      newBlock_ = 0;
     }
 
-    public BlockChangeMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private BlockChangeMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -10894,7 +11954,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -10905,26 +11965,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_BlockChangeMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_BlockChangeMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.BlockChangeMessage.class, org.terasology.protobuf.NetData.BlockChangeMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<BlockChangeMessage> PARSER =
-        new com.google.protobuf.AbstractParser<BlockChangeMessage>() {
-      public BlockChangeMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new BlockChangeMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<BlockChangeMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -10940,13 +11985,13 @@ public final class NetData {
      * <code>optional .Vector3iData pos = 1;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iData getPos() {
-      return pos_;
+      return pos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
     }
     /**
      * <code>optional .Vector3iData pos = 1;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iDataOrBuilder getPosOrBuilder() {
-      return pos_;
+      return pos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
     }
 
     public static final int NEWBLOCK_FIELD_NUMBER = 2;
@@ -10964,10 +12009,6 @@ public final class NetData {
       return newBlock_;
     }
 
-    private void initFields() {
-      pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-      newBlock_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -10984,45 +12025,85 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.BlockChangeMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.BlockChangeMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, pos_);
+        output.writeMessage(1, getPos());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, newBlock_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, pos_);
+          .computeMessageSize(1, getPos());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, newBlock_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.BlockChangeMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.BlockChangeMessage other = (org.terasology.protobuf.NetData.BlockChangeMessage) obj;
+
+      boolean result = true;
+      result = result && (hasPos() == other.hasPos());
+      if (hasPos()) {
+        result = result && getPos()
+            .equals(other.getPos());
+      }
+      result = result && (hasNewBlock() == other.hasNewBlock());
+      if (hasNewBlock()) {
+        result = result && (getNewBlock()
+            == other.getNewBlock());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasPos()) {
+        hash = (37 * hash) + POS_FIELD_NUMBER;
+        hash = (53 * hash) + getPos().hashCode();
+      }
+      if (hasNewBlock()) {
+        hash = (37 * hash) + NEWBLOCK_FIELD_NUMBER;
+        hash = (53 * hash) + getNewBlock();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.BlockChangeMessage parseFrom(
@@ -11048,46 +12129,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.BlockChangeMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.BlockChangeMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.BlockChangeMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.BlockChangeMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.BlockChangeMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.BlockChangeMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.BlockChangeMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.BlockChangeMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -11095,7 +12187,7 @@ public final class NetData {
      * Protobuf type {@code BlockChangeMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.BlockChangeMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:BlockChangeMessage)
         org.terasology.protobuf.NetData.BlockChangeMessageOrBuilder {
@@ -11104,7 +12196,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_BlockChangeMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_BlockChangeMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -11117,23 +12209,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getPosFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         if (posBuilder_ == null) {
-          pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          pos_ = null;
         } else {
           posBuilder_.clear();
         }
@@ -11141,10 +12230,6 @@ public final class NetData {
         newBlock_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -11185,6 +12270,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BlockChangeMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BlockChangeMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BlockChangeMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BlockChangeMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.BlockChangeMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.BlockChangeMessage)other);
@@ -11203,13 +12337,13 @@ public final class NetData {
           setNewBlock(other.getNewBlock());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -11224,7 +12358,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.BlockChangeMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -11234,8 +12368,8 @@ public final class NetData {
       }
       private int bitField0_;
 
-      private org.terasology.protobuf.NetData.Vector3iData pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.Vector3iData pos_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> posBuilder_;
       /**
        * <code>optional .Vector3iData pos = 1;</code>
@@ -11248,7 +12382,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.Vector3iData getPos() {
         if (posBuilder_ == null) {
-          return pos_;
+          return pos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
         } else {
           return posBuilder_.getMessage();
         }
@@ -11289,6 +12423,7 @@ public final class NetData {
       public Builder mergePos(org.terasology.protobuf.NetData.Vector3iData value) {
         if (posBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              pos_ != null &&
               pos_ != org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance()) {
             pos_ =
               org.terasology.protobuf.NetData.Vector3iData.newBuilder(pos_).mergeFrom(value).buildPartial();
@@ -11307,7 +12442,7 @@ public final class NetData {
        */
       public Builder clearPos() {
         if (posBuilder_ == null) {
-          pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          pos_ = null;
           onChanged();
         } else {
           posBuilder_.clear();
@@ -11330,17 +12465,18 @@ public final class NetData {
         if (posBuilder_ != null) {
           return posBuilder_.getMessageOrBuilder();
         } else {
-          return pos_;
+          return pos_ == null ?
+              org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
         }
       }
       /**
        * <code>optional .Vector3iData pos = 1;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> 
           getPosFieldBuilder() {
         if (posBuilder_ == null) {
-          posBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          posBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder>(
                   getPos(),
                   getParentForChildren(),
@@ -11381,21 +12517,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:BlockChangeMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:BlockChangeMessage)
+    private static final org.terasology.protobuf.NetData.BlockChangeMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new BlockChangeMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.BlockChangeMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:BlockChangeMessage)
+    public static org.terasology.protobuf.NetData.BlockChangeMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<BlockChangeMessage>
+        PARSER = new com.google.protobuf.AbstractParser<BlockChangeMessage>() {
+      public BlockChangeMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new BlockChangeMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<BlockChangeMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<BlockChangeMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.BlockChangeMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface BiomeChangeMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:BiomeChangeMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<BiomeChangeMessage> {
 
     /**
@@ -11423,38 +12596,29 @@ public final class NetData {
   /**
    * Protobuf type {@code BiomeChangeMessage}
    */
-  public static final class BiomeChangeMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class BiomeChangeMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         BiomeChangeMessage> implements
       // @@protoc_insertion_point(message_implements:BiomeChangeMessage)
       BiomeChangeMessageOrBuilder {
     // Use BiomeChangeMessage.newBuilder() to construct.
-    private BiomeChangeMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.BiomeChangeMessage, ?> builder) {
+    private BiomeChangeMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.BiomeChangeMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private BiomeChangeMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final BiomeChangeMessage defaultInstance;
-    public static BiomeChangeMessage getDefaultInstance() {
-      return defaultInstance;
+    private BiomeChangeMessage() {
+      newBiome_ = 0;
     }
 
-    public BiomeChangeMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private BiomeChangeMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -11497,7 +12661,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -11508,26 +12672,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_BiomeChangeMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_BiomeChangeMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.BiomeChangeMessage.class, org.terasology.protobuf.NetData.BiomeChangeMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<BiomeChangeMessage> PARSER =
-        new com.google.protobuf.AbstractParser<BiomeChangeMessage>() {
-      public BiomeChangeMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new BiomeChangeMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<BiomeChangeMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -11543,13 +12692,13 @@ public final class NetData {
      * <code>optional .Vector3iData pos = 1;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iData getPos() {
-      return pos_;
+      return pos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
     }
     /**
      * <code>optional .Vector3iData pos = 1;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iDataOrBuilder getPosOrBuilder() {
-      return pos_;
+      return pos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
     }
 
     public static final int NEWBIOME_FIELD_NUMBER = 2;
@@ -11567,10 +12716,6 @@ public final class NetData {
       return newBiome_;
     }
 
-    private void initFields() {
-      pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-      newBiome_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -11587,45 +12732,85 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.BiomeChangeMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.BiomeChangeMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, pos_);
+        output.writeMessage(1, getPos());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, newBiome_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, pos_);
+          .computeMessageSize(1, getPos());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, newBiome_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.BiomeChangeMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.BiomeChangeMessage other = (org.terasology.protobuf.NetData.BiomeChangeMessage) obj;
+
+      boolean result = true;
+      result = result && (hasPos() == other.hasPos());
+      if (hasPos()) {
+        result = result && getPos()
+            .equals(other.getPos());
+      }
+      result = result && (hasNewBiome() == other.hasNewBiome());
+      if (hasNewBiome()) {
+        result = result && (getNewBiome()
+            == other.getNewBiome());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasPos()) {
+        hash = (37 * hash) + POS_FIELD_NUMBER;
+        hash = (53 * hash) + getPos().hashCode();
+      }
+      if (hasNewBiome()) {
+        hash = (37 * hash) + NEWBIOME_FIELD_NUMBER;
+        hash = (53 * hash) + getNewBiome();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.BiomeChangeMessage parseFrom(
@@ -11651,46 +12836,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.BiomeChangeMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.BiomeChangeMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.BiomeChangeMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.BiomeChangeMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.BiomeChangeMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.BiomeChangeMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.BiomeChangeMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.BiomeChangeMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -11698,7 +12894,7 @@ public final class NetData {
      * Protobuf type {@code BiomeChangeMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.BiomeChangeMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:BiomeChangeMessage)
         org.terasology.protobuf.NetData.BiomeChangeMessageOrBuilder {
@@ -11707,7 +12903,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_BiomeChangeMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_BiomeChangeMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -11720,23 +12916,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getPosFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         if (posBuilder_ == null) {
-          pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          pos_ = null;
         } else {
           posBuilder_.clear();
         }
@@ -11744,10 +12937,6 @@ public final class NetData {
         newBiome_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -11788,6 +12977,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BiomeChangeMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BiomeChangeMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BiomeChangeMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.BiomeChangeMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.BiomeChangeMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.BiomeChangeMessage)other);
@@ -11806,13 +13044,13 @@ public final class NetData {
           setNewBiome(other.getNewBiome());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -11827,7 +13065,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.BiomeChangeMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -11837,8 +13075,8 @@ public final class NetData {
       }
       private int bitField0_;
 
-      private org.terasology.protobuf.NetData.Vector3iData pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.Vector3iData pos_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> posBuilder_;
       /**
        * <code>optional .Vector3iData pos = 1;</code>
@@ -11851,7 +13089,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.Vector3iData getPos() {
         if (posBuilder_ == null) {
-          return pos_;
+          return pos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
         } else {
           return posBuilder_.getMessage();
         }
@@ -11892,6 +13130,7 @@ public final class NetData {
       public Builder mergePos(org.terasology.protobuf.NetData.Vector3iData value) {
         if (posBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              pos_ != null &&
               pos_ != org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance()) {
             pos_ =
               org.terasology.protobuf.NetData.Vector3iData.newBuilder(pos_).mergeFrom(value).buildPartial();
@@ -11910,7 +13149,7 @@ public final class NetData {
        */
       public Builder clearPos() {
         if (posBuilder_ == null) {
-          pos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          pos_ = null;
           onChanged();
         } else {
           posBuilder_.clear();
@@ -11933,17 +13172,18 @@ public final class NetData {
         if (posBuilder_ != null) {
           return posBuilder_.getMessageOrBuilder();
         } else {
-          return pos_;
+          return pos_ == null ?
+              org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : pos_;
         }
       }
       /**
        * <code>optional .Vector3iData pos = 1;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> 
           getPosFieldBuilder() {
         if (posBuilder_ == null) {
-          posBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          posBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder>(
                   getPos(),
                   getParentForChildren(),
@@ -11984,16 +13224,53 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:BiomeChangeMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:BiomeChangeMessage)
+    private static final org.terasology.protobuf.NetData.BiomeChangeMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new BiomeChangeMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.BiomeChangeMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:BiomeChangeMessage)
+    public static org.terasology.protobuf.NetData.BiomeChangeMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<BiomeChangeMessage>
+        PARSER = new com.google.protobuf.AbstractParser<BiomeChangeMessage>() {
+      public BiomeChangeMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new BiomeChangeMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<BiomeChangeMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<BiomeChangeMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.BiomeChangeMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface Vector3iDataOrBuilder extends
@@ -12030,37 +13307,30 @@ public final class NetData {
   /**
    * Protobuf type {@code Vector3iData}
    */
-  public static final class Vector3iData extends
-      com.google.protobuf.GeneratedMessage implements
+  public  static final class Vector3iData extends
+      com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Vector3iData)
       Vector3iDataOrBuilder {
     // Use Vector3iData.newBuilder() to construct.
-    private Vector3iData(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    private Vector3iData(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private Vector3iData(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Vector3iData defaultInstance;
-    public static Vector3iData getDefaultInstance() {
-      return defaultInstance;
+    private Vector3iData() {
+      x_ = 0;
+      y_ = 0;
+      z_ = 0;
     }
 
-    public Vector3iData getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private Vector3iData(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -12100,7 +13370,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -12111,26 +13381,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_Vector3iData_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_Vector3iData_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.Vector3iData.class, org.terasology.protobuf.NetData.Vector3iData.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<Vector3iData> PARSER =
-        new com.google.protobuf.AbstractParser<Vector3iData>() {
-      public Vector3iData parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Vector3iData(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Vector3iData> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -12179,11 +13434,6 @@ public final class NetData {
       return z_;
     }
 
-    private void initFields() {
-      x_ = 0;
-      y_ = 0;
-      z_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -12196,7 +13446,6 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, x_);
       }
@@ -12206,12 +13455,11 @@ public final class NetData {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt32(3, z_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -12227,16 +13475,64 @@ public final class NetData {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, z_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.Vector3iData)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.Vector3iData other = (org.terasology.protobuf.NetData.Vector3iData) obj;
+
+      boolean result = true;
+      result = result && (hasX() == other.hasX());
+      if (hasX()) {
+        result = result && (getX()
+            == other.getX());
+      }
+      result = result && (hasY() == other.hasY());
+      if (hasY()) {
+        result = result && (getY()
+            == other.getY());
+      }
+      result = result && (hasZ() == other.hasZ());
+      if (hasZ()) {
+        result = result && (getZ()
+            == other.getZ());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasX()) {
+        hash = (37 * hash) + X_FIELD_NUMBER;
+        hash = (53 * hash) + getX();
+      }
+      if (hasY()) {
+        hash = (37 * hash) + Y_FIELD_NUMBER;
+        hash = (53 * hash) + getY();
+      }
+      if (hasZ()) {
+        hash = (37 * hash) + Z_FIELD_NUMBER;
+        hash = (53 * hash) + getZ();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.Vector3iData parseFrom(
@@ -12262,46 +13558,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.Vector3iData parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.Vector3iData parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.Vector3iData parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.Vector3iData parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.Vector3iData parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.Vector3iData parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.Vector3iData prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.Vector3iData prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -12309,7 +13616,7 @@ public final class NetData {
      * Protobuf type {@code Vector3iData}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:Vector3iData)
         org.terasology.protobuf.NetData.Vector3iDataOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
@@ -12317,7 +13624,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_Vector3iData_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_Vector3iData_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -12330,18 +13637,15 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         x_ = 0;
@@ -12351,10 +13655,6 @@ public final class NetData {
         z_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -12395,6 +13695,32 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.Vector3iData) {
           return mergeFrom((org.terasology.protobuf.NetData.Vector3iData)other);
@@ -12415,7 +13741,8 @@ public final class NetData {
         if (other.hasZ()) {
           setZ(other.getZ());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -12432,7 +13759,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.Vector3iData) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -12537,58 +13864,85 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:Vector3iData)
     }
 
+    // @@protoc_insertion_point(class_scope:Vector3iData)
+    private static final org.terasology.protobuf.NetData.Vector3iData DEFAULT_INSTANCE;
     static {
-      defaultInstance = new Vector3iData(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.Vector3iData();
     }
 
-    // @@protoc_insertion_point(class_scope:Vector3iData)
+    public static org.terasology.protobuf.NetData.Vector3iData getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<Vector3iData>
+        PARSER = new com.google.protobuf.AbstractParser<Vector3iData>() {
+      public Vector3iData parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new Vector3iData(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Vector3iData> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Vector3iData> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.Vector3iData getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ServerInfoRequestOrBuilder extends
       // @@protoc_insertion_point(interface_extends:ServerInfoRequest)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<ServerInfoRequest> {
   }
   /**
    * Protobuf type {@code ServerInfoRequest}
    */
-  public static final class ServerInfoRequest extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class ServerInfoRequest extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         ServerInfoRequest> implements
       // @@protoc_insertion_point(message_implements:ServerInfoRequest)
       ServerInfoRequestOrBuilder {
     // Use ServerInfoRequest.newBuilder() to construct.
-    private ServerInfoRequest(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.ServerInfoRequest, ?> builder) {
+    private ServerInfoRequest(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.ServerInfoRequest, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ServerInfoRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ServerInfoRequest defaultInstance;
-    public static ServerInfoRequest getDefaultInstance() {
-      return defaultInstance;
+    private ServerInfoRequest() {
     }
 
-    public ServerInfoRequest getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ServerInfoRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -12612,7 +13966,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -12623,30 +13977,13 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_ServerInfoRequest_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_ServerInfoRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.ServerInfoRequest.class, org.terasology.protobuf.NetData.ServerInfoRequest.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<ServerInfoRequest> PARSER =
-        new com.google.protobuf.AbstractParser<ServerInfoRequest>() {
-      public ServerInfoRequest parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ServerInfoRequest(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ServerInfoRequest> getParserForType() {
-      return PARSER;
-    }
-
-    private void initFields() {
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -12663,31 +14000,53 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.ServerInfoRequest>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.ServerInfoRequest>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.ServerInfoRequest)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.ServerInfoRequest other = (org.terasology.protobuf.NetData.ServerInfoRequest) obj;
+
+      boolean result = true;
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.ServerInfoRequest parseFrom(
@@ -12713,46 +14072,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.ServerInfoRequest parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ServerInfoRequest parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ServerInfoRequest parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ServerInfoRequest parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ServerInfoRequest parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ServerInfoRequest parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.ServerInfoRequest prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.ServerInfoRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -12760,7 +14130,7 @@ public final class NetData {
      * Protobuf type {@code ServerInfoRequest}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.ServerInfoRequest, Builder> implements
         // @@protoc_insertion_point(builder_implements:ServerInfoRequest)
         org.terasology.protobuf.NetData.ServerInfoRequestOrBuilder {
@@ -12769,7 +14139,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_ServerInfoRequest_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_ServerInfoRequest_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -12782,25 +14152,18 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -12826,6 +14189,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ServerInfoRequest, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ServerInfoRequest, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ServerInfoRequest, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ServerInfoRequest, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.ServerInfoRequest) {
           return mergeFrom((org.terasology.protobuf.NetData.ServerInfoRequest)other);
@@ -12838,13 +14250,13 @@ public final class NetData {
       public Builder mergeFrom(org.terasology.protobuf.NetData.ServerInfoRequest other) {
         if (other == org.terasology.protobuf.NetData.ServerInfoRequest.getDefaultInstance()) return this;
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -12859,7 +14271,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.ServerInfoRequest) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -12867,21 +14279,58 @@ public final class NetData {
         }
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:ServerInfoRequest)
     }
 
+    // @@protoc_insertion_point(class_scope:ServerInfoRequest)
+    private static final org.terasology.protobuf.NetData.ServerInfoRequest DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ServerInfoRequest(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.ServerInfoRequest();
     }
 
-    // @@protoc_insertion_point(class_scope:ServerInfoRequest)
+    public static org.terasology.protobuf.NetData.ServerInfoRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ServerInfoRequest>
+        PARSER = new com.google.protobuf.AbstractParser<ServerInfoRequest>() {
+      public ServerInfoRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ServerInfoRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ServerInfoRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ServerInfoRequest> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.ServerInfoRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface JoinMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:JoinMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<JoinMessage> {
 
     /**
@@ -12937,38 +14386,31 @@ public final class NetData {
   /**
    * Protobuf type {@code JoinMessage}
    */
-  public static final class JoinMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class JoinMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         JoinMessage> implements
       // @@protoc_insertion_point(message_implements:JoinMessage)
       JoinMessageOrBuilder {
     // Use JoinMessage.newBuilder() to construct.
-    private JoinMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.JoinMessage, ?> builder) {
+    private JoinMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.JoinMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private JoinMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final JoinMessage defaultInstance;
-    public static JoinMessage getDefaultInstance() {
-      return defaultInstance;
+    private JoinMessage() {
+      name_ = "";
+      version_ = "";
+      viewDistanceLevel_ = 0;
     }
 
-    public JoinMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private JoinMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -13023,7 +14465,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -13034,31 +14476,16 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_JoinMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_JoinMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.JoinMessage.class, org.terasology.protobuf.NetData.JoinMessage.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<JoinMessage> PARSER =
-        new com.google.protobuf.AbstractParser<JoinMessage>() {
-      public JoinMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new JoinMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<JoinMessage> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int NAME_FIELD_NUMBER = 1;
-    private java.lang.Object name_;
+    private volatile java.lang.Object name_;
     /**
      * <code>optional string name = 1;</code>
      */
@@ -13100,7 +14527,7 @@ public final class NetData {
     }
 
     public static final int VERSION_FIELD_NUMBER = 2;
-    private java.lang.Object version_;
+    private volatile java.lang.Object version_;
     /**
      * <code>optional string version = 2;</code>
      */
@@ -13168,21 +14595,15 @@ public final class NetData {
      * <code>optional .Color color = 4;</code>
      */
     public org.terasology.protobuf.NetData.Color getColor() {
-      return color_;
+      return color_ == null ? org.terasology.protobuf.NetData.Color.getDefaultInstance() : color_;
     }
     /**
      * <code>optional .Color color = 4;</code>
      */
     public org.terasology.protobuf.NetData.ColorOrBuilder getColorOrBuilder() {
-      return color_;
+      return color_ == null ? org.terasology.protobuf.NetData.Color.getDefaultInstance() : color_;
     }
 
-    private void initFields() {
-      name_ = "";
-      version_ = "";
-      viewDistanceLevel_ = 0;
-      color_ = org.terasology.protobuf.NetData.Color.getDefaultInstance();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -13199,39 +14620,35 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.JoinMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.JoinMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getNameBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getVersionBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, version_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeSInt32(3, viewDistanceLevel_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(4, color_);
+        output.writeMessage(4, getColor());
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getNameBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getVersionBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, version_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -13239,19 +14656,79 @@ public final class NetData {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, color_);
+          .computeMessageSize(4, getColor());
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.JoinMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.JoinMessage other = (org.terasology.protobuf.NetData.JoinMessage) obj;
+
+      boolean result = true;
+      result = result && (hasName() == other.hasName());
+      if (hasName()) {
+        result = result && getName()
+            .equals(other.getName());
+      }
+      result = result && (hasVersion() == other.hasVersion());
+      if (hasVersion()) {
+        result = result && getVersion()
+            .equals(other.getVersion());
+      }
+      result = result && (hasViewDistanceLevel() == other.hasViewDistanceLevel());
+      if (hasViewDistanceLevel()) {
+        result = result && (getViewDistanceLevel()
+            == other.getViewDistanceLevel());
+      }
+      result = result && (hasColor() == other.hasColor());
+      if (hasColor()) {
+        result = result && getColor()
+            .equals(other.getColor());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasName()) {
+        hash = (37 * hash) + NAME_FIELD_NUMBER;
+        hash = (53 * hash) + getName().hashCode();
+      }
+      if (hasVersion()) {
+        hash = (37 * hash) + VERSION_FIELD_NUMBER;
+        hash = (53 * hash) + getVersion().hashCode();
+      }
+      if (hasViewDistanceLevel()) {
+        hash = (37 * hash) + VIEWDISTANCELEVEL_FIELD_NUMBER;
+        hash = (53 * hash) + getViewDistanceLevel();
+      }
+      if (hasColor()) {
+        hash = (37 * hash) + COLOR_FIELD_NUMBER;
+        hash = (53 * hash) + getColor().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.JoinMessage parseFrom(
@@ -13277,46 +14754,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.JoinMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.JoinMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.JoinMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.JoinMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.JoinMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.JoinMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.JoinMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.JoinMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -13324,7 +14812,7 @@ public final class NetData {
      * Protobuf type {@code JoinMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.JoinMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:JoinMessage)
         org.terasology.protobuf.NetData.JoinMessageOrBuilder {
@@ -13333,7 +14821,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_JoinMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_JoinMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -13346,19 +14834,16 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getColorFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         name_ = "";
@@ -13368,16 +14853,12 @@ public final class NetData {
         viewDistanceLevel_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
         if (colorBuilder_ == null) {
-          color_ = org.terasology.protobuf.NetData.Color.getDefaultInstance();
+          color_ = null;
         } else {
           colorBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -13426,6 +14907,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.JoinMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.JoinMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.JoinMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.JoinMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.JoinMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.JoinMessage)other);
@@ -13454,13 +14984,13 @@ public final class NetData {
           mergeColor(other.getColor());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -13475,7 +15005,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.JoinMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -13669,8 +15199,8 @@ public final class NetData {
         return this;
       }
 
-      private org.terasology.protobuf.NetData.Color color_ = org.terasology.protobuf.NetData.Color.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.Color color_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Color, org.terasology.protobuf.NetData.Color.Builder, org.terasology.protobuf.NetData.ColorOrBuilder> colorBuilder_;
       /**
        * <code>optional .Color color = 4;</code>
@@ -13683,7 +15213,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.Color getColor() {
         if (colorBuilder_ == null) {
-          return color_;
+          return color_ == null ? org.terasology.protobuf.NetData.Color.getDefaultInstance() : color_;
         } else {
           return colorBuilder_.getMessage();
         }
@@ -13724,6 +15254,7 @@ public final class NetData {
       public Builder mergeColor(org.terasology.protobuf.NetData.Color value) {
         if (colorBuilder_ == null) {
           if (((bitField0_ & 0x00000008) == 0x00000008) &&
+              color_ != null &&
               color_ != org.terasology.protobuf.NetData.Color.getDefaultInstance()) {
             color_ =
               org.terasology.protobuf.NetData.Color.newBuilder(color_).mergeFrom(value).buildPartial();
@@ -13742,7 +15273,7 @@ public final class NetData {
        */
       public Builder clearColor() {
         if (colorBuilder_ == null) {
-          color_ = org.terasology.protobuf.NetData.Color.getDefaultInstance();
+          color_ = null;
           onChanged();
         } else {
           colorBuilder_.clear();
@@ -13765,17 +15296,18 @@ public final class NetData {
         if (colorBuilder_ != null) {
           return colorBuilder_.getMessageOrBuilder();
         } else {
-          return color_;
+          return color_ == null ?
+              org.terasology.protobuf.NetData.Color.getDefaultInstance() : color_;
         }
       }
       /**
        * <code>optional .Color color = 4;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Color, org.terasology.protobuf.NetData.Color.Builder, org.terasology.protobuf.NetData.ColorOrBuilder> 
           getColorFieldBuilder() {
         if (colorBuilder_ == null) {
-          colorBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          colorBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.Color, org.terasology.protobuf.NetData.Color.Builder, org.terasology.protobuf.NetData.ColorOrBuilder>(
                   getColor(),
                   getParentForChildren(),
@@ -13784,16 +15316,53 @@ public final class NetData {
         }
         return colorBuilder_;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:JoinMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:JoinMessage)
+    private static final org.terasology.protobuf.NetData.JoinMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new JoinMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.JoinMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:JoinMessage)
+    public static org.terasology.protobuf.NetData.JoinMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<JoinMessage>
+        PARSER = new com.google.protobuf.AbstractParser<JoinMessage>() {
+      public JoinMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new JoinMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<JoinMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<JoinMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.JoinMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ColorOrBuilder extends
@@ -13812,37 +15381,28 @@ public final class NetData {
   /**
    * Protobuf type {@code Color}
    */
-  public static final class Color extends
-      com.google.protobuf.GeneratedMessage implements
+  public  static final class Color extends
+      com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Color)
       ColorOrBuilder {
     // Use Color.newBuilder() to construct.
-    private Color(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    private Color(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private Color(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Color defaultInstance;
-    public static Color getDefaultInstance() {
-      return defaultInstance;
+    private Color() {
+      rgba_ = 0;
     }
 
-    public Color getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private Color(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -13872,7 +15432,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -13883,26 +15443,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_Color_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_Color_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.Color.class, org.terasology.protobuf.NetData.Color.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<Color> PARSER =
-        new com.google.protobuf.AbstractParser<Color>() {
-      public Color parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Color(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Color> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -13921,9 +15466,6 @@ public final class NetData {
       return rgba_;
     }
 
-    private void initFields() {
-      rgba_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -13936,16 +15478,14 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeUInt32(1, rgba_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -13953,16 +15493,46 @@ public final class NetData {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(1, rgba_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.Color)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.Color other = (org.terasology.protobuf.NetData.Color) obj;
+
+      boolean result = true;
+      result = result && (hasRgba() == other.hasRgba());
+      if (hasRgba()) {
+        result = result && (getRgba()
+            == other.getRgba());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasRgba()) {
+        hash = (37 * hash) + RGBA_FIELD_NUMBER;
+        hash = (53 * hash) + getRgba();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.Color parseFrom(
@@ -13988,46 +15558,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.Color parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.Color parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.Color parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.Color parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.Color parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.Color parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.Color prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.Color prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -14035,7 +15616,7 @@ public final class NetData {
      * Protobuf type {@code Color}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:Color)
         org.terasology.protobuf.NetData.ColorOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
@@ -14043,7 +15624,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_Color_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_Color_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -14056,27 +15637,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         rgba_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -14109,6 +15683,32 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.Color) {
           return mergeFrom((org.terasology.protobuf.NetData.Color)other);
@@ -14123,7 +15723,8 @@ public final class NetData {
         if (other.hasRgba()) {
           setRgba(other.getRgba());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -14140,7 +15741,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.Color) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -14181,21 +15782,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:Color)
     }
 
+    // @@protoc_insertion_point(class_scope:Color)
+    private static final org.terasology.protobuf.NetData.Color DEFAULT_INSTANCE;
     static {
-      defaultInstance = new Color(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.Color();
     }
 
-    // @@protoc_insertion_point(class_scope:Color)
+    public static org.terasology.protobuf.NetData.Color getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<Color>
+        PARSER = new com.google.protobuf.AbstractParser<Color>() {
+      public Color parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new Color(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Color> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Color> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.Color getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface JoinCompleteMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:JoinCompleteMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<JoinCompleteMessage> {
 
     /**
@@ -14210,38 +15848,29 @@ public final class NetData {
   /**
    * Protobuf type {@code JoinCompleteMessage}
    */
-  public static final class JoinCompleteMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class JoinCompleteMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         JoinCompleteMessage> implements
       // @@protoc_insertion_point(message_implements:JoinCompleteMessage)
       JoinCompleteMessageOrBuilder {
     // Use JoinCompleteMessage.newBuilder() to construct.
-    private JoinCompleteMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.JoinCompleteMessage, ?> builder) {
+    private JoinCompleteMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.JoinCompleteMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private JoinCompleteMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final JoinCompleteMessage defaultInstance;
-    public static JoinCompleteMessage getDefaultInstance() {
-      return defaultInstance;
+    private JoinCompleteMessage() {
+      clientId_ = 0;
     }
 
-    public JoinCompleteMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private JoinCompleteMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -14271,7 +15900,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -14282,26 +15911,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_JoinCompleteMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_JoinCompleteMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.JoinCompleteMessage.class, org.terasology.protobuf.NetData.JoinCompleteMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<JoinCompleteMessage> PARSER =
-        new com.google.protobuf.AbstractParser<JoinCompleteMessage>() {
-      public JoinCompleteMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new JoinCompleteMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<JoinCompleteMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -14320,9 +15934,6 @@ public final class NetData {
       return clientId_;
     }
 
-    private void initFields() {
-      clientId_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -14339,20 +15950,18 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.JoinCompleteMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.JoinCompleteMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, clientId_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -14361,16 +15970,49 @@ public final class NetData {
           .computeInt32Size(1, clientId_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.JoinCompleteMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.JoinCompleteMessage other = (org.terasology.protobuf.NetData.JoinCompleteMessage) obj;
+
+      boolean result = true;
+      result = result && (hasClientId() == other.hasClientId());
+      if (hasClientId()) {
+        result = result && (getClientId()
+            == other.getClientId());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasClientId()) {
+        hash = (37 * hash) + CLIENTID_FIELD_NUMBER;
+        hash = (53 * hash) + getClientId();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.JoinCompleteMessage parseFrom(
@@ -14396,46 +16038,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.JoinCompleteMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.JoinCompleteMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.JoinCompleteMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.JoinCompleteMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.JoinCompleteMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.JoinCompleteMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.JoinCompleteMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.JoinCompleteMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -14443,7 +16096,7 @@ public final class NetData {
      * Protobuf type {@code JoinCompleteMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.JoinCompleteMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:JoinCompleteMessage)
         org.terasology.protobuf.NetData.JoinCompleteMessageOrBuilder {
@@ -14452,7 +16105,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_JoinCompleteMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_JoinCompleteMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -14465,27 +16118,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         clientId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -14518,6 +16164,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.JoinCompleteMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.JoinCompleteMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.JoinCompleteMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.JoinCompleteMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.JoinCompleteMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.JoinCompleteMessage)other);
@@ -14533,13 +16228,13 @@ public final class NetData {
           setClientId(other.getClientId());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -14554,7 +16249,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.JoinCompleteMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -14595,21 +16290,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:JoinCompleteMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:JoinCompleteMessage)
+    private static final org.terasology.protobuf.NetData.JoinCompleteMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new JoinCompleteMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.JoinCompleteMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:JoinCompleteMessage)
+    public static org.terasology.protobuf.NetData.JoinCompleteMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<JoinCompleteMessage>
+        PARSER = new com.google.protobuf.AbstractParser<JoinCompleteMessage>() {
+      public JoinCompleteMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new JoinCompleteMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<JoinCompleteMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<JoinCompleteMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.JoinCompleteMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ServerInfoMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:ServerInfoMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<ServerInfoMessage> {
 
     /**
@@ -14652,7 +16384,7 @@ public final class NetData {
     /**
      * <code>repeated string blockName = 3;</code>
      */
-    com.google.protobuf.ProtocolStringList
+    java.util.List<java.lang.String>
         getBlockNameList();
     /**
      * <code>repeated string blockName = 3;</code>
@@ -14732,7 +16464,7 @@ public final class NetData {
     /**
      * <code>repeated string assetUri = 7;</code>
      */
-    com.google.protobuf.ProtocolStringList
+    java.util.List<java.lang.String>
         getAssetUriList();
     /**
      * <code>repeated string assetUri = 7;</code>
@@ -14751,7 +16483,7 @@ public final class NetData {
     /**
      * <code>repeated string registerBlockFamily = 8;</code>
      */
-    com.google.protobuf.ProtocolStringList
+    java.util.List<java.lang.String>
         getRegisterBlockFamilyList();
     /**
      * <code>repeated string registerBlockFamily = 8;</code>
@@ -14807,7 +16539,7 @@ public final class NetData {
     /**
      * <code>repeated string biomeId = 11;</code>
      */
-    com.google.protobuf.ProtocolStringList
+    java.util.List<java.lang.String>
         getBiomeIdList();
     /**
      * <code>repeated string biomeId = 11;</code>
@@ -14909,38 +16641,46 @@ public final class NetData {
   /**
    * Protobuf type {@code ServerInfoMessage}
    */
-  public static final class ServerInfoMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class ServerInfoMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         ServerInfoMessage> implements
       // @@protoc_insertion_point(message_implements:ServerInfoMessage)
       ServerInfoMessageOrBuilder {
     // Use ServerInfoMessage.newBuilder() to construct.
-    private ServerInfoMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.ServerInfoMessage, ?> builder) {
+    private ServerInfoMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.ServerInfoMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ServerInfoMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ServerInfoMessage defaultInstance;
-    public static ServerInfoMessage getDefaultInstance() {
-      return defaultInstance;
+    private ServerInfoMessage() {
+      module_ = java.util.Collections.emptyList();
+      blockId_ = java.util.Collections.emptyList();
+      blockName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      component_ = java.util.Collections.emptyList();
+      event_ = java.util.Collections.emptyList();
+      assetId_ = java.util.Collections.emptyList();
+      assetUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      registerBlockFamily_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      worldInfo_ = java.util.Collections.emptyList();
+      biomeShortId_ = java.util.Collections.emptyList();
+      biomeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      errorMessage_ = "";
+      version_ = "";
+      gameName_ = "";
+      time_ = 0L;
+      reflectionHeight_ = 0F;
+      mOTD_ = "";
+      onlinePlayersAmount_ = 0;
     }
 
-    public ServerInfoMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ServerInfoMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -14964,7 +16704,8 @@ public final class NetData {
                 module_ = new java.util.ArrayList<org.terasology.protobuf.NetData.ModuleInfo>();
                 mutable_bitField0_ |= 0x00000001;
               }
-              module_.add(input.readMessage(org.terasology.protobuf.NetData.ModuleInfo.PARSER, extensionRegistry));
+              module_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.ModuleInfo.PARSER, extensionRegistry));
               break;
             }
             case 16: {
@@ -15002,7 +16743,8 @@ public final class NetData {
                 component_ = new java.util.ArrayList<org.terasology.protobuf.NetData.SerializationInfo>();
                 mutable_bitField0_ |= 0x00000008;
               }
-              component_.add(input.readMessage(org.terasology.protobuf.NetData.SerializationInfo.PARSER, extensionRegistry));
+              component_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.SerializationInfo.PARSER, extensionRegistry));
               break;
             }
             case 42: {
@@ -15010,7 +16752,8 @@ public final class NetData {
                 event_ = new java.util.ArrayList<org.terasology.protobuf.NetData.SerializationInfo>();
                 mutable_bitField0_ |= 0x00000010;
               }
-              event_.add(input.readMessage(org.terasology.protobuf.NetData.SerializationInfo.PARSER, extensionRegistry));
+              event_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.SerializationInfo.PARSER, extensionRegistry));
               break;
             }
             case 48: {
@@ -15057,7 +16800,8 @@ public final class NetData {
                 worldInfo_ = new java.util.ArrayList<org.terasology.protobuf.NetData.WorldInfo>();
                 mutable_bitField0_ |= 0x00000100;
               }
-              worldInfo_.add(input.readMessage(org.terasology.protobuf.NetData.WorldInfo.PARSER, extensionRegistry));
+              worldInfo_.add(
+                  input.readMessage(org.terasology.protobuf.NetData.WorldInfo.PARSER, extensionRegistry));
               break;
             }
             case 80: {
@@ -15135,7 +16879,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
           module_ = java.util.Collections.unmodifiableList(module_);
@@ -15179,26 +16923,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_ServerInfoMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_ServerInfoMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.ServerInfoMessage.class, org.terasology.protobuf.NetData.ServerInfoMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<ServerInfoMessage> PARSER =
-        new com.google.protobuf.AbstractParser<ServerInfoMessage>() {
-      public ServerInfoMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ServerInfoMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ServerInfoMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -15528,7 +17257,7 @@ public final class NetData {
     }
 
     public static final int ERRORMESSAGE_FIELD_NUMBER = 12;
-    private java.lang.Object errorMessage_;
+    private volatile java.lang.Object errorMessage_;
     /**
      * <code>optional string errorMessage = 12;</code>
      */
@@ -15570,7 +17299,7 @@ public final class NetData {
     }
 
     public static final int VERSION_FIELD_NUMBER = 15;
-    private java.lang.Object version_;
+    private volatile java.lang.Object version_;
     /**
      * <code>optional string version = 15;</code>
      */
@@ -15612,7 +17341,7 @@ public final class NetData {
     }
 
     public static final int GAMENAME_FIELD_NUMBER = 16;
-    private java.lang.Object gameName_;
+    private volatile java.lang.Object gameName_;
     /**
      * <code>optional string gameName = 16;</code>
      */
@@ -15684,7 +17413,7 @@ public final class NetData {
     }
 
     public static final int MOTD_FIELD_NUMBER = 19;
-    private java.lang.Object mOTD_;
+    private volatile java.lang.Object mOTD_;
     /**
      * <code>optional string MOTD = 19;</code>
      */
@@ -15740,26 +17469,6 @@ public final class NetData {
       return onlinePlayersAmount_;
     }
 
-    private void initFields() {
-      module_ = java.util.Collections.emptyList();
-      blockId_ = java.util.Collections.emptyList();
-      blockName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      component_ = java.util.Collections.emptyList();
-      event_ = java.util.Collections.emptyList();
-      assetId_ = java.util.Collections.emptyList();
-      assetUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      registerBlockFamily_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      worldInfo_ = java.util.Collections.emptyList();
-      biomeShortId_ = java.util.Collections.emptyList();
-      biomeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      errorMessage_ = "";
-      version_ = "";
-      gameName_ = "";
-      time_ = 0L;
-      reflectionHeight_ = 0F;
-      mOTD_ = "";
-      onlinePlayersAmount_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -15801,21 +17510,21 @@ public final class NetData {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.ServerInfoMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.ServerInfoMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       for (int i = 0; i < module_.size(); i++) {
         output.writeMessage(1, module_.get(i));
       }
       if (getBlockIdList().size() > 0) {
-        output.writeRawVarint32(18);
-        output.writeRawVarint32(blockIdMemoizedSerializedSize);
+        output.writeUInt32NoTag(18);
+        output.writeUInt32NoTag(blockIdMemoizedSerializedSize);
       }
       for (int i = 0; i < blockId_.size(); i++) {
         output.writeSInt32NoTag(blockId_.get(i));
       }
       for (int i = 0; i < blockName_.size(); i++) {
-        output.writeBytes(3, blockName_.getByteString(i));
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, blockName_.getRaw(i));
       }
       for (int i = 0; i < component_.size(); i++) {
         output.writeMessage(4, component_.get(i));
@@ -15824,39 +17533,39 @@ public final class NetData {
         output.writeMessage(5, event_.get(i));
       }
       if (getAssetIdList().size() > 0) {
-        output.writeRawVarint32(50);
-        output.writeRawVarint32(assetIdMemoizedSerializedSize);
+        output.writeUInt32NoTag(50);
+        output.writeUInt32NoTag(assetIdMemoizedSerializedSize);
       }
       for (int i = 0; i < assetId_.size(); i++) {
         output.writeInt32NoTag(assetId_.get(i));
       }
       for (int i = 0; i < assetUri_.size(); i++) {
-        output.writeBytes(7, assetUri_.getByteString(i));
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, assetUri_.getRaw(i));
       }
       for (int i = 0; i < registerBlockFamily_.size(); i++) {
-        output.writeBytes(8, registerBlockFamily_.getByteString(i));
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 8, registerBlockFamily_.getRaw(i));
       }
       for (int i = 0; i < worldInfo_.size(); i++) {
         output.writeMessage(9, worldInfo_.get(i));
       }
       if (getBiomeShortIdList().size() > 0) {
-        output.writeRawVarint32(82);
-        output.writeRawVarint32(biomeShortIdMemoizedSerializedSize);
+        output.writeUInt32NoTag(82);
+        output.writeUInt32NoTag(biomeShortIdMemoizedSerializedSize);
       }
       for (int i = 0; i < biomeShortId_.size(); i++) {
         output.writeSInt32NoTag(biomeShortId_.get(i));
       }
       for (int i = 0; i < biomeId_.size(); i++) {
-        output.writeBytes(11, biomeId_.getByteString(i));
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 11, biomeId_.getRaw(i));
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(12, getErrorMessageBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 12, errorMessage_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(15, getVersionBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 15, version_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(16, getGameNameBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 16, gameName_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeInt64(17, time_);
@@ -15865,18 +17574,17 @@ public final class NetData {
         output.writeFloat(18, reflectionHeight_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeBytes(19, getMOTDBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 19, mOTD_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeInt32(20, onlinePlayersAmount_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -15901,8 +17609,7 @@ public final class NetData {
       {
         int dataSize = 0;
         for (int i = 0; i < blockName_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(blockName_.getByteString(i));
+          dataSize += computeStringSizeNoTag(blockName_.getRaw(i));
         }
         size += dataSize;
         size += 1 * getBlockNameList().size();
@@ -15932,8 +17639,7 @@ public final class NetData {
       {
         int dataSize = 0;
         for (int i = 0; i < assetUri_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(assetUri_.getByteString(i));
+          dataSize += computeStringSizeNoTag(assetUri_.getRaw(i));
         }
         size += dataSize;
         size += 1 * getAssetUriList().size();
@@ -15941,8 +17647,7 @@ public final class NetData {
       {
         int dataSize = 0;
         for (int i = 0; i < registerBlockFamily_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(registerBlockFamily_.getByteString(i));
+          dataSize += computeStringSizeNoTag(registerBlockFamily_.getRaw(i));
         }
         size += dataSize;
         size += 1 * getRegisterBlockFamilyList().size();
@@ -15968,23 +17673,19 @@ public final class NetData {
       {
         int dataSize = 0;
         for (int i = 0; i < biomeId_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(biomeId_.getByteString(i));
+          dataSize += computeStringSizeNoTag(biomeId_.getRaw(i));
         }
         size += dataSize;
         size += 1 * getBiomeIdList().size();
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(12, getErrorMessageBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(12, errorMessage_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(15, getVersionBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(15, version_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(16, getGameNameBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(16, gameName_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
@@ -15995,24 +17696,180 @@ public final class NetData {
           .computeFloatSize(18, reflectionHeight_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(19, getMOTDBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(19, mOTD_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(20, onlinePlayersAmount_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.ServerInfoMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.ServerInfoMessage other = (org.terasology.protobuf.NetData.ServerInfoMessage) obj;
+
+      boolean result = true;
+      result = result && getModuleList()
+          .equals(other.getModuleList());
+      result = result && getBlockIdList()
+          .equals(other.getBlockIdList());
+      result = result && getBlockNameList()
+          .equals(other.getBlockNameList());
+      result = result && getComponentList()
+          .equals(other.getComponentList());
+      result = result && getEventList()
+          .equals(other.getEventList());
+      result = result && getAssetIdList()
+          .equals(other.getAssetIdList());
+      result = result && getAssetUriList()
+          .equals(other.getAssetUriList());
+      result = result && getRegisterBlockFamilyList()
+          .equals(other.getRegisterBlockFamilyList());
+      result = result && getWorldInfoList()
+          .equals(other.getWorldInfoList());
+      result = result && getBiomeShortIdList()
+          .equals(other.getBiomeShortIdList());
+      result = result && getBiomeIdList()
+          .equals(other.getBiomeIdList());
+      result = result && (hasErrorMessage() == other.hasErrorMessage());
+      if (hasErrorMessage()) {
+        result = result && getErrorMessage()
+            .equals(other.getErrorMessage());
+      }
+      result = result && (hasVersion() == other.hasVersion());
+      if (hasVersion()) {
+        result = result && getVersion()
+            .equals(other.getVersion());
+      }
+      result = result && (hasGameName() == other.hasGameName());
+      if (hasGameName()) {
+        result = result && getGameName()
+            .equals(other.getGameName());
+      }
+      result = result && (hasTime() == other.hasTime());
+      if (hasTime()) {
+        result = result && (getTime()
+            == other.getTime());
+      }
+      result = result && (hasReflectionHeight() == other.hasReflectionHeight());
+      if (hasReflectionHeight()) {
+        result = result && (
+            java.lang.Float.floatToIntBits(getReflectionHeight())
+            == java.lang.Float.floatToIntBits(
+                other.getReflectionHeight()));
+      }
+      result = result && (hasMOTD() == other.hasMOTD());
+      if (hasMOTD()) {
+        result = result && getMOTD()
+            .equals(other.getMOTD());
+      }
+      result = result && (hasOnlinePlayersAmount() == other.hasOnlinePlayersAmount());
+      if (hasOnlinePlayersAmount()) {
+        result = result && (getOnlinePlayersAmount()
+            == other.getOnlinePlayersAmount());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getModuleCount() > 0) {
+        hash = (37 * hash) + MODULE_FIELD_NUMBER;
+        hash = (53 * hash) + getModuleList().hashCode();
+      }
+      if (getBlockIdCount() > 0) {
+        hash = (37 * hash) + BLOCKID_FIELD_NUMBER;
+        hash = (53 * hash) + getBlockIdList().hashCode();
+      }
+      if (getBlockNameCount() > 0) {
+        hash = (37 * hash) + BLOCKNAME_FIELD_NUMBER;
+        hash = (53 * hash) + getBlockNameList().hashCode();
+      }
+      if (getComponentCount() > 0) {
+        hash = (37 * hash) + COMPONENT_FIELD_NUMBER;
+        hash = (53 * hash) + getComponentList().hashCode();
+      }
+      if (getEventCount() > 0) {
+        hash = (37 * hash) + EVENT_FIELD_NUMBER;
+        hash = (53 * hash) + getEventList().hashCode();
+      }
+      if (getAssetIdCount() > 0) {
+        hash = (37 * hash) + ASSETID_FIELD_NUMBER;
+        hash = (53 * hash) + getAssetIdList().hashCode();
+      }
+      if (getAssetUriCount() > 0) {
+        hash = (37 * hash) + ASSETURI_FIELD_NUMBER;
+        hash = (53 * hash) + getAssetUriList().hashCode();
+      }
+      if (getRegisterBlockFamilyCount() > 0) {
+        hash = (37 * hash) + REGISTERBLOCKFAMILY_FIELD_NUMBER;
+        hash = (53 * hash) + getRegisterBlockFamilyList().hashCode();
+      }
+      if (getWorldInfoCount() > 0) {
+        hash = (37 * hash) + WORLDINFO_FIELD_NUMBER;
+        hash = (53 * hash) + getWorldInfoList().hashCode();
+      }
+      if (getBiomeShortIdCount() > 0) {
+        hash = (37 * hash) + BIOMESHORTID_FIELD_NUMBER;
+        hash = (53 * hash) + getBiomeShortIdList().hashCode();
+      }
+      if (getBiomeIdCount() > 0) {
+        hash = (37 * hash) + BIOMEID_FIELD_NUMBER;
+        hash = (53 * hash) + getBiomeIdList().hashCode();
+      }
+      if (hasErrorMessage()) {
+        hash = (37 * hash) + ERRORMESSAGE_FIELD_NUMBER;
+        hash = (53 * hash) + getErrorMessage().hashCode();
+      }
+      if (hasVersion()) {
+        hash = (37 * hash) + VERSION_FIELD_NUMBER;
+        hash = (53 * hash) + getVersion().hashCode();
+      }
+      if (hasGameName()) {
+        hash = (37 * hash) + GAMENAME_FIELD_NUMBER;
+        hash = (53 * hash) + getGameName().hashCode();
+      }
+      if (hasTime()) {
+        hash = (37 * hash) + TIME_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getTime());
+      }
+      if (hasReflectionHeight()) {
+        hash = (37 * hash) + REFLECTIONHEIGHT_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getReflectionHeight());
+      }
+      if (hasMOTD()) {
+        hash = (37 * hash) + MOTD_FIELD_NUMBER;
+        hash = (53 * hash) + getMOTD().hashCode();
+      }
+      if (hasOnlinePlayersAmount()) {
+        hash = (37 * hash) + ONLINEPLAYERSAMOUNT_FIELD_NUMBER;
+        hash = (53 * hash) + getOnlinePlayersAmount();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.ServerInfoMessage parseFrom(
@@ -16038,46 +17895,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.ServerInfoMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ServerInfoMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ServerInfoMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ServerInfoMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ServerInfoMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ServerInfoMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.ServerInfoMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.ServerInfoMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -16085,7 +17953,7 @@ public final class NetData {
      * Protobuf type {@code ServerInfoMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.ServerInfoMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:ServerInfoMessage)
         org.terasology.protobuf.NetData.ServerInfoMessageOrBuilder {
@@ -16094,7 +17962,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_ServerInfoMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_ServerInfoMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -16107,22 +17975,19 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getModuleFieldBuilder();
           getComponentFieldBuilder();
           getEventFieldBuilder();
           getWorldInfoFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         if (moduleBuilder_ == null) {
@@ -16178,10 +18043,6 @@ public final class NetData {
         onlinePlayersAmount_ = 0;
         bitField0_ = (bitField0_ & ~0x00020000);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -16309,6 +18170,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ServerInfoMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ServerInfoMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ServerInfoMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ServerInfoMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.ServerInfoMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.ServerInfoMessage)other);
@@ -16339,7 +18249,7 @@ public final class NetData {
               module_ = other.module_;
               bitField0_ = (bitField0_ & ~0x00000001);
               moduleBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getModuleFieldBuilder() : null;
             } else {
               moduleBuilder_.addAllMessages(other.module_);
@@ -16385,7 +18295,7 @@ public final class NetData {
               component_ = other.component_;
               bitField0_ = (bitField0_ & ~0x00000008);
               componentBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getComponentFieldBuilder() : null;
             } else {
               componentBuilder_.addAllMessages(other.component_);
@@ -16411,7 +18321,7 @@ public final class NetData {
               event_ = other.event_;
               bitField0_ = (bitField0_ & ~0x00000010);
               eventBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getEventFieldBuilder() : null;
             } else {
               eventBuilder_.addAllMessages(other.event_);
@@ -16467,7 +18377,7 @@ public final class NetData {
               worldInfo_ = other.worldInfo_;
               bitField0_ = (bitField0_ & ~0x00000100);
               worldInfoBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getWorldInfoFieldBuilder() : null;
             } else {
               worldInfoBuilder_.addAllMessages(other.worldInfo_);
@@ -16524,37 +18434,33 @@ public final class NetData {
           setOnlinePlayersAmount(other.getOnlinePlayersAmount());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         for (int i = 0; i < getModuleCount(); i++) {
           if (!getModule(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getComponentCount(); i++) {
           if (!getComponent(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getEventCount(); i++) {
           if (!getEvent(i).isInitialized()) {
-            
             return false;
           }
         }
         for (int i = 0; i < getWorldInfoCount(); i++) {
           if (!getWorldInfo(i).isInitialized()) {
-            
             return false;
           }
         }
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -16569,7 +18475,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.ServerInfoMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -16588,7 +18494,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.ModuleInfo, org.terasology.protobuf.NetData.ModuleInfo.Builder, org.terasology.protobuf.NetData.ModuleInfoOrBuilder> moduleBuilder_;
 
       /**
@@ -16804,11 +18710,11 @@ public final class NetData {
            getModuleBuilderList() {
         return getModuleFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.ModuleInfo, org.terasology.protobuf.NetData.ModuleInfo.Builder, org.terasology.protobuf.NetData.ModuleInfoOrBuilder> 
           getModuleFieldBuilder() {
         if (moduleBuilder_ == null) {
-          moduleBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          moduleBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.ModuleInfo, org.terasology.protobuf.NetData.ModuleInfo.Builder, org.terasology.protobuf.NetData.ModuleInfoOrBuilder>(
                   module_,
                   ((bitField0_ & 0x00000001) == 0x00000001),
@@ -16987,7 +18893,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder> componentBuilder_;
 
       /**
@@ -17203,11 +19109,11 @@ public final class NetData {
            getComponentBuilderList() {
         return getComponentFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
           getComponentFieldBuilder() {
         if (componentBuilder_ == null) {
-          componentBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          componentBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder>(
                   component_,
                   ((bitField0_ & 0x00000008) == 0x00000008),
@@ -17227,7 +19133,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder> eventBuilder_;
 
       /**
@@ -17443,11 +19349,11 @@ public final class NetData {
            getEventBuilderList() {
         return getEventFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
           getEventFieldBuilder() {
         if (eventBuilder_ == null) {
-          eventBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          eventBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder>(
                   event_,
                   ((bitField0_ & 0x00000010) == 0x00000010),
@@ -17719,7 +19625,7 @@ public final class NetData {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.WorldInfo, org.terasology.protobuf.NetData.WorldInfo.Builder, org.terasology.protobuf.NetData.WorldInfoOrBuilder> worldInfoBuilder_;
 
       /**
@@ -17935,11 +19841,11 @@ public final class NetData {
            getWorldInfoBuilderList() {
         return getWorldInfoFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilder<
+      private com.google.protobuf.RepeatedFieldBuilderV3<
           org.terasology.protobuf.NetData.WorldInfo, org.terasology.protobuf.NetData.WorldInfo.Builder, org.terasology.protobuf.NetData.WorldInfoOrBuilder> 
           getWorldInfoFieldBuilder() {
         if (worldInfoBuilder_ == null) {
-          worldInfoBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+          worldInfoBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               org.terasology.protobuf.NetData.WorldInfo, org.terasology.protobuf.NetData.WorldInfo.Builder, org.terasology.protobuf.NetData.WorldInfoOrBuilder>(
                   worldInfo_,
                   ((bitField0_ & 0x00000100) == 0x00000100),
@@ -18508,21 +20414,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:ServerInfoMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:ServerInfoMessage)
+    private static final org.terasology.protobuf.NetData.ServerInfoMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ServerInfoMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.ServerInfoMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:ServerInfoMessage)
+    public static org.terasology.protobuf.NetData.ServerInfoMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ServerInfoMessage>
+        PARSER = new com.google.protobuf.AbstractParser<ServerInfoMessage>() {
+      public ServerInfoMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ServerInfoMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ServerInfoMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ServerInfoMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.ServerInfoMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface WorldInfoOrBuilder extends
       // @@protoc_insertion_point(interface_extends:WorldInfo)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<WorldInfo> {
 
     /**
@@ -18551,38 +20494,30 @@ public final class NetData {
   /**
    * Protobuf type {@code WorldInfo}
    */
-  public static final class WorldInfo extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class WorldInfo extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         WorldInfo> implements
       // @@protoc_insertion_point(message_implements:WorldInfo)
       WorldInfoOrBuilder {
     // Use WorldInfo.newBuilder() to construct.
-    private WorldInfo(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.WorldInfo, ?> builder) {
+    private WorldInfo(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.WorldInfo, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private WorldInfo(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final WorldInfo defaultInstance;
-    public static WorldInfo getDefaultInstance() {
-      return defaultInstance;
+    private WorldInfo() {
+      title_ = "";
+      time_ = 0L;
     }
 
-    public WorldInfo getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private WorldInfo(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -18618,7 +20553,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -18629,31 +20564,16 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_WorldInfo_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_WorldInfo_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.WorldInfo.class, org.terasology.protobuf.NetData.WorldInfo.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<WorldInfo> PARSER =
-        new com.google.protobuf.AbstractParser<WorldInfo>() {
-      public WorldInfo parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new WorldInfo(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<WorldInfo> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int TITLE_FIELD_NUMBER = 1;
-    private java.lang.Object title_;
+    private volatile java.lang.Object title_;
     /**
      * <code>optional string title = 1;</code>
      */
@@ -18709,10 +20629,6 @@ public final class NetData {
       return time_;
     }
 
-    private void initFields() {
-      title_ = "";
-      time_ = 0L;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -18729,45 +20645,85 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.WorldInfo>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.WorldInfo>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getTitleBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, title_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt64(2, time_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getTitleBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, title_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(2, time_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.WorldInfo)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.WorldInfo other = (org.terasology.protobuf.NetData.WorldInfo) obj;
+
+      boolean result = true;
+      result = result && (hasTitle() == other.hasTitle());
+      if (hasTitle()) {
+        result = result && getTitle()
+            .equals(other.getTitle());
+      }
+      result = result && (hasTime() == other.hasTime());
+      if (hasTime()) {
+        result = result && (getTime()
+            == other.getTime());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasTitle()) {
+        hash = (37 * hash) + TITLE_FIELD_NUMBER;
+        hash = (53 * hash) + getTitle().hashCode();
+      }
+      if (hasTime()) {
+        hash = (37 * hash) + TIME_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getTime());
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.WorldInfo parseFrom(
@@ -18793,46 +20749,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.WorldInfo parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.WorldInfo parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.WorldInfo parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.WorldInfo parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.WorldInfo parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.WorldInfo parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.WorldInfo prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.WorldInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -18840,7 +20807,7 @@ public final class NetData {
      * Protobuf type {@code WorldInfo}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.WorldInfo, Builder> implements
         // @@protoc_insertion_point(builder_implements:WorldInfo)
         org.terasology.protobuf.NetData.WorldInfoOrBuilder {
@@ -18849,7 +20816,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_WorldInfo_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_WorldInfo_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -18862,18 +20829,15 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         title_ = "";
@@ -18881,10 +20845,6 @@ public final class NetData {
         time_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -18921,6 +20881,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.WorldInfo, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.WorldInfo, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.WorldInfo, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.WorldInfo, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.WorldInfo) {
           return mergeFrom((org.terasology.protobuf.NetData.WorldInfo)other);
@@ -18941,13 +20950,13 @@ public final class NetData {
           setTime(other.getTime());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -18962,7 +20971,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.WorldInfo) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -19079,21 +21088,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:WorldInfo)
     }
 
+    // @@protoc_insertion_point(class_scope:WorldInfo)
+    private static final org.terasology.protobuf.NetData.WorldInfo DEFAULT_INSTANCE;
     static {
-      defaultInstance = new WorldInfo(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.WorldInfo();
     }
 
-    // @@protoc_insertion_point(class_scope:WorldInfo)
+    public static org.terasology.protobuf.NetData.WorldInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<WorldInfo>
+        PARSER = new com.google.protobuf.AbstractParser<WorldInfo>() {
+      public WorldInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new WorldInfo(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<WorldInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<WorldInfo> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.WorldInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface SerializationInfoOrBuilder extends
       // @@protoc_insertion_point(interface_extends:SerializationInfo)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<SerializationInfo> {
 
     /**
@@ -19122,7 +21168,7 @@ public final class NetData {
     /**
      * <code>repeated string fieldName = 3;</code>
      */
-    com.google.protobuf.ProtocolStringList
+    java.util.List<java.lang.String>
         getFieldNameList();
     /**
      * <code>repeated string fieldName = 3;</code>
@@ -19150,38 +21196,32 @@ public final class NetData {
   /**
    * Protobuf type {@code SerializationInfo}
    */
-  public static final class SerializationInfo extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class SerializationInfo extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         SerializationInfo> implements
       // @@protoc_insertion_point(message_implements:SerializationInfo)
       SerializationInfoOrBuilder {
     // Use SerializationInfo.newBuilder() to construct.
-    private SerializationInfo(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.SerializationInfo, ?> builder) {
+    private SerializationInfo(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.SerializationInfo, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private SerializationInfo(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final SerializationInfo defaultInstance;
-    public static SerializationInfo getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public SerializationInfo getDefaultInstanceForType() {
-      return defaultInstance;
+    private SerializationInfo() {
+      name_ = "";
+      id_ = 0;
+      fieldName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      fieldIds_ = com.google.protobuf.ByteString.EMPTY;
     }
 
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private SerializationInfo(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -19231,7 +21271,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
           fieldName_ = fieldName_.getUnmodifiableView();
@@ -19245,31 +21285,16 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_SerializationInfo_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_SerializationInfo_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.SerializationInfo.class, org.terasology.protobuf.NetData.SerializationInfo.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<SerializationInfo> PARSER =
-        new com.google.protobuf.AbstractParser<SerializationInfo>() {
-      public SerializationInfo parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new SerializationInfo(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<SerializationInfo> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int NAME_FIELD_NUMBER = 1;
-    private java.lang.Object name_;
+    private volatile java.lang.Object name_;
     /**
      * <code>optional string name = 1;</code>
      */
@@ -19369,12 +21394,6 @@ public final class NetData {
       return fieldIds_;
     }
 
-    private void initFields() {
-      name_ = "";
-      id_ = 0;
-      fieldName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      fieldIds_ = com.google.protobuf.ByteString.EMPTY;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -19391,35 +21410,32 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.SerializationInfo>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.SerializationInfo>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getNameBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, id_);
       }
       for (int i = 0; i < fieldName_.size(); i++) {
-        output.writeBytes(3, fieldName_.getByteString(i));
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, fieldName_.getRaw(i));
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeBytes(4, fieldIds_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getNameBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -19428,8 +21444,7 @@ public final class NetData {
       {
         int dataSize = 0;
         for (int i = 0; i < fieldName_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(fieldName_.getByteString(i));
+          dataSize += computeStringSizeNoTag(fieldName_.getRaw(i));
         }
         size += dataSize;
         size += 1 * getFieldNameList().size();
@@ -19439,16 +21454,73 @@ public final class NetData {
           .computeBytesSize(4, fieldIds_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.SerializationInfo)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.SerializationInfo other = (org.terasology.protobuf.NetData.SerializationInfo) obj;
+
+      boolean result = true;
+      result = result && (hasName() == other.hasName());
+      if (hasName()) {
+        result = result && getName()
+            .equals(other.getName());
+      }
+      result = result && (hasId() == other.hasId());
+      if (hasId()) {
+        result = result && (getId()
+            == other.getId());
+      }
+      result = result && getFieldNameList()
+          .equals(other.getFieldNameList());
+      result = result && (hasFieldIds() == other.hasFieldIds());
+      if (hasFieldIds()) {
+        result = result && getFieldIds()
+            .equals(other.getFieldIds());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasName()) {
+        hash = (37 * hash) + NAME_FIELD_NUMBER;
+        hash = (53 * hash) + getName().hashCode();
+      }
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId();
+      }
+      if (getFieldNameCount() > 0) {
+        hash = (37 * hash) + FIELDNAME_FIELD_NUMBER;
+        hash = (53 * hash) + getFieldNameList().hashCode();
+      }
+      if (hasFieldIds()) {
+        hash = (37 * hash) + FIELDIDS_FIELD_NUMBER;
+        hash = (53 * hash) + getFieldIds().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
@@ -19474,46 +21546,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.SerializationInfo parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.SerializationInfo parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.SerializationInfo prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.SerializationInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -19521,7 +21604,7 @@ public final class NetData {
      * Protobuf type {@code SerializationInfo}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.SerializationInfo, Builder> implements
         // @@protoc_insertion_point(builder_implements:SerializationInfo)
         org.terasology.protobuf.NetData.SerializationInfoOrBuilder {
@@ -19530,7 +21613,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_SerializationInfo_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_SerializationInfo_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -19543,18 +21626,15 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         name_ = "";
@@ -19566,10 +21646,6 @@ public final class NetData {
         fieldIds_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -19615,6 +21691,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.SerializationInfo, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.SerializationInfo, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.SerializationInfo, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.SerializationInfo, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.SerializationInfo) {
           return mergeFrom((org.terasology.protobuf.NetData.SerializationInfo)other);
@@ -19648,13 +21773,13 @@ public final class NetData {
           setFieldIds(other.getFieldIds());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -19669,7 +21794,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.SerializationInfo) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -19914,21 +22039,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:SerializationInfo)
     }
 
+    // @@protoc_insertion_point(class_scope:SerializationInfo)
+    private static final org.terasology.protobuf.NetData.SerializationInfo DEFAULT_INSTANCE;
     static {
-      defaultInstance = new SerializationInfo(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.SerializationInfo();
     }
 
-    // @@protoc_insertion_point(class_scope:SerializationInfo)
+    public static org.terasology.protobuf.NetData.SerializationInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<SerializationInfo>
+        PARSER = new com.google.protobuf.AbstractParser<SerializationInfo>() {
+      public SerializationInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new SerializationInfo(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<SerializationInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SerializationInfo> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.SerializationInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ModuleInfoOrBuilder extends
       // @@protoc_insertion_point(interface_extends:ModuleInfo)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<ModuleInfo> {
 
     /**
@@ -19962,38 +22124,30 @@ public final class NetData {
   /**
    * Protobuf type {@code ModuleInfo}
    */
-  public static final class ModuleInfo extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class ModuleInfo extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         ModuleInfo> implements
       // @@protoc_insertion_point(message_implements:ModuleInfo)
       ModuleInfoOrBuilder {
     // Use ModuleInfo.newBuilder() to construct.
-    private ModuleInfo(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleInfo, ?> builder) {
+    private ModuleInfo(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleInfo, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ModuleInfo(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ModuleInfo defaultInstance;
-    public static ModuleInfo getDefaultInstance() {
-      return defaultInstance;
+    private ModuleInfo() {
+      moduleId_ = "";
+      moduleVersion_ = "";
     }
 
-    public ModuleInfo getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ModuleInfo(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -20030,7 +22184,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -20041,31 +22195,16 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_ModuleInfo_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_ModuleInfo_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.ModuleInfo.class, org.terasology.protobuf.NetData.ModuleInfo.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<ModuleInfo> PARSER =
-        new com.google.protobuf.AbstractParser<ModuleInfo>() {
-      public ModuleInfo parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ModuleInfo(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ModuleInfo> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int MODULEID_FIELD_NUMBER = 1;
-    private java.lang.Object moduleId_;
+    private volatile java.lang.Object moduleId_;
     /**
      * <code>optional string moduleId = 1;</code>
      */
@@ -20107,7 +22246,7 @@ public final class NetData {
     }
 
     public static final int MODULEVERSION_FIELD_NUMBER = 2;
-    private java.lang.Object moduleVersion_;
+    private volatile java.lang.Object moduleVersion_;
     /**
      * <code>optional string moduleVersion = 2;</code>
      */
@@ -20148,10 +22287,6 @@ public final class NetData {
       }
     }
 
-    private void initFields() {
-      moduleId_ = "";
-      moduleVersion_ = "";
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -20168,45 +22303,83 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleInfo>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleInfo>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getModuleIdBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, moduleId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getModuleVersionBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, moduleVersion_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getModuleIdBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, moduleId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getModuleVersionBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, moduleVersion_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.ModuleInfo)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.ModuleInfo other = (org.terasology.protobuf.NetData.ModuleInfo) obj;
+
+      boolean result = true;
+      result = result && (hasModuleId() == other.hasModuleId());
+      if (hasModuleId()) {
+        result = result && getModuleId()
+            .equals(other.getModuleId());
+      }
+      result = result && (hasModuleVersion() == other.hasModuleVersion());
+      if (hasModuleVersion()) {
+        result = result && getModuleVersion()
+            .equals(other.getModuleVersion());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasModuleId()) {
+        hash = (37 * hash) + MODULEID_FIELD_NUMBER;
+        hash = (53 * hash) + getModuleId().hashCode();
+      }
+      if (hasModuleVersion()) {
+        hash = (37 * hash) + MODULEVERSION_FIELD_NUMBER;
+        hash = (53 * hash) + getModuleVersion().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.ModuleInfo parseFrom(
@@ -20232,46 +22405,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.ModuleInfo parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleInfo parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleInfo parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleInfo parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleInfo parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleInfo parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleInfo prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -20279,7 +22463,7 @@ public final class NetData {
      * Protobuf type {@code ModuleInfo}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.ModuleInfo, Builder> implements
         // @@protoc_insertion_point(builder_implements:ModuleInfo)
         org.terasology.protobuf.NetData.ModuleInfoOrBuilder {
@@ -20288,7 +22472,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_ModuleInfo_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_ModuleInfo_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -20301,18 +22485,15 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         moduleId_ = "";
@@ -20320,10 +22501,6 @@ public final class NetData {
         moduleVersion_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -20360,6 +22537,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleInfo, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleInfo, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleInfo, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleInfo, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.ModuleInfo) {
           return mergeFrom((org.terasology.protobuf.NetData.ModuleInfo)other);
@@ -20382,13 +22608,13 @@ public final class NetData {
           onChanged();
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -20403,7 +22629,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.ModuleInfo) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -20564,21 +22790,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:ModuleInfo)
     }
 
+    // @@protoc_insertion_point(class_scope:ModuleInfo)
+    private static final org.terasology.protobuf.NetData.ModuleInfo DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ModuleInfo(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.ModuleInfo();
     }
 
-    // @@protoc_insertion_point(class_scope:ModuleInfo)
+    public static org.terasology.protobuf.NetData.ModuleInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ModuleInfo>
+        PARSER = new com.google.protobuf.AbstractParser<ModuleInfo>() {
+      public ModuleInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ModuleInfo(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ModuleInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ModuleInfo> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.ModuleInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ModuleRequestOrBuilder extends
       // @@protoc_insertion_point(interface_extends:ModuleRequest)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<ModuleRequest> {
 
     /**
@@ -20598,38 +22861,29 @@ public final class NetData {
   /**
    * Protobuf type {@code ModuleRequest}
    */
-  public static final class ModuleRequest extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class ModuleRequest extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         ModuleRequest> implements
       // @@protoc_insertion_point(message_implements:ModuleRequest)
       ModuleRequestOrBuilder {
     // Use ModuleRequest.newBuilder() to construct.
-    private ModuleRequest(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleRequest, ?> builder) {
+    private ModuleRequest(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleRequest, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ModuleRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ModuleRequest defaultInstance;
-    public static ModuleRequest getDefaultInstance() {
-      return defaultInstance;
+    private ModuleRequest() {
+      moduleId_ = "";
     }
 
-    public ModuleRequest getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ModuleRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -20660,7 +22914,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -20671,31 +22925,16 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_ModuleRequest_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_ModuleRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.ModuleRequest.class, org.terasology.protobuf.NetData.ModuleRequest.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<ModuleRequest> PARSER =
-        new com.google.protobuf.AbstractParser<ModuleRequest>() {
-      public ModuleRequest parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ModuleRequest(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ModuleRequest> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int MODULEID_FIELD_NUMBER = 1;
-    private java.lang.Object moduleId_;
+    private volatile java.lang.Object moduleId_;
     /**
      * <code>optional string moduleId = 1;</code>
      */
@@ -20736,9 +22975,6 @@ public final class NetData {
       }
     }
 
-    private void initFields() {
-      moduleId_ = "";
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -20755,38 +22991,68 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleRequest>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleRequest>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getModuleIdBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, moduleId_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getModuleIdBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, moduleId_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.ModuleRequest)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.ModuleRequest other = (org.terasology.protobuf.NetData.ModuleRequest) obj;
+
+      boolean result = true;
+      result = result && (hasModuleId() == other.hasModuleId());
+      if (hasModuleId()) {
+        result = result && getModuleId()
+            .equals(other.getModuleId());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasModuleId()) {
+        hash = (37 * hash) + MODULEID_FIELD_NUMBER;
+        hash = (53 * hash) + getModuleId().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.ModuleRequest parseFrom(
@@ -20812,46 +23078,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.ModuleRequest parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleRequest parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleRequest parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleRequest parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleRequest parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleRequest parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleRequest prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -20859,7 +23136,7 @@ public final class NetData {
      * Protobuf type {@code ModuleRequest}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.ModuleRequest, Builder> implements
         // @@protoc_insertion_point(builder_implements:ModuleRequest)
         org.terasology.protobuf.NetData.ModuleRequestOrBuilder {
@@ -20868,7 +23145,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_ModuleRequest_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_ModuleRequest_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -20881,27 +23158,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         moduleId_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -20934,6 +23204,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleRequest, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleRequest, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleRequest, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleRequest, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.ModuleRequest) {
           return mergeFrom((org.terasology.protobuf.NetData.ModuleRequest)other);
@@ -20951,13 +23270,13 @@ public final class NetData {
           onChanged();
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -20972,7 +23291,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.ModuleRequest) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -21057,21 +23376,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:ModuleRequest)
     }
 
+    // @@protoc_insertion_point(class_scope:ModuleRequest)
+    private static final org.terasology.protobuf.NetData.ModuleRequest DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ModuleRequest(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.ModuleRequest();
     }
 
-    // @@protoc_insertion_point(class_scope:ModuleRequest)
+    public static org.terasology.protobuf.NetData.ModuleRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ModuleRequest>
+        PARSER = new com.google.protobuf.AbstractParser<ModuleRequest>() {
+      public ModuleRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ModuleRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ModuleRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ModuleRequest> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.ModuleRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ModuleDataHeaderOrBuilder extends
       // @@protoc_insertion_point(interface_extends:ModuleDataHeader)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<ModuleDataHeader> {
 
     /**
@@ -21128,38 +23484,32 @@ public final class NetData {
   /**
    * Protobuf type {@code ModuleDataHeader}
    */
-  public static final class ModuleDataHeader extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class ModuleDataHeader extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         ModuleDataHeader> implements
       // @@protoc_insertion_point(message_implements:ModuleDataHeader)
       ModuleDataHeaderOrBuilder {
     // Use ModuleDataHeader.newBuilder() to construct.
-    private ModuleDataHeader(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleDataHeader, ?> builder) {
+    private ModuleDataHeader(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleDataHeader, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ModuleDataHeader(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ModuleDataHeader defaultInstance;
-    public static ModuleDataHeader getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public ModuleDataHeader getDefaultInstanceForType() {
-      return defaultInstance;
+    private ModuleDataHeader() {
+      id_ = "";
+      version_ = "";
+      size_ = 0L;
+      error_ = "";
     }
 
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ModuleDataHeader(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -21207,7 +23557,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -21218,31 +23568,16 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_ModuleDataHeader_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_ModuleDataHeader_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.ModuleDataHeader.class, org.terasology.protobuf.NetData.ModuleDataHeader.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<ModuleDataHeader> PARSER =
-        new com.google.protobuf.AbstractParser<ModuleDataHeader>() {
-      public ModuleDataHeader parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ModuleDataHeader(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ModuleDataHeader> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int ID_FIELD_NUMBER = 1;
-    private java.lang.Object id_;
+    private volatile java.lang.Object id_;
     /**
      * <code>optional string id = 1;</code>
      */
@@ -21284,7 +23619,7 @@ public final class NetData {
     }
 
     public static final int VERSION_FIELD_NUMBER = 2;
-    private java.lang.Object version_;
+    private volatile java.lang.Object version_;
     /**
      * <code>optional string version = 2;</code>
      */
@@ -21341,7 +23676,7 @@ public final class NetData {
     }
 
     public static final int ERROR_FIELD_NUMBER = 15;
-    private java.lang.Object error_;
+    private volatile java.lang.Object error_;
     /**
      * <code>optional string error = 15;</code>
      */
@@ -21382,12 +23717,6 @@ public final class NetData {
       }
     }
 
-    private void initFields() {
-      id_ = "";
-      version_ = "";
-      size_ = 0L;
-      error_ = "";
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -21404,59 +23733,115 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleDataHeader>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleDataHeader>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getIdBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getVersionBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, version_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt64(3, size_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(15, getErrorBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 15, error_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getIdBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getVersionBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, version_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(3, size_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(15, getErrorBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(15, error_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.ModuleDataHeader)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.ModuleDataHeader other = (org.terasology.protobuf.NetData.ModuleDataHeader) obj;
+
+      boolean result = true;
+      result = result && (hasId() == other.hasId());
+      if (hasId()) {
+        result = result && getId()
+            .equals(other.getId());
+      }
+      result = result && (hasVersion() == other.hasVersion());
+      if (hasVersion()) {
+        result = result && getVersion()
+            .equals(other.getVersion());
+      }
+      result = result && (hasSize() == other.hasSize());
+      if (hasSize()) {
+        result = result && (getSize()
+            == other.getSize());
+      }
+      result = result && (hasError() == other.hasError());
+      if (hasError()) {
+        result = result && getError()
+            .equals(other.getError());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      if (hasVersion()) {
+        hash = (37 * hash) + VERSION_FIELD_NUMBER;
+        hash = (53 * hash) + getVersion().hashCode();
+      }
+      if (hasSize()) {
+        hash = (37 * hash) + SIZE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getSize());
+      }
+      if (hasError()) {
+        hash = (37 * hash) + ERROR_FIELD_NUMBER;
+        hash = (53 * hash) + getError().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.ModuleDataHeader parseFrom(
@@ -21482,46 +23867,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.ModuleDataHeader parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleDataHeader parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleDataHeader parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleDataHeader parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleDataHeader parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleDataHeader parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleDataHeader prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleDataHeader prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -21529,7 +23925,7 @@ public final class NetData {
      * Protobuf type {@code ModuleDataHeader}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.ModuleDataHeader, Builder> implements
         // @@protoc_insertion_point(builder_implements:ModuleDataHeader)
         org.terasology.protobuf.NetData.ModuleDataHeaderOrBuilder {
@@ -21538,7 +23934,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_ModuleDataHeader_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_ModuleDataHeader_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -21551,18 +23947,15 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         id_ = "";
@@ -21574,10 +23967,6 @@ public final class NetData {
         error_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -21622,6 +24011,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleDataHeader, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleDataHeader, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleDataHeader, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleDataHeader, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.ModuleDataHeader) {
           return mergeFrom((org.terasology.protobuf.NetData.ModuleDataHeader)other);
@@ -21652,13 +24090,13 @@ public final class NetData {
           onChanged();
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -21673,7 +24111,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.ModuleDataHeader) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -21942,21 +24380,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:ModuleDataHeader)
     }
 
+    // @@protoc_insertion_point(class_scope:ModuleDataHeader)
+    private static final org.terasology.protobuf.NetData.ModuleDataHeader DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ModuleDataHeader(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.ModuleDataHeader();
     }
 
-    // @@protoc_insertion_point(class_scope:ModuleDataHeader)
+    public static org.terasology.protobuf.NetData.ModuleDataHeader getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ModuleDataHeader>
+        PARSER = new com.google.protobuf.AbstractParser<ModuleDataHeader>() {
+      public ModuleDataHeader parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ModuleDataHeader(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ModuleDataHeader> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ModuleDataHeader> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.ModuleDataHeader getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ModuleDataOrBuilder extends
       // @@protoc_insertion_point(interface_extends:ModuleData)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<ModuleData> {
 
     /**
@@ -21971,38 +24446,29 @@ public final class NetData {
   /**
    * Protobuf type {@code ModuleData}
    */
-  public static final class ModuleData extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class ModuleData extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         ModuleData> implements
       // @@protoc_insertion_point(message_implements:ModuleData)
       ModuleDataOrBuilder {
     // Use ModuleData.newBuilder() to construct.
-    private ModuleData(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleData, ?> builder) {
+    private ModuleData(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleData, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ModuleData(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ModuleData defaultInstance;
-    public static ModuleData getDefaultInstance() {
-      return defaultInstance;
+    private ModuleData() {
+      module_ = com.google.protobuf.ByteString.EMPTY;
     }
 
-    public ModuleData getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ModuleData(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -22032,7 +24498,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -22043,26 +24509,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_ModuleData_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_ModuleData_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.ModuleData.class, org.terasology.protobuf.NetData.ModuleData.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<ModuleData> PARSER =
-        new com.google.protobuf.AbstractParser<ModuleData>() {
-      public ModuleData parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ModuleData(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ModuleData> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -22081,9 +24532,6 @@ public final class NetData {
       return module_;
     }
 
-    private void initFields() {
-      module_ = com.google.protobuf.ByteString.EMPTY;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -22100,20 +24548,18 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleData>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleData>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, module_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -22122,16 +24568,49 @@ public final class NetData {
           .computeBytesSize(1, module_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.ModuleData)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.ModuleData other = (org.terasology.protobuf.NetData.ModuleData) obj;
+
+      boolean result = true;
+      result = result && (hasModule() == other.hasModule());
+      if (hasModule()) {
+        result = result && getModule()
+            .equals(other.getModule());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasModule()) {
+        hash = (37 * hash) + MODULE_FIELD_NUMBER;
+        hash = (53 * hash) + getModule().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.ModuleData parseFrom(
@@ -22157,46 +24636,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.ModuleData parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleData parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleData parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleData parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleData parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleData parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleData prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleData prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -22204,7 +24694,7 @@ public final class NetData {
      * Protobuf type {@code ModuleData}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.ModuleData, Builder> implements
         // @@protoc_insertion_point(builder_implements:ModuleData)
         org.terasology.protobuf.NetData.ModuleDataOrBuilder {
@@ -22213,7 +24703,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_ModuleData_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_ModuleData_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -22226,27 +24716,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         module_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -22279,6 +24762,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleData, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleData, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleData, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleData, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.ModuleData) {
           return mergeFrom((org.terasology.protobuf.NetData.ModuleData)other);
@@ -22294,13 +24826,13 @@ public final class NetData {
           setModule(other.getModule());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -22315,7 +24847,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.ModuleData) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -22359,21 +24891,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:ModuleData)
     }
 
+    // @@protoc_insertion_point(class_scope:ModuleData)
+    private static final org.terasology.protobuf.NetData.ModuleData DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ModuleData(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.ModuleData();
     }
 
-    // @@protoc_insertion_point(class_scope:ModuleData)
+    public static org.terasology.protobuf.NetData.ModuleData getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ModuleData>
+        PARSER = new com.google.protobuf.AbstractParser<ModuleData>() {
+      public ModuleData parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ModuleData(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ModuleData> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ModuleData> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.ModuleData getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ModuleSendErrorOrBuilder extends
       // @@protoc_insertion_point(interface_extends:ModuleSendError)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<ModuleSendError> {
 
     /**
@@ -22393,38 +24962,29 @@ public final class NetData {
   /**
    * Protobuf type {@code ModuleSendError}
    */
-  public static final class ModuleSendError extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class ModuleSendError extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         ModuleSendError> implements
       // @@protoc_insertion_point(message_implements:ModuleSendError)
       ModuleSendErrorOrBuilder {
     // Use ModuleSendError.newBuilder() to construct.
-    private ModuleSendError(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleSendError, ?> builder) {
+    private ModuleSendError(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.ModuleSendError, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ModuleSendError(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ModuleSendError defaultInstance;
-    public static ModuleSendError getDefaultInstance() {
-      return defaultInstance;
+    private ModuleSendError() {
+      message_ = "";
     }
 
-    public ModuleSendError getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ModuleSendError(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -22455,7 +25015,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -22466,31 +25026,16 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_ModuleSendError_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_ModuleSendError_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.ModuleSendError.class, org.terasology.protobuf.NetData.ModuleSendError.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<ModuleSendError> PARSER =
-        new com.google.protobuf.AbstractParser<ModuleSendError>() {
-      public ModuleSendError parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ModuleSendError(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ModuleSendError> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int MESSAGE_FIELD_NUMBER = 1;
-    private java.lang.Object message_;
+    private volatile java.lang.Object message_;
     /**
      * <code>optional string message = 1;</code>
      */
@@ -22531,9 +25076,6 @@ public final class NetData {
       }
     }
 
-    private void initFields() {
-      message_ = "";
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -22550,38 +25092,68 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleSendError>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.ModuleSendError>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getMessageBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, message_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getMessageBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, message_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.ModuleSendError)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.ModuleSendError other = (org.terasology.protobuf.NetData.ModuleSendError) obj;
+
+      boolean result = true;
+      result = result && (hasMessage() == other.hasMessage());
+      if (hasMessage()) {
+        result = result && getMessage()
+            .equals(other.getMessage());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasMessage()) {
+        hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+        hash = (53 * hash) + getMessage().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.ModuleSendError parseFrom(
@@ -22607,46 +25179,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.ModuleSendError parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleSendError parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleSendError parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleSendError parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.ModuleSendError parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.ModuleSendError parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleSendError prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.ModuleSendError prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -22654,7 +25237,7 @@ public final class NetData {
      * Protobuf type {@code ModuleSendError}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.ModuleSendError, Builder> implements
         // @@protoc_insertion_point(builder_implements:ModuleSendError)
         org.terasology.protobuf.NetData.ModuleSendErrorOrBuilder {
@@ -22663,7 +25246,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_ModuleSendError_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_ModuleSendError_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -22676,27 +25259,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         message_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -22729,6 +25305,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleSendError, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleSendError, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleSendError, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.ModuleSendError, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.ModuleSendError) {
           return mergeFrom((org.terasology.protobuf.NetData.ModuleSendError)other);
@@ -22746,13 +25371,13 @@ public final class NetData {
           onChanged();
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -22767,7 +25392,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.ModuleSendError) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -22852,21 +25477,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:ModuleSendError)
     }
 
+    // @@protoc_insertion_point(class_scope:ModuleSendError)
+    private static final org.terasology.protobuf.NetData.ModuleSendError DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ModuleSendError(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.ModuleSendError();
     }
 
-    // @@protoc_insertion_point(class_scope:ModuleSendError)
+    public static org.terasology.protobuf.NetData.ModuleSendError getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ModuleSendError>
+        PARSER = new com.google.protobuf.AbstractParser<ModuleSendError>() {
+      public ModuleSendError parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ModuleSendError(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ModuleSendError> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ModuleSendError> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.ModuleSendError getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface CreateEntityMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:CreateEntityMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<CreateEntityMessage> {
 
     /**
@@ -22898,38 +25560,28 @@ public final class NetData {
   /**
    * Protobuf type {@code CreateEntityMessage}
    */
-  public static final class CreateEntityMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class CreateEntityMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         CreateEntityMessage> implements
       // @@protoc_insertion_point(message_implements:CreateEntityMessage)
       CreateEntityMessageOrBuilder {
     // Use CreateEntityMessage.newBuilder() to construct.
-    private CreateEntityMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.CreateEntityMessage, ?> builder) {
+    private CreateEntityMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.CreateEntityMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private CreateEntityMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final CreateEntityMessage defaultInstance;
-    public static CreateEntityMessage getDefaultInstance() {
-      return defaultInstance;
+    private CreateEntityMessage() {
     }
 
-    public CreateEntityMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private CreateEntityMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -22980,7 +25632,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -22991,26 +25643,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_CreateEntityMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_CreateEntityMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.CreateEntityMessage.class, org.terasology.protobuf.NetData.CreateEntityMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<CreateEntityMessage> PARSER =
-        new com.google.protobuf.AbstractParser<CreateEntityMessage>() {
-      public CreateEntityMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CreateEntityMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<CreateEntityMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -23026,13 +25663,13 @@ public final class NetData {
      * <code>optional .PackedEntity entity = 1;</code>
      */
     public org.terasology.protobuf.EntityData.PackedEntity getEntity() {
-      return entity_;
+      return entity_ == null ? org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance() : entity_;
     }
     /**
      * <code>optional .PackedEntity entity = 1;</code>
      */
     public org.terasology.protobuf.EntityData.PackedEntityOrBuilder getEntityOrBuilder() {
-      return entity_;
+      return entity_ == null ? org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance() : entity_;
     }
 
     public static final int BLOCKPOS_FIELD_NUMBER = 2;
@@ -23047,19 +25684,15 @@ public final class NetData {
      * <code>optional .Vector3iData blockPos = 2;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iData getBlockPos() {
-      return blockPos_;
+      return blockPos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : blockPos_;
     }
     /**
      * <code>optional .Vector3iData blockPos = 2;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iDataOrBuilder getBlockPosOrBuilder() {
-      return blockPos_;
+      return blockPos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : blockPos_;
     }
 
-    private void initFields() {
-      entity_ = org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance();
-      blockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -23082,45 +25715,85 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.CreateEntityMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.CreateEntityMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, entity_);
+        output.writeMessage(1, getEntity());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, blockPos_);
+        output.writeMessage(2, getBlockPos());
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, entity_);
+          .computeMessageSize(1, getEntity());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, blockPos_);
+          .computeMessageSize(2, getBlockPos());
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.CreateEntityMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.CreateEntityMessage other = (org.terasology.protobuf.NetData.CreateEntityMessage) obj;
+
+      boolean result = true;
+      result = result && (hasEntity() == other.hasEntity());
+      if (hasEntity()) {
+        result = result && getEntity()
+            .equals(other.getEntity());
+      }
+      result = result && (hasBlockPos() == other.hasBlockPos());
+      if (hasBlockPos()) {
+        result = result && getBlockPos()
+            .equals(other.getBlockPos());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasEntity()) {
+        hash = (37 * hash) + ENTITY_FIELD_NUMBER;
+        hash = (53 * hash) + getEntity().hashCode();
+      }
+      if (hasBlockPos()) {
+        hash = (37 * hash) + BLOCKPOS_FIELD_NUMBER;
+        hash = (53 * hash) + getBlockPos().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.CreateEntityMessage parseFrom(
@@ -23146,46 +25819,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.CreateEntityMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.CreateEntityMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.CreateEntityMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.CreateEntityMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.CreateEntityMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.CreateEntityMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.CreateEntityMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.CreateEntityMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -23193,7 +25877,7 @@ public final class NetData {
      * Protobuf type {@code CreateEntityMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.CreateEntityMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:CreateEntityMessage)
         org.terasology.protobuf.NetData.CreateEntityMessageOrBuilder {
@@ -23202,7 +25886,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_CreateEntityMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_CreateEntityMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -23215,39 +25899,32 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getEntityFieldBuilder();
           getBlockPosFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         if (entityBuilder_ == null) {
-          entity_ = org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance();
+          entity_ = null;
         } else {
           entityBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
         if (blockPosBuilder_ == null) {
-          blockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          blockPos_ = null;
         } else {
           blockPosBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -23292,6 +25969,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.CreateEntityMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.CreateEntityMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.CreateEntityMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.CreateEntityMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.CreateEntityMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.CreateEntityMessage)other);
@@ -23310,19 +26036,18 @@ public final class NetData {
           mergeBlockPos(other.getBlockPos());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (hasEntity()) {
           if (!getEntity().isInitialized()) {
-            
             return false;
           }
         }
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -23337,7 +26062,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.CreateEntityMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -23347,8 +26072,8 @@ public final class NetData {
       }
       private int bitField0_;
 
-      private org.terasology.protobuf.EntityData.PackedEntity entity_ = org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.EntityData.PackedEntity entity_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.EntityData.PackedEntity, org.terasology.protobuf.EntityData.PackedEntity.Builder, org.terasology.protobuf.EntityData.PackedEntityOrBuilder> entityBuilder_;
       /**
        * <code>optional .PackedEntity entity = 1;</code>
@@ -23361,7 +26086,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.EntityData.PackedEntity getEntity() {
         if (entityBuilder_ == null) {
-          return entity_;
+          return entity_ == null ? org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance() : entity_;
         } else {
           return entityBuilder_.getMessage();
         }
@@ -23402,6 +26127,7 @@ public final class NetData {
       public Builder mergeEntity(org.terasology.protobuf.EntityData.PackedEntity value) {
         if (entityBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              entity_ != null &&
               entity_ != org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance()) {
             entity_ =
               org.terasology.protobuf.EntityData.PackedEntity.newBuilder(entity_).mergeFrom(value).buildPartial();
@@ -23420,7 +26146,7 @@ public final class NetData {
        */
       public Builder clearEntity() {
         if (entityBuilder_ == null) {
-          entity_ = org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance();
+          entity_ = null;
           onChanged();
         } else {
           entityBuilder_.clear();
@@ -23443,17 +26169,18 @@ public final class NetData {
         if (entityBuilder_ != null) {
           return entityBuilder_.getMessageOrBuilder();
         } else {
-          return entity_;
+          return entity_ == null ?
+              org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance() : entity_;
         }
       }
       /**
        * <code>optional .PackedEntity entity = 1;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.EntityData.PackedEntity, org.terasology.protobuf.EntityData.PackedEntity.Builder, org.terasology.protobuf.EntityData.PackedEntityOrBuilder> 
           getEntityFieldBuilder() {
         if (entityBuilder_ == null) {
-          entityBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          entityBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.EntityData.PackedEntity, org.terasology.protobuf.EntityData.PackedEntity.Builder, org.terasology.protobuf.EntityData.PackedEntityOrBuilder>(
                   getEntity(),
                   getParentForChildren(),
@@ -23463,8 +26190,8 @@ public final class NetData {
         return entityBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.Vector3iData blockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.Vector3iData blockPos_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> blockPosBuilder_;
       /**
        * <code>optional .Vector3iData blockPos = 2;</code>
@@ -23477,7 +26204,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.Vector3iData getBlockPos() {
         if (blockPosBuilder_ == null) {
-          return blockPos_;
+          return blockPos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : blockPos_;
         } else {
           return blockPosBuilder_.getMessage();
         }
@@ -23518,6 +26245,7 @@ public final class NetData {
       public Builder mergeBlockPos(org.terasology.protobuf.NetData.Vector3iData value) {
         if (blockPosBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              blockPos_ != null &&
               blockPos_ != org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance()) {
             blockPos_ =
               org.terasology.protobuf.NetData.Vector3iData.newBuilder(blockPos_).mergeFrom(value).buildPartial();
@@ -23536,7 +26264,7 @@ public final class NetData {
        */
       public Builder clearBlockPos() {
         if (blockPosBuilder_ == null) {
-          blockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          blockPos_ = null;
           onChanged();
         } else {
           blockPosBuilder_.clear();
@@ -23559,17 +26287,18 @@ public final class NetData {
         if (blockPosBuilder_ != null) {
           return blockPosBuilder_.getMessageOrBuilder();
         } else {
-          return blockPos_;
+          return blockPos_ == null ?
+              org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : blockPos_;
         }
       }
       /**
        * <code>optional .Vector3iData blockPos = 2;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> 
           getBlockPosFieldBuilder() {
         if (blockPosBuilder_ == null) {
-          blockPosBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          blockPosBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder>(
                   getBlockPos(),
                   getParentForChildren(),
@@ -23578,21 +26307,58 @@ public final class NetData {
         }
         return blockPosBuilder_;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:CreateEntityMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:CreateEntityMessage)
+    private static final org.terasology.protobuf.NetData.CreateEntityMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new CreateEntityMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.CreateEntityMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:CreateEntityMessage)
+    public static org.terasology.protobuf.NetData.CreateEntityMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<CreateEntityMessage>
+        PARSER = new com.google.protobuf.AbstractParser<CreateEntityMessage>() {
+      public CreateEntityMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new CreateEntityMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CreateEntityMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CreateEntityMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.CreateEntityMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface UpdateEntityMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:UpdateEntityMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<UpdateEntityMessage> {
 
     /**
@@ -23620,38 +26386,29 @@ public final class NetData {
   /**
    * Protobuf type {@code UpdateEntityMessage}
    */
-  public static final class UpdateEntityMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class UpdateEntityMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         UpdateEntityMessage> implements
       // @@protoc_insertion_point(message_implements:UpdateEntityMessage)
       UpdateEntityMessageOrBuilder {
     // Use UpdateEntityMessage.newBuilder() to construct.
-    private UpdateEntityMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.UpdateEntityMessage, ?> builder) {
+    private UpdateEntityMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.UpdateEntityMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private UpdateEntityMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final UpdateEntityMessage defaultInstance;
-    public static UpdateEntityMessage getDefaultInstance() {
-      return defaultInstance;
+    private UpdateEntityMessage() {
+      netId_ = 0;
     }
 
-    public UpdateEntityMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private UpdateEntityMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -23694,7 +26451,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -23705,26 +26462,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_UpdateEntityMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_UpdateEntityMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.UpdateEntityMessage.class, org.terasology.protobuf.NetData.UpdateEntityMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<UpdateEntityMessage> PARSER =
-        new com.google.protobuf.AbstractParser<UpdateEntityMessage>() {
-      public UpdateEntityMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new UpdateEntityMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<UpdateEntityMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -23740,13 +26482,13 @@ public final class NetData {
      * <code>optional .PackedEntity entity = 1;</code>
      */
     public org.terasology.protobuf.EntityData.PackedEntity getEntity() {
-      return entity_;
+      return entity_ == null ? org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance() : entity_;
     }
     /**
      * <code>optional .PackedEntity entity = 1;</code>
      */
     public org.terasology.protobuf.EntityData.PackedEntityOrBuilder getEntityOrBuilder() {
-      return entity_;
+      return entity_ == null ? org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance() : entity_;
     }
 
     public static final int NETID_FIELD_NUMBER = 2;
@@ -23764,10 +26506,6 @@ public final class NetData {
       return netId_;
     }
 
-    private void initFields() {
-      entity_ = org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance();
-      netId_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -23790,45 +26528,85 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.UpdateEntityMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.UpdateEntityMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, entity_);
+        output.writeMessage(1, getEntity());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, netId_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, entity_);
+          .computeMessageSize(1, getEntity());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, netId_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.UpdateEntityMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.UpdateEntityMessage other = (org.terasology.protobuf.NetData.UpdateEntityMessage) obj;
+
+      boolean result = true;
+      result = result && (hasEntity() == other.hasEntity());
+      if (hasEntity()) {
+        result = result && getEntity()
+            .equals(other.getEntity());
+      }
+      result = result && (hasNetId() == other.hasNetId());
+      if (hasNetId()) {
+        result = result && (getNetId()
+            == other.getNetId());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasEntity()) {
+        hash = (37 * hash) + ENTITY_FIELD_NUMBER;
+        hash = (53 * hash) + getEntity().hashCode();
+      }
+      if (hasNetId()) {
+        hash = (37 * hash) + NETID_FIELD_NUMBER;
+        hash = (53 * hash) + getNetId();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.UpdateEntityMessage parseFrom(
@@ -23854,46 +26632,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.UpdateEntityMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.UpdateEntityMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.UpdateEntityMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.UpdateEntityMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.UpdateEntityMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.UpdateEntityMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.UpdateEntityMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.UpdateEntityMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -23901,7 +26690,7 @@ public final class NetData {
      * Protobuf type {@code UpdateEntityMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.UpdateEntityMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:UpdateEntityMessage)
         org.terasology.protobuf.NetData.UpdateEntityMessageOrBuilder {
@@ -23910,7 +26699,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_UpdateEntityMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_UpdateEntityMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -23923,23 +26712,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getEntityFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         if (entityBuilder_ == null) {
-          entity_ = org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance();
+          entity_ = null;
         } else {
           entityBuilder_.clear();
         }
@@ -23947,10 +26733,6 @@ public final class NetData {
         netId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -23991,6 +26773,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.UpdateEntityMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.UpdateEntityMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.UpdateEntityMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.UpdateEntityMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.UpdateEntityMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.UpdateEntityMessage)other);
@@ -24009,19 +26840,18 @@ public final class NetData {
           setNetId(other.getNetId());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (hasEntity()) {
           if (!getEntity().isInitialized()) {
-            
             return false;
           }
         }
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -24036,7 +26866,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.UpdateEntityMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -24046,8 +26876,8 @@ public final class NetData {
       }
       private int bitField0_;
 
-      private org.terasology.protobuf.EntityData.PackedEntity entity_ = org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.EntityData.PackedEntity entity_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.EntityData.PackedEntity, org.terasology.protobuf.EntityData.PackedEntity.Builder, org.terasology.protobuf.EntityData.PackedEntityOrBuilder> entityBuilder_;
       /**
        * <code>optional .PackedEntity entity = 1;</code>
@@ -24060,7 +26890,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.EntityData.PackedEntity getEntity() {
         if (entityBuilder_ == null) {
-          return entity_;
+          return entity_ == null ? org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance() : entity_;
         } else {
           return entityBuilder_.getMessage();
         }
@@ -24101,6 +26931,7 @@ public final class NetData {
       public Builder mergeEntity(org.terasology.protobuf.EntityData.PackedEntity value) {
         if (entityBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              entity_ != null &&
               entity_ != org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance()) {
             entity_ =
               org.terasology.protobuf.EntityData.PackedEntity.newBuilder(entity_).mergeFrom(value).buildPartial();
@@ -24119,7 +26950,7 @@ public final class NetData {
        */
       public Builder clearEntity() {
         if (entityBuilder_ == null) {
-          entity_ = org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance();
+          entity_ = null;
           onChanged();
         } else {
           entityBuilder_.clear();
@@ -24142,17 +26973,18 @@ public final class NetData {
         if (entityBuilder_ != null) {
           return entityBuilder_.getMessageOrBuilder();
         } else {
-          return entity_;
+          return entity_ == null ?
+              org.terasology.protobuf.EntityData.PackedEntity.getDefaultInstance() : entity_;
         }
       }
       /**
        * <code>optional .PackedEntity entity = 1;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.EntityData.PackedEntity, org.terasology.protobuf.EntityData.PackedEntity.Builder, org.terasology.protobuf.EntityData.PackedEntityOrBuilder> 
           getEntityFieldBuilder() {
         if (entityBuilder_ == null) {
-          entityBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          entityBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.EntityData.PackedEntity, org.terasology.protobuf.EntityData.PackedEntity.Builder, org.terasology.protobuf.EntityData.PackedEntityOrBuilder>(
                   getEntity(),
                   getParentForChildren(),
@@ -24193,21 +27025,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:UpdateEntityMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:UpdateEntityMessage)
+    private static final org.terasology.protobuf.NetData.UpdateEntityMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new UpdateEntityMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.UpdateEntityMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:UpdateEntityMessage)
+    public static org.terasology.protobuf.NetData.UpdateEntityMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<UpdateEntityMessage>
+        PARSER = new com.google.protobuf.AbstractParser<UpdateEntityMessage>() {
+      public UpdateEntityMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new UpdateEntityMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<UpdateEntityMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<UpdateEntityMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.UpdateEntityMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface RemoveEntityMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:RemoveEntityMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<RemoveEntityMessage> {
 
     /**
@@ -24222,38 +27091,29 @@ public final class NetData {
   /**
    * Protobuf type {@code RemoveEntityMessage}
    */
-  public static final class RemoveEntityMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class RemoveEntityMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         RemoveEntityMessage> implements
       // @@protoc_insertion_point(message_implements:RemoveEntityMessage)
       RemoveEntityMessageOrBuilder {
     // Use RemoveEntityMessage.newBuilder() to construct.
-    private RemoveEntityMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.RemoveEntityMessage, ?> builder) {
+    private RemoveEntityMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.RemoveEntityMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private RemoveEntityMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final RemoveEntityMessage defaultInstance;
-    public static RemoveEntityMessage getDefaultInstance() {
-      return defaultInstance;
+    private RemoveEntityMessage() {
+      netId_ = 0;
     }
 
-    public RemoveEntityMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private RemoveEntityMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -24283,7 +27143,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -24294,26 +27154,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_RemoveEntityMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_RemoveEntityMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.RemoveEntityMessage.class, org.terasology.protobuf.NetData.RemoveEntityMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<RemoveEntityMessage> PARSER =
-        new com.google.protobuf.AbstractParser<RemoveEntityMessage>() {
-      public RemoveEntityMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new RemoveEntityMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<RemoveEntityMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -24332,9 +27177,6 @@ public final class NetData {
       return netId_;
     }
 
-    private void initFields() {
-      netId_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -24351,20 +27193,18 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.RemoveEntityMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.RemoveEntityMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, netId_);
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -24373,16 +27213,49 @@ public final class NetData {
           .computeInt32Size(1, netId_);
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.RemoveEntityMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.RemoveEntityMessage other = (org.terasology.protobuf.NetData.RemoveEntityMessage) obj;
+
+      boolean result = true;
+      result = result && (hasNetId() == other.hasNetId());
+      if (hasNetId()) {
+        result = result && (getNetId()
+            == other.getNetId());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasNetId()) {
+        hash = (37 * hash) + NETID_FIELD_NUMBER;
+        hash = (53 * hash) + getNetId();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.RemoveEntityMessage parseFrom(
@@ -24408,46 +27281,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.RemoveEntityMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.RemoveEntityMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.RemoveEntityMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.RemoveEntityMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.RemoveEntityMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.RemoveEntityMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.RemoveEntityMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.RemoveEntityMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -24455,7 +27339,7 @@ public final class NetData {
      * Protobuf type {@code RemoveEntityMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.RemoveEntityMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:RemoveEntityMessage)
         org.terasology.protobuf.NetData.RemoveEntityMessageOrBuilder {
@@ -24464,7 +27348,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_RemoveEntityMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_RemoveEntityMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -24477,27 +27361,20 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         netId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -24530,6 +27407,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.RemoveEntityMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.RemoveEntityMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.RemoveEntityMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.RemoveEntityMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.RemoveEntityMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.RemoveEntityMessage)other);
@@ -24545,13 +27471,13 @@ public final class NetData {
           setNetId(other.getNetId());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -24566,7 +27492,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.RemoveEntityMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -24607,21 +27533,58 @@ public final class NetData {
         onChanged();
         return this;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:RemoveEntityMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:RemoveEntityMessage)
+    private static final org.terasology.protobuf.NetData.RemoveEntityMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new RemoveEntityMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.RemoveEntityMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:RemoveEntityMessage)
+    public static org.terasology.protobuf.NetData.RemoveEntityMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<RemoveEntityMessage>
+        PARSER = new com.google.protobuf.AbstractParser<RemoveEntityMessage>() {
+      public RemoveEntityMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new RemoveEntityMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<RemoveEntityMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RemoveEntityMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.RemoveEntityMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface EventMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:EventMessage)
-      com.google.protobuf.GeneratedMessage.
+      com.google.protobuf.GeneratedMessageV3.
           ExtendableMessageOrBuilder<EventMessage> {
 
     /**
@@ -24662,38 +27625,29 @@ public final class NetData {
   /**
    * Protobuf type {@code EventMessage}
    */
-  public static final class EventMessage extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+  public  static final class EventMessage extends
+      com.google.protobuf.GeneratedMessageV3.ExtendableMessage<
         EventMessage> implements
       // @@protoc_insertion_point(message_implements:EventMessage)
       EventMessageOrBuilder {
     // Use EventMessage.newBuilder() to construct.
-    private EventMessage(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.NetData.EventMessage, ?> builder) {
+    private EventMessage(com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<org.terasology.protobuf.NetData.EventMessage, ?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private EventMessage(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final EventMessage defaultInstance;
-    public static EventMessage getDefaultInstance() {
-      return defaultInstance;
+    private EventMessage() {
+      targetId_ = 0;
     }
 
-    public EventMessage getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private EventMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -24749,7 +27703,7 @@ public final class NetData {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -24760,26 +27714,11 @@ public final class NetData {
       return org.terasology.protobuf.NetData.internal_static_EventMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.terasology.protobuf.NetData.internal_static_EventMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.terasology.protobuf.NetData.EventMessage.class, org.terasology.protobuf.NetData.EventMessage.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<EventMessage> PARSER =
-        new com.google.protobuf.AbstractParser<EventMessage>() {
-      public EventMessage parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new EventMessage(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<EventMessage> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -24810,13 +27749,13 @@ public final class NetData {
      * <code>optional .Event event = 2;</code>
      */
     public org.terasology.protobuf.EntityData.Event getEvent() {
-      return event_;
+      return event_ == null ? org.terasology.protobuf.EntityData.Event.getDefaultInstance() : event_;
     }
     /**
      * <code>optional .Event event = 2;</code>
      */
     public org.terasology.protobuf.EntityData.EventOrBuilder getEventOrBuilder() {
-      return event_;
+      return event_ == null ? org.terasology.protobuf.EntityData.Event.getDefaultInstance() : event_;
     }
 
     public static final int TARGETBLOCKPOS_FIELD_NUMBER = 3;
@@ -24831,20 +27770,15 @@ public final class NetData {
      * <code>optional .Vector3iData targetBlockPos = 3;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iData getTargetBlockPos() {
-      return targetBlockPos_;
+      return targetBlockPos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : targetBlockPos_;
     }
     /**
      * <code>optional .Vector3iData targetBlockPos = 3;</code>
      */
     public org.terasology.protobuf.NetData.Vector3iDataOrBuilder getTargetBlockPosOrBuilder() {
-      return targetBlockPos_;
+      return targetBlockPos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : targetBlockPos_;
     }
 
-    private void initFields() {
-      targetId_ = 0;
-      event_ = org.terasology.protobuf.EntityData.Event.getDefaultInstance();
-      targetBlockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -24867,26 +27801,24 @@ public final class NetData {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.EventMessage>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
+      com.google.protobuf.GeneratedMessageV3
+        .ExtendableMessage<org.terasology.protobuf.NetData.EventMessage>.ExtensionWriter
+          extensionWriter = newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, targetId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, event_);
+        output.writeMessage(2, getEvent());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, targetBlockPos_);
+        output.writeMessage(3, getTargetBlockPos());
       }
       extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -24896,23 +27828,74 @@ public final class NetData {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, event_);
+          .computeMessageSize(2, getEvent());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, targetBlockPos_);
+          .computeMessageSize(3, getTargetBlockPos());
       }
       size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof org.terasology.protobuf.NetData.EventMessage)) {
+        return super.equals(obj);
+      }
+      org.terasology.protobuf.NetData.EventMessage other = (org.terasology.protobuf.NetData.EventMessage) obj;
+
+      boolean result = true;
+      result = result && (hasTargetId() == other.hasTargetId());
+      if (hasTargetId()) {
+        result = result && (getTargetId()
+            == other.getTargetId());
+      }
+      result = result && (hasEvent() == other.hasEvent());
+      if (hasEvent()) {
+        result = result && getEvent()
+            .equals(other.getEvent());
+      }
+      result = result && (hasTargetBlockPos() == other.hasTargetBlockPos());
+      if (hasTargetBlockPos()) {
+        result = result && getTargetBlockPos()
+            .equals(other.getTargetBlockPos());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      result = result &&
+          getExtensionFields().equals(other.getExtensionFields());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasTargetId()) {
+        hash = (37 * hash) + TARGETID_FIELD_NUMBER;
+        hash = (53 * hash) + getTargetId();
+      }
+      if (hasEvent()) {
+        hash = (37 * hash) + EVENT_FIELD_NUMBER;
+        hash = (53 * hash) + getEvent().hashCode();
+      }
+      if (hasTargetBlockPos()) {
+        hash = (37 * hash) + TARGETBLOCKPOS_FIELD_NUMBER;
+        hash = (53 * hash) + getTargetBlockPos().hashCode();
+      }
+      hash = hashFields(hash, getExtensionFields());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static org.terasology.protobuf.NetData.EventMessage parseFrom(
@@ -24938,46 +27921,57 @@ public final class NetData {
     }
     public static org.terasology.protobuf.NetData.EventMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.EventMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.EventMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.EventMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static org.terasology.protobuf.NetData.EventMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static org.terasology.protobuf.NetData.EventMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.EventMessage prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.EventMessage prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -24985,7 +27979,7 @@ public final class NetData {
      * Protobuf type {@code EventMessage}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+        com.google.protobuf.GeneratedMessageV3.ExtendableBuilder<
           org.terasology.protobuf.NetData.EventMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:EventMessage)
         org.terasology.protobuf.NetData.EventMessageOrBuilder {
@@ -24994,7 +27988,7 @@ public final class NetData {
         return org.terasology.protobuf.NetData.internal_static_EventMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.terasology.protobuf.NetData.internal_static_EventMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -25007,41 +28001,34 @@ public final class NetData {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
           getEventFieldBuilder();
           getTargetBlockPosFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         targetId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
         if (eventBuilder_ == null) {
-          event_ = org.terasology.protobuf.EntityData.Event.getDefaultInstance();
+          event_ = null;
         } else {
           eventBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
         if (targetBlockPosBuilder_ == null) {
-          targetBlockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          targetBlockPos_ = null;
         } else {
           targetBlockPosBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -25090,6 +28077,55 @@ public final class NetData {
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.EventMessage, Type> extension,
+          Type value) {
+        return (Builder) super.setExtension(extension, value);
+      }
+      public <Type> Builder setExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.EventMessage, java.util.List<Type>> extension,
+          int index, Type value) {
+        return (Builder) super.setExtension(extension, index, value);
+      }
+      public <Type> Builder addExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.EventMessage, java.util.List<Type>> extension,
+          Type value) {
+        return (Builder) super.addExtension(extension, value);
+      }
+      public <Type> Builder clearExtension(
+          com.google.protobuf.GeneratedMessage.GeneratedExtension<
+              org.terasology.protobuf.NetData.EventMessage, ?> extension) {
+        return (Builder) super.clearExtension(extension);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.terasology.protobuf.NetData.EventMessage) {
           return mergeFrom((org.terasology.protobuf.NetData.EventMessage)other);
@@ -25111,19 +28147,18 @@ public final class NetData {
           mergeTargetBlockPos(other.getTargetBlockPos());
         }
         this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (hasEvent()) {
           if (!getEvent().isInitialized()) {
-            
             return false;
           }
         }
         if (!extensionsAreInitialized()) {
-          
           return false;
         }
         return true;
@@ -25138,7 +28173,7 @@ public final class NetData {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.terasology.protobuf.NetData.EventMessage) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -25180,8 +28215,8 @@ public final class NetData {
         return this;
       }
 
-      private org.terasology.protobuf.EntityData.Event event_ = org.terasology.protobuf.EntityData.Event.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.EntityData.Event event_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.EntityData.Event, org.terasology.protobuf.EntityData.Event.Builder, org.terasology.protobuf.EntityData.EventOrBuilder> eventBuilder_;
       /**
        * <code>optional .Event event = 2;</code>
@@ -25194,7 +28229,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.EntityData.Event getEvent() {
         if (eventBuilder_ == null) {
-          return event_;
+          return event_ == null ? org.terasology.protobuf.EntityData.Event.getDefaultInstance() : event_;
         } else {
           return eventBuilder_.getMessage();
         }
@@ -25235,6 +28270,7 @@ public final class NetData {
       public Builder mergeEvent(org.terasology.protobuf.EntityData.Event value) {
         if (eventBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              event_ != null &&
               event_ != org.terasology.protobuf.EntityData.Event.getDefaultInstance()) {
             event_ =
               org.terasology.protobuf.EntityData.Event.newBuilder(event_).mergeFrom(value).buildPartial();
@@ -25253,7 +28289,7 @@ public final class NetData {
        */
       public Builder clearEvent() {
         if (eventBuilder_ == null) {
-          event_ = org.terasology.protobuf.EntityData.Event.getDefaultInstance();
+          event_ = null;
           onChanged();
         } else {
           eventBuilder_.clear();
@@ -25276,17 +28312,18 @@ public final class NetData {
         if (eventBuilder_ != null) {
           return eventBuilder_.getMessageOrBuilder();
         } else {
-          return event_;
+          return event_ == null ?
+              org.terasology.protobuf.EntityData.Event.getDefaultInstance() : event_;
         }
       }
       /**
        * <code>optional .Event event = 2;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.EntityData.Event, org.terasology.protobuf.EntityData.Event.Builder, org.terasology.protobuf.EntityData.EventOrBuilder> 
           getEventFieldBuilder() {
         if (eventBuilder_ == null) {
-          eventBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          eventBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.EntityData.Event, org.terasology.protobuf.EntityData.Event.Builder, org.terasology.protobuf.EntityData.EventOrBuilder>(
                   getEvent(),
                   getParentForChildren(),
@@ -25296,8 +28333,8 @@ public final class NetData {
         return eventBuilder_;
       }
 
-      private org.terasology.protobuf.NetData.Vector3iData targetBlockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
+      private org.terasology.protobuf.NetData.Vector3iData targetBlockPos_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> targetBlockPosBuilder_;
       /**
        * <code>optional .Vector3iData targetBlockPos = 3;</code>
@@ -25310,7 +28347,7 @@ public final class NetData {
        */
       public org.terasology.protobuf.NetData.Vector3iData getTargetBlockPos() {
         if (targetBlockPosBuilder_ == null) {
-          return targetBlockPos_;
+          return targetBlockPos_ == null ? org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : targetBlockPos_;
         } else {
           return targetBlockPosBuilder_.getMessage();
         }
@@ -25351,6 +28388,7 @@ public final class NetData {
       public Builder mergeTargetBlockPos(org.terasology.protobuf.NetData.Vector3iData value) {
         if (targetBlockPosBuilder_ == null) {
           if (((bitField0_ & 0x00000004) == 0x00000004) &&
+              targetBlockPos_ != null &&
               targetBlockPos_ != org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance()) {
             targetBlockPos_ =
               org.terasology.protobuf.NetData.Vector3iData.newBuilder(targetBlockPos_).mergeFrom(value).buildPartial();
@@ -25369,7 +28407,7 @@ public final class NetData {
        */
       public Builder clearTargetBlockPos() {
         if (targetBlockPosBuilder_ == null) {
-          targetBlockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          targetBlockPos_ = null;
           onChanged();
         } else {
           targetBlockPosBuilder_.clear();
@@ -25392,17 +28430,18 @@ public final class NetData {
         if (targetBlockPosBuilder_ != null) {
           return targetBlockPosBuilder_.getMessageOrBuilder();
         } else {
-          return targetBlockPos_;
+          return targetBlockPos_ == null ?
+              org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance() : targetBlockPos_;
         }
       }
       /**
        * <code>optional .Vector3iData targetBlockPos = 3;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
+      private com.google.protobuf.SingleFieldBuilderV3<
           org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> 
           getTargetBlockPosFieldBuilder() {
         if (targetBlockPosBuilder_ == null) {
-          targetBlockPosBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+          targetBlockPosBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder>(
                   getTargetBlockPos(),
                   getParentForChildren(),
@@ -25411,164 +28450,201 @@ public final class NetData {
         }
         return targetBlockPosBuilder_;
       }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:EventMessage)
     }
 
+    // @@protoc_insertion_point(class_scope:EventMessage)
+    private static final org.terasology.protobuf.NetData.EventMessage DEFAULT_INSTANCE;
     static {
-      defaultInstance = new EventMessage(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new org.terasology.protobuf.NetData.EventMessage();
     }
 
-    // @@protoc_insertion_point(class_scope:EventMessage)
+    public static org.terasology.protobuf.NetData.EventMessage getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<EventMessage>
+        PARSER = new com.google.protobuf.AbstractParser<EventMessage>() {
+      public EventMessage parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new EventMessage(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<EventMessage> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EventMessage> getParserForType() {
+      return PARSER;
+    }
+
+    public org.terasology.protobuf.NetData.EventMessage getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_NetMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_NetMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HandshakeHello_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HandshakeHello_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_NewIdentityRequest_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_NewIdentityRequest_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ProvisionIdentity_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ProvisionIdentity_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_CertificateSet_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_CertificateSet_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HandshakeVerification_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HandshakeVerification_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Certificate_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Certificate_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_BlockFamilyRegisteredMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_BlockFamilyRegisteredMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_InvalidateChunkMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_InvalidateChunkMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_BlockChangeMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_BlockChangeMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_BiomeChangeMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_BiomeChangeMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Vector3iData_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Vector3iData_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ServerInfoRequest_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ServerInfoRequest_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_JoinMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_JoinMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Color_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Color_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_JoinCompleteMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_JoinCompleteMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ServerInfoMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ServerInfoMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_WorldInfo_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_WorldInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_SerializationInfo_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_SerializationInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ModuleInfo_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ModuleInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ModuleRequest_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ModuleRequest_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ModuleDataHeader_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ModuleDataHeader_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ModuleData_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ModuleData_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ModuleSendError_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ModuleSendError_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_CreateEntityMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_CreateEntityMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_UpdateEntityMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_UpdateEntityMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_RemoveEntityMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_RemoveEntityMessage_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_EventMessage_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_EventMessage_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
     return descriptor;
   }
-  private static com.google.protobuf.Descriptors.FileDescriptor
+  private static  com.google.protobuf.Descriptors.FileDescriptor
       descriptor;
   static {
     java.lang.String[] descriptorData = {
@@ -25671,169 +28747,169 @@ public final class NetData {
     internal_static_NetMessage_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_NetMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_NetMessage_descriptor,
         new java.lang.String[] { "ChunkInfo", "InvalidateChunk", "BlockChange", "CreateEntity", "RemoveEntity", "UpdateEntity", "Event", "Time", "BiomeChange", "ServerInfoRequest", "ServerInfo", "BlockFamilyRegistered", "Join", "ModuleRequest", "ModuleDataHeader", "ModuleData", "JoinComplete", "HandshakeHello", "NewIdentityRequest", "ProvisionIdentity", "HandshakeVerification", });
     internal_static_HandshakeHello_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_HandshakeHello_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_HandshakeHello_descriptor,
         new java.lang.String[] { "Random", "Certificate", "Timestamp", });
     internal_static_NewIdentityRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_NewIdentityRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_NewIdentityRequest_descriptor,
         new java.lang.String[] { "PreMasterSecret", "Random", });
     internal_static_ProvisionIdentity_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_ProvisionIdentity_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ProvisionIdentity_descriptor,
         new java.lang.String[] { "EncryptedCertificates", });
     internal_static_CertificateSet_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_CertificateSet_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CertificateSet_descriptor,
         new java.lang.String[] { "PublicCertificate", "PrivateExponent", });
     internal_static_HandshakeVerification_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_HandshakeVerification_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_HandshakeVerification_descriptor,
         new java.lang.String[] { "Signature", });
     internal_static_Certificate_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_Certificate_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Certificate_descriptor,
         new java.lang.String[] { "Id", "Modulus", "Exponent", "Signature", });
     internal_static_BlockFamilyRegisteredMessage_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_BlockFamilyRegisteredMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_BlockFamilyRegisteredMessage_descriptor,
         new java.lang.String[] { "BlockUri", "BlockId", });
     internal_static_InvalidateChunkMessage_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_InvalidateChunkMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_InvalidateChunkMessage_descriptor,
         new java.lang.String[] { "Pos", });
     internal_static_BlockChangeMessage_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_BlockChangeMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_BlockChangeMessage_descriptor,
         new java.lang.String[] { "Pos", "NewBlock", });
     internal_static_BiomeChangeMessage_descriptor =
       getDescriptor().getMessageTypes().get(10);
     internal_static_BiomeChangeMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_BiomeChangeMessage_descriptor,
         new java.lang.String[] { "Pos", "NewBiome", });
     internal_static_Vector3iData_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_Vector3iData_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Vector3iData_descriptor,
         new java.lang.String[] { "X", "Y", "Z", });
     internal_static_ServerInfoRequest_descriptor =
       getDescriptor().getMessageTypes().get(12);
     internal_static_ServerInfoRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ServerInfoRequest_descriptor,
         new java.lang.String[] { });
     internal_static_JoinMessage_descriptor =
       getDescriptor().getMessageTypes().get(13);
     internal_static_JoinMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_JoinMessage_descriptor,
         new java.lang.String[] { "Name", "Version", "ViewDistanceLevel", "Color", });
     internal_static_Color_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_Color_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Color_descriptor,
         new java.lang.String[] { "Rgba", });
     internal_static_JoinCompleteMessage_descriptor =
       getDescriptor().getMessageTypes().get(15);
     internal_static_JoinCompleteMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_JoinCompleteMessage_descriptor,
         new java.lang.String[] { "ClientId", });
     internal_static_ServerInfoMessage_descriptor =
       getDescriptor().getMessageTypes().get(16);
     internal_static_ServerInfoMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ServerInfoMessage_descriptor,
         new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetId", "AssetUri", "RegisterBlockFamily", "WorldInfo", "BiomeShortId", "BiomeId", "ErrorMessage", "Version", "GameName", "Time", "ReflectionHeight", "MOTD", "OnlinePlayersAmount", });
     internal_static_WorldInfo_descriptor =
       getDescriptor().getMessageTypes().get(17);
     internal_static_WorldInfo_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_WorldInfo_descriptor,
         new java.lang.String[] { "Title", "Time", });
     internal_static_SerializationInfo_descriptor =
       getDescriptor().getMessageTypes().get(18);
     internal_static_SerializationInfo_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SerializationInfo_descriptor,
         new java.lang.String[] { "Name", "Id", "FieldName", "FieldIds", });
     internal_static_ModuleInfo_descriptor =
       getDescriptor().getMessageTypes().get(19);
     internal_static_ModuleInfo_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ModuleInfo_descriptor,
         new java.lang.String[] { "ModuleId", "ModuleVersion", });
     internal_static_ModuleRequest_descriptor =
       getDescriptor().getMessageTypes().get(20);
     internal_static_ModuleRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ModuleRequest_descriptor,
         new java.lang.String[] { "ModuleId", });
     internal_static_ModuleDataHeader_descriptor =
       getDescriptor().getMessageTypes().get(21);
     internal_static_ModuleDataHeader_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ModuleDataHeader_descriptor,
         new java.lang.String[] { "Id", "Version", "Size", "Error", });
     internal_static_ModuleData_descriptor =
       getDescriptor().getMessageTypes().get(22);
     internal_static_ModuleData_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ModuleData_descriptor,
         new java.lang.String[] { "Module", });
     internal_static_ModuleSendError_descriptor =
       getDescriptor().getMessageTypes().get(23);
     internal_static_ModuleSendError_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ModuleSendError_descriptor,
         new java.lang.String[] { "Message", });
     internal_static_CreateEntityMessage_descriptor =
       getDescriptor().getMessageTypes().get(24);
     internal_static_CreateEntityMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CreateEntityMessage_descriptor,
         new java.lang.String[] { "Entity", "BlockPos", });
     internal_static_UpdateEntityMessage_descriptor =
       getDescriptor().getMessageTypes().get(25);
     internal_static_UpdateEntityMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_UpdateEntityMessage_descriptor,
         new java.lang.String[] { "Entity", "NetId", });
     internal_static_RemoveEntityMessage_descriptor =
       getDescriptor().getMessageTypes().get(26);
     internal_static_RemoveEntityMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_RemoveEntityMessage_descriptor,
         new java.lang.String[] { "NetId", });
     internal_static_EventMessage_descriptor =
       getDescriptor().getMessageTypes().get(27);
     internal_static_EventMessage_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_EventMessage_descriptor,
         new java.lang.String[] { "TargetId", "Event", "TargetBlockPos", });
     org.terasology.protobuf.EntityData.getDescriptor();
