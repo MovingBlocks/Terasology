@@ -126,6 +126,9 @@ public class SaveTransaction extends AbstractTask {
     public void run() {
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAY_FINISHED
                 || RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
+            if (RecordAndReplayUtils.isShutdownRequested()) {
+                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+            }
             return; //if it is a replay, do not save the game
         }
         try {

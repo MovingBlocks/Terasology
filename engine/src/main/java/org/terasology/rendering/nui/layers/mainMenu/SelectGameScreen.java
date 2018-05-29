@@ -93,17 +93,10 @@ public class SelectGameScreen extends CoreScreenLayer {
 
         final UILabel saveGamePath = find("saveGamePath", UILabel.class);
         if (saveGamePath != null) {
-            //this is be temporary since there is no UI for Record and Replay yet.
-            //Gets the recordings path if it is a replay, or the saves path otherwise.
-            Path saveOrRecordingPath;
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-                saveOrRecordingPath = PathManager.getInstance().getRecordingsPath();
-            } else {
-                saveOrRecordingPath = PathManager.getInstance().getSavesPath();
-            }
+            Path savePath = PathManager.getInstance().getSavesPath();
             saveGamePath.setText(
                     translationSystem.translate("${engine:menu#save-game-path} ") +
-                            saveOrRecordingPath.toAbsolutePath().toString()); //save path
+                            savePath.toAbsolutePath().toString()); //save path
         }
 
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
@@ -218,9 +211,6 @@ public class SelectGameScreen extends CoreScreenLayer {
     private void loadGame(GameInfo item) {
         try {
             GameManifest manifest = item.getManifest();
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
-                copySaveDirectoryToRecordingLibrary(manifest.getTitle());
-            }
             RecordAndReplayUtils.setGameTitle(manifest.getTitle());
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
@@ -229,18 +219,6 @@ public class SelectGameScreen extends CoreScreenLayer {
             logger.error("Failed to load saved game", e);
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
         }
-    }
-
-    private void copySaveDirectoryToRecordingLibrary(String gameTitle) {
-        File saveDirectory = new File(PathManager.getInstance().getSavePath(gameTitle).toString());
-        Path destinationPath = PathManager.getInstance().getRecordingPath(gameTitle);
-        File destDirectory = new File(destinationPath.toString());
-        try {
-            FileUtils.copyDirectoryStructure(saveDirectory, destDirectory);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
-
     }
 
     public boolean isLoadingAsServer() {

@@ -248,6 +248,8 @@
     "select-modules-filter-reset": "Reset Filters",
     "select-modules-filter-title": "Module Categories",
     "select-multiplayer-game-sub-title": "Multiplayer",
+    "select-record": "Record Game",
+    "select-replay": "Replay Library",
     "select-singleplayer-game-sub-title": "Singleplayer",
     "select-world-gen": "Choose World Generator",
     "select-world-gen-info": "enabling modules may add more",

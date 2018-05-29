@@ -1,5 +1,5 @@
 {
-  "type": "RecordReplayScreen",
+  "type": "ReplayScreen",
   "skin": "engine:mainMenu",
   "contents": {
       "type": "relativeLayout",
@@ -22,7 +22,7 @@
               "type": "UILabel",
               "id": "subtitle",
               "family": "title",
-              "text": "${engine:menu#select-game-title}",
+              "text": "${engine:menu#select-replay}",
               "layoutInfo": {
                   "height": 48,
                   "position-horizontal-center": {},
@@ -36,7 +36,7 @@
               "type": "UILabel",
               "id": "gameTypeTitle",
               "family": "subtitle",
-              "text": "${engine:menu#select-singleplayer-game-sub-title}",
+              "text": "",
               "layoutInfo": {
                   "height": 30,
                   "position-horizontal-center": {},
@@ -88,7 +88,7 @@
                   {
                       "type": "UIButton",
                       "id": "load",
-                      "text": "${engine:menu#load-game}"
+                      "text": "${engine:menu#start-replay}"
                   },
                   {
                       "type": "UIButton",

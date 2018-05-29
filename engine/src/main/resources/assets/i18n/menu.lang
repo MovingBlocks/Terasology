@@ -241,6 +241,8 @@
     "select-modules-filter-reset": "select-modules-filter-reset",
     "select-modules-filter-title": "select-modules-filter-title",
     "select-multiplayer-game-sub-title": "select-multiplayer-game-sub-title",
+    "select-record": "select-record",
+    "select-replay": "select-replay",
     "select-singleplayer-game-sub-title": "select-singleplayer-game-sub-title",
     "select-world-gen": "select-world-gen",
     "select-world-gen-info": "select-world-gen-info",

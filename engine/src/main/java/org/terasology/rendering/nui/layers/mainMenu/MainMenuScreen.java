@@ -68,7 +68,8 @@ public class MainMenuScreen extends CoreScreenLayer {
         jvmWarningLabel.setVisible(NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE);
 
         SelectGameScreen selectScreen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
-        RecordReplayScreen recordReplayScreen = getManager().createScreen(RecordReplayScreen.ASSET_URI, RecordReplayScreen.class);
+        RecordScreen recordScreen = getManager().createScreen(RecordScreen.ASSET_URI, RecordScreen.class);
+        ReplayScreen replayScreen = getManager().createScreen(ReplayScreen.ASSET_URI, ReplayScreen.class);
         WidgetUtil.trySubscribe(this, "singleplayer", button -> {
             selectScreen.setLoadingAsServer(false);
             triggerForwardAnimation(selectScreen);
@@ -78,14 +79,12 @@ public class MainMenuScreen extends CoreScreenLayer {
             triggerForwardAnimation(selectScreen);
         });
         WidgetUtil.trySubscribe(this, "record", button -> {
-            recordReplayScreen.setLoadingAsServer(false);
             RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_RECORD);
-            triggerForwardAnimation(recordReplayScreen);
+            triggerForwardAnimation(recordScreen);
         });
         WidgetUtil.trySubscribe(this, "replay", button -> {
-            recordReplayScreen.setLoadingAsServer(false);
             RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_REPLAY);
-            triggerForwardAnimation(recordReplayScreen);
+            triggerForwardAnimation(replayScreen);
         });
         WidgetUtil.trySubscribe(this, "join", button -> {
             if (storageService.getStatus() == StorageServiceWorkerStatus.WORKING) {

@@ -156,14 +156,6 @@ public class EventSystemReplayImpl implements EventSystem {
         }
     }
 
-    //Used for testing purposes
-    private void printComponents(EntityRef e) {
-        System.out.println("ENTITY: " + e.getId());
-        for (Component c : e.iterateComponents()) {
-            System.out.println("COMPONENTS: " + c.toString());
-        }
-    }
-
     @Override
     public void process() {
 
@@ -183,6 +175,7 @@ public class EventSystemReplayImpl implements EventSystem {
                     RecordAndReplaySerializer.deserializeRecordedEvents(recordingPath);
                     fillRecordedEvents();
                 } else {
+                    RecordAndReplayUtils.reset();
                     RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
                 }
             }
