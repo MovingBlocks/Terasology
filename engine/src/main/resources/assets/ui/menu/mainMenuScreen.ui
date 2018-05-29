@@ -85,6 +85,16 @@
                     },
                     {
                         "type": "UIButton",
+                        "id": "record",
+                        "text": "${engine:menu#start-record}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "replay",
+                        "text": "${engine:menu#start-replay}"
+                    },
+                    {
+                        "type": "UIButton",
                         "id": "multiplayer",
                         "text": "${engine:menu#host-multiplayer-game}"
                     },

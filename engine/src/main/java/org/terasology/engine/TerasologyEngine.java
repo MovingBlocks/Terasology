@@ -187,7 +187,7 @@ public class TerasologyEngine implements GameEngine {
     public void initialize() {
         //These 3 lines are what activate or deactivate Record & Replay on this Trial. Only one should be active at a time.
         //RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_RECORD);
-        RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_REPLAY);
+        //RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_REPLAY);
         //RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
 
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);

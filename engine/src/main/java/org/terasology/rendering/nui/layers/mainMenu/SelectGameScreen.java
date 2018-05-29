@@ -54,7 +54,6 @@ import java.nio.file.Path;
 import java.util.stream.Collectors;
 
 public class SelectGameScreen extends CoreScreenLayer {
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectGameScreen");
     public static final ResourceUrn PREVIEW_IMAGE_URI = new ResourceUrn("engine:savedGamePreview");
     public static final ResourceUrn DEFAULT_PREVIEW_IMAGE_URI = new ResourceUrn("engine:defaultPreview");

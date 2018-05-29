@@ -258,6 +258,8 @@
     "sound-volume": "sound-volume",
     "ssao": "ssao",
     "start-game": "start-game",
+    "start-record": "start-record",
+    "start-replay": "start-replay",
     "start-singleplayer-game": "start-singleplayer-game",
     "storage-service": "storage-service",
     "storage-service-conflict-message": "storage-service-conflict-message",

@@ -23,6 +23,8 @@ import org.terasology.engine.NonNativeJVMDetector;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -66,7 +68,8 @@ public class MainMenuScreen extends CoreScreenLayer {
         jvmWarningLabel.setVisible(NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE);
 
         SelectGameScreen selectScreen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
-
+        //RecordAndReplayGameScreen recordAndReplayGameScreen = getManager().createScreen(RecordAndReplayGameScreen.ASSET_URI, RecordAndReplayGameScreen.class);
+        RecordReplayScreen recordReplayScreen = getManager().createScreen(RecordReplayScreen.ASSET_URI, RecordReplayScreen.class);
         WidgetUtil.trySubscribe(this, "singleplayer", button -> {
             selectScreen.setLoadingAsServer(false);
             triggerForwardAnimation(selectScreen);
@@ -74,6 +77,14 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "multiplayer", button -> {
             selectScreen.setLoadingAsServer(true);
             triggerForwardAnimation(selectScreen);
+        });
+        WidgetUtil.trySubscribe(this, "record", button -> {
+            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_RECORD);
+            triggerForwardAnimation(recordReplayScreen);
+        });
+        WidgetUtil.trySubscribe(this, "replay", button -> {
+            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_REPLAY);
+            triggerForwardAnimation(recordReplayScreen);
         });
         WidgetUtil.trySubscribe(this, "join", button -> {
             if (storageService.getStatus() == StorageServiceWorkerStatus.WORKING) {
