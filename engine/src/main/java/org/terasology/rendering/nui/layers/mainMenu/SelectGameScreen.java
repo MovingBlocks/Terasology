@@ -141,8 +141,7 @@ public class SelectGameScreen extends CoreScreenLayer {
 
     }
 
-    private void updateDescription(GameInfo item)
-    {
+    private void updateDescription(GameInfo item) {
         if (item == null) {
             worldGenerator.setText("");
             moduleNames.setText("");
@@ -173,12 +172,7 @@ public class SelectGameScreen extends CoreScreenLayer {
     private void removeSelectedGame(final UIList<GameInfo> gameList) {
         GameInfo gameInfo = gameList.getSelection();
         if (gameInfo != null) {
-            Path world;
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-                world = PathManager.getInstance().getRecordingPath(gameInfo.getManifest().getTitle());
-            } else {
-                world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
-            }
+            Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
             try {
                 FilesUtil.recursiveDelete(world);
                 gameList.getList().remove(gameInfo);

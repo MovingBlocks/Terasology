@@ -21,33 +21,50 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.naming.Name;
+import org.terasology.naming.NameVersion;
 import org.terasology.network.NetworkMode;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.rendering.assets.texture.AWTTextureFormat;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.FilesUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 public class ReplayScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:replayScreen");
+    public static final ResourceUrn PREVIEW_IMAGE_URI = new ResourceUrn("engine:savedGamePreview");
+    public static final ResourceUrn DEFAULT_PREVIEW_IMAGE_URI = new ResourceUrn("engine:defaultPreview");
 
     private static final Logger logger = LoggerFactory.getLogger(ReplayScreen.class);
+
+    private UIImage previewImage;
+    private UILabel worldGenerator;
+    private UILabel moduleNames;
 
     @In
     private Config config;
@@ -71,6 +88,17 @@ public class ReplayScreen extends CoreScreenLayer {
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
 
         refreshList(gameList);
+
+        gameList.subscribeSelection((widget, item) -> {
+            find("load", UIButton.class).setEnabled(item != null);
+            find("delete", UIButton.class).setEnabled(item != null);
+//            find("details", UIButton.class).setEnabled(item != null);
+            updateDescription(item);
+        });
+
+        worldGenerator = find("worldGenerator", UILabel.class);
+        moduleNames = find("moduleNames", UILabel.class);
+
         gameList.select(0);
         gameList.subscribe((widget, item) -> loadGame(item));
 
@@ -82,24 +110,60 @@ public class ReplayScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "delete", button -> {
-            GameInfo gameInfo = gameList.getSelection();
-            if (gameInfo != null) {
-                Path world = PathManager.getInstance().getRecordingPath(gameInfo.getManifest().getTitle());
-                try {
-                    FilesUtil.recursiveDelete(world);
-                    gameList.getList().remove(gameInfo);
-                    gameList.setSelection(null);
-                } catch (Exception e) {
-                    logger.error("Failed to delete replay", e);
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
-                }
-            }
+            TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
+            confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup-title}"),
+                    translationSystem.translate("${engine:menu#remove-confirmation-popup-message}"));
+            confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), () -> removeSelectedReplay(gameList));
+            confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> {
             RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
             triggerBackAnimation();
         });
+    }
+
+    private void updateDescription(GameInfo item) {
+        if (item == null) {
+            worldGenerator.setText("");
+            moduleNames.setText("");
+            loadPreviewImage(null);
+            return;
+        }
+
+        String mainWorldGenerator = item.getManifest()
+                .getWorldInfo(TerasologyConstants.MAIN_WORLD)
+                .getWorldGenerator()
+                .getObjectName()
+                .toString();
+
+        String commaSeparatedModules = item.getManifest()
+                .getModules()
+                .stream()
+                .map(NameVersion::getName)
+                .map(Name::toString)
+                .sorted(String::compareToIgnoreCase)
+                .collect(Collectors.joining(", "));
+
+        worldGenerator.setText(mainWorldGenerator);
+        moduleNames.setText(commaSeparatedModules);
+
+        loadPreviewImage(item);
+    }
+
+    private void removeSelectedReplay(final UIList<GameInfo> gameList) {
+        GameInfo gameInfo = gameList.getSelection();
+        if (gameInfo != null) {
+            Path world = PathManager.getInstance().getRecordingPath(gameInfo.getManifest().getTitle());
+            try {
+                FilesUtil.recursiveDelete(world);
+                gameList.getList().remove(gameInfo);
+                gameList.setSelection(null);
+            } catch (Exception e) {
+                logger.error("Failed to delete replay", e);
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -130,5 +194,23 @@ public class ReplayScreen extends CoreScreenLayer {
 
     private void refreshList(UIList<GameInfo> gameList) {
         gameList.setList(GameProvider.getSavedRecordings());
+    }
+
+    private void loadPreviewImage(GameInfo item) {
+        Texture texture;
+        if (item != null && item.getPreviewImage() != null) {
+            TextureData textureData = null;
+            try {
+                textureData = AWTTextureFormat.convertToTextureData(item.getPreviewImage(), Texture.FilterMode.LINEAR);
+            } catch( IOException e ) {
+                logger.error("Converting preview image to texture data {} failed", e);
+            }
+            texture = Assets.generateAsset(PREVIEW_IMAGE_URI, textureData, Texture.class);
+        } else {
+            texture = Assets.getTexture(DEFAULT_PREVIEW_IMAGE_URI).get();
+        }
+
+        previewImage = find("previewImage", UIImage.class);
+        previewImage.setImage(texture);
     }
 }

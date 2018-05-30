@@ -42,6 +42,8 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
@@ -119,8 +121,10 @@ public class StateIngame implements GameState {
 
     @Override
     public void dispose(boolean shuttingDown) {
-        ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
-        screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
+            ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
+            screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
+        }
 
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.dispose();
