@@ -117,7 +117,6 @@ public class NewGameScreen extends CoreScreenLayer {
             @Override
             public void set(Module value) {
                 setSelectedGameplayModule(value);
-                System.out.println(config.getWorldGeneration().getDefaultGenerator());
                 selected = value;
             }
         });
