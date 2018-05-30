@@ -45,6 +45,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.AdvancedGameSetupScreen;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -82,7 +83,7 @@ public class NewGameScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
 
     @Override
-    public void initialise(){
+    public void initialise() {
 
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
@@ -116,6 +117,7 @@ public class NewGameScreen extends CoreScreenLayer {
             @Override
             public void set(Module value) {
                 setSelectedGameplayModule(value);
+                System.out.println(config.getWorldGeneration().getDefaultGenerator());
                 selected = value;
             }
         });
@@ -166,15 +168,12 @@ public class NewGameScreen extends CoreScreenLayer {
                 }
                 return;
             }
-            for(Module module : result.getModules()) {
+            for (Module module : result.getModules()) {
                 gameManifest.addModule(module.getId(), module.getVersion());
             }
 
-            SimpleUri uri = StandardModuleExtension.getDefaultWorldGenerator(gameplay.getSelection());
-            if(uri == null) {
-                uri = new SimpleUri(DEFAULT_WORLD_GENERATOR);
-            }
-
+            SimpleUri uri = config.getWorldGeneration().getDefaultGenerator();
+            System.out.println(uri);
             float timeOffset = 0.25f + 0.025f;
             WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, "thisisjustrandom69",
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
