@@ -39,7 +39,6 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
@@ -47,7 +46,6 @@ import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.Assets;
-import org.terasology.utilities.FilesUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +63,7 @@ public class RecordScreen extends CoreScreenLayer {
     private UIImage previewImage;
     private UILabel worldGenerator;
     private UILabel moduleNames;
+    private UIList<GameInfo> gameList;
 
 
     @In
@@ -85,9 +84,9 @@ public class RecordScreen extends CoreScreenLayer {
                             savePath.toAbsolutePath().toString()); //save path
         }
 
-        final UIList<GameInfo> gameList = find("gameList", UIList.class);
+        gameList = find("gameList", UIList.class);
 
-        refreshList(gameList);
+        refreshGameList();
 
         gameList.subscribeSelection((widget, item) -> {
             find("load", UIButton.class).setEnabled(item != null);
@@ -181,7 +180,7 @@ public class RecordScreen extends CoreScreenLayer {
 
     }
 
-    private void refreshList(UIList<GameInfo> gameList) {
+    public void refreshGameList() {
         gameList.setList(GameProvider.getSavedGames());
     }
 

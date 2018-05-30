@@ -176,6 +176,7 @@ public class EventSystemReplayImpl implements EventSystem {
                     fillRecordedEvents();
                 } else {
                     RecordAndReplayUtils.reset();
+                    RecordedEventStore.popEvents();
                     RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
                 }
             }
