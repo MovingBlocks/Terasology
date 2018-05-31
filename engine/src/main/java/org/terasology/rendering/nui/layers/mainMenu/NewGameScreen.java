@@ -105,7 +105,7 @@ public class NewGameScreen extends CoreScreenLayer {
 
         final UIDropdownScrollable<Module> gameplay = find("gameplay", UIDropdownScrollable.class);
         gameplay.setOptions(getGameplayModules());
-        gameplay.setVisibleOptions(3);
+        gameplay.setVisibleOptions(5);
         gameplay.bindSelection(new Binding<Module>() {
             Module selected;
 
