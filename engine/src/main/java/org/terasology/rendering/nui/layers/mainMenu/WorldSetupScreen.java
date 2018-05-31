@@ -24,8 +24,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldSetupScreen");
 
     @Override
-    public void initialise(){
-
+    public void initialise() {
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()

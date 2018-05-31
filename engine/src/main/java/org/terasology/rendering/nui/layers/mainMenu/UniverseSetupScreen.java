@@ -157,6 +157,16 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         );
     }
 
+    @Override
+    public void onOpened() {
+        worlds.clear();
+        worldNumber = 0;
+        final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
+        List<String> worldOptions = Lists.newArrayList(worlds.keySet());
+        worldsDropdown.setOptions(worldOptions);
+        selectedWorld = "";
+    }
+
     private Set<Name> getAllEnabledModuleNames() {
         Set<Name> enabledModules = Sets.newHashSet();
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
