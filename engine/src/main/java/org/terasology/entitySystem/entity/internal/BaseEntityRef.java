@@ -233,7 +233,6 @@ public abstract class BaseEntityRef extends EntityRef {
 
     @Override
     public void invalidate() {
-        //System.out.println("Invalidating! (ABS) " + getId());
         entityManager = null;
     }
 

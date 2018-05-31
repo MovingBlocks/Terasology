@@ -38,30 +38,30 @@ public class EventCatcher {
     /**
      * Receives a PendingEvent and add it as a RecordedEvent in the RecordedEventStore if it is an event type that should be
      * recorded.
-     * @param pe PendingEvent to be checked and added
+     * @param pendingEvent PendingEvent to be checked and added
      * @return If the event was added to the RecordedEventStore
      */
-    public boolean addEvent(PendingEvent pe) {
-        if (shouldRecordEvent(pe)) {
+    public boolean addEvent(PendingEvent pendingEvent) {
+        if (shouldRecordEvent(pendingEvent)) {
             long timestamp = System.currentTimeMillis() - this.startTime;
-            Event e = EventCopier.copyEvent(pe.getEvent());
-            PendingEvent newPendingEvent = new PendingEvent(pe.getEntity(), e);
-            RecordedEvent re;
-            if (pe.getComponent() == null) {
-                re = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), timestamp, this.eventCounter);
+            Event e = EventCopier.copyEvent(pendingEvent.getEvent());
+            PendingEvent newPendingEvent = new PendingEvent(pendingEvent.getEntity(), e);
+            RecordedEvent recordedEvent;
+            if (pendingEvent.getComponent() == null) {
+                recordedEvent = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), timestamp, this.eventCounter);
             } else {
-                re = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), newPendingEvent.getComponent(), timestamp, this.eventCounter);
+                recordedEvent = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), newPendingEvent.getComponent(), timestamp, this.eventCounter);
             }
             this.eventCounter++;
-            return RecordedEventStore.add(re);
+            return RecordedEventStore.add(recordedEvent);
         } else {
             return false;
         }
     }
 
 
-    private boolean shouldRecordEvent(PendingEvent pe) {
-        Event event = pe.getEvent();
+    private boolean shouldRecordEvent(PendingEvent pendingEvent) {
+        Event event = pendingEvent.getEvent();
         return (event instanceof PlaySoundEvent
                 || event instanceof InputEvent
                 || event instanceof CameraTargetChangedEvent

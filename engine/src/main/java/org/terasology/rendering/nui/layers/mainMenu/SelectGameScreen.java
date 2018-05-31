@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -29,7 +28,6 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.NetworkMode;
-import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -49,7 +47,6 @@ import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.FilesUtil;
 import java.io.IOException;
-import java.io.File;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 

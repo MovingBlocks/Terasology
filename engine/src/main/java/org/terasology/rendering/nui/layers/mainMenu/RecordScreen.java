@@ -52,6 +52,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
+/**
+ * Screen for the record menu.
+ */
 public class RecordScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:recordScreen");

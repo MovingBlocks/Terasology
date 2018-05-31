@@ -56,8 +56,6 @@ import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -185,7 +183,6 @@ public class TerasologyEngine implements GameEngine {
     }
 
     public void initialize() {
-
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         Stopwatch totalInitTime = Stopwatch.createStarted();
         try {
@@ -413,8 +410,6 @@ public class TerasologyEngine implements GameEngine {
             /* do nothing */
         }
         PerformanceMonitor.endActivity();
-        //RecordedEventStore.getInstance().saveEvents();
-        //game is closed here
     }
 
     /**
