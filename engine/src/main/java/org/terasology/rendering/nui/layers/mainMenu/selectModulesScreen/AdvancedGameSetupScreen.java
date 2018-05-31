@@ -74,6 +74,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+/**
+ * This screen loads up all the modules, local and remote. The modules
+ * are displayed in different colours according to their state of selection.
+ * For downloading remote modules list a FutureTask is used. The modules can also be filtered and the choice
+ * of filtering is saved in the config.
+ */
 public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:advancedGameSetupScreen");
@@ -85,8 +91,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private ModuleManager moduleManager;
     @In
     private Config config;
-
-    private SelectModulesConfig selectModulesConfig;
     @In
     private WorldGeneratorManager worldGenManager;
     @In
@@ -99,6 +103,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private Future<Void> remoteModuleRegistryUpdater;
     private boolean needsUpdate = true;
     private ResettableUIText moduleSearch;
+    private SelectModulesConfig selectModulesConfig;
 
     @Override
     public void onOpened() {
