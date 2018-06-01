@@ -37,6 +37,7 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.entitySystem.event.ConsumableEvent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.event.PendingEvent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
@@ -88,16 +89,15 @@ public class EventSystemImpl implements EventSystem {
 
     private EventLibrary eventLibrary;
     private NetworkSystem networkSystem;
-
-    //Event recording
     private EventCatcher eventCatcher;
 
 
-    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
+    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EventCatcher eventCatcher) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
-        this.eventCatcher = new EventCatcher();
+        this.eventCatcher = eventCatcher;
+        this.eventCatcher.startTimer();
     }
 
     @Override
@@ -266,7 +266,6 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
-            //event recording
             if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
                 eventCatcher.addEvent(new PendingEvent(entity, event));
             }

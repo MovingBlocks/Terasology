@@ -118,12 +118,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
         boolean writeSaveGamesEnabled = context.get(Config.class).getSystem().isWriteSaveGamesEnabled();
         //Gets save data from a normal save or from a recording if it is a replay
-        Path saveOrRecordingPath;
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-            saveOrRecordingPath = PathManager.getInstance().getRecordingPath(gameManifest.getTitle());
-        } else {
-            saveOrRecordingPath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
-        }
+        Path saveOrRecordingPath = getSaveOrRecordingPath();
         StorageManager storageManager;
         try {
             storageManager = writeSaveGamesEnabled
@@ -166,6 +161,16 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.put(Camera.class, worldRenderer.getActiveCamera());
 
         return true;
+    }
+
+    private Path getSaveOrRecordingPath() {
+        Path saveOrRecordingPath;
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+            saveOrRecordingPath = PathManager.getInstance().getRecordingPath(gameManifest.getTitle());
+        } else {
+            saveOrRecordingPath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
+        }
+        return saveOrRecordingPath;
     }
 
     @Override

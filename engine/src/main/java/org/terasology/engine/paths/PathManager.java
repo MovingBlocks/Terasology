@@ -48,6 +48,7 @@ public final class PathManager {
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
     private static final String CONFIGS_DIR = "configs";
+    private static final String REGEX = "[^A-Za-z0-9-_ ]";
 
     private static PathManager instance;
     private Path installPath;
@@ -302,10 +303,10 @@ public final class PathManager {
     }
 
     public Path getSavePath(String title) {
-        return getSavesPath().resolve(title.replaceAll("[^A-Za-z0-9-_ ]", ""));
+        return getSavesPath().resolve(title.replaceAll(REGEX, ""));
     }
 
     public Path getRecordingPath(String title) {
-        return getRecordingsPath().resolve(title.replaceAll("[^A-Za-z0-9-_ ]", ""));
+        return getRecordingsPath().resolve(title.replaceAll(REGEX, ""));
     }
 }

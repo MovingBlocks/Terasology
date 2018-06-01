@@ -17,7 +17,7 @@ package org.terasology.recording;
 
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.internal.PendingEvent;
+import org.terasology.entitySystem.event.PendingEvent;
 import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
 import org.terasology.input.events.InputEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
@@ -31,6 +31,10 @@ public class EventCatcher {
     private long eventCounter;
 
     public EventCatcher() {
+
+    }
+
+    public void startTimer() {
         this.startTime = System.currentTimeMillis();
         this.eventCounter = 0;
     }

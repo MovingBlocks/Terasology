@@ -23,7 +23,7 @@ import org.terasology.entitySystem.event.Event;
  */
 public class RecordedEvent {
 
-    private long entityRefId;
+    private long entityId;
     private Event event;
     private Component component;
     private double timestamp;
@@ -31,13 +31,13 @@ public class RecordedEvent {
 
     /**
      *
-     * @param entityRefId Id of the EntityRef which the event was sent against.
+     * @param entityId Id of the EntityRef which the event was sent against.
      * @param event The event to be recorded.
      * @param timestamp The timestamp in which the event was sent.
      * @param position The position of the RecordedEvent.
      */
-    RecordedEvent(long entityRefId, Event event, double timestamp, long position) {
-        this.entityRefId = entityRefId;
+    RecordedEvent(long entityId, Event event, double timestamp, long position) {
+        this.entityId = entityId;
         this.event = event;
         this.timestamp = timestamp;
         this.position = position;
@@ -45,14 +45,14 @@ public class RecordedEvent {
 
     /**
      *
-     * @param entityRefId Id of the EntityRef which the event was sent against.
+     * @param entityId Id of the EntityRef which the event was sent against.
      * @param event The event to be recorded.
      * @param component The component that was sent with the event
      * @param timestamp The timestamp in which the event was sent.
      * @param position The position of the RecordedEvent.
      */
-    RecordedEvent(long entityRefId, Event event, Component component, double timestamp, long position) {
-        this.entityRefId = entityRefId;
+    RecordedEvent(long entityId, Event event, Component component, double timestamp, long position) {
+        this.entityId = entityId;
         this.event = event;
         this.component = component;
         this.timestamp = timestamp;
@@ -69,8 +69,8 @@ public class RecordedEvent {
         return position;
     }
 
-    long getEntityRefId() {
-        return entityRefId;
+    long getEntityId() {
+        return entityId;
     }
 
     public Event getEvent() {

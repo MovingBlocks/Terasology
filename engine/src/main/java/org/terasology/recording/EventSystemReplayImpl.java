@@ -43,7 +43,7 @@ import org.terasology.entitySystem.event.ConsumableEvent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.event.internal.PendingEvent;
+import org.terasology.entitySystem.event.PendingEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -106,9 +106,9 @@ public class EventSystemReplayImpl implements EventSystem {
 
     //Event replaying
     /** if the recorded events were loaded from the RecordedEventStore. */
-    private boolean loadedRecordedEvents;
+    private boolean areRecordedEventsLoaded;
     /** When the events were loaded. Used to reproduce the events at the correct time. */
-    private long startTime;
+    private long replayEventsLoadTime;
     /** Necessary to do some entity id mapping from original client and replay client. */
     private EngineEntityManager entityManager;
 
@@ -118,9 +118,6 @@ public class EventSystemReplayImpl implements EventSystem {
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
         this.entityManager = entityManager;
-        this.loadedRecordedEvents = false;
-
-
     }
 
     /**
@@ -179,11 +176,11 @@ public class EventSystemReplayImpl implements EventSystem {
     public void process() {
 
         //Load recorded events if they were not loaded and if the game is ready to replay.
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING && !this.loadedRecordedEvents) {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING && !this.areRecordedEventsLoaded) {
             fillRecordedEvents();
-            this.loadedRecordedEvents = true;
+            this.areRecordedEventsLoaded = true;
             logger.info("Loaded Recorded Events!");
-            startTime = System.currentTimeMillis();
+            replayEventsLoadTime = System.currentTimeMillis();
         }
         //If replay is ready, process some recorded events if the time is right.
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
@@ -201,12 +198,14 @@ public class EventSystemReplayImpl implements EventSystem {
             }
         }
         //Original process() on EventSystemImpl
-        for (PendingEvent event = pendingEvents.poll(); event != null; event = pendingEvents.poll()) {
+        PendingEvent event = pendingEvents.poll();
+        while (event != null) {
             if (event.getComponent() != null) {
                 originalSend(event.getEntity(), event.getEvent(), event.getComponent());
             } else {
                 originalSend(event.getEntity(), event.getEvent());
             }
+            event = pendingEvents.poll();
         }
     }
 
@@ -216,25 +215,17 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     private void processRecordedEvents(long maxDuration) {
         long beginTime = System.currentTimeMillis();
-
         for (RecordedEvent re = recordedEvents.peek(); re != null; re = recordedEvents.peek()) {
-            long passedTime = System.currentTimeMillis() - this.startTime;
+            long passedTime = System.currentTimeMillis() - this.replayEventsLoadTime;
             //Waits until the time of reproduction is right or until 'maxDuration' miliseconds have already passed since this method was called
             while (passedTime < re.getTimestamp()) {
-                passedTime = System.currentTimeMillis() - this.startTime;
+                passedTime = System.currentTimeMillis() - this.replayEventsLoadTime;
                 if ((System.currentTimeMillis() - beginTime) >= maxDuration) {
                     return;
                 }
             }
             recordedEvents.poll();
-            //PendingEvent event = re.getPendingEvent();
-            EntityRef entity;
-            // Maps the entities IDs to get the correct entity, even if the id changed from record to replay;
-            if (re.getEntityRefId() == EntityRefIdMap.getIdFromPrevious("client")) {
-                entity = this.entityManager.getEntity(EntityRefIdMap.getId("client")); // If it is the gameClient id
-            } else {
-                entity = this.entityManager.getEntity(re.getEntityRefId()); // gets entityref from id
-            }
+            EntityRef entity = getEntityRef(re);
             // Sends recorded event to be processed
             if (re.getComponent() != null) {
                 originalSend(entity, re.getEvent(), re.getComponent());
@@ -246,6 +237,17 @@ public class EventSystemReplayImpl implements EventSystem {
                 return;
             }
         }
+    }
+
+    private EntityRef getEntityRef(RecordedEvent re) {
+        EntityRef entity;
+        // Maps the entities IDs to get the correct entity, even if the id changed from record to replay;
+        if (re.getEntityId() == EntityIdMap.getIdFromPrevious("client")) {
+            entity = this.entityManager.getEntity(EntityIdMap.getId("client")); // If it is the gameClient id
+        } else {
+            entity = this.entityManager.getEntity(re.getEntityId()); // gets entityref from id
+        }
+        return entity;
     }
 
     @Override
@@ -452,8 +454,6 @@ public class EventSystemReplayImpl implements EventSystem {
         }
 
         return false;
-        //return true;
-
     }
 
     private void sendStandardEvent(EntityRef entity, Event event, List<EventSystemReplayImpl.EventHandlerInfo> selectedHandlers) {

@@ -126,7 +126,7 @@ class RecordedEventSerializer {
             writer.beginArray();
             for (RecordedEvent event : events) {
                 writer.beginObject();
-                writer.name("entityRef_ID").value(event.getEntityRefId());
+                writer.name("entityRef_ID").value(event.getEntityId());
                 writer.name("timestamp").value(event.getTimestamp());
                 writer.name("position").value(event.getPosition());
                 writer.name("event_class").value(event.getEvent().getClass().toString());
@@ -140,7 +140,7 @@ class RecordedEventSerializer {
             writer.endObject();
             writer.close();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error while serializing events:", e);
         }
 
 
@@ -222,8 +222,7 @@ class RecordedEventSerializer {
                 logger.error("ERROR: EVENT NOT SUPPORTED FOR SERIALIZATION");
             }
         } catch (Exception e) {
-            logger.error("Could not serialize this event: " + event.toString());
-            e.printStackTrace();
+            logger.error("Could not serialize this event: " + event.toString(), e);
         }
     }
 
@@ -292,7 +291,7 @@ class RecordedEventSerializer {
         }
     }
 
-    public List<RecordedEvent> deserializeRecordedEvents(String path) {
+    List<RecordedEvent> deserializeRecordedEvents(String path) {
         List<RecordedEvent> events = new ArrayList<>();
         JsonObject jsonObject;
         try {
@@ -300,23 +299,18 @@ class RecordedEventSerializer {
             JsonElement jsonElement = parser.parse(new FileReader(path));
             jsonObject = jsonElement.getAsJsonObject();
             JsonArray jsonEvents = jsonObject.getAsJsonArray("events");
-            String clazz;
-            long refId;
-            long timestamp;
-            long position;
-            Event event;
             for (JsonElement element : jsonEvents) {
                 jsonObject = element.getAsJsonObject();
-                clazz = jsonObject.get("event_class").getAsString();
-                refId = jsonObject.get("entityRef_ID").getAsLong();
-                position = jsonObject.get("position").getAsLong();
-                timestamp = jsonObject.get("timestamp").getAsLong();
-                event = deserializeSpecificEventData(jsonObject.get("event_data").getAsJsonObject(), clazz);
+                String clazz = jsonObject.get("event_class").getAsString();
+                long refId = jsonObject.get("entityRef_ID").getAsLong();
+                long position = jsonObject.get("position").getAsLong();
+                long timestamp = jsonObject.get("timestamp").getAsLong();
+                Event event = deserializeSpecificEventData(jsonObject.get("event_data").getAsJsonObject(), clazz);
                 RecordedEvent re = new RecordedEvent(refId, event, timestamp, position);
                 events.add(re);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error while deserializing event:", e);
         }
 
         return events;
@@ -468,7 +462,7 @@ class RecordedEventSerializer {
             float delta = jsonObject.get("delta").getAsFloat();
             newEvent = new MouseWheelEvent(mousePosition, wheelTurns, delta);
         } else {
-            logger.error("Not an Input Event"); // change to logger
+            logger.error("Not an Input Event");
             return null;
         }
 

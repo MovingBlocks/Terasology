@@ -29,7 +29,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
-import org.terasology.recording.EntityRefIdMap;
+import org.terasology.recording.EntityIdMap;
 import org.terasology.registry.CoreRegistry;
 
 /**
@@ -51,7 +51,7 @@ public class LocalPlayer {
     public void setClientEntity(EntityRef entity) {
 
         //Gets the client ids for record and replay
-        EntityRefIdMap.add("client", entity.getId());
+        EntityIdMap.add("client", entity.getId());
         this.clientEntity = entity;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         if (clientComp != null) {

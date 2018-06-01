@@ -124,12 +124,8 @@ public class SaveTransaction extends AbstractTask {
 
     @Override
     public void run() {
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAY_FINISHED
-                || RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
-            if (RecordAndReplayUtils.isShutdownRequested()) {
-                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
-            }
-            return; //if it is a replay, do not save the game
+        if (isReplay()) {
+            return;
         }
         try {
             if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {
@@ -149,20 +145,38 @@ public class SaveTransaction extends AbstractTask {
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
             //Save Recording Data
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
-                if (RecordAndReplayUtils.isShutdownRequested()) {
-                    RecordAndReplaySerializer.serializeRecordAndReplayData();
-                    RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
-                    RecordAndReplayUtils.reset();
-                } else {
-                    String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
-                    RecordAndReplaySerializer.serializeRecordedEvents(recordingPath);
-                }
-            }
+            saveRecordingData();
         } catch (IOException | RuntimeException t) {
             logger.error("Save game creation failed", t);
             result = SaveTransactionResult.createFailureResult(t);
         }
+    }
+
+    private void saveRecordingData() {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
+            if (RecordAndReplayUtils.isShutdownRequested()) {
+                RecordAndReplaySerializer.serializeRecordAndReplayData();
+                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                RecordAndReplayUtils.reset();
+            } else {
+                String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
+                RecordAndReplaySerializer.serializeRecordedEvents(recordingPath);
+            }
+        }
+    }
+
+    private boolean isReplay() {
+        boolean isReplay = false;
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAY_FINISHED
+                || RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
+
+            isReplay = true;
+            if (RecordAndReplayUtils.isShutdownRequested()) {
+                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+            }
+
+        }
+        return isReplay;
     }
 
     private void prepareChunksPlayersAndGlobalStore() {

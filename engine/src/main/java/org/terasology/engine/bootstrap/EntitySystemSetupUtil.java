@@ -38,6 +38,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
+import org.terasology.recording.EventCatcher;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.EventSystemReplayImpl;
@@ -113,24 +114,26 @@ public final class EntitySystemSetupUtil {
         entityManager.setComponentLibrary(library.getComponentLibrary());
 
         // Event System
-        EventSystem eventSystem;
-        //If it's replaying, should use the proper EventSystem
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager);
-        } else {
-            eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
-        }
+        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library);
         entityManager.setEventSystem(eventSystem);
         context.put(EventSystem.class, eventSystem);
 
         // TODO: Review - NodeClassLibrary related to the UI for behaviours. Should not be here and probably not even in the CoreRegistry
         context.put(OneOfProviderFactory.class, new OneOfProviderFactory());
-
-
-
         registerComponents(library.getComponentLibrary(), environment);
         registerEvents(entityManager.getEventSystem(), environment);
         RecordAndReplaySerializer.setEntityManager(entityManager);
+    }
+
+    private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library) {
+        EventSystem eventSystem;
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager);
+        } else {
+            EventCatcher eventCatcher = new EventCatcher();
+            eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem, eventCatcher);
+        }
+        return eventSystem;
     }
 
     private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {

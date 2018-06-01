@@ -37,6 +37,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.recording.EventCatcher;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -73,7 +74,8 @@ public class PojoEventSystemTests {
         entityManager.setPrefabManager(new PojoPrefabManager(context));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        eventSystem = new EventSystemImpl(entitySystemLibrary.getEventLibrary(), networkSystem);
+        EventCatcher eventCatcher = new EventCatcher();
+        eventSystem = new EventSystemImpl(entitySystemLibrary.getEventLibrary(), networkSystem, eventCatcher);
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();
     }

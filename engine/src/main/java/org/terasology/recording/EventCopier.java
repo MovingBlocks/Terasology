@@ -135,53 +135,53 @@ final class EventCopier {
     // there must be a better way to do this
     private static BindButtonEvent createNewBindButtonEvent(BindButtonEvent originalEvent) {
         BindButtonEvent newEvent = null;
-        Class c = originalEvent.getClass();
+        Class eventClass = originalEvent.getClass();
 
-        if (c.equals(ChatButton.class)) {
+        if (eventClass.equals(ChatButton.class)) {
             newEvent = new ChatButton();
-        } else if (c.equals(ConsoleButton.class)) {
+        } else if (eventClass.equals(ConsoleButton.class)) {
             newEvent = new ConsoleButton();
-        } else if (c.equals(HideHUDButton.class)) {
+        } else if (eventClass.equals(HideHUDButton.class)) {
             newEvent = new HideHUDButton();
-        } else if (c.equals(OnlinePlayersButton.class)) {
+        } else if (eventClass.equals(OnlinePlayersButton.class)) {
             newEvent = new OnlinePlayersButton();
-        } else if (c.equals(PauseButton.class)) {
+        } else if (eventClass.equals(PauseButton.class)) {
             newEvent = new PauseButton();
-        } else if (c.equals(ScreenshotButton.class)) {
+        } else if (eventClass.equals(ScreenshotButton.class)) {
             newEvent = new ScreenshotButton();
-        } else if (c.equals(AttackButton.class)) {
+        } else if (eventClass.equals(AttackButton.class)) {
             newEvent = new AttackButton();
-        } else if (c.equals(FrobButton.class)) {
+        } else if (eventClass.equals(FrobButton.class)) {
             newEvent = new FrobButton();
-        } else if (c.equals(UseItemButton.class)) {
+        } else if (eventClass.equals(UseItemButton.class)) {
             newEvent = new UseItemButton();
-        } else if (c.equals(AutoMoveButton.class)) {
+        } else if (eventClass.equals(AutoMoveButton.class)) {
             newEvent = new AutoMoveButton();
-        } else if (c.equals(BackwardsButton.class)) {
+        } else if (eventClass.equals(BackwardsButton.class)) {
             newEvent = new BackwardsButton();
-        } else if (c.equals(CrouchButton.class)) {
+        } else if (eventClass.equals(CrouchButton.class)) {
             newEvent = new CrouchButton();
-        } else if (c.equals(ForwardsButton.class)) {
+        } else if (eventClass.equals(ForwardsButton.class)) {
             newEvent = new ForwardsButton();
-        } else if (c.equals(JumpButton.class)) {
+        } else if (eventClass.equals(JumpButton.class)) {
             newEvent = new JumpButton();
-        } else if (c.equals(LeftStrafeButton.class)) {
+        } else if (eventClass.equals(LeftStrafeButton.class)) {
             newEvent = new LeftStrafeButton();
-        } else if (c.equals(RightStrafeButton.class)) {
+        } else if (eventClass.equals(RightStrafeButton.class)) {
             newEvent = new RightStrafeButton();
-        } else if (c.equals(ToggleSpeedPermanentlyButton.class)) {
+        } else if (eventClass.equals(ToggleSpeedPermanentlyButton.class)) {
             newEvent = new ToggleSpeedPermanentlyButton();
-        } else if (c.equals(ToggleSpeedTemporarilyButton.class)) {
+        } else if (eventClass.equals(ToggleSpeedTemporarilyButton.class)) {
             newEvent = new ToggleSpeedTemporarilyButton();
-        } else if (c.equals(BTEditorButton.class)) {
+        } else if (eventClass.equals(BTEditorButton.class)) {
             newEvent = new BTEditorButton();
-        } else if (c.equals(DecreaseViewDistanceButton.class)) {
+        } else if (eventClass.equals(DecreaseViewDistanceButton.class)) {
             newEvent = new DecreaseViewDistanceButton();
-        } else if (c.equals(IncreaseViewDistanceButton.class)) {
+        } else if (eventClass.equals(IncreaseViewDistanceButton.class)) {
             newEvent = new IncreaseViewDistanceButton();
-        } else if (c.equals(NUIEditorButton.class)) {
+        } else if (eventClass.equals(NUIEditorButton.class)) {
             newEvent = new NUIEditorButton();
-        } else if (c.equals(NUISkinEditorButton.class)) {
+        } else if (eventClass.equals(NUISkinEditorButton.class)) {
             newEvent = new NUISkinEditorButton();
         }  else {
             logger.error("ERROR!!! Event not Identified: " + originalEvent.toString());
@@ -191,13 +191,13 @@ final class EventCopier {
 
     private static KeyEvent createNewKeyEvent(KeyEvent originalEvent) {
         KeyEvent newEvent = null;
-        Class c = originalEvent.getClass();
+        Class eventClass = originalEvent.getClass();
 
-        if (c.equals(KeyDownEvent.class)) {
+        if (eventClass.equals(KeyDownEvent.class)) {
             newEvent = KeyDownEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
-        } else if (c.equals(KeyRepeatEvent.class)) {
+        } else if (eventClass.equals(KeyRepeatEvent.class)) {
             newEvent = KeyRepeatEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
-        } else if (c.equals(KeyUpEvent.class)) {
+        } else if (eventClass.equals(KeyUpEvent.class)) {
             newEvent = KeyUpEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
         } else {
             logger.error("ERROR!!! Event not Identified");
@@ -207,23 +207,23 @@ final class EventCopier {
 
     private static BindAxisEvent createNewBindAxisEvent(BindAxisEvent originalEvent) {
         BindAxisEvent newEvent = null;
-        Class c = originalEvent.getClass();
+        Class eventClass = originalEvent.getClass();
 
-        if (c.equals(ForwardsMovementAxis.class)) {
+        if (eventClass.equals(ForwardsMovementAxis.class)) {
             newEvent = new ForwardsMovementAxis();
-        } else if (c.equals(ForwardsRealMovementAxis.class)) {
+        } else if (eventClass.equals(ForwardsRealMovementAxis.class)) {
             newEvent = new ForwardsRealMovementAxis();
-        } else if (c.equals(RotationPitchAxis.class)) {
+        } else if (eventClass.equals(RotationPitchAxis.class)) {
             newEvent = new RotationPitchAxis();
-        } else if (c.equals(RotationYawAxis.class)) {
+        } else if (eventClass.equals(RotationYawAxis.class)) {
             newEvent = new RotationYawAxis();
-        } else if (c.equals(StrafeMovementAxis.class)) {
+        } else if (eventClass.equals(StrafeMovementAxis.class)) {
             newEvent = new StrafeMovementAxis();
-        } else if (c.equals(StrafeRealMovementAxis.class)) {
+        } else if (eventClass.equals(StrafeRealMovementAxis.class)) {
             newEvent = new StrafeRealMovementAxis();
-        } else if (c.equals(VerticalMovementAxis.class)) {
+        } else if (eventClass.equals(VerticalMovementAxis.class)) {
             newEvent = new VerticalMovementAxis();
-        } else if (c.equals(VerticalRealMovementAxis.class)) {
+        } else if (eventClass.equals(VerticalRealMovementAxis.class)) {
             newEvent = new VerticalRealMovementAxis();
         } else {
             logger.error("ERROR!!! Event not Identified");

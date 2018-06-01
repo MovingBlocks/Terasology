@@ -51,7 +51,7 @@ public final class RecordAndReplaySerializer {
     }
 
     /**
-     * Serialize RecordedEvents, EntityRefIdMap and some RecordAndReplayUtils data.
+     * Serialize RecordedEvents, EntityIdMap and some RecordAndReplayUtils data.
      */
     public static void serializeRecordAndReplayData() {
         String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
@@ -75,7 +75,7 @@ public final class RecordAndReplaySerializer {
     }
 
     /**
-     * Deserialize RecordedEvents, EntityRefIdMap and some RecordAndReplayUtils data.
+     * Deserialize RecordedEvents, EntityIdMap and some RecordAndReplayUtils data.
      */
     public static void deserializeRecordAndReplayData() {
         String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
@@ -100,11 +100,11 @@ public final class RecordAndReplaySerializer {
     private static void serializeRefIdMap(Gson gson, String recordingPath) {
         try {
             JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + REF_ID_MAP));
-            gson.toJson(EntityRefIdMap.getCurrentMap(), HashMap.class, writer);
+            gson.toJson(EntityIdMap.getCurrentMap(), HashMap.class, writer);
             writer.close();
             logger.info("RefIdMap Serialization completed!");
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error while serializing Entity ID Map:", e);
         }
     }
 
@@ -113,10 +113,10 @@ public final class RecordAndReplaySerializer {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(new FileReader(recordingPath + REF_ID_MAP));
             Type typeOfHashMap = new TypeToken<HashMap<String, Long>>() { }.getType();
-            EntityRefIdMap.setPreviousMap(gson.fromJson(jsonElement, typeOfHashMap));
+            EntityIdMap.setPreviousMap(gson.fromJson(jsonElement, typeOfHashMap));
             logger.info("RefIdMap Deserialization completed!");
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error while deserializing Entity ID Map:", e);
         }
     }
 
@@ -127,7 +127,7 @@ public final class RecordAndReplaySerializer {
             writer.close();
             logger.info("File Amount Serialization completed!");
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error while serializing file amount:", e);
         }
     }
 
@@ -139,7 +139,7 @@ public final class RecordAndReplaySerializer {
             RecordAndReplayUtils.setFileAmount(gson.fromJson(jsonElement, typeOfCount));
             logger.info("File Amount Deserialization completed!");
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error while deserializing file amount:", e);
         }
     }
 

@@ -70,7 +70,9 @@ public final class RecordAndReplayUtils {
         RecordAndReplayUtils.fileAmount = fileAmount;
     }
 
-    //should be called once a Recording ends
+    /**
+     * Resets shutdownRequested, fileCount and fileAmount. Should be called once a Recording ends.
+     */
     public static void reset() {
         shutdownRequested = false;
         fileCount = 1;

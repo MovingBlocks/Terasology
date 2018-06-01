@@ -178,7 +178,7 @@ public class RecordScreen extends CoreScreenLayer {
         try {
             FileUtils.copyDirectoryStructure(saveDirectory, destDirectory);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error trying to copy the save directory:", e);
         }
 
     }
