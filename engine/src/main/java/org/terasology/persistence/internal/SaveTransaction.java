@@ -144,7 +144,6 @@ public class SaveTransaction extends AbstractTask {
             mergeChanges();
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
-            //Save Recording Data
             saveRecordingData();
         } catch (IOException | RuntimeException t) {
             logger.error("Save game creation failed", t);
