@@ -50,6 +50,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindableButton;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
@@ -439,15 +440,14 @@ public class EventSystemReplayImpl implements EventSystem {
      * @return if the event is selected to replay
      */
     private boolean isSelectedToReplayEvent(Event event) {
-        //MouseAxisEvent should return false for the replay to work, since it is necessary to move the mouse a little
-        //on the begin of a new replay.
         if ( event instanceof PlaySoundEvent ||
                 event instanceof BindableButton ||
                 event instanceof KeyEvent ||
                 event instanceof BindAxisEvent ||
                 event instanceof CharacterMoveInputEvent ||
                 event instanceof MouseButtonEvent ||
-                event instanceof MouseWheelEvent) {
+                event instanceof MouseWheelEvent ||
+                event instanceof MouseAxisEvent) {
             return true;
         }
 

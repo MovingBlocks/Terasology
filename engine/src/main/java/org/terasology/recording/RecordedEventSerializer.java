@@ -140,86 +140,90 @@ class RecordedEventSerializer {
             writer.endObject();
             writer.close();
         } catch (Exception e) {
-            e.printStackTrace(); // put this into a logger
+            logger.error(e.getMessage());
         }
 
 
     }
 
-    private void writeSpecificEventData(JsonWriter writer, Event event) throws Exception {
+    private void writeSpecificEventData(JsonWriter writer, Event event) {
+        try {
+            GsonSerializationContext serializationContext = new GsonSerializationContext(null);
+            if (event instanceof InputEvent) {
+                InputEvent e = (InputEvent) event;
+                writer.name("delta").value(e.getDelta());
+                writer.name("consumed").value(e.isConsumed());
+                writer.name("target").value(e.getTarget().getId());
 
-        GsonSerializationContext serializationContext = new GsonSerializationContext(null);
-        if (event instanceof InputEvent) {
-            InputEvent e = (InputEvent) event;
-            writer.name("delta").value(e.getDelta());
-            writer.name("consumed").value(e.isConsumed());
-            writer.name("target").value(e.getTarget().getId());
+                TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3f.class);
+                GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getHitNormal(), serializationContext);
+                writer.name("hitNormal");
+                writer.beginObject();
+                JsonArray array = data.getElement().getAsJsonArray();
+                writer.name("x").value(array.get(0).getAsFloat());
+                writer.name("y").value(array.get(1).getAsFloat());
+                writer.name("z").value(array.get(2).getAsFloat());
+                writer.endObject();
 
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3f.class);
-            GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getHitNormal(), serializationContext);
-            writer.name("hitNormal");
-            writer.beginObject();
-            JsonArray array = data.getElement().getAsJsonArray();
-            writer.name("x").value(array.get(0).getAsFloat());
-            writer.name("y").value(array.get(1).getAsFloat());
-            writer.name("z").value(array.get(2).getAsFloat());
-            writer.endObject();
+                data = (GsonPersistedData) handler.serialize(e.getHitPosition(), serializationContext);
+                writer.name("hitPosition");
+                writer.beginObject();
+                array = data.getElement().getAsJsonArray();
+                writer.name("x").value(array.get(0).getAsFloat());
+                writer.name("y").value(array.get(1).getAsFloat());
+                writer.name("z").value(array.get(2).getAsFloat());
+                writer.endObject();
 
-            data = (GsonPersistedData) handler.serialize(e.getHitPosition(), serializationContext);
-            writer.name("hitPosition");
-            writer.beginObject();
-            array = data.getElement().getAsJsonArray();
-            writer.name("x").value(array.get(0).getAsFloat());
-            writer.name("y").value(array.get(1).getAsFloat());
-            writer.name("z").value(array.get(2).getAsFloat());
-            writer.endObject();
+                handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3i.class);
+                data = (GsonPersistedData) handler.serialize(e.getTargetBlockPosition(), serializationContext);
+                writer.name("targetBlockPosition");
+                writer.beginObject();
+                array = data.getElement().getAsJsonArray();
+                writer.name("x").value(array.get(0).getAsInt());
+                writer.name("y").value(array.get(1).getAsInt());
+                writer.name("z").value(array.get(2).getAsInt());
+                writer.endObject();
 
-            handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3i.class);
-            data = (GsonPersistedData) handler.serialize(e.getTargetBlockPosition(), serializationContext);
-            writer.name("targetBlockPosition");
-            writer.beginObject();
-            array = data.getElement().getAsJsonArray();
-            writer.name("x").value(array.get(0).getAsInt());
-            writer.name("y").value(array.get(1).getAsInt());
-            writer.name("z").value(array.get(2).getAsInt());
-            writer.endObject();
-
-            writeInputEventInstanceData(writer, event, serializationContext);
+                writeInputEventInstanceData(writer, event, serializationContext);
 
 
-        } else if (event instanceof CameraTargetChangedEvent) {
-            CameraTargetChangedEvent e = (CameraTargetChangedEvent) event;
-            writer.name("OldTarget").value(e.getOldTarget().getId());
-            writer.name("NewTarget").value(e.getNewTarget().getId());
-        } else if (event instanceof PlaySoundEvent) {
-            PlaySoundEvent e = (PlaySoundEvent) event;
-            writer.name("volume").value(e.getVolume());
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(StaticSound.class);
-            PersistedData data = handler.serialize(e.getSound(), serializationContext);
-            writer.name("sound").value(data.getAsString());
+            } else if (event instanceof CameraTargetChangedEvent) {
+                CameraTargetChangedEvent e = (CameraTargetChangedEvent) event;
+                writer.name("OldTarget").value(e.getOldTarget().getId());
+                writer.name("NewTarget").value(e.getNewTarget().getId());
+            } else if (event instanceof PlaySoundEvent) {
+                PlaySoundEvent e = (PlaySoundEvent) event;
+                writer.name("volume").value(e.getVolume());
+                TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(StaticSound.class);
+                PersistedData data = handler.serialize(e.getSound(), serializationContext);
+                writer.name("sound").value(data.getAsString());
 
-        } else if (event instanceof CharacterMoveInputEvent) {
-            CharacterMoveInputEvent e = (CharacterMoveInputEvent) event;
-            writer.name("delta").value(e.getDeltaMs());
-            writer.name("pitch").value(e.getPitch());
-            writer.name("yaw").value(e.getYaw());
-            writer.name("running").value(e.isRunning());
-            writer.name("crouching").value(e.isCrouching());
-            writer.name("jumpRequested").value(e.isJumpRequested());
-            writer.name("sequeceNumber").value(e.getSequenceNumber());
-            writer.name("firstRun").value(e.isFirstRun());
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3f.class);
-            GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getMovementDirection(), serializationContext);
-            writer.name("movementDirection");
-            writer.beginObject();
-            JsonArray array = data.getElement().getAsJsonArray();
-            writer.name("x").value(array.get(0).getAsFloat());
-            writer.name("y").value(array.get(1).getAsFloat());
-            writer.name("z").value(array.get(2).getAsFloat());
-            writer.endObject();
+            } else if (event instanceof CharacterMoveInputEvent) {
+                CharacterMoveInputEvent e = (CharacterMoveInputEvent) event;
+                writer.name("delta").value(e.getDeltaMs());
+                writer.name("pitch").value(e.getPitch());
+                writer.name("yaw").value(e.getYaw());
+                writer.name("running").value(e.isRunning());
+                writer.name("crouching").value(e.isCrouching());
+                writer.name("jumpRequested").value(e.isJumpRequested());
+                writer.name("sequeceNumber").value(e.getSequenceNumber());
+                writer.name("firstRun").value(e.isFirstRun());
+                TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3f.class);
+                GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getMovementDirection(), serializationContext);
+                writer.name("movementDirection");
+                writer.beginObject();
+                JsonArray array = data.getElement().getAsJsonArray();
+                writer.name("x").value(array.get(0).getAsFloat());
+                writer.name("y").value(array.get(1).getAsFloat());
+                writer.name("z").value(array.get(2).getAsFloat());
+                writer.endObject();
 
-        } else {
-            logger.error("ERROR: EVENT NOT SUPPORTED FOR SERIALIZATION");
+            } else {
+                logger.error("ERROR: EVENT NOT SUPPORTED FOR SERIALIZATION");
+            }
+        } catch (Exception e) {
+            logger.error("Could not serialize this event: " + event.toString());
+            e.printStackTrace();
         }
     }
 

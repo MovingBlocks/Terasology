@@ -183,8 +183,9 @@ public class RecordScreen extends CoreScreenLayer {
 
     }
 
-    public void refreshGameList() {
+    void refreshGameList() {
         gameList.setList(GameProvider.getSavedGames());
+        gameList.setSelection(null);
     }
 
     private void loadPreviewImage(GameInfo item) {
