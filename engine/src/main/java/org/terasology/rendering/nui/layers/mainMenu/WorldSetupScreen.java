@@ -16,12 +16,47 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
+import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
+import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.properties.Property;
+import org.terasology.rendering.nui.properties.PropertyOrdering;
+import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.rendering.world.World;
+import org.terasology.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.world.generator.WorldConfigurator;
+import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class WorldSetupScreen extends CoreScreenLayer {
 
+    @In
+    private WorldGeneratorManager worldGeneratorManager;
+
+    @In
+    private Config config;
+
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldSetupScreen");
+    private WorldGenerator worldGenerator;
+    private World world;
+    private ModuleEnvironment environment;
+    private Context context;
 
     @Override
     public void initialise() {
@@ -29,5 +64,137 @@ public class WorldSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
         );
+    }
+
+    public void setWorld(Context subContext, World worldSelected) throws UnresolvedWorldGeneratorException {
+        world = worldSelected;
+        context = subContext;
+        SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
+        environment = context.get(ModuleEnvironment.class);
+        context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
+
+        worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
+        configureProperties();
+    }
+
+    private void configureProperties() {
+
+        PropertyLayout propLayout = find("properties", PropertyLayout.class);
+        propLayout.setOrdering(PropertyOrdering.byLabel());
+        propLayout.clear();
+
+        WorldConfigurator worldConfig = worldGenerator.getConfigurator();
+
+        Map<String, Component> params = worldConfig.getProperties();
+
+        for (String key : params.keySet()) {
+            Class<? extends Component> clazz = params.get(key).getClass();
+            Component comp = config.getModuleConfig(worldGenerator.getUri(), key, clazz);
+            if (comp != null) {
+                worldConfig.setProperty(key, comp);       // use the data from the config instead of defaults
+            }
+        }
+
+        ComponentLibrary compLib = context.get(ComponentLibrary.class);
+
+        for (String label : params.keySet()) {
+
+            PropertyProvider provider = new PropertyProvider() {
+                @Override
+                protected <T> Binding<T> createTextBinding(Object target, FieldMetadata<Object, T> fieldMetadata) {
+                    return new WorldSetupScreen.WorldConfigBinding<>(worldConfig, label, compLib, fieldMetadata);
+                }
+
+                @Override
+                protected Binding<Float> createFloatBinding(Object target, FieldMetadata<Object, ?> fieldMetadata) {
+                    return new WorldSetupScreen.WorldConfigNumberBinding(worldConfig, label, compLib, fieldMetadata);
+                }
+            };
+
+            Component target = params.get(label);
+            List<Property<?, ?>> properties = provider.createProperties(target);
+            propLayout.addProperties(label, properties);
+        }
+        world.setWorldConfigurator(worldConfig);
+    }
+
+    /**
+     * Updates a world configurator through setProperty() whenever Binding#set() is called.
+     */
+    private static class WorldConfigBinding<T> implements Binding<T> {
+        private final String label;
+        private final WorldConfigurator worldConfig;
+        private final FieldMetadata<Object, T> fieldMetadata;
+        private final ComponentLibrary compLib;
+
+        protected WorldConfigBinding(WorldConfigurator config, String label, ComponentLibrary compLib, FieldMetadata<Object, T> fieldMetadata) {
+            this.worldConfig = config;
+            this.label = label;
+            this.compLib = compLib;
+            this.fieldMetadata = fieldMetadata;
+        }
+
+        @Override
+        public T get() {
+            Component comp = worldConfig.getProperties().get(label);
+            return fieldMetadata.getValue(comp);
+        }
+
+        @Override
+        public void set(T value) {
+            T old = get();
+
+            if (!Objects.equals(old, value)) {
+                cloneAndSet(label, value);
+            }
+        }
+
+        private void cloneAndSet(String group, Object value) {
+            Component comp = worldConfig.getProperties().get(group);
+            Component clone = compLib.copy(comp);
+            fieldMetadata.setValue(clone, value);
+
+            // notify the world generator about the new component
+            worldConfig.setProperty(label, clone);
+        }
+    }
+
+    private static class WorldConfigNumberBinding implements Binding<Float> {
+
+        private WorldSetupScreen.WorldConfigBinding<? extends Number> binding;
+
+        @SuppressWarnings("unchecked")
+        protected WorldConfigNumberBinding(WorldConfigurator config, String label, ComponentLibrary compLib, FieldMetadata<Object, ?> field) {
+            Class<?> type = field.getType();
+            if (type == Integer.TYPE || type == Integer.class) {
+                this.binding = new WorldSetupScreen.WorldConfigBinding<>(config, label, compLib,
+                        (FieldMetadata<Object, Integer>) field);
+            } else if (type == Float.TYPE || type == Float.class) {
+                this.binding = new WorldSetupScreen.WorldConfigBinding<>(config, label, compLib,
+                        (FieldMetadata<Object, Float>) field);
+            }
+        }
+
+        @Override
+        public Float get() {
+            Number val = binding.get();
+            if (val instanceof Float) {
+                // use boxed instance directly
+                return (Float) val;
+            }
+            // create a boxed instance otherwise
+            return val.floatValue();
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public void set(Float value) {
+            Class<? extends Number> type = binding.fieldMetadata.getType();
+            if (type == Integer.TYPE || type == Integer.class) {
+                ((Binding<Integer>) binding).set(value.intValue());
+            } else if (type == Float.TYPE || type == Float.class) {
+                ((Binding<Float>) binding).set(value);
+            }
+        }
     }
 }

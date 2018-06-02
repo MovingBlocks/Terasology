@@ -66,13 +66,13 @@ import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.TileData;
+import org.terasology.rendering.world.World;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -94,7 +94,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private ModuleEnvironment environment;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
-    HashMap<String, WorldGeneratorInfo> worlds = new HashMap<String, WorldGeneratorInfo>();
+    List<World> worlds = Lists.newArrayList();
     int worldNumber = 0;
 
     @Override
@@ -178,17 +178,22 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
         WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
         WidgetUtil.trySubscribe(this, "worldConfig", button -> {
-            if (!worlds.isEmpty() || !selectedWorld.isEmpty()) {
-                triggerForwardAnimation(worldSetupScreen);
-            } else {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
+            try {
+                if (!worlds.isEmpty() || !selectedWorld.isEmpty()) {
+                    worldSetupScreen.setWorld(context, findWorldByName());
+                    triggerForwardAnimation(worldSetupScreen);
+                } else {
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
+                }
+            } catch (UnresolvedWorldGeneratorException e) {
+                e.getMessage();
             }
         });
 
         WidgetUtil.trySubscribe(this, "addGenerator", button -> {
             addNewWorld(worldGenerator.getSelection());
-            List<String> worldOptions = Lists.newArrayList(worlds.keySet());
-            worldsDropdown.setOptions(worldOptions);
+            List<World> worldOptions = worlds;
+            worldsDropdown.setOptions(worldNames());
             //triggerForwardAnimation(worldSetupScreen);
         });
 
@@ -212,8 +217,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         worlds.clear();
         worldNumber = 0;
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
-        List<String> worldOptions = Lists.newArrayList(worlds.keySet());
-        worldsDropdown.setOptions(worldOptions);
+        List<World> worldOptions = worlds;
+        worldsDropdown.setOptions(worldNames());
         selectedWorld = "";
     }
 
@@ -240,7 +245,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
-        worlds.put(selectedWorld, worldGeneratorInfo);
+        worlds.add(new World(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo ));
         worldNumber++;
     }
 
@@ -298,5 +303,23 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
 
     }
+
+    private List<String> worldNames() {
+        List<String> worldNamesList = Lists.newArrayList();
+        for (World world: worlds) {
+            worldNamesList.add(world.getWorldName().toString());
+        }
+        return worldNamesList;
+    }
+
+    private World findWorldByName() {
+        for (World world: worlds) {
+            if (world.getWorldName().toString().equals(selectedWorld)) {
+                return world;
+            }
+        }
+        return null;
+    }
+
 }
 
