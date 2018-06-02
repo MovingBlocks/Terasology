@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
@@ -176,9 +177,13 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         );
 
         WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
-        WidgetUtil.trySubscribe(this, "worldConfig", button ->
-                triggerForwardAnimation(worldSetupScreen)
-        );
+        WidgetUtil.trySubscribe(this, "worldConfig", button -> {
+            if (!worlds.isEmpty() || !selectedWorld.isEmpty()) {
+                triggerForwardAnimation(worldSetupScreen);
+            } else {
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
+            }
+        });
 
         WidgetUtil.trySubscribe(this, "addGenerator", button -> {
             addNewWorld(worldGenerator.getSelection());
@@ -189,11 +194,15 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
         WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button -> {
-            try {
-                worldPreGenerationScreen.setEnvironment(config.getWorldGeneration().getDefaultGenerator(), context);
-                triggerForwardAnimation(worldPreGenerationScreen);
-            } catch (UnresolvedWorldGeneratorException e) {
-                e.getMessage();
+            if (!worlds.isEmpty()) {
+                try {
+                    worldPreGenerationScreen.setEnvironment(config.getWorldGeneration().getDefaultGenerator(), context);
+                    triggerForwardAnimation(worldPreGenerationScreen);
+                } catch (UnresolvedWorldGeneratorException e) {
+                    e.getMessage();
+                }
+            } else {
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
             }
         });
     }
@@ -245,6 +254,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         context.put(NUIManager.class, getManager());
 
         assetTypeManager = new ModuleAwareAssetTypeManager();
+        context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(ModuleManager.class, moduleManager);
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
