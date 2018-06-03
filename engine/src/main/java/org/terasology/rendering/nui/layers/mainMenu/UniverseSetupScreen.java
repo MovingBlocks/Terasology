@@ -73,6 +73,7 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -257,7 +258,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
         context.put(NUIManager.class, getManager());
-
+        context.put(UniverseSetupScreen.class, this);
         assetTypeManager = new ModuleAwareAssetTypeManager();
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
@@ -304,7 +305,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     }
 
-    private List<String> worldNames() {
+    public List<String> worldNames() {
         List<String> worldNamesList = Lists.newArrayList();
         for (World world: worlds) {
             worldNamesList.add(world.getWorldName().toString());
@@ -312,13 +313,21 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         return worldNamesList;
     }
 
-    private World findWorldByName() {
+    public World findWorldByName() {
         for (World world: worlds) {
             if (world.getWorldName().toString().equals(selectedWorld)) {
                 return world;
             }
         }
         return null;
+    }
+
+    public List<World> getWorldsList() {
+        return worlds;
+    }
+
+    public String getSelectedWorld() {
+        return selectedWorld;
     }
 
 }

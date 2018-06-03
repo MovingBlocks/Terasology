@@ -126,7 +126,7 @@
                 }
               },
               {
-                "type": "UIDropdown",
+                "type": "UIDropdownScrollable",
                 "id": "worlds",
                 "layoutInfo": {
                   "position-horizontal-center": {},

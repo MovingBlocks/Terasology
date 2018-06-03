@@ -21,7 +21,6 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.math.TeraMath;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -29,13 +28,12 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.rendering.world.World;
 import org.terasology.utilities.Assets;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
@@ -58,25 +56,33 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     private Config config;
 
 
-
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
     private ModuleEnvironment environment;
     private WorldGenerator worldGenerator;
     private Texture texture;
     private UIImage previewImage;
     private Context context;
     private PreviewGenerator previewGen;
+    private List<World> worldList;
+    private String selectedWorld;
+    private List<String> worldNames;
 
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
 
     public WorldPreGenerationScreen() {
     }
 
     public void setEnvironment(SimpleUri worldGenUri, Context subContext) throws UnresolvedWorldGeneratorException {
+
         context = subContext;
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
         worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
-        worldGenerator.setWorldSeed("thisisjustrancdom");
+        worldList = context.get(UniverseSetupScreen.class).getWorldsList();
+        selectedWorld = context.get(UniverseSetupScreen.class).getSelectedWorld();
+        worldNames = context.get(UniverseSetupScreen.class).worldNames();
+        worldGenerator.setWorldSeed("thisisjustrandom");
+        final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
+        worldsDropdown.setOptions(worldNames);
         genTexture();
 
         List<Zone> previewZones = Lists.newArrayList(worldGenerator.getZones())
@@ -90,6 +96,20 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+
+        final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
+        worldsDropdown.bindSelection(new Binding<String>() {
+            @Override
+            public String get() {
+                return selectedWorld;
+            }
+
+            @Override
+            public void set(String value) {
+                selectedWorld = value;
+                updatePreview();
+            }
+        });
 
         StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button ->
