@@ -274,7 +274,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
             context.put(EnvironmentSwitchHandler.class, environmentSwitcher);
 
-            environmentSwitcher.handleSwitchToGameEnvironment(context);
+            environmentSwitcher.handleSwitchToPreviewEnvironment(context, environment);
         }
     }
 
