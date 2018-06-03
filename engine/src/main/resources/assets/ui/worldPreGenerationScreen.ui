@@ -114,7 +114,7 @@
               {
                 "type": "UILabel",
                 "text": "${engine:menu#game-worlds}:",
-                "id": "worldGenLabel",
+                "id": "worldLabel",
                 "family": "left-label",
                 "layoutInfo": {
                   "position-horizontal-center": {},
@@ -127,7 +127,7 @@
               },
               {
                 "type": "UIDropdown",
-                "id": "worldGenerators",
+                "id": "worlds",
                 "layoutInfo": {
                   "position-horizontal-center": {},
                   "position-top": {
