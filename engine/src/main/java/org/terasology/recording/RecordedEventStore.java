@@ -21,30 +21,30 @@ import java.util.List;
 /**
  * Responsible for saving the recorded events.
  */
-public final class RecordedEventStore {
+public class RecordedEventStore {
 
-    private static List<RecordedEvent> events = new ArrayList<>();
+    private List<RecordedEvent> events;
 
-    private RecordedEventStore() {
-
+    public RecordedEventStore() {
+        events = new ArrayList<>();
     }
 
 
-    public static boolean add(RecordedEvent event) {
+    public boolean add(RecordedEvent event) {
         return events.add(event);
     }
 
-    public static List<RecordedEvent> getEvents() {
+    public List<RecordedEvent> getEvents() {
         return events;
     }
 
-    static List<RecordedEvent> popEvents() {
+    List<RecordedEvent> popEvents() {
         List<RecordedEvent> recordedEvents = events;
         events = new ArrayList<>();
         return recordedEvents;
     }
 
-    public static void setEvents(List<RecordedEvent> deserializedEvents) {
+    public void setEvents(List<RecordedEvent> deserializedEvents) {
         events = deserializedEvents;
     }
 }

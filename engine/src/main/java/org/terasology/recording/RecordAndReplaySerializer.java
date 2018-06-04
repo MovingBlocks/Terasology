@@ -38,6 +38,7 @@ import java.util.Map;
  */
 public final class RecordAndReplaySerializer {
     private static EntityManager entityManager;
+    private static RecordedEventStore recordedEventStore;
     private static final Logger logger = LoggerFactory.getLogger(RecordAndReplaySerializer.class);
     private static final String EVENT_DIR = "/events";
     private static final String JSON = ".json";
@@ -50,6 +51,10 @@ public final class RecordAndReplaySerializer {
 
     public static void setEntityManager(EntityManager manager) {
         entityManager = manager;
+    }
+
+    public static void setRecordedEventStore(RecordedEventStore store) {
+        recordedEventStore = store;
     }
 
     /**
@@ -72,7 +77,7 @@ public final class RecordAndReplaySerializer {
         String filepath = recordingPath + EVENT_DIR + RecordAndReplayUtils.getFileCount() + JSON;
         RecordAndReplayUtils.setFileAmount(RecordAndReplayUtils.getFileAmount() + 1);
         RecordAndReplayUtils.setFileCount(RecordAndReplayUtils.getFileCount() + 1);
-        serializer.serializeRecordedEvents(RecordedEventStore.popEvents(), filepath);
+        serializer.serializeRecordedEvents(recordedEventStore.popEvents(), filepath);
         logger.info("RecordedEvents Serialization completed!");
     }
 
@@ -95,7 +100,7 @@ public final class RecordAndReplaySerializer {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
         String filepath = recordingPath + EVENT_DIR + RecordAndReplayUtils.getFileCount() + JSON;
         RecordAndReplayUtils.setFileCount(RecordAndReplayUtils.getFileCount() + 1);
-        RecordedEventStore.setEvents(serializer.deserializeRecordedEvents(filepath));
+        recordedEventStore.setEvents(serializer.deserializeRecordedEvents(filepath));
         logger.info("RecordedEvents Deserialization completed!");
     }
 

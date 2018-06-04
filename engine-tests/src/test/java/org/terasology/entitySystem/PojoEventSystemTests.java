@@ -74,7 +74,7 @@ public class PojoEventSystemTests {
         entityManager.setPrefabManager(new PojoPrefabManager(context));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        EventCatcher eventCatcher = new EventCatcher(null);
+        EventCatcher eventCatcher = new EventCatcher(null, null);
         eventSystem = new EventSystemImpl(entitySystemLibrary.getEventLibrary(), networkSystem, eventCatcher);
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();

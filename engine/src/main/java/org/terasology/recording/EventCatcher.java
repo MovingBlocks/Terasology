@@ -28,9 +28,13 @@ public class EventCatcher {
     private long startTime;
     private long eventCounter;
     private List<Class<?>> selectedClassesToRecord;
+    private EventCopier eventCopier;
+    private RecordedEventStore recordedEventStore;
 
-    public EventCatcher(List<Class<?>> selectedClassesToRecord) {
+    public EventCatcher(List<Class<?>> selectedClassesToRecord, RecordedEventStore recordedEventStore) {
         this.selectedClassesToRecord = selectedClassesToRecord;
+        this.eventCopier = new EventCopier();
+        this.recordedEventStore = recordedEventStore;
     }
 
     public void startTimer() {
@@ -47,7 +51,7 @@ public class EventCatcher {
     public boolean addEvent(PendingEvent pendingEvent) {
         if (shouldRecordEvent(pendingEvent)) {
             long timestamp = System.currentTimeMillis() - this.startTime;
-            Event e = EventCopier.copyEvent(pendingEvent.getEvent());
+            Event e = this.eventCopier.copyEvent(pendingEvent.getEvent());
             PendingEvent newPendingEvent = new PendingEvent(pendingEvent.getEntity(), e);
             RecordedEvent recordedEvent;
             if (pendingEvent.getComponent() == null) {
@@ -56,7 +60,7 @@ public class EventCatcher {
                 recordedEvent = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), newPendingEvent.getComponent(), timestamp, this.eventCounter);
             }
             this.eventCounter++;
-            return RecordedEventStore.add(recordedEvent);
+            return recordedEventStore.add(recordedEvent);
         } else {
             return false;
         }

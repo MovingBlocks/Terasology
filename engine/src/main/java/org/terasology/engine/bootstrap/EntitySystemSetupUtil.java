@@ -47,6 +47,7 @@ import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.EventSystemReplayImpl;
 import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordedEventStore;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -120,8 +121,14 @@ public final class EntitySystemSetupUtil {
         EntitySystemLibrary library = context.get(EntitySystemLibrary.class);
         entityManager.setComponentLibrary(library.getComponentLibrary());
 
+        //Record and Replay
+        RecordedEventStore recordedEventStore = new RecordedEventStore();
+        RecordAndReplaySerializer.setEntityManager(entityManager);
+        RecordAndReplaySerializer.setRecordedEventStore(recordedEventStore);
+
+
         // Event System
-        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library);
+        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library, recordedEventStore);
         entityManager.setEventSystem(eventSystem);
         context.put(EventSystem.class, eventSystem);
 
@@ -129,16 +136,15 @@ public final class EntitySystemSetupUtil {
         context.put(OneOfProviderFactory.class, new OneOfProviderFactory());
         registerComponents(library.getComponentLibrary(), environment);
         registerEvents(entityManager.getEventSystem(), environment);
-        RecordAndReplaySerializer.setEntityManager(entityManager);
     }
 
-    private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library) {
+    private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library, RecordedEventStore recordedEventStore) {
         EventSystem eventSystem;
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager);
+            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager, recordedEventStore);
         } else {
             List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
-            EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord);
+            EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord, recordedEventStore);
             eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem, eventCatcher);
         }
         return eventSystem;

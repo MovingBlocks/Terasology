@@ -112,19 +112,22 @@ public class EventSystemReplayImpl implements EventSystem {
     /** Necessary to do some entity id mapping from original client and replay client. */
     private EngineEntityManager entityManager;
 
+    private RecordedEventStore recordedEventStore;
 
-    public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager) {
+
+    public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager, RecordedEventStore recordedEventStore) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
         this.entityManager = entityManager;
+        this.recordedEventStore = recordedEventStore;
     }
 
     /**
      * Fills recordedEvents with the events in RecordedEventStore.
      */
     private void fillRecordedEvents() {
-        Collection<RecordedEvent> events = RecordedEventStore.getEvents();
+        Collection<RecordedEvent> events = recordedEventStore.getEvents();
         for (RecordedEvent event : events) {
             this.recordedEvents.offer(event);
         }
@@ -192,7 +195,7 @@ public class EventSystemReplayImpl implements EventSystem {
                     fillRecordedEvents();
                 } else {
                     RecordAndReplayUtils.reset();
-                    RecordedEventStore.popEvents();
+                    recordedEventStore.popEvents();
                     RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
                 }
             }

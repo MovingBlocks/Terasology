@@ -66,16 +66,16 @@ import org.terasology.rendering.nui.editor.binds.NUISkinEditorButton;
 /**
  * Responsible for making deep copies for the event types supported by Record And Replay.
  */
-final class EventCopier {
+class EventCopier {
 
     private static final Logger logger = LoggerFactory.getLogger(EventCopier.class);
 
 
-    private EventCopier() {
+    public EventCopier() {
 
     }
 
-    static Event copyEvent(Event e) {
+    Event copyEvent(Event e) {
         if (e instanceof PlaySoundEvent) {
             return e;
         } else if (e instanceof BindButtonEvent) {
@@ -125,7 +125,7 @@ final class EventCopier {
         }
     }
 
-    private static void inputEventSetup(InputEvent newEvent, InputEvent originalEvent) {
+    private void inputEventSetup(InputEvent newEvent, InputEvent originalEvent) {
         newEvent.setTargetInfo(originalEvent.getTarget(),
                 originalEvent.getTargetBlockPosition(),
                 originalEvent.getHitPosition(),
@@ -133,7 +133,7 @@ final class EventCopier {
     }
 
     // there must be a better way to do this
-    private static BindButtonEvent createNewBindButtonEvent(BindButtonEvent originalEvent) {
+    private BindButtonEvent createNewBindButtonEvent(BindButtonEvent originalEvent) {
         BindButtonEvent newEvent = null;
         Class eventClass = originalEvent.getClass();
 
@@ -189,7 +189,7 @@ final class EventCopier {
         return newEvent;
     }
 
-    private static KeyEvent createNewKeyEvent(KeyEvent originalEvent) {
+    private KeyEvent createNewKeyEvent(KeyEvent originalEvent) {
         KeyEvent newEvent = null;
         Class eventClass = originalEvent.getClass();
 
@@ -205,7 +205,7 @@ final class EventCopier {
         return newEvent;
     }
 
-    private static BindAxisEvent createNewBindAxisEvent(BindAxisEvent originalEvent) {
+    private BindAxisEvent createNewBindAxisEvent(BindAxisEvent originalEvent) {
         BindAxisEvent newEvent = null;
         Class eventClass = originalEvent.getClass();
 
@@ -231,7 +231,7 @@ final class EventCopier {
         return newEvent;
     }
 
-    private static MouseAxisEvent createNewMouseAxisEvent(MouseAxisEvent originalEvent) {
+    private MouseAxisEvent createNewMouseAxisEvent(MouseAxisEvent originalEvent) {
         return MouseAxisEvent.create(originalEvent.getMouseAxis(), originalEvent.getValue(), originalEvent.getDelta());
     }
 
