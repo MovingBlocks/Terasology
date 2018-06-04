@@ -15,6 +15,7 @@
  */
 package org.terasology.recording;
 
+import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -30,6 +31,7 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Responsible for serializing and saving every Recording data.
@@ -100,7 +102,7 @@ public final class RecordAndReplaySerializer {
     private static void serializeRefIdMap(Gson gson, String recordingPath) {
         try {
             JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + REF_ID_MAP));
-            gson.toJson(EntityIdMap.getCurrentMap(), HashMap.class, writer);
+            gson.toJson(EntityIdMap.getCurrentMap(), HashBiMap.class, writer);
             writer.close();
             logger.info("RefIdMap Serialization completed!");
         } catch (Exception e) {
@@ -113,7 +115,8 @@ public final class RecordAndReplaySerializer {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(new FileReader(recordingPath + REF_ID_MAP));
             Type typeOfHashMap = new TypeToken<HashMap<String, Long>>() { }.getType();
-            EntityIdMap.setPreviousMap(gson.fromJson(jsonElement, typeOfHashMap));
+            Map<String, Long> previousMap = gson.fromJson(jsonElement, typeOfHashMap);
+            EntityIdMap.setPreviousMap(HashBiMap.create(previousMap));
             logger.info("RefIdMap Deserialization completed!");
         } catch (Exception e) {
             logger.error("Error while deserializing Entity ID Map:", e);

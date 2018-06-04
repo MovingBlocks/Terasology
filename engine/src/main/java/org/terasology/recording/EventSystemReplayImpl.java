@@ -239,13 +239,18 @@ public class EventSystemReplayImpl implements EventSystem {
         }
     }
 
-    private EntityRef getEntityRef(RecordedEvent re) {
+    /**
+     * Maps the entities IDs to get the correct entity, even if the id changed from record to replay.
+     * @param recordedEvent the RecordedEvent to have its id checked and converted.
+     * @return the equivalent EntityRef to the one during the recording.
+     */
+    private EntityRef getEntityRef(RecordedEvent recordedEvent) {
         EntityRef entity;
-        // Maps the entities IDs to get the correct entity, even if the id changed from record to replay;
-        if (re.getEntityId() == EntityIdMap.getIdFromPrevious("client")) {
-            entity = this.entityManager.getEntity(EntityIdMap.getId("client")); // If it is the gameClient id
+        String previousName = EntityIdMap.getNameFromPrevious(recordedEvent.getEntityId());
+        if (previousName != null) {
+            entity = this.entityManager.getEntity(EntityIdMap.getId(previousName));
         } else {
-            entity = this.entityManager.getEntity(re.getEntityId()); // gets entityref from id
+            entity = this.entityManager.getEntity(recordedEvent.getEntityId());
         }
         return entity;
     }

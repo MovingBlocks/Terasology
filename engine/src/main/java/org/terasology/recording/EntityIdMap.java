@@ -15,6 +15,9 @@
  */
 package org.terasology.recording;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,10 +27,10 @@ import java.util.Map;
 public final class EntityIdMap {
 
     // This map saves the ids from the current game, be it a record or replay. If it is a record, this data will be saved in a file.
-    private static Map<String, Long> currentMap = new HashMap<>();
+    private static BiMap<String, Long> currentMap = HashBiMap.create();
 
     // When a replay begins, this variable is loaded with the Recording's "currentMap".
-    private static Map<String, Long> previousMap = new HashMap<>();
+    private static BiMap<String, Long> previousMap = HashBiMap.create();
 
 
     private EntityIdMap() {
@@ -38,6 +41,9 @@ public final class EntityIdMap {
         currentMap.put(key, id);
     }
 
+    public static String getNameFromPrevious(long id) {
+        return previousMap.inverse().get(id);
+    }
 
     public static long getId(String key) {
         return currentMap.get(key);
@@ -51,7 +57,7 @@ public final class EntityIdMap {
         return currentMap;
     }
 
-    static void setPreviousMap(Map<String, Long> map) {
+    static void setPreviousMap(BiMap<String, Long> map) {
         previousMap = map;
     }
 }
