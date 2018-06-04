@@ -39,6 +39,7 @@ import java.util.Map;
 public final class RecordAndReplaySerializer {
     private static EntityManager entityManager;
     private static RecordedEventStore recordedEventStore;
+    private static EntityIdMap entityIdMap;
     private static final Logger logger = LoggerFactory.getLogger(RecordAndReplaySerializer.class);
     private static final String EVENT_DIR = "/events";
     private static final String JSON = ".json";
@@ -55,6 +56,10 @@ public final class RecordAndReplaySerializer {
 
     public static void setRecordedEventStore(RecordedEventStore store) {
         recordedEventStore = store;
+    }
+
+    public static void setEntityIdMap(EntityIdMap entityIdMap) {
+        RecordAndReplaySerializer.entityIdMap = entityIdMap;
     }
 
     /**
@@ -107,7 +112,7 @@ public final class RecordAndReplaySerializer {
     private static void serializeRefIdMap(Gson gson, String recordingPath) {
         try {
             JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + REF_ID_MAP));
-            gson.toJson(EntityIdMap.getCurrentMap(), HashBiMap.class, writer);
+            gson.toJson(entityIdMap.getCurrentMap(), HashBiMap.class, writer);
             writer.close();
             logger.info("RefIdMap Serialization completed!");
         } catch (Exception e) {
@@ -121,7 +126,7 @@ public final class RecordAndReplaySerializer {
             JsonElement jsonElement = parser.parse(new FileReader(recordingPath + REF_ID_MAP));
             Type typeOfHashMap = new TypeToken<HashMap<String, Long>>() { }.getType();
             Map<String, Long> previousMap = gson.fromJson(jsonElement, typeOfHashMap);
-            EntityIdMap.setPreviousMap(HashBiMap.create(previousMap));
+            entityIdMap.setPreviousMap(HashBiMap.create(previousMap));
             logger.info("RefIdMap Deserialization completed!");
         } catch (Exception e) {
             logger.error("Error while deserializing Entity ID Map:", e);

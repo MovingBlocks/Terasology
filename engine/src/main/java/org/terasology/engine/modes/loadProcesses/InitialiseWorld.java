@@ -35,6 +35,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadOnlyStorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
+import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -157,7 +158,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.put(WorldRenderer.class, worldRenderer);
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        context.put(LocalPlayer.class, new LocalPlayer());
+        context.put(LocalPlayer.class, new LocalPlayer(context.get(EntityIdMap.class)));
         context.put(Camera.class, worldRenderer.getActiveCamera());
 
         return true;

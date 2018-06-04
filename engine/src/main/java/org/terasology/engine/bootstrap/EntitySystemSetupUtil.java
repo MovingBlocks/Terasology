@@ -42,6 +42,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
+import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.EventCatcher;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordAndReplayStatus;
@@ -123,12 +124,15 @@ public final class EntitySystemSetupUtil {
 
         //Record and Replay
         RecordedEventStore recordedEventStore = new RecordedEventStore();
+        EntityIdMap entityIdMap = new EntityIdMap();
+        context.put(EntityIdMap.class, entityIdMap);
         RecordAndReplaySerializer.setEntityManager(entityManager);
         RecordAndReplaySerializer.setRecordedEventStore(recordedEventStore);
+        RecordAndReplaySerializer.setEntityIdMap(entityIdMap);
 
 
         // Event System
-        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library, recordedEventStore);
+        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library, recordedEventStore, entityIdMap);
         entityManager.setEventSystem(eventSystem);
         context.put(EventSystem.class, eventSystem);
 
@@ -138,10 +142,11 @@ public final class EntitySystemSetupUtil {
         registerEvents(entityManager.getEventSystem(), environment);
     }
 
-    private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library, RecordedEventStore recordedEventStore) {
+    private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library,
+                                                 RecordedEventStore recordedEventStore, EntityIdMap entityIdMap) {
         EventSystem eventSystem;
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager, recordedEventStore);
+            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager, recordedEventStore, entityIdMap);
         } else {
             List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
             EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord, recordedEventStore);

@@ -111,16 +111,20 @@ public class EventSystemReplayImpl implements EventSystem {
     private long replayEventsLoadTime;
     /** Necessary to do some entity id mapping from original client and replay client. */
     private EngineEntityManager entityManager;
-
+    /** Where the RecordedEvents are deserialized */
     private RecordedEventStore recordedEventStore;
+    /** The entity id map from the record game to the replay */
+    private EntityIdMap entityIdMap;
 
 
-    public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager, RecordedEventStore recordedEventStore) {
+    public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
+                                 RecordedEventStore recordedEventStore, EntityIdMap entityIdMap) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
         this.entityManager = entityManager;
         this.recordedEventStore = recordedEventStore;
+        this.entityIdMap = entityIdMap;
     }
 
     /**
@@ -249,9 +253,9 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     private EntityRef getEntityRef(RecordedEvent recordedEvent) {
         EntityRef entity;
-        String previousName = EntityIdMap.getNameFromPrevious(recordedEvent.getEntityId());
+        String previousName = entityIdMap.getNameFromPrevious(recordedEvent.getEntityId());
         if (previousName != null) {
-            entity = this.entityManager.getEntity(EntityIdMap.getId(previousName));
+            entity = this.entityManager.getEntity(entityIdMap.getId(previousName));
         } else {
             entity = this.entityManager.getEntity(recordedEvent.getEntityId());
         }

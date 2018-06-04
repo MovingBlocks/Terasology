@@ -38,8 +38,10 @@ public class LocalPlayer {
 
     private EntityRef clientEntity = EntityRef.NULL;
     private int nextActivationId;
+    private EntityIdMap entityIdMap;
 
-    public LocalPlayer() {
+    public LocalPlayer(EntityIdMap entityIdMap) {
+        this.entityIdMap = entityIdMap;
     }
 
     // TODO: As per Immortius answer in Pull Request #1088,
@@ -51,7 +53,7 @@ public class LocalPlayer {
     public void setClientEntity(EntityRef entity) {
 
         //Gets the client ids for record and replay
-        EntityIdMap.add("client", entity.getId());
+        this.entityIdMap.add("client", entity.getId());
         this.clientEntity = entity;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         if (clientComp != null) {

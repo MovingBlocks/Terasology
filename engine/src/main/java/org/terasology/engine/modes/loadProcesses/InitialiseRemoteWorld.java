@@ -23,6 +23,7 @@ import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
+import org.terasology.recording.EntityIdMap;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.backdrop.Skysphere;
@@ -60,7 +61,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     public boolean step() {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        LocalPlayer localPlayer = new LocalPlayer();
+        LocalPlayer localPlayer = new LocalPlayer(context.get(EntityIdMap.class));
         context.put(LocalPlayer.class, localPlayer);
         BlockManager blockManager = context.get(BlockManager.class);
 
