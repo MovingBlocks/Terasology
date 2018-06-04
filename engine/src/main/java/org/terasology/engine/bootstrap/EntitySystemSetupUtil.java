@@ -126,13 +126,12 @@ public final class EntitySystemSetupUtil {
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         EntityIdMap entityIdMap = new EntityIdMap();
         context.put(EntityIdMap.class, entityIdMap);
-        RecordAndReplaySerializer.setEntityManager(entityManager);
-        RecordAndReplaySerializer.setRecordedEventStore(recordedEventStore);
-        RecordAndReplaySerializer.setEntityIdMap(entityIdMap);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap);
+        context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
 
         // Event System
-        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library, recordedEventStore, entityIdMap);
+        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library, recordedEventStore, entityIdMap, recordAndReplaySerializer);
         entityManager.setEventSystem(eventSystem);
         context.put(EventSystem.class, eventSystem);
 
@@ -143,10 +142,12 @@ public final class EntitySystemSetupUtil {
     }
 
     private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library,
-                                                 RecordedEventStore recordedEventStore, EntityIdMap entityIdMap) {
+                                                 RecordedEventStore recordedEventStore, EntityIdMap entityIdMap,
+                                                 RecordAndReplaySerializer recordAndReplaySerializer) {
         EventSystem eventSystem;
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager, recordedEventStore, entityIdMap);
+            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager, recordedEventStore,
+                    entityIdMap, recordAndReplaySerializer);
         } else {
             List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
             EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord, recordedEventStore);

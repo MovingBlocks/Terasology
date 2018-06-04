@@ -45,6 +45,9 @@ import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.recording.EntityIdMap;
+import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordedEventStore;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 
@@ -108,10 +111,15 @@ public abstract class TerasologyTestingEnvironment {
         engineEntityManager = context.get(EngineEntityManager.class);
         BlockManager mockBlockManager = context.get(BlockManager.class); // 'mock' added to avoid hiding a field
         BiomeManager biomeManager = context.get(BiomeManager.class);
+        RecordedEventStore recordedEventStore = new RecordedEventStore();
+        EntityIdMap entityIdMap = new EntityIdMap();
+        context.put(EntityIdMap.class, entityIdMap);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, entityIdMap);
+        context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, mockBlockManager, biomeManager));
+                engineEntityManager, mockBlockManager, biomeManager, recordAndReplaySerializer));
 
         componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);

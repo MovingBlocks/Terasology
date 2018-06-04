@@ -36,6 +36,7 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadOnlyStorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.recording.EntityIdMap;
+import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -121,9 +122,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         //Gets save data from a normal save or from a recording if it is a replay
         Path saveOrRecordingPath = getSaveOrRecordingPath();
         StorageManager storageManager;
+        RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager)
+                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, recordAndReplaySerializer)
                     : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);

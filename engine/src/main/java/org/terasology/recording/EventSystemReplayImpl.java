@@ -115,16 +115,20 @@ public class EventSystemReplayImpl implements EventSystem {
     private RecordedEventStore recordedEventStore;
     /** The entity id map from the record game to the replay */
     private EntityIdMap entityIdMap;
+    /** Class responsible for deserializing recorded data */
+    private RecordAndReplaySerializer recordAndReplaySerializer;
 
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
-                                 RecordedEventStore recordedEventStore, EntityIdMap entityIdMap) {
+                                 RecordedEventStore recordedEventStore, EntityIdMap entityIdMap,
+                                 RecordAndReplaySerializer recordAndReplaySerializer) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
         this.entityManager = entityManager;
         this.recordedEventStore = recordedEventStore;
         this.entityIdMap = entityIdMap;
+        this.recordAndReplaySerializer = recordAndReplaySerializer;
     }
 
     /**
@@ -195,7 +199,7 @@ public class EventSystemReplayImpl implements EventSystem {
             if (this.recordedEvents.isEmpty()) {
                 if (RecordAndReplayUtils.getFileCount() <= RecordAndReplayUtils.getFileAmount()) { //Get next recorded events file
                     String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
-                    RecordAndReplaySerializer.deserializeRecordedEvents(recordingPath);
+                    recordAndReplaySerializer.deserializeRecordedEvents(recordingPath);
                     fillRecordedEvents();
                 } else {
                     RecordAndReplayUtils.reset();

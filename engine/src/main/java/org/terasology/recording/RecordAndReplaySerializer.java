@@ -37,35 +37,27 @@ import java.util.Map;
  * Responsible for serializing and saving every Recording data.
  */
 public final class RecordAndReplaySerializer {
-    private static EntityManager entityManager;
-    private static RecordedEventStore recordedEventStore;
-    private static EntityIdMap entityIdMap;
+
     private static final Logger logger = LoggerFactory.getLogger(RecordAndReplaySerializer.class);
     private static final String EVENT_DIR = "/events";
     private static final String JSON = ".json";
     private static final String REF_ID_MAP = "/ref_id_map" + JSON;
     private static final String FILE_AMOUNT = "/file_amount" + JSON;
 
-    private RecordAndReplaySerializer() {
+    private EntityManager entityManager;
+    private RecordedEventStore recordedEventStore;
+    private EntityIdMap entityIdMap;
 
-    }
-
-    public static void setEntityManager(EntityManager manager) {
-        entityManager = manager;
-    }
-
-    public static void setRecordedEventStore(RecordedEventStore store) {
-        recordedEventStore = store;
-    }
-
-    public static void setEntityIdMap(EntityIdMap entityIdMap) {
-        RecordAndReplaySerializer.entityIdMap = entityIdMap;
+    public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store, EntityIdMap idMap) {
+        this.entityManager = manager;
+        this.recordedEventStore = store;
+        this.entityIdMap = idMap;
     }
 
     /**
      * Serialize RecordedEvents, EntityIdMap and some RecordAndReplayUtils data.
      */
-    public static void serializeRecordAndReplayData() {
+    public void serializeRecordAndReplayData() {
         String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
         serializeRecordedEvents(recordingPath);
         Gson gson = new GsonBuilder().create();
@@ -77,7 +69,7 @@ public final class RecordAndReplaySerializer {
      * Serialize RecordedEvents.
      * @param recordingPath path where the data should be saved.
      */
-    public static void serializeRecordedEvents(String recordingPath) {
+    public void serializeRecordedEvents(String recordingPath) {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
         String filepath = recordingPath + EVENT_DIR + RecordAndReplayUtils.getFileCount() + JSON;
         RecordAndReplayUtils.setFileAmount(RecordAndReplayUtils.getFileAmount() + 1);
@@ -89,7 +81,7 @@ public final class RecordAndReplaySerializer {
     /**
      * Deserialize RecordedEvents, EntityIdMap and some RecordAndReplayUtils data.
      */
-    public static void deserializeRecordAndReplayData() {
+    public void deserializeRecordAndReplayData() {
         String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
         deserializeRecordedEvents(recordingPath);
         Gson gson = new GsonBuilder().create();
@@ -101,7 +93,7 @@ public final class RecordAndReplaySerializer {
      * Deserialize RecordedEvents.
      * @param recordingPath path where the data was saved.
      */
-    static void deserializeRecordedEvents(String recordingPath) {
+    void deserializeRecordedEvents(String recordingPath) {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
         String filepath = recordingPath + EVENT_DIR + RecordAndReplayUtils.getFileCount() + JSON;
         RecordAndReplayUtils.setFileCount(RecordAndReplayUtils.getFileCount() + 1);
@@ -109,7 +101,7 @@ public final class RecordAndReplaySerializer {
         logger.info("RecordedEvents Deserialization completed!");
     }
 
-    private static void serializeRefIdMap(Gson gson, String recordingPath) {
+    private void serializeRefIdMap(Gson gson, String recordingPath) {
         try {
             JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + REF_ID_MAP));
             gson.toJson(entityIdMap.getCurrentMap(), HashBiMap.class, writer);
@@ -120,7 +112,7 @@ public final class RecordAndReplaySerializer {
         }
     }
 
-    private static void deserializeRefIdMap(Gson gson, String recordingPath) {
+    private void deserializeRefIdMap(Gson gson, String recordingPath) {
         try {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(new FileReader(recordingPath + REF_ID_MAP));
@@ -133,7 +125,7 @@ public final class RecordAndReplaySerializer {
         }
     }
 
-    private static void serializeFileAmount(Gson gson, String recordingPath) {
+    private void serializeFileAmount(Gson gson, String recordingPath) {
         try {
             JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + FILE_AMOUNT));
             gson.toJson(RecordAndReplayUtils.getFileAmount(), Integer.class, writer);
@@ -144,7 +136,7 @@ public final class RecordAndReplaySerializer {
         }
     }
 
-    private static void deserializeFileAmount(Gson gson, String recordingPath) {
+    private void deserializeFileAmount(Gson gson, String recordingPath) {
         try {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(new FileReader(recordingPath + FILE_AMOUNT));

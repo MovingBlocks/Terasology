@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Saves important EntityRef ids so a mapping from recording to replay can be done.
  */
-public final class EntityIdMap {
+public class EntityIdMap {
 
     // This map saves the ids from the current game, be it a record or replay. If it is a record, this data will be saved in a file.
     private BiMap<String, Long> currentMap = HashBiMap.create();

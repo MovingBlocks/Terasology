@@ -647,7 +647,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
             //Activate the replay when the preparations are ready
             if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-                RecordAndReplaySerializer.deserializeRecordAndReplayData();
+                RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
+                recordAndReplaySerializer.deserializeRecordAndReplayData();
                 RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAYING);
             }
         }

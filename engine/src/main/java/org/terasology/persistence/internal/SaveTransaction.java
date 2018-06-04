@@ -95,13 +95,17 @@ public class SaveTransaction extends AbstractTask {
     private final StoragePathProvider storagePathProvider;
     private final SaveTransactionHelper saveTransactionHelper;
 
+    //Record and Replay
+    private RecordAndReplaySerializer recordAndReplaySerializer;
+
 
     public SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
                            Map<String, EntityData.PlayerStore> unloadedPlayers,
                            Map<String, PlayerStoreBuilder> loadedPlayers, GlobalStoreBuilder globalStoreBuilder,
                            Map<Vector3i, CompressedChunkBuilder> unloadedChunks, Map<Vector3i, ChunkImpl> loadedChunks,
                            GameManifest gameManifest, boolean storeChunksInZips,
-                           StoragePathProvider storagePathProvider, Lock worldDirectoryWriteLock) {
+                           StoragePathProvider storagePathProvider, Lock worldDirectoryWriteLock,
+                           RecordAndReplaySerializer recordAndReplaySerializer) {
         this.privateEntityManager = privateEntityManager;
         this.deltaToSave = deltaToSave;
         this.unloadedPlayers = unloadedPlayers;
@@ -114,6 +118,7 @@ public class SaveTransaction extends AbstractTask {
         this.storagePathProvider = storagePathProvider;
         this.saveTransactionHelper = new SaveTransactionHelper(storagePathProvider);
         this.worldDirectoryWriteLock = worldDirectoryWriteLock;
+        this.recordAndReplaySerializer = recordAndReplaySerializer;
     }
 
 
@@ -154,12 +159,12 @@ public class SaveTransaction extends AbstractTask {
     private void saveRecordingData() {
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
             if (RecordAndReplayUtils.isShutdownRequested()) {
-                RecordAndReplaySerializer.serializeRecordAndReplayData();
+                recordAndReplaySerializer.serializeRecordAndReplayData();
                 RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
                 RecordAndReplayUtils.reset();
             } else {
                 String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
-                RecordAndReplaySerializer.serializeRecordedEvents(recordingPath);
+                recordAndReplaySerializer.serializeRecordedEvents(recordingPath);
             }
         }
     }

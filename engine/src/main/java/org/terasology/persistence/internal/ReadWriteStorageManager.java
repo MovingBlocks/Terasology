@@ -44,6 +44,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
+import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.ShutdownTask;
@@ -108,6 +109,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private EngineEntityManager privateEntityManager;
     private EntitySetDeltaRecorder entitySetDeltaRecorder;
+    private RecordAndReplaySerializer recordAndReplaySerializer;
     /**
      * A component library that provides a copy() method that replaces {@link EntityRef}s which {@link EntityRef}s
      * that will use the privateEntityManager.
@@ -115,12 +117,13 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private ComponentLibrary entityRefReplacingComponentLibrary;
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                   BlockManager blockManager, BiomeManager biomeManager) throws IOException {
-        this(savePath, environment, entityManager, blockManager, biomeManager, true);
+                                   BlockManager blockManager, BiomeManager biomeManager, RecordAndReplaySerializer recordAndReplaySerializer) throws IOException {
+        this(savePath, environment, entityManager, blockManager, biomeManager, true, recordAndReplaySerializer);
     }
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                   BlockManager blockManager, BiomeManager biomeManager, boolean storeChunksInZips) throws IOException {
+                                   BlockManager blockManager, BiomeManager biomeManager, boolean storeChunksInZips,
+                                   RecordAndReplaySerializer recordAndReplaySerializer) throws IOException {
         super(savePath, environment, entityManager, blockManager, biomeManager, storeChunksInZips);
 
         entityManager.subscribeForDestruction(this);
@@ -134,6 +137,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         this.entityRefReplacingComponentLibrary = privateEntityManager.getComponentLibrary()
                 .createCopyUsingCopyStrategy(EntityRef.class, new DelayedEntityRefCopyStrategy(this));
         this.entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
+        this.recordAndReplaySerializer = recordAndReplaySerializer;
 
     }
 
@@ -245,7 +249,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private SaveTransaction createSaveTransaction() {
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
-                entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock);
+                entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock, recordAndReplaySerializer);
 
         ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);

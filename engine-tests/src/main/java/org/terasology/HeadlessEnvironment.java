@@ -63,6 +63,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
@@ -150,10 +151,11 @@ public class HeadlessEnvironment extends Environment {
         EngineEntityManager engineEntityManager = context.get(EngineEntityManager.class);
         BlockManager blockManager = context.get(BlockManager.class);
         BiomeManager biomeManager = context.get(BiomeManager.class);
+        RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
         Path savePath = PathManager.getInstance().getSavePath("world1");
 
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, blockManager, biomeManager));
+                engineEntityManager, blockManager, biomeManager, recordAndReplaySerializer));
     }
 
     @Override
