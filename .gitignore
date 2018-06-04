@@ -98,4 +98,8 @@ config/metrics/
 API_file.txt
 New_API_file.txt
 
+# Ignore Whitelist and Blacklist files
+whitelist.json
+blacklist.json
+
 # Ignore weird stuff that might be obsolete
