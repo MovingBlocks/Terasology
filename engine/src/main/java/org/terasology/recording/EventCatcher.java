@@ -15,12 +15,10 @@
  */
 package org.terasology.recording;
 
-import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.PendingEvent;
-import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
-import org.terasology.input.events.InputEvent;
-import org.terasology.logic.characters.CharacterMoveInputEvent;
+
+import java.util.List;
 
 /**
  * This class is responsible for catching the events during a Record and send the desired ones to the RecordedEventStore.
@@ -29,9 +27,10 @@ public class EventCatcher {
 
     private long startTime;
     private long eventCounter;
+    private List<Class<?>> selectedClassesToRecord;
 
-    public EventCatcher() {
-
+    public EventCatcher(List<Class<?>> selectedClassesToRecord) {
+        this.selectedClassesToRecord = selectedClassesToRecord;
     }
 
     public void startTimer() {
@@ -63,12 +62,14 @@ public class EventCatcher {
         }
     }
 
-
     private boolean shouldRecordEvent(PendingEvent pendingEvent) {
-        Event event = pendingEvent.getEvent();
-        return (event instanceof PlaySoundEvent
-                || event instanceof InputEvent
-                || event instanceof CameraTargetChangedEvent
-                || event instanceof CharacterMoveInputEvent);
+        boolean shouldRecord = false;
+        for (Class<?> supportedEventClass : this.selectedClassesToRecord) {
+            if (supportedEventClass.isInstance(pendingEvent.getEvent())) {
+                shouldRecord = true;
+                break;
+            }
+        }
+        return shouldRecord;
     }
 }

@@ -16,6 +16,7 @@
 
 package org.terasology.engine.bootstrap;
 
+import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -34,6 +35,9 @@ import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
+import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
+import org.terasology.input.events.InputEvent;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -47,6 +51,9 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides static methods that can be used to put entity system related objects into a {@link Context} instance.
@@ -130,7 +137,8 @@ public final class EntitySystemSetupUtil {
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager);
         } else {
-            EventCatcher eventCatcher = new EventCatcher();
+            List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
+            EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord);
             eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem, eventCatcher);
         }
         return eventSystem;
@@ -151,6 +159,15 @@ public final class EntitySystemSetupUtil {
                 eventSystem.registerEvent(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);
             }
         }
+    }
+
+    private static List<Class<?>> createSelectedClassesToRecordList() {
+        List<Class<?>> selectedClassesToRecord = new ArrayList<>();
+        selectedClassesToRecord.add(InputEvent.class);
+        selectedClassesToRecord.add(PlaySoundEvent.class);
+        selectedClassesToRecord.add(CameraTargetChangedEvent.class);
+        selectedClassesToRecord.add(CharacterMoveInputEvent.class);
+        return selectedClassesToRecord;
     }
 
 }
