@@ -53,6 +53,7 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
         text.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
+                logger.info("localPlayer is: {}", localPlayer);
                 PingStockComponent pingStockComp = localPlayer.getClientEntity().getComponent(PingStockComponent.class);
                 if (pingStockComp == null) {
                     String playerListText = determinePlayerListText();
@@ -85,11 +86,17 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Map.Entry<EntityRef, Long> entry : pingMap.entrySet()) {
+            EntityRef clientEntity = entry.getKey();
+            if (clientEntity == null || clientEntity.getComponent(ClientComponent.class) == null) {
+                logger.warn("OnlinePlayersOverlay skipping a null client entity or component");
+                continue;
+            }
+
             if (!first) {
                 sb.append("\n");
             }
-            EntityRef clientEntity = entry.getKey();
-            ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);;
+
+            ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
             sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo));
             sb.append(" ");
             Long pingValue = pingMap.get(clientEntity);

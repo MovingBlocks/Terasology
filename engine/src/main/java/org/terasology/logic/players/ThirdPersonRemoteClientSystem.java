@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.players;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
@@ -42,6 +44,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.logic.VisualComponent;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /*
@@ -51,6 +54,7 @@ import java.util.Map;
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(ThirdPersonRemoteClientSystem.class);
 
     private static final int USEANIMATIONLENGTH = 200;
 
@@ -62,19 +66,19 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     private Time time;
 
     // the item from the inventory synchronized with the server
-    private Map<EntityRef,EntityRef> charactersHandEntities = new HashMap<>();
+    private Map<EntityRef, EntityRef> charactersHandEntities = new HashMap<>();
 
-    private Map<EntityRef,EntityRef> charactersHeldItems = new HashMap<>();
+    private Map<EntityRef, EntityRef> charactersHeldItems = new HashMap<>();
 
 
     private EntityRef getHandEntity(EntityRef character) {
         EntityRef handEntity = charactersHandEntities.get(character);
-        if ( handEntity == EntityRef.NULL) {
+        if (handEntity == EntityRef.NULL) {
             // create the hand entity
             EntityBuilder entityBuilder = entityManager.newBuilder("engine:hand");
             entityBuilder.setPersistent(false);
             handEntity = entityBuilder.build();
-            charactersHandEntities.put(character,handEntity);
+            charactersHandEntities.put(character, handEntity);
         }
         return handEntity;
     }
@@ -83,29 +87,29 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     @ReceiveEvent
     public void ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent event, EntityRef character,
                                                            RemotePersonHeldItemMountPointComponent remotePersonHeldItemMountPointComponent) {
-    if(!localPlayer.getCharacterEntity().equals(character)) {
-        if (!remotePersonHeldItemMountPointComponent.mountPointEntity.exists()) {
-            EntityBuilder builder = entityManager.newBuilder("engine:RemotePersonHeldItemMountPoint");
-            builder.setPersistent(false);
-            remotePersonHeldItemMountPointComponent.mountPointEntity = builder.build();
-            character.saveComponent(remotePersonHeldItemMountPointComponent);
-        }
+        if (!localPlayer.getCharacterEntity().equals(character)) {
+            if (!remotePersonHeldItemMountPointComponent.mountPointEntity.exists()) {
+                EntityBuilder builder = entityManager.newBuilder("engine:RemotePersonHeldItemMountPoint");
+                builder.setPersistent(false);
+                remotePersonHeldItemMountPointComponent.mountPointEntity = builder.build();
+                character.saveComponent(remotePersonHeldItemMountPointComponent);
+            }
 
-        // link the mount point entity to the camera
-        Location.removeChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity);
-        Location.attachChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity,
-                remotePersonHeldItemMountPointComponent.translate,
-                new Quat4f(
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.y,
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.x,
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.z),
-                remotePersonHeldItemMountPointComponent.scale);
+            // link the mount point entity to the camera
+            Location.removeChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity);
+            Location.attachChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity,
+                    remotePersonHeldItemMountPointComponent.translate,
+                    new Quat4f(
+                            TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.y,
+                            TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.x,
+                            TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.z),
+                    remotePersonHeldItemMountPointComponent.scale);
         }
     }
 
     @ReceiveEvent
     public void ensureHeldItemIsMountedOnLoad(OnChangedComponent event, EntityRef clientEntity, ClientComponent clientComponent) {
-        if ((!(localPlayer.getClientEntity().equals(clientEntity))) &&(clientEntity.exists()) && clientComponent.character!= EntityRef.NULL) {
+        if ((!(localPlayer.getClientEntity().equals(clientEntity))) && (clientEntity.exists()) && clientComponent.character != EntityRef.NULL) {
             CharacterHeldItemComponent characterHeldItemComponent = clientComponent.character.getComponent(CharacterHeldItemComponent.class);
             if (characterHeldItemComponent != null && !(clientComponent.character.equals(localPlayer.getCharacterEntity()))) {
                 linkHeldItemLocationForRemotePlayer(characterHeldItemComponent.selectedItem, clientComponent.character);
@@ -115,7 +119,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
     @Command(shortDescription = "Sets the held item mount point translation for remote characters")
     public void setRemotePlayersHeldItemMountPointTranslations(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
-        for (EntityRef remotePlayer: charactersHeldItems.keySet()) {
+        for (EntityRef remotePlayer : charactersHeldItems.keySet()) {
             RemotePersonHeldItemMountPointComponent newComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
             if (newComponent != null) {
                 newComponent.translate = new Vector3f(x, y, z);
@@ -126,7 +130,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
     @Command(shortDescription = "Sets the held item mount point rotation for remote characters")
     public void setRemotePlayersHeldItemMountPointRotations(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
-        for (EntityRef remotePlayer: charactersHeldItems.keySet()) {
+        for (EntityRef remotePlayer : charactersHeldItems.keySet()) {
             RemotePersonHeldItemMountPointComponent newComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
             if (newComponent != null) {
                 newComponent.rotateDegrees = new Vector3f(x, y, z);
@@ -137,7 +141,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
     @Command(shortDescription = "Sets the held item mount point scale for remote characters")
     public void setRemotePlayersHeldItemMountPointScale(@CommandParam("scale") float scale) {
-        for (EntityRef remotePlayer: charactersHeldItems.keySet()) {
+        for (EntityRef remotePlayer : charactersHeldItems.keySet()) {
             RemotePersonHeldItemMountPointComponent newComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
             if (newComponent != null) {
                 newComponent.scale = scale;
@@ -150,7 +154,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     public void onHeldItemActivated(OnActivatedComponent event, EntityRef player, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
         if (!localPlayer.getCharacterEntity().equals(player)) {
             EntityRef newItem = heldItemComponent.selectedItem;
-            linkHeldItemLocationForRemotePlayer(newItem,player);
+            linkHeldItemLocationForRemotePlayer(newItem, player);
         }
     }
 
@@ -158,13 +162,14 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
         if (!localPlayer.getCharacterEntity().equals(character)) {
             EntityRef newItem = heldItemComponent.selectedItem;
-            linkHeldItemLocationForRemotePlayer(newItem,character);
+            linkHeldItemLocationForRemotePlayer(newItem, character);
         }
     }
 
+    // TODO: This likely never triggers in headless since this is a client-only system - there might need to be an authority system to catch that
     @ReceiveEvent
     public void onClientDisconnect(DisconnectedEvent event, EntityRef clientEntity, ClientComponent clientComponent) {
-        if(charactersHeldItems.containsKey(clientComponent.character) || charactersHandEntities.containsKey(clientComponent.character)){
+        if (charactersHeldItems.containsKey(clientComponent.character) || charactersHandEntities.containsKey(clientComponent.character)) {
             charactersHeldItems.remove(clientComponent.character);
             charactersHandEntities.remove(clientComponent.character);
             destroyUnheldItems();
@@ -174,16 +179,17 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     /**
      * Changes held item entity.
      *
-     * <p>Detaches old held item and removes it's components. Adds components to new held item and
-     * attaches it to the mount point entity.</p>
+     * Detaches old held item and removes it's components. Adds components to new held item and
+     * attaches it to the mount point entity.
      */
-    private void linkHeldItemLocationForRemotePlayer(EntityRef newItem,EntityRef player) {
+    private void linkHeldItemLocationForRemotePlayer(EntityRef newItem, EntityRef player) {
         //If this character is yet unknown to us, add it to the map
-        if(!charactersHeldItems.containsKey(player)){
-            charactersHeldItems.put(player,EntityRef.NULL);
+        if (!charactersHeldItems.containsKey(player)) {
+            logger.info("linkHeldItemLocationForRemotePlayer got called for a player not yet in charactersHeldItems, adding {} with EntityRef.NULL", player );
+            charactersHeldItems.put(player, EntityRef.NULL);
         }
         EntityRef currentHeldItem = charactersHeldItems.get(player);
-        if (!newItem.equals(currentHeldItem)) {
+        if (newItem != null && !newItem.equals(currentHeldItem)) {
             RemotePersonHeldItemMountPointComponent mountPointComponent = player.getComponent(RemotePersonHeldItemMountPointComponent.class);
             if (mountPointComponent != null) {
 
@@ -202,7 +208,8 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
                 // create client side held item entity for remote player and store it in local remote players map
                 currentHeldItem = entityManager.create();
-                charactersHeldItems.put(player,currentHeldItem);
+                charactersHeldItems.put(player, currentHeldItem);
+                logger.info("linkHeldItemLocationForRemotePlayer is now creating/putting a new entry into charactersHeldItems: {}. {}", player, currentHeldItem);
 
                 // add the visually relevant components
                 for (Component component : newHeldItem.iterateComponents()) {
@@ -235,27 +242,59 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     /*
      * TODO javadoc
      */
-    private void destroyUnheldItems(){
+    private void destroyUnheldItems() {
         for (EntityRef entityRef : entityManager.getEntitiesWith(ItemIsRemotelyHeldComponent.class)) {
+            logger.info("In destroyUnheldItems for {}", entityRef);
             if ((!charactersHeldItems.containsValue(entityRef)) && !(charactersHandEntities.containsValue(entityRef))) {
+                logger.info("Destroying {}", entityRef);
                 entityRef.destroy();
             }
         }
     }
+
     /*
      *TODO javadoc
      */
-    private void updateRemoteCharacters(){
-        for (EntityRef entityRef : entityManager.getEntitiesWith(CharacterComponent.class)) {
-            if(!entityRef.equals(localPlayer.getCharacterEntity())) {
+    private void updateRemoteCharacters() {
+        for (EntityRef entityRef : entityManager.getEntitiesWith(CharacterComponent.class, PlayerCharacterComponent.class)) {
+            if (!entityRef.equals(localPlayer.getCharacterEntity())) {
+
                 //Update held items
                 if (!charactersHeldItems.containsKey(entityRef)) {
+                    logger.info("Adding entity {} to charactersHeldItems", entityRef);
                     charactersHeldItems.put(entityRef, EntityRef.NULL);
-                }//Update Hand Entities
+                }
+
+                //Update Hand Entities
                 if (!charactersHandEntities.containsKey(entityRef)) {
+                    logger.info("Adding entity {} to charactersHandEntities", entityRef);
                     charactersHandEntities.put(entityRef, EntityRef.NULL);
                 }
+            } else {
+                logger.info("During updateRemoteCharacters got the local player? {}", entityRef);
             }
+        }
+
+        logger.info("Checking current state of charactersHeldItems");
+        for (EntityRef remotePlayer : charactersHeldItems.keySet()) {
+            logger.info("For remote player {} there is {}", remotePlayer, charactersHandEntities.get(remotePlayer));
+        }
+
+        for (Iterator<Map.Entry<EntityRef, EntityRef>> it = charactersHeldItems.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<EntityRef, EntityRef> entry = it.next();
+            if (entry.getKey().getId() == 0) {
+                logger.info("Removing no longer valid player held item entry {}", entry);
+                it.remove();
+            }
+        }
+
+        // TODO One liner of the above, just no logging. But neither version actually removes the item! What gives?
+        //charactersHeldItems.entrySet().removeIf(e -> e.getKey().getId() == 0);
+
+        // When a player logs out the above removal should trigger and remove that entry, but already here the same items remain present
+        logger.info("Checking state AFTER cleanup of charactersHeldItems");
+        for (EntityRef remotePlayer : charactersHeldItems.keySet()) {
+            logger.info("For remote player {} there is {}", remotePlayer, charactersHandEntities.get(remotePlayer));
         }
     }
 
@@ -268,22 +307,35 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
         //TODO probably not good to call here but make sure it's called upon held item activation? or client disconnect and add removing entries
         updateRemoteCharacters();
 
-        for (EntityRef remotePlayer: charactersHeldItems.keySet()) {
-//            if(remotePlayer.equals(localPlayer.getCharacterEntity())){//TODO is this really needed? characterHeldItems and characterHandEntities should not contain local player
-//                continue;
-//            }
-            //EntityRef currentHeldItem = charactersHeldItems.get(remotePlayer);
-            // ensure empty hand is shown if no item is held at the moment
-            if ((!charactersHeldItems.get(remotePlayer).exists()) && charactersHeldItems.get(remotePlayer) != getHandEntity(remotePlayer)) {
+        for (EntityRef remotePlayer : charactersHeldItems.keySet()) {
+            if (remotePlayer == null) {
+                logger.warn("ThirdPersonRemoteClientSystem went through its update loop but found a null remotePlayer");
+                continue;
+            }
+
+            //TODO is this really needed? characterHeldItems and characterHandEntities should not contain local player
+            if (remotePlayer.equals(localPlayer.getCharacterEntity())) {
+                //logger.info("ThirdPersonRemoteClientSystem got a remotePlayer that was also the local player: {}", remotePlayer);
+                continue;
+            }
+
+            // TODO: Better approach? Was overly vulnerable to things ceasing to exist with bad timing (player logged out, Gooey despawning (fixed by filtering players only))
+            EntityRef currentHeldItem = charactersHeldItems.get(remotePlayer);
+            if (currentHeldItem == null) {
+                logger.warn("Got a currentHeldItem that was null, for remote player (maybe logged out?) {}", remotePlayer);
+                // TODO: Forcibly remove that item - but at this point the EntityRef has been reset to id == 0 (EntityRef.NULL)
+                // charactersHeldItems.remove(remotePlayer); // Doesn't work, entity 0 isn't in the map, might hit concurrent modification exception anyway
+                // With this catching null currentHeldItems crashes are avoided but the code remains messy (and a secondary held item can exist in some cases)
+                continue;
+            } else if (!currentHeldItem.exists() && currentHeldItem != getHandEntity(remotePlayer)) {
+                // ensure empty hand is shown if no item is held at the moment
                 linkHeldItemLocationForRemotePlayer(getHandEntity(remotePlayer), remotePlayer);
             }
-            //EntityRef currentHeldItem = charactersHeldItems.get(remotePlayer);
 
             // get the remote person mount point
             CharacterHeldItemComponent characterHeldItemComponent = remotePlayer.getComponent(CharacterHeldItemComponent.class);
             RemotePersonHeldItemMountPointComponent mountPointComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
-            if (characterHeldItemComponent == null
-                    || mountPointComponent == null) {
+            if (characterHeldItemComponent == null || mountPointComponent == null) {
                 continue;
             }
 
