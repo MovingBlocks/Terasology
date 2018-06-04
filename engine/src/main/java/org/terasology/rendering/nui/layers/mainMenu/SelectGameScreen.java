@@ -202,24 +202,24 @@ public class SelectGameScreen extends CoreScreenLayer {
     }
 
     private void loadGame(GameInfo item) {
-    	  if(loadingAsServer){
-          	Path blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
-              Path whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
-              if (!Files.exists(blacklistPath)) {
-                  try {
-						Files.createFile(blacklistPath);
-					} catch (IOException e) {
-						logger.error("IO Exception on blacklist generation",e);
-					}
-              }
-              if (!Files.exists(whitelistPath)) {
-                  try {
-						Files.createFile(whitelistPath);
-					} catch (IOException e) {
-						logger.error("IO Exception on whitelist generation",e);
-					}
-              }
-          }
+		if (loadingAsServer) {
+			Path blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
+			Path whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
+			if (!Files.exists(blacklistPath)) {
+				try {
+					Files.createFile(blacklistPath);
+				} catch (IOException e) {
+					logger.error("IO Exception on blacklist generation", e);
+				}
+			}
+			if (!Files.exists(whitelistPath)) {
+				try {
+					Files.createFile(whitelistPath);
+				} catch (IOException e) {
+					logger.error("IO Exception on whitelist generation", e);
+				}
+			}
+		}
     	try {
             GameManifest manifest = item.getManifest();
           
