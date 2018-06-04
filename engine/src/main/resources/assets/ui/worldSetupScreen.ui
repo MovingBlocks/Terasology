@@ -1,5 +1,5 @@
 {
-  "type": "WorldSetupScreen",
+  "type": "engine:worldSetupScreen",
   "skin": "engine:mainMenu",
   "contents": {
     "type": "relativeLayout",
@@ -34,100 +34,117 @@
       },
       {
         "type": "UIBox",
-        "id":"mainBox",
-        "content": {
-          "type": "ColumnLayout",
-          "columns": 1,
-          "verticalSpacing": 4,
-          "horizontalSpacing": 4,
-          "contents": [
-            {
-              "type": "RowLayout",
-              "verticalSpacing": 4,
-              "horizontalSpacing": 4,
-              "contents": [
-                {
-                  "type": "UILabel",
-                  "text": "World Shape:",
-                  "family": "left-label",
-                  "layoutInfo": {
-                    "relativeWidth": 0.20
-                  }
-                },
-                {
-                  "type": "UIDropdownScrollable",
-                  "id": "worlds",
-                  "layoutInfo": {
-                    "relativeWidth": 0.50
-                  }
-                }
-              ]
-            },
-            {
-              "type": "UISpace",
-              "size": [
-                1,
-                48
-              ]
-            },
-            {
-              "type": "ScrollableArea",
-              "content": {
-                "type": "propertyLayout",
-                "id": "properties",
-                "rowConstraints": "[min]"
-              },
-              "layoutInfo": {
-                "position-horizontal-center": {},
-                "position-top": {
-                  "target": "BOTTOM",
-                  "offset": 8,
-                  "widget": "seed"
-                },
-                "position-bottom": {
-                  "target": "TOP",
-                  "offset": 8,
-                  "widget": "apply"
-                }
-              }
-            }
-          ]
-        },
+        "id": "container",
         "layoutInfo": {
-          "width": 500,
-          "use-content-height": true,
+          "width": 520,
           "position-horizontal-center": {},
           "position-top": {
             "target": "BOTTOM",
             "offset": 16,
             "widget": "subtitle"
+          },
+          "position-bottom": {
+            "target": "TOP",
+            "widget": "close",
+            "offset": 16
           }
         }
       },
       {
-        "type": "RowLayout",
-        "id": "actionsRow",
-        "horizontalSpacing": 4,
+        "type": "ColumnLayout",
+        "columns": 1,
+        "verticalSpacing": 16,
+        "horizontalSpacing": 8,
+        "layoutInfo": {
+          "width": 504,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "TOP",
+            "widget": "container",
+            "offset": 8
+          },
+          "position-bottom": {
+            "target": "TOP",
+            "widget": "close",
+            "offset": 24
+          }
+        },
         "contents": [
           {
-            "type": "UIButton",
-            "text": "${engine:menu#back}",
-            "id": "close"
-          },
-          {
-            "type": "UIButton",
-            "text": "${engine:menu#accept}",
-            "id": "accept"
+            "type": "RelativeLayout",
+            "family": "description",
+            "contents": [
+              {
+                "type": "RowLayout",
+                "id": "shape",
+                "layoutInfo": {
+                  "use-content-height": true,
+                  "position-horizontal-center": {},
+                  "position-top": {
+                    "target": "TOP"
+                  }
+                },
+                "contents": [
+                  {
+                    "type": "UILabel",
+                    "text": "World Shape:"
+                  },
+                  {
+                    "type": "UIDropdownScrollable",
+                    "id": "worlds"
+                  }
+                ]
+              },
+              {
+                "type": "ScrollableArea",
+                "content": {
+                  "type": "propertyLayout",
+                  "id": "properties",
+                  "rowConstraints": "[min]"
+                },
+                "layoutInfo": {
+                  "position-horizontal-center": {},
+                  "position-top": {
+                    "target": "BOTTOM",
+                    "offset": 8,
+                    "widget": "shape"
+                  },
+                  "position-bottom": {
+                    "target": "TOP",
+                    "offset": 8,
+                    "widget": "apply"
+                  }
+                }
+              },
+              {
+                "type": "UIButton",
+                "text": "${engine:menu#accept}",
+                "id": "apply",
+                "layoutInfo": {
+                  "height": 32,
+                  "width" : 100,
+                  "position-horizontal-center": {},
+                  "position-bottom": {
+                    "target": "BOTTOM",
+                    "offset": 4
+                  }
+                }
+              }
+            ]
           }
-        ],
+        ]
+      },
+      {
+        "type": "UIButton",
+        "text": "${engine:menu#back}",
+        "id": "close",
         "layoutInfo": {
-          "width": 400,
+          "width": 128,
           "height": 32,
           "position-horizontal-center": {},
           "position-bottom": {
             "target": "BOTTOM",
-            "offset": -48,
-            "widget": "mainBox"
+            "offset": 48
           }
         }
       }
