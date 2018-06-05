@@ -40,8 +40,6 @@ import org.terasology.world.sun.BasicCelestialModel;
 import org.terasology.world.sun.CelestialSystem;
 import org.terasology.world.sun.DefaultCelestialSystem;
 
-/**
- */
 public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     private final Context context;
     private final GameManifest gameManifest;

@@ -213,7 +213,7 @@ public class TerasologyEngine implements GameEngine {
 
             verifyInitialisation();
 
-            /**
+            /*
              * Prevent objects being put in engine context after init phase. Engine states should use/create a
              * child context.
              */

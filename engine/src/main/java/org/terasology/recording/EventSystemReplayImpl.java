@@ -69,7 +69,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -153,7 +152,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
             Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
             List<EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
-            Collections.sort(selectedHandlers, priorityComparator);
+            selectedHandlers.sort(priorityComparator);
 
             if (event instanceof ConsumableEvent) {
                 sendConsumableEvent(entity, event, selectedHandlers);
@@ -172,7 +171,7 @@ public class EventSystemReplayImpl implements EventSystem {
             SetMultimap<Class<? extends Component>, EventSystemReplayImpl.EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
             if (handlers != null) {
                 List<EventSystemReplayImpl.EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
-                Collections.sort(eventHandlers, priorityComparator);
+                eventHandlers.sort(priorityComparator);
                 for (EventSystemReplayImpl.EventHandlerInfo eventHandler : eventHandlers) {
                     if (eventHandler.isValidFor(entity)) {
                         eventHandler.invoke(entity, event);
@@ -286,7 +285,7 @@ public class EventSystemReplayImpl implements EventSystem {
     /**
      * Events are added to the event library if they have a network annotation
      *
-     * @param eventType
+     * @param eventType the type of the event to be checked.
      * @return Whether the event should be added to the event library
      */
     private boolean shouldAddToLibrary(Class<? extends Event> eventType) {
@@ -423,8 +422,8 @@ public class EventSystemReplayImpl implements EventSystem {
      * Calls the 'process' method if the replay is activated and the event is of a type selected to be replayed.
      * This way, events of the types that are recorded and replayed are ignored during a replay. This is what makes
      * the player have no control over the character during a replay.
-     * @param entity
-     * @param event
+     * @param entity the entity which the event was sent against.
+     * @param event the event being sent.
      */
     @Override
     public void send(EntityRef entity, Event event) {
@@ -439,9 +438,9 @@ public class EventSystemReplayImpl implements EventSystem {
      * Calls the 'process' method if the replay is activated and the event is of a type selected to be replayed.
      * This way, events of the types that are recorded and replayed are ignored during a replay. This is what makes
      * the player have no control over the character during a replay.
-     * @param entity
-     * @param event
-     * @param component
+     * @param entity the entity which the event was sent against.
+     * @param event the event being sent.
+     * @param component the component sent along with the event.
      */
     @Override
     public void send(EntityRef entity, Event event, Component component) {
@@ -461,18 +460,15 @@ public class EventSystemReplayImpl implements EventSystem {
      * @return if the event is selected to replay
      */
     private boolean isSelectedToReplayEvent(Event event) {
-        if ( event instanceof PlaySoundEvent ||
-                event instanceof BindableButton ||
-                event instanceof KeyEvent ||
-                event instanceof BindAxisEvent ||
-                event instanceof CharacterMoveInputEvent ||
-                event instanceof MouseButtonEvent ||
-                event instanceof MouseWheelEvent ||
-                event instanceof MouseAxisEvent) {
-            return true;
-        }
+        return event instanceof PlaySoundEvent
+                || event instanceof BindableButton
+                || event instanceof KeyEvent
+                || event instanceof BindAxisEvent
+                || event instanceof CharacterMoveInputEvent
+                || event instanceof MouseButtonEvent
+                || event instanceof MouseWheelEvent
+                || event instanceof MouseAxisEvent;
 
-        return false;
     }
 
     private void sendStandardEvent(EntityRef entity, Event event, List<EventSystemReplayImpl.EventHandlerInfo> selectedHandlers) {
@@ -595,61 +591,6 @@ public class EventSystemReplayImpl implements EventSystem {
         Object getHandler();
     }
 
-    private static class ReflectedEventHandlerInfo implements EventSystemReplayImpl.EventHandlerInfo {
-        private ComponentSystem handler;
-        private Method method;
-        private ImmutableList<Class<? extends Component>> filterComponents;
-        private ImmutableList<Class<? extends Component>> componentParams;
-        private int priority;
-
-        ReflectedEventHandlerInfo(ComponentSystem handler,
-                                  Method method,
-                                  int priority,
-                                  Collection<Class<? extends Component>> filterComponents,
-                                  Collection<Class<? extends Component>> componentParams) {
-            this.handler = handler;
-            this.method = method;
-            this.filterComponents = ImmutableList.copyOf(filterComponents);
-            this.componentParams = ImmutableList.copyOf(componentParams);
-            this.priority = priority;
-        }
-
-        @Override
-        public boolean isValidFor(EntityRef entity) {
-            for (Class<? extends Component> component : filterComponents) {
-                if (!entity.hasComponent(component)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public void invoke(EntityRef entity, Event event) {
-            try {
-                Object[] params = new Object[2 + componentParams.size()];
-                params[0] = event;
-                params[1] = entity;
-                for (int i = 0; i < componentParams.size(); ++i) {
-                    params[i + 2] = entity.getComponent(componentParams.get(i));
-                }
-                method.invoke(handler, params);
-            } catch (Exception ex) {
-                logger.error("Failed to invoke event", ex);
-            }
-        }
-
-        @Override
-        public int getPriority() {
-            return priority;
-        }
-
-        @Override
-        public ComponentSystem getHandler() {
-            return handler;
-        }
-    }
-
     private static class ByteCodeEventHandlerInfo implements EventSystemReplayImpl.EventHandlerInfo {
         private ComponentSystem handler;
         private String activity;
@@ -759,9 +700,7 @@ public class EventSystemReplayImpl implements EventSystem {
             }
             if (obj instanceof EventSystemReplayImpl.ReceiverEventHandlerInfo) {
                 EventSystemReplayImpl.ReceiverEventHandlerInfo other = (EventSystemReplayImpl.ReceiverEventHandlerInfo) obj;
-                if (Objects.equal(receiver, other.receiver)) {
-                    return true;
-                }
+                return Objects.equal(receiver, other.receiver);
             }
             return false;
         }

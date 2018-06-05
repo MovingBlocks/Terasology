@@ -32,8 +32,6 @@ import org.terasology.physics.Physics;
 import org.terasology.recording.EntityIdMap;
 import org.terasology.registry.CoreRegistry;
 
-/**
- */
 public class LocalPlayer {
 
     private EntityRef clientEntity = EntityRef.NULL;
@@ -120,7 +118,7 @@ public class LocalPlayer {
         return getViewPosition(new Vector3f());
     }
 
-    public Vector3f getViewPosition(Vector3f out) {
+    private Vector3f getViewPosition(Vector3f out) {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
         if (clientComponent == null) {
             return out;
@@ -173,7 +171,7 @@ public class LocalPlayer {
      * @param usedOwnedEntity an entity owned by the player like an item.
      *
      */
-    public void activateOwnedEntityAsClient(EntityRef usedOwnedEntity) {
+    void activateOwnedEntityAsClient(EntityRef usedOwnedEntity) {
         if (!usedOwnedEntity.exists()) {
             return;
         }
@@ -187,7 +185,7 @@ public class LocalPlayer {
      *
      * @return true if a target got activated.
      */
-    public boolean activateTargetAsClient() {
+    boolean activateTargetAsClient() {
         return activateTargetOrOwnedEntity(EntityRef.NULL);
     }
 

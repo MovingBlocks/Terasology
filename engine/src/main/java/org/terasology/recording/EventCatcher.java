@@ -57,7 +57,8 @@ public class EventCatcher {
             if (pendingEvent.getComponent() == null) {
                 recordedEvent = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), timestamp, this.eventCounter);
             } else {
-                recordedEvent = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), newPendingEvent.getComponent(), timestamp, this.eventCounter);
+                recordedEvent = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(),
+                        newPendingEvent.getComponent(), timestamp, eventCounter);
             }
             this.eventCounter++;
             return recordedEventStore.add(recordedEvent);

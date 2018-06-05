@@ -59,24 +59,24 @@ class SaveTransactionBuilder {
         this.recordAndReplayUtils = recordAndReplayUtils;
     }
 
-    public void addUnloadedPlayer(String id, EntityData.PlayerStore unloadedPlayer) {
+    void addUnloadedPlayer(String id, EntityData.PlayerStore unloadedPlayer) {
         unloadedPlayers.put(id, unloadedPlayer);
     }
 
-    public void addLoadedPlayer(String id, PlayerStoreBuilder loadedPlayer) {
+    void addLoadedPlayer(String id, PlayerStoreBuilder loadedPlayer) {
         loadedPlayers.put(id, loadedPlayer);
     }
 
-    public void setGlobalStoreBuilder(GlobalStoreBuilder globalStoreBuilder) {
+    void setGlobalStoreBuilder(GlobalStoreBuilder globalStoreBuilder) {
         this.globalStoreBuilder = globalStoreBuilder;
     }
 
-    public void addUnloadedChunk(final Vector3i chunkPosition, final CompressedChunkBuilder b) {
+    void addUnloadedChunk(final Vector3i chunkPosition, final CompressedChunkBuilder b) {
         unloadedChunks.put(chunkPosition, b);
     }
 
 
-    public void addLoadedChunk(final Vector3i chunkPosition, final ChunkImpl chunk) {
+    void addLoadedChunk(final Vector3i chunkPosition, final ChunkImpl chunk) {
         loadedChunks.put(chunkPosition, chunk);
     }
 

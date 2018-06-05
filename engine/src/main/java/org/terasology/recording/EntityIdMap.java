@@ -48,10 +48,6 @@ public class EntityIdMap {
         return currentMap.get(key);
     }
 
-    long getIdFromPrevious(String key) {
-        return previousMap.get(key);
-    }
-
     Map<String, Long> getCurrentMap() {
         return currentMap;
     }

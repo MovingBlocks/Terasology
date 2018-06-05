@@ -53,7 +53,6 @@ import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 import org.terasology.recording.EventCatcher;
 import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.world.block.BlockComponent;
 
 import java.lang.reflect.Method;
@@ -128,7 +127,7 @@ public class EventSystemImpl implements EventSystem {
     /**
      * Events are added to the event library if they have a network annotation
      *
-     * @param eventType
+     * @param eventType the type of the event to be checked
      * @return Whether the event should be added to the event library
      */
     private boolean shouldAddToLibrary(Class<? extends Event> eventType) {
@@ -273,7 +272,7 @@ public class EventSystemImpl implements EventSystem {
 
             Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
             List<EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
-            Collections.sort(selectedHandlers, priorityComparator);
+            selectedHandlers.sort(priorityComparator);
 
             if (event instanceof ConsumableEvent) {
                 sendConsumableEvent(entity, event, selectedHandlers);
@@ -375,7 +374,7 @@ public class EventSystemImpl implements EventSystem {
             SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
             if (handlers != null) {
                 List<EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
-                Collections.sort(eventHandlers, priorityComparator);
+                eventHandlers.sort(priorityComparator);
                 for (EventHandlerInfo eventHandler : eventHandlers) {
                     if (eventHandler.isValidFor(entity)) {
                         eventHandler.invoke(entity, event);

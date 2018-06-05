@@ -100,7 +100,7 @@ public class SaveTransaction extends AbstractTask {
     private RecordAndReplayUtils recordAndReplayUtils;
 
 
-    public SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
+    SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
                            Map<String, EntityData.PlayerStore> unloadedPlayers,
                            Map<String, PlayerStoreBuilder> loadedPlayers, GlobalStoreBuilder globalStoreBuilder,
                            Map<Vector3i, CompressedChunkBuilder> unloadedChunks, Map<Vector3i, ChunkImpl> loadedChunks,
@@ -188,7 +188,7 @@ public class SaveTransaction extends AbstractTask {
     }
 
     private void prepareChunksPlayersAndGlobalStore() {
-        /**
+        /*
          * Currently loaded persistent entities without owner that have not been saved yet.
          */
         Set<EntityRef> unsavedEntities = new HashSet<>();
@@ -305,7 +305,7 @@ public class SaveTransaction extends AbstractTask {
             if (privateEntityManager.isActiveEntity(entityId)) {
                 entityToDestroy = privateEntityManager.getEntity(entityId);
             } else {
-                /**
+                /*
                  * Create the entity as theere could be a component that references a {@link DelayedEntityRef}
                  * with the specified id. It is important that the {@link DelayedEntityRef} will reference
                  * a destroyed {@link EntityRef} instance. That is why a entity will be created, potentially

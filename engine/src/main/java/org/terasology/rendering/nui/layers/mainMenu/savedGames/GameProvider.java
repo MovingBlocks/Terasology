@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -40,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-/**
- */
 public final class GameProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(GameProvider.class);

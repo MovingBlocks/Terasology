@@ -97,7 +97,7 @@ public class StateHeadlessSetup implements GameState {
 
         componentSystemManager.initialise();
 
-        GameManifest gameManifest = null;
+        GameManifest gameManifest;
         List<GameInfo> savedGames = GameProvider.getSavedGames();
         if (savedGames.size() > 0) {
             gameManifest = savedGames.get(0).getManifest();

@@ -37,8 +37,6 @@ import org.terasology.version.TerasologyVersion;
 
 import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedStatusMessage;
 
-/**
- */
 public class MainMenuScreen extends CoreScreenLayer {
 
     @In

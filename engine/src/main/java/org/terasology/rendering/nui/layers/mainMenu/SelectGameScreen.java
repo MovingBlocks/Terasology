@@ -28,7 +28,6 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.NetworkMode;
-import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.AWTTextureFormat;

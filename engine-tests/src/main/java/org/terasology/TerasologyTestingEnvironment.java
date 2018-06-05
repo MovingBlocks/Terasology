@@ -22,11 +22,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.audio.AudioManager;
-import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
@@ -44,7 +39,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
-import org.terasology.physics.CollisionGroupManager;
 import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
@@ -63,20 +57,13 @@ import static org.mockito.Mockito.mock;
  */
 public abstract class TerasologyTestingEnvironment {
     protected static Context context;
-    private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
 
-    private static BlockManager blockManager;
-    private static Config config;
-    private static AudioManager audioManager;
-    private static CollisionGroupManager collisionGroupManager;
     private static ModuleManager moduleManager;
-    private static AssetManager assetManager;
 
     private static HeadlessEnvironment env;
 
     protected EngineTime mockTime;
     private EngineEntityManager engineEntityManager;
-    private ComponentSystemManager componentSystemManager;
 
     @BeforeClass
     public static void setupEnvironment() throws Exception {
@@ -89,11 +76,6 @@ public abstract class TerasologyTestingEnvironment {
          */
         env = new HeadlessEnvironment(new Name("engine"));
         context = env.getContext();
-        assetManager = context.get(AssetManager.class);
-        blockManager = context.get(BlockManager.class);
-        config = context.get(Config.class);
-        audioManager = context.get(AudioManager.class);
-        collisionGroupManager = context.get(CollisionGroupManager.class);
         moduleManager = context.get(ModuleManager.class);
 
     }
@@ -124,7 +106,7 @@ public abstract class TerasologyTestingEnvironment {
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
                 engineEntityManager, mockBlockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils));
 
-        componentSystemManager = new ComponentSystemManager(context);
+        ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
         LoadPrefabs prefabLoadStep = new LoadPrefabs(context);
 

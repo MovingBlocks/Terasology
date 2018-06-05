@@ -19,8 +19,6 @@ package org.terasology.entitySystem.event;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 
-/**
- */
 public class PendingEvent {
     private EntityRef entity;
     private Event event;
