@@ -97,6 +97,7 @@ public class SaveTransaction extends AbstractTask {
 
     //Record and Replay
     private RecordAndReplaySerializer recordAndReplaySerializer;
+    private RecordAndReplayUtils recordAndReplayUtils;
 
 
     public SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
@@ -105,7 +106,8 @@ public class SaveTransaction extends AbstractTask {
                            Map<Vector3i, CompressedChunkBuilder> unloadedChunks, Map<Vector3i, ChunkImpl> loadedChunks,
                            GameManifest gameManifest, boolean storeChunksInZips,
                            StoragePathProvider storagePathProvider, Lock worldDirectoryWriteLock,
-                           RecordAndReplaySerializer recordAndReplaySerializer) {
+                           RecordAndReplaySerializer recordAndReplaySerializer,
+                           RecordAndReplayUtils recordAndReplayUtils) {
         this.privateEntityManager = privateEntityManager;
         this.deltaToSave = deltaToSave;
         this.unloadedPlayers = unloadedPlayers;
@@ -119,6 +121,7 @@ public class SaveTransaction extends AbstractTask {
         this.saveTransactionHelper = new SaveTransactionHelper(storagePathProvider);
         this.worldDirectoryWriteLock = worldDirectoryWriteLock;
         this.recordAndReplaySerializer = recordAndReplaySerializer;
+        this.recordAndReplayUtils = recordAndReplayUtils;
     }
 
 
@@ -157,13 +160,14 @@ public class SaveTransaction extends AbstractTask {
     }
 
     private void saveRecordingData() {
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
-            if (RecordAndReplayUtils.isShutdownRequested()) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+            if (recordAndReplayUtils.isShutdownRequested()) {
                 recordAndReplaySerializer.serializeRecordAndReplayData();
-                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
-                RecordAndReplayUtils.reset();
+
+                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                recordAndReplayUtils.reset();
             } else {
-                String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
+                String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
                 recordAndReplaySerializer.serializeRecordedEvents(recordingPath);
             }
         }
@@ -171,12 +175,12 @@ public class SaveTransaction extends AbstractTask {
 
     private boolean isReplay() {
         boolean isReplay = false;
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAY_FINISHED
-                || RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAY_FINISHED
+                || RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
 
             isReplay = true;
-            if (RecordAndReplayUtils.isShutdownRequested()) {
-                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+            if (recordAndReplayUtils.isShutdownRequested()) {
+                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
             }
 
         }

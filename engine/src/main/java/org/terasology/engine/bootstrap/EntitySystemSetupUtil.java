@@ -123,15 +123,17 @@ public final class EntitySystemSetupUtil {
         entityManager.setComponentLibrary(library.getComponentLibrary());
 
         //Record and Replay
+        RecordAndReplayUtils recordAndReplayUtils = context.get(RecordAndReplayUtils.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         EntityIdMap entityIdMap = new EntityIdMap();
         context.put(EntityIdMap.class, entityIdMap);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap, recordAndReplayUtils);
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
 
         // Event System
-        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library, recordedEventStore, entityIdMap, recordAndReplaySerializer);
+        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library, recordedEventStore, entityIdMap,
+                recordAndReplaySerializer, recordAndReplayUtils);
         entityManager.setEventSystem(eventSystem);
         context.put(EventSystem.class, eventSystem);
 
@@ -143,11 +145,11 @@ public final class EntitySystemSetupUtil {
 
     private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library,
                                                  RecordedEventStore recordedEventStore, EntityIdMap entityIdMap,
-                                                 RecordAndReplaySerializer recordAndReplaySerializer) {
+                                                 RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils) {
         EventSystem eventSystem;
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager, recordedEventStore,
-                    entityIdMap, recordAndReplaySerializer);
+                    entityIdMap, recordAndReplaySerializer, recordAndReplayUtils);
         } else {
             List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
             EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord, recordedEventStore);

@@ -67,6 +67,7 @@ public class RecordScreen extends CoreScreenLayer {
     private UILabel worldGenerator;
     private UILabel moduleNames;
     private UIList<GameInfo> gameList;
+    private RecordAndReplayUtils recordAndReplayUtils;
 
 
     @In
@@ -111,7 +112,7 @@ public class RecordScreen extends CoreScreenLayer {
 
 
         WidgetUtil.trySubscribe(this, "close", button -> {
-            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
             triggerBackAnimation();
         });
     }
@@ -162,7 +163,7 @@ public class RecordScreen extends CoreScreenLayer {
         try {
             GameManifest manifest = item.getManifest();
             copySaveDirectoryToRecordingLibrary(manifest.getTitle());
-            RecordAndReplayUtils.setGameTitle(manifest.getTitle());
+            recordAndReplayUtils.setGameTitle(manifest.getTitle());
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, NetworkMode.NONE));
@@ -205,5 +206,9 @@ public class RecordScreen extends CoreScreenLayer {
 
         previewImage = find("previewImage", UIImage.class);
         previewImage.setImage(texture);
+    }
+
+    void setRecordAndReplayUtils(RecordAndReplayUtils recordAndReplayUtils) {
+        this.recordAndReplayUtils = recordAndReplayUtils;
     }
 }

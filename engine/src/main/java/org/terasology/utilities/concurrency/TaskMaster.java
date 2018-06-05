@@ -120,7 +120,6 @@ public final class TaskMaster<T extends Task> {
     }
 
     public void shutdown(T shutdownTask, boolean awaitComplete) {
-        RecordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
         if (!shutdownTask.isTerminateSignal()) {
             throw new IllegalArgumentException("Expected task to provide terminate signal");
         }

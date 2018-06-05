@@ -266,7 +266,7 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
                 eventCatcher.addEvent(new PendingEvent(entity, event));
             }
             networkReplicate(entity, event);
@@ -369,7 +369,7 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
                 eventCatcher.addEvent(new PendingEvent(entity, event, component));
             }
             SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());

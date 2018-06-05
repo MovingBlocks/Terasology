@@ -79,11 +79,15 @@ public class MainMenuScreen extends CoreScreenLayer {
             triggerForwardAnimation(selectScreen);
         });
         WidgetUtil.trySubscribe(this, "record", button -> {
-            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_RECORD);
+            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.PREPARING_RECORD);
+            RecordAndReplayUtils recordAndReplayUtils = engine.createChildContext().get(RecordAndReplayUtils.class);
+            recordScreen.setRecordAndReplayUtils(recordAndReplayUtils);
             triggerForwardAnimation(recordScreen);
         });
         WidgetUtil.trySubscribe(this, "replay", button -> {
-            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_REPLAY);
+            RecordAndReplayUtils recordAndReplayUtils = engine.createChildContext().get(RecordAndReplayUtils.class);
+            replayScreen.setRecordAndReplayUtils(recordAndReplayUtils);
+            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.PREPARING_REPLAY);
             triggerForwardAnimation(replayScreen);
         });
         WidgetUtil.trySubscribe(this, "join", button -> {

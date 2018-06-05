@@ -21,6 +21,7 @@ import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.util.Map;
@@ -43,16 +44,19 @@ class SaveTransactionBuilder {
     private final StoragePathProvider storagePathProvider;
     private GameManifest gameManifest;
     private RecordAndReplaySerializer recordAndReplaySerializer;
+    private RecordAndReplayUtils recordAndReplayUtils;
 
     SaveTransactionBuilder(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
                            boolean storeChunksInZips, StoragePathProvider storagePathProvider,
-                           Lock worldDirectoryWriteLock, RecordAndReplaySerializer recordAndReplaySerializer) {
+                           Lock worldDirectoryWriteLock, RecordAndReplaySerializer recordAndReplaySerializer,
+                           RecordAndReplayUtils recordAndReplayUtils) {
         this.privateEntityManager = privateEntityManager;
         this.deltaToSave = deltaToSave;
         this.storeChunksInZips = storeChunksInZips;
         this.storagePathProvider = storagePathProvider;
         this.worldDirectoryWriteLock = worldDirectoryWriteLock;
         this.recordAndReplaySerializer = recordAndReplaySerializer;
+        this.recordAndReplayUtils = recordAndReplayUtils;
     }
 
     public void addUnloadedPlayer(String id, EntityData.PlayerStore unloadedPlayer) {
@@ -79,7 +83,7 @@ class SaveTransactionBuilder {
     public SaveTransaction build() {
         return new SaveTransaction(privateEntityManager, deltaToSave, unloadedPlayers, loadedPlayers, globalStoreBuilder,
                 unloadedChunks, loadedChunks, gameManifest, storeChunksInZips, storagePathProvider,
-                worldDirectoryWriteLock, recordAndReplaySerializer);
+                worldDirectoryWriteLock, recordAndReplaySerializer, recordAndReplayUtils);
 
     }
 

@@ -202,7 +202,6 @@ public class SelectGameScreen extends CoreScreenLayer {
     private void loadGame(GameInfo item) {
         try {
             GameManifest manifest = item.getManifest();
-            RecordAndReplayUtils.setGameTitle(manifest.getTitle());
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));

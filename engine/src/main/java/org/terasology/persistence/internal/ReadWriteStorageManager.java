@@ -45,6 +45,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.ShutdownTask;
@@ -110,6 +111,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private EngineEntityManager privateEntityManager;
     private EntitySetDeltaRecorder entitySetDeltaRecorder;
     private RecordAndReplaySerializer recordAndReplaySerializer;
+    private RecordAndReplayUtils recordAndReplayUtils;
     /**
      * A component library that provides a copy() method that replaces {@link EntityRef}s which {@link EntityRef}s
      * that will use the privateEntityManager.
@@ -117,13 +119,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private ComponentLibrary entityRefReplacingComponentLibrary;
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                   BlockManager blockManager, BiomeManager biomeManager, RecordAndReplaySerializer recordAndReplaySerializer) throws IOException {
-        this(savePath, environment, entityManager, blockManager, biomeManager, true, recordAndReplaySerializer);
+                                   BlockManager blockManager, BiomeManager biomeManager, RecordAndReplaySerializer recordAndReplaySerializer,
+                                   RecordAndReplayUtils recordAndReplayUtils) throws IOException {
+        this(savePath, environment, entityManager, blockManager, biomeManager, true, recordAndReplaySerializer, recordAndReplayUtils);
     }
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
                                    BlockManager blockManager, BiomeManager biomeManager, boolean storeChunksInZips,
-                                   RecordAndReplaySerializer recordAndReplaySerializer) throws IOException {
+                                   RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils) throws IOException {
         super(savePath, environment, entityManager, blockManager, biomeManager, storeChunksInZips);
 
         entityManager.subscribeForDestruction(this);
@@ -138,6 +141,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
                 .createCopyUsingCopyStrategy(EntityRef.class, new DelayedEntityRefCopyStrategy(this));
         this.entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
         this.recordAndReplaySerializer = recordAndReplaySerializer;
+        this.recordAndReplayUtils = recordAndReplayUtils;
 
     }
 
@@ -150,6 +154,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     @Override
     public void finishSavingAndShutdown() {
+        recordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
         saveThreadManager.shutdown(new ShutdownTask(), true);
         checkSaveTransactionAndClearUpIfItIsDone();
     }
@@ -249,7 +254,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private SaveTransaction createSaveTransaction() {
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
-                entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock, recordAndReplaySerializer);
+                entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock,
+                recordAndReplaySerializer, recordAndReplayUtils);
 
         ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);

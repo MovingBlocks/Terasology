@@ -641,15 +641,15 @@ public final class WorldRendererImpl implements WorldRenderer {
             requestedTaskListRefresh = false;
 
             //Activate record when the preparations are ready
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
-                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.RECORDING);
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
+                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.RECORDING);
             }
 
             //Activate the replay when the preparations are ready
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
                 RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
                 recordAndReplaySerializer.deserializeRecordAndReplayData();
-                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAYING);
+                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAYING);
             }
         }
     }

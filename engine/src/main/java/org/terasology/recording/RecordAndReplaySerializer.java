@@ -47,18 +47,20 @@ public final class RecordAndReplaySerializer {
     private EntityManager entityManager;
     private RecordedEventStore recordedEventStore;
     private EntityIdMap entityIdMap;
+    private RecordAndReplayUtils recordAndReplayUtils;
 
-    public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store, EntityIdMap idMap) {
+    public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store, EntityIdMap idMap, RecordAndReplayUtils recordAndReplayUtils) {
         this.entityManager = manager;
         this.recordedEventStore = store;
         this.entityIdMap = idMap;
+        this.recordAndReplayUtils = recordAndReplayUtils;
     }
 
     /**
      * Serialize RecordedEvents, EntityIdMap and some RecordAndReplayUtils data.
      */
     public void serializeRecordAndReplayData() {
-        String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
+        String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
         serializeRecordedEvents(recordingPath);
         Gson gson = new GsonBuilder().create();
         serializeRefIdMap(gson, recordingPath);
@@ -71,9 +73,9 @@ public final class RecordAndReplaySerializer {
      */
     public void serializeRecordedEvents(String recordingPath) {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
-        String filepath = recordingPath + EVENT_DIR + RecordAndReplayUtils.getFileCount() + JSON;
-        RecordAndReplayUtils.setFileAmount(RecordAndReplayUtils.getFileAmount() + 1);
-        RecordAndReplayUtils.setFileCount(RecordAndReplayUtils.getFileCount() + 1);
+        String filepath = recordingPath + EVENT_DIR + recordAndReplayUtils.getFileCount() + JSON;
+        recordAndReplayUtils.setFileAmount(recordAndReplayUtils.getFileAmount() + 1);
+        recordAndReplayUtils.setFileCount(recordAndReplayUtils.getFileCount() + 1);
         serializer.serializeRecordedEvents(recordedEventStore.popEvents(), filepath);
         logger.info("RecordedEvents Serialization completed!");
     }
@@ -82,7 +84,7 @@ public final class RecordAndReplaySerializer {
      * Deserialize RecordedEvents, EntityIdMap and some RecordAndReplayUtils data.
      */
     public void deserializeRecordAndReplayData() {
-        String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
+        String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
         deserializeRecordedEvents(recordingPath);
         Gson gson = new GsonBuilder().create();
         deserializeRefIdMap(gson, recordingPath);
@@ -95,8 +97,8 @@ public final class RecordAndReplaySerializer {
      */
     void deserializeRecordedEvents(String recordingPath) {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
-        String filepath = recordingPath + EVENT_DIR + RecordAndReplayUtils.getFileCount() + JSON;
-        RecordAndReplayUtils.setFileCount(RecordAndReplayUtils.getFileCount() + 1);
+        String filepath = recordingPath + EVENT_DIR + recordAndReplayUtils.getFileCount() + JSON;
+        recordAndReplayUtils.setFileCount(recordAndReplayUtils.getFileCount() + 1);
         recordedEventStore.setEvents(serializer.deserializeRecordedEvents(filepath));
         logger.info("RecordedEvents Deserialization completed!");
     }
@@ -128,7 +130,7 @@ public final class RecordAndReplaySerializer {
     private void serializeFileAmount(Gson gson, String recordingPath) {
         try {
             JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + FILE_AMOUNT));
-            gson.toJson(RecordAndReplayUtils.getFileAmount(), Integer.class, writer);
+            gson.toJson(recordAndReplayUtils.getFileAmount(), Integer.class, writer);
             writer.close();
             logger.info("File Amount Serialization completed!");
         } catch (Exception e) {
@@ -141,7 +143,7 @@ public final class RecordAndReplaySerializer {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(new FileReader(recordingPath + FILE_AMOUNT));
             Type typeOfCount = new TypeToken<Integer>() { }.getType();
-            RecordAndReplayUtils.setFileAmount(gson.fromJson(jsonElement, typeOfCount));
+            recordAndReplayUtils.setFileAmount(gson.fromJson(jsonElement, typeOfCount));
             logger.info("File Amount Deserialization completed!");
         } catch (Exception e) {
             logger.error("Error while deserializing file amount:", e);

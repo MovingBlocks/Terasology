@@ -46,6 +46,7 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldProvider;
@@ -93,6 +94,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     private EntityRef character;
     private Path savePath;
     private RecordAndReplaySerializer recordAndReplaySerializer;
+    private RecordAndReplayUtils recordAndReplayUtils;
 
     @Before
     public void setup() throws Exception {
@@ -111,11 +113,12 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         EntityIdMap entityIdMap = new EntityIdMap();
-        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap);
+        recordAndReplayUtils = new RecordAndReplayUtils();
+        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap, recordAndReplayUtils);
 
 
         esm = new ReadWriteStorageManager(savePath, moduleEnvironment, entityManager, blockManager, biomeManager,
-                false, recordAndReplaySerializer);
+                false, recordAndReplaySerializer, recordAndReplayUtils);
         context.put(StorageManager.class, esm);
 
         this.character = entityManager.create();
@@ -217,7 +220,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
 
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                biomeManager, false, recordAndReplaySerializer);
+                biomeManager, false, recordAndReplaySerializer, recordAndReplayUtils);
         newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
@@ -238,7 +241,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                biomeManager, false, recordAndReplaySerializer);
+                biomeManager, false, recordAndReplaySerializer, recordAndReplayUtils);
         newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
@@ -290,7 +293,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                biomeManager, storeChunkInZips, recordAndReplaySerializer);
+                biomeManager, storeChunkInZips, recordAndReplaySerializer, recordAndReplayUtils);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -325,7 +328,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                biomeManager, false, recordAndReplaySerializer);
+                biomeManager, false, recordAndReplaySerializer, recordAndReplayUtils);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);

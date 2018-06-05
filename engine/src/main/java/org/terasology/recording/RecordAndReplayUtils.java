@@ -19,61 +19,55 @@ package org.terasology.recording;
  * Saves data important for Record and Replay, such as the RecordAndReplayStatus, the title of the current game, if a
  * shutdown was requested, and the amount of files used to serialize RecordedEvents.
  */
-public final class RecordAndReplayUtils {
-    private static RecordAndReplayStatus recordAndReplayStatus = RecordAndReplayStatus.NOT_ACTIVATED;
-    private static String gameTitle;
-    private static boolean shutdownRequested;
-    private static int fileCount = 1;
-    private static int fileAmount;
+public class RecordAndReplayUtils {
+    private String gameTitle;
+    private boolean shutdownRequested;
+    private int fileCount;
+    private int fileAmount;
 
-    private RecordAndReplayUtils() {
-
+    public RecordAndReplayUtils() {
+        this.shutdownRequested = false;
+        this.fileCount = 1;
+        this.fileAmount = 0;
+        this.gameTitle = "";
     }
 
-    public static RecordAndReplayStatus getRecordAndReplayStatus() {
-        return recordAndReplayStatus;
-    }
-
-    public static void setRecordAndReplayStatus(RecordAndReplayStatus recordAndReplayStatus) {
-        RecordAndReplayUtils.recordAndReplayStatus = recordAndReplayStatus;
-    }
-
-    public static String getGameTitle() {
+    public String getGameTitle() {
         return gameTitle;
     }
 
-    public static void setGameTitle(String gameTitle) {
-        RecordAndReplayUtils.gameTitle = gameTitle;
+    public void setGameTitle(String gameTitle) {
+        this.gameTitle = gameTitle;
     }
 
-    public static boolean isShutdownRequested() {
+    public boolean isShutdownRequested() {
         return shutdownRequested;
     }
 
-    public static void setShutdownRequested(boolean shutdownRequested) {
-        RecordAndReplayUtils.shutdownRequested = shutdownRequested;
+    public void setShutdownRequested(boolean shutdownRequested) {
+        this.shutdownRequested = shutdownRequested;
     }
 
-    static int getFileCount() {
+    int getFileCount() {
         return fileCount;
     }
 
-    static void setFileCount(int fileCount) {
-        RecordAndReplayUtils.fileCount = fileCount;
+    void setFileCount(int fileCount) {
+        this.fileCount = fileCount;
     }
 
-    static int getFileAmount() {
+    int getFileAmount() {
         return fileAmount;
     }
 
-    static void setFileAmount(int fileAmount) {
-        RecordAndReplayUtils.fileAmount = fileAmount;
+    void setFileAmount(int fileAmount) {
+        this.fileAmount = fileAmount;
     }
 
     /**
      * Resets shutdownRequested, fileCount and fileAmount. Should be called once a Recording ends.
      */
-    public static void reset() {
+    public void reset() {
         shutdownRequested = false;
         fileCount = 1;
         fileAmount = 0;

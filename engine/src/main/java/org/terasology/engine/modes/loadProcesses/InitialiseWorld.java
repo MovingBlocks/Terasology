@@ -123,9 +123,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         Path saveOrRecordingPath = getSaveOrRecordingPath();
         StorageManager storageManager;
         RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
+        RecordAndReplayUtils recordAndReplayUtils = context.get(RecordAndReplayUtils.class);
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, recordAndReplaySerializer)
+                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils)
                     : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);
@@ -168,7 +169,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
     private Path getSaveOrRecordingPath() {
         Path saveOrRecordingPath;
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             saveOrRecordingPath = PathManager.getInstance().getRecordingPath(gameManifest.getTitle());
         } else {
             saveOrRecordingPath = PathManager.getInstance().getSavePath(gameManifest.getTitle());

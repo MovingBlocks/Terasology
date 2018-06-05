@@ -47,6 +47,7 @@ import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
@@ -114,12 +115,14 @@ public abstract class TerasologyTestingEnvironment {
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         EntityIdMap entityIdMap = new EntityIdMap();
         context.put(EntityIdMap.class, entityIdMap);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, entityIdMap);
+        RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
+        context.put(RecordAndReplayUtils.class, recordAndReplayUtils);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, entityIdMap, recordAndReplayUtils);
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, mockBlockManager, biomeManager, recordAndReplaySerializer));
+                engineEntityManager, mockBlockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils));
 
         componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);

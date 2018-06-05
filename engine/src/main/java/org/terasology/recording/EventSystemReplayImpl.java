@@ -117,11 +117,13 @@ public class EventSystemReplayImpl implements EventSystem {
     private EntityIdMap entityIdMap;
     /** Class responsible for deserializing recorded data */
     private RecordAndReplaySerializer recordAndReplaySerializer;
+    /** Responsible for knowing the game name of the recording */
+    private RecordAndReplayUtils recordAndReplayUtils;
 
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
                                  RecordedEventStore recordedEventStore, EntityIdMap entityIdMap,
-                                 RecordAndReplaySerializer recordAndReplaySerializer) {
+                                 RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
@@ -129,6 +131,7 @@ public class EventSystemReplayImpl implements EventSystem {
         this.recordedEventStore = recordedEventStore;
         this.entityIdMap = entityIdMap;
         this.recordAndReplaySerializer = recordAndReplaySerializer;
+        this.recordAndReplayUtils = recordAndReplayUtils;
     }
 
     /**
@@ -187,24 +190,24 @@ public class EventSystemReplayImpl implements EventSystem {
     public void process() {
 
         //Load recorded events if they were not loaded and if the game is ready to replay.
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING && !this.areRecordedEventsLoaded) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING && !this.areRecordedEventsLoaded) {
             fillRecordedEvents();
             this.areRecordedEventsLoaded = true;
             logger.info("Loaded Recorded Events!");
             replayEventsLoadTime = System.currentTimeMillis();
         }
         //If replay is ready, process some recorded events if the time is right.
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
             processRecordedEvents(10);
             if (this.recordedEvents.isEmpty()) {
-                if (RecordAndReplayUtils.getFileCount() <= RecordAndReplayUtils.getFileAmount()) { //Get next recorded events file
-                    String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
+                if (recordAndReplayUtils.getFileCount() <= recordAndReplayUtils.getFileAmount()) { //Get next recorded events file
+                    String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
                     recordAndReplaySerializer.deserializeRecordedEvents(recordingPath);
                     fillRecordedEvents();
                 } else {
-                    RecordAndReplayUtils.reset();
+                    recordAndReplayUtils.reset();
                     recordedEventStore.popEvents();
-                    RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
+                    RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
                 }
             }
         }
@@ -425,7 +428,7 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     @Override
     public void send(EntityRef entity, Event event) {
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING && isSelectedToReplayEvent(event)) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING && isSelectedToReplayEvent(event)) {
             process(); // the process is responsible for calling the replay methods
         } else {
             originalSend(entity, event);
@@ -442,7 +445,7 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING && isSelectedToReplayEvent(event)) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING && isSelectedToReplayEvent(event)) {
             process(); // the process is responsible for calling the replay methods
         } else {
             originalSend(entity, event, component);

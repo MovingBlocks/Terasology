@@ -121,7 +121,7 @@ public class StateIngame implements GameState {
 
     @Override
     public void dispose(boolean shuttingDown) {
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
             ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
             screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
         }
