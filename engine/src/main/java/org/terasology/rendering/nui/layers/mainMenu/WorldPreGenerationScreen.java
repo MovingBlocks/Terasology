@@ -146,12 +146,12 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         });
 
         StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
-        WidgetUtil.trySubscribe(this, "continue", button ->
-                updatePreview()
-        );
+        WidgetUtil.trySubscribe(this, "continue", button -> {
+            startPlayingScreen.setTargetWorld(findWorldByName(), texture);
+            triggerForwardAnimation(startPlayingScreen);
+        });
 
         WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
-
         WidgetUtil.trySubscribe(this, "config", button -> {
             try {
                 if (!selectedWorld.isEmpty()) {

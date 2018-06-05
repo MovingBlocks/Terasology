@@ -102,7 +102,7 @@
           {
             "type": "UIButton",
             "text": "${engine:menu#start-game}",
-            "id": "continue"
+            "id": "play"
           }
         ],
         "layoutInfo": {

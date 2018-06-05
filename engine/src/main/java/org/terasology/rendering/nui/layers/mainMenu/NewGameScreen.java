@@ -174,7 +174,7 @@ public class NewGameScreen extends CoreScreenLayer {
             SimpleUri uri = config.getWorldGeneration().getDefaultGenerator();
             System.out.println(uri);
             float timeOffset = 0.25f + 0.025f;
-            WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, "thisisjustrandom69",
+            WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, "thisisjustrandom",
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
             gameManifest.addWorld(worldInfo);
             gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
