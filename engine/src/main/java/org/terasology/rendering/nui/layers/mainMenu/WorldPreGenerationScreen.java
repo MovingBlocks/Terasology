@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.math.TeraMath;
 import org.terasology.module.ModuleEnvironment;
@@ -51,14 +50,11 @@ import java.util.stream.Collectors;
 
 public class WorldPreGenerationScreen extends CoreScreenLayer {
 
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
     @In
     private ModuleManager moduleManager;
-
     @In
     private Config config;
-
-
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
     private ModuleEnvironment environment;
     private WorldGenerator worldGenerator;
     private Texture texture;
@@ -207,7 +203,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     }
 
     private World findWorldByName() {
-        for (World world: worldList) {
+        for (World world : worldList) {
             if (world.getWorldName().toString().equals(selectedWorld)) {
                 return world;
             }

@@ -45,13 +45,11 @@ import java.util.Objects;
 
 public class WorldSetupScreen extends CoreScreenLayer {
 
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldSetupScreen");
     @In
     private WorldGeneratorManager worldGeneratorManager;
-
     @In
     private Config config;
-
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldSetupScreen");
     private WorldGenerator worldGenerator;
     private World world;
     private ModuleEnvironment environment;

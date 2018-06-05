@@ -54,6 +54,7 @@ import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
+import org.terasology.rendering.world.World;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -66,14 +67,12 @@ import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.TileData;
-import org.terasology.rendering.world.World;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,22 +80,18 @@ import java.util.stream.Collectors;
 public class UniverseSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
+    List<World> worlds = Lists.newArrayList();
+    int worldNumber = 0;
     private String selectedWorld = "";
-
     @In
     private WorldGeneratorManager worldGeneratorManager;
-
     @In
     private ModuleManager moduleManager;
-
     @In
     private Config config;
-
     private ModuleEnvironment environment;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
-    List<World> worlds = Lists.newArrayList();
-    int worldNumber = 0;
 
     @Override
     public void initialise() {
@@ -246,7 +241,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
-        worlds.add(new World(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo ));
+        worlds.add(new World(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
         worldNumber++;
     }
 
@@ -307,14 +302,14 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     public List<String> worldNames() {
         List<String> worldNamesList = Lists.newArrayList();
-        for (World world: worlds) {
+        for (World world : worlds) {
             worldNamesList.add(world.getWorldName().toString());
         }
         return worldNamesList;
     }
 
     public World findWorldByName() {
-        for (World world: worlds) {
+        for (World world : worlds) {
             if (world.getWorldName().toString().equals(selectedWorld)) {
                 return world;
             }

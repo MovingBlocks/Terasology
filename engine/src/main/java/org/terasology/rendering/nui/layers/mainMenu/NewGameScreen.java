@@ -100,7 +100,7 @@ public class NewGameScreen extends CoreScreenLayer {
                 }
             });
         }
-        final UIText gameName = find("gameName",UIText.class);
+        final UIText gameName = find("gameName", UIText.class);
         setGameName(gameName);
 
         final UIDropdownScrollable<Module> gameplay = find("gameplay", UIDropdownScrollable.class);
@@ -160,7 +160,7 @@ public class NewGameScreen extends CoreScreenLayer {
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
             System.out.println(result.getModules());
-            if(!result.isSuccess()) {
+            if (!result.isSuccess()) {
                 MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                 if (errorMessagePopup != null) {
                     errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
@@ -223,6 +223,7 @@ public class NewGameScreen extends CoreScreenLayer {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         return resolver.resolve(moduleName).isSuccess();
     }
+
     private void setSelectedGameplayModule(Module module) {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         if (moduleConfig.getDefaultGameplayModuleName().equals(module.getId().toString())) {
@@ -258,10 +259,9 @@ public class NewGameScreen extends CoreScreenLayer {
     }
 
 
-
     @Override
     public void onOpened() {
-        final UIText gameName = find("gameName",UIText.class);
+        final UIText gameName = find("gameName", UIText.class);
         setGameName(gameName);
 
         final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);

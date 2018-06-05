@@ -52,7 +52,6 @@ public class StartPlayingScreen extends CoreScreenLayer {
     private World world;
 
 
-
     @Override
     public void initialise() {
 
@@ -67,8 +66,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-            System.out.println(result.getModules());
-            if(!result.isSuccess()) {
+            if (!result.isSuccess()) {
                 MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                 if (errorMessagePopup != null) {
                     errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
