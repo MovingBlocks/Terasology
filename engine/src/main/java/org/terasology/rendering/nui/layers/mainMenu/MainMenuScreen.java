@@ -80,7 +80,6 @@ public class MainMenuScreen extends CoreScreenLayer {
         });
         WidgetUtil.trySubscribe(this, "record", button -> {
             RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_RECORD);
-            recordScreen.refreshGameList();
             triggerForwardAnimation(recordScreen);
         });
         WidgetUtil.trySubscribe(this, "replay", button -> {

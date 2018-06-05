@@ -151,6 +151,7 @@ public class RecordScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+        refreshGameList();
         super.onOpened();
         if (!config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
@@ -183,7 +184,7 @@ public class RecordScreen extends CoreScreenLayer {
 
     }
 
-    void refreshGameList() {
+    private void refreshGameList() {
         gameList.setList(GameProvider.getSavedGames());
         gameList.setSelection(null);
     }
