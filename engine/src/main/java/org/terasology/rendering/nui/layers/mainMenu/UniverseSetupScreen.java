@@ -77,6 +77,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Sets up the Universe for a user. Displays a list of {@link org.terasology.world.generator.WorldGenerator}
+ * for a particular game template.
+ */
 public class UniverseSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
@@ -239,12 +243,21 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         }
     }
 
+    /**
+     * Called whenever the user decides to create a new world.
+     * @param worldGeneratorInfo The {@link WorldGeneratorInfo} object for the new world.
+     */
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
         worlds.add(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
         worldNumber++;
     }
 
+    /**
+     * This method switched the environment of the game to a temporary one needed for
+     * creating a game. It created a new {@link Context} and only puts the minimum classes
+     * needed for successful game creation.
+     */
     public void setEnvironment() {
         context = new ContextImpl();
         CoreRegistry.setContext(context);
@@ -300,6 +313,11 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     }
 
+    /**
+     * Create a list of the names of the world, so that they can be displayed as simple String
+     * in the drop-down.
+     * @return A list of world names in String.
+     */
     public List<String> worldNames() {
         List<String> worldNamesList = Lists.newArrayList();
         for (WorldSetupWrapper world : worlds) {
@@ -308,6 +326,11 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         return worldNamesList;
     }
 
+    /**
+     * This method takes the name of the selected world as String and return the corresponding
+     * WorldSetupWrapper object.
+     * @return {@link WorldSetupWrapper} object.
+     */
     public WorldSetupWrapper findWorldByName() {
         for (WorldSetupWrapper world : worlds) {
             if (world.getWorldName().toString().equals(selectedWorld)) {
@@ -317,10 +340,17 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         return null;
     }
 
+    /**
+     *
+     * @return the list of worlds.
+     */
     public List<WorldSetupWrapper> getWorldsList() {
         return worlds;
     }
 
+    /**
+     * @return the selcted world in the drop-down.
+     */
     public String getSelectedWorld() {
         return selectedWorld;
     }

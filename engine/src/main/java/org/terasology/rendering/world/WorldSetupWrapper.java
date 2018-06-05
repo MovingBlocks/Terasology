@@ -20,6 +20,10 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 
+/**
+ * This class only has significance during the create game phase.
+ * Every world is a object of this class.
+ */
 public class WorldSetupWrapper {
 
     private Name worldName;
@@ -27,6 +31,11 @@ public class WorldSetupWrapper {
     private WorldConfigurator worldConfigurator;
     private WorldGenerator worldGenerator;
 
+    /**
+     * A constructor to initialise a world object.
+     * @param worldName The World Name which is displayed in the drop-downs.
+     * @param worldGeneratorInfo Contains the {@link WorldGeneratorInfo} object for that world.
+     */
     public WorldSetupWrapper(Name worldName, WorldGeneratorInfo worldGeneratorInfo) {
         this.worldName = worldName;
         this.worldGeneratorInfo = worldGeneratorInfo;

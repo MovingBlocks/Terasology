@@ -92,6 +92,13 @@ public class StartPlayingScreen extends CoreScreenLayer {
         previewImage.setImage(texture);
     }
 
+    /**
+     * This method is called before the screen comes to the forefront to set the world
+     * in which the player is about to spawn.
+     * @param targetWorld The world in which the player is going to spawn.
+     * @param targetWorldTexture The world texture generated in {@link WorldPreGenerationScreen} to be displayed on this
+     *                           screen.
+     */
     public void setTargetWorld(WorldSetupWrapper targetWorld, Texture targetWorldTexture) {
         texture = targetWorldTexture;
         world = targetWorld;

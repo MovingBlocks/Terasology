@@ -43,6 +43,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Allows configuration of a single world.
+ */
 public class WorldSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldSetupScreen");
@@ -69,6 +72,14 @@ public class WorldSetupScreen extends CoreScreenLayer {
         });
     }
 
+    /**
+     * This method sets the world whose properties are to changed. This function is called before the screen comes
+     * to the forefront.
+     * @param subContext As there is a new environment created in the {@link UniverseSetupScreen}, it's passed to
+     *                   this screen instead of using the old Context.
+     * @param worldSelected the world whose configurations are to be changed.
+     * @throws UnresolvedWorldGeneratorException
+     */
     public void setWorld(Context subContext, WorldSetupWrapper worldSelected) throws UnresolvedWorldGeneratorException {
         world = worldSelected;
         context = subContext;
@@ -85,6 +96,10 @@ public class WorldSetupScreen extends CoreScreenLayer {
         configureProperties();
     }
 
+    /**
+     * Assigns a {@link WorldConfigurator} for every world if it doesn't exist. Using
+     * the WorldConfigurator it gets the properties associated with that world.
+     */
     private void configureProperties() {
 
         PropertyLayout propLayout = find("properties", PropertyLayout.class);

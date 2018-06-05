@@ -185,6 +185,10 @@ public class NewGameScreen extends CoreScreenLayer {
         );
     }
 
+    /**
+     * Sets the game names based on the game number of the last saved game
+     * @param gameName The {@link UIText} in which the name will be displayed.
+     */
     private void setGameName(UIText gameName) {
         if (gameName != null) {
             int gameNumber = 1;

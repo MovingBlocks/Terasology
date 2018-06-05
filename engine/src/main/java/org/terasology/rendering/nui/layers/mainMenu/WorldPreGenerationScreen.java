@@ -48,6 +48,11 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+/**
+ * This class let's the user preview different worlds added in the
+ * {@link UniverseSetupScreen}. Each world is still configurable and it's seed
+ * can be changed by the re-roll button. Note that each world has a unique seed.
+ */
 public class WorldPreGenerationScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
@@ -71,6 +76,13 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     public WorldPreGenerationScreen() {
     }
 
+    /**
+     * A function called before the screen comes to the forefront to setup the environment
+     * and extract necessary objects from the new Context.
+     * @param subContext As there is a new environment created in the {@link UniverseSetupScreen}, it's passed to
+     *                   this screen instead of using the old Context.
+     * @throws UnresolvedWorldGeneratorException The creation of a world generator can throw this Exception
+     */
     public void setEnvironment(Context subContext) throws UnresolvedWorldGeneratorException {
 
         context = subContext;
@@ -187,7 +199,9 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         }
     }
 
-
+    /**
+     * Generates a texture and set's to the image view, thus previewing the world.
+     */
     private void genTexture() {
         int imgWidth = 384;
         int imgHeight = 384;
@@ -201,6 +215,10 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         previewImage.setImage(texture);
     }
 
+    /**
+     * Updates the preview according to any changes to made the configurator.
+     * Also pops up a message and keeps track of percentage world preview prepared.
+     */
     private void updatePreview() {
 
         final NUIManager manager = context.get(NUIManager.class);
@@ -223,6 +241,11 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         popup.startOperation(operation, true);
     }
 
+    /**
+     * This method takes the name of the selected world as String and return the corresponding
+     * WorldSetupWrapper object.
+     * @return {@link WorldSetupWrapper} object.
+     */
     private WorldSetupWrapper findWorldByName() {
         for (WorldSetupWrapper world : worldList) {
             if (world.getWorldName().toString().equals(selectedWorld)) {
@@ -232,6 +255,11 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         return null;
     }
 
+    /**
+     * Sets a unique seed by simply appending the world name with an incrementing number.
+     * @param world {@link WorldSetupWrapper} object whose seed is to be set.
+     * @return The seed as a string.
+     */
     private String createSeed(String world) {
         return world + seedNumber++;
     }
