@@ -71,15 +71,23 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     public WorldPreGenerationScreen() {
     }
 
-    public void setEnvironment(SimpleUri worldGenUri, Context subContext) throws UnresolvedWorldGeneratorException {
+    public void setEnvironment(Context subContext) throws UnresolvedWorldGeneratorException {
 
         context = subContext;
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
-        worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
+        //worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
         worldList = context.get(UniverseSetupScreen.class).getWorldsList();
         selectedWorld = context.get(UniverseSetupScreen.class).getSelectedWorld();
         worldNames = context.get(UniverseSetupScreen.class).worldNames();
+        if (findWorldByName().getWorldGenerator() == null) {
+            worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
+            findWorldByName().setWorldGenerator(worldGenerator);
+        } else {
+            worldGenerator = findWorldByName().getWorldGenerator();
+        }
+        //worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
+
         worldGenerator.setWorldSeed("thisisjustrandom");
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         worldsDropdown.setOptions(worldNames);
@@ -107,7 +115,20 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
             @Override
             public void set(String value) {
                 selectedWorld = value;
-                updatePreview();
+                System.out.println("" + worldList.get(0).getWorldConfigurator());
+                try {
+                    if (findWorldByName().getWorldGenerator() == null) {
+                        worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
+                        findWorldByName().setWorldGenerator(worldGenerator);
+                    } else {
+                        worldGenerator = findWorldByName().getWorldGenerator();
+                    }
+                    worldGenerator.setWorldSeed("thisisjustrandom");
+                    previewGen = new FacetLayerPreview(environment, worldGenerator);
+                    updatePreview();
+                } catch (UnresolvedWorldGeneratorException e) {
+                    e.getMessage();
+                }
             }
         });
 
@@ -161,6 +182,15 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
 
         popup.onSuccess(texture::reload);
         popup.startOperation(operation, true);
+    }
+
+    public World findWorldByName() {
+        for (World world: worldList) {
+            if (world.getWorldName().toString().equals(selectedWorld)) {
+                return world;
+            }
+        }
+        return null;
     }
 
 }

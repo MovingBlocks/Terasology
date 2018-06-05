@@ -17,6 +17,7 @@ package org.terasology.rendering.world;
 
 import org.terasology.naming.Name;
 import org.terasology.world.generator.WorldConfigurator;
+import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 
 public class World {
@@ -24,6 +25,7 @@ public class World {
     private Name worldName;
     private WorldGeneratorInfo worldGeneratorInfo;
     private WorldConfigurator worldConfigurator;
+    private WorldGenerator worldGenerator;
 
     public World(Name worldName, WorldGeneratorInfo worldGeneratorInfo) {
         this.worldName = worldName;
@@ -44,5 +46,13 @@ public class World {
 
     public WorldConfigurator getWorldConfigurator() {
         return worldConfigurator;
+    }
+
+    public void setWorldGenerator(WorldGenerator worldGenerator) {
+        this.worldGenerator = worldGenerator;
+    }
+
+    public WorldGenerator getWorldGenerator() {
+        return worldGenerator;
     }
 }

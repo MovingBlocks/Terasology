@@ -19,7 +19,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.module.ModuleEnvironment;
@@ -57,23 +56,34 @@ public class WorldSetupScreen extends CoreScreenLayer {
     private World world;
     private ModuleEnvironment environment;
     private Context context;
+    private WorldConfigurator oldWorldConfig;
 
     @Override
     public void initialise() {
 
-        WidgetUtil.trySubscribe(this, "close", button ->
-                triggerBackAnimation()
-        );
+        WidgetUtil.trySubscribe(this, "accept", button -> {
+            triggerBackAnimation();
+        });
+
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            world.setWorldConfigurator(oldWorldConfig);
+            triggerBackAnimation();
+        });
     }
 
     public void setWorld(Context subContext, World worldSelected) throws UnresolvedWorldGeneratorException {
         world = worldSelected;
         context = subContext;
-        SimpleUri worldGenUri = config.getWorldGeneration().getDefaultGenerator();
+        SimpleUri worldGenUri = worldSelected.getWorldGeneratorInfo().getUri();
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
-
-        worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
+        if (world.getWorldGenerator() == null) {
+            worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
+            world.setWorldGenerator(worldGenerator);
+        } else {
+            worldGenerator = world.getWorldGenerator();
+        }
+        //worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
         configureProperties();
     }
 
@@ -82,8 +92,14 @@ public class WorldSetupScreen extends CoreScreenLayer {
         PropertyLayout propLayout = find("properties", PropertyLayout.class);
         propLayout.setOrdering(PropertyOrdering.byLabel());
         propLayout.clear();
-
-        WorldConfigurator worldConfig = worldGenerator.getConfigurator();
+        WorldConfigurator worldConfig;
+        if (world.getWorldConfigurator() != null) {
+            worldConfig = world.getWorldConfigurator();
+        } else {
+            worldConfig = worldGenerator.getConfigurator();
+            world.setWorldConfigurator(worldConfig);
+        }
+        oldWorldConfig = worldConfig;
 
         Map<String, Component> params = worldConfig.getProperties();
 
@@ -115,7 +131,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
             List<Property<?, ?>> properties = provider.createProperties(target);
             propLayout.addProperties(label, properties);
         }
-        world.setWorldConfigurator(worldConfig);
+        System.out.println();
     }
 
     /**

@@ -202,7 +202,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "continue", button -> {
             if (!worlds.isEmpty()) {
                 try {
-                    worldPreGenerationScreen.setEnvironment(config.getWorldGeneration().getDefaultGenerator(), context);
+                    worldPreGenerationScreen.setEnvironment(context);
                     triggerForwardAnimation(worldPreGenerationScreen);
                 } catch (UnresolvedWorldGeneratorException e) {
                     e.getMessage();
@@ -247,6 +247,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
         worlds.add(new World(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo ));
+        System.out.println("" + findWorldByName().getWorldConfigurator());
         worldNumber++;
     }
 
