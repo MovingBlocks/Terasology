@@ -21,6 +21,7 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.math.TeraMath;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -33,6 +34,7 @@ import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UIImage;
+import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.World;
 import org.terasology.utilities.Assets;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
@@ -66,6 +68,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     private List<World> worldList;
     private String selectedWorld;
     private List<String> worldNames;
+    private UISlider zoomSlider;
 
 
     public WorldPreGenerationScreen() {
@@ -104,6 +107,11 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+
+        zoomSlider = find("zoomSlider", UISlider.class);
+        if (zoomSlider != null) {
+            zoomSlider.setValue(2f);
+        }
 
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         worldsDropdown.bindSelection(new Binding<String>() {
@@ -180,7 +188,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
                 popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
 
         Callable<TextureData> operation = () -> {
-            int zoom = 8;
+            int zoom = TeraMath.floorToInt(zoomSlider.getValue());
             TextureData data = texture.getData();
 
             previewGen.render(data, zoom, progressListener);
