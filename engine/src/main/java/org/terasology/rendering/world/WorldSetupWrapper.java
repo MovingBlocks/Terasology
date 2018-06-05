@@ -20,14 +20,14 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 
-public class World {
+public class WorldSetupWrapper {
 
     private Name worldName;
     private WorldGeneratorInfo worldGeneratorInfo;
     private WorldConfigurator worldConfigurator;
     private WorldGenerator worldGenerator;
 
-    public World(Name worldName, WorldGeneratorInfo worldGeneratorInfo) {
+    public WorldSetupWrapper(Name worldName, WorldGeneratorInfo worldGeneratorInfo) {
         this.worldName = worldName;
         this.worldGeneratorInfo = worldGeneratorInfo;
     }

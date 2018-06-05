@@ -54,7 +54,7 @@ import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.world.World;
+import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -80,7 +80,7 @@ import java.util.stream.Collectors;
 public class UniverseSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
-    List<World> worlds = Lists.newArrayList();
+    List<WorldSetupWrapper> worlds = Lists.newArrayList();
     int worldNumber = 0;
     private String selectedWorld = "";
     @In
@@ -188,7 +188,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "addGenerator", button -> {
             addNewWorld(worldGenerator.getSelection());
-            List<World> worldOptions = worlds;
+            List<WorldSetupWrapper> worldOptions = worlds;
             worldsDropdown.setOptions(worldNames());
             //triggerForwardAnimation(worldSetupScreen);
         });
@@ -213,7 +213,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         worlds.clear();
         worldNumber = 0;
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
-        List<World> worldOptions = worlds;
+        List<WorldSetupWrapper> worldOptions = worlds;
         worldsDropdown.setOptions(worldNames());
         selectedWorld = "";
     }
@@ -241,7 +241,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
-        worlds.add(new World(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
+        worlds.add(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
         worldNumber++;
     }
 
@@ -302,14 +302,14 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     public List<String> worldNames() {
         List<String> worldNamesList = Lists.newArrayList();
-        for (World world : worlds) {
+        for (WorldSetupWrapper world : worlds) {
             worldNamesList.add(world.getWorldName().toString());
         }
         return worldNamesList;
     }
 
-    public World findWorldByName() {
-        for (World world : worlds) {
+    public WorldSetupWrapper findWorldByName() {
+        for (WorldSetupWrapper world : worlds) {
             if (world.getWorldName().toString().equals(selectedWorld)) {
                 return world;
             }
@@ -317,7 +317,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         return null;
     }
 
-    public List<World> getWorldsList() {
+    public List<WorldSetupWrapper> getWorldsList() {
         return worlds;
     }
 

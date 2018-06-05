@@ -34,7 +34,7 @@ import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.world.World;
+import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.utilities.Assets;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
@@ -61,7 +61,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     private UIImage previewImage;
     private Context context;
     private PreviewGenerator previewGen;
-    private List<World> worldList;
+    private List<WorldSetupWrapper> worldList;
     private String selectedWorld;
     private List<String> worldNames;
     private UISlider zoomSlider;
@@ -202,8 +202,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         popup.startOperation(operation, true);
     }
 
-    private World findWorldByName() {
-        for (World world : worldList) {
+    private WorldSetupWrapper findWorldByName() {
+        for (WorldSetupWrapper world : worldList) {
             if (world.getWorldName().toString().equals(selectedWorld)) {
                 return world;
             }

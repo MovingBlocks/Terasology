@@ -32,7 +32,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.world.World;
+import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
@@ -49,7 +49,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:startPlayingScreen");
     private Texture texture;
-    private World world;
+    private WorldSetupWrapper world;
 
 
     @Override
@@ -92,7 +92,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
         previewImage.setImage(texture);
     }
 
-    public void setTargetWorld(World targetWorld, Texture targetWorldTexture) {
+    public void setTargetWorld(WorldSetupWrapper targetWorld, Texture targetWorldTexture) {
         texture = targetWorldTexture;
         world = targetWorld;
     }

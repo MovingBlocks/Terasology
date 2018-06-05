@@ -31,7 +31,7 @@ import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
-import org.terasology.rendering.world.World;
+import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
@@ -51,7 +51,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
     @In
     private Config config;
     private WorldGenerator worldGenerator;
-    private World world;
+    private WorldSetupWrapper world;
     private ModuleEnvironment environment;
     private Context context;
     private WorldConfigurator oldWorldConfig;
@@ -69,7 +69,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
         });
     }
 
-    public void setWorld(Context subContext, World worldSelected) throws UnresolvedWorldGeneratorException {
+    public void setWorld(Context subContext, WorldSetupWrapper worldSelected) throws UnresolvedWorldGeneratorException {
         world = worldSelected;
         context = subContext;
         SimpleUri worldGenUri = worldSelected.getWorldGeneratorInfo().getUri();
