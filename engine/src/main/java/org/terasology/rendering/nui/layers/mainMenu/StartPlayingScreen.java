@@ -62,7 +62,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "play", button -> {
             GameManifest gameManifest = new GameManifest();
 
-            gameManifest.setTitle(world.getWorldName().toString());
+            //gameManifest.setTitle(world.getWorldName().toString());
 
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());

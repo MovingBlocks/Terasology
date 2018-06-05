@@ -127,7 +127,9 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
                     } else {
                         worldGenerator = findWorldByName().getWorldGenerator();
                     }
-                    worldGenerator.setWorldSeed("thisisjustrandom");
+                    if (worldGenerator.getWorldSeed() == null) {
+                        worldGenerator.setWorldSeed(createSeed(selectedWorld));
+                    }
                     previewGen = new FacetLayerPreview(environment, worldGenerator);
                     updatePreview();
                 } catch (UnresolvedWorldGeneratorException e) {
@@ -164,6 +166,25 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
         );
+    }
+
+    @Override
+    public void onOpened() {
+        try {
+            if (findWorldByName().getWorldGenerator() == null) {
+                worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
+                findWorldByName().setWorldGenerator(worldGenerator);
+            } else {
+                worldGenerator = findWorldByName().getWorldGenerator();
+            }
+            if (worldGenerator.getWorldSeed().isEmpty()) {
+                worldGenerator.setWorldSeed(createSeed(selectedWorld));
+            }
+            previewGen = new FacetLayerPreview(environment, worldGenerator);
+            updatePreview();
+        } catch (UnresolvedWorldGeneratorException e) {
+            e.getMessage();
+        }
     }
 
 
