@@ -69,6 +69,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     private String selectedWorld;
     private List<String> worldNames;
     private UISlider zoomSlider;
+    private int seedNumber = 0;
 
 
     public WorldPreGenerationScreen() {
@@ -91,7 +92,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         }
         //worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
 
-        worldGenerator.setWorldSeed("thisisjustrandom");
+        worldGenerator.setWorldSeed(createSeed(selectedWorld));
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         worldsDropdown.setOptions(worldNames);
         genTexture();
@@ -137,6 +138,11 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
                     e.getMessage();
                 }
             }
+        });
+
+        WidgetUtil.trySubscribe(this, "reRoll", button -> {
+            worldGenerator.setWorldSeed(createSeed(selectedWorld));
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Ready to roll!", "World seed for " + selectedWorld + " has been changed");
         });
 
         StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
@@ -200,13 +206,17 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         popup.startOperation(operation, true);
     }
 
-    public World findWorldByName() {
+    private World findWorldByName() {
         for (World world: worldList) {
             if (world.getWorldName().toString().equals(selectedWorld)) {
                 return world;
             }
         }
         return null;
+    }
+
+    private String createSeed(String world) {
+        return world + seedNumber++;
     }
 
 }
