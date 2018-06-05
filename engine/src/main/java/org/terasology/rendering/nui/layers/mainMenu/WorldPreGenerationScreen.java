@@ -115,7 +115,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
             @Override
             public void set(String value) {
                 selectedWorld = value;
-                System.out.println("" + worldList.get(0).getWorldConfigurator());
                 try {
                     if (findWorldByName().getWorldGenerator() == null) {
                         worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
@@ -139,9 +138,18 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
 
         WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
 
-        WidgetUtil.trySubscribe(this, "config", button ->
-                triggerForwardAnimation(worldSetupScreen)
-        );
+        WidgetUtil.trySubscribe(this, "config", button -> {
+            try {
+                if (!selectedWorld.isEmpty()) {
+                    worldSetupScreen.setWorld(context, findWorldByName());
+                    triggerForwardAnimation(worldSetupScreen);
+                } else {
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
+                }
+            } catch (UnresolvedWorldGeneratorException e) {
+                e.getMessage();
+            }
+        });
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()

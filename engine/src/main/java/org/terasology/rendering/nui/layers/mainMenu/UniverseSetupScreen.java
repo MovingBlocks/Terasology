@@ -247,7 +247,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
         worlds.add(new World(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo ));
-        System.out.println("" + findWorldByName().getWorldConfigurator());
         worldNumber++;
     }
 

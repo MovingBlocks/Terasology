@@ -61,7 +61,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
 
-        WidgetUtil.trySubscribe(this, "accept", button -> {
+        WidgetUtil.trySubscribe(this, "apply", button -> {
             triggerBackAnimation();
         });
 
@@ -131,7 +131,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
             List<Property<?, ?>> properties = provider.createProperties(target);
             propLayout.addProperties(label, properties);
         }
-        System.out.println();
     }
 
     /**
