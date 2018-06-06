@@ -47,6 +47,7 @@ import org.terasology.utilities.Assets;
 import org.terasology.utilities.FilesUtil;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
@@ -201,9 +202,27 @@ public class SelectGameScreen extends CoreScreenLayer {
     }
 
     private void loadGame(GameInfo item) {
-        try {
+		if (loadingAsServer) {
+			Path blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
+			Path whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
+			if (!Files.exists(blacklistPath)) {
+				try {
+					Files.createFile(blacklistPath);
+				} catch (IOException e) {
+					logger.error("IO Exception on blacklist generation", e);
+				}
+			}
+			if (!Files.exists(whitelistPath)) {
+				try {
+					Files.createFile(whitelistPath);
+				} catch (IOException e) {
+					logger.error("IO Exception on whitelist generation", e);
+				}
+			}
+		}
+    	try {
             GameManifest manifest = item.getManifest();
-
+          
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));

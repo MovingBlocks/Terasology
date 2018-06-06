@@ -8,6 +8,77 @@ You can run the game with `-homedir` to instead store all game data in the direc
 
 Report issues in the [support forum](http://forum.terasology.org/forum/support.20) or ask on [IRC](https://github.com/MovingBlocks/Terasology/wiki/Using-IRC) (`#terasology` on Freenode)
 
+## Controls
+
+Note: Keys between the latest stable and latest develop build may differ.
+
+* [W,A,S,D] - Movement
+* [E] - Activate / Use (while pointing at a chest, TNT blocks, etc)
+* [Q] - Throw held (block) item (hold down to charge for a longer throw!)
+* [R] - Keep moving forward (like W) until [R] is pressed again
+* [Space] - Jump / Ascend
+* [Ctrl] - Crouch / Descend
+* [Shift] - Hold to run (or walk when run is toggled to default)
+* [Caps lock] - Toggle default between run or walk (starts on run)
+* [Left click] - Trigger left click action (default = remove block)
+* [Right click] - Trigger right click action (default = place block)
+* [Mouse wheel up/down] - Cycle through toolbar slots OR pick up / deposit items into stacks in an inventory one at a time
+* [1..0] - Change the active toolbar slot
+* [I] - Toggle inventory screen
+* [B] - Show infinite block inventory (requires "BlockPicker" module active)
+* [C] - Show character screen for stats and equipment (requires "Equipment" module active)
+* [H] - Hide user interface
+* [T] - Toggle chat interface (effectively a mini-console that only does chat)
+* [Tab] - Auto-completion in the console
+* [Home] - Increase viewing distance
+* [End] - Decrease viewing distance
+* [Escape] - Show/hide the game menu screen
+* [F1] OR [`] - Toggle full developer console (the "grave" key, usually above tab)
+* [F2] - Toggle window focus and reveals a debug pane (only contains stuff if module(s) using it is enabled)
+* [F3] - Toggle debug mode and information
+* [F5] - Show behavior tree editor
+* [F10] - Show NUI editor
+* [F12] - Take screenshot (goes to /screenshots in game data dir)
+
+
+## Debug Features
+
+Only works when the F3 debug mode is enabled (and may come and go)
+
+* [Arrow up/down] - Adjust the current time in small steps
+* [Arrow left/right] - Adjust the current time in larger steps
+* [F4] - Cycle advanced debug metrics
+* [F6] - Debug rendering enabled
+* [F7] - Cycle debug rendering stage
+* [F8] - Debug render chunk bounding boxes
+* [F9] - Debug render wire-frame
+
+## Game console
+
+Press the `F1` or `grave` key (usually the \` key immediately above `tab`) to show the in-game console. Mostly everything is case insensitive. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes). For partial commands with multiple completion candidates you can `tab` again to cycle through them.
+
+* `help` - Show in-game help (more thorough)
+* `search [something]` - searches for any command, prefab, or asset with "something" in its name, help text, etc
+* `flight` - just what it sounds like :)
+* `ghost` - no-clip mode (fly through anything)
+* `hspeed` - greatly increase your movement speed
+* `hjump` - jump really high. Almost like flying - but it isn't. Just jump good.
+* `restoreSpeed` - normalizes speed (both horizontal and vertical)
+* `help give` - Shows detailed help on the "give" command
+* `give Water` - Gives 16 water blocks (default quantity when not specified)
+* `give Stone 99 Stair` - Gives you 99 stone stair blocks
+* `give Chest` - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
+* `give TNT` - Gives you 16 TNT blocks you can place and activate ('E') to blow up
+* `bulkGiveBlock cake` - Gives you a stack of blocks for every block with the name "cake" in it! Find good block series with `search`
+* `listBlocks` - Lists all actively used blocks (have been loaded for the world)
+* `listFreeShapeBlocks` - Lists all blocks that can be requested in any known shape
+* `listShapes` - Lists the available shapes
+* `healthMax` - Fully restores the player's health
+* `showHealth` - Shows the player's health
+* `teleport 42 42 42` - Warps the player to x = 42, y = 42, z = 42
+* `toggleSunHalting X` - Stops the sun's movement at X position, denoted in days.
+
+
 ## Multiplayer
 
 To name yourself for a multiplayer game use Settings / Player. You can also pick a color, which will affect your placeholder monkey head player avatar, name in chat, and floating name tag.
@@ -68,6 +139,16 @@ Alternatively you can run from source and supply parameters for game configurati
 
 This will all become easier as the project and especially the launcher mature further :-)
 
+### Server Whitelist and Blacklist
+
+Hosting a server will create a whitelist and a blacklist that can be used to manage who is able to connect to that server.
+
+If the whitelist contains at least one client ID, only the ID(s) on the list will be allowed to connect to the server. All IDs not on the whitelist are effectively blacklisted.
+
+If the whitelist is empty, any ID not on the blacklist will be able to connect. 
+
+Client IDs are added to the lists in JSON format, for example: ["6a5f11f7-4038-4ef0-91ac-86cb957588b1","01264d12-27cf-4699-b8e2-bdc92ac8ef73"]
+
 ### Server via Docker
 
 If you're into Docker you can launch a container with a Terasology server already hooked up. 
@@ -80,72 +161,4 @@ Example: `docker pull qwick/terasology:latest`
 
 The Docker server starts with no extra modules configured, you would have to go update the game server's config accordingly if desired.
 
-## Controls
 
-Note: Keys between the latest stable and latest develop build may differ.
-
-* [W,A,S,D] - Movement
-* [E] - Activate / Use (while pointing at a chest, TNT blocks, etc)
-* [Q] - Throw held (block) item (hold down to charge for a longer throw!)
-* [R] - Keep moving forward (like W) until [R] is pressed again
-* [Space] - Jump / Ascend
-* [Ctrl] - Crouch / Descend
-* [Shift] - Hold to run (or walk when run is toggled to default)
-* [Caps lock] - Toggle default between run or walk (starts on run)
-* [Left click] - Trigger left click action (default = remove block)
-* [Right click] - Trigger right click action (default = place block)
-* [Mouse wheel up/down] - Cycle through toolbar slots OR pick up / deposit items into stacks in an inventory one at a time
-* [1..0] - Change the active toolbar slot
-* [I] - Toggle inventory screen
-* [B] - Show infinite block inventory (requires "BlockPicker" module active)
-* [C] - Show character screen for stats and equipment (requires "Equipment" module active)
-* [H] - Hide user interface
-* [T] - Toggle chat interface (effectively a mini-console that only does chat)
-* [Tab] - Auto-completion in the console
-* [Home] - Increase viewing distance
-* [End] - Decrease viewing distance
-* [Escape] - Show/hide the game menu screen
-* [F1] OR [`] - Toggle full developer console (the "grave" key, usually above tab)
-* [F2] - Toggle window focus and reveals a debug pane (only contains stuff if module(s) using it is enabled)
-* [F3] - Toggle debug mode and information
-* [F5] - Show behavior tree editor
-* [F10] - Show NUI editor
-* [F12] - Take screenshot (goes to /screenshots in game data dir)
-
-
-## Debug Features
-
-Only works when the F3 debug mode is enabled (and may come and go)
-
-* [Arrow up/down] - Adjust the current time in small steps
-* [Arrow left/right] - Adjust the current time in larger steps
-* [F4] - Cycle advanced debug metrics
-* [F6] - Debug rendering enabled
-* [F7] - Cycle debug rendering stage
-* [F8] - Debug render chunk bounding boxes
-* [F9] - Debug render wire-frame
-
-
-## Game console
-
-Press the `F1` or `grave` key (usually the \` key immediately above `tab`) to show the in-game console. Mostly everything is case insensitive. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes). For partial commands with multiple completion candidates you can `tab` again to cycle through them.
-
-* `help` - Show in-game help (more thorough)
-* `search [something]` - searches for any command, prefab, or asset with "something" in its name, help text, etc
-* `flight` - just what it sounds like :)
-* `ghost` - no-clip mode (fly through anything)
-* `hspeed` - greatly increase your movement speed
-* `hjump` - jump really high. Almost like flying - but it isn't. Just jump good.
-* `restoreSpeed` - normalizes speed (both horizontal and vertical)
-* `help give` - Shows detailed help on the "give" command
-* `give Water` - Gives 16 water blocks (default quantity when not specified)
-* `give Stone 99 Stair` - Gives you 99 stone stair blocks
-* `give Chest` - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
-* `give TNT` - Gives you 16 TNT blocks you can place and activate ('E') to blow up
-* `bulkGiveBlock cake` - Gives you a stack of blocks for every block with the name "cake" in it! Find good block series with `search`
-* `listBlocks` - Lists all actively used blocks (have been loaded for the world)
-* `listFreeShapeBlocks` - Lists all blocks that can be requested in any known shape
-* `listShapes` - Lists the available shapes
-* `healthMax` - Fully restores the player's health
-* `showHealth` - Shows the player's health
-* `teleport 42 42 42` - Warps the player to x = 42, y = 42, z = 42
