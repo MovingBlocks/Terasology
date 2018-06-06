@@ -147,7 +147,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         // stores the old character momentum so that it might be re-applied after the teleport event
         DeferredMomentumComponent deferredMomentum = new DeferredMomentumComponent();
         deferredMomentum.setVelocity(lastState.getVelocity());
-        entity.saveComponent(new DeferredMomentumComponent());
+        entity.saveComponent(deferredMomentum);
 
         stateBuffer.add(newState);
         characterMovementSystemUtility.setToState(entity, newState);
