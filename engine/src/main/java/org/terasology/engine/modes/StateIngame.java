@@ -121,7 +121,6 @@ public class StateIngame implements GameState {
             screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
         }
 
-
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.dispose();
 
