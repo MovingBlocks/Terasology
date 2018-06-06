@@ -139,12 +139,18 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
+
         newState.setPosition(new Vector3f(event.getTargetPosition()));
         newState.setVelocity(Vector3f.zero());
         newState.setTime(time.getGameTimeInMs());
+
+        // stores the old character momentum so that it might be re-applied after the teleport event
+        DeferredMomentumComponent deferredMomentum = new DeferredMomentumComponent();
+        deferredMomentum.setVelocity(lastState.getVelocity());
+        entity.saveComponent(new DeferredMomentumComponent());
+
         stateBuffer.add(newState);
         characterMovementSystemUtility.setToState(entity, newState);
-
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
