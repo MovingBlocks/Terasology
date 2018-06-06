@@ -147,11 +147,11 @@ public final class EntitySystemSetupUtil {
                                                  RecordedEventStore recordedEventStore, EntityIdMap entityIdMap,
                                                  RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils) {
         EventSystem eventSystem;
+        List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
         if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager, recordedEventStore,
-                    entityIdMap, recordAndReplaySerializer, recordAndReplayUtils);
+                    entityIdMap, recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToRecord);
         } else {
-            List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
             EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord, recordedEventStore);
             eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem, eventCatcher);
         }

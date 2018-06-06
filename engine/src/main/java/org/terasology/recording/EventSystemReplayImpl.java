@@ -15,7 +15,6 @@
  */
 package org.terasology.recording;
 
-import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventReceiver;
@@ -47,13 +46,6 @@ import org.terasology.entitySystem.event.PendingEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.input.BindAxisEvent;
-import org.terasology.input.BindableButton;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseAxisEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.Client;
@@ -118,11 +110,14 @@ public class EventSystemReplayImpl implements EventSystem {
     private RecordAndReplaySerializer recordAndReplaySerializer;
     /** Responsible for knowing the game name of the recording */
     private RecordAndReplayUtils recordAndReplayUtils;
+    /** List of classes selected to replay */
+    private List<Class<?>> selectedClassesToReplay;
 
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
                                  RecordedEventStore recordedEventStore, EntityIdMap entityIdMap,
-                                 RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils) {
+                                 RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils,
+                                 List<Class<?>> selectedClassesToReplay) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
@@ -131,6 +126,7 @@ public class EventSystemReplayImpl implements EventSystem {
         this.entityIdMap = entityIdMap;
         this.recordAndReplaySerializer = recordAndReplaySerializer;
         this.recordAndReplayUtils = recordAndReplayUtils;
+        this.selectedClassesToReplay = selectedClassesToReplay;
     }
 
     /**
@@ -460,14 +456,14 @@ public class EventSystemReplayImpl implements EventSystem {
      * @return if the event is selected to replay
      */
     private boolean isSelectedToReplayEvent(Event event) {
-        return event instanceof PlaySoundEvent
-                || event instanceof BindableButton
-                || event instanceof KeyEvent
-                || event instanceof BindAxisEvent
-                || event instanceof CharacterMoveInputEvent
-                || event instanceof MouseButtonEvent
-                || event instanceof MouseWheelEvent
-                || event instanceof MouseAxisEvent;
+        boolean selectedToReplay = false;
+        for (Class<?> supportedEventClass : this.selectedClassesToReplay) {
+            if (supportedEventClass.isInstance(event)) {
+                selectedToReplay = true;
+                break;
+            }
+        }
+        return selectedToReplay;
 
     }
 
