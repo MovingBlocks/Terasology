@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,8 +139,7 @@ public class SelectGameScreen extends CoreScreenLayer {
 
     }
 
-    private void updateDescription(GameInfo item)
-    {
+    private void updateDescription(GameInfo item) {
         if (item == null) {
             worldGenerator.setText("");
             moduleNames.setText("");
@@ -202,25 +201,25 @@ public class SelectGameScreen extends CoreScreenLayer {
     }
 
     private void loadGame(GameInfo item) {
-		if (loadingAsServer) {
-			Path blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
-			Path whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
-			if (!Files.exists(blacklistPath)) {
-				try {
-					Files.createFile(blacklistPath);
-				} catch (IOException e) {
-					logger.error("IO Exception on blacklist generation", e);
-				}
-			}
-			if (!Files.exists(whitelistPath)) {
-				try {
-					Files.createFile(whitelistPath);
-				} catch (IOException e) {
-					logger.error("IO Exception on whitelist generation", e);
-				}
-			}
-		}
-    	try {
+        if (loadingAsServer) {
+            Path blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
+            Path whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
+            if (!Files.exists(blacklistPath)) {
+                try {
+                    Files.createFile(blacklistPath);
+                } catch (IOException e) {
+                    logger.error("IO Exception on blacklist generation", e);
+                }
+            }
+            if (!Files.exists(whitelistPath)) {
+                try {
+                    Files.createFile(whitelistPath);
+                } catch (IOException e) {
+                    logger.error("IO Exception on whitelist generation", e);
+                }
+            }
+        }
+        try {
             GameManifest manifest = item.getManifest();
           
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
@@ -250,7 +249,7 @@ public class SelectGameScreen extends CoreScreenLayer {
             TextureData textureData = null;
             try {
                 textureData = AWTTextureFormat.convertToTextureData(item.getPreviewImage(), Texture.FilterMode.LINEAR);
-            } catch( IOException e ) {
+            } catch (IOException e) {
                 logger.error("Converting preview image to texture data {} failed", e);
             }
             texture = Assets.generateAsset(PREVIEW_IMAGE_URI, textureData, Texture.class);
