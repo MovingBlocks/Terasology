@@ -193,7 +193,7 @@ public class EventSystemReplayImpl implements EventSystem {
         }
         //If replay is ready, process some recorded events if the time is right.
         if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
-            processRecordedEvents(10);
+            processRecordedEvents(1);
             if (this.recordedEvents.isEmpty()) {
                 if (recordAndReplayUtils.getFileCount() <= recordAndReplayUtils.getFileAmount()) { //Get next recorded events file
                     String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
