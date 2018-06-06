@@ -136,6 +136,12 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private AtomicInteger sentBytes = new AtomicInteger();
     private Color color;
 
+    /**
+     * Sets up a new net client with metrics, time, identity, and a world provider.
+     * @param channel
+     * @param networkSystem
+     * @param identity Publice certificate for the client.
+     */
     public NetClient(Channel channel, NetworkSystemImpl networkSystem, PublicIdentityCertificate identity) {
         this.channel = channel;
         metricSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);

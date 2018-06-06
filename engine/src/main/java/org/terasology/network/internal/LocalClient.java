@@ -37,6 +37,12 @@ public class LocalClient extends AbstractClient {
 
     private Config config = CoreRegistry.get(Config.class);
 
+    /**
+     * Creates an entity for the new local client.
+     * @param preferredName Clients preferred name.
+     * @param color Clients preferred color.
+     * @param entityManager Entity manager for the clients entity creation.
+     */
     public LocalClient(String preferredName, Color color, EntityManager entityManager) {
         createEntity(preferredName, color, entityManager);
     }

@@ -29,6 +29,10 @@ public class JoinStatusImpl implements JoinStatus {
     public JoinStatusImpl() {
     }
 
+    /**
+     * Function sets the Join status error message and sets the status to FAILED.
+     * @param errorMessage
+     */
     public JoinStatusImpl(String errorMessage) {
         this.errorMessage = errorMessage;
         status = Status.FAILED;
@@ -44,6 +48,10 @@ public class JoinStatusImpl implements JoinStatus {
         return currentActivity;
     }
 
+    /**
+     * Sets the current activity.
+     * @param currentActivity
+     */
     public synchronized void setCurrentActivity(String currentActivity) {
         this.currentActivity = currentActivity;
         currentProgress.set(0);
@@ -63,11 +71,18 @@ public class JoinStatusImpl implements JoinStatus {
         return errorMessage;
     }
 
+    /**
+     * Sets the current error message.
+     * @param errorMessage
+     */
     public synchronized void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
         status = Status.FAILED;
     }
 
+    /**
+     * Sets the Join Status as complete.
+     */
     public synchronized void setComplete() {
         status = Status.COMPLETE;
     }

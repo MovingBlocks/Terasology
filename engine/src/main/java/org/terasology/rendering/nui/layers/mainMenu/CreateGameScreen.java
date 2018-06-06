@@ -30,6 +30,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.input.Keyboard;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
@@ -45,6 +46,7 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
@@ -236,7 +238,7 @@ public class CreateGameScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "close", button -> {
             triggerBackAnimation();
             // get back to main screen if no saved games
-            if (GameProvider.getSavedGames().isEmpty()) {
+            if (!isSavedGamesExist()) {
                 triggerBackAnimation();
             }
         });
@@ -443,6 +445,23 @@ public class CreateGameScreen extends CoreScreenLayer {
 
     @Override
     public boolean isLowerLayerVisible() {
+        return false;
+    }
+
+    private boolean isSavedGamesExist() {
+        return !GameProvider.getSavedGames().isEmpty();
+    }
+
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE && isEscapeToCloseAllowed()) {
+            triggerBackAnimation();
+            if (!isSavedGamesExist()) {
+                // get back to main screen
+                triggerBackAnimation();
+            }
+            return true;
+        }
         return false;
     }
 }
