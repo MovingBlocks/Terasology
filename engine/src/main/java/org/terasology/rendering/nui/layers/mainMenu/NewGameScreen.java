@@ -50,6 +50,7 @@ import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
@@ -160,7 +161,8 @@ public class NewGameScreen extends CoreScreenLayer {
             GameManifest gameManifest = new GameManifest();
 
             gameManifest.setTitle(gameName.getText());
-
+            String tempSeed = new FastRandom().nextString(32);
+            gameManifest.setSeed(tempSeed);
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
             System.out.println(result.getModules());
@@ -178,7 +180,7 @@ public class NewGameScreen extends CoreScreenLayer {
             SimpleUri uri = config.getWorldGeneration().getDefaultGenerator();
             System.out.println(uri);
             float timeOffset = 0.25f + 0.025f;
-            WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, "thisisjustrandom",
+            WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, tempSeed,
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
             gameManifest.addWorld(worldInfo);
             gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
