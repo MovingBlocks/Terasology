@@ -165,7 +165,6 @@ public class NewGameScreen extends CoreScreenLayer {
             gameManifest.setSeed(tempSeed);
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-            System.out.println(result.getModules());
             if (!result.isSuccess()) {
                 MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                 if (errorMessagePopup != null) {
@@ -178,8 +177,7 @@ public class NewGameScreen extends CoreScreenLayer {
             }
 
             SimpleUri uri = config.getWorldGeneration().getDefaultGenerator();
-            System.out.println(uri);
-            float timeOffset = 0.25f + 0.025f;
+            float timeOffset = 0.50f;
             WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, tempSeed,
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
             gameManifest.addWorld(worldInfo);

@@ -84,7 +84,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
             }
 
             SimpleUri uri = world.getWorldGeneratorInfo().getUri();
-            float timeOffset = 0.25f + 0.025f;
+            float timeOffset = 0.50f;
             WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, world.getWorldGenerator().getWorldSeed(),
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
             gameManifest.addWorld(worldInfo);
