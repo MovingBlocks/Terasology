@@ -49,6 +49,7 @@ import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.UniverseSetupScreen;
+import org.terasology.rendering.nui.layers.mainMenu.UniverseWrapper;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.widgets.ResettableUIText;
 import org.terasology.rendering.nui.widgets.TextChangeEventListener;
@@ -105,6 +106,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private boolean needsUpdate = true;
     private ResettableUIText moduleSearch;
     private SelectModulesConfig selectModulesConfig;
+    private UniverseWrapper universeWrapper;
 
     @Override
     public void onOpened() {
@@ -425,7 +427,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
         UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button -> {
-            universeSetupScreen.setEnvironment();
+            universeSetupScreen.setEnvironment(universeWrapper);
+            universeWrapper.setSeed(seed.getText());
             triggerForwardAnimation(universeSetupScreen);
         });
 
@@ -703,5 +706,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         public StandardModuleExtension getStandardModuleExtension() {
             return standardModuleExtension;
         }
+    }
+
+    public void setUniverseWrapper(UniverseWrapper wrapper) {
+        universeWrapper = wrapper;
     }
 }

@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -50,7 +51,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:startPlayingScreen");
     private Texture texture;
     private WorldSetupWrapper world;
-
+    private UniverseWrapper universeWrapper;
 
     @Override
     public void initialise() {
@@ -62,7 +63,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "play", button -> {
             GameManifest gameManifest = new GameManifest();
 
-            //gameManifest.setTitle(world.getWorldName().toString());
+            gameManifest.setTitle(universeWrapper.getGameName());
 
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
@@ -82,7 +83,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
             WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, world.getWorldGenerator().getWorldSeed(),
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
             gameManifest.addWorld(worldInfo);
-            gameEngine.changeState(new StateLoading(gameManifest, (false) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         });
     }
 
@@ -99,8 +100,9 @@ public class StartPlayingScreen extends CoreScreenLayer {
      * @param targetWorldTexture The world texture generated in {@link WorldPreGenerationScreen} to be displayed on this
      *                           screen.
      */
-    public void setTargetWorld(WorldSetupWrapper targetWorld, Texture targetWorldTexture) {
+    public void setTargetWorld(WorldSetupWrapper targetWorld, Texture targetWorldTexture, Context context) {
         texture = targetWorldTexture;
         world = targetWorld;
+        universeWrapper = context.get(UniverseWrapper.class);
     }
 }

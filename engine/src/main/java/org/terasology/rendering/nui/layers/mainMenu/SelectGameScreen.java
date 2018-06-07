@@ -52,8 +52,7 @@ public class SelectGameScreen extends CoreScreenLayer {
     @In
     private TranslationSystem translationSystem;
 
-    private boolean loadingAsServer;
-
+    private UniverseWrapper universeWrapper;
 
     @Override
     public void initialise() {
@@ -64,7 +63,7 @@ public class SelectGameScreen extends CoreScreenLayer {
             gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    if (loadingAsServer) {
+                    if (isLoadingAsServer()) {
                         return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
                     } else {
                         return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
@@ -88,7 +87,7 @@ public class SelectGameScreen extends CoreScreenLayer {
 
         CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
         WidgetUtil.trySubscribe(this, "create", button -> {
-            screen.setLoadingAsServer(loadingAsServer);
+            screen.setUniverseWrapper(universeWrapper);
             triggerForwardAnimation(screen);
         });
 
@@ -107,9 +106,10 @@ public class SelectGameScreen extends CoreScreenLayer {
             confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
         });
         NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
-        WidgetUtil.trySubscribe(this, "test", button ->
-            triggerForwardAnimation(newGameScreen)
-        );
+        WidgetUtil.trySubscribe(this, "test", button -> {
+            newGameScreen.setUniverseWrapper(universeWrapper);
+            triggerForwardAnimation(newGameScreen);
+        });
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
@@ -137,7 +137,7 @@ public class SelectGameScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
-        if (loadingAsServer && !config.getPlayer().hasEnteredUsername()) {
+        if (isLoadingAsServer() && !config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }
     }
@@ -148,7 +148,7 @@ public class SelectGameScreen extends CoreScreenLayer {
 
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
-            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
@@ -156,11 +156,11 @@ public class SelectGameScreen extends CoreScreenLayer {
     }
 
     public boolean isLoadingAsServer() {
-        return loadingAsServer;
+        return universeWrapper.getLoadingAsServer();
     }
 
-    public void setLoadingAsServer(boolean loadingAsServer) {
-        this.loadingAsServer = loadingAsServer;
+    public void setUniverseWrapper(UniverseWrapper wrapper) {
+        this.universeWrapper = wrapper;
     }
 
     private void refreshList(UIList<GameInfo> gameList) {

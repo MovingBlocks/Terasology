@@ -66,13 +66,15 @@ public class MainMenuScreen extends CoreScreenLayer {
         jvmWarningLabel.setVisible(NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE);
 
         SelectGameScreen selectScreen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
-
+        UniverseWrapper universeWrapper = new UniverseWrapper();
         WidgetUtil.trySubscribe(this, "singleplayer", button -> {
-            selectScreen.setLoadingAsServer(false);
+            universeWrapper.setLoadingAsServer(false);
+            selectScreen.setUniverseWrapper(universeWrapper);
             triggerForwardAnimation(selectScreen);
         });
         WidgetUtil.trySubscribe(this, "multiplayer", button -> {
-            selectScreen.setLoadingAsServer(true);
+            universeWrapper.setLoadingAsServer(true);
+            selectScreen.setUniverseWrapper(universeWrapper);
             triggerForwardAnimation(selectScreen);
         });
         WidgetUtil.trySubscribe(this, "join", button -> {

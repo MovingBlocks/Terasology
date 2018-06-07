@@ -82,6 +82,8 @@ public class NewGameScreen extends CoreScreenLayer {
     @In
     private TranslationSystem translationSystem;
 
+    private UniverseWrapper universeWrapper;
+
     @Override
     public void initialise() {
 
@@ -92,7 +94,7 @@ public class NewGameScreen extends CoreScreenLayer {
             gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    if (loadingAsServer) {
+                    if (isLoadingAsServer()) {
                         return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
                     } else {
                         return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
@@ -148,9 +150,11 @@ public class NewGameScreen extends CoreScreenLayer {
         });
 
         AdvancedGameSetupScreen advancedSetupGameScreen = getManager().createScreen(AdvancedGameSetupScreen.ASSET_URI, AdvancedGameSetupScreen.class);
-        WidgetUtil.trySubscribe(this, "advancedSetup", button ->
-                triggerForwardAnimation(advancedSetupGameScreen)
-        );
+        WidgetUtil.trySubscribe(this, "advancedSetup", button -> {
+            universeWrapper.setGameName(gameName.getText());
+            advancedSetupGameScreen.setUniverseWrapper(universeWrapper);
+            triggerForwardAnimation(advancedSetupGameScreen);
+        });
 
         WidgetUtil.trySubscribe(this, "play", button -> {
             GameManifest gameManifest = new GameManifest();
@@ -177,7 +181,7 @@ public class NewGameScreen extends CoreScreenLayer {
             WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, "thisisjustrandom",
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
             gameManifest.addWorld(worldInfo);
-            gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         });
 
         WidgetUtil.trySubscribe(this, "close", button ->
@@ -303,11 +307,11 @@ public class NewGameScreen extends CoreScreenLayer {
     }
 
     public boolean isLoadingAsServer() {
-        return loadingAsServer;
+        return universeWrapper.getLoadingAsServer();
     }
 
-    public void setLoadingAsServer(boolean loadingAsServer) {
-        this.loadingAsServer = loadingAsServer;
+    public void setUniverseWrapper(UniverseWrapper wrapper) {
+        this.universeWrapper = wrapper;
     }
 
 }

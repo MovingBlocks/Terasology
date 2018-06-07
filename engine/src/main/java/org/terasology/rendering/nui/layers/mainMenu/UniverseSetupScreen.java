@@ -258,7 +258,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      * creating a game. It created a new {@link Context} and only puts the minimum classes
      * needed for successful game creation.
      */
-    public void setEnvironment() {
+    public void setEnvironment(UniverseWrapper wrapper) {
         context = new ContextImpl();
         CoreRegistry.setContext(context);
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
@@ -272,6 +272,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(ModuleManager.class, moduleManager);
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        context.put(UniverseWrapper.class, wrapper);
         ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
 
         if (result.isSuccess()) {

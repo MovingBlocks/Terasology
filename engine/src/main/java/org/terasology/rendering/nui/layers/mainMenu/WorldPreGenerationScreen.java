@@ -157,7 +157,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
 
         StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button -> {
-            startPlayingScreen.setTargetWorld(findWorldByName(), texture);
+            startPlayingScreen.setTargetWorld(findWorldByName(), texture, context);
             triggerForwardAnimation(startPlayingScreen);
         });
 
