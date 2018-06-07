@@ -24,6 +24,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ResolutionResult;
@@ -33,6 +34,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UIImage;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
@@ -47,6 +49,9 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
     @In
     private GameEngine gameEngine;
+
+    @In
+    private TranslationSystem translationSystem;
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:startPlayingScreen");
     private Texture texture;
@@ -91,6 +96,9 @@ public class StartPlayingScreen extends CoreScreenLayer {
     public void onOpened() {
         UIImage previewImage = find("preview", UIImage.class);
         previewImage.setImage(texture);
+
+        UILabel subitle = find("subtitle", UILabel.class);
+        subitle.setText(translationSystem.translate("${engine:menu#start-playing}") + " in " + world.getWorldName().toString());
     }
 
     /**

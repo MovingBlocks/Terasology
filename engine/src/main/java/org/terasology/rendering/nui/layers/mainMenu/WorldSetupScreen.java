@@ -21,6 +21,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.In;
@@ -31,6 +32,7 @@ import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldConfigurator;
@@ -53,6 +55,10 @@ public class WorldSetupScreen extends CoreScreenLayer {
     private WorldGeneratorManager worldGeneratorManager;
     @In
     private Config config;
+
+    @In
+    private TranslationSystem translationSystem;
+
     private WorldGenerator worldGenerator;
     private WorldSetupWrapper world;
     private ModuleEnvironment environment;
@@ -70,6 +76,12 @@ public class WorldSetupScreen extends CoreScreenLayer {
             world.setWorldConfigurator(oldWorldConfig);
             triggerBackAnimation();
         });
+    }
+
+    @Override
+    public void onOpened() {
+        UILabel subitle = find("subtitle", UILabel.class);
+        subitle.setText(translationSystem.translate("${engine:menu#world-setup}") + " for " + world.getWorldName().toString());
     }
 
     /**
