@@ -72,10 +72,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     private int seedNumber = 0;
     private float zoomValue = 2f;
 
-
-    public WorldPreGenerationScreen() {
-    }
-
     /**
      * A function called before the screen comes to the forefront to setup the environment
      * and extract necessary objects from the new Context.

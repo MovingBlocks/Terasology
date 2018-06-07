@@ -131,7 +131,8 @@ public class WorldSetupScreen extends CoreScreenLayer {
             Class<? extends Component> clazz = params.get(key).getClass();
             Component comp = config.getModuleConfig(worldGenerator.getUri(), key, clazz);
             if (comp != null) {
-                worldConfig.setProperty(key, comp);       // use the data from the config instead of defaults
+                // use the data from the config instead of defaults
+                worldConfig.setProperty(key, comp);
             }
         }
 
@@ -206,11 +207,9 @@ public class WorldSetupScreen extends CoreScreenLayer {
         protected WorldConfigNumberBinding(WorldConfigurator config, String label, ComponentLibrary compLib, FieldMetadata<Object, ?> field) {
             Class<?> type = field.getType();
             if (type == Integer.TYPE || type == Integer.class) {
-                this.binding = new WorldSetupScreen.WorldConfigBinding<>(config, label, compLib,
-                        (FieldMetadata<Object, Integer>) field);
+                this.binding = new WorldSetupScreen.WorldConfigBinding<>(config, label, compLib, (FieldMetadata<Object, Integer>) field);
             } else if (type == Float.TYPE || type == Float.class) {
-                this.binding = new WorldSetupScreen.WorldConfigBinding<>(config, label, compLib,
-                        (FieldMetadata<Object, Float>) field);
+                this.binding = new WorldSetupScreen.WorldConfigBinding<>(config, label, compLib, (FieldMetadata<Object, Float>) field);
             }
         }
 

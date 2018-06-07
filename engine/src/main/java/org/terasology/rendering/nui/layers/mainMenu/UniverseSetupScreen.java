@@ -84,7 +84,7 @@ import java.util.stream.Collectors;
 public class UniverseSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
-    List<WorldSetupWrapper> worlds = Lists.newArrayList();
+    private List<WorldSetupWrapper> worlds = Lists.newArrayList();
     int worldNumber = 0;
     private String selectedWorld = "";
     @In
@@ -244,7 +244,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     }
 
     /**
-     * Called whenever the user decides to create a new world.
+     * Called whenever the user decides to add a new world.
      * @param worldGeneratorInfo The {@link WorldGeneratorInfo} object for the new world.
      */
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
@@ -257,6 +257,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      * This method switched the environment of the game to a temporary one needed for
      * creating a game. It created a new {@link Context} and only puts the minimum classes
      * needed for successful game creation.
+     * @param wrapper passed from the {@link org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.AdvancedGameSetupScreen} and pushed into the new context.
      */
     public void setEnvironment(UniverseWrapper wrapper) {
         context = new ContextImpl();
@@ -340,11 +341,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         }
         return null;
     }
-
-    /**
-     *
-     * @return the list of worlds.
-     */
+    
     public List<WorldSetupWrapper> getWorldsList() {
         return worlds;
     }

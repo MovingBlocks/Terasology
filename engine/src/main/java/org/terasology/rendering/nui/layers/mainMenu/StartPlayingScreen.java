@@ -84,6 +84,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
             }
 
             SimpleUri uri = world.getWorldGeneratorInfo().getUri();
+            // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
             float timeOffset = 0.50f;
             WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, world.getWorldGenerator().getWorldSeed(),
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
@@ -105,8 +106,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
      * This method is called before the screen comes to the forefront to set the world
      * in which the player is about to spawn.
      * @param targetWorld The world in which the player is going to spawn.
-     * @param targetWorldTexture The world texture generated in {@link WorldPreGenerationScreen} to be displayed on this
-     *                           screen.
+     * @param targetWorldTexture The world texture generated in {@link WorldPreGenerationScreen} to be displayed on this screen.
      */
     public void setTargetWorld(WorldSetupWrapper targetWorld, Texture targetWorldTexture, Context context) {
         texture = targetWorldTexture;

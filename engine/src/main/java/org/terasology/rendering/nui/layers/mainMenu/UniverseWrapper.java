@@ -15,6 +15,10 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+/**
+ * A class which store the universe level properties for a game like if
+ * the game is single-player or multi-player, seed value and the game name.
+ */
 public class UniverseWrapper {
 
     private  String seed;
