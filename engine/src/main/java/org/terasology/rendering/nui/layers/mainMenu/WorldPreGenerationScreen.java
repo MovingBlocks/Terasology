@@ -69,8 +69,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     private List<WorldSetupWrapper> worldList;
     private String selectedWorld;
     private List<String> worldNames;
-    private UISlider zoomSlider;
     private int seedNumber = 0;
+    private float zoomValue = 2f;
 
 
     public WorldPreGenerationScreen() {
@@ -88,7 +88,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         context = subContext;
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
-        //worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
         worldList = context.get(UniverseSetupScreen.class).getWorldsList();
         selectedWorld = context.get(UniverseSetupScreen.class).getSelectedWorld();
         worldNames = context.get(UniverseSetupScreen.class).worldNames();
@@ -98,7 +97,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         } else {
             worldGenerator = findWorldByName().getWorldGenerator();
         }
-        //worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
 
         worldGenerator.setWorldSeed(createSeed(selectedWorld));
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
@@ -117,10 +115,20 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
 
-        zoomSlider = find("zoomSlider", UISlider.class);
-        if (zoomSlider != null) {
-            zoomSlider.setValue(2f);
-        }
+        final UISlider zoomSlider = find("zoomSlider", UISlider.class);
+        zoomSlider.bindValue(new Binding<Float>() {
+            @Override
+            public Float get() {
+                return zoomValue;
+            }
+
+            @Override
+            public void set(Float value) {
+                zoomValue = value;
+                updatePreview();
+            }
+        });
+
 
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         worldsDropdown.bindSelection(new Binding<String>() {
@@ -153,6 +161,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "reRoll", button -> {
             worldGenerator.setWorldSeed(createSeed(selectedWorld));
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Ready to roll!", "World seed for " + selectedWorld + " has been changed");
+            updatePreview();
         });
 
         StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
@@ -229,7 +238,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
                 popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
 
         Callable<TextureData> operation = () -> {
-            int zoom = TeraMath.floorToInt(zoomSlider.getValue());
+            int zoom = TeraMath.floorToInt(zoomValue);
             TextureData data = texture.getData();
 
             previewGen.render(data, zoom, progressListener);

@@ -104,7 +104,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
         } else {
             worldGenerator = world.getWorldGenerator();
         }
-        //worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, context, environment);
         configureProperties();
     }
 
