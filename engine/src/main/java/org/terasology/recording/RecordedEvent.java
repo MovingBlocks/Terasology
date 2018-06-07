@@ -26,7 +26,7 @@ public class RecordedEvent {
     private long entityId;
     private Event event;
     private Component component;
-    private double timestamp;
+    private long timestamp;
     private long position;
 
     /**
@@ -36,7 +36,7 @@ public class RecordedEvent {
      * @param timestamp The timestamp in which the event was sent.
      * @param position The position of the RecordedEvent.
      */
-    RecordedEvent(long entityId, Event event, double timestamp, long position) {
+    RecordedEvent(long entityId, Event event, long timestamp, long position) {
         this.entityId = entityId;
         this.event = event;
         this.timestamp = timestamp;
@@ -51,7 +51,7 @@ public class RecordedEvent {
      * @param timestamp The timestamp in which the event was sent.
      * @param position The position of the RecordedEvent.
      */
-    RecordedEvent(long entityId, Event event, Component component, double timestamp, long position) {
+    RecordedEvent(long entityId, Event event, Component component, long timestamp, long position) {
         this.entityId = entityId;
         this.event = event;
         this.component = component;

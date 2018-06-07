@@ -75,9 +75,9 @@ public class EventSystemReplayImplTest {
         RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAYING);
         entity = entityManager.create();
         Long id = entity.getId();
-        eventStore.add(new RecordedEvent(id, new AttackButton(), 0.1, 1));
-        eventStore.add(new RecordedEvent(id, new AttackButton(), 0.2, 2));
-        eventStore.add(new RecordedEvent(id, new AttackButton(), 0.3, 3));
+        eventStore.add(new RecordedEvent(id, new AttackButton(), 1, 1));
+        eventStore.add(new RecordedEvent(id, new AttackButton(), 2, 2));
+        eventStore.add(new RecordedEvent(id, new AttackButton(), 3, 3));
 
         List<Class<?>> selectedClassesToReplay = new ArrayList<>();
         selectedClassesToReplay.add(InputEvent.class);
@@ -95,17 +95,20 @@ public class EventSystemReplayImplTest {
     @Test
     public void testReplayStatus() {
         assertEquals(RecordAndReplayStatus.REPLAYING, RecordAndReplayStatus.getCurrentStatus());
-        eventSystem.process();
-        eventSystem.process();
-        eventSystem.process();
+        long startTime = System.currentTimeMillis();
+        while ((System.currentTimeMillis() - startTime) < 10) {
+            eventSystem.process();
+        }
         assertEquals(RecordAndReplayStatus.REPLAY_FINISHED, RecordAndReplayStatus.getCurrentStatus());
     }
 
     @Test
     public void testProcessingRecordedEvent() {
         assertEquals(0, handler.receivedAttackButtonList.size());
-        eventSystem.process();
-        eventSystem.process();
+        long startTime = System.currentTimeMillis();
+        while ((System.currentTimeMillis() - startTime) < 10) {
+            eventSystem.process();
+        }
         assertEquals(3, handler.receivedAttackButtonList.size());
     }
 
@@ -113,15 +116,20 @@ public class EventSystemReplayImplTest {
     public void testBlockingEventDuringReplay() {
         assertEquals(0, handler.receivedAttackButtonList.size());
         eventSystem.send(entity, new AttackButton());
-        eventSystem.process();
+        long startTime = System.currentTimeMillis();
+        while ((System.currentTimeMillis() - startTime) < 10) {
+            eventSystem.process();
+        }
         assertEquals(3, handler.receivedAttackButtonList.size());
     }
 
     @Test
     public void testSendingEventAfterReplay() {
         assertEquals(0, handler.receivedAttackButtonList.size());
-        eventSystem.process();
-        eventSystem.process();
+        long startTime = System.currentTimeMillis();
+        while ((System.currentTimeMillis() - startTime) < 10) {
+            eventSystem.process();
+        }
         eventSystem.send(entity, new AttackButton());
         assertEquals(4, handler.receivedAttackButtonList.size());
     }
@@ -129,8 +137,10 @@ public class EventSystemReplayImplTest {
     @Test
     public void testSendingAllowedEventDuringReplay() {
         eventSystem.send(entity, new TestEvent());
-        eventSystem.process();
-        eventSystem.process();
+        long startTime = System.currentTimeMillis();
+        while ((System.currentTimeMillis() - startTime) < 10) {
+            eventSystem.process();
+        }
         assertEquals(3, handler.receivedAttackButtonList.size());
         assertEquals(1, handler.receivedTestEventList.size());
     }

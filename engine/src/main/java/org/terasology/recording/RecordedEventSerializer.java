@@ -27,6 +27,7 @@ import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.input.binds.interaction.AttackButton;
@@ -320,8 +321,8 @@ class RecordedEventSerializer {
         Event result = null;
         GsonDeserializationContext deserializationContext = new GsonDeserializationContext(null);
         if (clazz.equals(CameraTargetChangedEvent.class.toString())) {
-            EntityRef oldTarget = this.entityManager.getEntity(jsonObject.get("OldTarget").getAsLong());
-            EntityRef newTarget = this.entityManager.getEntity(jsonObject.get("NewTarget").getAsLong());
+            EntityRef oldTarget = new RecordedEntityRef(jsonObject.get("OldTarget").getAsLong(), (LowLevelEntityManager) this.entityManager);
+            EntityRef newTarget =  new RecordedEntityRef(jsonObject.get("NewTarget").getAsLong(), (LowLevelEntityManager) this.entityManager);
             result = new CameraTargetChangedEvent(oldTarget, newTarget);
         } else if (clazz.equals(PlaySoundEvent.class.toString())) {
             float volume = jsonObject.get("volume").getAsFloat();
@@ -501,7 +502,7 @@ class RecordedEventSerializer {
     private void inputEventSetup(InputEvent event, JsonObject jsonObject) {
         float delta = jsonObject.get("delta").getAsFloat();
         boolean consumed = jsonObject.get("consumed").getAsBoolean();
-        EntityRef target = this.entityManager.getEntity(jsonObject.get("target").getAsLong());
+        EntityRef target =  new RecordedEntityRef(jsonObject.get("target").getAsLong(), (LowLevelEntityManager) this.entityManager);
         JsonObject aux = jsonObject.get("hitNormal").getAsJsonObject();
         Vector3f hitNormal = new Vector3f(aux.get("x").getAsFloat(), aux.get("y").getAsFloat(), aux.get("z").getAsFloat());
         aux = jsonObject.get("hitPosition").getAsJsonObject();
