@@ -65,6 +65,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
@@ -509,6 +510,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
      * @return the EntityRef that the networking system says is the client associated with this player
      */
     public EntityRef getClientEntityViaNetworkSystem() {
-        return networkSystem.getServer().getClientEntity();
+        if (networkSystem.getMode() != NetworkMode.NONE && networkSystem.getServer() != null) {
+            return networkSystem.getServer().getClientEntity();
+        } else {
+            return null;
+        }
     }
 }

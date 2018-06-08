@@ -16,9 +16,11 @@
 package org.terasology.logic.players;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * This is used on the client side to track and clean up items that are no longer held by remote players,  but are still location linked
  */
 public class ItemIsRemotelyHeldComponent implements Component {
+    public EntityRef remotePlayer = EntityRef.NULL;
 }
