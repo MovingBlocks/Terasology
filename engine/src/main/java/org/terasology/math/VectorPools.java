@@ -21,12 +21,17 @@ public class VectorPools {
 
     private static final int POOL_SIZE = 100_000; //Might be a bit overkill, but some might methods return array of all Vectors in chunk
 
+    // debug purpose
+    public static long freed3is = 0;
+    public static long drawn3is = 0;
+
     private static int currentVector3isAvailable;
     private static final Vector3i[] VECTOR_3I_POOL = new Vector3i[POOL_SIZE];
 
     private VectorPools() { }
 
     public static synchronized Vector3i getVector3i() {
+        drawn3is++;
         if (currentVector3isAvailable > 0) {
             VECTOR_3I_POOL[currentVector3isAvailable - 1].set(0, 0, 0);
             return VECTOR_3I_POOL[--currentVector3isAvailable];
@@ -35,6 +40,7 @@ public class VectorPools {
     }
 
     public static synchronized Vector3i getVector3i(Vector3i other) {
+        drawn3is++;
         if (currentVector3isAvailable > 0) {
             VECTOR_3I_POOL[currentVector3isAvailable - 1].set(other);
             return VECTOR_3I_POOL[--currentVector3isAvailable];
@@ -43,6 +49,7 @@ public class VectorPools {
     }
 
     public static synchronized Vector3i getVector3i(int x, int y, int z) {
+        drawn3is++;
         if (currentVector3isAvailable > 0) {
             VECTOR_3I_POOL[currentVector3isAvailable - 1].set(x, y, z);
             return VECTOR_3I_POOL[--currentVector3isAvailable];
@@ -51,6 +58,7 @@ public class VectorPools {
     }
 
     public static synchronized void free(Vector3i v) {
+        freed3is++;
         if (currentVector3isAvailable < POOL_SIZE) {
             VECTOR_3I_POOL[currentVector3isAvailable++] = v;
         }
