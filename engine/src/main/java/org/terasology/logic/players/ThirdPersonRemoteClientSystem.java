@@ -191,11 +191,6 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
      * attaches it to the mount point entity.
      */
     private void linkHeldItemLocationForRemotePlayer(EntityRef newItem, EntityRef player) {
-        if (newItem == EntityRef.NULL) {
-            logger.info("linkHeldItemLocationForRemotePlayer called with no item (empty hand) so skipping for player {}", player);
-            return;
-        }
-
         if (relatesToLocalPlayer(player)) {
            logger.info("linkHeldItemLocationForRemotePlayer called with an entity that relates to the local player, ignoring{}", player);
            return;
@@ -209,10 +204,18 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
             if (remotePlayerCandidate.equals(player)) {
                 logger.info("Thinking we found a match with player {} so counting this held item as relevant for processing", player);
                 currentHeldItem = heldItemCandidate;
+                // If we found an existing item yet the situation calls for emptying the players hand then we just need to remove the old item
+                if (newItem.equals(EntityRef.NULL)) {
+                    logger.info("Found an existing held item but the new request was to no longer hold anything so destroying {}", currentHeldItem);
+                    currentHeldItem.destroy();
+                    return;
+                }
+                break;
             }
         }
 
-        if (newItem != null && !newItem.equals(currentHeldItem)) {
+        // In the case of an actual change of item other than an empty hand we need to hook up a new held item entity
+        if (newItem != null && !newItem.equals(EntityRef.NULL) && !newItem.equals(currentHeldItem)) {
             RemotePersonHeldItemMountPointComponent mountPointComponent = player.getComponent(RemotePersonHeldItemMountPointComponent.class);
             if (mountPointComponent != null) {
 
@@ -221,7 +224,6 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
                     currentHeldItem.destroy();
                 }
 
-                // create client side held item entity for remote player and store it in local remote players map
                 currentHeldItem = entityManager.create();
                 logger.info("linkHeldItemLocationForRemotePlayer is now creating a new held item {}", currentHeldItem);
 
@@ -254,6 +256,8 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.z),
                         heldItemTransformComponent.scale);
             }
+        } else {
+            logger.info("Somehow ended up in the else during linkHeldItemLocationForRemotePlayer - current item was {} and new item {}", currentHeldItem, newItem);
         }
     }
 
