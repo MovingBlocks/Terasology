@@ -503,4 +503,12 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void renderShadows() {
     }
 
+    /**
+     * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer.
+     * This can be needed in special cases where the local player isn't fully available (TODO: May be a bug?)
+     * @return the EntityRef that the networking system says is the client associated with this player
+     */
+    public EntityRef getClientEntityViaNetworkSystem() {
+        return networkSystem.getServer().getClientEntity();
+    }
 }

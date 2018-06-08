@@ -39,12 +39,10 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.VisualComponent;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /*
@@ -58,10 +56,15 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
     private static final int USEANIMATIONLENGTH = 200;
 
-    @In
+    @In // TODO: localPlayer doesn't seem to work properly in headless multiplayer. Ends up connected to a NullEntityRef. So can't test against it
     private LocalPlayer localPlayer;
+
+    @In
+    private LocalPlayerSystem localPlayerSystem;
+
     @In
     private EntityManager entityManager;
+
     @In
     private Time time;
 
@@ -69,7 +72,6 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     private Map<EntityRef, EntityRef> charactersHandEntities = new HashMap<>();
 
     private Map<EntityRef, EntityRef> charactersHeldItems = new HashMap<>();
-
 
     private EntityRef getHandEntity(EntityRef character) {
         EntityRef handEntity = charactersHandEntities.get(character);
@@ -83,37 +85,55 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
         return handEntity;
     }
 
-    // ensures held item mount point entity exists, attaches it to the character and sets its transform
+    /**
+     * Ensures held item mount point entity exists, attaches it to the character and sets its transform.
+     * @param event the activation that triggered the need to consider changing a held item
+     * @param character the character for which we need to consider the held item
+     * @param remotePersonHeldItemMountPointComponent data for the mount point on the remote character
+     */
     @ReceiveEvent
     public void ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent event, EntityRef character,
                                                            RemotePersonHeldItemMountPointComponent remotePersonHeldItemMountPointComponent) {
-        if (!localPlayer.getCharacterEntity().equals(character)) {
-            if (!remotePersonHeldItemMountPointComponent.mountPointEntity.exists()) {
-                EntityBuilder builder = entityManager.newBuilder("engine:RemotePersonHeldItemMountPoint");
-                builder.setPersistent(false);
-                remotePersonHeldItemMountPointComponent.mountPointEntity = builder.build();
-                character.saveComponent(remotePersonHeldItemMountPointComponent);
-            }
-
-            // link the mount point entity to the camera
-            Location.removeChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity);
-            Location.attachChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity,
-                    remotePersonHeldItemMountPointComponent.translate,
-                    new Quat4f(
-                            TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.y,
-                            TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.x,
-                            TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.z),
-                    remotePersonHeldItemMountPointComponent.scale);
+        if (relatesToLocalPlayer(character)) {
+            logger.info("ensureClientSideEntityOnHeldItemMountPoint found its given character to relate to the local player, ignoring: {}", character);
+            return;
         }
+
+        // In case we haven't dealt with a given remote player yet set up a non-persistent mount point
+        if (!remotePersonHeldItemMountPointComponent.mountPointEntity.exists()) {
+            EntityBuilder builder = entityManager.newBuilder("engine:RemotePersonHeldItemMountPoint");
+            builder.setPersistent(false);
+            remotePersonHeldItemMountPointComponent.mountPointEntity = builder.build();
+            character.saveComponent(remotePersonHeldItemMountPointComponent);
+        }
+
+        // Link the mount point entity to the camera
+        Location.removeChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity);
+        Location.attachChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity,
+                remotePersonHeldItemMountPointComponent.translate,
+                new Quat4f(
+                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.y,
+                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.x,
+                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.z),
+                remotePersonHeldItemMountPointComponent.scale);
+
     }
 
     @ReceiveEvent
     public void ensureHeldItemIsMountedOnLoad(OnChangedComponent event, EntityRef clientEntity, ClientComponent clientComponent) {
-        if ((!(localPlayer.getClientEntity().equals(clientEntity))) && (clientEntity.exists()) && clientComponent.character != EntityRef.NULL) {
+        if (relatesToLocalPlayer(clientEntity)) {
+            logger.info("ensureHeldItemIsMountedOnLoad found its given clientEntity to relate to the local player, ignoring: {}", clientEntity);
+            return;
+        }
+
+        if (clientEntity.exists() && clientComponent.character != EntityRef.NULL) {
+            logger.info("ensureHeldItemIsMountedOnLoad says a given clientEntity exists, has a character, and isn't related to the local player: {}", clientEntity);
             CharacterHeldItemComponent characterHeldItemComponent = clientComponent.character.getComponent(CharacterHeldItemComponent.class);
             if (characterHeldItemComponent != null && !(clientComponent.character.equals(localPlayer.getCharacterEntity()))) {
                 linkHeldItemLocationForRemotePlayer(characterHeldItemComponent.selectedItem, clientComponent.character);
             }
+        } else {
+            logger.info("ensureHeldItemIsMountedOnLoad given a remote client, but one that didn't properly exist?");
         }
     }
 
@@ -152,40 +172,43 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
     @ReceiveEvent
     public void onHeldItemActivated(OnActivatedComponent event, EntityRef player, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
-        if (!localPlayer.getCharacterEntity().equals(player)) {
-            EntityRef newItem = heldItemComponent.selectedItem;
-            linkHeldItemLocationForRemotePlayer(newItem, player);
+        if (relatesToLocalPlayer(player)) {
+            logger.info("onHeldItemActivated found its given player to relate to the local player, ignoring: {}", player);
+            return;
         }
+
+        logger.info("onHeldItemActivated says the given player is not the local player's character entity: {}", player);
+        EntityRef newItem = heldItemComponent.selectedItem;
+        linkHeldItemLocationForRemotePlayer(newItem, player);
     }
 
     @ReceiveEvent
     public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
-        if (!localPlayer.getCharacterEntity().equals(character)) {
-            EntityRef newItem = heldItemComponent.selectedItem;
-            linkHeldItemLocationForRemotePlayer(newItem, character);
+        if (relatesToLocalPlayer(character)) {
+            logger.info("onHeldItemChanged found its given character to relate to the local player, ignoring: {}", character);
+            return;
         }
-    }
 
-    // TODO: This likely never triggers in headless since this is a client-only system - there might need to be an authority system to catch that
-    @ReceiveEvent
-    public void onClientDisconnect(DisconnectedEvent event, EntityRef clientEntity, ClientComponent clientComponent) {
-        if (charactersHeldItems.containsKey(clientComponent.character) || charactersHandEntities.containsKey(clientComponent.character)) {
-            charactersHeldItems.remove(clientComponent.character);
-            charactersHandEntities.remove(clientComponent.character);
-            destroyUnheldItems();
-        }
+        logger.info("onHeldItemChanged says the given character is not the local player's character entity: {}", character);
+        EntityRef newItem = heldItemComponent.selectedItem;
+        linkHeldItemLocationForRemotePlayer(newItem, character);
     }
 
     /**
      * Changes held item entity.
      *
-     * Detaches old held item and removes it's components. Adds components to new held item and
+     * Detaches old held item and removes its components. Adds components to new held item and
      * attaches it to the mount point entity.
      */
     private void linkHeldItemLocationForRemotePlayer(EntityRef newItem, EntityRef player) {
+        if (relatesToLocalPlayer(player)) {
+           logger.info("linkHeldItemLocationForRemotePlayer called with an entity that relates to the local player, ignoring{}", player);
+           return;
+        }
+
         //If this character is yet unknown to us, add it to the map
         if (!charactersHeldItems.containsKey(player)) {
-            logger.info("linkHeldItemLocationForRemotePlayer got called for a player not yet in charactersHeldItems, adding {} with EntityRef.NULL", player );
+            logger.info("linkHeldItemLocationForRemotePlayer got called for a player not yet in charactersHeldItems, adding {} with EntityRef.NULL", player);
             charactersHeldItems.put(player, EntityRef.NULL);
         }
         EntityRef currentHeldItem = charactersHeldItems.get(player);
@@ -257,44 +280,17 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
      */
     private void updateRemoteCharacters() {
         for (EntityRef entityRef : entityManager.getEntitiesWith(CharacterComponent.class, PlayerCharacterComponent.class)) {
-            if (!entityRef.equals(localPlayer.getCharacterEntity())) {
-
+            if (!relatesToLocalPlayer(entityRef)) {
                 //Update held items
                 if (!charactersHeldItems.containsKey(entityRef)) {
-                    logger.info("Adding entity {} to charactersHeldItems", entityRef);
                     charactersHeldItems.put(entityRef, EntityRef.NULL);
                 }
 
                 //Update Hand Entities
                 if (!charactersHandEntities.containsKey(entityRef)) {
-                    logger.info("Adding entity {} to charactersHandEntities", entityRef);
                     charactersHandEntities.put(entityRef, EntityRef.NULL);
                 }
-            } else {
-                logger.info("During updateRemoteCharacters got the local player? {}", entityRef);
             }
-        }
-
-        logger.info("Checking current state of charactersHeldItems");
-        for (EntityRef remotePlayer : charactersHeldItems.keySet()) {
-            logger.info("For remote player {} there is {}", remotePlayer, charactersHandEntities.get(remotePlayer));
-        }
-
-        for (Iterator<Map.Entry<EntityRef, EntityRef>> it = charactersHeldItems.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<EntityRef, EntityRef> entry = it.next();
-            if (entry.getKey().getId() == 0) {
-                logger.info("Removing no longer valid player held item entry {}", entry);
-                it.remove();
-            }
-        }
-
-        // TODO One liner of the above, just no logging. But neither version actually removes the item! What gives?
-        //charactersHeldItems.entrySet().removeIf(e -> e.getKey().getId() == 0);
-
-        // When a player logs out the above removal should trigger and remove that entry, but already here the same items remain present
-        logger.info("Checking state AFTER cleanup of charactersHeldItems");
-        for (EntityRef remotePlayer : charactersHeldItems.keySet()) {
-            logger.info("For remote player {} there is {}", remotePlayer, charactersHandEntities.get(remotePlayer));
         }
     }
 
@@ -314,8 +310,8 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
             }
 
             //TODO is this really needed? characterHeldItems and characterHandEntities should not contain local player
-            if (remotePlayer.equals(localPlayer.getCharacterEntity())) {
-                //logger.info("ThirdPersonRemoteClientSystem got a remotePlayer that was also the local player: {}", remotePlayer);
+            if (relatesToLocalPlayer(remotePlayer)) {
+                logger.info("ThirdPersonRemoteClientSystem's update got a remotePlayer that was also the local player? {}", remotePlayer);
                 continue;
             }
 
@@ -375,5 +371,57 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     @Override
     public void shutdown() {
         destroyUnheldItems();
+    }
+
+    /**
+     * Checks a given entity in a variety of ways to see if it is immediately related to a local player.
+     * @param entity the entity to check (probably a player, client, or character entity)
+     * @return true if any such check passes, otherwise false
+     */
+    private boolean relatesToLocalPlayer(EntityRef entity) {
+        if (entity == null || entity.equals(EntityRef.NULL)) {
+            logger.info("checkForLocalPlayer given a bad entity (null or NullEntityRef - can't relate that to a local player!");
+            return false;
+        }
+
+        if (entity.equals(localPlayer.getClientEntity())) {
+            logger.info("checkForLocalPlayer found a match to the localPlayer client entity! {}", entity);
+            return true;
+        }
+
+        if (entity.equals(localPlayer.getCharacterEntity())) {
+            logger.info("checkForLocalPlayer found a match to the localPlayer character entity! {}", entity);
+            return true;
+        }
+
+        if (entity.equals(localPlayer.getClientInfoEntity())) {
+            logger.info("checkForLocalPlayer found a match to the localPlayer client info entity! {}", entity);
+            return true;
+        }
+
+        // In case we're in a scenario where localPlayer is unreliable this is an alternative way to check
+        // This was needed in one case with headless + one client where an event triggered when localPlayer wasn't set right
+        EntityRef networkSystemProvidedClientEntity = localPlayerSystem.getClientEntityViaNetworkSystem();
+        if (entity.equals(networkSystemProvidedClientEntity)) {
+            logger.info("checkForLocalPlayer found its entity to match the network system provided local client entity! {}", entity);
+        }
+
+        if (entity.hasComponent(CharacterComponent.class)) {
+            EntityRef controller = entity.getComponent(CharacterComponent.class).controller;
+
+            if (controller != null) {
+                if (controller.equals(localPlayer.getClientEntity())) {
+                    logger.info("checkForLocalPlayer found its entity to be a character whose controller matched the localPlayer client entity! {}", controller);
+                    return true;
+                }
+
+                if (controller.equals(networkSystemProvidedClientEntity)) {
+                    logger.info("checkForLocalPlayer found its entity to be a character controller matching the network system provided local client entity! {}", controller);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
