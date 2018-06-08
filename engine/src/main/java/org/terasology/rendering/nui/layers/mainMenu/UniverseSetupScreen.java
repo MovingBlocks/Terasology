@@ -195,9 +195,14 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "addGenerator", button -> {
-            addNewWorld(worldGenerator.getSelection());
-            List<WorldSetupWrapper> worldOptions = worlds;
-            worldsDropdown.setOptions(worldNames());
+            if (worldGenerator.getSelection().getUri().toString().equals("Core:heightMap")) {
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("HeightMap not supported", "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
+
+            } else {
+                addNewWorld(worldGenerator.getSelection());
+                List<WorldSetupWrapper> worldOptions = worlds;
+                worldsDropdown.setOptions(worldNames());
+            }
             //triggerForwardAnimation(worldSetupScreen);
         });
 
