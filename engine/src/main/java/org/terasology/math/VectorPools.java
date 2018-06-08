@@ -19,7 +19,7 @@ import org.terasology.math.geom.Vector3i;
 
 public class VectorPools {
 
-    private static final int POOL_SIZE = 100;
+    private static final int POOL_SIZE = 100_000; //Might be a bit overkill, but some might methods return array of all Vectors in chunk
 
     private static int currentVector3isAvailable;
     private static final Vector3i[] VECTOR_3I_POOL = new Vector3i[POOL_SIZE];

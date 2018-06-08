@@ -27,6 +27,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
+import org.terasology.math.VectorPools;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
@@ -180,6 +181,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             if (!chunkProvider.isChunkReady(chunkPos)) {
                 return false;
             }
+            VectorPools.free(chunkPos);
         }
         return true;
     }
@@ -204,6 +206,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 }
                 for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
                     RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
+                    VectorPools.free(pos);
                     if (dirtiedChunk != null) {
                         dirtiedChunk.setDirty(true);
                     }
@@ -244,6 +247,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                     }
                     for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
                         RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
+                        VectorPools.free(pos);
                         if (dirtiedChunk != null) {
                             dirtiedChunks.add(dirtiedChunk);
                         }
@@ -348,6 +352,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 }
                 for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
                     RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
+                    VectorPools.free(pos);
                     if (dirtiedChunk != null) {
                         dirtiedChunk.setDirty(true);
                     }

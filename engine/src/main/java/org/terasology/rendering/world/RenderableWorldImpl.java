@@ -24,6 +24,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.VectorPools;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -145,8 +146,10 @@ class RenderableWorldImpl implements RenderableWorld {
             chunk = chunkProvider.getChunk(chunkCoordinates);
             if (chunk == null) {
                 pregenerationIsComplete = false;
+                VectorPools.free(chunkCoordinates);
             } else if (chunk.isDirty()) {
                 localView = worldProvider.getLocalView(chunkCoordinates);
+                VectorPools.free(chunkCoordinates);
                 if (localView == null) {
                     continue;
                 }

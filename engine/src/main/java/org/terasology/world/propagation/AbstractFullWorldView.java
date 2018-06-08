@@ -16,6 +16,7 @@
 package org.terasology.world.propagation;
 
 import org.terasology.math.ChunkMath;
+import org.terasology.math.VectorPools;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
@@ -63,6 +64,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
         setValueAt(getChunk(pos), ChunkMath.calcBlockPos(pos.x, pos.y, pos.z), value);
         for (Vector3i affectedChunkPos : ChunkMath.getChunkRegionAroundWorldPos(pos, 1)) {
             Chunk dirtiedChunk = chunkProvider.getChunk(affectedChunkPos);
+            VectorPools.free(affectedChunkPos);
             if (dirtiedChunk != null) {
                 dirtiedChunk.setDirty(true);
             }

@@ -29,6 +29,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.VectorPools;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -104,6 +105,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                     for (Vector3i location : blockRegion.region) {
                         Block blockInWorld = worldProvider.getBlock(location);
                         commonDefaultDropsHandling(event, entity, location, blockInWorld.getBlockFamily().getArchetypeBlock());
+                        VectorPools.free(location);
                     }
                 } else {
                     // just drop the ActAsBlock block

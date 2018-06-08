@@ -22,6 +22,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DoDestroyEvent;
+import org.terasology.math.VectorPools;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
@@ -43,6 +44,7 @@ public class BlockRegionSystem extends BaseComponentSystem {
     public void onDestroyed(DoDestroyEvent event, EntityRef entity, BlockRegionComponent blockRegion) {
         for (Vector3i blockPosition : blockRegion.region) {
             worldProvider.setBlock(blockPosition, blockManager.getBlock(BlockManager.AIR_ID));
+            VectorPools.free(blockPosition);
         }
     }
 }

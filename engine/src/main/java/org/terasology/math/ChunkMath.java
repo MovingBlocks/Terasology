@@ -111,7 +111,7 @@ public final class ChunkMath {
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    result[index++] = new Vector3i(x, y, z);
+                    result[index++] = VectorPools.getVector3i(x, y, z);
                 }
             }
         }

@@ -341,7 +341,7 @@ public final class Region3i implements Iterable<Vector3i> {
 
         @Override
         public Vector3i next() {
-            Vector3i result = new Vector3i(pos.x + min.x, pos.y + min.y, pos.z + min.z);
+            Vector3i result = VectorPools.getVector3i(pos.x + min.x, pos.y + min.y, pos.z + min.z);
             pos.z++;
             if (pos.z >= size.z) {
                 pos.z = 0;

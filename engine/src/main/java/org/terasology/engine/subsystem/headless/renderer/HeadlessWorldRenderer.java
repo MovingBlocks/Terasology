@@ -20,6 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.Region3i;
+import org.terasology.math.VectorPools;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -217,6 +218,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 chunksInProximity.clear();
                 for (Vector3i chunkPosition : viewRegion) {
                     RenderableChunk c = chunkProvider.getChunk(chunkPosition);
+                    VectorPools.free(chunkPosition);
                     if (c != null && worldProvider.getLocalView(c.getPosition()) != null) {
                         chunksInProximity.add(c);
                     } else {
@@ -240,6 +242,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // add
                 for (Vector3i chunkPosition : viewRegion) {
                     RenderableChunk c = chunkProvider.getChunk(chunkPosition);
+                    VectorPools.free(chunkPosition);
                     if (c != null && worldProvider.getLocalView(c.getPosition()) != null) {
                         chunksInProximity.add(c);
                     } else {
