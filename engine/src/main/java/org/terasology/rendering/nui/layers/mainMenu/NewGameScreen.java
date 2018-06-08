@@ -178,7 +178,7 @@ public class NewGameScreen extends CoreScreenLayer {
 
             SimpleUri uri = config.getWorldGeneration().getDefaultGenerator();
             // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
-            float timeOffset = 0.50f;
+            final float timeOffset = 0.50f;
             WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, tempSeed,
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
             gameManifest.addWorld(worldInfo);

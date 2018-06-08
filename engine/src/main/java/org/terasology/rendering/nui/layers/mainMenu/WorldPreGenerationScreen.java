@@ -49,17 +49,20 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
- * This class let's the user preview different worlds added in the
- * {@link UniverseSetupScreen}. Each world is still configurable and it's seed
+ * This class lets the user preview different worlds added in the
+ * {@link UniverseSetupScreen}. Each world is still configurable and its seed
  * can be changed by the re-roll button. Note that each world has a unique seed.
  */
 public class WorldPreGenerationScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
+
     @In
     private ModuleManager moduleManager;
+
     @In
     private Config config;
+
     private ModuleEnvironment environment;
     private WorldGenerator worldGenerator;
     private Texture texture;
@@ -75,8 +78,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     /**
      * A function called before the screen comes to the forefront to setup the environment
      * and extract necessary objects from the new Context.
-     * @param subContext As there is a new environment created in the {@link UniverseSetupScreen}, it's passed to
-     *                   this screen instead of using the old Context.
+     * @param subContext The new environment created in {@link UniverseSetupScreen}
      * @throws UnresolvedWorldGeneratorException The creation of a world generator can throw this Exception
      */
     public void setEnvironment(Context subContext) throws UnresolvedWorldGeneratorException {
@@ -125,7 +127,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
             }
         });
 
-
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         worldsDropdown.bindSelection(new Binding<String>() {
             @Override
@@ -149,7 +150,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
                     previewGen = new FacetLayerPreview(environment, worldGenerator);
                     updatePreview();
                 } catch (UnresolvedWorldGeneratorException e) {
-                    e.getMessage();
+                    e.printStackTrace();
                 }
             }
         });
@@ -176,7 +177,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
                 }
             } catch (UnresolvedWorldGeneratorException e) {
-                e.getMessage();
+                e.printStackTrace();
             }
         });
 
@@ -200,12 +201,12 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
             previewGen = new FacetLayerPreview(environment, worldGenerator);
             updatePreview();
         } catch (UnresolvedWorldGeneratorException e) {
-            e.getMessage();
+            e.printStackTrace();
         }
     }
 
     /**
-     * Generates a texture and set's to the image view, thus previewing the world.
+     * Generates a texture and sets it to the image view, thus previewing the world.
      */
     private void genTexture() {
         int imgWidth = 384;
@@ -221,7 +222,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     }
 
     /**
-     * Updates the preview according to any changes to made the configurator.
+     * Updates the preview according to any changes made to the configurator.
      * Also pops up a message and keeps track of percentage world preview prepared.
      */
     private void updatePreview() {
@@ -247,9 +248,9 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     }
 
     /**
-     * This method takes the name of the selected world as String and return the corresponding
-     * WorldSetupWrapper object.
-     * @return {@link WorldSetupWrapper} object.
+     * This method takes the name of the world selected in the worldsDropdown
+     * as String and return the corresponding WorldSetupWrapper object.
+     * @return {@link WorldSetupWrapper} object of the selected world.
      */
     private WorldSetupWrapper findWorldByName() {
         for (WorldSetupWrapper world : worldList) {

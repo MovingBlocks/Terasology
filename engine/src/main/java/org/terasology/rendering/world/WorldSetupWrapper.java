@@ -22,7 +22,7 @@ import org.terasology.world.generator.internal.WorldGeneratorInfo;
 
 /**
  * This class only has significance during the create game phase.
- * Every world is a object of this class.
+ * Every world is an object of this class.
  */
 public class WorldSetupWrapper {
 

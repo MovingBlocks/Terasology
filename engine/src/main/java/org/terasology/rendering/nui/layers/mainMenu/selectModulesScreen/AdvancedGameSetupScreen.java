@@ -59,7 +59,6 @@ import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.util.ArrayList;

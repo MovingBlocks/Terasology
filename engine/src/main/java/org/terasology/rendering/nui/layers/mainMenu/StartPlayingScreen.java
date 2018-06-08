@@ -41,6 +41,8 @@ import org.terasology.world.time.WorldTime;
 
 public class StartPlayingScreen extends CoreScreenLayer {
 
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:startPlayingScreen");
+
     @In
     private ModuleManager moduleManager;
 
@@ -53,7 +55,6 @@ public class StartPlayingScreen extends CoreScreenLayer {
     @In
     private TranslationSystem translationSystem;
 
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:startPlayingScreen");
     private Texture texture;
     private WorldSetupWrapper world;
     private UniverseWrapper universeWrapper;
@@ -85,7 +86,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
             SimpleUri uri = world.getWorldGeneratorInfo().getUri();
             // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
-            float timeOffset = 0.50f;
+            final float timeOffset = 0.50f;
             WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, world.getWorldGenerator().getWorldSeed(),
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
             gameManifest.addWorld(worldInfo);

@@ -51,8 +51,10 @@ import java.util.Objects;
 public class WorldSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldSetupScreen");
+
     @In
     private WorldGeneratorManager worldGeneratorManager;
+
     @In
     private Config config;
 
@@ -85,10 +87,9 @@ public class WorldSetupScreen extends CoreScreenLayer {
     }
 
     /**
-     * This method sets the world whose properties are to changed. This function is called before the screen comes
+     * This method sets the world whose properties are to be changed. This function is called before the screen comes
      * to the forefront.
-     * @param subContext As there is a new environment created in the {@link UniverseSetupScreen}, it's passed to
-     *                   this screen instead of using the old Context.
+     * @param subContext the new environment created in {@link UniverseSetupScreen}
      * @param worldSelected the world whose configurations are to be changed.
      * @throws UnresolvedWorldGeneratorException
      */

@@ -84,18 +84,22 @@ import java.util.stream.Collectors;
 public class UniverseSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
-    private List<WorldSetupWrapper> worlds = Lists.newArrayList();
-    int worldNumber = 0;
-    private String selectedWorld = "";
+
     @In
     private WorldGeneratorManager worldGeneratorManager;
+
     @In
     private ModuleManager moduleManager;
+
     @In
     private Config config;
+
+    private List<WorldSetupWrapper> worlds = Lists.newArrayList();
     private ModuleEnvironment environment;
     private ModuleAwareAssetTypeManager assetTypeManager;
     private Context context;
+    private int worldNumber;
+    private String selectedWorld = "";
 
     @Override
     public void initialise() {
@@ -186,7 +190,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
                 }
             } catch (UnresolvedWorldGeneratorException e) {
-                e.getMessage();
+                e.printStackTrace();
             }
         });
 
@@ -204,7 +208,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                     worldPreGenerationScreen.setEnvironment(context);
                     triggerForwardAnimation(worldPreGenerationScreen);
                 } catch (UnresolvedWorldGeneratorException e) {
-                    e.getMessage();
+                    e.printStackTrace();
                 }
             } else {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
@@ -254,10 +258,10 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     }
 
     /**
-     * This method switched the environment of the game to a temporary one needed for
-     * creating a game. It created a new {@link Context} and only puts the minimum classes
+     * This method switches the environment of the game to a temporary one needed for
+     * creating a game. It creates a new {@link Context} and only puts the minimum classes
      * needed for successful game creation.
-     * @param wrapper passed from the {@link org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.AdvancedGameSetupScreen} and pushed into the new context.
+     * @param wrapper takes the {@link org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.AdvancedGameSetupScreen} and pushes it into the new context.
      */
     public void setEnvironment(UniverseWrapper wrapper) {
         context = new ContextImpl();
@@ -312,13 +316,12 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
-
     }
 
     /**
      * Create a list of the names of the world, so that they can be displayed as simple String
      * in the drop-down.
-     * @return A list of world names in String.
+     * @return A list of world names encoded as a String
      */
     public List<String> worldNames() {
         List<String> worldNamesList = Lists.newArrayList();
@@ -341,7 +344,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         }
         return null;
     }
-    
+
     public List<WorldSetupWrapper> getWorldsList() {
         return worlds;
     }
