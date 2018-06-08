@@ -337,19 +337,19 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     }
 
     @Override
-    public void preSave() {
-
-    }
-
-    @Override
-    public void shutdown() {
-        /* TODO: Unsure if this would matter - seems to cause an NPE from engaging in destruction while already shutting down
-        for (EntityRef remainingHeldItems : entityManager.getEntitiesWith(ItemIsRemotelyHeldComponent.class)) {
-            if (remainingHeldItems.exists()) {
-                remainingHeldItems.destroy();
+    public void postBegin() {
+        // Go through all known remote players already present and make sure they have their currently equipped items defined
+        // TODO: This catches the scenario in which a player logs in and can see other already-connected players' held items
+        // But it doesn't cover when a new player then connects later. Only when that player takes an action causing an event handled in this System
+        for (EntityRef remotePlayer : entityManager.getEntitiesWith(CharacterComponent.class,
+                                                                    PlayerCharacterComponent.class,
+                                                                    CharacterHeldItemComponent.class,
+                                                                    RemotePersonHeldItemMountPointComponent.class)) {
+            if (!relatesToLocalPlayer(remotePlayer)) {
+                logger.info("Found a remote player to process during postBegin, selected item is {}", remotePlayer.getComponent(CharacterHeldItemComponent.class).selectedItem);
+                linkHeldItemLocationForRemotePlayer(remotePlayer.getComponent(CharacterHeldItemComponent.class).selectedItem, remotePlayer);
             }
         }
-        */
     }
 
     /**
