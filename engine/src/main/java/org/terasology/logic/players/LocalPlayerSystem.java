@@ -65,6 +65,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
@@ -503,4 +504,16 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void renderShadows() {
     }
 
+    /**
+     * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer.
+     * This can be needed in special cases where the local player isn't fully available (TODO: May be a bug?)
+     * @return the EntityRef that the networking system says is the client associated with this player
+     */
+    public EntityRef getClientEntityViaNetworkSystem() {
+        if (networkSystem.getMode() != NetworkMode.NONE && networkSystem.getServer() != null) {
+            return networkSystem.getServer().getClientEntity();
+        } else {
+            return null;
+        }
+    }
 }
