@@ -88,7 +88,8 @@
                 "type": "UILabel",
                 "text": "${engine:menu#time-progression-during-pre-generation}:",
                 "id": "timeLabel",
-                "family": "left-label"
+                "family": "left-label",
+                "enabled": false
               },
               {
                 "type": "UISlider",
@@ -98,6 +99,7 @@
                 "increment": 1.0,
                 "precision": 0,
                 "value": 0.0,
+                "enabled": false,
                 "layoutInfo": {
                   "position-horizontal-center": {},
                   "position-top": {

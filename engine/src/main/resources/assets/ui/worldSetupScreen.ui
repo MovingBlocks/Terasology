@@ -87,11 +87,13 @@
                 "contents": [
                   {
                     "type": "UILabel",
-                    "text": "World Shape:"
+                    "text": "World Shape:",
+                    "enabled": false
                   },
                   {
                     "type": "UIDropdownScrollable",
-                    "id": "worlds"
+                    "id": "worlds",
+                    "enabled": false
                   }
                 ]
               },
