@@ -29,10 +29,10 @@ import org.terasology.math.geom.Rect2i;
 public class Border {
     public static final Border ZERO = new Border(0, 0, 0, 0);
 
-    private int left;
-    private int right;
-    private int top;
-    private int bottom;
+    private final int left;
+    private final int right;
+    private final int top;
+    private final int bottom;
 
     public Border(int left, int right, int top, int bottom) {
         this.left = left;

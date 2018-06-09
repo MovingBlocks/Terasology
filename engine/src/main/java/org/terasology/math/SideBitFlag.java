@@ -29,7 +29,7 @@ import java.util.Set;
  *
  */
 public final class SideBitFlag {
-    private static TObjectByteMap<Side> sideBits = new TObjectByteHashMap<>();
+    private static final TObjectByteMap<Side> sideBits = new TObjectByteHashMap<>();
 
     static {
         sideBits.put(Side.TOP, (byte) 0b000001);

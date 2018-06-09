@@ -20,8 +20,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
+import org.lwjgl.openal.AL;
 import org.terasology.math.geom.Quat4f;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,52 +36,57 @@ import java.util.Map;
  *
  */
 public final class Rotation {
-
-    private static final TByteObjectMap<Rotation> ALL_ROTATIONS;
+    private static final Rotation[] ALL_ROTATIONS;
     private static final TByteObjectMap<Rotation> NORMALIZED_ROTATIONS;
     private static final ImmutableList<Rotation> HORIZONTAL_ROTATIONS;
-    private static final Map<Rotation, Rotation> REVERSE_ROTATIONS_MAP;
+    private static final Rotation[] REVERSE_ROTATIONS;
 
-    private Yaw yaw;
-    private Pitch pitch;
-    private Roll roll;
+    private final Yaw yaw;
+    private final Pitch pitch;
+    private final Roll roll;
+
+    /**
+     * The index used by .rotate(), among others. Ranges from 0 to 63 (4^3-1).
+     */
+    private final int index;
 
     private Rotation(Yaw yaw, Pitch pitch, Roll roll) {
         this.pitch = pitch;
         this.yaw = yaw;
         this.roll = roll;
+        this.index = indexFor(yaw, pitch, roll);
     }
 
     public static Rotation none() {
-        return ALL_ROTATIONS.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE));
+        return rotate(Yaw.NONE, Pitch.NONE, Roll.NONE);
     }
 
     public static Rotation rotate(Pitch pitch) {
-        return ALL_ROTATIONS.get(indexFor(Yaw.NONE, pitch, Roll.NONE));
+        return rotate(Yaw.NONE, pitch, Roll.NONE);
     }
 
     public static Rotation rotate(Yaw yaw) {
-        return ALL_ROTATIONS.get(indexFor(yaw, Pitch.NONE, Roll.NONE));
+        return rotate(yaw, Pitch.NONE, Roll.NONE);
     }
 
     public static Rotation rotate(Roll roll) {
-        return ALL_ROTATIONS.get(indexFor(Yaw.NONE, Pitch.NONE, roll));
+        return rotate(Yaw.NONE, Pitch.NONE, roll);
     }
 
     public static Rotation rotate(Yaw yaw, Pitch pitch) {
-        return ALL_ROTATIONS.get(indexFor(yaw, pitch, Roll.NONE));
+        return rotate(yaw, pitch, Roll.NONE);
     }
 
     public static Rotation rotate(Pitch pitch, Roll roll) {
-        return ALL_ROTATIONS.get(indexFor(Yaw.NONE, pitch, roll));
+        return rotate(Yaw.NONE, pitch, roll);
     }
 
     public static Rotation rotate(Yaw yaw, Roll roll) {
-        return ALL_ROTATIONS.get(indexFor(yaw, Pitch.NONE, roll));
+        return rotate(yaw, Pitch.NONE, roll);
     }
 
     public static Rotation rotate(Yaw yaw, Pitch pitch, Roll roll) {
-        return ALL_ROTATIONS.get(indexFor(yaw, pitch, roll));
+        return ALL_ROTATIONS[indexFor(yaw, pitch, roll)];
     }
 
     /**
@@ -92,7 +99,7 @@ public final class Rotation {
      */
     public static Rotation findReverse(Rotation rotation) {
         Preconditions.checkNotNull(rotation);
-        return REVERSE_ROTATIONS_MAP.get(rotation);
+        return REVERSE_ROTATIONS[rotation.index];
     }
 
     public static List<Rotation> horizontalRotations() {
@@ -100,13 +107,14 @@ public final class Rotation {
     }
 
     static {
-        ALL_ROTATIONS = new TByteObjectHashMap<>();
+        ALL_ROTATIONS = new Rotation[4 * 4 * 4];
+
         NORMALIZED_ROTATIONS = new TByteObjectHashMap<>();
         for (Pitch pitch : Pitch.values()) {
             for (Yaw yaw : Yaw.values()) {
                 for (Roll roll : Roll.values()) {
                     Rotation rotation = new Rotation(yaw, pitch, roll);
-                    ALL_ROTATIONS.put(indexFor(yaw, pitch, roll), new Rotation(yaw, pitch, roll));
+                    ALL_ROTATIONS[indexFor(yaw, pitch, roll)] = rotation;
                     Byte duplicateIndex = findDuplicateRotation(rotation);
                     if (duplicateIndex == null) {
                         NORMALIZED_ROTATIONS.put(indexFor(yaw, pitch, roll), rotation);
@@ -116,15 +124,15 @@ public final class Rotation {
         }
 
         HORIZONTAL_ROTATIONS = ImmutableList.of(
-                ALL_ROTATIONS.get(indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE)),
-                ALL_ROTATIONS.get(indexFor(Yaw.CLOCKWISE_90, Pitch.NONE, Roll.NONE)),
-                ALL_ROTATIONS.get(indexFor(Yaw.CLOCKWISE_180, Pitch.NONE, Roll.NONE)),
-                ALL_ROTATIONS.get(indexFor(Yaw.CLOCKWISE_270, Pitch.NONE, Roll.NONE)));
+                ALL_ROTATIONS[indexFor(Yaw.NONE, Pitch.NONE, Roll.NONE)],
+                ALL_ROTATIONS[indexFor(Yaw.CLOCKWISE_90, Pitch.NONE, Roll.NONE)],
+                ALL_ROTATIONS[indexFor(Yaw.CLOCKWISE_180, Pitch.NONE, Roll.NONE)],
+                ALL_ROTATIONS[indexFor(Yaw.CLOCKWISE_270, Pitch.NONE, Roll.NONE)]);
 
-        REVERSE_ROTATIONS_MAP = new HashMap<>();
-        for (Rotation rotation : ALL_ROTATIONS.valueCollection()) {
+        REVERSE_ROTATIONS = new Rotation[ALL_ROTATIONS.length];
+        for (Rotation rotation : ALL_ROTATIONS) {
             Rotation reverse = findReverseInternal(rotation);
-            REVERSE_ROTATIONS_MAP.put(rotation, reverse);
+            REVERSE_ROTATIONS[rotation.index] = reverse;
         }
     }
 
@@ -145,6 +153,7 @@ public final class Rotation {
         Side frontResult = rotation.rotate(Side.FRONT);
         Side topResult = rotation.rotate(Side.TOP);
         byte[] result = new byte[]{127};
+
         NORMALIZED_ROTATIONS.forEachEntry(
                 (a, b) -> {
                     if (b.rotate(Side.FRONT) == frontResult
@@ -199,14 +208,14 @@ public final class Rotation {
         }
         if (obj instanceof Rotation) {
             Rotation other = (Rotation) obj;
-            return yaw == other.yaw && pitch == other.pitch && roll == other.roll;
+            return index == other.index;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(yaw, pitch, roll);
+        return index;
     }
 
     /**
@@ -215,7 +224,7 @@ public final class Rotation {
      * @return All possible rotations for each yaw, pitch & roll combination.
      */
     public static Iterable<Rotation> allValues() {
-        return ALL_ROTATIONS.valueCollection();
+        return Arrays.asList(ALL_ROTATIONS);
     }
 
     /**

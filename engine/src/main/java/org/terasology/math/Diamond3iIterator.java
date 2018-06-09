@@ -25,7 +25,7 @@ import java.util.Iterator;
 public final class Diamond3iIterator implements Iterator<Vector3i> {
 
     private final Vector3i origin;
-    private int maxDistance;
+    private final int maxDistance;
 
     private int x;
     private int y;

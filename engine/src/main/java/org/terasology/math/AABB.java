@@ -452,11 +452,11 @@ public final class AABB {
     }
 
     public boolean intersectRectangle(Vector3f from, Vector3f direction) {
-        Vector3f dirfrac = new Vector3f();
-
-        dirfrac.x = 1.0f / direction.x;
-        dirfrac.y = 1.0f / direction.y;
-        dirfrac.z = 1.0f / direction.z;
+        Vector3f dirfrac = new Vector3f(
+                1.0f / direction.x,
+                1.0f / direction.y,
+                1.0f / direction.z
+        );
 
         float t1 = (min.x - from.x) * dirfrac.x;
         float t2 = (max.x - from.x) * dirfrac.x;

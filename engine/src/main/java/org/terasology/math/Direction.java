@@ -34,11 +34,11 @@ public enum Direction {
     FORWARD(new Vector3i(0, 0, 1), new Vector3f(0, 0, 1)),
     DOWN(Vector3i.down(), new Vector3f(0, -1, 0));
 
-    private static EnumMap<Direction, Direction> reverseMap;
-    private static EnumMap<Direction, Side> conversionMap;
+    private static final EnumMap<Direction, Direction> reverseMap;
+    private static final EnumMap<Direction, Side> conversionMap;
 
-    private Vector3i vector3iDir;
-    private Vector3f vector3fDir;
+    private final Vector3i vector3iDir;
+    private final Vector3f vector3fDir;
 
     static {
         reverseMap = new EnumMap<>(Direction.class);
