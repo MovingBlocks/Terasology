@@ -157,7 +157,6 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "reRoll", button -> {
             worldGenerator.setWorldSeed(createSeed(selectedWorld));
-            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Ready to roll!", "World seed for " + selectedWorld + " has been changed");
             updatePreview();
         });
 
