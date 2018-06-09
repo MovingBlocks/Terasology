@@ -233,7 +233,9 @@ Contributors
  [dorasun](https://github.com/dorasun),
  [oekonomi](https://github.com/oekonomi),
  [Chris 'cwgreene' Greene](https://github.com/cwgreene),
- [AdamAboudi](https://github.com/AdamAboudi)
+ [AdamAboudi](https://github.com/AdamAboudi),
+ [lgzy](https://github.com/lgzy),
+ [dave2s](https://github.com/dave2s)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
