@@ -113,32 +113,62 @@
                   },
                   "position-bottom": {
                     "target": "TOP",
-                    "offset": 8,
+                    "offset": 16,
                     "widget": "apply"
                   }
                 }
               },
               {
-                "type": "UIButton",
-                "text": "${engine:menu#accept}",
+                "type": "RowLayout",
+                "horizontalSpacing": 4,
                 "id": "apply",
                 "layoutInfo": {
-                  "height": 32,
-                  "width" : 100,
                   "position-horizontal-center": {},
-                  "position-bottom": {
+                  "height": 32,
+                  "width": 260,
+                  "position-top": {
                     "target": "BOTTOM",
-                    "offset": 4
+                    "widget": "properties",
+                    "offset": 16
                   }
-                }
+                },
+                "contents": [
+                  {
+                    "type": "UIButton",
+                    "text": "${engine:menu#dialog-cancel}",
+                    "id": "close",
+                    "layoutInfo": {
+                      "width": 128,
+                      "height": 32,
+                      "position-horizontal-center": {},
+                      "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                      }
+                    }
+                  },
+                  {
+                    "type": "UIButton",
+                    "text": "${engine:menu#accept}",
+                    "id": "accept",
+                    "layoutInfo": {
+                      "height": 32,
+                      "width" : 100,
+                      "position-horizontal-center": {},
+                      "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 4
+                      }
+                    }
+                  }
+                ]
               }
             ]
           }
         ]
       },
       {
-        "type": "UIButton",
-        "text": "${engine:menu#back}",
+        "type": "UISpace",
         "id": "close",
         "layoutInfo": {
           "width": 128,

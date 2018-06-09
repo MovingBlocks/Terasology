@@ -70,7 +70,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
 
-        WidgetUtil.trySubscribe(this, "apply", button -> {
+        WidgetUtil.trySubscribe(this, "accept", button -> {
             triggerBackAnimation();
         });
 
