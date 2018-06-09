@@ -260,7 +260,9 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     }
 
     /**
-     * modifies the remote players' held item mount points to show and move their held items at their location
+     * Modifies the remote players' held item mount points to show and move their held items at their location. Clean up no longer needed held item entities.
+     *
+     * TODO: Also responsible for catching characters without current held item entities and then create them. Should be moved elsewhere
      */
     @Override
     public void update(float delta) {
@@ -292,7 +294,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
                 }
             }
 
-            logger.info("After searching for an existing held item the set is now: {}", heldItemsForReview);
+            logger.debug("After searching for an existing held item the set is now: {}", heldItemsForReview);
 
             // If an associated held item entity does *not* exist yet, consider making one if the player has an item selected
             if (currentHeldItem == EntityRef.NULL) {
@@ -368,6 +370,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
     /**
      * Checks a given entity in a variety of ways to see if it is immediately related to a local player.
+     * TODO: Is a bit of a shotgun blast approach to throwing out undesired player/client/character entities. Needs a more surgical approach.
      * @param entity the entity to check (probably a player, client, or character entity)
      * @return true if any such check passes, otherwise false
      */
