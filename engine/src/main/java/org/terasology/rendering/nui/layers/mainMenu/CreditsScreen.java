@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.Pattern;
 
 public class CreditsScreen extends CoreScreenLayer {
 
@@ -50,37 +49,44 @@ public class CreditsScreen extends CoreScreenLayer {
 
         creditsScroll = find("creditsScroll", UIScrollingText.class);
         if (creditsScroll != null) {
+            StringBuilder credits = new StringBuilder();
+
             ClassLoader classloader = getClass().getClassLoader();
             InputStream is = classloader.getResourceAsStream("Credits.md");
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                StringBuilder credits = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) {
-                    line = line.replaceAll("\\[([^]]*)]\\(([^)]+)\\)", "$1").trim();
-                    if (line.startsWith("* ")) {
-                        if (line.endsWith(":")) {
-                            credits.append(System.lineSeparator());
-                            credits.append(line, 2, line.length() - 1);
-                            credits.append(System.lineSeparator());
-                            credits.append(System.lineSeparator());
+            if (is == null) {
+                credits.append("${engine:menu#error-credits-not-found}");
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        line = line.replaceAll("\\[([^]]*)]\\(([^)]+)\\)", "$1").trim();
+                        if (line.startsWith("* ")) {
+                            if (line.endsWith(":")) {
+                                credits.append(System.lineSeparator());
+                                credits.append(line, 2, line.length() - 1);
+                                credits.append(System.lineSeparator());
+                                credits.append(System.lineSeparator());
+                            } else {
+                                credits.append(line, 2, line.length());
+                                credits.append(System.lineSeparator());
+                            }
                         } else {
-                            credits.append(line, 2, line.length());
+                            credits.append(line);
                             credits.append(System.lineSeparator());
                         }
-                    } else {
-                        credits.append(line);
-                        credits.append(System.lineSeparator());
                     }
-                }
+                } catch (IOException e) {
+                    Logger logger = LoggerFactory.getLogger(CreditsScreen.class);
+                    logger.info("Could not open Credits file");
 
-                creditsScroll.setText(credits.toString());
-                creditsScroll.setAutoReset(false);
-                creditsScroll.setScrollingSpeed(1);
-                creditsScroll.startScrolling();
-            } catch (IOException e) {
-                Logger logger = LoggerFactory.getLogger(CreditsScreen.class);
-                logger.info("Could not open Credits file");
+                    credits = new StringBuilder("${engine:menu#error-credits-open");
+                }
             }
+
+            creditsScroll.setText(credits.toString());
+            creditsScroll.setAutoReset(false);
+            creditsScroll.setScrollingSpeed(1);
+            creditsScroll.startScrolling();
         }
     }
 
