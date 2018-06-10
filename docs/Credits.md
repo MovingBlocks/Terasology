@@ -235,7 +235,8 @@ Contributors
  [Chris 'cwgreene' Greene](https://github.com/cwgreene),
  [AdamAboudi](https://github.com/AdamAboudi),
  [lgzy](https://github.com/lgzy),
- [dave2s](https://github.com/dave2s)
+ [dave2s](https://github.com/dave2s),
+ [asiekierka](https://github.com/asiekierka)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
