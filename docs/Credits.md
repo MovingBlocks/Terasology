@@ -325,6 +325,6 @@ Icons prepared by kartikey0303 (also CC BY 4.0)
 Additional Notes
 --------
 
-A few of Terasology's base textures use the awesome [Good Morning Craft](http://www.minecraftforum.net/forums/mapping-and-modding/resource-packs/1227051-16x-good-morning-craft) texture pack by Louis Durrant. Make sure to visit his <a href="http://www.carrotcakestudios.co.uk/">homepage</a> and support his work.
+A few of Terasology's base textures use the awesome [Good Morning Craft](http://www.minecraftforum.net/forums/mapping-and-modding/resource-packs/1227051-16x-good-morning-craft) texture pack by Louis Durrant. Make sure to visit his [homepage](http://www.carrotcakestudios.co.uk/) and support his work.
 
 Our default font is ["Noto" by Google](http://www.google.com/get/noto), which is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) just like Terasology. More on the [font in the wiki](https://github.com/MovingBlocks/Terasology/wiki/Text-and-Font).

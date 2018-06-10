@@ -105,6 +105,8 @@
     "enum-editor-prompt": "enum-editor-prompt",
     "enum-editor-title": "enum-editor-title",
     "error": "error",
+    "error-credits-not-found": "error-credits-not-found",
+    "error-credits-open": "error-credits-open",
     "error-downloading-server-list": "error-downloading-server-list",
     "existing-file-warning": "existing-file-warning",
     "exit-game": "exit-game",
