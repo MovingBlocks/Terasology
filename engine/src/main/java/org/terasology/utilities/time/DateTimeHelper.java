@@ -33,6 +33,9 @@ public class DateTimeHelper {
      * @return delta between timestamps as a string
      */
     public static String getDeltaBetweenTimestamps(final long start, final long end) {
+        if (start < 0 || end < 0 || start > end) {
+            throw new IllegalArgumentException("Wrong timestamp values: " + start + " or " + end);
+        }
         TimeUnit timeUnit = TimeUnit.SECONDS;
 
         long diffInMilliseconds = end - start;
@@ -49,7 +52,7 @@ public class DateTimeHelper {
 
         if (days > 0) {
             builder.append(days);
-            builder.append(" Days");
+            builder.append(" Days ");
         }
 
         builder.append(fill2(hrs));
