@@ -133,34 +133,6 @@
                   }
                 },
                 "contents": [
-                  {
-                    "type": "UIButton",
-                    "text": "${engine:menu#dialog-cancel}",
-                    "id": "close",
-                    "layoutInfo": {
-                      "width": 128,
-                      "height": 32,
-                      "position-horizontal-center": {},
-                      "position-bottom": {
-                        "target": "BOTTOM",
-                        "offset": 48
-                      }
-                    }
-                  },
-                  {
-                    "type": "UIButton",
-                    "text": "${engine:menu#accept}",
-                    "id": "accept",
-                    "layoutInfo": {
-                      "height": 32,
-                      "width" : 100,
-                      "position-horizontal-center": {},
-                      "position-bottom": {
-                        "target": "BOTTOM",
-                        "offset": 4
-                      }
-                    }
-                  }
                 ]
               }
             ]
@@ -168,7 +140,8 @@
         ]
       },
       {
-        "type": "UISpace",
+        "type": "UIButton",
+        "text": "Done",
         "id": "close",
         "layoutInfo": {
           "width": 128,
