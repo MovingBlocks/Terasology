@@ -72,6 +72,11 @@ public abstract class AbstractBlockFamily implements BlockFamily {
 
     @Override
     public String toString() {
-        return "BlockFamily[" + uri.toString() + "]";
+        String familyType = "";
+        RegisterBlockFamily registerInfo = this.getClass().getAnnotation(RegisterBlockFamily.class);
+        if (registerInfo != null) {
+            familyType = registerInfo.value();
+        }
+        return "BlockFamily[" + familyType + "," + uri.toString() + "]";
     }
 }

@@ -41,7 +41,7 @@ public class FreeformFamily extends AbstractBlockFamily {
     private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
 
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
-    private Block block;
+    private Block archetypeBlock;
 
     public FreeformFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
@@ -52,11 +52,11 @@ public class FreeformFamily extends AbstractBlockFamily {
             uri = new BlockUri(definition.getUrn(), shape.getUrn());
         }
         if (shape.isCollisionYawSymmetric()) {
-            block = blockBuilder.constructSimpleBlock(definition, shape, uri, this);
+            archetypeBlock = blockBuilder.constructSimpleBlock(definition, shape, uri, this);
         } else {
             for (Rotation rot : Rotation.horizontalRotations()) {
                 Side side = rot.rotate(Side.FRONT);
-                block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot,
+                Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot,
                         new BlockUri(uri, new Name(side.name())), this);
                 if (block == null) {
                     throw new IllegalArgumentException("Missing block for side: " + side.toString());
@@ -76,7 +76,7 @@ public class FreeformFamily extends AbstractBlockFamily {
 
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        if (block == null) {
+        if (archetypeBlock == null) {
             if (attachmentSide.isHorizontal()) {
                 return blocks.get(attachmentSide);
             }
@@ -86,15 +86,15 @@ public class FreeformFamily extends AbstractBlockFamily {
                 return blocks.get(Side.FRONT);
             }
         }
-        return block;
+        return archetypeBlock;
     }
 
     @Override
     public Block getArchetypeBlock() {
-        if (block == null) {
+        if (archetypeBlock == null) {
             return blocks.get(this.getArchetypeSide());
         }
-        return block;
+        return archetypeBlock;
     }
 
     protected Side getArchetypeSide() {
@@ -103,7 +103,7 @@ public class FreeformFamily extends AbstractBlockFamily {
 
     @Override
     public Block getBlockFor(BlockUri blockUri) {
-        if (block == null && getURI().equals(blockUri.getFamilyUri())) {
+        if (archetypeBlock == null && getURI().equals(blockUri.getFamilyUri())) {
             try {
                 Side side = Side.valueOf(blockUri.getIdentifier().toString().toUpperCase(Locale.ENGLISH));
                 return blocks.get(side);
@@ -113,15 +113,15 @@ public class FreeformFamily extends AbstractBlockFamily {
             }
 
         }
-        return block;
+        return archetypeBlock;
     }
 
     @Override
     public Iterable<Block> getBlocks() {
-        if (block == null) {
+        if (archetypeBlock == null) {
             return blocks.values();
         }
-        return Arrays.asList(block);
+        return Arrays.asList(archetypeBlock);
     }
 
 }
