@@ -63,6 +63,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -309,8 +310,13 @@ public class GameDetailsScreen extends CoreScreenLayer {
                 .sorted(Comparator.comparing(NameVersion::getName))
                 .map(nameVersion -> {
                     Module module = moduleManager.getRegistry().getModule(nameVersion.getName(), nameVersion.getVersion());
+                    if (module == null) {
+                        logger.warn("Can't find module in your classpath - {}:{}", nameVersion.getName(), nameVersion.getVersion());
+                        return null;
+                    }
                     return ModuleSelectionInfo.local(module);
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         gameModules.setList(sortedGameModules);
