@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
 
-final class ModuleSelectionInfo {
+public final class ModuleSelectionInfo {
     private Module latestVersion;
     private Module selectedVersion;
     private Module onlineVersion;

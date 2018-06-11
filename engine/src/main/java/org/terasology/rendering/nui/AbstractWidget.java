@@ -24,6 +24,7 @@ import org.terasology.rendering.nui.widgets.UILabel;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  */
@@ -119,6 +120,11 @@ public abstract class AbstractWidget implements UIWidget {
             }
         }
         return null;
+    }
+
+    @Override
+    public <T extends UIWidget> Optional<T> tryFind(String id, Class<T> type) {
+        return Optional.ofNullable(find(id, type));
     }
 
     @Override

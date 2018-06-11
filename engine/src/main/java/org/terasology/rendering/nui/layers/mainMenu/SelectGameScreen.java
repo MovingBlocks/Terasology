@@ -104,7 +104,7 @@ public class SelectGameScreen extends CoreScreenLayer {
         gameList.subscribeSelection((widget, item) -> {
             find("load", UIButton.class).setEnabled(item != null);
             find("delete", UIButton.class).setEnabled(item != null);
-//            find("details", UIButton.class).setEnabled(item != null);
+            find("details", UIButton.class).setEnabled(item != null);
             updateDescription(item);
         });
 
@@ -136,6 +136,16 @@ public class SelectGameScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+
+        WidgetUtil.trySubscribe(this, "details", button -> {
+            GameInfo gameInfo = gameList.getSelection();
+            if (gameInfo != null) {
+                GameDetailsScreen detailsScreen = getManager().createScreen(GameDetailsScreen.ASSET_URI, GameDetailsScreen.class);
+                detailsScreen.setGameInfo(gameInfo);
+                detailsScreen.setPreviewImage(previewImage.getImage());
+                getManager().pushScreen(detailsScreen);
+            }
+        });
 
     }
 

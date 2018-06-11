@@ -53,10 +53,10 @@ public class UITabBox extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (contents.size() != 0) {
+        if (!contents.isEmpty()) {
             Rect2i region = canvas.getRegion();
             Rect2i buttonRegion = Rect2i.createFromMinAndSize(region.minX(), region.minY(), region.width(), tabBarHeight);
-            Rect2i boxRegion = Rect2i.createFromMinAndMax(region.minX(), region.minY() + tabBarHeight, region.width(), region.height() - tabBarHeight);
+            Rect2i boxRegion = Rect2i.createFromMinAndMax(region.minX(), region.minY() + tabBarHeight, region.width(), region.height());
             canvas.drawWidget(contents.get(currentTab), boxRegion);
             canvas.drawWidget(buttonLayout, buttonRegion);
         }
@@ -64,7 +64,7 @@ public class UITabBox extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        if (contents.size() != 0) {
+        if (!contents.isEmpty()) {
             return canvas.calculateRestrictedSize(contents.get(currentTab), sizeHint);
         }
         return Vector2i.zero();
@@ -87,7 +87,7 @@ public class UITabBox extends CoreWidget {
 
     @Override
     public Iterator<UIWidget> iterator() {
-        if (contents.size() != 0) {
+        if (!contents.isEmpty()) {
             return contents.iterator();
         }
         return Collections.emptyIterator();
@@ -110,4 +110,16 @@ public class UITabBox extends CoreWidget {
         listeners.remove(tabNumber);
         buttons.remove(tabNumber);
     }
+
+    /**
+     * Selects a tab from the contents list via index.
+     *
+     * @param index The index of the item to select.
+     */
+    public void select(int index) {
+        if (index >= 0 && index < contents.size()) {
+            currentTab = index;
+        }
+    }
+
 }
