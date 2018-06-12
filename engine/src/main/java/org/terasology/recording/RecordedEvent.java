@@ -61,7 +61,7 @@ public class RecordedEvent {
 
 
 
-    public double getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 

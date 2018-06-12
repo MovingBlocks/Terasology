@@ -94,6 +94,7 @@ import org.terasology.input.MouseInput;
 
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,6 +104,7 @@ import java.util.List;
 class RecordedEventSerializer {
 
     private static final Logger logger = LoggerFactory.getLogger(RecordedEventSerializer.class);
+    private static final double DEFAULT_DOUBLE_VALUE = 0.0;
     private TypeSerializationLibrary typeSerializationLibrary;
     private EntityManager entityManager;
 
@@ -156,35 +158,7 @@ class RecordedEventSerializer {
                 writer.name("consumed").value(e.isConsumed());
                 writer.name("target").value(e.getTarget().getId());
 
-                TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3f.class);
-                GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getHitNormal(), serializationContext);
-                writer.name("hitNormal");
-                writer.beginObject();
-                JsonArray array = data.getElement().getAsJsonArray();
-                writer.name("x").value(array.get(0).getAsFloat());
-                writer.name("y").value(array.get(1).getAsFloat());
-                writer.name("z").value(array.get(2).getAsFloat());
-                writer.endObject();
-
-                data = (GsonPersistedData) handler.serialize(e.getHitPosition(), serializationContext);
-                writer.name("hitPosition");
-                writer.beginObject();
-                array = data.getElement().getAsJsonArray();
-                writer.name("x").value(array.get(0).getAsFloat());
-                writer.name("y").value(array.get(1).getAsFloat());
-                writer.name("z").value(array.get(2).getAsFloat());
-                writer.endObject();
-
-                handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3i.class);
-                data = (GsonPersistedData) handler.serialize(e.getTargetBlockPosition(), serializationContext);
-                writer.name("targetBlockPosition");
-                writer.beginObject();
-                array = data.getElement().getAsJsonArray();
-                writer.name("x").value(array.get(0).getAsInt());
-                writer.name("y").value(array.get(1).getAsInt());
-                writer.name("z").value(array.get(2).getAsInt());
-                writer.endObject();
-
+                writeVector3fData(writer, serializationContext, e);
                 writeInputEventInstanceData(writer, event, serializationContext);
 
 
@@ -225,6 +199,68 @@ class RecordedEventSerializer {
         } catch (Exception e) {
             logger.error("Could not serialize this event: " + event.toString(), e);
         }
+    }
+
+    private void writeVector3fData(JsonWriter writer, GsonSerializationContext serializationContext, InputEvent e) throws IOException {
+        if (e.getHitNormal() == null) {
+            writeDefaultVector3fData(writer);
+        } else {
+            writeRealVector3fData(writer, serializationContext, e);
+        }
+    }
+
+    private void writeRealVector3fData(JsonWriter writer, GsonSerializationContext serializationContext, InputEvent e) throws IOException {
+        TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3f.class);
+        GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getHitNormal(), serializationContext);
+        writer.name("hitNormal");
+        writer.beginObject();
+        JsonArray array = data.getElement().getAsJsonArray();
+        writer.name("x").value(array.get(0).getAsFloat());
+        writer.name("y").value(array.get(1).getAsFloat());
+        writer.name("z").value(array.get(2).getAsFloat());
+        writer.endObject();
+
+        data = (GsonPersistedData) handler.serialize(e.getHitPosition(), serializationContext);
+        writer.name("hitPosition");
+        writer.beginObject();
+        array = data.getElement().getAsJsonArray();
+        writer.name("x").value(array.get(0).getAsFloat());
+        writer.name("y").value(array.get(1).getAsFloat());
+        writer.name("z").value(array.get(2).getAsFloat());
+        writer.endObject();
+
+        handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3i.class);
+        data = (GsonPersistedData) handler.serialize(e.getTargetBlockPosition(), serializationContext);
+        writer.name("targetBlockPosition");
+        writer.beginObject();
+        array = data.getElement().getAsJsonArray();
+        writer.name("x").value(array.get(0).getAsInt());
+        writer.name("y").value(array.get(1).getAsInt());
+        writer.name("z").value(array.get(2).getAsInt());
+        writer.endObject();
+    }
+
+    private void writeDefaultVector3fData(JsonWriter writer) throws IOException {
+        writer.name("hitNormal");
+        writer.beginObject();
+        writer.name("x").value(DEFAULT_DOUBLE_VALUE);
+        writer.name("y").value(DEFAULT_DOUBLE_VALUE);
+        writer.name("z").value(DEFAULT_DOUBLE_VALUE);
+        writer.endObject();
+
+        writer.name("hitPosition");
+        writer.beginObject();
+        writer.name("x").value(DEFAULT_DOUBLE_VALUE);
+        writer.name("y").value(DEFAULT_DOUBLE_VALUE);
+        writer.name("z").value(DEFAULT_DOUBLE_VALUE);
+        writer.endObject();
+
+        writer.name("targetBlockPosition");
+        writer.beginObject();
+        writer.name("x").value(DEFAULT_DOUBLE_VALUE);
+        writer.name("y").value(DEFAULT_DOUBLE_VALUE);
+        writer.name("z").value(DEFAULT_DOUBLE_VALUE);
+        writer.endObject();
     }
 
     private void writeInputEventInstanceData(JsonWriter writer, Event event, GsonSerializationContext serializationContext) throws Exception {

@@ -45,6 +45,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
@@ -152,7 +153,9 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     @Override
     public void finishSavingAndShutdown() {
-        recordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+            recordAndReplayUtils.setShutdownRequested(true);
+        }
         saveThreadManager.shutdown(new ShutdownTask(), true);
         checkSaveTransactionAndClearUpIfItIsDone();
     }
@@ -244,6 +247,10 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private void waitForCompletionOfPreviousSave() {
         if (saveTransaction != null && saveTransaction.getResult() == null) {
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
+                System.out.println("Activating ShutdownRequested");
+                recordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
+            }
             saveThreadManager.shutdown(new ShutdownTask(), true);
             saveThreadManager.restart();
         }

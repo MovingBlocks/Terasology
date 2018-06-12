@@ -57,6 +57,9 @@ import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 import org.terasology.world.block.BlockComponent;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -113,6 +116,10 @@ public class EventSystemReplayImpl implements EventSystem {
     /** List of classes selected to replay */
     private List<Class<?>> selectedClassesToReplay;
 
+    //test purposes
+    private long maxTimestampDiff;
+    private StringBuffer buffer;
+
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
                                  RecordedEventStore recordedEventStore, EntityIdMap entityIdMap,
@@ -127,6 +134,7 @@ public class EventSystemReplayImpl implements EventSystem {
         this.recordAndReplaySerializer = recordAndReplaySerializer;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.selectedClassesToReplay = selectedClassesToReplay;
+        this.buffer = new StringBuffer();
     }
 
     /**
@@ -199,10 +207,20 @@ public class EventSystemReplayImpl implements EventSystem {
                     String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
                     recordAndReplaySerializer.deserializeRecordedEvents(recordingPath);
                     fillRecordedEvents();
+                    this.buffer.append("DESERIALIZATION!\n");
                 } else {
-                    recordAndReplayUtils.reset();
                     recordedEventStore.popEvents();
                     RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
+                    /*System.out.println("Max diff: " + this.maxTimestampDiff);
+                    try {
+                        BufferedWriter writer = new BufferedWriter(new FileWriter(new File("diff_data.txt")));
+                        writer.write(this.buffer.toString());
+                        writer.flush();
+                        writer.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }*/
+
                 }
             }
         }
@@ -236,6 +254,9 @@ public class EventSystemReplayImpl implements EventSystem {
             recordedEvents.poll();
             EntityRef entity = getEntityRef(re);
             // Sends recorded event to be processed
+            this.buffer.append("Record - " + re.getTimestamp() + " Replay - " + passedTime);
+            this.buffer.append(" Time diff: " + (passedTime - re.getTimestamp()) + " Event: " + re.getEvent().toString() + "\n");
+            if (this.maxTimestampDiff < (passedTime - re.getTimestamp())) this.maxTimestampDiff = passedTime - re.getTimestamp();
             if (re.getComponent() != null) {
                 originalSend(entity, re.getEvent(), re.getComponent());
             } else {

@@ -181,6 +181,7 @@ public class SaveTransaction extends AbstractTask {
             isReplay = true;
             if (recordAndReplayUtils.isShutdownRequested()) {
                 RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                recordAndReplayUtils.reset();
             }
 
         }
