@@ -96,7 +96,7 @@ public class EventSystemReplayImplTest {
     public void testReplayStatus() {
         assertEquals(RecordAndReplayStatus.REPLAYING, RecordAndReplayStatus.getCurrentStatus());
         long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < 10) {
+        while ((System.currentTimeMillis() - startTime) < 30) {
             eventSystem.process();
         }
         assertEquals(RecordAndReplayStatus.REPLAY_FINISHED, RecordAndReplayStatus.getCurrentStatus());
