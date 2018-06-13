@@ -158,31 +158,35 @@ public class NewGameScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "play", button -> {
-            GameManifest gameManifest = new GameManifest();
+            if(gameName.getText().isEmpty()) {
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game name cannot be empty");
+            } else {
+                GameManifest gameManifest = new GameManifest();
 
-            gameManifest.setTitle(gameName.getText());
-            String tempSeed = new FastRandom().nextString(32);
-            gameManifest.setSeed(tempSeed);
-            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-            if (!result.isSuccess()) {
-                MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                if (errorMessagePopup != null) {
-                    errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
+                gameManifest.setTitle(gameName.getText());
+                String tempSeed = new FastRandom().nextString(32);
+                gameManifest.setSeed(tempSeed);
+                DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+                ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+                if (!result.isSuccess()) {
+                    MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                    if (errorMessagePopup != null) {
+                        errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
+                    }
+                    return;
                 }
-                return;
-            }
-            for (Module module : result.getModules()) {
-                gameManifest.addModule(module.getId(), module.getVersion());
-            }
+                for (Module module : result.getModules()) {
+                    gameManifest.addModule(module.getId(), module.getVersion());
+                }
 
-            SimpleUri uri = config.getWorldGeneration().getDefaultGenerator();
-            // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
-            final float timeOffset = 0.50f;
-            WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, tempSeed,
-                    (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
-            gameManifest.addWorld(worldInfo);
-            gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                SimpleUri uri = config.getWorldGeneration().getDefaultGenerator();
+                // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
+                final float timeOffset = 0.50f;
+                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, tempSeed,
+                        (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
+                gameManifest.addWorld(worldInfo);
+                gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            }
         });
 
         WidgetUtil.trySubscribe(this, "close", button ->
