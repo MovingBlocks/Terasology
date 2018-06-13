@@ -85,12 +85,6 @@ public class SelectGameScreen extends CoreScreenLayer {
         gameList.select(0);
         gameList.subscribe((widget, item) -> loadGame(item));
 
-        CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
-        WidgetUtil.trySubscribe(this, "create", button -> {
-            screen.setUniverseWrapper(universeWrapper);
-            triggerForwardAnimation(screen);
-        });
-
         WidgetUtil.trySubscribe(this, "load", button -> {
             GameInfo gameInfo = gameList.getSelection();
             if (gameInfo != null) {
@@ -106,7 +100,7 @@ public class SelectGameScreen extends CoreScreenLayer {
             confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
         });
         NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
-        WidgetUtil.trySubscribe(this, "test", button -> {
+        WidgetUtil.trySubscribe(this, "create", button -> {
             newGameScreen.setUniverseWrapper(universeWrapper);
             triggerForwardAnimation(newGameScreen);
         });
