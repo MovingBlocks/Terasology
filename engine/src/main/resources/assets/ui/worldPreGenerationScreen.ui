@@ -111,7 +111,7 @@
               },
               {
                 "type": "UILabel",
-                "text": "${engine:menu#preview-zoom-factor}:",
+                "text": "${engine:menu#preview-zoom-factor} (temp):",
                 "id": "zoomLabel",
                 "family": "left-label",
                 "layoutInfo": {
