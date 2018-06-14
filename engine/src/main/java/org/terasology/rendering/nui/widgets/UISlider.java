@@ -39,6 +39,8 @@ public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
 
+    private static UISliderOnChangeListener uiSliderOnChangeListener;
+
     private InteractionListener tickerListener = new BaseInteractionListener() {
         private Vector2i offset = new Vector2i();
 
@@ -56,6 +58,9 @@ public class UISlider extends CoreWidget {
         @Override
         public void onMouseRelease(NUIMouseReleaseEvent event) {
             active = false;
+            if (uiSliderOnChangeListener != null) {
+                uiSliderOnChangeListener.onSliderMouseDown(getValue());
+            }
         }
 
         @Override
@@ -264,5 +269,13 @@ public class UISlider extends CoreWidget {
 
     private int pixelOffsetFor(float val, int width) {
         return TeraMath.floorToInt(width * (val - getMinimum()) / getRange());
+    }
+
+    public interface UISliderOnChangeListener {
+        void onSliderMouseDown(float val);
+    }
+
+    public void setUiSliderOnChangeListener(UISliderOnChangeListener listener) {
+        uiSliderOnChangeListener = listener;
     }
 }
