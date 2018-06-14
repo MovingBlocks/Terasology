@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
  * {@link UniverseSetupScreen}. Each world is still configurable and its seed
  * can be changed by the re-roll button. Note that each world has a unique seed.
  */
-public class WorldPreGenerationScreen extends CoreScreenLayer {
+public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlider.UISliderOnChangeListener {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
 
@@ -73,11 +73,12 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     private String selectedWorld;
     private List<String> worldNames;
     private int seedNumber = 0;
-    private float zoomValue = 2f;
+    private UISlider zoomSlider;
 
     /**
      * A function called before the screen comes to the forefront to setup the environment
      * and extract necessary objects from the new Context.
+     *
      * @param subContext The new environment created in {@link UniverseSetupScreen}
      * @throws UnresolvedWorldGeneratorException The creation of a world generator can throw this Exception
      */
@@ -113,19 +114,12 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
 
-        final UISlider zoomSlider = find("zoomSlider", UISlider.class);
-        zoomSlider.bindValue(new Binding<Float>() {
-            @Override
-            public Float get() {
-                return zoomValue;
-            }
+        zoomSlider = find("zoomSlider", UISlider.class);
+        if (zoomSlider != null) {
+            zoomSlider.setValue(2f);
+            zoomSlider.setUiSliderOnChangeListener(this);
+        }
 
-            @Override
-            public void set(Float value) {
-                zoomValue = value;
-                updatePreview();
-            }
-        });
 
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         worldsDropdown.bindSelection(new Binding<String>() {
@@ -234,7 +228,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
                 popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
 
         Callable<TextureData> operation = () -> {
-            int zoom = TeraMath.floorToInt(zoomValue);
+            int zoom = TeraMath.floorToInt(zoomSlider.getValue());
             TextureData data = texture.getData();
 
             previewGen.render(data, zoom, progressListener);
@@ -249,6 +243,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     /**
      * This method takes the name of the world selected in the worldsDropdown
      * as String and return the corresponding WorldSetupWrapper object.
+     *
      * @return {@link WorldSetupWrapper} object of the selected world.
      */
     private WorldSetupWrapper findWorldByName() {
@@ -262,11 +257,17 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
 
     /**
      * Sets a unique seed by simply appending the world name with an incrementing number.
+     *
      * @param world {@link WorldSetupWrapper} object whose seed is to be set.
      * @return The seed as a string.
      */
     private String createSeed(String world) {
         return world + seedNumber++;
+    }
+
+    @Override
+    public void onSliderMouseDown(float val) {
+        updatePreview();
     }
 
 }
