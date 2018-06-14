@@ -143,7 +143,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
             description.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    StringBuilder sb = new StringBuilder();
+                    final StringBuilder sb = new StringBuilder();
                     sb.append(translationSystem.translate("${engine:menu#biome-name}: "));
                     sb.append(biome.getId());
                     sb.append('\n');
@@ -180,9 +180,9 @@ public class GameDetailsScreen extends CoreScreenLayer {
                     new ReadOnlyBinding<String>() {
                         @Override
                         public String get() {
-                            List<String> blocks = blockFamilyIds.get(familyName);
-                            if (blocks != null) {
-                                return blocks.stream().sorted().collect(Collectors.joining("\n"));
+                            List<String> blockFamilyNames = blockFamilyIds.get(familyName);
+                            if (blockFamilyNames != null) {
+                                return blockFamilyNames.stream().sorted().collect(Collectors.joining("\n"));
                             }
                             return "";
                         }
@@ -225,31 +225,36 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
     private void setUpGameModules() {
 
-        final Binding<ModuleMetadata> moduleInfoBinding = new ReadOnlyBinding<ModuleMetadata>() {
+        final Binding<ModuleSelectionInfo> moduleInfoBinding = new ReadOnlyBinding<ModuleSelectionInfo>() {
             @Override
-            public ModuleMetadata get() {
+            public ModuleSelectionInfo get() {
                 if (gameModules.getSelection() != null) {
-                    return gameModules.getSelection().getMetadata();
+                    return gameModules.getSelection();
                 }
                 return null;
             }
         };
 
         gameModules.subscribeSelection((widget, moduleSelectionInfo) -> {
-            if (moduleSelectionInfo == null) {
+            if (moduleSelectionInfo == null || moduleSelectionInfo.getMetadata() == null) {
                 return;
             }
             if (description != null) {
                 description.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
-                        ModuleMetadata moduleMetadata = moduleInfoBinding.get();
-                        if (moduleMetadata != null) {
+                        ModuleSelectionInfo moduleSelectionInfo = moduleInfoBinding.get();
+                        if (moduleSelectionInfo != null && moduleSelectionInfo.getMetadata() != null) {
+                            final StringBuilder sb = new StringBuilder();
+                            ModuleMetadata moduleMetadata = moduleSelectionInfo.getMetadata();
+                            if (!moduleSelectionInfo.isValidToSelect()) {
+                                sb.append(translationSystem.translate("${engine:menu#game-details-invalid-module-version-warning}")).append('\n').append('\n');
+                            }
                             String moduleDescription = moduleMetadata.getDescription().toString();
                             if (StringUtils.isBlank(moduleDescription)) {
                                 moduleDescription = translationSystem.translate("${engine:menu#game-details-no-description}");
                             }
-                            StringBuilder sb = new StringBuilder(moduleDescription + '\n' + '\n');
+                            sb.append(moduleDescription).append('\n').append('\n');
                             StringBuilder dependenciesNames;
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && !dependencies.isEmpty()) {
@@ -267,6 +272,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
                             }
 
                             return sb.append(translationSystem.translate("${engine:menu#game-details-version}"))
+                                    .append(" ")
                                     .append(moduleMetadata.getVersion().toString())
                                     .append('\n')
                                     .append('\n')
@@ -286,11 +292,19 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
         gameModules.setItemRenderer(new AbstractItemRenderer<ModuleSelectionInfo>() {
             String getString(ModuleSelectionInfo value) {
-                return value.getMetadata().getDisplayName().toString();
+                if (value.getMetadata() != null) {
+                    return value.getMetadata().getDisplayName().toString();
+                }
+                return "";
             }
 
             @Override
             public void draw(ModuleSelectionInfo value, Canvas canvas) {
+                if (!value.isValidToSelect()) {
+                    canvas.setMode("invalid");
+                } else {
+                    canvas.setMode("available");
+                }
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
@@ -312,7 +326,14 @@ public class GameDetailsScreen extends CoreScreenLayer {
                     Module module = moduleManager.getRegistry().getModule(nameVersion.getName(), nameVersion.getVersion());
                     if (module == null) {
                         logger.warn("Can't find module in your classpath - {}:{}", nameVersion.getName(), nameVersion.getVersion());
-                        return null;
+                        module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
+                        if (module == null) {
+                            logger.error("Can't find any versions of this module {} in your classpath!", nameVersion.getName());
+                            return null;
+                        }
+                        ModuleSelectionInfo latestVersionModule = ModuleSelectionInfo.local(module);
+                        latestVersionModule.setValidToSelect(false);
+                        return latestVersionModule;
                     }
                     return ModuleSelectionInfo.local(module);
                 })

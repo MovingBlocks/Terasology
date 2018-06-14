@@ -320,6 +320,8 @@
                                                         {
                                                             "type": "ScrollableArea",
                                                             "id": "moduleList",
+                                                            "family": "module-list",
+                                                            "skin": "mainmenu",
                                                             "content": {
                                                                 "type": "ColumnLayout",
                                                                 "columns": 1,

@@ -149,6 +149,7 @@
     "game-details-no-description": "game-details-no-description",
     "game-details-version": "game-details-version",
     "game-details-last-play": "game-details-last-play",
+    "game-details-invalid-module-version-warning": "game-details-invalid-module-version-warning",
     "game-name": "game-name",
     "game-settings": "game-settings",
     "game-worlds": "game-worlds",

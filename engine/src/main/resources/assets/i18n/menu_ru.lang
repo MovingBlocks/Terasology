@@ -118,6 +118,7 @@
     "game-details-no-description": "Нет описания.",
     "game-details-version": "Версия:",
     "game-details-last-play": "Последняя игра",
+    "game-details-invalid-module-version-warning": "Предупреждение: manifest.json содержит недопустимую или недоступную версию модуля. Это описание для последней доступной версии модуля в вашем classpath'e.",
     "game-name": "Название сохранения",
     "game-settings": "Настройки",
     "game-worlds": "Мир",
