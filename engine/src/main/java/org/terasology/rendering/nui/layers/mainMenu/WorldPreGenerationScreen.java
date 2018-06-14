@@ -53,9 +53,10 @@ import java.util.stream.Collectors;
  * {@link UniverseSetupScreen}. Each world is still configurable and its seed
  * can be changed by the re-roll button. Note that each world has a unique seed.
  */
-public class WorldPreGenerationScreen extends CoreScreenLayer {
+public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlider.UISliderOnChangeListener {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
+
 
     @In
     private ModuleManager moduleManager;
@@ -114,18 +115,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     public void initialise() {
 
         final UISlider zoomSlider = find("zoomSlider", UISlider.class);
-        zoomSlider.bindValue(new Binding<Float>() {
-            @Override
-            public Float get() {
-                return zoomValue;
-            }
-
-            @Override
-            public void set(Float value) {
-                zoomValue = value;
-                updatePreview();
-            }
-        });
+        zoomSlider.setUiSliderOnChangeListener(this);
 
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         worldsDropdown.bindSelection(new Binding<String>() {
@@ -270,4 +260,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         return world + seedNumber++;
     }
 
+    @Override
+    public void onSliderMouseDown(float val) {
+        updatePreview();
+    }
 }
