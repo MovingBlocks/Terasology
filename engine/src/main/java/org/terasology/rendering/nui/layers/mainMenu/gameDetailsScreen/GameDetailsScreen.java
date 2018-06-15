@@ -48,7 +48,7 @@ import org.terasology.rendering.nui.layers.mainMenu.SelectGameScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIImage;
+import org.terasology.rendering.nui.widgets.UIImageSlideshow;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UITabBox;
@@ -482,10 +482,10 @@ public class GameDetailsScreen extends CoreScreenLayer {
         this.gameInfo = gameInfo;
     }
 
-    public void setPreviewImage(TextureRegion texture) {
-        UIImage previewImage = find("previewImage", UIImage.class);
-        if (previewImage != null) {
-            previewImage.setImage(texture);
+    protected void setPreviewImage(TextureRegion texture) {
+        UIImageSlideshow slider = find("preview", UIImageSlideshow.class);
+        if (slider != null) {
+            slider.addImage(texture);
         }
     }
 }

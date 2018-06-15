@@ -82,8 +82,8 @@
                                 },
                                 "contents": [
                                     {
-                                        "type": "UIImage",
-                                        "id": "previewImage",
+                                        "type": "UIImageSlideshow",
+                                        "id": "preview",
                                         "skin": "framed_image",
                                         "layoutInfo": {
                                             "height": 280,
@@ -103,7 +103,7 @@
                                             "position-horizontal-center": {},
                                             "position-top": {
                                                 "target": "BOTTOM",
-                                                "widget": "previewImage"
+                                                "widget": "preview"
                                             }
                                         }
                                     },
