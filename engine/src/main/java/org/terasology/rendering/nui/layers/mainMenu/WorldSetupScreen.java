@@ -70,12 +70,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
 
-        WidgetUtil.trySubscribe(this, "apply", button -> {
-            triggerBackAnimation();
-        });
-
         WidgetUtil.trySubscribe(this, "close", button -> {
-            world.setWorldConfigurator(oldWorldConfig);
             triggerBackAnimation();
         });
     }
