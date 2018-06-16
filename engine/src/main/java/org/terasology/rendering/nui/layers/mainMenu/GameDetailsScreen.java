@@ -168,6 +168,24 @@ public class GameDetailsScreen extends CoreScreenLayer {
             worldDescription.setVisible(false);
             descriptionContainer.setVisible(true);
         }));
+
+        biomes.setItemRenderer(new AbstractItemRenderer<Biome>() {
+            String getString(Biome biome) {
+                return biome.getName();
+            }
+
+            @Override
+            public void draw(Biome value, Canvas canvas) {
+                canvas.drawText(getString(value), canvas.getRegion());
+            }
+
+            @Override
+            public Vector2i getPreferredSize(Biome biome, Canvas canvas) {
+                String text = getString(biome);
+                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                        canvas.getCurrentStyle().getFont().getLineHeight());
+            }
+        });
     }
 
     private void setUpBlocks() {
