@@ -366,6 +366,8 @@
                                         "contents": [
                                             {
                                                 "type": "ScrollableArea",
+                                                "skin": "mainmenu",
+                                                "family": "biome-list",
                                                 "content": {
                                                     "type": "ColumnLayout",
                                                     "columns": 1,

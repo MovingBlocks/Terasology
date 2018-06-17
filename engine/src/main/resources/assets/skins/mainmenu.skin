@@ -94,6 +94,24 @@
                 }
             }
         },
+        "biome-list": {
+            "elements": {
+                "UIList": {
+                    "parts": {
+                        "item": {
+                            "modes": {
+                                "internal": {
+                                    "text-color": "FFFFFFFF"
+                                },
+                                "external": {
+                                    "text-color": "8B85FFFF"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "description": {
             "elements": {
                 "UILabel": {

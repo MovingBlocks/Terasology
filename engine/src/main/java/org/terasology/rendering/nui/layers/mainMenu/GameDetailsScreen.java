@@ -176,6 +176,11 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(Biome value, Canvas canvas) {
+                if (value.getId().contains("Core:")) {
+                    canvas.setMode("internal");
+                } else {
+                    canvas.setMode("external");
+                }
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
@@ -392,7 +397,10 @@ public class GameDetailsScreen extends CoreScreenLayer {
         if (result.isSuccess()) {
             ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
             BiomeManager biomeManager = new BiomeManager(env, gameInfo.getManifest().getBiomeIdMap());
-            biomes.setList(biomeManager.getBiomes());
+            List<Biome> sortedBiomes = biomeManager.getBiomes().stream()
+                    .sorted(Comparator.comparing(Biome::getName))
+                    .collect(Collectors.toList());
+            biomes.setList(sortedBiomes);
         }
     }
 
