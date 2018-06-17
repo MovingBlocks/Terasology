@@ -59,7 +59,7 @@ public class UISlider extends CoreWidget {
         public void onMouseRelease(NUIMouseReleaseEvent event) {
             active = false;
             if(uiSliderOnChangeTriggeredListener != null) {
-                uiSliderOnChangeTriggeredListener.onSliderMouseDown(getValue());
+                uiSliderOnChangeTriggeredListener.onSliderValueChanged(getValue());
             }
         }
 

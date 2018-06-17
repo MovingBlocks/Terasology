@@ -20,5 +20,5 @@ package org.terasology.rendering.nui.widgets;
  */
 public interface UISliderOnChangeTriggeredListener {
 
-    void onSliderMouseDown(float val);
+    void onSliderValueChanged(float val);
 }

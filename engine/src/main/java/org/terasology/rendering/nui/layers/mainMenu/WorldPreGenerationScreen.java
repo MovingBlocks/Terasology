@@ -267,7 +267,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
     }
 
     @Override
-    public void onSliderMouseDown(float val) {
+    public void onSliderValueChanged(float val) {
         updatePreview();
     }
 
