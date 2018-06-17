@@ -34,6 +34,7 @@ import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.rendering.nui.widgets.UISliderOnChangeTriggeredListener;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.utilities.Assets;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
@@ -53,7 +54,7 @@ import java.util.stream.Collectors;
  * {@link UniverseSetupScreen}. Each world is still configurable and its seed
  * can be changed by the re-roll button. Note that each world has a unique seed.
  */
-public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlider.UISliderOnChangeListener {
+public class WorldPreGenerationScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
 
@@ -117,7 +118,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         zoomSlider = find("zoomSlider", UISlider.class);
         if (zoomSlider != null) {
             zoomSlider.setValue(2f);
-            zoomSlider.setUiSliderOnChangeListener(this);
+            zoomSlider.setUiSliderOnChangeTriggeredListener(this);
         }
 
 
