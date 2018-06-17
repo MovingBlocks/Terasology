@@ -104,11 +104,6 @@
                         "text": "${engine:menu#credits}"
                     },
                     {
-                        "type" : "UIButton",
-                        "id" : "behavioreditor",
-                        "text" : "Behavior Editor"
-                    },
-                    {
                         "type" : "UISpace",
                         "size" : [1, 64]
                     },
