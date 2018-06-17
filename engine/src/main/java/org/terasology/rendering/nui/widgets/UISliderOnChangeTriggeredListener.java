@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 /**
- * A listener
+ * A listener which runs when the value of a {@link UISlider} changes
  */
 public interface UISliderOnChangeTriggeredListener {
 
