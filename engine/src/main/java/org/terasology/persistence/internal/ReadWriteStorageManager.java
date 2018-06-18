@@ -246,11 +246,10 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
     private void waitForCompletionOfPreviousSave() {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
+            recordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
+        }
         if (saveTransaction != null && saveTransaction.getResult() == null) {
-            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
-                System.out.println("Activating ShutdownRequested");
-                recordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
-            }
             saveThreadManager.shutdown(new ShutdownTask(), true);
             saveThreadManager.restart();
         }

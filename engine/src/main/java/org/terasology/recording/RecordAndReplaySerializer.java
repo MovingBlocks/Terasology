@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.math.geom.Vector3f;
 
 import java.io.FileWriter;
 import java.io.FileReader;
@@ -43,17 +44,21 @@ public final class RecordAndReplaySerializer {
     private static final String JSON = ".json";
     private static final String REF_ID_MAP = "/ref_id_map" + JSON;
     private static final String FILE_AMOUNT = "/file_amount" + JSON;
+    private static final String STATE_EVENT_POSITION = "/state_event_position" + JSON;
 
     private EntityManager entityManager;
     private RecordedEventStore recordedEventStore;
     private EntityIdMap entityIdMap;
     private RecordAndReplayUtils recordAndReplayUtils;
+    private CharacterStateEventPositionMap characterStateEventPositionMap;
 
-    public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store, EntityIdMap idMap, RecordAndReplayUtils recordAndReplayUtils) {
+    public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store, EntityIdMap idMap,
+                                     RecordAndReplayUtils recordAndReplayUtils, CharacterStateEventPositionMap characterStateEventPositionMap) {
         this.entityManager = manager;
         this.recordedEventStore = store;
         this.entityIdMap = idMap;
         this.recordAndReplayUtils = recordAndReplayUtils;
+        this.characterStateEventPositionMap = characterStateEventPositionMap;
     }
 
     /**
@@ -65,6 +70,7 @@ public final class RecordAndReplaySerializer {
         Gson gson = new GsonBuilder().create();
         serializeRefIdMap(gson, recordingPath);
         serializeFileAmount(gson, recordingPath);
+        serializeCharacterStateEventPositonMap(gson, recordingPath);
     }
 
     /**
@@ -89,6 +95,7 @@ public final class RecordAndReplaySerializer {
         Gson gson = new GsonBuilder().create();
         deserializeRefIdMap(gson, recordingPath);
         deserializeFileAmount(gson, recordingPath);
+        deserializeCharacterStateEventPositonMap(gson, recordingPath);
     }
 
     /**
@@ -150,8 +157,29 @@ public final class RecordAndReplaySerializer {
         }
     }
 
+    private void serializeCharacterStateEventPositonMap(Gson gson, String recordingPath) {
+        try {
+            JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + STATE_EVENT_POSITION));
+            gson.toJson(characterStateEventPositionMap.getIdToPosition(), HashMap.class, writer);
+            writer.close();
+            characterStateEventPositionMap.reset();
+            logger.info("CharacterStateEvent positions Serialization completed!");
+        } catch (Exception e) {
+            logger.error("Error while serializing CharacterStateEvent positions:", e);
+        }
+    }
 
-
-
+    private void deserializeCharacterStateEventPositonMap(Gson gson, String recordingPath) {
+        try {
+            JsonParser parser = new JsonParser();
+            JsonElement jsonElement = parser.parse(new FileReader(recordingPath + STATE_EVENT_POSITION));
+            Type typeOfHashMap = new TypeToken<HashMap<Integer, Vector3f>>() { }.getType();
+            Map<Integer, Vector3f> previousMap = gson.fromJson(jsonElement, typeOfHashMap);
+            characterStateEventPositionMap.setIdToPosition(previousMap);
+            logger.info("CharacterStateEvent positions Deserialization completed!");
+        } catch (Exception e) {
+            logger.error("Error while deserializing CharacterStateEvent positions:", e);
+        }
+    }
 
 }

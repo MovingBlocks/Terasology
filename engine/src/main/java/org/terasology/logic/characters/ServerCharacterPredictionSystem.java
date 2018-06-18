@@ -35,6 +35,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.recording.CharacterStateEventPositionMap;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.utilities.collection.CircularBuffer;
@@ -68,6 +70,9 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     @In
     private NetworkSystem networkSystem;
+
+    @In
+    private CharacterStateEventPositionMap characterStateEventPositionMap;
 
     private CharacterMover characterMover;
     private Map<EntityRef, CircularBuffer<CharacterStateEvent>> characterStates = Maps.newHashMap();
@@ -126,6 +131,12 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         if (delta < 0) {
             CharacterStateEvent newState = stepState(input, lastState, entity);
             stateBuffer.add(newState);
+
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING)  {
+                newState.setPosition(characterStateEventPositionMap.get(newState.getSequenceNumber()));
+            } else if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+                characterStateEventPositionMap.add(newState.getSequenceNumber(), newState.getPosition());
+            }
 
             characterMovementSystemUtility.setToState(entity, newState);
             lastInputEvent.put(entity, input);

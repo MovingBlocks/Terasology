@@ -58,6 +58,7 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.behavior.nui.BTEditorButton;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.logic.characters.GetMaxSpeedEvent;
 import org.terasology.logic.players.DecreaseViewDistanceButton;
 import org.terasology.logic.players.IncreaseViewDistanceButton;
 import org.terasology.rendering.nui.editor.binds.NUIEditorButton;
@@ -119,6 +120,13 @@ class EventCopier {
             MouseWheelEvent originalEvent = (MouseWheelEvent) e;
             MouseWheelEvent newEvent = new MouseWheelEvent(originalEvent.getMousePosition(), originalEvent.getWheelTurns(), originalEvent.getDelta());
             inputEventSetup(newEvent, originalEvent);
+            return newEvent;
+        } else if (e instanceof GetMaxSpeedEvent) {
+            GetMaxSpeedEvent originalEvent = (GetMaxSpeedEvent) e;
+            GetMaxSpeedEvent newEvent = new GetMaxSpeedEvent(originalEvent.getBaseValue(), originalEvent.getMovementMode());
+            newEvent.setModifiers(originalEvent.getModifiers());
+            newEvent.setMultipliers(originalEvent.getMultipliers());
+            newEvent.setPostModifiers(originalEvent.getPostModifiers());
             return newEvent;
         } else {
             return null;

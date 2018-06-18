@@ -15,11 +15,15 @@
  */
 package org.terasology.recording;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
+import gnu.trove.list.TFloatList;
+import gnu.trove.list.array.TFloatArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.audio.StaticSound;
@@ -36,6 +40,8 @@ import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
 import org.terasology.logic.behavior.nui.BTEditorButton;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.logic.characters.GetMaxSpeedEvent;
+import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.players.DecreaseViewDistanceButton;
 import org.terasology.logic.players.IncreaseViewDistanceButton;
 import org.terasology.math.geom.Vector2i;
@@ -118,6 +124,7 @@ class RecordedEventSerializer {
         typeSerializationLibrary.add(ButtonState.class, new EnumTypeHandler<>(ButtonState.class));
         typeSerializationLibrary.add(Keyboard.Key.class, new EnumTypeHandler<>(Keyboard.Key.class));
         typeSerializationLibrary.add(MouseInput.class, new EnumTypeHandler<>(MouseInput.class));
+        typeSerializationLibrary.add(MovementMode.class, new EnumTypeHandler<>(MovementMode.class));
         this.entityManager = entityManager;
     }
 
@@ -152,6 +159,7 @@ class RecordedEventSerializer {
     private void writeSpecificEventData(JsonWriter writer, Event event) {
         try {
             GsonSerializationContext serializationContext = new GsonSerializationContext(null);
+            Gson gson = new GsonBuilder().create();
             if (event instanceof InputEvent) {
                 InputEvent e = (InputEvent) event;
                 writer.name("delta").value(e.getDelta());
@@ -193,6 +201,18 @@ class RecordedEventSerializer {
                 writer.name("z").value(array.get(2).getAsFloat());
                 writer.endObject();
 
+            } else if (event instanceof GetMaxSpeedEvent) {
+                GetMaxSpeedEvent e = (GetMaxSpeedEvent) event;
+                writer.name("baseValue").value(e.getBaseValue());
+                TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(MovementMode.class);
+                GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getMovementMode(), serializationContext);
+                writer.name("movementMode").value(data.getAsString());
+                writer.name("modifiers");
+                gson.toJson(e.getModifiers(), TFloatArrayList.class, writer);
+                writer.name("multipliers");
+                gson.toJson(e.getMultipliers(), TFloatArrayList.class, writer);
+                writer.name("postModifiers");
+                gson.toJson(e.getPostModifiers(), TFloatArrayList.class, writer);
             } else {
                 logger.error("ERROR: EVENT NOT SUPPORTED FOR SERIALIZATION");
             }
@@ -355,6 +375,7 @@ class RecordedEventSerializer {
 
     private Event deserializeSpecificEventData(JsonObject jsonObject, String clazz) {
         Event result = null;
+        Gson gson = new GsonBuilder().create();
         GsonDeserializationContext deserializationContext = new GsonDeserializationContext(null);
         if (clazz.equals(CameraTargetChangedEvent.class.toString())) {
             EntityRef oldTarget = new RecordedEntityRef(jsonObject.get("OldTarget").getAsLong(), (LowLevelEntityManager) this.entityManager);
@@ -380,6 +401,19 @@ class RecordedEventSerializer {
                     objMoveDirection.get("y").getAsFloat(),
                     objMoveDirection.get("z").getAsFloat());
             result = new CharacterMoveInputEvent(sequenceNumber, pitch, yaw, movementDirection, running, crouching, jumpRequested, delta);
+        } else if (clazz.equals(GetMaxSpeedEvent.class.toString())) {
+            float baseValue = jsonObject.get("baseValue").getAsFloat();
+            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(MovementMode.class);
+            GsonPersistedData data = new GsonPersistedData(jsonObject.get("movementMode"));
+            MovementMode movementMode = (MovementMode) handler.deserialize(data, deserializationContext);
+            TFloatList modifiers = gson.fromJson(jsonObject.get("modifiers"), TFloatArrayList.class);
+            TFloatList multipliers = gson.fromJson(jsonObject.get("multipliers"), TFloatArrayList.class);
+            TFloatList postModifiers = gson.fromJson(jsonObject.get("postModifiers"), TFloatArrayList.class);
+            GetMaxSpeedEvent event = new GetMaxSpeedEvent(baseValue, movementMode);
+            event.setPostModifiers(postModifiers);
+            event.setMultipliers(multipliers);
+            event.setModifiers(modifiers);
+            result = event;
         } else if (getInputEventSpecificType(jsonObject, clazz, deserializationContext) != null) { //input events
             result = getInputEventSpecificType(jsonObject, clazz, deserializationContext);
         }

@@ -44,6 +44,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
+import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
@@ -114,7 +115,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         EntityIdMap entityIdMap = new EntityIdMap();
         recordAndReplayUtils = new RecordAndReplayUtils();
-        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap, recordAndReplayUtils);
+        CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
+        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap, recordAndReplayUtils, characterStateEventPositionMap);
 
 
         esm = new ReadWriteStorageManager(savePath, moduleEnvironment, entityManager, blockManager, biomeManager,
