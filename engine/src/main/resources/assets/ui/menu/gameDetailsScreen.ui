@@ -320,6 +320,8 @@
                                                         {
                                                             "type": "ScrollableArea",
                                                             "id": "moduleList",
+                                                            "family": "module-list",
+                                                            "skin": "mainmenu",
                                                             "content": {
                                                                 "type": "ColumnLayout",
                                                                 "columns": 1,
@@ -364,6 +366,8 @@
                                         "contents": [
                                             {
                                                 "type": "ScrollableArea",
+                                                "skin": "mainmenu",
+                                                "family": "biome-list",
                                                 "content": {
                                                     "type": "ColumnLayout",
                                                     "columns": 1,

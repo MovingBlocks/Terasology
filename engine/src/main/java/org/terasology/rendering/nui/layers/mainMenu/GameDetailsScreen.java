@@ -59,6 +59,7 @@ import org.terasology.world.internal.WorldInfo;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -95,6 +96,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private ScrollableArea worldDescription;
     private ScrollableArea descriptionContainer;
     private Map<String, List<String>> blockFamilyIds;
+    private List<String> errors;
 
     @Override
     public void initialise() {
@@ -123,11 +125,23 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+        errors = new ArrayList<>();
+
         loadGeneralInfo();
         loadGameModules();
         loadBiomes();
         loadBlocks();
         loadGameWorlds();
+
+        if (!errors.isEmpty()) {
+            StringBuilder errorMessageBuilder = new StringBuilder();
+            errors.forEach(error -> errorMessageBuilder
+                    .append('\n')
+                    .append(errors.indexOf(error) + 1)
+                    .append(". ")
+                    .append(error));
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
+        }
 
         tryFind("tabs", UITabBox.class).ifPresent(tabs -> tabs.select(0));
 
@@ -143,7 +157,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
             description.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    StringBuilder sb = new StringBuilder();
+                    final StringBuilder sb = new StringBuilder();
                     sb.append(translationSystem.translate("${engine:menu#biome-name}: "));
                     sb.append(biome.getId());
                     sb.append('\n');
@@ -176,6 +190,11 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(Biome value, Canvas canvas) {
+                if (value.getId().contains("Core:")) {
+                    canvas.setMode("internal");
+                } else {
+                    canvas.setMode("external");
+                }
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
@@ -198,9 +217,9 @@ public class GameDetailsScreen extends CoreScreenLayer {
                     new ReadOnlyBinding<String>() {
                         @Override
                         public String get() {
-                            List<String> blocks = blockFamilyIds.get(familyName);
-                            if (blocks != null) {
-                                return blocks.stream().sorted().collect(Collectors.joining("\n"));
+                            List<String> blockFamilyNames = blockFamilyIds.get(familyName);
+                            if (blockFamilyNames != null) {
+                                return blockFamilyNames.stream().sorted().collect(Collectors.joining("\n"));
                             }
                             return "";
                         }
@@ -243,31 +262,36 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
     private void setUpGameModules() {
 
-        final Binding<ModuleMetadata> moduleInfoBinding = new ReadOnlyBinding<ModuleMetadata>() {
+        final Binding<ModuleSelectionInfo> moduleInfoBinding = new ReadOnlyBinding<ModuleSelectionInfo>() {
             @Override
-            public ModuleMetadata get() {
+            public ModuleSelectionInfo get() {
                 if (gameModules.getSelection() != null) {
-                    return gameModules.getSelection().getMetadata();
+                    return gameModules.getSelection();
                 }
                 return null;
             }
         };
 
         gameModules.subscribeSelection((widget, moduleSelectionInfo) -> {
-            if (moduleSelectionInfo == null) {
+            if (moduleSelectionInfo == null || moduleSelectionInfo.getMetadata() == null) {
                 return;
             }
             if (description != null) {
                 description.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
-                        ModuleMetadata moduleMetadata = moduleInfoBinding.get();
-                        if (moduleMetadata != null) {
+                        ModuleSelectionInfo moduleSelectionInfo = moduleInfoBinding.get();
+                        if (moduleSelectionInfo != null && moduleSelectionInfo.getMetadata() != null) {
+                            final StringBuilder sb = new StringBuilder();
+                            ModuleMetadata moduleMetadata = moduleSelectionInfo.getMetadata();
+                            if (!moduleSelectionInfo.isValidToSelect()) {
+                                sb.append(translationSystem.translate("${engine:menu#game-details-invalid-module-version-warning}")).append('\n').append('\n');
+                            }
                             String moduleDescription = moduleMetadata.getDescription().toString();
                             if (StringUtils.isBlank(moduleDescription)) {
                                 moduleDescription = translationSystem.translate("${engine:menu#game-details-no-description}");
                             }
-                            StringBuilder sb = new StringBuilder(moduleDescription + '\n' + '\n');
+                            sb.append(moduleDescription).append('\n').append('\n');
                             StringBuilder dependenciesNames;
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && !dependencies.isEmpty()) {
@@ -285,6 +309,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
                             }
 
                             return sb.append(translationSystem.translate("${engine:menu#game-details-version}"))
+                                    .append(" ")
                                     .append(moduleMetadata.getVersion().toString())
                                     .append('\n')
                                     .append('\n')
@@ -304,11 +329,19 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
         gameModules.setItemRenderer(new AbstractItemRenderer<ModuleSelectionInfo>() {
             String getString(ModuleSelectionInfo value) {
-                return value.getMetadata().getDisplayName().toString();
+                if (value.getMetadata() != null) {
+                    return value.getMetadata().getDisplayName().toString();
+                }
+                return "";
             }
 
             @Override
             public void draw(ModuleSelectionInfo value, Canvas canvas) {
+                if (!value.isValidToSelect()) {
+                    canvas.setMode("invalid");
+                } else {
+                    canvas.setMode("available");
+                }
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
@@ -330,7 +363,14 @@ public class GameDetailsScreen extends CoreScreenLayer {
                     Module module = moduleManager.getRegistry().getModule(nameVersion.getName(), nameVersion.getVersion());
                     if (module == null) {
                         logger.warn("Can't find module in your classpath - {}:{}", nameVersion.getName(), nameVersion.getVersion());
-                        return null;
+                        module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
+                        if (module == null) {
+                            logger.error("Can't find any versions of this module {} in your classpath!", nameVersion.getName());
+                            return null;
+                        }
+                        ModuleSelectionInfo latestVersionModule = ModuleSelectionInfo.local(module);
+                        latestVersionModule.setValidToSelect(false);
+                        return latestVersionModule;
                     }
                     return ModuleSelectionInfo.local(module);
                 })
@@ -362,7 +402,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private void loadBiomes() {
-        List<Name> moduleIds = gameInfo.getManifest().getModules().stream()
+        List<Biome> biomesList = Collections.emptyList();
+        final List<Name> moduleIds = gameInfo.getManifest().getModules().stream()
                 .map(NameVersion::getName)
                 .collect(Collectors.toCollection(ArrayList::new));
 
@@ -370,9 +411,20 @@ public class GameDetailsScreen extends CoreScreenLayer {
         ResolutionResult result = resolver.resolve(moduleIds);
         if (result.isSuccess()) {
             ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
-            BiomeManager biomeManager = new BiomeManager(env, gameInfo.getManifest().getBiomeIdMap());
-            biomes.setList(biomeManager.getBiomes());
+            BiomeManager biomeManager = null;
+            try {
+                biomeManager = new BiomeManager(env, gameInfo.getManifest().getBiomeIdMap());
+            } catch (Exception ex) {
+                errors.add(translationSystem.translate("${engine:menu#game-details-biomes-error}") + "\n " + ex.getMessage());
+                logger.error("Couldn't load biomes: {}", ex.getMessage());
+            }
+            if (biomeManager != null) {
+                biomesList = biomeManager.getBiomes().stream()
+                        .sorted(Comparator.comparing(Biome::getName))
+                        .collect(Collectors.toList());
+            }
         }
+        biomes.setList(biomesList);
     }
 
     private void loadGameWorlds() {
