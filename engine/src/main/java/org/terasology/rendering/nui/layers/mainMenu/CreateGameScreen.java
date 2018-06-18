@@ -93,6 +93,11 @@ public class CreateGameScreen extends CoreScreenLayer {
 
     private boolean loadingAsServer;
 
+    /**
+     * A UniverseWrapper object used here to determine if the game is single-player or multi-player.
+     */
+    private UniverseWrapper universeWrapper;
+
     @Override
     @SuppressWarnings("unchecked")
     public void initialise() {
@@ -104,7 +109,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    if (loadingAsServer) {
+                    if (isLoadingAsServer()) {
                         return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
                     } else {
                         return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
@@ -272,7 +277,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                         (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
                 gameManifest.addWorld(worldInfo);
 
-                gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
             }
         });
 
@@ -436,11 +441,11 @@ public class CreateGameScreen extends CoreScreenLayer {
     }
 
     public boolean isLoadingAsServer() {
-        return loadingAsServer;
+        return universeWrapper.getLoadingAsServer();
     }
 
-    public void setLoadingAsServer(boolean loadingAsServer) {
-        this.loadingAsServer = loadingAsServer;
+    public void setUniverseWrapper(UniverseWrapper wrapper) {
+        this.universeWrapper = wrapper;
     }
 
     @Override
