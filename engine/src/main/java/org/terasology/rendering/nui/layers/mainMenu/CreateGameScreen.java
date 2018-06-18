@@ -91,11 +91,7 @@ public class CreateGameScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private boolean loadingAsServer;
-
-    /**
-     * A UniverseWrapper object used here to determine if the game is single-player or multi-player.
-     */
+    /** A UniverseWrapper object used here to determine if the game is single-player or multi-player.*/
     private UniverseWrapper universeWrapper;
 
     @Override

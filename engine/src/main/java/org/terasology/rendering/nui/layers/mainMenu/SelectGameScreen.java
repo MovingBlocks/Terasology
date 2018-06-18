@@ -200,8 +200,8 @@ public class SelectGameScreen extends CoreScreenLayer {
         super.onOpened();
 
         if (GameProvider.getSavedGames().isEmpty()) {
-            CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
-            screen.setLoadingAsServer(isLoadingAsServer());
+            NewGameScreen screen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
+            screen.setUniverseWrapper(universeWrapper);
             getManager().pushScreen(screen);
         }
 
