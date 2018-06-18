@@ -25,6 +25,10 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A Gson {@link TypeAdapterFactory} that creates a {@link GsonTypeHandlerAdapter} for each
+ * {@link TypeHandler} registered in the {@link #typeHandlerMap}.
+ */
 public class GsonTypeHandlerAdapterFactory implements TypeAdapterFactory {
     private Map<Class<?>, TypeHandler<?>> typeHandlerMap;
 
@@ -32,10 +36,19 @@ public class GsonTypeHandlerAdapterFactory implements TypeAdapterFactory {
         typeHandlerMap = new HashMap<>();
     }
 
+    /**
+     * Adds a {@link TypeHandler} to the {@link #typeHandlerMap} for the given type.
+     * @param type The {@link Class} of the type.
+     * @param typeHandler The {@link TypeHandler} for the type.
+     */
     public <T> void addTypeHandler(Class<T> type, TypeHandler<T> typeHandler) {
         typeHandlerMap.put(type, typeHandler);
     }
 
+    /**
+     * Returns a boolean stating whether the {@link #typeHandlerMap} contains a type handler for the given type.
+     * @param type The {@link Class} of the given type.
+     */
     public boolean containsTypeHandlerFor(Class<?> type) {
         return typeHandlerMap.containsKey(type);
     }
