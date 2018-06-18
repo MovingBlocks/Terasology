@@ -42,7 +42,8 @@ import java.io.IOException;
  *
  * Since instances of {@link GsonTypeHandlerAdapter} require a {@link Gson} object and a
  * {@link TypeToken}, it is recommended to register {@link GsonTypeHandlerAdapter} type adapters as a
- * type adapter factory via a {@link com.google.gson.TypeAdapterFactory}.
+ * type adapter factory via a {@link com.google.gson.TypeAdapterFactory} like
+ * {@link GsonTypeHandlerAdapterFactory}.
  */
 public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
 
