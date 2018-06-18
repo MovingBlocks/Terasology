@@ -59,6 +59,7 @@ import org.terasology.world.internal.WorldInfo;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -95,6 +96,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private ScrollableArea worldDescription;
     private ScrollableArea descriptionContainer;
     private Map<String, List<String>> blockFamilyIds;
+    private List<String> errors;
 
     @Override
     public void initialise() {
@@ -123,11 +125,23 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+        errors = new ArrayList<>();
+
         loadGeneralInfo();
         loadGameModules();
         loadBiomes();
         loadBlocks();
         loadGameWorlds();
+
+        if (!errors.isEmpty()) {
+            StringBuilder errorMessageBuilder = new StringBuilder();
+            errors.forEach(error -> errorMessageBuilder
+                    .append('\n')
+                    .append(errors.indexOf(error) + 1)
+                    .append(". ")
+                    .append(error));
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
+        }
 
         tryFind("tabs", UITabBox.class).ifPresent(tabs -> tabs.select(0));
 
@@ -388,7 +402,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private void loadBiomes() {
-        List<Name> moduleIds = gameInfo.getManifest().getModules().stream()
+        List<Biome> biomesList = Collections.emptyList();
+        final List<Name> moduleIds = gameInfo.getManifest().getModules().stream()
                 .map(NameVersion::getName)
                 .collect(Collectors.toCollection(ArrayList::new));
 
@@ -396,12 +411,20 @@ public class GameDetailsScreen extends CoreScreenLayer {
         ResolutionResult result = resolver.resolve(moduleIds);
         if (result.isSuccess()) {
             ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
-            BiomeManager biomeManager = new BiomeManager(env, gameInfo.getManifest().getBiomeIdMap());
-            List<Biome> sortedBiomes = biomeManager.getBiomes().stream()
-                    .sorted(Comparator.comparing(Biome::getName))
-                    .collect(Collectors.toList());
-            biomes.setList(sortedBiomes);
+            BiomeManager biomeManager = null;
+            try {
+                biomeManager = new BiomeManager(env, gameInfo.getManifest().getBiomeIdMap());
+            } catch (Exception ex) {
+                errors.add(translationSystem.translate("${engine:menu#game-details-biomes-error}") + "\n " + ex.getMessage());
+                logger.error("Couldn't load biomes: {}", ex.getMessage());
+            }
+            if (biomeManager != null) {
+                biomesList = biomeManager.getBiomes().stream()
+                        .sorted(Comparator.comparing(Biome::getName))
+                        .collect(Collectors.toList());
+            }
         }
+        biomes.setList(biomesList);
     }
 
     private void loadGameWorlds() {

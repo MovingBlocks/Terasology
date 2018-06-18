@@ -119,6 +119,8 @@
     "game-details-version": "Версия:",
     "game-details-last-play": "Последняя игра",
     "game-details-invalid-module-version-warning": "Предупреждение: manifest.json содержит недопустимую или недоступную версию модуля. Это описание для последней доступной версии модуля в вашем classpath'e.",
+    "game-details-errors-message-title": "Возникли ошибки",
+    "game-details-biomes-error": "Не удалось загрузить биомы",
     "game-name": "Название сохранения",
     "game-settings": "Настройки",
     "game-worlds": "Мир",

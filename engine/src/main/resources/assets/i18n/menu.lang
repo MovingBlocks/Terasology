@@ -150,6 +150,8 @@
     "game-details-version": "game-details-version",
     "game-details-last-play": "game-details-last-play",
     "game-details-invalid-module-version-warning": "game-details-invalid-module-version-warning",
+    "game-details-errors-message-title": "game-details-errors-message-title",
+    "game-details-biomes-error": "game-details-biomes-error",
     "game-name": "game-name",
     "game-settings": "game-settings",
     "game-worlds": "game-worlds",
