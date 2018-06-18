@@ -199,4 +199,21 @@ public final class ReflectionUtil {
         return getTypeParameterForSuperInterface(targetClass.getGenericSuperclass(), superClass, index);
     }
 
+    public static Object readField(Object object, String fieldName) {
+        Class<?> cls = object.getClass();
+        for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
+            try {
+                final Field field = c.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                return field.get(object);
+            } catch (final NoSuchFieldException e) {
+                // Try parent
+            } catch (Exception e) {
+                throw new IllegalArgumentException(
+                        "Cannot access field " + cls.getName() + "." + fieldName, e);
+            }
+        }
+        throw new IllegalArgumentException(
+                "Cannot find field " + cls.getName() + "." + fieldName);
+    }
 }
