@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -43,8 +43,9 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.SelectGameScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.ModuleSelectionInfo;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -136,10 +137,10 @@ public class GameDetailsScreen extends CoreScreenLayer {
         if (!errors.isEmpty()) {
             StringBuilder errorMessageBuilder = new StringBuilder();
             errors.forEach(error -> errorMessageBuilder
-                    .append('\n')
                     .append(errors.indexOf(error) + 1)
                     .append(". ")
-                    .append(error));
+                    .append(error)
+                    .append('\n'));
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
         }
 
@@ -284,7 +285,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
                         if (moduleSelectionInfo != null && moduleSelectionInfo.getMetadata() != null) {
                             final StringBuilder sb = new StringBuilder();
                             ModuleMetadata moduleMetadata = moduleSelectionInfo.getMetadata();
-                            if (!moduleSelectionInfo.isValidToSelect()) {
+                            if (moduleSelectionInfo.isLatestVersion()) {
                                 sb.append(translationSystem.translate("${engine:menu#game-details-invalid-module-version-warning}")).append('\n').append('\n');
                             }
                             String moduleDescription = moduleMetadata.getDescription().toString();
@@ -315,7 +316,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
                                     .append('\n')
                                     .append(dependenciesNames.toString()).toString();
                         }
-                        return "";
+                        return "Can't load any details for this module!";
                     }
                 });
             }
@@ -337,10 +338,12 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(ModuleSelectionInfo value, Canvas canvas) {
-                if (!value.isValidToSelect()) {
-                    canvas.setMode("invalid");
+                if (value.isStrictVersion()) {
+                    canvas.setMode("strict");
+                } else if (value.isLatestVersion()) {
+                    canvas.setMode("latest");
                 } else {
-                    canvas.setMode("available");
+                    canvas.setMode("invalid");
                 }
                 canvas.drawText(getString(value), canvas.getRegion());
             }
@@ -355,24 +358,24 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private void loadGameModules() {
-        final List<ModuleSelectionInfo> sortedGameModules = gameInfo.getManifest()
-                .getModules()
-                .stream()
+        final List<ModuleSelectionInfo> sortedGameModules = gameInfo.getManifest().getModules().stream()
                 .sorted(Comparator.comparing(NameVersion::getName))
                 .map(nameVersion -> {
                     Module module = moduleManager.getRegistry().getModule(nameVersion.getName(), nameVersion.getVersion());
-                    if (module == null) {
+                    if (module != null) {
+                        return ModuleSelectionInfo.strictVersion(module);
+                    } else {
                         logger.warn("Can't find module in your classpath - {}:{}", nameVersion.getName(), nameVersion.getVersion());
                         module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
-                        if (module == null) {
-                            logger.error("Can't find any versions of this module {} in your classpath!", nameVersion.getName());
-                            return null;
+                        if (module != null) {
+                            logger.debug("Get the latest available version of module {} in your classpath", nameVersion.getName());
+                            errors.add(String.format("Can't find module %s:%s in your classpath; load description for the latest available version.", nameVersion.getName(), nameVersion.getVersion()));
+                            return ModuleSelectionInfo.latestVersion(module);
                         }
-                        ModuleSelectionInfo latestVersionModule = ModuleSelectionInfo.local(module);
-                        latestVersionModule.setValidToSelect(false);
-                        return latestVersionModule;
+                        logger.error("Can't find any versions of module {} in your classpath!", nameVersion.getName());
+                        errors.add(String.format("Can't find any versions of module %s in your classpath!", nameVersion.getName()));
+                        return ModuleSelectionInfo.unavailableVersion();
                     }
-                    return ModuleSelectionInfo.local(module);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -443,11 +446,11 @@ public class GameDetailsScreen extends CoreScreenLayer {
         blocks.setList(Lists.newArrayList(blockFamilyIds.keySet()));
     }
 
-    protected void setGameInfo(GameInfo gameInfo) {
+    public void setGameInfo(GameInfo gameInfo) {
         this.gameInfo = gameInfo;
     }
 
-    protected void setPreviewImage(TextureRegion texture) {
+    public void setPreviewImage(TextureRegion texture) {
         UIImage previewImage = find("previewImage", UIImage.class);
         if (previewImage != null) {
             previewImage.setImage(texture);

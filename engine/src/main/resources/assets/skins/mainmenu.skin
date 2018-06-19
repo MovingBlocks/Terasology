@@ -87,6 +87,12 @@
                                 },
                                 "invalid": {
                                     "text-color": "FF0000FF"
+                                },
+                                "latest": {
+                                    "text-color": "FFFF33"
+                                },
+                                "strict": {
+                                    "text-color": "FFFFFFFF"
                                 }
                             }
                         }
