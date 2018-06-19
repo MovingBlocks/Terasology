@@ -6,11 +6,9 @@
       "contents": [
           {
               "type": "UIImage",
-              "image": "engine:terasology",
               "id": "title",
               "layoutInfo": {
-                  "width": 512,
-                  "height": 128,
+                  "height": 48,
                   "position-horizontal-center": {},
                   "position-top": {
                       "target": "TOP",
@@ -27,8 +25,8 @@
                   "height": 48,
                   "position-horizontal-center": {},
                   "position-top": {
-                      "target": "BOTTOM",
-                      "widget": "title"
+                      "target": "TOP",
+                      "offset": 48
                   }
               }
           },

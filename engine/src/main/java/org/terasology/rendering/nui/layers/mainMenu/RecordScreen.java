@@ -19,62 +19,36 @@ import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
-import org.terasology.i18n.TranslationSystem;
-import org.terasology.naming.Name;
-import org.terasology.naming.NameVersion;
 import org.terasology.network.NetworkMode;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
-import org.terasology.rendering.assets.texture.AWTTextureFormat;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.utilities.Assets;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.stream.Collectors;
 
 /**
  * Screen for the record menu.
  */
-public class RecordScreen extends CoreScreenLayer {
+public class RecordScreen extends SelectionScreen {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:recordScreen");
-    public static final ResourceUrn PREVIEW_IMAGE_URI = new ResourceUrn("engine:savedGamePreview");
-    public static final ResourceUrn DEFAULT_PREVIEW_IMAGE_URI = new ResourceUrn("engine:defaultPreview");
 
     private static final Logger logger = LoggerFactory.getLogger(RecordScreen.class);
 
-    private UIImage previewImage;
-    private UILabel worldGenerator;
-    private UILabel moduleNames;
     private UIList<GameInfo> gameList;
     private RecordAndReplayUtils recordAndReplayUtils;
-
-
-    @In
-    private Config config;
-
-    @In
-    private TranslationSystem translationSystem;
 
     @Override
     public void initialise() {
@@ -97,8 +71,7 @@ public class RecordScreen extends CoreScreenLayer {
             updateDescription(item);
         });
 
-        worldGenerator = find("worldGenerator", UILabel.class);
-        moduleNames = find("moduleNames", UILabel.class);
+        super.startWorldGeneratorAndModuleNames();
 
         gameList.select(0);
         gameList.subscribe((widget, item) -> loadGame(item));
@@ -117,46 +90,11 @@ public class RecordScreen extends CoreScreenLayer {
         });
     }
 
-    private void updateDescription(GameInfo item) {
-        if (item == null) {
-            worldGenerator.setText("");
-            moduleNames.setText("");
-            loadPreviewImage(null);
-            return;
-        }
-
-        String mainWorldGenerator = item.getManifest()
-                .getWorldInfo(TerasologyConstants.MAIN_WORLD)
-                .getWorldGenerator()
-                .getObjectName()
-                .toString();
-
-        String commaSeparatedModules = item.getManifest()
-                .getModules()
-                .stream()
-                .map(NameVersion::getName)
-                .map(Name::toString)
-                .sorted(String::compareToIgnoreCase)
-                .collect(Collectors.joining(", "));
-
-        worldGenerator.setText(mainWorldGenerator);
-        moduleNames.setText(commaSeparatedModules);
-
-        loadPreviewImage(item);
-    }
-
-    @Override
-    public boolean isLowerLayerVisible() {
-        return false;
-    }
 
     @Override
     public void onOpened() {
         refreshGameList();
         super.onOpened();
-        if (!config.getPlayer().hasEnteredUsername()) {
-            getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
-        }
     }
 
     private void loadGame(GameInfo item) {
@@ -188,24 +126,6 @@ public class RecordScreen extends CoreScreenLayer {
     private void refreshGameList() {
         gameList.setList(GameProvider.getSavedGames());
         gameList.setSelection(null);
-    }
-
-    private void loadPreviewImage(GameInfo item) {
-        Texture texture;
-        if (item != null && item.getPreviewImage() != null) {
-            TextureData textureData = null;
-            try {
-                textureData = AWTTextureFormat.convertToTextureData(item.getPreviewImage(), Texture.FilterMode.LINEAR);
-            } catch( IOException e ) {
-                logger.error("Converting preview image to texture data {} failed", e);
-            }
-            texture = Assets.generateAsset(PREVIEW_IMAGE_URI, textureData, Texture.class);
-        } else {
-            texture = Assets.getTexture(DEFAULT_PREVIEW_IMAGE_URI).get();
-        }
-
-        previewImage = find("previewImage", UIImage.class);
-        previewImage.setImage(texture);
     }
 
     void setRecordAndReplayUtils(RecordAndReplayUtils recordAndReplayUtils) {
