@@ -35,6 +35,7 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
+import org.terasology.math.VectorPools;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
@@ -187,6 +188,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             chunkPos.sub(region.minX(), region.minY(), region.minZ());
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
+            VectorPools.free(chunkPos);
         }
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
     }
@@ -233,6 +235,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             } else {
                 createOrLoadChunk(pos);
             }
+            VectorPools.free(pos);
         }
     }
 
