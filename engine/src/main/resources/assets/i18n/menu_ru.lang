@@ -123,6 +123,7 @@
     "game-details-invalid-module-error": "Предупреждение: Не удается загрузить какие-либо детали для этого модуля!",
     "game-details-errors-message-title": "Возникли ошибки",
     "game-details-biomes-error": "Не удалось загрузить биомы",
+    "game-details-show-errors": "Показать ошибки",
     "game-name": "Название сохранения",
     "game-settings": "Настройки",
     "game-worlds": "Мир",

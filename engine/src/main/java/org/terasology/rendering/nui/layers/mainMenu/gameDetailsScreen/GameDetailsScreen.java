@@ -47,6 +47,7 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.SelectGameScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -121,6 +122,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
             setUpBiomes();
         }
 
+        WidgetUtil.trySubscribe(this, "showErrors", button -> showErrors());
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
 
@@ -135,18 +137,23 @@ public class GameDetailsScreen extends CoreScreenLayer {
         loadGameWorlds();
 
         if (!errors.isEmpty()) {
-            StringBuilder errorMessageBuilder = new StringBuilder();
-            errors.forEach(error -> errorMessageBuilder
-                    .append(errors.indexOf(error) + 1)
-                    .append(". ")
-                    .append(error)
-                    .append('\n'));
-            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
+            showErrors();
         }
 
         tryFind("tabs", UITabBox.class).ifPresent(tabs -> tabs.select(0));
+        tryFind("showErrors", UIButton.class).ifPresent(button -> button.setEnabled(!errors.isEmpty()));
 
         super.onOpened();
+    }
+
+    private void showErrors() {
+        StringBuilder errorMessageBuilder = new StringBuilder();
+        errors.forEach(error -> errorMessageBuilder
+                .append(errors.indexOf(error) + 1)
+                .append(". ")
+                .append(error)
+                .append('\n'));
+        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
     }
 
     private void setUpBiomes() {
@@ -441,7 +448,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
             try {
                 biomeManager = new BiomeManager(env, gameInfo.getManifest().getBiomeIdMap());
             } catch (Exception ex) {
-                errors.add(translationSystem.translate("${engine:menu#game-details-biomes-error}") + "\n " + ex.getMessage());
+                errors.add(translationSystem.translate("${engine:menu#game-details-biomes-error}") + " - " + ex.getMessage());
                 logger.error("Couldn't load biomes: {}", ex.getMessage());
             }
             if (biomeManager != null) {
@@ -449,6 +456,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
                         .sorted(Comparator.comparing(Biome::getName))
                         .collect(Collectors.toList());
             }
+        } else {
+            errors.add(translationSystem.translate("${engine:menu#game-details-biomes-error}"));
         }
         biomes.setList(biomesList);
     }

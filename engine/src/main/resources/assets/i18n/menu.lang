@@ -161,6 +161,7 @@
     "game-details-invalid-module-error": "game-details-invalid-module-error",
     "game-details-errors-message-title": "game-details-errors-message-title",
     "game-details-biomes-error": "game-details-biomes-error",
+    "game-details-show-errors": "game-details-show-errors",
     "game-name": "game-name",
     "game-settings": "game-settings",
     "game-worlds": "game-worlds",

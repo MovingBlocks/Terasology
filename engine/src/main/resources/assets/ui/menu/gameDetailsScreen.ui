@@ -30,7 +30,7 @@
                     },
                     "position-bottom": {
                         "target": "TOP",
-                        "widget": "close",
+                        "widget": "actionButtons",
                         "offset": 8
                     }
                 }
@@ -48,7 +48,7 @@
                     },
                     "position-bottom": {
                         "target": "TOP",
-                        "widget": "close",
+                        "widget": "actionButtons",
                         "offset": 10
                     }
                 },
@@ -282,7 +282,7 @@
                                     },
                                     "position-bottom": {
                                         "target": "TOP",
-                                        "widget": "close",
+                                        "widget": "actionButtons",
                                         "offset": 10
                                     }
                                 },
@@ -464,17 +464,30 @@
                 ]
             },
             {
-                "type": "UIButton",
-                "text": "${engine:menu#back}",
-                "id": "close",
-                "layoutInfo": {
-                    "width": 128,
-                    "height": 32,
-                    "position-horizontal-center": {},
-                    "position-bottom": {
-                        "target": "BOTTOM",
-                        "offset": 30
+                "type": "RowLayout",
+                "id": "actionButtons",
+                "horizontalSpacing": 8,
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#back}",
+                        "id": "close"
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#game-details-show-errors}",
+                        "id": "showErrors",
+                        "enabled": false
                     }
+                ],
+                "layoutInfo": {
+                     "width": 250,
+                     "height": 32,
+                     "position-horizontal-center": {},
+                     "position-bottom": {
+                         "target": "BOTTOM",
+                         "offset": 30
+                     }
                 }
             }
         ]
