@@ -89,7 +89,7 @@
                                     "text-color": "FF0000FF"
                                 },
                                 "latest": {
-                                    "text-color": "FFFF33"
+                                    "text-color": "FFFF00FF"
                                 },
                                 "strict": {
                                     "text-color": "FFFFFFFF"

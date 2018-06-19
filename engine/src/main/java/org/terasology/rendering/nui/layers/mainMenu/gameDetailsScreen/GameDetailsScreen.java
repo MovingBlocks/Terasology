@@ -281,18 +281,35 @@ public class GameDetailsScreen extends CoreScreenLayer {
                 description.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
-                        ModuleSelectionInfo moduleSelectionInfo = moduleInfoBinding.get();
-                        if (moduleSelectionInfo != null && moduleSelectionInfo.getMetadata() != null) {
-                            final StringBuilder sb = new StringBuilder();
-                            ModuleMetadata moduleMetadata = moduleSelectionInfo.getMetadata();
+                        final StringBuilder sb = new StringBuilder();
+                        final ModuleSelectionInfo moduleSelectionInfo = moduleInfoBinding.get();
+
+                        if (moduleSelectionInfo == null) {
+                            return translationSystem.translate("${engine:menu#game-details-invalid-module-error}");
+                        }
+
+                        final ModuleMetadata moduleMetadata = moduleSelectionInfo.getMetadata();
+
+                        if (moduleMetadata != null) {
                             if (moduleSelectionInfo.isLatestVersion()) {
-                                sb.append(translationSystem.translate("${engine:menu#game-details-invalid-module-version-warning}")).append('\n').append('\n');
+                                sb.append(translationSystem.translate("${engine:menu#game-details-invalid-module-version-warning}"))
+                                        .append('\n')
+                                        .append('\n');
+                            }
+                            if (moduleMetadata.getVersion() != null) {
+                                sb.append(translationSystem.translate("${engine:menu#game-details-version}"))
+                                        .append(" ")
+                                        .append(moduleMetadata.getVersion().toString())
+                                        .append('\n')
+                                        .append('\n');
                             }
                             String moduleDescription = moduleMetadata.getDescription().toString();
                             if (StringUtils.isBlank(moduleDescription)) {
                                 moduleDescription = translationSystem.translate("${engine:menu#game-details-no-description}");
                             }
-                            sb.append(moduleDescription).append('\n').append('\n');
+                            sb.append(translationSystem.translate("${engine:menu#game-details-description}"))
+                                    .append(moduleDescription).append('\n').append('\n');
+
                             StringBuilder dependenciesNames;
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && !dependencies.isEmpty()) {
@@ -308,15 +325,19 @@ public class GameDetailsScreen extends CoreScreenLayer {
                                 dependenciesNames = new StringBuilder(translationSystem
                                         .translate("${engine:menu#module-dependencies-empty}") + ".");
                             }
-
-                            return sb.append(translationSystem.translate("${engine:menu#game-details-version}"))
-                                    .append(" ")
-                                    .append(moduleMetadata.getVersion().toString())
-                                    .append('\n')
-                                    .append('\n')
-                                    .append(dependenciesNames.toString()).toString();
+                            return sb.append(dependenciesNames).toString();
                         }
-                        return "Can't load any details for this module!";
+
+                        if (moduleSelectionInfo.isUnavailableVersion()) {
+                            return sb.append(translationSystem.translate("${engine:menu#game-details-invalid-module-error}"))
+                                    .append("\n")
+                                    .append('\n')
+                                    .append(translationSystem.translate("${engine:menu#game-details-version}"))
+                                    .append(" ")
+                                    .append(moduleSelectionInfo.getUnavailableModuleVersion())
+                                    .toString();
+                        }
+                        return translationSystem.translate("${engine:menu#game-details-invalid-module-error}");
                     }
                 });
             }
@@ -332,6 +353,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
             String getString(ModuleSelectionInfo value) {
                 if (value.getMetadata() != null) {
                     return value.getMetadata().getDisplayName().toString();
+                } else if (value.isUnavailableVersion()) {
+                    return value.getUnavailableModuleName();
                 }
                 return "";
             }
@@ -374,7 +397,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
                         }
                         logger.error("Can't find any versions of module {} in your classpath!", nameVersion.getName());
                         errors.add(String.format("Can't find any versions of module %s in your classpath!", nameVersion.getName()));
-                        return ModuleSelectionInfo.unavailableVersion();
+                        return ModuleSelectionInfo.unavailableVersion(nameVersion.getName().toString(), nameVersion.getVersion().toString());
                     }
                 })
                 .filter(Objects::nonNull)
