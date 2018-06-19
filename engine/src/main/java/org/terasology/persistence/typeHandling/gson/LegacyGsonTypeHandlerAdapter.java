@@ -27,11 +27,11 @@ import java.lang.reflect.Type;
 
 /**
  */
-public class JsonTypeHandlerAdapter<T> implements JsonDeserializer<T>, JsonSerializer<T> {
+public class LegacyGsonTypeHandlerAdapter<T> implements JsonDeserializer<T>, JsonSerializer<T> {
 
     private TypeHandler<T> typeHandler;
 
-    public JsonTypeHandlerAdapter(TypeHandler<T> handler) {
+    public LegacyGsonTypeHandlerAdapter(TypeHandler<T> handler) {
         this.typeHandler = handler;
     }
 

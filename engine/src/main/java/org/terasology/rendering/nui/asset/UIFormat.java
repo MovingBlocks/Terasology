@@ -39,7 +39,7 @@ import org.terasology.math.Border;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
-import org.terasology.persistence.typeHandling.gson.JsonTypeHandlerAdapter;
+import org.terasology.persistence.typeHandling.gson.LegacyGsonTypeHandlerAdapter;
 import org.terasology.persistence.typeHandling.mathTypes.BorderTypeHandler;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -106,7 +106,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             .registerTypeAdapter(UIData.class, new UIDataTypeAdapter())
             .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager));
         for (Class<?> handledType : library.getCoreTypes()) {
-            gsonBuilder.registerTypeAdapter(handledType, new JsonTypeHandlerAdapter<>(library.getHandlerFor(handledType)));
+            gsonBuilder.registerTypeAdapter(handledType, new LegacyGsonTypeHandlerAdapter<>(library.getHandlerFor(handledType)));
         }
 
         // override the String TypeAdapter from the serialization library
