@@ -22,6 +22,8 @@ import com.google.gson.reflect.TypeToken;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
+import java.lang.reflect.Type;
+
 /**
  * A Gson {@link TypeAdapterFactory} that dynamically looks up the {@link TypeHandler} from a
  * {@link TypeSerializationLibrary} for each type encountered, and creates a {@link GsonTypeHandlerAdapter} with
@@ -37,7 +39,7 @@ public class GsonTypeSerializationLibraryAdapterFactory implements TypeAdapterFa
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-        Class<? super T> rawType = type.getRawType();
+        Type rawType = type.getType();
 
         TypeHandler<T> typeHandler = (TypeHandler<T>) typeSerializationLibrary.getHandlerFor(rawType);
 
