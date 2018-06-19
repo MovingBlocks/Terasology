@@ -92,7 +92,6 @@
                         {
                             "type": "RowLayout",
                             "id": "AdvanceFilterTitle",
-                            "verticalSpacing": 4,
                             "contents": [
                                 {
                                     "type": "UILabel",

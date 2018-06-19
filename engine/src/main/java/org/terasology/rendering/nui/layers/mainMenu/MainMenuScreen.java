@@ -68,12 +68,17 @@ public class MainMenuScreen extends CoreScreenLayer {
         SelectGameScreen selectScreen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
         RecordScreen recordScreen = getManager().createScreen(RecordScreen.ASSET_URI, RecordScreen.class);
         ReplayScreen replayScreen = getManager().createScreen(ReplayScreen.ASSET_URI, ReplayScreen.class);
+      
+        UniverseWrapper universeWrapper = new UniverseWrapper();
+      
         WidgetUtil.trySubscribe(this, "singleplayer", button -> {
-            selectScreen.setLoadingAsServer(false);
+            universeWrapper.setLoadingAsServer(false);
+            selectScreen.setUniverseWrapper(universeWrapper);
             triggerForwardAnimation(selectScreen);
         });
         WidgetUtil.trySubscribe(this, "multiplayer", button -> {
-            selectScreen.setLoadingAsServer(true);
+            universeWrapper.setLoadingAsServer(true);
+            selectScreen.setUniverseWrapper(universeWrapper);
             triggerForwardAnimation(selectScreen);
         });
         WidgetUtil.trySubscribe(this, "record", button -> {

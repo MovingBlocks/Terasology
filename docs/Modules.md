@@ -96,7 +96,6 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [MedievalCities](https://github.com/Terasology/MedievalCities) - a set of building templates for a medieval era city
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [Minesweeper](https://github.com/Terasology/Minesweeper) - a little game inside a game
-* [Miniion](https://github.com/Terasology/Miniion) - base creature control system, used by MasterOfOreon - old module that has gone through a few redesigns
 * [Minimap](https://github.com/Terasology/Minimap) - a basic minimap. Show/hide with `M` by default and zoom with numpad `-` and `+`
 * [MobileBlocks](https://github.com/Terasology/MobileBlocks) - supports blocks that can move their location based on some directions
 * [ModularComputers](https://github.com/Terasology/ModularComputers) - central module for the creation of computers that themselves can have "hardware modules" of sorts added to them in-game to add interesting functionality

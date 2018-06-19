@@ -65,4 +65,9 @@ public enum CoreBiome implements Biome {
         return temperature;
     }
 
+    @Override
+    public String toString() {
+        return this.name;
+    }
+
 }

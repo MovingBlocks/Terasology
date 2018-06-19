@@ -213,11 +213,20 @@ task createVersionFile(type: Copy) {
     filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
 }
 
+// TODO: This could probably be done more Gradley (engine project resource dir instead of direct path?) and with some variables
+task copyCreditsFile(type: Copy) {
+    description "Copies the credits file into the engine's resource dir where it'll be read at runtime"
+    from "$rootDir/docs"
+    into "$rootDir/engine/src/main/resources"
+    include "Credits.md"
+}
+
 // Main application dist target. Does NOT include any modules.
 task distApp (type: Sync) {
     description = "Creates an application package for distribution"
 
     dependsOn createVersionFile
+    dependsOn copyCreditsFile
     dependsOn rootProject.extractNatives
     dependsOn jar
 
