@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
@@ -32,31 +30,34 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * A widget to display image slideshows
+ * A widget to display image slideshows.
  */
 public class UIImageSlideshow extends CoreWidget {
 
-    private Logger logger = LoggerFactory.getLogger(UIImageSlideshow.class);
-
     private Binding<TextureRegion> currentImage = new DefaultBinding<>();
-
-    private long timestamp = new Date().getTime();
+    private long timestamp = getCurrentTimestamp();
     private boolean active = true;
+    private List<TextureRegion> images = new ArrayList<>();
 
-    @LayoutConfig
+    /**
+     * An index number of current image.
+     */
     private int index = 0;
 
+    /**
+     * A speed of changing images in seconds.
+     */
     @LayoutConfig
-    private int speed = 5; // seconds
+    private int speed = 5;
 
+    /**
+     * Whether the slideshow infinite.
+     */
     @LayoutConfig
     private boolean infinite = true;
 
     @LayoutConfig
     private boolean ignoreAspectRatio;
-
-
-    private List<TextureRegion> images = new ArrayList<>();
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -75,13 +76,15 @@ public class UIImageSlideshow extends CoreWidget {
 
     @Override
     public void update(float delta) {
-
-        if (isActive() && timestamp + speed * 1000 < new Date().getTime()) {
-            timestamp = new Date().getTime();
+        if (isActive() && timestamp + speed * 1000 < getCurrentTimestamp()) {
+            timestamp = getCurrentTimestamp();
             nextImage();
         }
-
         super.update(delta);
+    }
+
+    private static long getCurrentTimestamp() {
+        return new Date().getTime();
     }
 
     private void nextImage() {
