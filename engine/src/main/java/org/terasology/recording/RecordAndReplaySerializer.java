@@ -160,7 +160,7 @@ public final class RecordAndReplaySerializer {
     private void serializeCharacterStateEventPositonMap(Gson gson, String recordingPath) {
         try {
             JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + STATE_EVENT_POSITION));
-            gson.toJson(characterStateEventPositionMap.getIdToPosition(), HashMap.class, writer);
+            gson.toJson(characterStateEventPositionMap.getIdToData(), HashMap.class, writer);
             writer.close();
             characterStateEventPositionMap.reset();
             logger.info("CharacterStateEvent positions Serialization completed!");
@@ -173,9 +173,9 @@ public final class RecordAndReplaySerializer {
         try {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(new FileReader(recordingPath + STATE_EVENT_POSITION));
-            Type typeOfHashMap = new TypeToken<HashMap<Integer, Vector3f>>() { }.getType();
-            Map<Integer, Vector3f> previousMap = gson.fromJson(jsonElement, typeOfHashMap);
-            characterStateEventPositionMap.setIdToPosition(previousMap);
+            Type typeOfHashMap = new TypeToken<HashMap<Integer, Vector3f[]>>() { }.getType();
+            Map<Integer, Vector3f[]> previousMap = gson.fromJson(jsonElement, typeOfHashMap);
+            characterStateEventPositionMap.setIdToData(previousMap);
             logger.info("CharacterStateEvent positions Deserialization completed!");
         } catch (Exception e) {
             logger.error("Error while deserializing CharacterStateEvent positions:", e);

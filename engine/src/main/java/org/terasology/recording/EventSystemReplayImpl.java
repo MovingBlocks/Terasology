@@ -191,40 +191,7 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     @Override
     public void process() {
-
-        //Load recorded events if they were not loaded and if the game is ready to replay.
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING && !this.areRecordedEventsLoaded) {
-            fillRecordedEvents();
-            this.areRecordedEventsLoaded = true;
-            logger.info("Loaded Recorded Events!");
-            replayEventsLoadTime = System.currentTimeMillis();
-        }
-        //If replay is ready, process some recorded events if the time is right.
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
-            processRecordedEvents(1);
-            if (this.recordedEvents.isEmpty()) {
-                if (recordAndReplayUtils.getFileCount() <= recordAndReplayUtils.getFileAmount()) { //Get next recorded events file
-                    String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
-                    recordAndReplaySerializer.deserializeRecordedEvents(recordingPath);
-                    fillRecordedEvents();
-                    this.buffer.append("DESERIALIZATION!\n");
-                } else {
-                    recordedEventStore.popEvents();
-                    RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
-                    System.out.println("Max diff: " + this.maxTimestampDiff);
-                    try {
-                        BufferedWriter writer = new BufferedWriter(new FileWriter(new File("diff_data.txt")));
-                        writer.write(this.buffer.toString());
-                        writer.flush();
-                        writer.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }
-        }
-        //Original process() on EventSystemImpl
+        processRecordedEvents();
         PendingEvent event = pendingEvents.poll();
         while (event != null) {
             if (event.getComponent() != null) {
@@ -236,11 +203,56 @@ public class EventSystemReplayImpl implements EventSystem {
         }
     }
 
+    private void processRecordedEvents() {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING && !this.areRecordedEventsLoaded) {
+            initialiseReplayData();
+        }
+        //If replay is ready, process some recorded events if the time is right.
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+            processRecordedEventsBatch(1);
+            if (this.recordedEvents.isEmpty()) {
+                if (recordAndReplayUtils.getFileCount() <= recordAndReplayUtils.getFileAmount()) { //Get next recorded events file
+                    loadNextRecordedEventFile();
+                } else {
+                    finishReplay();
+                }
+            }
+        }
+    }
+
+    private void finishReplay() {
+        recordedEventStore.popEvents();
+        RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
+        System.out.println("Max diff: " + this.maxTimestampDiff);
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("diff_data.txt")));
+            writer.write(this.buffer.toString());
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadNextRecordedEventFile() {
+        String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
+        recordAndReplaySerializer.deserializeRecordedEvents(recordingPath);
+        fillRecordedEvents();
+        this.buffer.append("DESERIALIZATION!\n");
+    }
+
+    private void initialiseReplayData() {
+        fillRecordedEvents();
+        this.areRecordedEventsLoaded = true;
+        logger.info("Loaded Recorded Events!");
+        replayEventsLoadTime = System.currentTimeMillis();
+    }
+
     /**
      * Try to process recorded events for 'maxDuration' miliseconds. Events are only processed if the time is right.
      * @param maxDuration the amount of time in which this method will try to process recorded events in one go.
      */
-    private void processRecordedEvents(long maxDuration) {
+    private void processRecordedEventsBatch(long maxDuration) {
         long beginTime = System.currentTimeMillis();
         for (RecordedEvent re = recordedEvents.peek(); re != null; re = recordedEvents.peek()) {
             long passedTime = System.currentTimeMillis() - this.replayEventsLoadTime;
@@ -256,7 +268,10 @@ public class EventSystemReplayImpl implements EventSystem {
             // Sends recorded event to be processed
             this.buffer.append("Record - " + re.getTimestamp() + " Replay - " + passedTime);
             this.buffer.append(" Time diff: " + (passedTime - re.getTimestamp()) + " Event: " + re.getEvent().toString() + "\n");
-            if (this.maxTimestampDiff < (passedTime - re.getTimestamp())) this.maxTimestampDiff = passedTime - re.getTimestamp();
+            if (this.maxTimestampDiff < (passedTime - re.getTimestamp())) {
+                this.maxTimestampDiff = passedTime - re.getTimestamp();
+            }
+
             if (re.getComponent() != null) {
                 originalSend(entity, re.getEvent(), re.getComponent());
             } else {
@@ -444,9 +459,7 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     @Override
     public void send(EntityRef entity, Event event) {
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING && isSelectedToReplayEvent(event)) {
-            process(); // the process is responsible for calling the replay methods
-        } else {
+        if (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAYING || !isSelectedToReplayEvent(event)) {
             originalSend(entity, event);
         }
     }
@@ -461,9 +474,7 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING && isSelectedToReplayEvent(event)) {
-            process(); // the process is responsible for calling the replay methods
-        } else {
+        if (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAYING || !isSelectedToReplayEvent(event)) {
             originalSend(entity, event, component);
         }
     }

@@ -50,6 +50,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     public static final int RENDER_DELAY = 100;
     public static final int MAX_INPUT_OVERFLOW = 100;
     public static final int MAX_INPUT_UNDERFLOW = 100;
+    private static final int MAX_INPUT_OVERFLOW_REPLAY_INCREASE = 120;
 
     private static final Logger logger = LoggerFactory.getLogger(ServerCharacterPredictionSystem.class);
 
@@ -126,16 +127,18 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
-
-        float delta = input.getDelta() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW);
+        float delta = input.getDeltaMs() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW + 100);
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+            delta -= MAX_INPUT_OVERFLOW_REPLAY_INCREASE;
+        }
         if (delta < 0) {
             CharacterStateEvent newState = stepState(input, lastState, entity);
             stateBuffer.add(newState);
 
             if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING)  {
-                newState.setPosition(characterStateEventPositionMap.get(newState.getSequenceNumber()));
+                characterStateEventPositionMap.updateCharacterStateEvent(newState);
             } else if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
-                characterStateEventPositionMap.add(newState.getSequenceNumber(), newState.getPosition());
+                characterStateEventPositionMap.add(newState.getSequenceNumber(), newState.getPosition(), newState.getVelocity());
             }
 
             characterMovementSystemUtility.setToState(entity, newState);

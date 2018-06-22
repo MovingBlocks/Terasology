@@ -15,6 +15,7 @@
  */
 package org.terasology.recording;
 
+import org.terasology.logic.characters.CharacterStateEvent;
 import org.terasology.math.geom.Vector3f;
 
 import java.util.HashMap;
@@ -22,30 +23,38 @@ import java.util.Map;
 
 public class CharacterStateEventPositionMap {
 
-    private Map<Integer, Vector3f> idToPosition;
+    private Map<Integer, Vector3f[]> idToData;
 
     public CharacterStateEventPositionMap() {
-        this.idToPosition = new HashMap<>();
+        this.idToData = new HashMap<>();
     }
 
-    public void add(int sequenceNumber, Vector3f position) {
-        Vector3f pos = new Vector3f(position);
-        idToPosition.put(sequenceNumber, pos);
+    public void add(int sequenceNumber, Vector3f position, Vector3f velocity) {
+        Vector3f[] data = new Vector3f[2];
+        data[0] = new Vector3f(position);
+        data[1] = new Vector3f(velocity);
+        idToData.put(sequenceNumber, data);
     }
 
-    public Vector3f get(int sequenceNumber) {
-        return idToPosition.get(sequenceNumber);
+    public Vector3f[] get(int sequenceNumber) {
+        return idToData.get(sequenceNumber);
     }
 
-    Map<Integer, Vector3f> getIdToPosition() {
-        return idToPosition;
+    Map<Integer, Vector3f[]> getIdToData() {
+        return idToData;
     }
 
-    void setIdToPosition(Map<Integer, Vector3f> idToPosition) {
-        this.idToPosition = idToPosition;
+    void setIdToData(Map<Integer, Vector3f[]> idToData) {
+        this.idToData = idToData;
     }
 
     public void reset() {
-        this.idToPosition = new HashMap<>();
+        this.idToData = new HashMap<>();
+    }
+
+    public void updateCharacterStateEvent(CharacterStateEvent event) {
+        Vector3f[] data = this.idToData.get(event.getSequenceNumber());
+        event.setPosition(data[0]);
+        event.setVelocity(data[1]);
     }
 }
