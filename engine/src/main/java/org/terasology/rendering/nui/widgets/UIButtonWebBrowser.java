@@ -18,6 +18,8 @@ package org.terasology.rendering.nui.widgets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -25,7 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * Button with predefined action - open the link in default web browser
+ * Button with predefined action - open the link in default web browser.
  */
 public class UIButtonWebBrowser extends UIButton {
 
@@ -33,11 +35,30 @@ public class UIButtonWebBrowser extends UIButton {
 
     private String link = "";
 
+    private Binding<Boolean> confirmed = new DefaultBinding<>();
+
+    private Runnable confirmationProcess;
+
     public UIButtonWebBrowser() {
         this.subscribe(openInDefaultBrowser);
     }
 
-    private ActivateEventListener openInDefaultBrowser = button -> {
+    /**
+     *  Does confirmation and activates default action.
+     */
+    public void doConfirmation() {
+        confirmed.set(true);
+        openInDefaultBrowser.onActivated(this);
+    }
+
+    private final ActivateEventListener openInDefaultBrowser = button -> {
+        if (!hasConfirmation()) {
+            logger.debug("You don't have confirmation for opening web browser");
+            if (confirmationProcess != null) {
+                confirmationProcess.run();
+            }
+            return;
+        }
         if (Desktop.isDesktopSupported()) {
             Desktop desktop = Desktop.getDesktop();
             try {
@@ -68,5 +89,13 @@ public class UIButtonWebBrowser extends UIButton {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public boolean hasConfirmation() {
+        return confirmed.get() != null && confirmed.get();
+    }
+
+    public void setConfirmationHandler(Runnable runnable) {
+        confirmationProcess = runnable;
     }
 }
