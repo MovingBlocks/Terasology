@@ -30,7 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * A widget to display image slideshows.
+ * This widget displays images in sequence in an image slideshow.
  */
 public class UIImageSlideshow extends CoreWidget {
 
@@ -40,12 +40,12 @@ public class UIImageSlideshow extends CoreWidget {
     private List<TextureRegion> images = new ArrayList<>();
 
     /**
-     * An index number of current image.
+     * Index of current image.
      */
     private int index = 0;
 
     /**
-     * A speed of changing images in seconds.
+     * Speed of slideshow (in seconds).
      */
     @LayoutConfig
     private int speed = 5;
