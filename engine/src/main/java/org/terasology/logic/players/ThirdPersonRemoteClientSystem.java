@@ -123,9 +123,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     public void setRemotePlayersHeldItemMountPointTranslations(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         for (EntityRef remotePlayer : entityManager.getEntitiesWith(RemotePersonHeldItemMountPointComponent.class)) {
             RemotePersonHeldItemMountPointComponent remoteMountPointComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
-            if (remoteMountPointComponent != null) {
-                remoteMountPointComponent.translate.set(x, y, z);
-            }
+            remoteMountPointComponent.translate.set(x, y, z);
         }
     }
 
@@ -133,19 +131,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     public void setRemotePlayersHeldItemMountPointRotations(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         for (EntityRef remotePlayer : entityManager.getEntitiesWith(RemotePersonHeldItemMountPointComponent.class)) {
             RemotePersonHeldItemMountPointComponent remoteMountPointComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
-            if (remoteMountPointComponent != null) {
-                remoteMountPointComponent.rotateDegrees.set(x, y, z);
-            }
-        }
-    }
-
-    @Command(shortDescription = "Sets the held item mount point scale for remote characters")
-    public void setRemotePlayersHeldItemMountPointScale(@CommandParam("scale") float scale) {
-        for (EntityRef remotePlayer : entityManager.getEntitiesWith(RemotePersonHeldItemMountPointComponent.class)) {
-            RemotePersonHeldItemMountPointComponent remoteMountPointComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
-            if (remoteMountPointComponent != null) {
-                remoteMountPointComponent.scale = scale;
-            }
+            remoteMountPointComponent.rotateDegrees.set(x, y, z);
         }
     }
 
