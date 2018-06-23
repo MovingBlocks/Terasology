@@ -399,7 +399,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
                         module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
                         if (module != null) {
                             logger.debug("Get the latest available version of module {} in your classpath", nameVersion.getName());
-                            errors.add(String.format("Can't find module %s:%s in your classpath; load description for the latest available version.", nameVersion.getName(), nameVersion.getVersion()));
+                            errors.add(String.format("Can't find module %s:%s in your classpath; loaded description for the latest available version.", nameVersion.getName(), nameVersion.getVersion()));
                             return ModuleSelectionInfo.latestVersion(module);
                         }
                         logger.error("Can't find any versions of module {} in your classpath!", nameVersion.getName());
