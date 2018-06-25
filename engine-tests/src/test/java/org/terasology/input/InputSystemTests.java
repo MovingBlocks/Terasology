@@ -75,7 +75,8 @@ public class InputSystemTests {
     }
 
     private void setUpLocalPlayer(Context context) {
-        LocalPlayer localPlayer = new LocalPlayer(new EntityIdMap());
+        LocalPlayer localPlayer = new LocalPlayer();
+        localPlayer.setEntityIdMap(new EntityIdMap());
         clientEntity = mock(EntityRef.class);
         ClientComponent clientComponent = new ClientComponent();
         characterEntity = mock(EntityRef.class);

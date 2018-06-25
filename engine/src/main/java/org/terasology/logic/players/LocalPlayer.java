@@ -30,6 +30,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.recording.EntityIdMap;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.CoreRegistry;
 
 public class LocalPlayer {
@@ -38,8 +39,8 @@ public class LocalPlayer {
     private int nextActivationId;
     private EntityIdMap entityIdMap;
 
-    public LocalPlayer(EntityIdMap entityIdMap) {
-        this.entityIdMap = entityIdMap;
+    public LocalPlayer() {
+
     }
 
     // TODO: As per Immortius answer in Pull Request #1088,
@@ -51,13 +52,19 @@ public class LocalPlayer {
     public void setClientEntity(EntityRef entity) {
 
         //Gets the client ids for record and replay
-        this.entityIdMap.add("client", entity.getId());
+        if (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.NOT_ACTIVATED) {
+            this.entityIdMap.add("client", entity.getId());
+        }
         this.clientEntity = entity;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         if (clientComp != null) {
             clientComp.local = true;
             entity.saveComponent(clientComp);
         }
+    }
+
+    public void setEntityIdMap(EntityIdMap entityIdMap) {
+        this.entityIdMap = entityIdMap;
     }
 
     public EntityRef getClientEntity() {
@@ -171,7 +178,7 @@ public class LocalPlayer {
      * @param usedOwnedEntity an entity owned by the player like an item.
      *
      */
-    void activateOwnedEntityAsClient(EntityRef usedOwnedEntity) {
+    public void activateOwnedEntityAsClient(EntityRef usedOwnedEntity) {
         if (!usedOwnedEntity.exists()) {
             return;
         }

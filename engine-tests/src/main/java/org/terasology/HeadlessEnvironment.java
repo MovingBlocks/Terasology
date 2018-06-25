@@ -124,7 +124,7 @@ public class HeadlessEnvironment extends Environment {
      *
      * @param modules a set of module names that should be loaded (latest version)
      */
-    HeadlessEnvironment(Name... modules) {
+    public HeadlessEnvironment(Name... modules) {
         super(modules);
     }
 

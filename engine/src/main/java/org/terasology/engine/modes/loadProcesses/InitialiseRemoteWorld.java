@@ -59,7 +59,8 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     public boolean step() {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        LocalPlayer localPlayer = new LocalPlayer(context.get(EntityIdMap.class));
+        LocalPlayer localPlayer = new LocalPlayer();
+        localPlayer.setEntityIdMap(context.get(EntityIdMap.class));
         context.put(LocalPlayer.class, localPlayer);
         BlockManager blockManager = context.get(BlockManager.class);
 

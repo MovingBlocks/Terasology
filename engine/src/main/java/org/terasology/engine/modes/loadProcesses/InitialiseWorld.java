@@ -161,7 +161,9 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.put(WorldRenderer.class, worldRenderer);
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        context.put(LocalPlayer.class, new LocalPlayer(context.get(EntityIdMap.class)));
+        LocalPlayer localPlayer = new LocalPlayer();
+        localPlayer.setEntityIdMap(context.get(EntityIdMap.class));
+        context.put(LocalPlayer.class, new LocalPlayer());
         context.put(Camera.class, worldRenderer.getActiveCamera());
 
         return true;
