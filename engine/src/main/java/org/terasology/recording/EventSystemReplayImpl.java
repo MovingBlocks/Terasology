@@ -223,7 +223,7 @@ public class EventSystemReplayImpl implements EventSystem {
     private void finishReplay() {
         recordedEventStore.popEvents();
         RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
-        System.out.println("Max diff: " + this.maxTimestampDiff);
+        //System.out.println("Max diff: " + this.maxTimestampDiff);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(new File("diff_data.txt")));
             writer.write(this.buffer.toString());
