@@ -19,10 +19,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,7 +74,8 @@ public final class GameProvider {
                 try {
                     if (!info.getTitle().isEmpty()) {
                         Date date = new Date(world.getKey().toMillis());
-                        result.add(new GameInfo(info, date));
+                        BufferedImage image = getSavedGamePreviewImage(world.getValue());
+                        result.add(new GameInfo(info, date, image));
                     }
                 } catch (NullPointerException npe) {
                     logger.error("The save file was corrupted for: " + world.toString() + ". The manifest can be found and restored at: " + gameManifest.toString(), npe);
@@ -79,6 +85,19 @@ public final class GameProvider {
             }
         }
         return result;
+    }
+
+    private static BufferedImage getSavedGamePreviewImage(Path path) {
+        Path previewImagePath = path.resolve(TerasologyConstants.DEFAULT_GAME_PREVIEW_IMAGE_NAME);
+        if (!previewImagePath.toFile().exists()) {
+            return null;
+        }
+        try (InputStream in = new BufferedInputStream(Files.newInputStream(previewImagePath))) {
+            return ImageIO.read(in);
+        } catch (IOException ex) {
+            logger.warn("Can't load an image", ex);
+        }
+        return null;
     }
 
 }

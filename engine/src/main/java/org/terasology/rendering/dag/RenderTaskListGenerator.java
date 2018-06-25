@@ -114,7 +114,7 @@ public final class RenderTaskListGenerator {
             if (node.isEnabled()) {
                 if (logger.isInfoEnabled()) {
                     // Marker tasks just add a dividing line to the logger output
-                    taskList.add(new MarkerTask(node.getClass().getSimpleName()));
+                    taskList.add(new MarkerTask(node.getUri() + " (" + node.getClass().getSimpleName() + ")"));
                     enabledNodes++; // we count them only for statistical purposes
                     potentialTasks += 2 * node.getDesiredStateChanges().size() + 1;
                 }

@@ -87,6 +87,30 @@
                                 },
                                 "invalid": {
                                     "text-color": "FF0000FF"
+                                },
+                                "latest": {
+                                    "text-color": "FFFF00FF"
+                                },
+                                "strict": {
+                                    "text-color": "FFFFFFFF"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "biome-list": {
+            "elements": {
+                "UIList": {
+                    "parts": {
+                        "item": {
+                            "modes": {
+                                "internal": {
+                                    "text-color": "FFFFFFFF"
+                                },
+                                "external": {
+                                    "text-color": "8B85FFFF"
                                 }
                             }
                         }

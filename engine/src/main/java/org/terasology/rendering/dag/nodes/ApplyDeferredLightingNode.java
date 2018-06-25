@@ -43,7 +43,9 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 public class ApplyDeferredLightingNode extends AbstractNode {
     private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL_URN = new ResourceUrn("engine:prog.lightBufferPass");
 
-    public ApplyDeferredLightingNode(Context context) {
+    public ApplyDeferredLightingNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
 
@@ -74,7 +76,7 @@ public class ApplyDeferredLightingNode extends AbstractNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Actual Node Processing
 

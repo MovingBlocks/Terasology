@@ -140,12 +140,17 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
-    private float parallaxBias = 0.05f;
+    private float parallaxBias = 0.25f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.50f)
-    private float parallaxScale = 0.05f;
+    private float parallaxScale = 0.5f;
 
-    public RefractiveReflectiveBlocksNode(Context context) {
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f sunDirection;
+
+    public RefractiveReflectiveBlocksNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
         worldProvider = context.get(WorldProvider.class);
@@ -187,10 +192,10 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
 
         if (normalMappingIsEnabled) {
             addDesiredStateChange(setTerrainNormalsInputTexture);
+        }
 
-            if (parallaxMappingIsEnabled) {
-                addDesiredStateChange(setTerrainHeightInputTexture);
-            }
+        if (parallaxMappingIsEnabled) {
+            addDesiredStateChange(setTerrainHeightInputTexture);
         }
     }
 
@@ -206,15 +211,18 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/RefractiveReflectiveBlocks");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
 
         // Common Shader Parameters
 
+        sunDirection = backdropProvider.getSunDirection(false);
+
         chunkMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
         chunkMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
         chunkMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+        chunkMaterial.setFloat3("sunVec", sunDirection, true);
 
         // Specific Shader Parameters
 
@@ -229,10 +237,10 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
         chunkMaterial.setInt("texSceneOpaque", 6, true);
         if (normalMappingIsEnabled) {
             chunkMaterial.setInt("textureAtlasNormal", 7, true);
-            if (parallaxMappingIsEnabled) {
-                chunkMaterial.setInt("textureAtlasHeight", 8, true);
-                chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
-            }
+        }
+        if (parallaxMappingIsEnabled) {
+            chunkMaterial.setInt("textureAtlasHeight", 8, true);
+            chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
         }
 
         chunkMaterial.setFloat4("lightingSettingsFrag", 0, 0, waterSpecExp, 0, true);
@@ -297,25 +305,17 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
                 normalMappingIsEnabled = renderingConfig.isNormalMapping();
                 if (normalMappingIsEnabled) {
                     addDesiredStateChange(setTerrainNormalsInputTexture);
-                    if (parallaxMappingIsEnabled) {
-                        addDesiredStateChange(setTerrainHeightInputTexture);
-                    }
                 } else {
                     removeDesiredStateChange(setTerrainNormalsInputTexture);
-                    if (parallaxMappingIsEnabled) {
-                        removeDesiredStateChange(setTerrainHeightInputTexture);
-                    }
                 }
                 break;
 
             case RenderingConfig.PARALLAX_MAPPING:
-                if (normalMappingIsEnabled) {
-                    parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
-                    if (parallaxMappingIsEnabled) {
-                        addDesiredStateChange(setTerrainHeightInputTexture);
-                    } else {
-                        removeDesiredStateChange(setTerrainHeightInputTexture);
-                    }
+                parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
+                if (parallaxMappingIsEnabled) {
+                    addDesiredStateChange(setTerrainHeightInputTexture);
+                } else {
+                    removeDesiredStateChange(setTerrainHeightInputTexture);
                 }
                 break;
 

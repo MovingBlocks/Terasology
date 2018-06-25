@@ -784,6 +784,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     private void processRemovedClient(Client client) {
         if (client instanceof NetClient) {
+            ServerConnectListManager serverConnectListManager = context.get(ServerConnectListManager.class);
+            if (!serverConnectListManager.isClientAllowedToConnect(client.getId())) {
+                return;
+            }
             NetClient netClient = (NetClient) client;
             netClientList.remove(netClient);
         }
@@ -796,9 +800,17 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     private void processNewClient(NetClient client) {
+        ServerConnectListManager serverConnectListManager = context.get(ServerConnectListManager.class);
+        if (!serverConnectListManager.isClientAllowedToConnect(client.getId())) {
+            String errorMessage = serverConnectListManager.getErrorMessage(client.getId());
+            client.send(NetData.NetMessage.newBuilder().setServerInfo(getServerInfoMessage(errorMessage)).build());
+            forceDisconnect(client);
+            // reset kicked status so the next connection is set correctly
+            kicked = false;
+            return;
+        }
+
         client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
-        // log after connect so that the name has been set:
-        logger.info("New client connected: {}", client.getName());
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
                 NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
         clientList.add(client);
@@ -807,6 +819,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         connectClient(client);
 
+        // log after connect so that the name has been set:
         logger.info("New client entity: {}", client.getEntity());
         for (EntityRef netEntity : entityManager.getEntitiesWith(NetworkComponent.class)) {
             NetworkComponent netComp = netEntity.getComponent(NetworkComponent.class);
@@ -832,6 +845,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     NetData.ServerInfoMessage getServerInfoMessage() {
+        return getServerInfoMessage(null);
+    }
+
+    private NetData.ServerInfoMessage getServerInfoMessage(String errorMessage) {
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
         serverInfoMessageBuilder.setTime(time.getGameTimeInMs());
         if (config.getServerMOTD() != null) {
@@ -847,7 +864,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         WorldGenerator worldGen = context.get(WorldGenerator.class);
         if (worldGen != null) {
-            serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel());
+            serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel() + 0.5f);
         }
         for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
             if (!StandardModuleExtension.isServerSideOnly(module)) {
@@ -867,6 +884,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         for (BlockFamily registeredBlockFamily : blockManager.listRegisteredBlockFamilies()) {
             serverInfoMessageBuilder.addRegisterBlockFamily(registeredBlockFamily.getURI().toString());
+        }
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            serverInfoMessageBuilder.setErrorMessage(errorMessage);
         }
         serializeComponentInfo(serverInfoMessageBuilder);
         serializeEventInfo(serverInfoMessageBuilder);

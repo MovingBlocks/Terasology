@@ -24,6 +24,7 @@ import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.block.ForceBlockActive;
 
@@ -67,4 +68,7 @@ public class SkeletalMeshComponent implements VisualComponent {
 
     public Vector3f scale = new Vector3f(1, 1, 1);
     public Vector3f translate = new Vector3f();
+
+    @Replicate
+    public Color color = Color.WHITE;
 }

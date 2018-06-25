@@ -104,8 +104,8 @@
                         "text": "${engine:menu#credits}"
                     },
                     {
-                        "type": "UISpace",
-                        "size": [1, 64]
+                        "type" : "UISpace",
+                        "size" : [1, 64]
                     },
                     {
                         "type": "UIButton",

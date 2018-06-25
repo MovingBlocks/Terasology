@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,12 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Collections;
 import java.util.List;
 
-/**
- */
 @API
 public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
 
@@ -49,17 +48,17 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
     }
 
     public boolean isFreeform() {
-        return getData().getFamilyFactory().isFreeformSupported();
+        return BlockFamilyRegistry.isFreeformSupported(getData().getBlockFamily());
     }
 
     public BlockFamily createFamily(BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(!isFreeform());
-        return getData().getFamilyFactory().createBlockFamily(this, blockBuilderHelper);
+        return BlockFamilyRegistry.createFamily(getData().getBlockFamily(), this, blockBuilderHelper);
     }
 
     public BlockFamily createFamily(BlockShape shape, BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(isFreeform());
-        return getData().getFamilyFactory().createBlockFamily(this, shape, blockBuilderHelper);
+        return BlockFamilyRegistry.createFamily(getData().getBlockFamily(), this, shape, blockBuilderHelper);
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  */
 package org.terasology.world.block;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.linearmath.Transform;
+import org.terasology.math.Transform;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.physics.shapes.CollisionShape;
 import com.google.common.collect.Maps;
 
+import org.terasology.math.Rotation;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -26,7 +28,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.VecMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
@@ -49,16 +50,14 @@ import java.util.Optional;
 
 /**
  * Stores all information for a specific block type.
- *
  */
 public final class Block {
 
     // TODO: Use directional light(s) when rendering instead of this
     private static final Map<BlockPart, Float> DIRECTION_LIT_LEVEL = Maps.newEnumMap(BlockPart.class);
 
-    /**
-     * Init. the LUTs.
-     */
+
+     // Initialize the LUTs
     static {
         DIRECTION_LIT_LEVEL.put(BlockPart.TOP, 0.9f);
         DIRECTION_LIT_LEVEL.put(BlockPart.BOTTOM, 0.9f);
@@ -73,8 +72,7 @@ public final class Block {
     private BlockUri uri;
     private String displayName = "Untitled block";
     private BlockFamily family;
-    // TODO: Remove this and replace with the rotation applied to the block
-    private Side direction = Side.FRONT;
+    private Rotation rotation = Rotation.none();
 
     /* PROPERTIES */
 
@@ -112,6 +110,8 @@ public final class Block {
     // Physics
     private float mass = 10;
     private boolean debrisOnDestroy = true;
+    private float friction = 0.5f;
+    private float restitution = 0.0f;
 
     // Entity integration
     private Prefab prefab;
@@ -174,12 +174,16 @@ public final class Block {
         this.family = value;
     }
 
-    public void setDirection(Side direction) {
-        this.direction = direction;
+    public void setRotation(Rotation rotation) {
+        this.rotation = rotation;
+    }
+
+    public Rotation getRotation() {
+        return rotation;
     }
 
     public Side getDirection() {
-        return direction;
+        return rotation.rotate(Side.FRONT);
     }
 
     /**
@@ -386,6 +390,7 @@ public final class Block {
 
     /**
      * Check can a block attach in the side of this block
+     *
      * @param side The side of attaching
      * @return False if this block is not allowed attachment or the side of this block is not full side
      */
@@ -470,6 +475,7 @@ public final class Block {
 
     /**
      * Indestructible if hardness is 0
+     *
      * @param hardness how much damage it takes to destroy the block, indestructible if hardness is 0
      */
     public void setHardness(int hardness) {
@@ -519,6 +525,22 @@ public final class Block {
 
     public void setMass(float mass) {
         this.mass = mass;
+    }
+
+    public float getFriction() {
+        return friction;
+    }
+
+    public void setFriction(float friction) {
+        this.friction = friction;
+    }
+
+    public float getRestitution() {
+        return restitution;
+    }
+
+    public void setRestitution(float restitution) {
+        this.restitution = restitution;
     }
 
     public BlockColorSource getColorSource(BlockPart part) {
@@ -617,18 +639,14 @@ public final class Block {
 
     /**
      * Set the collision box for the block
+     *
      * @param offset The offset to the block's center
-     * @param shape The shape of collision box
+     * @param shape  The shape of collision box
      */
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        Transform t = new Transform(new javax.vecmath.Matrix4f(new javax.vecmath.Quat4f(0, 0, 0, 1), VecMath.to(offset), 1.0f));
-        javax.vecmath.Vector3f min = new javax.vecmath.Vector3f();
-        javax.vecmath.Vector3f max = new javax.vecmath.Vector3f();
-        shape.getAabb(t, min, max);
-
-        bounds = AABB.createMinMax(VecMath.from(min), VecMath.from(max));
+        bounds = shape.getAABB(new Transform(offset, new Quat4f(0, 0, 0, 1), 1.0f));
     }
 
     public CollisionShape getCollisionShape() {

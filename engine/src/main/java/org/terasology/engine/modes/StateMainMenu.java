@@ -68,6 +68,7 @@ public class StateMainMenu implements GameState {
 
     private String messageOnLoad = "";
 
+
     public StateMainMenu() {
     }
 
@@ -197,8 +198,8 @@ public class StateMainMenu implements GameState {
         updateUserInterface(delta);
 
         eventSystem.process();
-
         storageServiceWorker.flushNotificationsToConsole(console);
+
     }
 
     @Override

@@ -63,12 +63,23 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private final long timeoutThreshold = 10000;
     private Channel channel;
 
+    /**
+     * Initialises: network system, join status, and module manager.
+     * @param joinStatus
+     * @param networkSystem
+     */
     public ClientConnectionHandler(JoinStatusImpl joinStatus, NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
         this.joinStatus = joinStatus;
+        // TODO: implement translation of errorMessage in messageReceived once context is available
+        // See https://github.com/MovingBlocks/Terasology/pull/3332#discussion_r187081375
         this.moduleManager = CoreRegistry.get(ModuleManager.class);
     }
 
+    /**
+     * Sets timeout threshold, if client exceeds this time during connection it will automatically close the channel.
+     * @param inputChannel Socket for connections to allow I/O.
+     */
     private void scheduleTimeout(Channel inputChannel) {
         channel = inputChannel;
         timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
@@ -98,6 +109,15 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
         // Handle message
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+        String errorMessage = message.getServerInfo().getErrorMessage();
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            synchronized (joinStatus) {
+                joinStatus.setErrorMessage(errorMessage);
+                ctx.getChannel().close();
+                return;
+            }
+        }
+
         synchronized (joinStatus) {
             timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
             if (message.hasServerInfo()) {
@@ -118,6 +138,11 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
+    /**
+     * Attempts to receive a module from the server and push it to the client. Creates a file on the target machine and begins preparation to write to it.
+     * @param channelHandlerContext
+     * @param moduleDataHeader
+     */
     private void receiveModuleStart(ChannelHandlerContext channelHandlerContext,
             NetData.ModuleDataHeader moduleDataHeader) {
         if (receivingModule != null) {
@@ -158,6 +183,12 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
+    /**
+     * Converts file size to a string in either bytes, KB, or MB. Dependant on the files size.
+     * @param size Size of the file.
+     * @return String of the file size in either bytes or KB or MB.
+     */
+
     private String getSizeString(long size) {
         if (size < 1024) {
             return size + " bytes";
@@ -168,6 +199,11 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
+    /**
+     * Converts the modules data to a byte array and writes it to a file, which then is copied from the temp directory to the correct directory.
+     * @param channelHandlerContext
+     * @param moduleData The data of the module.
+     */
     private void receiveModule(ChannelHandlerContext channelHandlerContext, NetData.ModuleData moduleData) {
         if (receivingModule == null) {
             joinStatus.setErrorMessage("Module download error");
@@ -215,6 +251,11 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
+    /**
+     * Passes the join complete message to the client, and marks the entities joining as successful.
+     * @param channelHandlerContext
+     * @param joinComplete
+     */
     private void completeJoin(ChannelHandlerContext channelHandlerContext, NetData.JoinCompleteMessage joinComplete) {
         logger.info("Join complete received");
         server.setClientId(joinComplete.getClientId());
@@ -224,6 +265,11 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         joinStatus.setComplete();
     }
 
+    /**
+     * Gets the server information and passes it to the client, while also checking if all required modules have been downloaded.
+     * @param channelHandlerContext
+     * @param message Passes the server information message to the function.
+     */
     private void receivedServerInfo(ChannelHandlerContext channelHandlerContext, NetData.ServerInfoMessage message) {
         logger.info("Received server info");
         ((EngineTime) CoreRegistry.get(Time.class)).setGameTime(message.getTime());
@@ -251,6 +297,10 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
+    /**
+     * Sends a join request from the client upstream to the server.
+     * @param channelHandlerContext
+     */
     private void sendJoin(ChannelHandlerContext channelHandlerContext) {
         Config config = CoreRegistry.get(Config.class);
         NetData.JoinMessage.Builder bldr = NetData.JoinMessage.newBuilder();
@@ -263,6 +313,10 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(bldr).build());
     }
 
+    /**
+     * Gets the clients Join Status
+     * @return Returns join status.
+     */
     public JoinStatus getJoinStatus() {
         synchronized (joinStatus) {
             return joinStatus;

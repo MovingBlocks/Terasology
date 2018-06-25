@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.shapes;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
+import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;

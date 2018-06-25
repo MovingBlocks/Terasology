@@ -2,11 +2,11 @@
  * Torches catch on fire and stuff. On purpose!
  */
 {
-    "rotation": "attachedToSurface",
+    "family": "attachedToSurface",
     "sides": {
         "shape": "TorchWall"
     },
-    "top": {
+    "topBottom": {
         "shape": "TorchGrounded"
     },
     "penetrable": true,

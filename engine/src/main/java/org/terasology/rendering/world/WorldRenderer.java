@@ -17,9 +17,11 @@ package org.terasology.rendering.world;
 
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
+import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 /**
@@ -33,15 +35,33 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
  * If this is the first time you look into this interface, you might want to start with
  * the update and render methods as they are central to a rendering implementation.
  */
+@API
 public interface WorldRenderer {
     float BLOCK_LIGHT_POW = 0.96f;
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 0.7f;
 
+    /**
+     * @return the number of seconds since last frame, as a float number.
+     */
     float getSecondsSinceLastFrame();
 
+    /**
+     * Returns a Material instance corresponding to the asset identified by the input parameter.
+     *
+     * @param assetId a String uniquely identifying a Material.
+     * @return a Material instance.
+     */
     Material getMaterial(String assetId);
 
+    /**
+     * Informs the caller whether the renderer is in the first or second rendering stage of the current frame.
+     *
+     * In Stereo mode the first rendering stage corresponds to the rendering of the scene for the LEFT eye.
+     * In Mono mode this method always returns True as there is only one rendering stage.
+     *
+     * @return a boolean: True if it is the first rendering stage of the current frame, False otherwise.
+     */
     boolean isFirstRenderingStageForCurrentFrame();
 
     /**
@@ -218,4 +238,18 @@ public interface WorldRenderer {
      */
     // TODO: transform this to return an object or a map. Consumers would then take care of formatting.
     String getMetrics();
+
+    /***
+     * Returns the RenderGraph.
+     *
+     * This object is used by Engine and Modules to add/remove Nodes to/from the rendering process.
+     *
+     * Nodes encapsulate the rendering functionality of the renderer. A node might provide a basic rendering
+     * of the landscape, another might add deferred lighting to it while another might add tone mapping
+     * to the resulting 2d image. Arbitrary features and effects can be added or removed by adding or removing
+     * nodes to the graph and connecting them appropriately with other nodes.
+     *
+     * @return the RenderGraph containing the nodes used by the rendering process.
+     */
+    RenderGraph getRenderGraph();
 }

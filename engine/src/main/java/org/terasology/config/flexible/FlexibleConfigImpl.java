@@ -18,11 +18,11 @@ package org.terasology.config.flexible;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
@@ -35,9 +35,16 @@ import java.util.Map;
 public class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final String DESCRIPTION_PROPERTY_NAME = "description";
 
     private final Map<SimpleUri, Setting> settings = Maps.newHashMap();
     private final Map<SimpleUri, String> temporarilyParkedSettings = Maps.newHashMap();
+
+    private final String description;
+
+    public FlexibleConfigImpl(String description) {
+        this.description = description;
+    }
 
     /**
      * {@inheritDoc}
@@ -55,7 +62,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         }
 
         if (temporarilyParkedSettings.containsKey(id)) {
-            setting.setValueFromString(temporarilyParkedSettings.remove(id));
+            setting.setValueFromJson(temporarilyParkedSettings.remove(id));
         }
 
         settings.put(id, setting);
@@ -105,13 +112,20 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     }
 
     @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
     public void save(Writer writer) {
         JsonObject jsonObject = new JsonObject();
+
+        jsonObject.addProperty(DESCRIPTION_PROPERTY_NAME, description);
 
         for (Map.Entry<SimpleUri, Setting> entry : settings.entrySet()) {
             Setting setting = entry.getValue();
             if (!setting.getValue().equals(setting.getDefaultValue())) {
-                jsonObject.addProperty(entry.getKey().toString(), setting.getValue().toString());
+                jsonObject.add(entry.getKey().toString(), setting.getValueAsJson());
             }
         }
 
@@ -125,16 +139,19 @@ public class FlexibleConfigImpl implements FlexibleConfig {
 
     @Override
     public void load(Reader reader) {
-        try (JsonReader jsonReader = new JsonReader(reader)) {
-            jsonReader.beginObject();
+        try {
+            JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
 
-            while (jsonReader.hasNext()) {
-                SimpleUri id = new SimpleUri(jsonReader.nextName());
-                String value = jsonReader.nextString();
-                temporarilyParkedSettings.put(id, value);
+            for (Map.Entry<String, JsonElement> jsonEntry : jsonObject.entrySet()) {
+                if (jsonEntry.getKey().equals(DESCRIPTION_PROPERTY_NAME)) {
+                    continue;
+                }
+
+                SimpleUri id = new SimpleUri(jsonEntry.getKey());
+                String valueJson = jsonEntry.getValue().toString();
+                temporarilyParkedSettings.put(id, valueJson);
             }
 
-            jsonReader.endObject();
         } catch (Exception e) {
             throw new RuntimeException("Error parsing config file!");
         }

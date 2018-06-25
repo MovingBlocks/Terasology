@@ -32,14 +32,11 @@ import org.terasology.math.geom.SpiralIterable;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.ColorComponent;
-import org.terasology.physics.shapes.BoxShapeComponent;
-import org.terasology.physics.shapes.CapsuleShapeComponent;
-import org.terasology.physics.shapes.CylinderShapeComponent;
-import org.terasology.physics.shapes.HullShapeComponent;
-import org.terasology.physics.shapes.SphereShapeComponent;
-import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.physics.components.shapes.BoxShapeComponent;
+import org.terasology.physics.components.shapes.CapsuleShapeComponent;
+import org.terasology.physics.components.shapes.CylinderShapeComponent;
+import org.terasology.physics.components.shapes.HullShapeComponent;
+import org.terasology.physics.components.shapes.SphereShapeComponent;
 import org.terasology.world.WorldProvider;
 
 import java.util.Optional;
@@ -78,14 +75,6 @@ public class PlayerFactory {
 
         builder.getComponent(LocationComponent.class).setWorldPosition(spawnPosition);
         builder.setOwner(controller);
-
-        ClientComponent clientComp = controller.getComponent(ClientComponent.class);
-        if (clientComp != null) {
-            ColorComponent colorComp = clientComp.clientInfo.getComponent(ColorComponent.class);
-
-            MeshComponent meshComp = builder.getComponent(MeshComponent.class);
-            meshComp.color = colorComp.color;
-        }
 
         CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);
         playerComponent.controller = controller;

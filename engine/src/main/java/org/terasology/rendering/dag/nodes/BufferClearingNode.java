@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.context.Context;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.opengl.BaseFBOsManager;
@@ -45,7 +46,8 @@ public class BufferClearingNode extends AbstractNode {
      *                      Non GL_*_BIT values will be accepted but might eventually generate an opengl error.
      * @throws IllegalArgumentException if fboConfig, fboManager are null and if clearingMask is zero.
      */
-    public BufferClearingNode(FBOConfig fboConfig, BaseFBOsManager fboManager, int clearingMask) {
+    public BufferClearingNode(String nodeUri, Context context, FBOConfig fboConfig, BaseFBOsManager fboManager, int clearingMask) {
+        super(nodeUri, context);
 
         boolean argumentsAreValid = validateArguments(fboConfig, fboManager, clearingMask);
 
@@ -58,7 +60,9 @@ public class BufferClearingNode extends AbstractNode {
         }
     }
 
-    public BufferClearingNode(FBO fbo, int clearingMask) {
+    public BufferClearingNode(String nodeUri, Context context, FBO fbo, int clearingMask) {
+        super(nodeUri, context);
+
         boolean argumentsAreValid = validateArguments(fbo, clearingMask);
 
         if (argumentsAreValid) {
@@ -67,7 +71,6 @@ public class BufferClearingNode extends AbstractNode {
         } else {
             throw new IllegalArgumentException("Illegal argument(s): see the log for details.");
         }
-
     }
 
 

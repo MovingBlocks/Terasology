@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.world.block.internal;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -69,6 +68,7 @@ public class BlockManagerImpl extends BlockManager {
 
     private Set<BlockRegistrationListener> listeners = Sets.newLinkedHashSet();
 
+
     private boolean generateNewIds;
     private AtomicInteger nextId = new AtomicInteger(1);
 
@@ -81,8 +81,8 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     public BlockManagerImpl(WorldAtlas atlas,
-            AssetManager assetManager,
-            boolean generateNewIds) {
+                            AssetManager assetManager,
+                            boolean generateNewIds) {
         this.generateNewIds = generateNewIds;
         this.assetManager = assetManager;
         this.blockBuilder = new BlockBuilder(atlas);
@@ -252,6 +252,11 @@ public class BlockManagerImpl extends BlockManager {
                         block.setId(getNextId());
                     }
                     registerFamily(newFamily.get());
+
+                } catch (Exception ex) {
+                    // A family can fail to register if the block is missing uri or list of categories,
+                    // but can fail to register if the family throws an error for any reason
+                    logger.error("Failed to register block familiy '{}'", newFamily, ex);
                 } finally {
                     lock.unlock();
                 }
@@ -364,5 +369,4 @@ public class BlockManagerImpl extends BlockManager {
             this.idByUri = new TObjectShortHashMap<>(oldState.idByUri);
         }
     }
-
 }

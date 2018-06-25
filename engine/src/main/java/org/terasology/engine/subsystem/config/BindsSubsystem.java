@@ -1,4 +1,18 @@
-
+/*
+ * Copyright 2018 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.engine.subsystem.config;
 
 import com.google.common.collect.Lists;
@@ -19,6 +33,7 @@ import org.terasology.input.BindableButton;
 import org.terasology.input.ControllerInput;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.Input;
+import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
@@ -107,10 +122,10 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     }
 
     @Override
-    public void preInitialise(Context context) {
-        this.context = context;
-        bindsConfiguration = context.get(BindsConfiguration.class);
-        context.put(BindsManager.class, this);
+    public void preInitialise(Context passedContext) {
+        context = passedContext;
+        bindsConfiguration = passedContext.get(BindsConfiguration.class);
+        passedContext.put(BindsManager.class, this);
     }
 
     @Override
@@ -130,8 +145,8 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         updateDefaultBinds(context, bindsConfiguration);
     }
 
-    private void updateDefaultBinds(Context context, BindsConfiguration config) {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
+    private void updateDefaultBinds(Context passedContext, BindsConfiguration config) {
+        ModuleManager moduleManager = passedContext.get(ModuleManager.class);
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).isCodeModule()) {
@@ -382,6 +397,37 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         context.get(Config.class).save();
     }
 
+    /**
+     * Enumerates all active input bindings for a given binding.
+     * TODO: Restored for API reasons, may be duplicating code elsewhere. Should be reviewed
+     * @param bindId the ID
+     * @return a list of keyboard/mouse inputs that trigger the binding.
+     */
+    public List<Input> getInputsForBindButton(SimpleUri bindId) {
+        List<Input> inputs = Lists.newArrayList();
+        for (Map.Entry<Integer, BindableButton> entry : keyBinds.entrySet()) {
+            if (entry.getValue().getId().equals(bindId)) {
+                inputs.add(InputType.KEY.getInput(entry.getKey()));
+            }
+        }
+
+        for (Map.Entry<MouseInput, BindableButton> entry : mouseButtonBinds.entrySet()) {
+            if (entry.getValue().getId().equals(bindId)) {
+                inputs.add(entry.getKey());
+            }
+        }
+
+        if (mouseWheelUpBind.getId().equals(bindId)) {
+            inputs.add(MouseInput.WHEEL_UP);
+        }
+
+        if (mouseWheelDownBind.getId().equals(bindId)) {
+            inputs.add(MouseInput.WHEEL_DOWN);
+        }
+
+        return inputs;
+    }
+
     protected static class BindsConfigAdapter implements BindsConfiguration {
 
         private BindsConfig bindsConfig;
@@ -411,7 +457,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         }
 
         @Override
-        public void setBinds(SimpleUri bindUri, Input ... inputs) {
+        public void setBinds(SimpleUri bindUri, Input... inputs) {
             bindsConfig.setBinds(bindUri, inputs);
         }
 

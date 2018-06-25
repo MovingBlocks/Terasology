@@ -9,5 +9,6 @@
     "colorSource": "foliage_lut",
     "debrisOnDestroy": false,
     "waving": true,
-    "mass": 8
+    "mass": 8,
+    "sounds": "Core:leaf"
 }

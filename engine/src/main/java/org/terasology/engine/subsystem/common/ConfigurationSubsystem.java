@@ -58,7 +58,8 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         FlexibleConfigManager flexibleConfigManager = new FlexibleConfigManagerImpl();
         rootContext.put(FlexibleConfigManager.class, flexibleConfigManager);
 
-        FlexibleConfig renderingFlexibleConfig = new FlexibleConfigImpl();
+        // TODO: Update rendering config description
+        FlexibleConfig renderingFlexibleConfig = new FlexibleConfigImpl("Rendering Config");
         flexibleConfigManager.addConfig(new SimpleUri("engine:rendering"), renderingFlexibleConfig);
 
         flexibleConfigManager.loadAllConfigs();

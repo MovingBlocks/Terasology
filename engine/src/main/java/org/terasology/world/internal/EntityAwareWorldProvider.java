@@ -156,6 +156,18 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
+    public EntityRef setPermanentBlockEntity(Vector3i blockPosition, EntityRef blockEntity) {
+        if (GameThread.isCurrentThread()) {
+            EntityRef oldEntity = getExistingBlockEntityAt(blockPosition);
+            blockEntityLookup.put(blockPosition, blockEntity);
+            temporaryBlockEntities.remove(blockEntity);
+            return oldEntity;
+        }
+        logger.error("Attempted to set block entity off-thread");
+        return EntityRef.NULL;
+    }
+
+    @Override
     public EntityRef getExistingBlockEntityAt(Vector3i blockPosition) {
         if (GameThread.isCurrentThread()) {
             EntityRef result = blockEntityLookup.get(blockPosition);

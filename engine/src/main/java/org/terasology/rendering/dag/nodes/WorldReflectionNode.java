@@ -41,12 +41,10 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO_URI;
@@ -67,11 +65,10 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
-public class WorldReflectionNode extends ConditionDependentNode implements PropertyChangeListener {
+public class WorldReflectionNode extends ConditionDependentNode {
     private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;
-    private WorldRenderer worldRenderer;
     private BackdropProvider backdropProvider;
     private WorldProvider worldProvider;
 
@@ -88,10 +85,10 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
-    private float parallaxBias = 0.05f;
+    private float parallaxBias = 0.25f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.50f)
-    private float parallaxScale = 0.05f;
+    private float parallaxScale = 0.5f;
 
     /**
      * Constructs an instance of this class.
@@ -102,14 +99,13 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
      *
      * This method also requests the material using the "chunk" shaders (vertex, fragment) to be enabled.
      */
-    public WorldReflectionNode(Context context) {
-        super(context);
+    public WorldReflectionNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
         worldProvider = context.get(WorldProvider.class);
 
-        worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new ReflectedCamera(activeCamera)); // this has to go before the LookThrough state change
         addDesiredStateChange(new LookThrough(activeCamera));
@@ -160,7 +156,7 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/worldReflection");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
@@ -178,13 +174,13 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
         chunkMaterial.setInt("textureLava", 2, true);
         if (isNormalMapping) {
             chunkMaterial.setInt("textureAtlasNormal", 3, true);
-            if (isParallaxMapping) {
-                chunkMaterial.setInt("textureAtlasHeight", 4, true);
-                chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
-            }
+        }
+        if (isParallaxMapping) {
+            chunkMaterial.setInt("textureAtlasHeight", 4, true);
+            chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
         }
 
-        chunkMaterial.setFloat("clip", 0.0f, true);
+        chunkMaterial.setFloat("clip", activeCamera.getReflectionHeight(), true);
 
         // Actual Node Processing
 
@@ -222,38 +218,29 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
 
         switch (propertyName) {
             case RenderingConfig.REFLECTIVE_WATER:
-                requiresCondition(() -> renderingConfig.isReflectiveWater());
                 break;
 
             case RenderingConfig.NORMAL_MAPPING:
                 isNormalMapping = renderingConfig.isNormalMapping();
                 if (isNormalMapping) {
                     addDesiredStateChange(setNormalTerrain);
-                    if (isParallaxMapping) {
-                        addDesiredStateChange(setHeightTerrain);
-                    }
                 } else {
                     removeDesiredStateChange(setNormalTerrain);
-                    if (isParallaxMapping) {
-                        removeDesiredStateChange(setHeightTerrain);
-                    }
                 }
                 break;
 
             case RenderingConfig.PARALLAX_MAPPING:
                 isParallaxMapping = renderingConfig.isParallaxMapping();
-                if (isNormalMapping) {
-                    if (isParallaxMapping) {
-                        addDesiredStateChange(setHeightTerrain);
-                    } else {
-                        removeDesiredStateChange(setHeightTerrain);
-                    }
+                if (isParallaxMapping) {
+                    addDesiredStateChange(setHeightTerrain);
+                } else {
+                    removeDesiredStateChange(setHeightTerrain);
                 }
                 break;
 
             // default: no other cases are possible - see subscribe operations in initialize().
         }
 
-        worldRenderer.requestTaskListRefresh();
+        super.propertyChange(event);
     }
 }

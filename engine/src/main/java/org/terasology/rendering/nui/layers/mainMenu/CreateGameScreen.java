@@ -30,6 +30,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.input.Keyboard;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
@@ -37,12 +38,15 @@ import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
@@ -87,7 +91,8 @@ public class CreateGameScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private boolean loadingAsServer;
+    /** A UniverseWrapper object used here to determine if the game is single-player or multi-player.*/
+    private UniverseWrapper universeWrapper;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -100,7 +105,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    if (loadingAsServer) {
+                    if (isLoadingAsServer()) {
                         return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
                     } else {
                         return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
@@ -109,9 +114,8 @@ public class CreateGameScreen extends CoreScreenLayer {
             });
         }
 
-
-        final UIText worldName = find("worldName", UIText.class);
-        setGameName(worldName);
+        final UIText gameName = find("gameName", UIText.class);
+        setGameName(gameName);
 
         final UIText seed = find("seed", UIText.class);
         if (seed != null) {
@@ -140,6 +144,13 @@ public class CreateGameScreen extends CoreScreenLayer {
             public String getString(Module value) {
                 return value.getMetadata().getDisplayName().value();
             }
+
+            @Override
+            public void draw(Module value, Canvas canvas) {
+                canvas.getCurrentStyle().setTextColor(validateModuleDependencies(value.getId()) ? Color.WHITE : Color.RED);
+                super.draw(value, canvas);
+                canvas.getCurrentStyle().setTextColor(Color.WHITE);
+            }
         });
 
         UILabel gameplayDescription = find("gameplayDescription", UILabel.class);
@@ -152,7 +163,6 @@ public class CreateGameScreen extends CoreScreenLayer {
                 } else {
                     return "";
                 }
-
             }
         });
 
@@ -178,7 +188,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             worldGenerator.bindSelection(new Binding<WorldGeneratorInfo>() {
                 @Override
                 public WorldGeneratorInfo get() {
-                    // get the default generator from the config.  This is likely to have  a user triggered selection.
+                    // get the default generator from the config. This is likely to have a user triggered selection.
                     WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
                     if (info != null && getAllEnabledModuleNames().contains(info.getUri().getModuleName())) {
                         return info;
@@ -211,10 +221,28 @@ public class CreateGameScreen extends CoreScreenLayer {
                     return "";
                 }
             });
+
+            final UIButton playButton = find("play", UIButton.class);
+            playButton.bindEnabled(new Binding<Boolean>() {
+                @Override
+                public Boolean get() {
+                    return validateModuleDependencies(gameplay.getSelection().getId());
+                }
+
+                @Override
+                public void set(Boolean value) {
+                    playButton.setEnabled(value);
+                }
+            });
         }
 
-
-        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            triggerBackAnimation();
+            // get back to main screen if no saved games
+            if (!isSavedGamesExist()) {
+                triggerBackAnimation();
+            }
+        });
 
         WidgetUtil.trySubscribe(this, "play", button -> {
             if (worldGenerator.getSelection() == null) {
@@ -225,7 +253,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             } else {
                 GameManifest gameManifest = new GameManifest();
 
-                gameManifest.setTitle(worldName.getText());
+                gameManifest.setTitle(gameName.getText());
                 gameManifest.setSeed(seed.getText());
                 DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
                 ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
@@ -240,12 +268,12 @@ public class CreateGameScreen extends CoreScreenLayer {
                     gameManifest.addModule(module.getId(), module.getVersion());
                 }
 
-                float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
+                float timeOffset = 0.25f + 0.025f; // Time at dawn + little offset to spawn in a brighter env.
                 WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
                         (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
                 gameManifest.addWorld(worldInfo);
 
-                gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
             }
         });
 
@@ -278,8 +306,8 @@ public class CreateGameScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
-        final UIText worldName = find("worldName", UIText.class);
-        setGameName(worldName);
+        final UIText gameName = find("gameName", UIText.class);
+        setGameName(gameName);
 
         final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
 
@@ -315,8 +343,8 @@ public class CreateGameScreen extends CoreScreenLayer {
         }
     }
 
-    private void setGameName(UIText worldName) {
-        if (worldName != null) {
+    private void setGameName(UIText gameName) {
+        if (gameName != null) {
             int gameNum = 1;
             for (GameInfo info : GameProvider.getSavedGames()) {
                 if (info.getManifest().getTitle().startsWith(DEFAULT_GAME_NAME_PREFIX)) {
@@ -329,7 +357,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                 }
             }
 
-            worldName.setText(DEFAULT_GAME_NAME_PREFIX + gameNum);
+            gameName.setText(DEFAULT_GAME_NAME_PREFIX + gameNum);
         }
     }
 
@@ -351,6 +379,11 @@ public class CreateGameScreen extends CoreScreenLayer {
                 recursivelyAddModuleDependencies(modules, dependencyInfo.getId());
             }
         }
+    }
+
+    private boolean validateModuleDependencies(Name moduleName) {
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        return resolver.resolve(moduleName).isSuccess();
     }
 
     private void setSelectedGameplayModule(Module module) {
@@ -404,15 +437,32 @@ public class CreateGameScreen extends CoreScreenLayer {
     }
 
     public boolean isLoadingAsServer() {
-        return loadingAsServer;
+        return universeWrapper.getLoadingAsServer();
     }
 
-    public void setLoadingAsServer(boolean loadingAsServer) {
-        this.loadingAsServer = loadingAsServer;
+    public void setUniverseWrapper(UniverseWrapper wrapper) {
+        this.universeWrapper = wrapper;
     }
 
     @Override
     public boolean isLowerLayerVisible() {
+        return false;
+    }
+
+    private boolean isSavedGamesExist() {
+        return !GameProvider.getSavedGames().isEmpty();
+    }
+
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE && isEscapeToCloseAllowed()) {
+            triggerBackAnimation();
+            if (!isSavedGamesExist()) {
+                // get back to main screen
+                triggerBackAnimation();
+            }
+            return true;
+        }
         return false;
     }
 }

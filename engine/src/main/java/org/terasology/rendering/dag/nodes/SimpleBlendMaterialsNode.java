@@ -50,7 +50,9 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 public class SimpleBlendMaterialsNode extends AbstractNode {
     private ComponentSystemManager componentSystemManager;
 
-    public SimpleBlendMaterialsNode(Context context) {
+    public SimpleBlendMaterialsNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         componentSystemManager = context.get(ComponentSystemManager.class);
 
         Camera playerCamera = context.get(WorldRenderer.class).getActiveCamera();
@@ -88,7 +90,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/simpleBlendMaterials");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderAlphaBlend();

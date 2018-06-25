@@ -17,9 +17,11 @@ package org.terasology.entitySystem.entity;
 
 import com.google.common.base.Objects;
 import org.terasology.entitySystem.MutableComponentContainer;
+import org.terasology.entitySystem.entity.internal.EntityScope;
 import org.terasology.entitySystem.entity.internal.NullEntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 
 /**
  * A wrapper around an entity id providing access to common functionality
@@ -83,13 +85,49 @@ public abstract class EntityRef implements MutableComponentContainer {
      * not relevant
      *
      * @param alwaysRelevant
+     * @deprecated replaced by {{@link #setScope(EntityScope)}}
      */
+    @Deprecated
     public abstract void setAlwaysRelevant(boolean alwaysRelevant);
 
     /**
      * @return The owning entity of this entity
      */
     public abstract EntityRef getOwner();
+
+    /**
+     * Sets the scope of the entity
+     *
+     * @param scope the new scope for the entity
+     */
+    public void setScope(EntityScope scope) {
+    }
+
+    /**
+     * Sets the scope of this entity to sector-scope, and sets the {@link SectorSimulationComponent#unloadedMaxDelta}
+     * and {@link SectorSimulationComponent#loadedMaxDelta} to the same given value.
+     *
+     * @param maxDelta the maximum delta for the sector-scope entity (loaded and unloaded)
+     */
+    public void setSectorScope(long maxDelta) {
+    }
+
+    /**
+     * Sets the scope of this entity to sector-scope, and sets the {@link SectorSimulationComponent#unloadedMaxDelta}
+     * and {@link SectorSimulationComponent#loadedMaxDelta} to the given values.
+     *
+     * @param unloadedMaxDelta the maximum unloaded delta for the sector-scope entity
+     * @param loadedMaxDelta the maximum loaded delta for the sector-scope entity
+     */
+    public void setSectorScope(long unloadedMaxDelta, long loadedMaxDelta) {
+    }
+
+    /**
+     * @return the scope of the entity
+     */
+    public EntityScope getScope() {
+        return null;
+    }
 
     /**
      * Sets the entity that owns this entity.
@@ -123,5 +161,11 @@ public abstract class EntityRef implements MutableComponentContainer {
     @Override
     public final int hashCode() {
         return Objects.hashCode(getId());
+    }
+
+    /**
+     * Invalidates this EntityRef
+     */
+    public void invalidate() {
     }
 }

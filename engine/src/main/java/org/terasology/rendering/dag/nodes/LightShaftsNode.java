@@ -81,8 +81,8 @@ public class LightShaftsNode extends ConditionDependentNode {
     @SuppressWarnings("FieldCanBeLocal")
     private Vector4f sunPositionScreenSpace = new Vector4f();
 
-    public LightShaftsNode(Context context) {
-        super(context);
+    public LightShaftsNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         backdropProvider = context.get(BackdropProvider.class);
         activeCamera = context.get(WorldRenderer.class).getActiveCamera();
@@ -111,7 +111,7 @@ public class LightShaftsNode extends ConditionDependentNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/lightShafts");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Shader Parameters
 

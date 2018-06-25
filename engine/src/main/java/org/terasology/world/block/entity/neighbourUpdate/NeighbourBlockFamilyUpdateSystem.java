@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,10 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.UpdatesWithNeighboursFamily;
+import org.terasology.world.block.items.OnBlockItemPlaced;
 
 import java.util.Set;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(NeighbourBlockFamilyUpdateSystem.class);
@@ -69,6 +68,21 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
         }
     }
 
+    /**
+     * Notifies the adjacent block families when a block is placed next to them.
+     * @param event
+     * @param entity
+     */
+    @ReceiveEvent
+    public void onBlockPlaced(OnBlockItemPlaced event, EntityRef entity) {
+        BlockComponent blockComponent = event.getPlacedBlock().getComponent(BlockComponent.class);
+        if (blockComponent == null) {
+            return;
+        }
+
+        Vector3i targetBlock = blockComponent.getPosition();
+        processUpdateForBlockLocation(targetBlock);
+    }
 
     private void notifyNeighboursOfChangedBlocks() {
         // Invoke the updates in another large block change for this class only
@@ -103,7 +117,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
                 final BlockFamily blockFamily = neighborBlock.getBlockFamily();
                 if (blockFamily instanceof UpdatesWithNeighboursFamily) {
                     UpdatesWithNeighboursFamily neighboursFamily = (UpdatesWithNeighboursFamily) blockFamily;
-                    Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
+                    Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(neighborLocation, neighborBlock);
                     if (neighborBlock != neighborBlockAfterUpdate) {
                         worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
                     }

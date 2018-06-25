@@ -20,8 +20,8 @@ extensions
 !/modules/CoreSampleGameplay
 !/modules/BuilderSampleGameplay
 !/modules/subprojects.gradle
-/meta/*
-!/meta/subprojects.gradle
+/metas/*
+!/metas/subprojects.gradle
 /libs/*
 !/libs/subprojects.gradle
 
@@ -71,9 +71,13 @@ Icon
 ehthumbs.db
 Thumbs.db
 
+# Ignore Terasology build output
+/engine/src/main/resources/Credits.md
+
 # Ignore Terasology output
 *.log
 /saves/
+/configs/
 /screenshots/
 /logs/
 /terasology-server/
@@ -93,5 +97,12 @@ nuiEditorAutosave.json
 /natives/
 config/metrics/
 
+# Ignore API files
+API_file.txt
+New_API_file.txt
+
+# Ignore Whitelist and Blacklist files
+whitelist.json
+blacklist.json
 
 # Ignore weird stuff that might be obsolete

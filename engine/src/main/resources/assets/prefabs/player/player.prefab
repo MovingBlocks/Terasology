@@ -18,10 +18,7 @@
     "radius": 0.3,
     "jumpSpeed": 12
   },
-  "Mesh": {
-    "mesh": "engine:testmonkey",
-    "material": "engine:monkeyHead9",
-    "hideFromOwner": true
+  "VisualCharacter": {
   },
   "BoxShape": {
     "extents": [
@@ -71,6 +68,11 @@
     "landingVolume": 0.25
   },
   "CharacterHeldItem": {
+  },
+  "RemotePersonHeldItemMountPoint": {
+        "rotateDegrees": [0, 0, 0],
+        "translate": [-0.4, 0.45, 0.3],
+        "scale": 0.35
   },
   "Breather": {},
   "GazeMountPoint": {

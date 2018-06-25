@@ -91,7 +91,9 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     @SuppressWarnings("FieldCanBeLocal")
     private float turbidity;
 
-    public BackdropNode(Context context) {
+    public BackdropNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         backdropProvider = context.get(BackdropProvider.class);
 
         worldRenderer = context.get(WorldRenderer.class);
@@ -146,7 +148,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/backdrop");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Common Shader Parameters
 

@@ -21,8 +21,9 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
 /**
- * TODO: Add javadocs
- * TODO: Better naming
+ * Instances of this class manage Frame buffer Objects (FBOs) whose characteristics are immutable.
+ *
+ * Once an FBO is first generated through the request(FBOConfig) method, it stays the same until it is disposed.
  */
 public class ImmutableFBOs extends AbstractFBOsManager {
 

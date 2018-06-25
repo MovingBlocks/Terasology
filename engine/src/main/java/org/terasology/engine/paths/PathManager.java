@@ -46,6 +46,7 @@ public final class PathManager {
     private static final String MOD_DIR = "modules";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
+    private static final String CONFIGS_DIR = "configs";
 
     private static PathManager instance;
     private Path installPath;
@@ -58,14 +59,24 @@ public final class PathManager {
     private ImmutableList<Path> modPaths = ImmutableList.of();
     private Path screenshotPath;
     private Path nativesPath;
+    private Path configsPath;
 
     private PathManager() {
         // By default, the path should be the code location (where terasology.jar is)
         try {
             URL urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation();
 
+            // TODO: Probably remove this after a while, confirming via logs that this is no longer needed
             Path codeLocation = Paths.get(urlToSource.toURI());
-            System.out.println("codeLocation: " + codeLocation);
+            System.out.println("PathManager being initialized. Initial code location is " + codeLocation.toAbsolutePath());
+
+            // Theory that whatever reason we needed to get the path that way isn't needed anymore - try just current dir ...
+            codeLocation = Paths.get("").toAbsolutePath();
+            System.out.println("Switched it to expected working dir: " + codeLocation.toAbsolutePath());
+
+            // If that fails in some situations a different approach could test for the following in the path:
+            // if (codeLocation.toString().contains(".gradle") || codeLocation.toString().contains(".m2")) {
+
             if (Files.isRegularFile(codeLocation)) {
                 installPath = findNativesHome(codeLocation.getParent(), 5);
                 if (installPath == null) {
@@ -237,6 +248,14 @@ public final class PathManager {
     }
 
     /**
+     *
+     * @return Path in which the game's config files are saved.
+     */
+    public Path getConfigsPath() {
+        return configsPath;
+    }
+
+    /**
      * Updates all of the path manager's file/directory references to match the path settings. Creates directories if they don't already exist.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
@@ -260,6 +279,7 @@ public final class PathManager {
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
         Files.createDirectories(screenshotPath);
         nativesPath = installPath.resolve(NATIVES_DIR);
+        configsPath = installPath.resolve(CONFIGS_DIR);
         if (currentWorldPath == null) {
             currentWorldPath = homePath;
         }

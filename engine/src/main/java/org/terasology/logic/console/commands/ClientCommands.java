@@ -29,6 +29,8 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.sun.CelestialSystem;
+import org.terasology.world.sun.DefaultCelestialSystem;
 
 /**
  * This class contains basic client commands for debugging eg.
@@ -45,6 +47,9 @@ public class ClientCommands extends BaseComponentSystem {
 
     @In
     private NetworkSystem networkSystem;
+
+    @In
+    private CelestialSystem celestialSystem;
 
     /**
      * Displays debug information on the target entity for the target the camera is pointing at
@@ -68,6 +73,21 @@ public class ClientCommands extends BaseComponentSystem {
         return "World time changed";
     }
 
+    /**
+     * Permanently halts the sun's position and angle
+     * @param day Float containing day to be set
+     * @return String message containing message to notify user
+     */
+    @Command(shortDescription = "Permanently halts the sun's position and angle", requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public  String toggleSunHalting(@CommandParam("day") float day) {
+        celestialSystem.toggleSunHalting(day);
+
+        if (celestialSystem.isSunHalted()) {
+            return "Permanently set the sun's position.";
+        } else {
+            return "Disabled the sun's halt.";
+        }
+    }
     /**
      * Sets the spawn location for the client to the current location
      * @return String containing debug information on the entity

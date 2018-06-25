@@ -612,6 +612,11 @@ public class KinematicCharacterMover implements CharacterMover {
             climb(state, input, desiredVelocity);
         }
 
+        // If swimming or diving, cancel double jump to avoid jumping underwater and on the surface
+        if (movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
+            movementComp.numberOfJumpsLeft = 0;
+        }
+
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
@@ -709,7 +714,10 @@ public class KinematicCharacterMover implements CharacterMover {
                 movementComp.numberOfJumpsLeft--;
             }
 
-            state.setGrounded(false);
+            if (state.isGrounded()) {
+                movementComp.numberOfJumpsLeft--;
+                state.setGrounded(false);
+            }
         }
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
             Vector3f hitVelocity = new Vector3f(state.getVelocity());

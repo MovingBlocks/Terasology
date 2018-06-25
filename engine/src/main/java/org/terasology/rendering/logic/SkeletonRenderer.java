@@ -247,6 +247,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.enable();
             skeletalMesh.material.setFloat("sunlight", 1.0f, true);
             skeletalMesh.material.setFloat("blockLight", 1.0f, true);
+            skeletalMesh.material.setFloat3("colorOffset", skeletalMesh.color.rf(), skeletalMesh.color.gf(), skeletalMesh.color.bf(), true);
 
             skeletalMesh.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             skeletalMesh.material.bindTextures();
@@ -342,10 +343,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             }
             glEnable(GL_DEPTH_TEST);
         }
-    }
-
-    @Override
-    public void renderFirstPerson() {
     }
 
     @Override

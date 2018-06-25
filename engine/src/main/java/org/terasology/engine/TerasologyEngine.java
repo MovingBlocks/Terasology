@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.engine;
 
 import com.google.common.base.Preconditions;
@@ -66,8 +65,7 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.version.TerasologyVersion;
-import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
-import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
@@ -79,6 +77,7 @@ import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.TileData;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -117,6 +116,8 @@ public class TerasologyEngine implements GameEngine {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
     private static final int ONE_MEBIBYTE = 1024 * 1024;
+
+    private final List<Class<?>> classesOnClasspathsToAddToEngine = new ArrayList<>();
 
     private GameState currentState;
     private GameState pendingState;
@@ -171,6 +172,14 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new GameSubsystem());
         this.allSubsystems.add(new I18nSubsystem());
         this.allSubsystems.add(new TelemetrySubSystem());
+    }
+
+    /**
+     * Provide ability to set additional engine classpath locations.   This must be called before initialize() or run().
+     * @param clazz any class that appears in the resource location to treat as an engine classpath.
+     */
+    protected void addToClassesOnClasspathsToAddToEngine(Class<?> clazz) {
+        classesOnClasspathsToAddToEngine.add(clazz);
     }
 
     public void initialize() {
@@ -284,7 +293,7 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
-        ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class));
+        ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class), classesOnClasspathsToAddToEngine);
         rootContext.put(ModuleManager.class, moduleManager);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
@@ -303,8 +312,8 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initAssets() {
-        DefaultBlockFamilyFactoryRegistry familyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
-        rootContext.put(BlockFamilyFactoryRegistry.class, familyFactoryRegistry);
+        BlockFamilyRegistry familyFactoryRegistry = new BlockFamilyRegistry();
+        rootContext.put(BlockFamilyRegistry.class, familyFactoryRegistry);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.registerCoreAssetType(Prefab.class,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,28 @@
 package org.terasology.world.block;
 
 import org.terasology.math.Rotation;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.SectionDefinitionData;
 import org.terasology.world.block.shapes.BlockShape;
 
-
 public interface BlockBuilderHelper {
 
-    Block constructSimpleBlock(BlockFamilyDefinition definition);
+    Block constructSimpleBlock(BlockFamilyDefinition definition, BlockUri uri, BlockFamily blockFamily);
 
-    Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape);
+    Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape, BlockUri uri, BlockFamily blockFamily);
 
-    Block constructSimpleBlock(BlockFamilyDefinition definition, String section);
+    Block constructSimpleBlock(BlockFamilyDefinition definition, String section, BlockUri uri, BlockFamily blockFamily);
 
-    Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape, String section);
+    Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape, String section, BlockUri uri, BlockFamily blockFamily);
 
-    Block constructTransformedBlock(BlockFamilyDefinition definition, Rotation rotation);
+    Block constructTransformedBlock(BlockFamilyDefinition definition, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
 
-    Block constructTransformedBlock(BlockFamilyDefinition definition, String section, Rotation rotation);
+    Block constructTransformedBlock(BlockFamilyDefinition definition, String section, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
 
-    Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, Rotation rotation);
+    Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
 
-    Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, String section, Rotation rotation);
+    Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, String section, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
 
-    Block constructCustomBlock(String defaultName, BlockShape shape, Rotation rotation, SectionDefinitionData section);
-
+    Block constructCustomBlock(String defaultName, BlockShape shape, Rotation rotation, SectionDefinitionData section, BlockUri uri, BlockFamily blockFamily);
 }

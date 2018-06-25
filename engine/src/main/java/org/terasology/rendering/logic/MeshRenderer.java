@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.logic;
 
-import com.bulletphysics.linearmath.Transform;
+import org.terasology.math.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import java.nio.FloatBuffer;
@@ -171,7 +171,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
-        Transform transWorldSpace = new Transform();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
@@ -203,14 +202,13 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     location.getWorldPosition(worldPos);
                     float worldScale = location.getWorldScale();
 
-                    javax.vecmath.Matrix4f matrixWorldSpace = new javax.vecmath.Matrix4f(VecMath.to(worldRot), VecMath.to(worldPos), worldScale);
-                    transWorldSpace.set(matrixWorldSpace);
+                    Transform toWorldSpace = new Transform(worldPos, worldRot, worldScale);
 
-                    Vector3f worldPositionCameraSpace = new Vector3f();
-                    worldPositionCameraSpace.sub(worldPos, cameraPosition);
-                    Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
+                    Vector3f offsetFromCamera = new Vector3f();
+                    offsetFromCamera.sub(worldPos, cameraPosition);
+                    Matrix4f matrixCameraSpace = new Matrix4f(worldRot, offsetFromCamera, worldScale);
 
-                    AABB aabb = meshComp.mesh.getAABB().transform(transWorldSpace);
+                    AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                         if (meshComp.mesh != lastMesh) {
                             if (lastMesh != null) {
@@ -259,10 +257,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
     @Override
     public void renderOverlay() {
-    }
-
-    @Override
-    public void renderFirstPerson() {
     }
 
     @Override

@@ -1,0 +1,22 @@
+{
+  "BehaviorNode": {
+    "action": "invert",
+    "name": "invert",
+    "displayName": "Invert",
+    "category": "logic",
+    "shape": "diamond",
+    "description": "Returns the inverse of child's state",
+    "color": [
+      0.7,
+      0.7,
+      0.7,
+      255
+    ],
+    "textColor": [
+      0,
+      0,
+      0,
+      255
+    ]
+  }
+}

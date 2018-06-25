@@ -43,6 +43,10 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
 
     private final EntityManager entityManager;
 
+    private boolean haltSunPosition = false;
+
+    private float haltedTime = 0f;
+
     public DefaultCelestialSystem(CelestialModel model, Context context) {
         WorldProvider worldProvider = context.get(WorldProvider.class);
         entityManager = context.get(EntityManager.class);
@@ -58,10 +62,23 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
 
     @Override
     public float getSunPosAngle() {
-        float days = getWorldTime().getDays();
+        float days;
+        if (isSunHalted()) {
+            days = haltedTime;
+        } else {
+            days = getWorldTime().getDays();
+        }
         return  model.getSunPosAngle(days);
     }
 
+    @Override
+    public boolean isSunHalted () { return haltSunPosition; }
+
+    @Override
+    public void toggleSunHalting (float timeInDays) {
+        haltSunPosition = !haltSunPosition;
+        haltedTime = timeInDays;
+    }
     /**
      * Updates the game perception of the time of day via launching a new OnMiddayEvent(),
      * OnDuskEvent(), OnMidnightEvent(), or OnDawnEvent() based on the time of day when

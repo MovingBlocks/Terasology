@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -38,6 +39,9 @@ public class CreditsScreen extends CoreScreenLayer {
     @In
     private Config config;
 
+    @In
+    private TranslationSystem translationSystem;
+
     private UIScrollingText creditsScroll;
 
     @Override
@@ -49,24 +53,44 @@ public class CreditsScreen extends CoreScreenLayer {
 
         creditsScroll = find("creditsScroll", UIScrollingText.class);
         if (creditsScroll != null) {
+            StringBuilder credits = new StringBuilder();
+
             ClassLoader classloader = getClass().getClassLoader();
-            InputStream is = classloader.getResourceAsStream("Credits.txt");
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                StringBuilder credits = new StringBuilder();
-                String line = br.readLine();
-                while (line != null) {
-                    credits.append(line);
-                    credits.append(System.lineSeparator());
-                    line = br.readLine();
+            InputStream is = classloader.getResourceAsStream("Credits.md");
+            if (is == null) {
+                credits.append(translationSystem.translate("${engine:menu#error-credits-not-found}"));
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        line = line.replaceAll("\\[([^]]*)]\\(([^)]+)\\)", "$1").trim();
+                        if (line.startsWith("* ")) {
+                            if (line.endsWith(":")) {
+                                credits.append(System.lineSeparator());
+                                credits.append(line, 2, line.length() - 1);
+                                credits.append(System.lineSeparator());
+                                credits.append(System.lineSeparator());
+                            } else {
+                                credits.append(line, 2, line.length());
+                                credits.append(System.lineSeparator());
+                            }
+                        } else {
+                            credits.append(line);
+                            credits.append(System.lineSeparator());
+                        }
+                    }
+                } catch (IOException e) {
+                    Logger logger = LoggerFactory.getLogger(CreditsScreen.class);
+                    logger.info("Could not open Credits file");
+
+                    credits = new StringBuilder(translationSystem.translate("${engine:menu#error-credits-open"));
                 }
-                creditsScroll.setText(credits.toString());
-                creditsScroll.setAutoReset(false);
-                creditsScroll.setScrollingSpeed(1);
-                creditsScroll.startScrolling();
-            } catch (IOException e) {
-                Logger logger = LoggerFactory.getLogger(CreditsScreen.class);
-                logger.info("Could not open Credits file");
             }
+
+            creditsScroll.setText(credits.toString());
+            creditsScroll.setAutoReset(false);
+            creditsScroll.setScrollingSpeed(1);
+            creditsScroll.startScrolling();
         }
     }
 

@@ -88,7 +88,9 @@ public class ConsoleScreen extends CoreScreenLayer {
                 StringBuilder messageList = new StringBuilder();
                 for (Message message : console.getMessages()) {
                     messageList.append(FontColor.getColored(message.getMessage(), message.getType().getColor()));
-                    messageList.append(Console.NEW_LINE);
+                    if (message.hasNewLine()) {
+                        messageList.append(Console.NEW_LINE);
+                    }
                 }
                 return messageList.toString();
             }

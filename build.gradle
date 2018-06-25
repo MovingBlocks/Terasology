@@ -217,6 +217,7 @@ idea {
     module.excludeDirs += file('protobuf')
 
     // Exclude output dirs
+    module.excludeDirs += file('configs')
     module.excludeDirs += file('logs')
     module.excludeDirs += file('saves')
     module.excludeDirs += file('screenshots')

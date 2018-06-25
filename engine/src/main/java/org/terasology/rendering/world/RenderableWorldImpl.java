@@ -34,6 +34,7 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
@@ -101,8 +102,13 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void onChunkLoaded(Vector3i chunkCoordinates) {
         if (renderableRegion.encompasses(chunkCoordinates)) {
-            chunksInProximityOfCamera.add(chunkProvider.getChunk(chunkCoordinates));
-            Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+            Chunk chunk = chunkProvider.getChunk(chunkCoordinates);
+            if (chunk != null) {
+                chunksInProximityOfCamera.add(chunk);
+                Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+            } else {
+                logger.warn("Warning: onChunkLoaded called for a null chunk!");
+            }
         }
     }
 
@@ -371,7 +377,11 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     private boolean isChunkValidForRender(RenderableChunk chunk) {
-        return chunk.isReady() && chunk.areAdjacentChunksReady();
+        return chunk.isReady() && areSurroundingChunksLoaded(chunk);
+    }
+
+    private boolean areSurroundingChunksLoaded(RenderableChunk chunk) {
+        return worldProvider.getWorldViewAround(chunk.getPosition()) != null;
     }
 
     private boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {

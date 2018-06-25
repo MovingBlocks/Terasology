@@ -218,7 +218,7 @@ public class UIScrollbar extends CoreWidget {
      * @return The max value scrollable to.
      */
     public int getRange() {
-        return range.get();
+        return Math.max(0, range.get());
     }
 
     /**

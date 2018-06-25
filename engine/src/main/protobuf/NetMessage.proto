@@ -147,6 +147,7 @@ message ServerInfoMessage {
     repeated sint32 biomeShortId = 10 [packed=true];
     repeated string biomeId = 11;
 
+    optional string errorMessage = 12;
     optional string version = 15;
     optional string gameName = 16;
     optional int64 time = 17;

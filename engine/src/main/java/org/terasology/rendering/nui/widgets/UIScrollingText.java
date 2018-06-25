@@ -25,6 +25,7 @@ import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,10 +245,11 @@ public class UIScrollingText extends CoreWidget {
                 textY.put(entry.getKey(), entry.getValue() - step);
             }
         } else {
-            String[] parsed = getText().split("\\r?\\n", -1);
             Font font = canvas.getCurrentStyle().getFont();
             int y = canvas.size().y + lineSpacing;
-            for (String line : parsed) {
+            int maxWidth = canvas.size().x;
+            List<String> lines = TextLineBuilder.getLines(font, getText(), maxWidth);
+            for (String line : lines) {
                 textY.put(line, y);
                 y += font.getHeight(line) + lineSpacing;
             }

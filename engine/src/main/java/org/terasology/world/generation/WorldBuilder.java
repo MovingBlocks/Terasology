@@ -23,6 +23,9 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.world.zones.ProviderStore;
+import org.terasology.world.zones.Zone;
+import org.terasology.world.zones.ZonePlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +37,7 @@ import java.util.Set;
 
 /**
  */
-public class WorldBuilder {
+public class WorldBuilder extends ProviderStore {
 
     private static final Logger logger = LoggerFactory.getLogger(WorldBuilder.class);
 
@@ -43,7 +46,6 @@ public class WorldBuilder {
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
     private final List<EntityProvider> entityProviders = new ArrayList<>();
     private int seaLevel = 32;
-    private Long seed;
 
     private WorldGeneratorPluginLibrary pluginLibrary;
 
@@ -66,10 +68,16 @@ public class WorldBuilder {
         return this;
     }
 
+    public WorldBuilder addZone(Zone zone) {
+        super.addZone(zone);
+        return this;
+    }
+
     public WorldBuilder addPlugins() {
         pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class).forEach(this::addProvider);
         pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class).forEach(this::addRasterizer);
         pluginLibrary.instantiateAllOfType(EntityProviderPlugin.class).forEach(this::addEntities);
+        pluginLibrary.instantiateAllOfType(ZonePlugin.class).forEach(this::addZone);
 
         return this;
     }
@@ -81,10 +89,6 @@ public class WorldBuilder {
     public WorldBuilder setSeaLevel(int level) {
         this.seaLevel = level;
         return this;
-    }
-
-    public void setSeed(long seed) {
-        this.seed = seed;
     }
 
     public World build() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import java.util.Map;
  * A table for storing entities and components. Focused on allowing iteration across a components of a given type
  *
  */
-class ComponentTable {
+public class ComponentTable {
     private Map<Class<?>, TLongObjectMap<Component>> store = Maps.newConcurrentMap();
 
     public <T extends Component> T get(long entityId, Class<T> componentClass) {
