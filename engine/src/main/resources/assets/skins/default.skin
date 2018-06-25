@@ -79,7 +79,7 @@
         "UIImage": {
             "texture-scale-mode": "scale fit"
         },
-        "UIImageSlideshow": {
+        "UITimedImageSlideshow": {
             "texture-scale-mode": "scale fit"
         },
         "RowLayout": {

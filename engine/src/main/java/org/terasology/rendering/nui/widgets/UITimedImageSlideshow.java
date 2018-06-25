@@ -18,37 +18,31 @@ package org.terasology.rendering.nui.widgets;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.ScaleMode;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
- * This widget displays images in sequence in an image slideshow.
+ * This widget displays images in sequence in an image slideshow. Switching images automatically after a time period.
  */
-public class UIImageSlideshow extends CoreWidget {
+public class UITimedImageSlideshow extends CoreWidget {
 
-    private Binding<TextureRegion> currentImage = new DefaultBinding<>();
-    private long timestamp = getCurrentTimestamp();
+    private Binding<UIWidget> currentImage = new DefaultBinding<>();
+    private List<UIImage> images = new ArrayList<>();
     private boolean active = true;
-    private List<TextureRegion> images = new ArrayList<>();
-
-    /**
-     * Index of current image.
-     */
+    private float imageDisplayTime = 0f;
     private int index = 0;
 
     /**
      * Speed of slideshow (in seconds).
      */
     @LayoutConfig
-    private int speed = 5;
+    private float speed = 5f;
 
     /**
      * Whether the slideshow infinite.
@@ -56,35 +50,23 @@ public class UIImageSlideshow extends CoreWidget {
     @LayoutConfig
     private boolean infinite = true;
 
-    @LayoutConfig
-    private boolean ignoreAspectRatio;
-
     @Override
     public void onDraw(Canvas canvas) {
         if (currentImage.get() != null) {
-            canvas.drawTexture(currentImage.get(), Color.WHITE);
-            if (ignoreAspectRatio) {
-                ScaleMode scaleMode = canvas.getCurrentStyle().getTextureScaleMode();
-                canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.STRETCH);
-                canvas.drawTexture(currentImage.get(), Color.WHITE);
-                canvas.getCurrentStyle().setTextureScaleMode(scaleMode);
-            } else {
-                canvas.drawTexture(currentImage.get(), Color.WHITE);
-            }
+            currentImage.get().onDraw(canvas);
         }
     }
 
     @Override
     public void update(float delta) {
-        if (isActive() && timestamp + speed * 1000 < getCurrentTimestamp()) {
-            timestamp = getCurrentTimestamp();
-            nextImage();
+        if (isActive()) {
+            imageDisplayTime += delta;
+            if (imageDisplayTime >= speed) {
+                imageDisplayTime = 0f;
+                nextImage();
+            }
         }
         super.update(delta);
-    }
-
-    private static long getCurrentTimestamp() {
-        return new Date().getTime();
     }
 
     private void nextImage() {
@@ -109,32 +91,56 @@ public class UIImageSlideshow extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         if (currentImage.get() != null) {
-            return currentImage.get().size();
+            return currentImage.get().getPreferredContentSize(canvas, sizeHint);
         }
         return Vector2i.zero();
     }
 
-    public void addImage(final TextureRegion textureRegion) {
-        images.add(textureRegion);
+    /**
+     * Adds image to slideshow list.
+     *
+     * @param image the image to show.
+     */
+    public void addImage(final UIImage image) {
+        images.add(image);
         if (currentImage.get() == null) {
             currentImage.set(images.get(index));
         }
     }
 
+    /**
+     * Adds texture region to slideshow list.
+     *
+     * @param textureRegion the textureRegion to show.
+     */
+    public void addImage(final TextureRegion textureRegion) {
+        addImage(new UIImage(textureRegion));
+    }
+
+    /**
+     * Removes all images from slideshow list.
+     */
     public void clean() {
         index = 0;
+        imageDisplayTime = 0f;
         currentImage.set(null);
         images = new ArrayList<>();
     }
 
-    public boolean isActive() {
+    protected boolean isActive() {
         return active;
     }
 
+    /**
+     * Starts the slideshow.
+     */
     public void start() {
         active = true;
     }
 
+    /**
+     * Stops the slideshow.
+     */
     public void stop() {
         active = false;
     }

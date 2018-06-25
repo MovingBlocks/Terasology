@@ -82,7 +82,7 @@
                                 },
                                 "contents": [
                                     {
-                                        "type": "UIImageSlideshow",
+                                        "type": "UITimedImageSlideshow",
                                         "id": "preview",
                                         "skin": "framed_image",
                                         "layoutInfo": {
