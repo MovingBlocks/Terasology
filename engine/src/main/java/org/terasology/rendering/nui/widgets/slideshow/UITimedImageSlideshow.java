@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets;
+package org.terasology.rendering.nui.widgets.slideshow;
 
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
@@ -23,6 +23,7 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.widgets.UIImage;
 
 import java.util.ArrayList;
 import java.util.List;
