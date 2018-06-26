@@ -18,8 +18,12 @@ package org.terasology.rendering.nui.widgets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.i18n.TranslationSystem;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.TwoButtonPopup;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -33,30 +37,39 @@ public class UIButtonWebBrowser extends UIButton {
 
     private static final Logger logger = LoggerFactory.getLogger(UIButtonWebBrowser.class);
 
-    private String link = "";
-
     private Binding<Boolean> confirmed = new DefaultBinding<>();
 
-    private Runnable confirmationProcess;
+    /**
+     * The link to be opened in web browser.
+     */
+    private String link = "";
+
+    /**
+     * Responsible for creating popups.
+     */
+    private NUIManager nuiManager;
+
+    /**
+     * Responsible for translating messages on popups.
+     */
+    private TranslationSystem translationSystem;
 
     public UIButtonWebBrowser() {
         this.subscribe(openInDefaultBrowser);
     }
 
     /**
-     *  Does confirmation and activates default action.
+     * Does confirmation and activates default action.
      */
-    public void doConfirmation() {
+    private void confirm() {
         confirmed.set(true);
         openInDefaultBrowser.onActivated(this);
     }
 
     private final ActivateEventListener openInDefaultBrowser = button -> {
         if (!hasConfirmation()) {
-            logger.debug("You don't have confirmation for opening web browser");
-            if (confirmationProcess != null) {
-                confirmationProcess.run();
-            }
+            logger.debug("Don't have confirmation for opening web browser.");
+            showConfirmationPopup();
             return;
         }
         if (Desktop.isDesktopSupported()) {
@@ -65,6 +78,7 @@ public class UIButtonWebBrowser extends UIButton {
                 desktop.browse(new URI(this.link));
             } catch (IOException | URISyntaxException e) {
                 logger.warn("Can't open {} in default browser of your system.", this.link);
+                showErrorPopup("Can't open " + this.link + " in default browser of your system.");
             }
         } else {
             String os = System.getProperty("os.name").toLowerCase();
@@ -78,24 +92,50 @@ public class UIButtonWebBrowser extends UIButton {
                     runtime.exec("xdg-open " + this.link);
                 }
             } catch (IOException e) {
-                logger.warn("Can't recognize your system and open the link {}.", this.link);
+                logger.warn("Can't recognize your OS and open the link {}.", this.link);
+                showErrorPopup("Can't recognize your OS and open the link " + this.link);
             }
         }
     };
+
+    private void showConfirmationPopup() {
+        if (nuiManager == null || translationSystem == null) {
+            logger.error("Can't show confirmation popup!");
+            return;
+        }
+        TwoButtonPopup confirmationPopup = nuiManager.pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
+        confirmationPopup.setMessage(translationSystem.translate("${engine:menu#button-web-browser-confirmation-title}"), translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}") + "\n" + getLink());
+        confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::confirm);
+        confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {
+        });
+    }
+
+    private void showErrorPopup(final String message) {
+        if (nuiManager != null) {
+            nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("", message);
+        }
+    }
+
+    private boolean hasConfirmation() {
+        return confirmed.get() != null && confirmed.get();
+    }
 
     public String getLink() {
         return link;
     }
 
-    public void setLink(String link) {
+    public UIButtonWebBrowser setLink(String link) {
         this.link = link;
+        return this;
     }
 
-    public boolean hasConfirmation() {
-        return confirmed.get() != null && confirmed.get();
+    public UIButtonWebBrowser setNuiManager(final NUIManager nuiManager) {
+        this.nuiManager = nuiManager;
+        return this;
     }
 
-    public void setConfirmationHandler(Runnable runnable) {
-        confirmationProcess = runnable;
+    public UIButtonWebBrowser setTranslationSystem(final TranslationSystem translationSystem) {
+        this.translationSystem = translationSystem;
+        return this;
     }
 }
