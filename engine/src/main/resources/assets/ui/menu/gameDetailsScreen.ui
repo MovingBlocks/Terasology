@@ -470,24 +470,40 @@
                 "contents": [
                     {
                         "type": "UIButton",
-                        "text": "${engine:menu#back}",
-                        "id": "close"
-                    },
-                    {
-                        "type": "UIButton",
                         "text": "${engine:menu#game-details-show-errors}",
                         "id": "showErrors",
                         "enabled": false
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#game-details-module-details}",
+                        "id": "openModuleDetails",
+                        "visible": false
                     }
                 ],
                 "layoutInfo": {
-                     "width": 250,
-                     "height": 32,
-                     "position-horizontal-center": {},
-                     "position-bottom": {
-                         "target": "BOTTOM",
-                         "offset": 30
-                     }
+                    "width": 400,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 16
+                    }
+                }
+            },
+            {
+                "type": "UIButton",
+                "text": "${engine:menu#back}",
+                "id": "close",
+                "layoutInfo": {
+                    "width": 128,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                    }
                 }
             }
         ]

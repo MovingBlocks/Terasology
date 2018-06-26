@@ -45,6 +45,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.SelectGameScreen;
+import org.terasology.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UIButton;
@@ -61,12 +62,14 @@ import org.terasology.world.internal.WorldInfo;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -99,6 +102,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private ScrollableArea descriptionContainer;
     private Map<String, List<String>> blockFamilyIds;
     private List<String> errors;
+    private UIButton openModuleDetails;
 
     @Override
     public void initialise() {
@@ -113,17 +117,25 @@ public class GameDetailsScreen extends CoreScreenLayer {
         descriptionTitle = find("descriptionTitle", UILabel.class);
         worldDescription = find("worldDescription", ScrollableArea.class);
         descriptionContainer = find("descriptionContainer", ScrollableArea.class);
+        openModuleDetails = find("openModuleDetails", UIButton.class);
 
         if (descriptionContainer != null && worldDescription != null && descriptionTitle != null &&
-                gameModules != null && gameWorlds != null && biomes != null && blocks != null) {
+                gameModules != null && gameWorlds != null && biomes != null && blocks != null && openModuleDetails != null) {
+
             setUpGameModules();
             setUpGameWorlds();
             setUpBlocks();
             setUpBiomes();
-        }
 
-        WidgetUtil.trySubscribe(this, "showErrors", button -> showErrors());
-        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+            openModuleDetails.subscribe(button -> openModuleDetailsScreen());
+
+            WidgetUtil.trySubscribe(this, "showErrors", button -> showErrors());
+            WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+        } else {
+            logger.error("Can't initialize screen correctly!");
+            triggerBackAnimation();
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+        }
     }
 
     @Override
@@ -165,19 +177,17 @@ public class GameDetailsScreen extends CoreScreenLayer {
             description.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    final StringBuilder sb = new StringBuilder();
-                    sb.append(translationSystem.translate("${engine:menu#biome-name}: "));
-                    sb.append(biome.getId());
-                    sb.append('\n');
-                    sb.append(translationSystem.translate("${engine:menu#biome-fog}: "));
-                    sb.append(biome.getFog());
-                    sb.append('\n');
-                    sb.append(translationSystem.translate("${engine:menu#biome-humidity}: "));
-                    sb.append(biome.getHumidity());
-                    sb.append('\n');
-                    sb.append(translationSystem.translate("${engine:menu#biome-temperature}: "));
-                    sb.append(biome.getTemperature());
-                    return sb.toString();
+                    return translationSystem.translate("${engine:menu#biome-name}: ") +
+                            biome.getId() +
+                            '\n' +
+                            translationSystem.translate("${engine:menu#biome-fog}: ") +
+                            biome.getFog() +
+                            '\n' +
+                            translationSystem.translate("${engine:menu#biome-humidity}: ") +
+                            biome.getHumidity() +
+                            '\n' +
+                            translationSystem.translate("${engine:menu#biome-temperature}: ") +
+                            biome.getTemperature();
                 }
             });
 
@@ -282,6 +292,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
         gameModules.subscribeSelection((widget, moduleSelectionInfo) -> {
             if (moduleSelectionInfo == null || moduleSelectionInfo.getMetadata() == null) {
+                openModuleDetails.setVisible(false);
                 return;
             }
             if (description != null) {
@@ -318,7 +329,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
                                     .append(moduleDescription).append('\n').append('\n');
 
                             StringBuilder dependenciesNames;
-                            List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
+                            final List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && !dependencies.isEmpty()) {
                                 dependenciesNames = new StringBuilder(translationSystem
                                         .translate("${engine:menu#module-dependencies-exist}") + ":" + '\n');
@@ -351,6 +362,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
             gameWorlds.setSelection(null);
             biomes.setSelection(null);
             blocks.setSelection(null);
+            openModuleDetails.setVisible(true);
             descriptionTitle.setText(translationSystem.translate("${engine:menu#game-details-module-description}") + " | " + moduleSelectionInfo.getMetadata().getDisplayName());
             descriptionContainer.setVisible(true);
             worldDescription.setVisible(false);
@@ -385,6 +397,31 @@ public class GameDetailsScreen extends CoreScreenLayer {
                         canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });
+
+        gameModules.subscribe(((widget, item) -> openModuleDetailsScreen()));
+    }
+
+    private void openModuleDetailsScreen() {
+        final ModuleDetailsScreen moduleDetailsScreen = getManager().createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
+
+        final Set<Module> allModules = gameModules.getList().stream()
+                .map(ModuleSelectionInfo::getModule)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        allModules.addAll(gameModules.getList().stream()
+                .map(ModuleSelectionInfo::getModule)
+                .filter(Objects::nonNull)
+                .map(Module::getMetadata)
+                .map(ModuleMetadata::getDependencies)
+                .flatMap(Collection::stream)
+                .filter(dep -> Objects.nonNull(dep.getId()))
+                .map(dep -> moduleManager.getRegistry().getLatestModuleVersion(dep.getId()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet()));
+
+        moduleDetailsScreen.setModules(allModules);
+        getManager().pushScreen(moduleDetailsScreen);
     }
 
     private void loadGameModules() {

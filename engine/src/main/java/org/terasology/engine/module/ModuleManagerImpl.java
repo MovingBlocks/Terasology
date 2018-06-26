@@ -76,6 +76,9 @@ public class ModuleManagerImpl implements ModuleManager {
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
         }
+        for (ModuleExtension ext : ExtraDataModuleExtension.values()) {
+            metadataReader.registerExtension(ext.getKey(), ext.getValueType());
+        }
         Module engineModule;
         try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = metadataReader.read(reader);

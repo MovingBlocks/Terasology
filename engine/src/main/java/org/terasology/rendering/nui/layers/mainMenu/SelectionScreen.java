@@ -48,6 +48,7 @@ public abstract class SelectionScreen extends CoreScreenLayer {
 
     private static final ResourceUrn PREVIEW_IMAGE_URI = new ResourceUrn("engine:savedGamePreview");
     private static final ResourceUrn DEFAULT_PREVIEW_IMAGE_URI = new ResourceUrn("engine:defaultPreview");
+    private static final int MODULES_LINE_LIMIT = 180;
 
     private static final Logger logger = LoggerFactory.getLogger(SelectionScreen.class);
 
@@ -82,13 +83,13 @@ public abstract class SelectionScreen extends CoreScreenLayer {
             return;
         }
 
-        String mainWorldGenerator = item.getManifest()
+        final String mainWorldGenerator = item.getManifest()
                 .getWorldInfo(TerasologyConstants.MAIN_WORLD)
                 .getWorldGenerator()
                 .getObjectName()
                 .toString();
 
-        String commaSeparatedModules = item.getManifest()
+        final String commaSeparatedModules = item.getManifest()
                 .getModules()
                 .stream()
                 .map(NameVersion::getName)
@@ -97,7 +98,7 @@ public abstract class SelectionScreen extends CoreScreenLayer {
                 .collect(Collectors.joining(", "));
 
         worldGenerator.setText(mainWorldGenerator);
-        moduleNames.setText(commaSeparatedModules);
+        moduleNames.setText(commaSeparatedModules.length() > MODULES_LINE_LIMIT ? commaSeparatedModules.substring(0, MODULES_LINE_LIMIT) + "..." : commaSeparatedModules);
 
         loadPreviewImage(item);
     }

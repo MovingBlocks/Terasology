@@ -86,7 +86,11 @@ public class SelectGameScreen extends SelectionScreen {
             confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
         });
 
-        WidgetUtil.trySubscribe(this, "create", button -> showNewGameScreen());
+        final NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
+        WidgetUtil.trySubscribe(this, "create", button -> {
+            newGameScreen.setUniverseWrapper(universeWrapper);
+            getManager().pushScreen(newGameScreen);
+        });
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
@@ -111,7 +115,9 @@ public class SelectGameScreen extends SelectionScreen {
         super.onOpened();
 
         if (GameProvider.getSavedGames().isEmpty()) {
-            showNewGameScreen();
+            final NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
+            newGameScreen.setUniverseWrapper(universeWrapper);
+            getManager().pushScreen(newGameScreen);
         }
 
         if (isLoadingAsServer() && !super.config.getPlayer().hasEnteredUsername()) {
@@ -119,12 +125,6 @@ public class SelectGameScreen extends SelectionScreen {
         }
 
         refreshGameInfoList(GameProvider.getSavedGames());
-    }
-
-    private void showNewGameScreen() {
-        final NewGameScreen screen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
-        screen.setUniverseWrapper(universeWrapper);
-        getManager().pushScreen(screen);
     }
 
     private void loadGame(GameInfo item) {

@@ -37,7 +37,7 @@ public class UIButtonWebBrowser extends UIButton {
 
     private static final Logger logger = LoggerFactory.getLogger(UIButtonWebBrowser.class);
 
-    private Binding<Boolean> confirmed = new DefaultBinding<>();
+    private Binding<Boolean> confirmed = new DefaultBinding<>(false);
 
     /**
      * The link to be opened in web browser.
@@ -125,6 +125,7 @@ public class UIButtonWebBrowser extends UIButton {
     }
 
     public UIButtonWebBrowser setLink(String link) {
+        confirmed.set(false);
         this.link = link;
         return this;
     }
