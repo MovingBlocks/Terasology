@@ -199,7 +199,8 @@
           {
             "type": "UIButton",
             "text": "${engine:menu#start-game}",
-            "id": "play"
+            "id": "play",
+            "enabled": false
           }
         ],
         "layoutInfo": {

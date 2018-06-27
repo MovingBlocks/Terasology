@@ -18,18 +18,22 @@ package org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.config.SelectModulesConfig;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.DependencyResolutionFailedException;
 import org.terasology.engine.module.ModuleInstaller;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
+import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
@@ -38,6 +42,7 @@ import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
+import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -48,6 +53,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.NewGameSetupHelper;
 import org.terasology.rendering.nui.layers.mainMenu.UniverseSetupScreen;
 import org.terasology.rendering.nui.layers.mainMenu.UniverseWrapper;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
@@ -96,6 +102,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private WorldGeneratorManager worldGenManager;
     @In
     private TranslationSystem translationSystem;
+    @In
+    private GameEngine gameEngine;
 
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
@@ -429,6 +437,19 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             universeSetupScreen.setEnvironment(universeWrapper);
             universeWrapper.setSeed(seed.getText());
             triggerForwardAnimation(universeSetupScreen);
+        });
+
+        WidgetUtil.trySubscribe(this, "play", button -> {
+            if (StringUtils.isBlank(seed.getText())) {
+                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game seed cannot be empty!");
+            } else {
+                GameManifest gameManifest = NewGameSetupHelper.buildNewGameSetup(universeWrapper, moduleManager, config);
+                if (gameManifest != null) {
+                    gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                } else {
+                    getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
+                }
+            }
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
