@@ -38,19 +38,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
-import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.FloatTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.ListTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.LongTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.MappedContainerTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.SetTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.*;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
@@ -86,6 +74,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -244,6 +233,18 @@ public class TypeSerializationLibrary {
                 }
             }
             logger.error("Set field is not parametrized, or holds unsupported type");
+            return null;
+
+        } else if (Queue.class.isAssignableFrom(typeClass)) {
+            // For queues:
+            Type parameter = ReflectionUtil.getTypeParameter(genericType, 0);
+            if (parameter != null) {
+                TypeHandler<?> innerHandler = getHandlerFor(parameter);
+                if (innerHandler != null) {
+                    return new QueueTypeHandler<>(innerHandler);
+                }
+            }
+            logger.error("Queue field is not parametrized, or holds unsupported type");
             return null;
 
         } else if (Map.class.isAssignableFrom(typeClass)) {
