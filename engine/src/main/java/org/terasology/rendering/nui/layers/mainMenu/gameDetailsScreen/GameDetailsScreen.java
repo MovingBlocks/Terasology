@@ -193,7 +193,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
         biomes.setItemRenderer(new AbstractItemRenderer<Biome>() {
             String getString(Biome biome) {
-                return biome.getName();
+                return biome.getId();
             }
 
             @Override
