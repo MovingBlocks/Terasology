@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Queue;
 
 public class QueueTypeHandler<E> extends SimpleTypeHandler<Queue<E>> {
-    private static final Logger logger = LoggerFactory.getLogger(QueueTypeHandler.class);
-
     private TypeHandler<E> contentsType;
 
     public QueueTypeHandler(TypeHandler<E> type) {
