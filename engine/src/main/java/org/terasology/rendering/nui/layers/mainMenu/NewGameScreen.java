@@ -152,7 +152,7 @@ public class NewGameScreen extends CoreScreenLayer {
             if (gameName.getText().isEmpty()) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game name cannot be empty");
             } else {
-                GameManifest gameManifest = NewGameSetupHelper.buildNewGameSetup(universeWrapper, moduleManager, config);
+                GameManifest gameManifest = GameManifestProvider.createDefaultGameManifest(universeWrapper, moduleManager, config);
                 if (gameManifest != null) {
                     gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 } else {

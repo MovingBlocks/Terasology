@@ -53,7 +53,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.rendering.nui.layers.mainMenu.NewGameSetupHelper;
+import org.terasology.rendering.nui.layers.mainMenu.GameManifestProvider;
 import org.terasology.rendering.nui.layers.mainMenu.UniverseSetupScreen;
 import org.terasology.rendering.nui.layers.mainMenu.UniverseWrapper;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
@@ -443,7 +443,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             if (StringUtils.isBlank(seed.getText())) {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game seed cannot be empty!");
             } else {
-                GameManifest gameManifest = NewGameSetupHelper.buildNewGameSetup(universeWrapper, moduleManager, config);
+                GameManifest gameManifest = GameManifestProvider.createDefaultGameManifest(universeWrapper, moduleManager, config);
                 if (gameManifest != null) {
                     gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 } else {

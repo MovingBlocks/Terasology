@@ -33,16 +33,24 @@ import org.terasology.world.time.WorldTime;
 
 
 /**
- * @TODO: rename?, add more methods for different screens and cases?
+ * Generates new games manifest according to input data.
  */
-public class NewGameSetupHelper {
+public class GameManifestProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(NewGameSetupHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameManifestProvider.class);
 
-    private NewGameSetupHelper() {
+    private GameManifestProvider() {
     }
 
-    public static GameManifest buildNewGameSetup(final UniverseWrapper universeWrapper, final ModuleManager moduleManager, final Config config) {
+    /**
+     * Generates game manifest with default settings (world generator, list of modules).
+     *
+     * @param universeWrapper  contains the universe level properties
+     * @param moduleManager    resolves modules
+     * @param config           provides default module selection, world generator
+     * @return                 game manifest with default settings
+     */
+    public static GameManifest createDefaultGameManifest(final UniverseWrapper universeWrapper, final ModuleManager moduleManager, final Config config) {
         GameManifest gameManifest = new GameManifest();
         if (StringUtils.isNotBlank(universeWrapper.getGameName())) {
             gameManifest.setTitle(universeWrapper.getGameName());
@@ -73,7 +81,6 @@ public class NewGameSetupHelper {
         final float timeOffset = 0.50f;
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, seed,
                 (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
-
 
         gameManifest.addWorld(worldInfo);
         return gameManifest;
