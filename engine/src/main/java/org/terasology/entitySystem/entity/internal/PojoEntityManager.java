@@ -27,6 +27,7 @@ import gnu.trove.set.hash.TLongHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -77,6 +78,7 @@ public class PojoEntityManager implements EngineEntityManager {
     private EventSystem eventSystem;
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
+    private WorldManager worldManager;
 
     private RefStrategy refStrategy = new DefaultRefStrategy();
 
@@ -104,6 +106,14 @@ public class PojoEntityManager implements EngineEntityManager {
         return globalPool;
     }
 
+    public EngineEntityPool getCurrentWorldPool() {
+        if (worldManager == null) {
+            return globalPool;
+        } else {
+            return worldManager.getCurrentWorldPool();
+        }
+    }
+
     @Override
     public void clear() {
         globalPool.clear();
@@ -114,31 +124,33 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityBuilder newBuilder() {
-        return globalPool.newBuilder();
+        return getCurrentWorldPool().newBuilder();
     }
 
     @Override
     public EntityBuilder newBuilder(String prefabName) {
-        return globalPool.newBuilder(prefabName);
+        return getCurrentWorldPool().newBuilder(prefabName);
     }
 
     @Override
     public EntityBuilder newBuilder(Prefab prefab) {
-        return globalPool.newBuilder(prefab);
+        return getCurrentWorldPool().newBuilder(prefab);
     }
 
     @Override
     public EntityRef create() {
-        return globalPool.create();
+        return getCurrentWorldPool().create();
     }
 
     @Override
     public EntityRef create(GameManifest gameManifest) {
         Map<String, WorldInfo> worldInfoMap = gameManifest.getWorldInfoMap();
+        worldManager = new WorldManager(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD));
         for (Map.Entry<String, WorldInfo> worldInfoEntry : worldInfoMap.entrySet()) {
             EngineEntityPool pool = new PojoEntityPool(this);
             pool.create();
             pools.add(pool);
+            worldManager.addWorldPool(worldInfoEntry.getValue(), pool);
         }
         return globalPool.create();
     }

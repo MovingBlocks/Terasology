@@ -52,7 +52,7 @@ public class EntityBuilder implements MutableComponentContainer {
 
     public EntityBuilder(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
-        this.pool = entityManager.getGlobalPool();
+        this.pool = entityManager.getCurrentWorldPool();
     }
 
     public EntityBuilder(EngineEntityManager entityManager, EngineEntityPool pool) {
