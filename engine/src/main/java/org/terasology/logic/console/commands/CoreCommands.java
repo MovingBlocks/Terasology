@@ -25,6 +25,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -34,6 +35,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.logic.console.Console;
@@ -51,6 +53,9 @@ import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.DependencyResolver;
+import org.terasology.module.Module;
+import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
@@ -79,6 +84,8 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.time.WorldTime;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -138,6 +145,9 @@ public class CoreCommands extends BaseComponentSystem {
 
     @In
     private Config config;
+
+    @In
+    private ModuleManager moduleManager;
 
     /**
      * Search commands/prefabs/assets with matching name, description, help text, usage or required permission

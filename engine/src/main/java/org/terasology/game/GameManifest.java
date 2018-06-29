@@ -20,12 +20,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.terasology.context.Context;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.naming.Version;
 import org.terasology.naming.gson.NameTypeAdapter;
 import org.terasology.naming.gson.VersionTypeAdapter;
+import org.terasology.registry.In;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
 import org.terasology.world.internal.WorldInfo;
@@ -107,6 +109,10 @@ public class GameManifest {
 
     public WorldInfo getWorldInfo(String name) {
         return worlds.get(name);
+    }
+
+    public Map<String, WorldInfo> getWorldInfoMap() {
+        return worlds;
     }
 
     public void addWorld(WorldInfo worldInfo) {

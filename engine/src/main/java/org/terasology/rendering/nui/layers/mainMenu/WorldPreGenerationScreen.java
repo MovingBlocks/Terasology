@@ -95,14 +95,10 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         worldList = context.get(UniverseSetupScreen.class).getWorldsList();
         selectedWorld = context.get(UniverseSetupScreen.class).getSelectedWorld();
         worldNames = context.get(UniverseSetupScreen.class).worldNames();
-        if (findWorldByName().getWorldGenerator() == null) {
-            worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
-            findWorldByName().setWorldGenerator(worldGenerator);
-        } else {
-            worldGenerator = findWorldByName().getWorldGenerator();
-        }
 
-        worldGenerator.setWorldSeed(createSeed(selectedWorld));
+        setWorldGenerators();
+
+        worldGenerator = findWorldByName().getWorldGenerator();
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         worldsDropdown.setOptions(worldNames);
         genTexture();
@@ -161,7 +157,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
         StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button -> {
-            startPlayingScreen.setTargetWorld(findWorldByName(), texture, context);
+            startPlayingScreen.setTargetWorld(worldList, findWorldByName(), texture, context);
             triggerForwardAnimation(startPlayingScreen);
         });
 
@@ -268,6 +264,19 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
      */
     private String createSeed(String world) {
         return world + seedNumber++;
+    }
+
+    private void setWorldGenerators() {
+        for (WorldSetupWrapper worldSetupWrapper : worldList) {
+            if (worldSetupWrapper.getWorldGenerator() == null) {
+                try {
+                    worldSetupWrapper.setWorldGenerator(WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment));
+                } catch (UnresolvedWorldGeneratorException e) {
+                    e.printStackTrace();
+                }
+            }
+            worldSetupWrapper.getWorldGenerator().setWorldSeed(createSeed(worldSetupWrapper.getWorldName().toString()));
+        }
     }
 
     @Override

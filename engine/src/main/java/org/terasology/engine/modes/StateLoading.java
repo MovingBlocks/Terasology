@@ -186,7 +186,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new PreBeginSystems(context));
         loadProcesses.add(new LoadEntities(context));
         loadProcesses.add(new InitialiseBlockTypeEntities(context));
-        loadProcesses.add(new CreateWorldEntity(context));
+        loadProcesses.add(new CreateWorldEntity(context, gameManifest));
         loadProcesses.add(new InitialiseWorldGenerator(context));
         if (netMode.isServer()) {
             boolean dedicated;

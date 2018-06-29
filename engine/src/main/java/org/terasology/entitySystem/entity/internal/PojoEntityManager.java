@@ -26,6 +26,7 @@ import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -39,9 +40,14 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.sectors.SectorSimulationComponent;
+import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.world.internal.WorldInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,6 +70,7 @@ public class PojoEntityManager implements EngineEntityManager {
     private EngineEntityPool globalPool = new PojoEntityPool(this);
     private PojoSectorManager sectorManager = new PojoSectorManager(this);
     private Map<Long, EngineEntityPool> poolMap = new MapMaker().initialCapacity(1000).makeMap();
+    private List<EngineEntityPool> pools = Lists.newArrayList();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
     private Set<EntityDestroySubscriber> destroySubscribers = Sets.newLinkedHashSet();
@@ -122,6 +129,17 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef create() {
+        return globalPool.create();
+    }
+
+    @Override
+    public EntityRef create(GameManifest gameManifest) {
+        Map<String, WorldInfo> worldInfoMap = gameManifest.getWorldInfoMap();
+        for (Map.Entry<String, WorldInfo> worldInfoEntry : worldInfoMap.entrySet()) {
+            EngineEntityPool pool = new PojoEntityPool(this);
+            pool.create();
+            pools.add(pool);
+        }
         return globalPool.create();
     }
 

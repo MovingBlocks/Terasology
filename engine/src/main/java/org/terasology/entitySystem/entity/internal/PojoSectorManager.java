@@ -21,6 +21,7 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityPool;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -70,6 +71,11 @@ public class PojoSectorManager implements EngineSectorManager {
 
     @Override
     public EntityRef create() {
+        return getPool().create();
+    }
+
+    @Override
+    public EntityRef create(GameManifest gameManifest) {
         return getPool().create();
     }
 

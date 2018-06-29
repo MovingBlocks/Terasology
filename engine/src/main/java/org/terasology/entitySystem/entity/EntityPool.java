@@ -17,6 +17,7 @@ package org.terasology.entitySystem.entity;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -52,6 +53,14 @@ public interface EntityPool {
      * @return A references to a new, unused entity
      */
     EntityRef create();
+
+    /**
+     * Create different pools for each world and creates the global pool.
+     *
+     * @param gameManifest The game for which multiple pools will be needed.
+     * @return A new entity builder
+     */
+    EntityRef create(GameManifest gameManifest);
 
     /**
      * @return A references to a new, unused entity with the desired components
