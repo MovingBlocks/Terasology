@@ -33,5 +33,9 @@ public final class KeyRepeatEvent extends KeyEvent {
         return event;
     }
 
+    public static KeyRepeatEvent createCopy(KeyRepeatEvent toBeCopied) {
+        return new KeyRepeatEvent(toBeCopied.getKey(), toBeCopied.getKeyCharacter(), toBeCopied.getDelta());
+    }
+
 
 }

@@ -42,6 +42,7 @@ import org.terasology.logic.behavior.nui.BTEditorButton;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.GetMaxSpeedEvent;
 import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.players.DecreaseViewDistanceButton;
 import org.terasology.logic.players.IncreaseViewDistanceButton;
 import org.terasology.math.geom.Vector2i;
@@ -213,6 +214,10 @@ class RecordedEventSerializer {
                 gson.toJson(e.getMultipliers(), TFloatArrayList.class, writer);
                 writer.name("postModifiers");
                 gson.toJson(e.getPostModifiers(), TFloatArrayList.class, writer);
+            } else if (event instanceof AttackEvent) {
+                AttackEvent e = (AttackEvent) event;
+                writer.name("instigator").value(e.getInstigator().getId());
+                writer.name("directCause").value(e.getDirectCause().getId());
             } else {
                 logger.error("ERROR: EVENT NOT SUPPORTED FOR SERIALIZATION");
             }
@@ -414,6 +419,10 @@ class RecordedEventSerializer {
             event.setMultipliers(multipliers);
             event.setModifiers(modifiers);
             result = event;
+        } else if (clazz.equals(AttackEvent.class.toString())) {
+            EntityRef instigator = new RecordedEntityRef(jsonObject.get("instigator").getAsLong(), (LowLevelEntityManager) this.entityManager);
+            EntityRef directCause = new RecordedEntityRef(jsonObject.get("directCause").getAsLong(), (LowLevelEntityManager) this.entityManager);
+            result = new AttackEvent(instigator, directCause);
         } else if (getInputEventSpecificType(jsonObject, clazz, deserializationContext) != null) { //input events
             result = getInputEventSpecificType(jsonObject, clazz, deserializationContext);
         }
@@ -498,11 +507,14 @@ class RecordedEventSerializer {
             float delta = jsonObject.get("delta").getAsFloat();
             KeyEvent aux;
             if (c.equals(KeyDownEvent.class.toString())) {
-                aux = KeyDownEvent.create(input, keychar, delta);
+                aux = KeyDownEvent.create(input, keychar, delta); //?
+                aux = KeyDownEvent.createCopy((KeyDownEvent) aux);
             } else if (c.equals(KeyRepeatEvent.class.toString())) {
-                aux = KeyRepeatEvent.create(input, keychar, delta);
+                aux = KeyRepeatEvent.create(input, keychar, delta); //?
+                aux = KeyRepeatEvent.createCopy((KeyRepeatEvent) aux);
             } else {
-                aux = KeyUpEvent.create(input, keychar, delta);
+                aux = KeyUpEvent.create(input, keychar, delta); //?
+                aux = KeyUpEvent.createCopy((KeyUpEvent) aux);
             }
             newEvent = aux;
         } else if (c.equals(MouseButtonEvent.class.toString())) {
@@ -524,7 +536,8 @@ class RecordedEventSerializer {
             MouseAxisEvent.MouseAxis mouseAxis = (MouseAxisEvent.MouseAxis) typeHandler.deserialize(data, deserializationContext);
             float value = jsonObject.get("value").getAsFloat();
             float delta = jsonObject.get("delta").getAsFloat();
-            newEvent = MouseAxisEvent.create(mouseAxis, value, delta);
+            MouseAxisEvent aux = MouseAxisEvent.create(mouseAxis, value, delta);
+            newEvent = MouseAxisEvent.createCopy(aux);
         } else if (c.equals(MouseWheelEvent.class.toString())) {
             JsonObject aux = jsonObject.get("mousePosition").getAsJsonObject();
             Vector2i mousePosition = new Vector2i(aux.get("x").getAsInt(), aux.get("y").getAsInt());

@@ -31,6 +31,7 @@ import org.terasology.math.geom.Vector3f;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,20 +46,24 @@ public final class RecordAndReplaySerializer {
     private static final String REF_ID_MAP = "/ref_id_map" + JSON;
     private static final String FILE_AMOUNT = "/file_amount" + JSON;
     private static final String STATE_EVENT_POSITION = "/state_event_position" + JSON;
+    private static final String DIRECTION_ORIGIN_LIST = "/direction_origin_list" + JSON;
 
     private EntityManager entityManager;
     private RecordedEventStore recordedEventStore;
     private EntityIdMap entityIdMap;
     private RecordAndReplayUtils recordAndReplayUtils;
     private CharacterStateEventPositionMap characterStateEventPositionMap;
+    private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
 
     public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store, EntityIdMap idMap,
-                                     RecordAndReplayUtils recordAndReplayUtils, CharacterStateEventPositionMap characterStateEventPositionMap) {
+                                     RecordAndReplayUtils recordAndReplayUtils, CharacterStateEventPositionMap characterStateEventPositionMap,
+                                     DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList) {
         this.entityManager = manager;
         this.recordedEventStore = store;
         this.entityIdMap = idMap;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.characterStateEventPositionMap = characterStateEventPositionMap;
+        this.directionAndOriginPosRecorderList = directionAndOriginPosRecorderList;
     }
 
     /**
@@ -71,6 +76,7 @@ public final class RecordAndReplaySerializer {
         serializeRefIdMap(gson, recordingPath);
         serializeFileAmount(gson, recordingPath);
         serializeCharacterStateEventPositonMap(gson, recordingPath);
+        serializeAttackEventExtraRecorder(gson, recordingPath);
     }
 
     /**
@@ -96,6 +102,7 @@ public final class RecordAndReplaySerializer {
         deserializeRefIdMap(gson, recordingPath);
         deserializeFileAmount(gson, recordingPath);
         deserializeCharacterStateEventPositonMap(gson, recordingPath);
+        deserializeAttackEventExtraRecorder(gson, recordingPath);
     }
 
     /**
@@ -179,6 +186,32 @@ public final class RecordAndReplaySerializer {
             logger.info("CharacterStateEvent positions Deserialization completed!");
         } catch (Exception e) {
             logger.error("Error while deserializing CharacterStateEvent positions:", e);
+        }
+    }
+
+    private void serializeAttackEventExtraRecorder(Gson gson, String recordingPath) {
+        try {
+            JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + DIRECTION_ORIGIN_LIST));
+            gson.toJson(directionAndOriginPosRecorderList.getList(), ArrayList.class, writer);
+            writer.close();
+            directionAndOriginPosRecorderList.reset();
+            logger.info("AttackEvent extras serialization completed!");
+        } catch( Exception e) {
+            logger.error("Error while serializing AttackEvent extras:", e);
+        }
+    }
+
+    //check this out
+    private void deserializeAttackEventExtraRecorder(Gson gson, String recordingPath) {
+        try {
+            JsonParser parser = new JsonParser();
+            JsonElement jsonElement = parser.parse(new FileReader(recordingPath + DIRECTION_ORIGIN_LIST));
+            Type type = new TypeToken<ArrayList<DirectionAndOriginPosRecorder>>() {}.getType();
+            ArrayList<DirectionAndOriginPosRecorder> list = gson.fromJson(jsonElement, type);
+            directionAndOriginPosRecorderList.setList(list);
+            logger.info("AttackEvent extras deserialization completed!");
+        } catch( Exception e) {
+            logger.error("Error while deserializing AttackEvent extras:", e);
         }
     }
 

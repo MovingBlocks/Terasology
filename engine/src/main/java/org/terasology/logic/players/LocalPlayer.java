@@ -29,6 +29,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
+import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.CoreRegistry;
@@ -37,7 +38,10 @@ public class LocalPlayer {
 
     private EntityRef clientEntity = EntityRef.NULL;
     private int nextActivationId;
+
+    //Record and Replay classes
     private EntityIdMap entityIdMap;
+    private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
 
     public LocalPlayer() {
 
@@ -63,8 +67,10 @@ public class LocalPlayer {
         }
     }
 
-    public void setEntityIdMap(EntityIdMap entityIdMap) {
-        this.entityIdMap = entityIdMap;
+    public void setRecordAndReplayClasses(EntityIdMap idMap, DirectionAndOriginPosRecorderList list) {
+        this.entityIdMap = idMap;
+        this.directionAndOriginPosRecorderList = list;
+
     }
 
     public EntityRef getClientEntity() {
@@ -206,6 +212,13 @@ public class LocalPlayer {
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         Vector3f direction = getViewDirection();
         Vector3f originPos = getViewPosition();
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+            this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().add(direction, originPos);
+        } else if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+            Vector3f[] data = this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().poll();
+            direction = data[0];
+            originPos = data[1];
+        }
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);

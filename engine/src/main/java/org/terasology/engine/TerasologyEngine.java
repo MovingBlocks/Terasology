@@ -57,6 +57,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.recording.CharacterStateEventPositionMap;
+import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -153,10 +154,14 @@ public class TerasologyEngine implements GameEngine {
         this.rootContext = new ContextImpl();
         rootContext.put(GameEngine.class, this);
         this.timeSubsystem = timeSubsystem;
+
+        //Record and Replay classes
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         rootContext.put(RecordAndReplayUtils.class, recordAndReplayUtils);
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         rootContext.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
+        DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
+        rootContext.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
         /*
          * We can't load the engine without core registry yet.
          * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.

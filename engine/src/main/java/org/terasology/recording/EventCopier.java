@@ -59,6 +59,7 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.behavior.nui.BTEditorButton;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.GetMaxSpeedEvent;
+import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.players.DecreaseViewDistanceButton;
 import org.terasology.logic.players.IncreaseViewDistanceButton;
 import org.terasology.rendering.nui.editor.binds.NUIEditorButton;
@@ -126,6 +127,10 @@ class EventCopier {
             newEvent.setModifiers(originalEvent.getModifiers());
             newEvent.setMultipliers(originalEvent.getMultipliers());
             newEvent.setPostModifiers(originalEvent.getPostModifiers());
+            return newEvent;
+        } else if (e instanceof AttackEvent) {
+            AttackEvent originalEvent = (AttackEvent) e;
+            AttackEvent  newEvent = new AttackEvent(originalEvent.getInstigator(), originalEvent.getDirectCause());
             return newEvent;
         } else {
             return null;
@@ -201,11 +206,11 @@ class EventCopier {
         Class eventClass = originalEvent.getClass();
 
         if (eventClass.equals(KeyDownEvent.class)) {
-            newEvent = KeyDownEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
+            newEvent = KeyDownEvent.createCopy((KeyDownEvent) originalEvent);
         } else if (eventClass.equals(KeyRepeatEvent.class)) {
-            newEvent = KeyRepeatEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
+            newEvent = KeyRepeatEvent.createCopy((KeyRepeatEvent) originalEvent);
         } else if (eventClass.equals(KeyUpEvent.class)) {
-            newEvent = KeyUpEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
+            newEvent = KeyUpEvent.createCopy((KeyUpEvent) originalEvent);
         } else {
             logger.error("ERROR!!! Event not Identified");
         }
@@ -239,7 +244,7 @@ class EventCopier {
     }
 
     private MouseAxisEvent createNewMouseAxisEvent(MouseAxisEvent originalEvent) {
-        return MouseAxisEvent.create(originalEvent.getMouseAxis(), originalEvent.getValue(), originalEvent.getDelta());
+        return MouseAxisEvent.createCopy(originalEvent);
     }
 
 }

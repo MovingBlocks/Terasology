@@ -46,6 +46,7 @@ import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.PlayerCharacterComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -54,6 +55,8 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
@@ -83,6 +86,9 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private BlockEntityRegistry blockRegistry;
+
+    @In
+    private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
 
     @ReceiveEvent
     public void beforeDestroy(BeforeDestroyEvent event, EntityRef character, CharacterComponent characterComponent, AliveCharacterComponent aliveCharacterComponent) {
@@ -209,9 +215,15 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
             Vector3f direction = gazeLocation.getWorldDirection();
             Vector3f originPos = gazeLocation.getWorldPosition();
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+                directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction, originPos);
+            } else if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+                Vector3f[] data = directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().poll();
+                direction = data[0];
+                originPos = data[1];
+            }
 
             HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
-
             if (result.isHit()) {
                 result.getEntity().send(new AttackEvent(character, event.getItem()));
             }

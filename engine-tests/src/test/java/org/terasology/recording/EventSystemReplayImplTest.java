@@ -72,7 +72,8 @@ public class EventSystemReplayImplTest {
         EntityIdMap entityIdMap = new EntityIdMap();
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore, entityIdMap, recordAndReplayUtils, characterStateEventPositionMap);
+        DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore, entityIdMap, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
         RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAYING);
         entity = entityManager.create();
         Long id = entity.getId();
