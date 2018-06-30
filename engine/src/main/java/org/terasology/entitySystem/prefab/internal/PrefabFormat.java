@@ -22,7 +22,10 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.prefab.ModuleDependenciesComponent;
 import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -38,10 +41,12 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
 
     private ComponentLibrary componentLibrary;
     private TypeSerializationLibrary typeSerializationLibrary;
+    private ModuleEnvironment environment;
 
-    public PrefabFormat(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
+    public PrefabFormat(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary, ModuleEnvironment envrionment) {
         super("prefab");
         this.componentLibrary = componentLibrary;
+        this.environment = envrionment;
         this.typeSerializationLibrary = typeSerializationLibrary;
     }
 
@@ -52,11 +57,23 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
             if (prefabData != null) {
                 logger.info("Attempting to deserialize prefab {} with inputs {}", resourceUrn, inputs);
                 PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeSerializationLibrary);
-                return serializer.deserialize(prefabData);
+                return checkOptionalDependencies(serializer.deserialize(prefabData));
+
             } else {
                 throw new IOException("Failed to read prefab for '" + resourceUrn + "'");
             }
         }
+    }
+    private PrefabData checkOptionalDependencies(PrefabData data) {
+        if (environment != null && data.hasComponent(ModuleDependenciesComponent.class)) {
+            ModuleDependenciesComponent component = data.getComponent(ModuleDependenciesComponent.class);
+            for (String name : component.modules) {
+                if (environment.get(new Name(name)) == null) {
+                    return null;
+                }
+            }
+        }
+        return data;
     }
 
 }
