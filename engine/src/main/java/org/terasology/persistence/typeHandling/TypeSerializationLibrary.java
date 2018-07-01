@@ -39,6 +39,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.ByteArrayTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
@@ -127,6 +128,7 @@ public class TypeSerializationLibrary {
         add(Long.TYPE, new LongTypeHandler());
         add(String.class, new StringTypeHandler());
         add(Number.class, new NumberTypeHandler());
+        add(byte[].class, new ByteArrayTypeHandler());
     }
 
     /**
