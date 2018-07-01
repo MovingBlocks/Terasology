@@ -88,7 +88,6 @@ class EventCopier {
         } else if (e instanceof KeyEvent) {
             KeyEvent originalEvent = (KeyEvent) e;
             KeyEvent newEvent = createNewKeyEvent(originalEvent);
-            newEvent.setState(originalEvent.getState());
             inputEventSetup(newEvent, originalEvent);
             return newEvent;
         } else if (e instanceof BindAxisEvent) {

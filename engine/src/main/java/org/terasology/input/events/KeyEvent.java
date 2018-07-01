@@ -48,11 +48,7 @@ public class KeyEvent extends ButtonEvent {
         return keyChar;
     }
 
-    public void setState(ButtonState state) {
-        this.state = state;
-    }
-
-    void setKey(Input newInput, char newKeyChar) {
+    protected void setKey(Input newInput, char newKeyChar) {
         this.input = newInput;
         this.keyChar = newKeyChar;
     }

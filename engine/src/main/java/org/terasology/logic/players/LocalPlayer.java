@@ -125,7 +125,7 @@ public class LocalPlayer {
         return getViewPosition(new Vector3f());
     }
 
-    private Vector3f getViewPosition(Vector3f out) {
+    public Vector3f getViewPosition(Vector3f out) {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
         if (clientComponent == null) {
             return out;

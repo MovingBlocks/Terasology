@@ -59,7 +59,7 @@ class SaveTransactionBuilder {
         this.recordAndReplayUtils = recordAndReplayUtils;
     }
 
-    void addUnloadedPlayer(String id, EntityData.PlayerStore unloadedPlayer) {
+    public void addUnloadedPlayer(String id, EntityData.PlayerStore unloadedPlayer) {
         unloadedPlayers.put(id, unloadedPlayer);
     }
 

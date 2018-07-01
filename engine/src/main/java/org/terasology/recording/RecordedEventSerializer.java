@@ -504,7 +504,6 @@ class RecordedEventSerializer {
             } else {
                 aux = KeyUpEvent.create(input, keychar, delta);
             }
-            aux.setState(state);
             newEvent = aux;
         } else if (c.equals(MouseButtonEvent.class.toString())) {
             GsonPersistedData data = new GsonPersistedData(jsonObject.get("button"));

@@ -41,7 +41,7 @@ public class MouseButtonEvent extends ButtonEvent {
         return button;
     }
 
-    private String getMouseButtonName() {
+    public String getMouseButtonName() {
         return button.getName();
     }
 

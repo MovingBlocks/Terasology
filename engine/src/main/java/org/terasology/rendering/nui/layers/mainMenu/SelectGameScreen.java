@@ -170,11 +170,11 @@ public class SelectGameScreen extends SelectionScreen {
         }
     }
 
-    private boolean isLoadingAsServer() {
+    public boolean isLoadingAsServer() {
         return universeWrapper.getLoadingAsServer();
     }
 
-    void setUniverseWrapper(UniverseWrapper wrapper) {
+    public void setUniverseWrapper(UniverseWrapper wrapper) {
         this.universeWrapper = wrapper;
     }
 

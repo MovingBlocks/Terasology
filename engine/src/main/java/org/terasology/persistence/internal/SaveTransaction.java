@@ -100,7 +100,7 @@ public class SaveTransaction extends AbstractTask {
     private RecordAndReplayUtils recordAndReplayUtils;
 
 
-    SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
+    public SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
                            Map<String, EntityData.PlayerStore> unloadedPlayers,
                            Map<String, PlayerStoreBuilder> loadedPlayers, GlobalStoreBuilder globalStoreBuilder,
                            Map<Vector3i, CompressedChunkBuilder> unloadedChunks, Map<Vector3i, ChunkImpl> loadedChunks,
