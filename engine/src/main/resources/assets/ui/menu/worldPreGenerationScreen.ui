@@ -45,7 +45,7 @@
           },
           "position-bottom": {
             "target": "TOP",
-            "widget": "close",
+            "widget": "actionsRow",
             "offset": 16
           }
         }
@@ -64,9 +64,9 @@
             "offset": 8
           },
           "position-bottom": {
-            "target": "TOP",
-            "widget": "close",
-            "offset": 24
+            "target": "BOTTOM",
+            "widget": "container",
+            "offset": 8
           }
         },
         "contents": [
@@ -187,32 +187,20 @@
         ]
       },
       {
-        "type": "UISpace",
-        "id": "close",
-        "layoutInfo": {
-          "width": 128,
-          "height": 32,
-          "position-horizontal-center": {},
-          "position-bottom": {
-            "target": "BOTTOM",
-            "offset": 48
-          }
-        }
-      },
-      {
         "type": "RowLayout",
         "id": "actionsRow",
         "horizontalSpacing": 4,
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#back}",
-            "id": "close"
+            "text": "${engine:menu#continue}",
+            "id": "continue"
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#continue}",
-            "id": "continue"
+            "text": "${engine:menu#start-game}",
+            "id": "play",
+            "enabled": false
           }
         ],
         "layoutInfo": {
@@ -221,8 +209,22 @@
           "position-horizontal-center": {},
           "position-bottom": {
             "target": "BOTTOM",
-            "offset": -48,
-            "widget": "container"
+            "offset": 80
+          }
+        }
+      },
+      {
+        "type": "UIButton",
+        "text": "${engine:menu#back}",
+        "id": "close",
+        "layoutInfo": {
+          "width": 128,
+          "height": 32,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "BOTTOM",
+            "widget": "actionsRow",
+            "offset": 16
           }
         }
       }

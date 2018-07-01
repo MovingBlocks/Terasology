@@ -23,7 +23,6 @@ import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
@@ -31,7 +30,6 @@ import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
-import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
@@ -43,18 +41,14 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.AdvancedGameSetupScreen;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
-import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
-import org.terasology.world.internal.WorldInfo;
-import org.terasology.world.time.WorldTime;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,11 +56,8 @@ import java.util.List;
 public class NewGameScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:newGameScreen");
-    private static final String DEFAULT_GAME_NAME_PREFIX = "Game ";
     private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
     private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
-    private static final String DEFAULT_WORLD_GENERATOR = "Core:FacetedPerlin";
-    private boolean loadingAsServer;
 
     @In
     private ModuleManager moduleManager;
@@ -158,34 +149,16 @@ public class NewGameScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "play", button -> {
-            if(gameName.getText().isEmpty()) {
+            if (gameName.getText().isEmpty()) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game name cannot be empty");
             } else {
-                GameManifest gameManifest = new GameManifest();
-
-                gameManifest.setTitle(gameName.getText());
-                String tempSeed = new FastRandom().nextString(32);
-                gameManifest.setSeed(tempSeed);
-                DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-                ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-                if (!result.isSuccess()) {
-                    MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                    if (errorMessagePopup != null) {
-                        errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
-                    }
-                    return;
+                GameManifest gameManifest = GameManifestProvider.createDefaultGameManifest(universeWrapper, moduleManager, config);
+                if (gameManifest != null) {
+                    gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                } else {
+                    MessagePopup errorPopup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                    errorPopup.setMessage("Error", "Can't create new game!");
                 }
-                for (Module module : result.getModules()) {
-                    gameManifest.addModule(module.getId(), module.getVersion());
-                }
-
-                SimpleUri uri = config.getWorldGeneration().getDefaultGenerator();
-                // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
-                final float timeOffset = 0.50f;
-                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, tempSeed,
-                        (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
-                gameManifest.addWorld(worldInfo);
-                gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
             }
         });
 
@@ -200,19 +173,7 @@ public class NewGameScreen extends CoreScreenLayer {
      */
     private void setGameName(UIText gameName) {
         if (gameName != null) {
-            int gameNumber = 1;
-            for (GameInfo info : GameProvider.getSavedGames()) {
-                if (info.getManifest().getTitle().startsWith(DEFAULT_GAME_NAME_PREFIX)) {
-                    String remainder = info.getManifest().getTitle().substring(DEFAULT_GAME_NAME_PREFIX.length());
-                    try {
-                        gameNumber = Math.max(gameNumber, Integer.parseInt(remainder) + 1);
-                    } catch (NumberFormatException e) {
-                        logger.trace("Could not parse {} as integer (not an error)", remainder, e);
-                    }
-                }
-            }
-
-            gameName.setText(DEFAULT_GAME_NAME_PREFIX + gameNumber);
+            gameName.setText(GameProvider.getNextGameName());
         }
     }
 
