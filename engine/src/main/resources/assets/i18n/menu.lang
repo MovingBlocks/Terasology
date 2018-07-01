@@ -58,6 +58,8 @@
     "biome-name": "biome-name",
     "bloom-effect": "bloom-effect",
     "bobbing": "bobbing",
+    "button-web-browser-confirmation-title": "button-web-browser-confirmation-title",
+    "button-web-browser-confirmation-message": "button-web-browser-confirmation-title",
     "camera-blur": "camera-blur",
     "camera-blur-max": "camera-blur-max",
     "camera-blur-normal": "camera-blur-normal",
