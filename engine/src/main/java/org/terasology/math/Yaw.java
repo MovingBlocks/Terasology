@@ -27,9 +27,9 @@ public enum Yaw {
     CLOCKWISE_180((byte) 0b10, (float) (Math.PI), 2),
     CLOCKWISE_270((byte) 0b11, (float) (-0.5f * Math.PI), 3);
 
-    private byte index;
-    private float radians;
-    private int increments;
+    private final byte index;
+    private final float radians;
+    private final int increments;
 
      Yaw(byte index, float radians, int increments) {
         this.index = index;
