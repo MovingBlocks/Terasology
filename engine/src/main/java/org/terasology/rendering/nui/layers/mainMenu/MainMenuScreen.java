@@ -23,6 +23,8 @@ import org.terasology.engine.NonNativeJVMDetector;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -35,8 +37,6 @@ import org.terasology.version.TerasologyVersion;
 
 import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedStatusMessage;
 
-/**
- */
 public class MainMenuScreen extends CoreScreenLayer {
 
     @In
@@ -66,7 +66,11 @@ public class MainMenuScreen extends CoreScreenLayer {
         jvmWarningLabel.setVisible(NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE);
 
         SelectGameScreen selectScreen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
+        RecordScreen recordScreen = getManager().createScreen(RecordScreen.ASSET_URI, RecordScreen.class);
+        ReplayScreen replayScreen = getManager().createScreen(ReplayScreen.ASSET_URI, ReplayScreen.class);
+      
         UniverseWrapper universeWrapper = new UniverseWrapper();
+      
         WidgetUtil.trySubscribe(this, "singleplayer", button -> {
             universeWrapper.setLoadingAsServer(false);
             selectScreen.setUniverseWrapper(universeWrapper);
@@ -76,6 +80,18 @@ public class MainMenuScreen extends CoreScreenLayer {
             universeWrapper.setLoadingAsServer(true);
             selectScreen.setUniverseWrapper(universeWrapper);
             triggerForwardAnimation(selectScreen);
+        });
+        WidgetUtil.trySubscribe(this, "record", button -> {
+            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.PREPARING_RECORD);
+            RecordAndReplayUtils recordAndReplayUtils = engine.createChildContext().get(RecordAndReplayUtils.class);
+            recordScreen.setRecordAndReplayUtils(recordAndReplayUtils);
+            triggerForwardAnimation(recordScreen);
+        });
+        WidgetUtil.trySubscribe(this, "replay", button -> {
+            RecordAndReplayUtils recordAndReplayUtils = engine.createChildContext().get(RecordAndReplayUtils.class);
+            replayScreen.setRecordAndReplayUtils(recordAndReplayUtils);
+            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.PREPARING_REPLAY);
+            triggerForwardAnimation(replayScreen);
         });
         WidgetUtil.trySubscribe(this, "join", button -> {
             if (storageService.getStatus() == StorageServiceWorkerStatus.WORKING) {

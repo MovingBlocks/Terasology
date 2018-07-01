@@ -35,6 +35,10 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadOnlyStorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
+import org.terasology.recording.EntityIdMap;
+import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.backdrop.Skysphere;
@@ -115,12 +119,15 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         // Init. a new world
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
         boolean writeSaveGamesEnabled = context.get(Config.class).getSystem().isWriteSaveGamesEnabled();
-        Path savePath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
+        //Gets save data from a normal save or from a recording if it is a replay
+        Path saveOrRecordingPath = getSaveOrRecordingPath();
         StorageManager storageManager;
+        RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
+        RecordAndReplayUtils recordAndReplayUtils = context.get(RecordAndReplayUtils.class);
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(savePath, environment, entityManager, blockManager, biomeManager)
-                    : new ReadOnlyStorageManager(savePath, environment, entityManager, blockManager, biomeManager);
+                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils)
+                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);
             context.get(GameEngine.class).changeState(new StateMainMenu("Unable to create storage manager!"));
@@ -154,10 +161,22 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.put(WorldRenderer.class, worldRenderer);
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        context.put(LocalPlayer.class, new LocalPlayer());
+        LocalPlayer localPlayer = new LocalPlayer();
+        localPlayer.setEntityIdMap(context.get(EntityIdMap.class));
+        context.put(LocalPlayer.class, localPlayer);
         context.put(Camera.class, worldRenderer.getActiveCamera());
 
         return true;
+    }
+
+    private Path getSaveOrRecordingPath() {
+        Path saveOrRecordingPath;
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+            saveOrRecordingPath = PathManager.getInstance().getRecordingPath(gameManifest.getTitle());
+        } else {
+            saveOrRecordingPath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
+        }
+        return saveOrRecordingPath;
     }
 
     @Override

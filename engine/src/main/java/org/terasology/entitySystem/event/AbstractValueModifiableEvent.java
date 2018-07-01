@@ -70,4 +70,28 @@ public abstract class AbstractValueModifiableEvent implements Event {
         }
         return result;
     }
+
+    public TFloatList getModifiers() {
+        return modifiers;
+    }
+
+    public void setModifiers(TFloatList modifiers) {
+        this.modifiers = modifiers;
+    }
+
+    public TFloatList getMultipliers() {
+        return multipliers;
+    }
+
+    public void setMultipliers(TFloatList multipliers) {
+        this.multipliers = multipliers;
+    }
+
+    public TFloatList getPostModifiers() {
+        return postModifiers;
+    }
+
+    public void setPostModifiers(TFloatList postModifiers) {
+        this.postModifiers = postModifiers;
+    }
 }

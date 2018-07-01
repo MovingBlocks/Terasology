@@ -56,6 +56,8 @@ import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.recording.CharacterStateEventPositionMap;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -151,6 +153,10 @@ public class TerasologyEngine implements GameEngine {
         this.rootContext = new ContextImpl();
         rootContext.put(GameEngine.class, this);
         this.timeSubsystem = timeSubsystem;
+        RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
+        rootContext.put(RecordAndReplayUtils.class, recordAndReplayUtils);
+        CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
+        rootContext.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
         /*
          * We can't load the engine without core registry yet.
          * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
@@ -210,7 +216,7 @@ public class TerasologyEngine implements GameEngine {
 
             verifyInitialisation();
 
-            /**
+            /*
              * Prevent objects being put in engine context after init phase. Engine states should use/create a
              * child context.
              */

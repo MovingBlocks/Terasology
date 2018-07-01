@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -30,6 +31,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
+import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.utilities.concurrency.AbstractTask;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
@@ -91,13 +95,19 @@ public class SaveTransaction extends AbstractTask {
     private final StoragePathProvider storagePathProvider;
     private final SaveTransactionHelper saveTransactionHelper;
 
+    //Record and Replay
+    private RecordAndReplaySerializer recordAndReplaySerializer;
+    private RecordAndReplayUtils recordAndReplayUtils;
+
 
     public SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
                            Map<String, EntityData.PlayerStore> unloadedPlayers,
                            Map<String, PlayerStoreBuilder> loadedPlayers, GlobalStoreBuilder globalStoreBuilder,
                            Map<Vector3i, CompressedChunkBuilder> unloadedChunks, Map<Vector3i, ChunkImpl> loadedChunks,
                            GameManifest gameManifest, boolean storeChunksInZips,
-                           StoragePathProvider storagePathProvider, Lock worldDirectoryWriteLock) {
+                           StoragePathProvider storagePathProvider, Lock worldDirectoryWriteLock,
+                           RecordAndReplaySerializer recordAndReplaySerializer,
+                           RecordAndReplayUtils recordAndReplayUtils) {
         this.privateEntityManager = privateEntityManager;
         this.deltaToSave = deltaToSave;
         this.unloadedPlayers = unloadedPlayers;
@@ -110,6 +120,8 @@ public class SaveTransaction extends AbstractTask {
         this.storagePathProvider = storagePathProvider;
         this.saveTransactionHelper = new SaveTransactionHelper(storagePathProvider);
         this.worldDirectoryWriteLock = worldDirectoryWriteLock;
+        this.recordAndReplaySerializer = recordAndReplaySerializer;
+        this.recordAndReplayUtils = recordAndReplayUtils;
     }
 
 
@@ -120,6 +132,9 @@ public class SaveTransaction extends AbstractTask {
 
     @Override
     public void run() {
+        if (isReplay()) {
+            return;
+        }
         try {
             if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {
                 // should not happen, as initialization should clean it up
@@ -137,14 +152,44 @@ public class SaveTransaction extends AbstractTask {
             mergeChanges();
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
+            saveRecordingData();
         } catch (IOException | RuntimeException t) {
             logger.error("Save game creation failed", t);
             result = SaveTransactionResult.createFailureResult(t);
         }
     }
 
+    private void saveRecordingData() {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+            if (recordAndReplayUtils.isShutdownRequested()) {
+                recordAndReplaySerializer.serializeRecordAndReplayData();
+
+                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                recordAndReplayUtils.reset();
+            } else {
+                String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
+                recordAndReplaySerializer.serializeRecordedEvents(recordingPath);
+            }
+        }
+    }
+
+    private boolean isReplay() {
+        boolean isReplay = false;
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAY_FINISHED
+                || RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+
+            isReplay = true;
+            if (recordAndReplayUtils.isShutdownRequested()) {
+                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                recordAndReplayUtils.reset();
+            }
+
+        }
+        return isReplay;
+    }
+
     private void prepareChunksPlayersAndGlobalStore() {
-        /**
+        /*
          * Currently loaded persistent entities without owner that have not been saved yet.
          */
         Set<EntityRef> unsavedEntities = new HashSet<>();
@@ -261,7 +306,7 @@ public class SaveTransaction extends AbstractTask {
             if (privateEntityManager.isActiveEntity(entityId)) {
                 entityToDestroy = privateEntityManager.getEntity(entityId);
             } else {
-                /**
+                /*
                  * Create the entity as theere could be a component that references a {@link DelayedEntityRef}
                  * with the specified id. It is important that the {@link DelayedEntityRef} will reference
                  * a destroyed {@link EntityRef} instance. That is why a entity will be created, potentially

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.event.internal;
+package org.terasology.entitySystem.event;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
 
-/**
- */
-class PendingEvent {
+public class PendingEvent {
     private EntityRef entity;
     private Event event;
     private Component component;
 
-     PendingEvent(EntityRef entity, Event event) {
+     public PendingEvent(EntityRef entity, Event event) {
         this.event = event;
         this.entity = entity;
     }
 
-     PendingEvent(EntityRef entity, Event event, Component component) {
+     public PendingEvent(EntityRef entity, Event event, Component component) {
         this.entity = entity;
         this.event = event;
         this.component = component;

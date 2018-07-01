@@ -15,8 +15,6 @@
  */
 package org.terasology.engine.modes;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -42,6 +40,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
@@ -58,8 +57,6 @@ import java.util.Collections;
  * @version 0.1
  */
 public class StateIngame implements GameState {
-
-    private static final Logger logger = LoggerFactory.getLogger(StateIngame.class);
 
     private ComponentSystemManager componentSystemManager;
     private EventSystem eventSystem;
@@ -119,6 +116,10 @@ public class StateIngame implements GameState {
 
     @Override
     public void dispose(boolean shuttingDown) {
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
+            ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
+            screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
+        }
 
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.dispose();
@@ -236,7 +237,7 @@ public class StateIngame implements GameState {
         return gameManifest.getTitle();
     }
 
-    public void renderUserInterface() {
+    private void renderUserInterface() {
         PerformanceMonitor.startActivity("Rendering NUI");
         nuiManager.render();
         PerformanceMonitor.endActivity();
@@ -250,7 +251,7 @@ public class StateIngame implements GameState {
         pauseGame = true;
     }
 
-    public void unpause() {
+    private void unpause() {
         pauseGame = false;
     }
 

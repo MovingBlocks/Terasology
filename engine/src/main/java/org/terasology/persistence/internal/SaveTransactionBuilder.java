@@ -20,6 +20,8 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.protobuf.EntityData;
+import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.util.Map;
@@ -41,42 +43,47 @@ class SaveTransactionBuilder {
     private final boolean storeChunksInZips;
     private final StoragePathProvider storagePathProvider;
     private GameManifest gameManifest;
+    private RecordAndReplaySerializer recordAndReplaySerializer;
+    private RecordAndReplayUtils recordAndReplayUtils;
 
     SaveTransactionBuilder(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
                            boolean storeChunksInZips, StoragePathProvider storagePathProvider,
-                           Lock worldDirectoryWriteLock) {
+                           Lock worldDirectoryWriteLock, RecordAndReplaySerializer recordAndReplaySerializer,
+                           RecordAndReplayUtils recordAndReplayUtils) {
         this.privateEntityManager = privateEntityManager;
         this.deltaToSave = deltaToSave;
         this.storeChunksInZips = storeChunksInZips;
         this.storagePathProvider = storagePathProvider;
         this.worldDirectoryWriteLock = worldDirectoryWriteLock;
+        this.recordAndReplaySerializer = recordAndReplaySerializer;
+        this.recordAndReplayUtils = recordAndReplayUtils;
     }
 
     public void addUnloadedPlayer(String id, EntityData.PlayerStore unloadedPlayer) {
         unloadedPlayers.put(id, unloadedPlayer);
     }
 
-    public void addLoadedPlayer(String id, PlayerStoreBuilder loadedPlayer) {
+    void addLoadedPlayer(String id, PlayerStoreBuilder loadedPlayer) {
         loadedPlayers.put(id, loadedPlayer);
     }
 
-    public void setGlobalStoreBuilder(GlobalStoreBuilder globalStoreBuilder) {
+    void setGlobalStoreBuilder(GlobalStoreBuilder globalStoreBuilder) {
         this.globalStoreBuilder = globalStoreBuilder;
     }
 
-    public void addUnloadedChunk(final Vector3i chunkPosition, final CompressedChunkBuilder b) {
+    void addUnloadedChunk(final Vector3i chunkPosition, final CompressedChunkBuilder b) {
         unloadedChunks.put(chunkPosition, b);
     }
 
 
-    public void addLoadedChunk(final Vector3i chunkPosition, final ChunkImpl chunk) {
+    void addLoadedChunk(final Vector3i chunkPosition, final ChunkImpl chunk) {
         loadedChunks.put(chunkPosition, chunk);
     }
 
     public SaveTransaction build() {
         return new SaveTransaction(privateEntityManager, deltaToSave, unloadedPlayers, loadedPlayers, globalStoreBuilder,
                 unloadedChunks, loadedChunks, gameManifest, storeChunksInZips, storagePathProvider,
-                worldDirectoryWriteLock);
+                worldDirectoryWriteLock, recordAndReplaySerializer, recordAndReplayUtils);
 
     }
 
