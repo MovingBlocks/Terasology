@@ -17,11 +17,11 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.util.Set;
 import org.junit.Test;
 import org.terasology.engine.SimpleUri;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,14 +41,11 @@ public class RenderTaskListGeneratorTest {
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
-        assertEquals("----- test:alphaNode (AlphaNode)",        taskList.get(0).toString().trim()); // Strictly speaking we don't need
-        assertEquals("SetName: foo",       taskList.get(1).toString().trim()); // trimming MarkerTask.toString(),
-        assertEquals("test:alphaNode (AlphaNode)",   taskList.get(2).toString().trim()); // resulting in "----- <NodeName>"
-        assertEquals("----- test:bravoNode (BravoNode)",        taskList.get(3).toString().trim()); // We just do it to avoid attracting
-        assertEquals("test:bravoNode (BravoNode)",   taskList.get(4).toString().trim()); // too much attention to it.
-        assertEquals("----- test:charlieNode (CharlieNode)",      taskList.get(5).toString().trim());
-        assertEquals("test:charlieNode (CharlieNode)", taskList.get(6).toString().trim());
-        assertEquals("SetName: bar",       taskList.get(7).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(0).toString().trim()); // trimming MarkerTask.toString(),
+        assertEquals("test:alphaNode (AlphaNode)",   taskList.get(1).toString().trim()); // resulting in "----- <NodeName>"
+        assertEquals("test:bravoNode (BravoNode)",   taskList.get(2).toString().trim()); // too much attention to it.
+        assertEquals("test:charlieNode (CharlieNode)", taskList.get(3).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(4).toString().trim());
     }
 
     @Test
@@ -66,17 +63,13 @@ public class RenderTaskListGeneratorTest {
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
-        assertEquals("----- test:alphaNode (AlphaNode)",        taskList.get(0).toString().trim());
-        assertEquals("SetName: foo",       taskList.get(1).toString().trim());
-        assertEquals("test:alphaNode (AlphaNode)",   taskList.get(2).toString().trim());
-        assertEquals("----- test:bravoNode (BravoNode)",        taskList.get(3).toString().trim());
-        assertEquals("test:bravoNode (BravoNode)",   taskList.get(4).toString().trim());
-        assertEquals("----- test:charlieNode (CharlieNode)",      taskList.get(5).toString().trim());
-        assertEquals("test:charlieNode (CharlieNode)", taskList.get(6).toString().trim());
-        assertEquals("----- test:deltaNode (DeltaNode)",        taskList.get(7).toString().trim());
-        assertEquals("SetName: bar",     taskList.get(8).toString().trim());
-        assertEquals("test:deltaNode (DeltaNode)",   taskList.get(9).toString().trim());
-        assertEquals("SetName: bar",       taskList.get(10).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(0).toString().trim());
+        assertEquals("test:alphaNode (AlphaNode)",   taskList.get(1).toString().trim());
+        assertEquals("test:bravoNode (BravoNode)",   taskList.get(2).toString().trim());
+        assertEquals("test:charlieNode (CharlieNode)", taskList.get(3).toString().trim());
+        assertEquals("SetName: bar",     taskList.get(4).toString().trim());
+        assertEquals("test:deltaNode (DeltaNode)",   taskList.get(5).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(6).toString().trim());
     }
 
     @Test
@@ -96,21 +89,16 @@ public class RenderTaskListGeneratorTest {
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
-        assertEquals("----- test:alphaNode (AlphaNode)",        taskList.get(0).toString().trim());
-        assertEquals("SetName: foo",       taskList.get(1).toString().trim());
-        assertEquals("test:alphaNode (AlphaNode)",   taskList.get(2).toString().trim());
-        assertEquals("----- test:bravoNode (BravoNode)",        taskList.get(3).toString().trim());
-        assertEquals("test:bravoNode (BravoNode)",   taskList.get(4).toString().trim());
-        assertEquals("----- test:echoNode (EchoNode)",         taskList.get(5).toString().trim());
-        assertEquals("SetName: bar",       taskList.get(6).toString().trim());
-        assertEquals("test:echoNode (EchoNode)",    taskList.get(7).toString().trim());
-        assertEquals("----- test:charlieNode (CharlieNode)",      taskList.get(8).toString().trim());
-        assertEquals("SetName: foo",       taskList.get(9).toString().trim());
-        assertEquals("test:charlieNode (CharlieNode)", taskList.get(10).toString().trim());
-        assertEquals("----- test:deltaNode (DeltaNode)",        taskList.get(11).toString().trim());
-        assertEquals("SetName: bar",     taskList.get(12).toString().trim());
-        assertEquals("test:deltaNode (DeltaNode)",   taskList.get(13).toString().trim());
-        assertEquals("SetName: bar",   taskList.get(14).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(0).toString().trim());
+        assertEquals("test:alphaNode (AlphaNode)",   taskList.get(1).toString().trim());
+        assertEquals("test:bravoNode (BravoNode)",   taskList.get(2).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(3).toString().trim());
+        assertEquals("test:echoNode (EchoNode)",    taskList.get(4).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(5).toString().trim());
+        assertEquals("test:charlieNode (CharlieNode)", taskList.get(6).toString().trim());
+        assertEquals("SetName: bar",     taskList.get(7).toString().trim());
+        assertEquals("test:deltaNode (DeltaNode)",   taskList.get(8).toString().trim());
+        assertEquals("SetName: bar",   taskList.get(9).toString().trim());
     }
 
     private abstract class DummyNode implements Node {
