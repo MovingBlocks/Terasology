@@ -48,11 +48,11 @@ import org.terasology.rendering.nui.layers.mainMenu.SelectGameScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UITabBox;
 import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.rendering.nui.widgets.slideshow.UITimedImageSlideshow;
 import org.terasology.utilities.time.DateTimeHelper;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
@@ -483,9 +483,9 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     public void setPreviewImage(TextureRegion texture) {
-        UIImage previewImage = find("previewImage", UIImage.class);
-        if (previewImage != null) {
-            previewImage.setImage(texture);
+        UITimedImageSlideshow slider = find("preview", UITimedImageSlideshow.class);
+        if (slider != null) {
+            slider.addImage(texture);
         }
     }
 }
