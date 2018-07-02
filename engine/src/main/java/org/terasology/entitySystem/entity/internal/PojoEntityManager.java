@@ -26,7 +26,6 @@ import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
@@ -45,9 +44,6 @@ import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.ArrayList;
@@ -84,21 +80,14 @@ public class PojoEntityManager implements EngineEntityManager {
 
     private TypeSerializationLibrary typeSerializerLibrary;
 
-    public void setTypeSerializerLibrary(TypeSerializationLibrary serializerLibrary) {
-        this.typeSerializerLibrary = serializerLibrary;
-    }
-
-    public void setComponentLibrary(ComponentLibrary componentLibrary) {
-        this.componentLibrary = componentLibrary;
-    }
-
-    public void setPrefabManager(PrefabManager prefabManager) {
-        this.prefabManager = prefabManager;
-    }
-
     @Override
     public RefStrategy getEntityRefStrategy() {
         return refStrategy;
+    }
+
+    @Override
+    public void setEntityRefStrategy(RefStrategy strategy) {
+        this.refStrategy = strategy;
     }
 
     @Override
@@ -218,11 +207,6 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public void setEntityRefStrategy(RefStrategy strategy) {
-        this.refStrategy = strategy;
-    }
-
-    @Override
     public EntityRef create(String prefabName) {
         return getCurrentWorldPool().create(prefabName);
     }
@@ -303,9 +287,18 @@ public class PojoEntityManager implements EngineEntityManager {
         return componentLibrary;
     }
 
+    public void setComponentLibrary(ComponentLibrary componentLibrary) {
+        this.componentLibrary = componentLibrary;
+    }
+
     @Override
     public EventSystem getEventSystem() {
         return eventSystem;
+    }
+
+    @Override
+    public void setEventSystem(EventSystem eventSystem) {
+        this.eventSystem = eventSystem;
     }
 
     @Override
@@ -313,11 +306,14 @@ public class PojoEntityManager implements EngineEntityManager {
         return prefabManager;
     }
 
+    public void setPrefabManager(PrefabManager prefabManager) {
+        this.prefabManager = prefabManager;
+    }
+
 
     /*
      * Engine features
      */
-
 
     @Override
     public EntityRef getEntity(long id) {
@@ -389,13 +385,12 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public void setEventSystem(EventSystem eventSystem) {
-        this.eventSystem = eventSystem;
-    }
-
-    @Override
     public TypeSerializationLibrary getTypeSerializerLibrary() {
         return typeSerializerLibrary;
+    }
+
+    public void setTypeSerializerLibrary(TypeSerializationLibrary serializerLibrary) {
+        this.typeSerializerLibrary = serializerLibrary;
     }
 
     @Override
@@ -420,7 +415,7 @@ public class PojoEntityManager implements EngineEntityManager {
                         .orElse(Collections.emptyList()));
 
         notifyBeforeDeactivation(entity, components);
-        for (Component component: components) {
+        for (Component component : components) {
             getPool(entityId).ifPresent(pool -> pool.getComponentStore().remove(entityId, component.getClass()));
         }
         loadedIds.remove(entityId);
@@ -613,14 +608,14 @@ public class PojoEntityManager implements EngineEntityManager {
 
     /**
      * Assign the given entity to the given pool.
-     *
+     * <p>
      * If the entity is already assigned to a pool, it will be re-assigned to the given pool.
      * This does not actually move the entity or any of its components.
      * If you want to move an entity to a different pool, {@link #moveToPool(long, EngineEntityPool)} should be used
      * instead.
      *
      * @param entityId the id of the entity to assign
-     * @param pool the pool to assign the entity to
+     * @param pool     the pool to assign the entity to
      */
     @Override
     public void assignToPool(long entityId, EngineEntityPool pool) {
@@ -631,10 +626,10 @@ public class PojoEntityManager implements EngineEntityManager {
 
     /**
      * Remove the assignment of an entity to a pool.
-     *
+     * <p>
      * This does not affect anything else related to the entity, but may lead to the entity or its components being
      * unable to be found.
-     *
+     * <p>
      * When using this method, be sure to properly re-assign the entity to its correct pool afterwards.
      *
      * @param id the id of the entity to remove the assignment for
@@ -747,31 +742,6 @@ public class PojoEntityManager implements EngineEntityManager {
         return list;
     }
 
-    private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {
-        private EntityRef key;
-        private T value;
-
-        EntityEntry(EntityRef ref, T value) {
-            this.key = ref;
-            this.value = value;
-        }
-
-        @Override
-        public EntityRef getKey() {
-            return key;
-        }
-
-        @Override
-        public T getValue() {
-            return value;
-        }
-
-        @Override
-        public T setValue(T newValue) {
-            throw new UnsupportedOperationException();
-        }
-    }
-
     @Override
     public boolean registerId(long entityId) {
         if (entityId >= nextEntityId) {
@@ -809,6 +779,31 @@ public class PojoEntityManager implements EngineEntityManager {
      */
     protected void unregister(long id) {
         loadedIds.remove(id);
+    }
+
+    private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {
+        private EntityRef key;
+        private T value;
+
+        EntityEntry(EntityRef ref, T value) {
+            this.key = ref;
+            this.value = value;
+        }
+
+        @Override
+        public EntityRef getKey() {
+            return key;
+        }
+
+        @Override
+        public T getValue() {
+            return value;
+        }
+
+        @Override
+        public T setValue(T newValue) {
+            throw new UnsupportedOperationException();
+        }
     }
 
 }
