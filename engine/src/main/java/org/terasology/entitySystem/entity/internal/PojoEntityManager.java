@@ -107,7 +107,7 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     public EngineEntityPool getCurrentWorldPool() {
-        if (worldManager == null) {
+        if (worldManager == null || worldManager.getCurrentWorldPool() == null) {
             return globalPool;
         } else {
             return worldManager.getCurrentWorldPool();
@@ -184,17 +184,17 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef create(Component... components) {
-        return globalPool.create(components);
+        return getCurrentWorldPool().create(components);
     }
 
     @Override
     public EntityRef create(Iterable<Component> components) {
-        return globalPool.create(components);
+        return getCurrentWorldPool().create(components);
     }
 
     @Override
     public EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents) {
-        return globalPool.create(components, sendLifecycleEvents);
+        return getCurrentWorldPool().create(components, sendLifecycleEvents);
     }
 
     @Override
@@ -204,27 +204,27 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef create(String prefabName) {
-        return globalPool.create(prefabName);
+        return getCurrentWorldPool().create(prefabName);
     }
 
     @Override
     public EntityRef create(Prefab prefab, Vector3f position) {
-        return globalPool.create(prefab, position);
+        return getCurrentWorldPool().create(prefab, position);
     }
 
     @Override
     public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        return globalPool.create(prefab, position, rotation);
+        return getCurrentWorldPool().create(prefab, position, rotation);
     }
 
     @Override
     public EntityRef create(String prefab, Vector3f position) {
-        return globalPool.create(prefab, position);
+        return getCurrentWorldPool().create(prefab, position);
     }
 
     @Override
     public EntityRef create(Prefab prefab) {
-        return globalPool.create(prefab);
+        return getCurrentWorldPool().create(prefab);
     }
 
     @Override
@@ -325,7 +325,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public ComponentTable getComponentStore() {
-        return globalPool.getComponentStore();
+        return getCurrentWorldPool().getComponentStore();
     }
 
     @Override
