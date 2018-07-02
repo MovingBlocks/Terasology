@@ -224,6 +224,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             }
 
             HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
+
             if (result.isHit()) {
                 result.getEntity().send(new AttackEvent(character, event.getItem()));
             }

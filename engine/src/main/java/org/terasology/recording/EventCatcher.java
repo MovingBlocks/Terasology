@@ -17,7 +17,6 @@ package org.terasology.recording;
 
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.PendingEvent;
-import org.terasology.input.events.MouseButtonEvent;
 
 import java.util.List;
 
