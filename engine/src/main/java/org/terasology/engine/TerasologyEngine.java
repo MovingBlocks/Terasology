@@ -67,7 +67,6 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.version.TerasologyVersion;
-import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
@@ -318,8 +317,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initAssets() {
-        BlockFamilyRegistry familyFactoryRegistry = new BlockFamilyRegistry();
-        rootContext.put(BlockFamilyRegistry.class, familyFactoryRegistry);
+
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.registerCoreAssetType(Prefab.class,
@@ -333,7 +331,7 @@ public class TerasologyEngine implements GameEngine {
         assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
                 (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
-                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), familyFactoryRegistry));
+                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
         assetTypeManager.registerCoreAssetType(UISkin.class,
                 (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");
         assetTypeManager.registerCoreAssetType(BehaviorTree.class,
