@@ -82,8 +82,8 @@ public final class AABB {
             AABB next = i.next();
             Vector3f otherMin = next.getMin();
             Vector3f otherMax = next.getMax();
-            Vector3fUtil.min(min, otherMin, min);
-            Vector3fUtil.max(max, otherMax, max);
+            min.min(otherMin);
+            max.max(otherMax);
         }
         return new AABB(min, max);
     }
