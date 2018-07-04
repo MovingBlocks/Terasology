@@ -67,7 +67,7 @@ public class PojoEntityManager implements EngineEntityManager {
     private EngineEntityPool globalPool = new PojoEntityPool(this);
     private PojoSectorManager sectorManager = new PojoSectorManager(this);
     private Map<Long, EngineEntityPool> poolMap = new MapMaker().initialCapacity(1000).makeMap();
-    private List<EngineEntityPool> pools = Lists.newArrayList();
+    private List<EngineEntityPool> worldPools = Lists.newArrayList();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
     private Set<EntityDestroySubscriber> destroySubscribers = Sets.newLinkedHashSet();
@@ -148,19 +148,6 @@ public class PojoEntityManager implements EngineEntityManager {
         return getCurrentWorldPool().create();
     }
 
-//    @Override
-//    public EntityRef create(GameManifest gameManifest) {
-//        Map<String, WorldInfo> worldInfoMap = gameManifest.getWorldInfoMap();
-//        worldManager = new WorldManager(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD));
-//        for (Map.Entry<String, WorldInfo> worldInfoEntry : worldInfoMap.entrySet()) {
-//            EngineEntityPool pool = new PojoEntityPool(this);
-//            pool.create();
-//            pools.add(pool);
-//            worldManager.addWorldPool(worldInfoEntry.getValue(), pool);
-//        }
-//        return globalPool.create();
-//    }
-
     @Override
     public void createWorldPools(GameManifest gameManifest) {
         Map<String, WorldInfo> worldInfoMap = gameManifest.getWorldInfoMap();
@@ -168,7 +155,7 @@ public class PojoEntityManager implements EngineEntityManager {
         for (Map.Entry<String, WorldInfo> worldInfoEntry : worldInfoMap.entrySet()) {
             EngineEntityPool pool = new PojoEntityPool(this);
             pool.create();
-            pools.add(pool);
+            worldPools.add(pool);
             worldManager.addWorldPool(worldInfoEntry.getValue(), pool);
         }
     }

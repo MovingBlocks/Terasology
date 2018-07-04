@@ -21,6 +21,7 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.game.GameManifest;
+import org.terasology.world.internal.WorldInfo;
 
 import java.util.Map;
 
@@ -37,7 +38,8 @@ public interface EntityManager extends EntityPool {
     EntityRef createSectorEntity(long maxDelta);
 
     /**
-     * Create different pools for each world and creates the global pool.
+     * Takes the {@link GameManifest}, gets {@link WorldInfo} of different worlds from it and
+     * creates pool for each world.
      *
      * @param gameManifest The game for which multiple pools will be needed.
      */
