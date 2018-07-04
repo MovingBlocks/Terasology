@@ -267,7 +267,7 @@ public class PojoEntityManager implements EngineEntityManager {
         if (isWorldPoolGlobalPool()) {
             return Iterables.concat(globalPool.getAllEntities(), sectorManager.getAllEntities());
         }
-        return Iterables.concat(globalPool.getAllEntities(), sectorManager.getAllEntities(), getCurrentWorldPool().getAllEntities());
+        return Iterables.concat(globalPool.getAllEntities(), getCurrentWorldPool().getAllEntities(), sectorManager.getAllEntities());
     }
 
     @SafeVarargs
@@ -278,7 +278,7 @@ public class PojoEntityManager implements EngineEntityManager {
                     sectorManager.getEntitiesWith(componentClasses));
         }
         return Iterables.concat(globalPool.getEntitiesWith(componentClasses),
-                sectorManager.getEntitiesWith(componentClasses), getCurrentWorldPool().getEntitiesWith(componentClasses));
+                getCurrentWorldPool().getEntitiesWith(componentClasses), sectorManager.getEntitiesWith(componentClasses));
     }
 
     @Override
@@ -286,8 +286,8 @@ public class PojoEntityManager implements EngineEntityManager {
         if (isWorldPoolGlobalPool()) {
             return globalPool.getActiveEntityCount() + sectorManager.getActiveEntityCount();
         }
-        return globalPool.getActiveEntityCount() + sectorManager.getActiveEntityCount()
-                + getCurrentWorldPool().getActiveEntityCount();
+        return globalPool.getActiveEntityCount() + getCurrentWorldPool().getActiveEntityCount()
+                + sectorManager.getActiveEntityCount();
 
     }
 
@@ -453,8 +453,8 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
         return globalPool.getComponentStore().get(entityId, componentClass) != null
-                || sectorManager.hasComponent(entityId, componentClass)
-                || getCurrentWorldPool().getComponentStore().get(entityId, componentClass) != null;
+                || getCurrentWorldPool().getComponentStore().get(entityId, componentClass) != null
+                || sectorManager.hasComponent(entityId, componentClass);
     }
 
     @Override
@@ -721,12 +721,12 @@ public class PojoEntityManager implements EngineEntityManager {
     @SafeVarargs
     public final int getCountOfEntitiesWith(Class<? extends Component>... componentClasses) {
         if (isWorldPoolGlobalPool()) {
-            return sectorManager.getCountOfEntitiesWith(componentClasses) +
-                    globalPool.getCountOfEntitiesWith(componentClasses);
+            return globalPool.getCountOfEntitiesWith(componentClasses) +
+                    sectorManager.getCountOfEntitiesWith(componentClasses);
         }
         return sectorManager.getCountOfEntitiesWith(componentClasses) +
-                globalPool.getCountOfEntitiesWith(componentClasses) +
-                getCurrentWorldPool().getCountOfEntitiesWith(componentClasses);
+                getCurrentWorldPool().getCountOfEntitiesWith(componentClasses) +
+                globalPool.getCountOfEntitiesWith(componentClasses);
     }
 
     public <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass) {
