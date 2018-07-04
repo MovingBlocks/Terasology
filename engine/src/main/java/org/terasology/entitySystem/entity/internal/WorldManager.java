@@ -20,6 +20,11 @@ import org.terasology.world.internal.WorldInfo;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * WorldManager is a class which created the bridge between the world pools and the worlds added to the GameManifest.
+ * The class maintains a Map<WorldInfo, EngineEntityPool> and information about the target world. There are methods
+ * to add more pools and worlds to the map and to change the current world.
+ */
 public class WorldManager {
 
     private Map<WorldInfo, EngineEntityPool> worldPoolMap = new HashMap<>();
