@@ -24,17 +24,27 @@ import org.terasology.math.geom.Vector3i;
 public class OnBlockItemPlaced implements Event {
     private Vector3i position;
     private EntityRef placedBlock;
+    private EntityRef instigator;
 
     public OnBlockItemPlaced(Vector3i pos, EntityRef placedBlock) {
         this.position = pos;
         this.placedBlock = placedBlock;
     }
 
+    public OnBlockItemPlaced(Vector3i pos, EntityRef placedBlock, EntityRef instigator) {
+        this.position = pos;
+        this.placedBlock = placedBlock;
+        this.instigator = instigator;
+    }
     public Vector3i getPosition() {
         return new Vector3i(position);
     }
 
     public EntityRef getPlacedBlock() {
         return placedBlock;
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }
