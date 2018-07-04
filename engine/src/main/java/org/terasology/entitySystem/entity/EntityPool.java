@@ -55,14 +55,6 @@ public interface EntityPool {
     EntityRef create();
 
     /**
-     * Create different pools for each world and creates the global pool.
-     *
-     * @param gameManifest The game for which multiple pools will be needed.
-     * @return A new entity builder
-     */
-    EntityRef create(GameManifest gameManifest);
-
-    /**
      * @return A references to a new, unused entity with the desired components
      */
     EntityRef create(Component... components);

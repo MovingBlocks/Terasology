@@ -73,11 +73,8 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             }
         } else {
             EntityRef worldEntity;
-            if (gameManifest.getWorldInfoMap().size() > 1) {
-                worldEntity = entityManager.create(gameManifest);
-            } else {
-                worldEntity = entityManager.create();
-            }
+            entityManager.createWorldPools(gameManifest);
+            worldEntity = entityManager.create();
             worldEntity.addComponent(new WorldComponent());
             NetworkComponent networkComponent = new NetworkComponent();
             networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;

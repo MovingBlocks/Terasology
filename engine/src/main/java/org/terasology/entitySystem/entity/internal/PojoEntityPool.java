@@ -68,11 +68,6 @@ public class PojoEntityPool implements EngineEntityPool {
     }
 
     @Override
-    public EntityRef create(GameManifest gameManifest) {
-        return create((Prefab) null, null, null);
-    }
-
-    @Override
     public EntityRef create(Component... components) {
         return create(Arrays.asList(components));
     }

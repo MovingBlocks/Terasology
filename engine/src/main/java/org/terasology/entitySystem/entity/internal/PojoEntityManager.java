@@ -116,11 +116,8 @@ public class PojoEntityManager implements EngineEntityManager {
      *
      * @return if world pools have been formed or not
      */
-    public boolean worldPoolIsGlobalPool() {
-        if (getCurrentWorldPool() == globalPool) {
-            return true;
-        }
-        return false;
+    private boolean isWorldPoolGlobalPool() {
+        return getCurrentWorldPool() == globalPool;
     }
 
     @Override
@@ -151,8 +148,21 @@ public class PojoEntityManager implements EngineEntityManager {
         return getCurrentWorldPool().create();
     }
 
+//    @Override
+//    public EntityRef create(GameManifest gameManifest) {
+//        Map<String, WorldInfo> worldInfoMap = gameManifest.getWorldInfoMap();
+//        worldManager = new WorldManager(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD));
+//        for (Map.Entry<String, WorldInfo> worldInfoEntry : worldInfoMap.entrySet()) {
+//            EngineEntityPool pool = new PojoEntityPool(this);
+//            pool.create();
+//            pools.add(pool);
+//            worldManager.addWorldPool(worldInfoEntry.getValue(), pool);
+//        }
+//        return globalPool.create();
+//    }
+
     @Override
-    public EntityRef create(GameManifest gameManifest) {
+    public void createWorldPools(GameManifest gameManifest) {
         Map<String, WorldInfo> worldInfoMap = gameManifest.getWorldInfoMap();
         worldManager = new WorldManager(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD));
         for (Map.Entry<String, WorldInfo> worldInfoEntry : worldInfoMap.entrySet()) {
@@ -161,7 +171,6 @@ public class PojoEntityManager implements EngineEntityManager {
             pools.add(pool);
             worldManager.addWorldPool(worldInfoEntry.getValue(), pool);
         }
-        return globalPool.create();
     }
 
     @Override
@@ -255,7 +264,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public Iterable<EntityRef> getAllEntities() {
-        if (worldPoolIsGlobalPool()) {
+        if (isWorldPoolGlobalPool()) {
             return Iterables.concat(globalPool.getAllEntities(), sectorManager.getAllEntities());
         }
         return Iterables.concat(globalPool.getAllEntities(), sectorManager.getAllEntities(), getCurrentWorldPool().getAllEntities());
@@ -264,7 +273,7 @@ public class PojoEntityManager implements EngineEntityManager {
     @SafeVarargs
     @Override
     public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
-        if (worldPoolIsGlobalPool()) {
+        if (isWorldPoolGlobalPool()) {
             return Iterables.concat(globalPool.getEntitiesWith(componentClasses),
                     sectorManager.getEntitiesWith(componentClasses));
         }
@@ -274,7 +283,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public int getActiveEntityCount() {
-        if (worldPoolIsGlobalPool()) {
+        if (isWorldPoolGlobalPool()) {
             return globalPool.getActiveEntityCount() + sectorManager.getActiveEntityCount();
         }
         return globalPool.getActiveEntityCount() + sectorManager.getActiveEntityCount()
@@ -711,7 +720,7 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     @SafeVarargs
     public final int getCountOfEntitiesWith(Class<? extends Component>... componentClasses) {
-        if (worldPoolIsGlobalPool()) {
+        if (isWorldPoolGlobalPool()) {
             return sectorManager.getCountOfEntitiesWith(componentClasses) +
                     globalPool.getCountOfEntitiesWith(componentClasses);
         }
@@ -722,7 +731,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     public <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass) {
         List<TLongObjectIterator<T>> iterators = new ArrayList<>();
-        if (worldPoolIsGlobalPool()) {
+        if (isWorldPoolGlobalPool()) {
             iterators.add(globalPool.getComponentStore().componentIterator(componentClass));
         } else {
             iterators.add(globalPool.getComponentStore().componentIterator(componentClass));

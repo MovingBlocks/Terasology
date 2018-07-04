@@ -16,12 +16,11 @@
 package org.terasology.entitySystem.entity;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.internal.EngineEntityPool;
-import org.terasology.entitySystem.entity.internal.EngineSectorManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.sectors.SectorSimulationComponent;
+import org.terasology.game.GameManifest;
 
 import java.util.Map;
 
@@ -36,6 +35,13 @@ public interface EntityManager extends EntityPool {
      * @return the newly created EntityRef
      */
     EntityRef createSectorEntity(long maxDelta);
+
+    /**
+     * Create different pools for each world and creates the global pool.
+     *
+     * @param gameManifest The game for which multiple pools will be needed.
+     */
+    void createWorldPools(GameManifest gameManifest);
 
     /**
      * Creates a new EntityRef in sector-scope
