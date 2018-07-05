@@ -28,6 +28,7 @@ import org.terasology.rendering.assets.texture.AWTTextureFormat;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -37,6 +38,7 @@ import org.terasology.utilities.FilesUtil;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +62,7 @@ public abstract class SelectionScreen extends CoreScreenLayer {
     private UILabel worldGenerator;
     private UILabel moduleNames;
 
-
+    private UIList<GameInfo> gameInfos;
 
     @Override
     public boolean isLowerLayerVisible() {
@@ -74,11 +76,6 @@ public abstract class SelectionScreen extends CoreScreenLayer {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }
     }
-
-    void superOnOpened() {
-        super.onOpened();
-    }
-
 
     void updateDescription(GameInfo item) {
         if (item == null) {
@@ -122,17 +119,17 @@ public abstract class SelectionScreen extends CoreScreenLayer {
             texture = Assets.getTexture(DEFAULT_PREVIEW_IMAGE_URI).get();
         }
 
-        previewImage = find("previewImage", UIImage.class);
         previewImage.setImage(texture);
     }
 
     protected void remove(final UIList<GameInfo> gameList, Path world, String removeString) {
-        GameInfo gameInfo = gameList.getSelection();
+        final GameInfo gameInfo = gameList.getSelection();
         if (gameInfo != null) {
             try {
                 FilesUtil.recursiveDelete(world);
                 gameList.getList().remove(gameInfo);
                 gameList.setSelection(null);
+                gameList.select(0);
             } catch (Exception e) {
                 logger.error("Failed to delete " + removeString, e);
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
@@ -140,9 +137,45 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         }
     }
 
-    void startWorldGeneratorAndModuleNames() {
-        worldGenerator = find("worldGenerator", UILabel.class);
-        moduleNames = find("moduleNames", UILabel.class);
+    @Override
+    public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+        if (!initScreenWidgets()) {
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't initialize the screen!");
+        }
     }
 
+    private boolean initScreenWidgets() {
+        worldGenerator = find("worldGenerator", UILabel.class);
+        moduleNames = find("moduleNames", UILabel.class);
+        previewImage = find("previewImage", UIImage.class);
+        gameInfos = find("gameList", UIList.class);
+        if (worldGenerator == null || moduleNames == null || gameInfos == null || previewImage == null) {
+            logger.error("Screen can't be initialized correctly, because required widgets are missed!\nworldGenerator = {}, moduleNames = {}, previewImage = {}, gameList = {}", worldGenerator, moduleNames, previewImage, gameInfos);
+            return false;
+        }
+        return true;
+    }
+
+    UIList<GameInfo> getGameInfos() {
+        return gameInfos;
+    }
+
+    void refreshGameInfoList(final List<GameInfo> updatedGameInfos) {
+        if (gameInfos != null) {
+            gameInfos.setList(updatedGameInfos);
+            gameInfos.select(0);
+        }
+    }
+
+    void initSaveGamePathWidget(final Path savePath) {
+        final UILabel saveGamePath = find("saveGamePath", UILabel.class);
+        if (saveGamePath != null) {
+            saveGamePath.setText(
+                    translationSystem.translate("${engine:menu#save-game-path} ") +
+                            savePath.toAbsolutePath().toString());
+        } else {
+            logger.warn("Can't find saveGamePath widget!");
+        }
+    }
 }

@@ -28,12 +28,9 @@ import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -47,42 +44,27 @@ public class RecordScreen extends SelectionScreen {
 
     private static final Logger logger = LoggerFactory.getLogger(RecordScreen.class);
 
-    private UIList<GameInfo> gameList;
     private RecordAndReplayUtils recordAndReplayUtils;
 
     @Override
     public void initialise() {
-        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+        super.initialise();
 
-        final UILabel saveGamePath = find("saveGamePath", UILabel.class);
-        if (saveGamePath != null) {
-            Path savePath = PathManager.getInstance().getSavesPath();
-            saveGamePath.setText(
-                    translationSystem.translate("${engine:menu#save-game-path} ") +
-                            savePath.toAbsolutePath().toString()); //save path
-        }
+        initSaveGamePathWidget(PathManager.getInstance().getSavesPath());
 
-        gameList = find("gameList", UIList.class);
-
-        refreshGameList();
-
-        gameList.subscribeSelection((widget, item) -> {
+        getGameInfos().subscribeSelection((widget, item) -> {
             find("load", UIButton.class).setEnabled(item != null);
             updateDescription(item);
         });
 
-        super.startWorldGeneratorAndModuleNames();
-
-        gameList.select(0);
-        gameList.subscribe((widget, item) -> loadGame(item));
+        getGameInfos().subscribe((widget, item) -> loadGame(item));
 
         WidgetUtil.trySubscribe(this, "load", button -> {
-            GameInfo gameInfo = gameList.getSelection();
+            final GameInfo gameInfo = getGameInfos().getSelection();
             if (gameInfo != null) {
                 loadGame(gameInfo);
             }
         });
-
 
         WidgetUtil.trySubscribe(this, "close", button -> {
             RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
@@ -90,16 +72,14 @@ public class RecordScreen extends SelectionScreen {
         });
     }
 
-
     @Override
     public void onOpened() {
-        refreshGameList();
-        super.onOpened();
+        refreshGameInfoList(GameProvider.getSavedGames());
     }
 
     private void loadGame(GameInfo item) {
         try {
-            GameManifest manifest = item.getManifest();
+            final GameManifest manifest = item.getManifest();
             copySaveDirectoryToRecordingLibrary(manifest.getTitle());
             recordAndReplayUtils.setGameTitle(manifest.getTitle());
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
@@ -120,12 +100,6 @@ public class RecordScreen extends SelectionScreen {
         } catch (Exception e) {
             logger.error("Error trying to copy the save directory:", e);
         }
-
-    }
-
-    private void refreshGameList() {
-        gameList.setList(GameProvider.getSavedGames());
-        gameList.setSelection(null);
     }
 
     void setRecordAndReplayUtils(RecordAndReplayUtils recordAndReplayUtils) {
