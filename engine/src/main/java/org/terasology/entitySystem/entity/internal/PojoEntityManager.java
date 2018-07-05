@@ -75,6 +75,7 @@ public class PojoEntityManager implements EngineEntityManager {
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
     private WorldManager worldManager;
+    private GameManifest gameManifest;
 
     private RefStrategy refStrategy = new DefaultRefStrategy();
 
@@ -149,7 +150,8 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public void createWorldPools(GameManifest gameManifest) {
+    public void createWorldPools(GameManifest game) {
+        this.gameManifest = game;
         Map<String, WorldInfo> worldInfoMap = gameManifest.getWorldInfoMap();
         worldManager = new WorldManager(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD));
         for (Map.Entry<String, WorldInfo> worldInfoEntry : worldInfoMap.entrySet()) {
@@ -316,6 +318,21 @@ public class PojoEntityManager implements EngineEntityManager {
         return getPool(id)
                 .map(pool -> pool.getEntity(id))
                 .orElse(EntityRef.NULL);
+    }
+
+    @Override
+    public List<EngineEntityPool> getWorldPools() {
+        return worldPools;
+    }
+
+    @Override
+    public Map<WorldInfo, EngineEntityPool> getWorldPoolsMap() {
+        return worldManager.getWorldPoolMap();
+    }
+
+    @Override
+    public Map<Long, EngineEntityPool> getPoolMap() {
+        return poolMap;
     }
 
     /**

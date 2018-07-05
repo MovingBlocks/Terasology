@@ -34,6 +34,10 @@ public class WorldManager {
         this.currentWorld = currentWorld;
     }
 
+    public Map<WorldInfo, EngineEntityPool> getWorldPoolMap() {
+        return worldPoolMap;
+    }
+
     public void addWorldPool(WorldInfo world, EngineEntityPool pool) {
         worldPoolMap.put(world, pool);
     }
