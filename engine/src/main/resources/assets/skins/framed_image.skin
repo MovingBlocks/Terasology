@@ -16,7 +16,7 @@
                 "right": 4
             }
         },
-        "UIImageSlideshow": {
+        "UITimedImageSlideshow": {
             "background": "engine:box",
             "background-border": {
                 "top": 4,
