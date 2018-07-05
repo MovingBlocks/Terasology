@@ -33,26 +33,63 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
 
+/**
+ * A layout that allows for a larger widget to be displayed in a smaller area with scrollbars.
+ * <p>
+ * Eg, If the widget is 100px tall and 20px wide, and the scrollable area is 20px wide and 20px tall
+ * then a vertical scrollbar will be shown. This will allow the user to scroll up and down through the large widget,
+ * as if they were moving a window over the widget.
+ */
 public class ScrollableArea extends CoreLayout {
     private static final int SCROLL_MULTIPLIER = -42;
 
+    /**
+     * The UIWidget this layout contains.
+     */
     @LayoutConfig
     private UIWidget content;
 
+    /**
+     * Controls if the scrollable 'window' should stick to the bottom of the content
+     * False by default
+     */
     @LayoutConfig
     private boolean stickToBottom;
+
+    /**
+     * Controls if the widget can have a vertical scrollbar.
+     * True by default.
+     */
     @LayoutConfig
     private boolean verticalScrollbar = true;
+
+    /**
+     * Controls if the widget can have a horizontal scrollbar.
+     * False by default.
+     */
     @LayoutConfig
     private boolean horizontalScrollbar;
+
+    /**
+     * The preferred width of the scrollable area.
+     * Set to null (blank) to use the width of the content
+     * <p>
+     * Null by default
+     */
     @LayoutConfig
     private Integer preferredWidth;
+
+    /**
+     * The preferred height of the scrollable area.
+     * Set to null (blank) to use the height of the content
+     * <p>
+     * Null by default
+     */
     @LayoutConfig
     private Integer preferredHeight;
 
     private UIScrollbar verticalBar = new UIScrollbar(true);
     private UIScrollbar horizontalBar = new UIScrollbar(false);
-
     private boolean moveToBottomPending;
     private boolean moveToTopPending;
 
@@ -174,24 +211,10 @@ public class ScrollableArea extends CoreLayout {
         }
     }
 
-    public void setContent(UIWidget widget) {
-        this.content = widget;
-    }
-
-    /**
-     * Allows setting the preferred size directly via code instead of solely in a .ui file.
-     * @param width the preferred width to set
-     * @param height the preferred height to set
-     */
-    public void setPreferredSize (int width, int height) {
-        preferredWidth = width;
-        preferredHeight = height;
-    }
-
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         Vector2i pf = canvas.calculatePreferredSize(content);
-        return  new Vector2i(preferredWidth == null ? pf.x : preferredWidth, preferredHeight == null ? pf.y : preferredHeight);
+        return new Vector2i(preferredWidth == null ? pf.x : preferredWidth, preferredHeight == null ? pf.y : preferredHeight);
     }
 
     @Override
@@ -224,20 +247,63 @@ public class ScrollableArea extends CoreLayout {
         content = null;
     }
 
-    public boolean isStickToBottom() {
-        return stickToBottom;
-    }
-
-    public void setStickToBottom(boolean stickToBottom) {
-        this.stickToBottom = stickToBottom;
-    }
-
+    /**
+     * Moves the layout to display the bottom of the widget.
+     * Equivalent to scrolling all the way down
+     */
     public void moveToBottom() {
         moveToBottomPending = true;
     }
 
+    /**
+     * Moves the layout to display the bottom of the widget.
+     * Equivalent to scrolling all the way up
+     */
     public void moveToTop() {
         moveToTopPending = true;
     }
 
+    /**
+     * @param widget The widget to display
+     */
+    public void setContent(UIWidget widget) {
+        this.content = widget;
+    }
+
+    /**
+     * @param width  The preferred width of the area
+     * @param height The preferred height of the area
+     */
+    public void setPreferredSize(Integer width, Integer height) {
+        preferredWidth = width;
+        preferredHeight = height;
+    }
+
+    /**
+     * @return True if the 'window' of this layout will stick to the bottom
+     */
+    public boolean isStickToBottom() {
+        return stickToBottom;
+    }
+
+    /**
+     * @param stickToBottom Controls if the 'window' of this layout will stick to the bottom
+     */
+    public void setStickToBottom(boolean stickToBottom) {
+        this.stickToBottom = stickToBottom;
+    }
+
+    /**
+     * @param horizontalScrollbar Controls if the widget can have a horizontal scrollbar
+     */
+    public void setHorizontalScrollbar(boolean horizontalScrollbar) {
+        this.horizontalScrollbar = horizontalScrollbar;
+    }
+
+    /**
+     * @param verticalScrollbar Controls if the widget can have a vertical scrollbar
+     */
+    public void setVerticalScrollbar(boolean verticalScrollbar) {
+        this.verticalScrollbar = verticalScrollbar;
+    }
 }
