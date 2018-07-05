@@ -200,7 +200,7 @@ public final class RecordAndReplaySerializer {
             logger.error("Error while serializing AttackEvent extras:", e);
         }
     }
-    
+
     private void deserializeAttackEventExtraRecorder(Gson gson, String recordingPath) {
         try {
             JsonParser parser = new JsonParser();
