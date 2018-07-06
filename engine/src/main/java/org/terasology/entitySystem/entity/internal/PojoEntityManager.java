@@ -156,7 +156,7 @@ public class PojoEntityManager implements EngineEntityManager {
         worldManager = new WorldManager(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD));
         for (Map.Entry<String, WorldInfo> worldInfoEntry : worldInfoMap.entrySet()) {
             EngineEntityPool pool = new PojoEntityPool(this);
-            pool.create();
+            //pool.create();
             worldPools.add(pool);
             worldManager.addWorldPool(worldInfoEntry.getValue(), pool);
         }

@@ -20,6 +20,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityPool;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.registry.In;
 import org.terasology.world.internal.WorldInfo;
 
@@ -32,7 +33,8 @@ public class WorldCommands extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
-    @Command(shortDescription = "Shutdown the server", runOnServer = true)
+    @Command(shortDescription = "Get information about different worlds and " +
+            "entities present in each pool", runOnServer = true)
     public String getUniverseInfo() {
         int worldCount = entityManager.getWorldPools().size();
         StringBuilder message = new StringBuilder(100);
@@ -55,4 +57,19 @@ public class WorldCommands extends BaseComponentSystem {
         }
         return message.toString();
     }
+
+    @Command(shortDescription = "Get information about different worlds and " +
+            "entities present in each pool", runOnServer = true)
+    public String makeEntity(@CommandParam("The world in which the entity is formed") String worldName) {
+        for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
+            if(entry.getKey().getTitle().equalsIgnoreCase(worldName)) {
+                entry.getValue().create();
+                return "Entity created in " + entry.getKey().getTitle() + " world";
+            }
+        }
+
+        return  worldName + " does not exist";
+    }
+
+
 }
