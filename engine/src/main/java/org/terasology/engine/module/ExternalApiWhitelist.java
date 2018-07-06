@@ -43,6 +43,7 @@ public final class ExternalApiWhitelist {
             .add("java.util.function")
             .add("java.util.regex")
             .add("java.util.stream")
+            .add("java.util.zip")
             .add("java.awt")
             .add("java.awt.geom")
             .add("java.awt.image")
@@ -83,39 +84,57 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl.opengl.GL11")
             .add("org.lwjgl.opengl.GL12")
             .add("org.lwjgl.opengl.GL13")
+            .add("org.terasology.jnlua")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
             .add(com.esotericsoftware.reflectasm.MethodAccess.class)
-            .add(IOException.class)
             .add(InvocationTargetException.class)
             .add(LoggerFactory.class)
             .add(Logger.class)
-            .add(Reader.class)
-            .add(StringReader.class)
-            .add(BufferedReader.class)
             .add(java.awt.datatransfer.UnsupportedFlavorException.class)
             .add(java.nio.ByteBuffer.class)
             .add(java.nio.IntBuffer.class)
+            .add(java.nio.file.attribute.FileTime.class) // java.util.zip dependency
+            // This class only operates on Class<?> or Object instances,
+            // effectively adding a way to access arrays without knowing their type
+            // beforehand. It's safe despite being in java.lang.reflect.
+            .add(java.lang.reflect.Array.class)
             .add(java.io.DataInput.class)
             .add(java.io.DataOutput.class)
             .add(java.io.EOFException.class)
+            .add(java.io.FileNotFoundException.class)
+            .add(java.io.IOException.class)
             .add(java.io.UTFDataFormatException.class)
+            /* All sorts of readers */
+            .add(java.io.Reader.class)
+            .add(java.io.BufferedReader.class)
+            .add(java.io.FilterReader.class)
+            .add(java.io.InputStreamReader.class)
+            .add(java.io.PipedReader.class)
+            .add(java.io.StringReader.class)
+            /* All sorts of writers */
+            .add(java.io.Writer.class)
+            .add(java.io.BufferedWriter.class)
+            .add(java.io.FilterWriter.class)
+            .add(java.io.OutputStreamWriter.class)
+            .add(java.io.PipedWriter.class)
+            .add(java.io.StringWriter.class)
             /* All sorts of input streams */
             .add(java.io.InputStream.class)
+            .add(java.io.BufferedInputStream.class)
             .add(java.io.ByteArrayInputStream.class)
+            .add(java.io.DataInputStream.class)
             .add(java.io.FilterInputStream.class)
             .add(java.io.PipedInputStream.class)
-            .add(java.io.BufferedInputStream.class)
-            .add(java.io.DataInputStream.class)
             .add(java.io.PushbackInputStream.class)
             /* All sorts of output streams */
             .add(java.io.OutputStream.class)
+            .add(java.io.BufferedOutputStream.class)
             .add(java.io.ByteArrayOutputStream.class)
+            .add(java.io.DataOutputStream.class)
             .add(java.io.FilterOutputStream.class)
             .add(java.io.PipedOutputStream.class)
-            .add(java.io.BufferedOutputStream.class)
-            .add(java.io.DataOutputStream.class)
             .build();
 
     private ExternalApiWhitelist() {
