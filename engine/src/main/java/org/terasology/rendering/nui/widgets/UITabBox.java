@@ -82,6 +82,7 @@ public class UITabBox extends CoreWidget {
                 buttons.set(i, button);
             }
         }
+        buttons.forEach(b -> b.setActive(currentTab == buttons.indexOf(b)));
         super.update(delta);
     }
 
