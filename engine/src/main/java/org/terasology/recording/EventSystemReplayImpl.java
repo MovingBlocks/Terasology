@@ -112,6 +112,8 @@ public class EventSystemReplayImpl implements EventSystem {
     private RecordAndReplayUtils recordAndReplayUtils;
     /** List of classes selected to replay */
     private List<Class<?>> selectedClassesToReplay;
+    /** The position of the last recorded event processed */
+    private long lastRecordedEventPosition;
 
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
@@ -253,6 +255,7 @@ public class EventSystemReplayImpl implements EventSystem {
             } else {
                 originalSend(entity, re.getEvent());
             }
+            this.lastRecordedEventPosition = re.getPosition();
             // Check if time is up.
             if ((System.currentTimeMillis() - beginTime) >= maxDuration) {
                 return;
@@ -575,6 +578,10 @@ public class EventSystemReplayImpl implements EventSystem {
             }
         }
         return result;
+    }
+
+    public long getLastRecordedEventPosition() {
+        return lastRecordedEventPosition;
     }
 
     private static class EventHandlerPriorityComparator implements Comparator<EventSystemReplayImpl.EventHandlerInfo> {
