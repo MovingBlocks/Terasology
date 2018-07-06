@@ -18,41 +18,18 @@ package org.terasology.recording;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.terasology.ReplayTestingEnvironment;
-import org.terasology.engine.TerasologyEngine;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 
 public class ReplayTest extends ReplayTestingEnvironment {
-
-
-
-    @Ignore("Not ready yet, and should be ignored by jenkins")
-    @Test
-    public void testReplay() throws Exception {
-        t1.start();
-        try {
-            while(RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAY_FINISHED) {
-                Thread.sleep(1000);
-            }
-            System.out.println("THREAD: REPLAY FINISHED! INITIALIZING TESTS...");
-            TerasologyEngine host = getHost();
-            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-            EntityRef character = localPlayer.getCharacterEntity();
-            LocationComponent location = character.getComponent(LocationComponent.class);
-            Vector3f finalPosition = new Vector3f(24.909637f, 14.409988f, -2.333587f);
-            assertEquals(finalPosition, location.getLocalPosition());
-            System.out.println("TESTS FINISHED");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     private Thread t1 = new Thread() {
 
@@ -65,5 +42,50 @@ public class ReplayTest extends ReplayTestingEnvironment {
             }
         }
     };
+
+    @Ignore("Not ready yet, and should be ignored by jenkins")
+    @Test
+    public void testReplayEnd() {
+        t1.start();
+        try {
+            while (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAY_FINISHED) {
+                Thread.sleep(1000);
+            }
+            System.out.println("THREAD: REPLAY FINISHED! INITIALIZING TESTS...");
+            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            EntityRef character = localPlayer.getCharacterEntity();
+            LocationComponent location = character.getComponent(LocationComponent.class);
+            Vector3f finalPosition = new Vector3f(24.909637f, 14.409988f, -2.333587f);
+            assertEquals(finalPosition, location.getLocalPosition());
+            System.out.println("TESTS FINISHED");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Ignore("Not ready yet, and should be ignored by jenkins")
+    @Test
+    public void testReplayMiddle() {
+        t1.start();
+        try {
+            while (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAY_FINISHED) {
+                if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+                    EventSystemReplayImpl eventSystem = (EventSystemReplayImpl) CoreRegistry.get(EventSystem.class);
+                    Vector3f initialPosition = new Vector3f(24.175291f, 13.407986f, 2.7723987f);
+                    LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+                    EntityRef character = localPlayer.getCharacterEntity();
+                    LocationComponent location = character.getComponent(LocationComponent.class);
+                    if(eventSystem.getLastRecordedEventPosition() >= 1343) {
+                        assertFalse(initialPosition.equals(location.getLocalPosition()));
+                    }
+                }
+
+                Thread.sleep(1000);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }
