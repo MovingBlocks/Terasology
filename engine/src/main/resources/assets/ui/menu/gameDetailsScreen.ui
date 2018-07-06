@@ -44,7 +44,7 @@
                     "position-top": {
                         "target": "BOTTOM",
                         "widget": "title",
-                        "offset": 24
+                        "offset": 32
                     },
                     "position-bottom": {
                         "target": "TOP",
