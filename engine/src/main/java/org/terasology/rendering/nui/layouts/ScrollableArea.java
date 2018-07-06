@@ -229,10 +229,11 @@ public class ScrollableArea extends CoreLayout {
         }
 
         canvas.addInteractionRegion(scrollListener);
+        int scrollbarWidth = canvas.calculateRestrictedSize(verticalBar, availableSize).x;
         canvas.drawWidget(verticalBar,
                 Rect2i.createFromMinAndSize(
                         new Vector2i(availableSize.x, 0),
-                        canvas.calculateRestrictedSize(verticalBar, availableSize)));
+                        new Vector2i(scrollbarWidth, availableSize.y)));
 
         try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
             canvas.drawWidget(content, Rect2i.createFromMinAndSize(0, -verticalBar.getValue(), availableSize.x, contentSize.y));
@@ -253,10 +254,11 @@ public class ScrollableArea extends CoreLayout {
 
         canvas.addInteractionRegion(scrollListener);
         horizontalBar.setRange(contentSize.x - contentRegion.width());
+        int scrollbarHeight = canvas.calculateRestrictedSize(verticalBar, availableSize).y;
         canvas.drawWidget(horizontalBar,
                 Rect2i.createFromMinAndSize(
                         new Vector2i(0, availableSize.y),
-                        canvas.calculateRestrictedSize(horizontalBar, availableSize)));
+                        new Vector2i(availableSize.x, scrollbarHeight)));
 
         try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
             canvas.drawWidget(content, Rect2i.createFromMinAndSize(-horizontalBar.getValue(), 0, contentSize.x, availableSize.y));
