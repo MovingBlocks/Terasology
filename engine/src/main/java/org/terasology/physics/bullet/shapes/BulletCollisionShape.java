@@ -16,29 +16,26 @@
 package org.terasology.physics.bullet.shapes;
 
 
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.linearmath.Transform;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+
 import org.terasology.math.AABB;
+import org.terasology.math.Transform;
 import org.terasology.math.VecMath;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector3f;
 
 public abstract class BulletCollisionShape implements org.terasology.physics.shapes.CollisionShape {
-    public CollisionShape underlyingShape;
+    public btCollisionShape underlyingShape;
 
     @Override
-    public AABB getAABB(org.terasology.math.Transform transform) {
-        Transform t = toBulletTransform(transform);
+    public AABB getAABB(Transform transform) {
 
-        javax.vecmath.Vector3f min = new javax.vecmath.Vector3f();
-        javax.vecmath.Vector3f max = new javax.vecmath.Vector3f();
-        underlyingShape.getAabb(t, min, max);
+        Vector3f min = new Vector3f();
+        Vector3f max = new Vector3f();
+        Matrix4f m = new Matrix4f();
+        underlyingShape.getAabb(m,min,max);
 
-        return AABB.createMinMax(VecMath.from(min), VecMath.from(max));
+        return AABB.createMinMax(min, max).move(transform.origin);
     }
 
-    protected static Transform toBulletTransform(org.terasology.math.Transform transform) {
-        return new Transform(
-                new javax.vecmath.Matrix4f(VecMath.to(transform.rotation),
-                        VecMath.to(transform.origin), transform.scale)
-        );
-    }
 }

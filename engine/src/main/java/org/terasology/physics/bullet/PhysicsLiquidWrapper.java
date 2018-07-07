@@ -15,86 +15,34 @@
  */
 package org.terasology.physics.bullet;
 
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btVoxelContentProvider;
+import com.badlogic.gdx.physics.bullet.collision.btVoxelInfo;
+import com.badlogic.gdx.physics.bullet.linearmath.btVector3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.physics.bullet.shapes.BulletCollisionShape;
-import org.terasology.physics.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
-import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
-import org.terasology.math.VecMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
 /**
  */
-public class PhysicsLiquidWrapper implements VoxelPhysicsWorld {
+public class PhysicsLiquidWrapper extends btVoxelContentProvider {
+    private static final Logger logger = LoggerFactory.getLogger(PhysicsLiquidWrapper.class);
+
     private WorldProvider world;
 
     public PhysicsLiquidWrapper(WorldProvider world) {
+        super();
         this.world = world;
     }
 
     @Override
-    public VoxelInfo getCollisionShapeAt(int x, int y, int z) {
+    public btVoxelInfo getVoxel(int x, int y, int z) {
         Block block = world.getBlock(x, y, z);
-        return new LiquidVoxelInfo(block, new Vector3i(x, y, z));
+        return new btVoxelInfo(false,false,block.getId(),x,y,z,((BulletCollisionShape)block.getCollisionShape()).underlyingShape,block.getCollisionOffset(),0,0,0);
+
     }
 
-    public void dispose() {
-        world = null;
-    }
 
-    private static class LiquidVoxelInfo implements VoxelInfo {
-
-        private boolean colliding;
-        private boolean blocking;
-        private CollisionShape shape;
-        private Vector3i position;
-        private Vector3f offset;
-
-         LiquidVoxelInfo(Block block, Vector3i position) {
-            this.shape = block.getCollisionShape();
-            this.offset = block.getCollisionOffset();
-            this.colliding = block.isLiquid();
-            this.blocking = false;
-            this.position = position;
-        }
-
-        @Override
-        public boolean isColliding() {
-            return colliding;
-        }
-
-        @Override
-        public Object getUserData() {
-            return position;
-        }
-
-        @Override
-        public com.bulletphysics.collision.shapes.CollisionShape getCollisionShape() {
-             return ((BulletCollisionShape) shape).underlyingShape;
-        }
-
-        @Override
-        public javax.vecmath.Vector3f getCollisionOffset() {
-            return VecMath.to(offset);
-        }
-
-        @Override
-        public boolean isBlocking() {
-            return blocking;
-        }
-
-        @Override
-        public float getFriction() {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        public float getRestitution() {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-    }
 }

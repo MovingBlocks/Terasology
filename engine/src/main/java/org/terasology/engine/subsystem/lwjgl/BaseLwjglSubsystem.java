@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.google.common.base.Charsets;
 import org.lwjgl.LWJGLUtil;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
         if (!initialised) {
             initLogger();
             LWJGLHelper.initNativeLibs();
+            Bullet.init();
             initialised = true;
         }
     }
