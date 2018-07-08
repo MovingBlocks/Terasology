@@ -21,6 +21,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.ParameterProvider;
@@ -65,10 +66,13 @@ public class BlockFamilyLibrary {
      * @return
      */
     public Class<? extends BlockFamily> getBlockFamily(String uri) {
-        if (uri == null || uri.isEmpty()) {
+        ClassMetadata<? extends BlockFamily, ?> resolved = library.resolve(uri);
+
+        if (uri == null || uri.isEmpty() || resolved == null) {
+            logger.error(" Failed to resolve Blockfamily {}",uri);
             return SymmetricFamily.class;
         }
-        return library.resolve(uri).getType();
+        return resolved.getType();
     }
 
     /**
