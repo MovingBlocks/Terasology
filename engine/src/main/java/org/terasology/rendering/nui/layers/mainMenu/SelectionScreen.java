@@ -72,9 +72,6 @@ public abstract class SelectionScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
-        if (!config.getPlayer().hasEnteredUsername()) {
-            getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
-        }
     }
 
     void updateDescription(GameInfo item) {
