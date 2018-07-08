@@ -37,6 +37,7 @@ import org.terasology.logic.console.ConsoleSystem;
 import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
+import org.terasology.recording.EntityIdMap;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
@@ -121,6 +122,7 @@ public class StateMainMenu implements GameState {
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = new LocalPlayer();
+        localPlayer.setEntityIdMap(context.get(EntityIdMap.class));
         context.put(LocalPlayer.class, localPlayer);
         localPlayer.setClientEntity(localPlayerEntity);
 

@@ -452,18 +452,18 @@ public final class AABB {
     }
 
     public boolean intersectRectangle(Vector3f from, Vector3f direction) {
-        Vector3f dirfrac = new Vector3f();
+        Vector3f dirFrac = new Vector3f(
+                1.0f / direction.x,
+                1.0f / direction.y,
+                1.0f / direction.z
+        );
 
-        dirfrac.x = 1.0f / direction.x;
-        dirfrac.y = 1.0f / direction.y;
-        dirfrac.z = 1.0f / direction.z;
-
-        float t1 = (min.x - from.x) * dirfrac.x;
-        float t2 = (max.x - from.x) * dirfrac.x;
-        float t3 = (min.y - from.y) * dirfrac.y;
-        float t4 = (max.y - from.y) * dirfrac.y;
-        float t5 = (min.z - from.z) * dirfrac.z;
-        float t6 = (max.z - from.z) * dirfrac.z;
+        float t1 = (min.x - from.x) * dirFrac.x;
+        float t2 = (max.x - from.x) * dirFrac.x;
+        float t3 = (min.y - from.y) * dirFrac.y;
+        float t4 = (max.y - from.y) * dirFrac.y;
+        float t5 = (min.z - from.z) * dirFrac.z;
+        float t6 = (max.z - from.z) * dirFrac.z;
 
         float tmin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
         float tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));

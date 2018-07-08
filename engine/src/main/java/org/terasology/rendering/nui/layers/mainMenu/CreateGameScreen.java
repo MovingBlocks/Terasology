@@ -48,7 +48,6 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.SelectModulesScreen;
 import org.terasology.rendering.nui.widgets.UIButton;
@@ -71,7 +70,6 @@ public class CreateGameScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:createGameScreen");
 
-    private static final String DEFAULT_GAME_NAME_PREFIX = "Game ";
     private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
 
     private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
@@ -345,19 +343,7 @@ public class CreateGameScreen extends CoreScreenLayer {
 
     private void setGameName(UIText gameName) {
         if (gameName != null) {
-            int gameNum = 1;
-            for (GameInfo info : GameProvider.getSavedGames()) {
-                if (info.getManifest().getTitle().startsWith(DEFAULT_GAME_NAME_PREFIX)) {
-                    String remainder = info.getManifest().getTitle().substring(DEFAULT_GAME_NAME_PREFIX.length());
-                    try {
-                        gameNum = Math.max(gameNum, Integer.parseInt(remainder) + 1);
-                    } catch (NumberFormatException e) {
-                        logger.trace("Could not parse {} as integer (not an error)", remainder, e);
-                    }
-                }
-            }
-
-            gameName.setText(DEFAULT_GAME_NAME_PREFIX + gameNum);
+            gameName.setText(GameProvider.getNextGameName());
         }
     }
 

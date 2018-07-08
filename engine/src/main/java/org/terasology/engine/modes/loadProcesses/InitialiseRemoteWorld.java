@@ -23,6 +23,7 @@ import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
+import org.terasology.recording.EntityIdMap;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.backdrop.Skysphere;
@@ -39,8 +40,6 @@ import org.terasology.world.sun.BasicCelestialModel;
 import org.terasology.world.sun.CelestialSystem;
 import org.terasology.world.sun.DefaultCelestialSystem;
 
-/**
- */
 public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     private final Context context;
     private final GameManifest gameManifest;
@@ -61,6 +60,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         LocalPlayer localPlayer = new LocalPlayer();
+        localPlayer.setEntityIdMap(context.get(EntityIdMap.class));
         context.put(LocalPlayer.class, localPlayer);
         BlockManager blockManager = context.get(BlockManager.class);
 

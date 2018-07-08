@@ -121,40 +121,17 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
     @Command(shortDescription = "Sets the held item mount point translation for remote characters")
     public void setRemotePlayersHeldItemMountPointTranslations(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
-        for (EntityRef remotePlayer : entityManager.getEntitiesWith(CharacterComponent.class, PlayerCharacterComponent.class)) {
-            if (relatesToLocalPlayer(remotePlayer)) {
-                RemotePersonHeldItemMountPointComponent newComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
-                if (newComponent != null) {
-                    newComponent.translate = new Vector3f(x, y, z);
-                    ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent.newInstance(), remotePlayer, newComponent);
-                }
-            }
+        for (EntityRef remotePlayer : entityManager.getEntitiesWith(RemotePersonHeldItemMountPointComponent.class)) {
+            RemotePersonHeldItemMountPointComponent remoteMountPointComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
+            remoteMountPointComponent.translate.set(x, y, z);
         }
     }
 
     @Command(shortDescription = "Sets the held item mount point rotation for remote characters")
     public void setRemotePlayersHeldItemMountPointRotations(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
-        for (EntityRef remotePlayer : entityManager.getEntitiesWith(CharacterComponent.class, PlayerCharacterComponent.class)) {
-            if (relatesToLocalPlayer(remotePlayer)) {
-                RemotePersonHeldItemMountPointComponent newComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
-                if (newComponent != null) {
-                    newComponent.rotateDegrees = new Vector3f(x, y, z);
-                    ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent.newInstance(), remotePlayer, newComponent);
-                }
-            }
-        }
-    }
-
-    @Command(shortDescription = "Sets the held item mount point scale for remote characters")
-    public void setRemotePlayersHeldItemMountPointScale(@CommandParam("scale") float scale) {
-        for (EntityRef remotePlayer : entityManager.getEntitiesWith(CharacterComponent.class, PlayerCharacterComponent.class)) {
-            if (relatesToLocalPlayer(remotePlayer)) {
-                RemotePersonHeldItemMountPointComponent newComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
-                if (newComponent != null) {
-                    newComponent.scale = scale;
-                    ensureClientSideEntityOnHeldItemMountPoint(OnActivatedComponent.newInstance(), remotePlayer, newComponent);
-                }
-            }
+        for (EntityRef remotePlayer : entityManager.getEntitiesWith(RemotePersonHeldItemMountPointComponent.class)) {
+            RemotePersonHeldItemMountPointComponent remoteMountPointComponent = remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);
+            remoteMountPointComponent.rotateDegrees.set(x, y, z);
         }
     }
 
@@ -190,8 +167,8 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
      */
     private void linkHeldItemLocationForRemotePlayer(EntityRef newItem, EntityRef player) {
         if (relatesToLocalPlayer(player)) {
-           logger.debug("linkHeldItemLocationForRemotePlayer called with an entity that relates to the local player, ignoring{}", player);
-           return;
+            logger.debug("linkHeldItemLocationForRemotePlayer called with an entity that relates to the local player, ignoring{}", player);
+            return;
         }
 
         // Find out if there is a current held item that maps to this player

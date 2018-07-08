@@ -112,11 +112,6 @@
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#back}",
-            "id": "close"
-          },
-          {
-            "type": "UIButton",
             "text": "${engine:menu#advanced}",
             "id": "advancedSetup"
           },
@@ -130,10 +125,25 @@
           "width": 400,
           "height": 32,
           "position-horizontal-center": {},
-          "position-bottom": {
+          "position-top": {
             "target": "BOTTOM",
-            "offset": -48,
+            "offset": 16,
             "widget": "mainBox"
+          }
+        }
+      },
+      {
+        "type": "UIButton",
+        "text": "${engine:menu#back}",
+        "id": "close",
+        "layoutInfo": {
+          "width": 128,
+          "height": 32,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "BOTTOM",
+            "offset": 16,
+            "widget": "actionsRow"
           }
         }
       }

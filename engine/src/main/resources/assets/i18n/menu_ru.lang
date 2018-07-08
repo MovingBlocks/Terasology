@@ -42,6 +42,8 @@
     "biome-name": "Название",
     "bloom-effect": "Насыщенность",
     "bobbing": "Шаги камеры",
+    "button-web-browser-confirmation-title": "Необходимо подтверждение",
+    "button-web-browser-confirmation-message": "Вы уверены что хотите открыть эту ссылку в браузере?",
     "camera-blur": "Размытие",
     "camera-blur-max": "максимальное",
     "camera-blur-normal": "средние",

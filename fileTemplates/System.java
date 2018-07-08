@@ -4,6 +4,9 @@
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 
+/**
+ * 
+ */
 @RegisterSystem
 public class ${NAME} extends BaseComponentSystem {
     

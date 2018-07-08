@@ -11,6 +11,9 @@
                     "text-color": "AAAAAAFF"
                 }
             }
+        },
+        "UIButtonWebBrowser": {
+            "text-color": "8B85FFFF"
         }
     },
     "families": {

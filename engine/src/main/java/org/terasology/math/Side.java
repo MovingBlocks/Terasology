@@ -37,17 +37,17 @@ public enum Side {
     FRONT(new Vector3i(0, 0, -1), true, true, false),
     BACK(new Vector3i(0, 0, 1), true, true, false);
 
-    private static EnumMap<Side, Side> reverseMap;
-    private static ImmutableList<Side> horizontalSides;
-    private static ImmutableList<Side> verticalSides;
-    private static EnumMap<Side, Side> clockwiseYawSide;
-    private static EnumMap<Side, Side> anticlockwiseYawSide;
-    private static EnumMap<Side, Side> clockwisePitchSide;
-    private static EnumMap<Side, Side> anticlockwisePitchSide;
-    private static EnumMap<Side, Side> clockwiseRollSide;
-    private static EnumMap<Side, Side> anticlockwiseRollSide;
-    private static EnumMap<Side, Direction> conversionMap;
-    private static EnumMap<Side, ImmutableList<Side>> tangents;
+    private static final EnumMap<Side, Side> reverseMap;
+    private static final ImmutableList<Side> horizontalSides;
+    private static final ImmutableList<Side> verticalSides;
+    private static final EnumMap<Side, Side> clockwiseYawSide;
+    private static final EnumMap<Side, Side> anticlockwiseYawSide;
+    private static final EnumMap<Side, Side> clockwisePitchSide;
+    private static final EnumMap<Side, Side> anticlockwisePitchSide;
+    private static final EnumMap<Side, Side> clockwiseRollSide;
+    private static final EnumMap<Side, Side> anticlockwiseRollSide;
+    private static final EnumMap<Side, Direction> conversionMap;
+    private static final EnumMap<Side, ImmutableList<Side>> tangents;
 
     static {
         tangents = new EnumMap<>(Side.class);
@@ -111,10 +111,10 @@ public enum Side {
         verticalSides = ImmutableList.of(TOP, BOTTOM);
     }
 
-    private Vector3i vector3iDir;
-    private boolean canYaw;
-    private boolean canPitch;
-    private boolean canRoll;
+    private final Vector3i vector3iDir;
+    private final boolean canYaw;
+    private final boolean canPitch;
+    private final boolean canRoll;
 
      Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
         this.vector3iDir = vector3i;
@@ -193,10 +193,17 @@ public enum Side {
     }
 
     /**
-     * @return Whether this is one of the horizontal directions.
+     * @return Whether this is one of the horizontal directions (LEFT, FRONT, RIGHT, BACK).
      */
     public boolean isHorizontal() {
         return canYaw;
+    }
+
+    /**
+     * @return Whether this is one of the vertical directions (TOP, BOTTOM).
+     */
+    public boolean isVertical() {
+        return !canYaw;
     }
 
     /**
@@ -294,11 +301,6 @@ public enum Side {
             return this;
         }
     }
-
-    public boolean isVertical() {
-        return !canYaw;
-    }
-
 
     public Iterable<Side> tangents() {
         return tangents.get(this);

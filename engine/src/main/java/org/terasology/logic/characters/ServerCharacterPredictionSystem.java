@@ -35,6 +35,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.recording.CharacterStateEventPositionMap;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.utilities.collection.CircularBuffer;
@@ -48,6 +50,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     public static final int RENDER_DELAY = 100;
     public static final int MAX_INPUT_OVERFLOW = 100;
     public static final int MAX_INPUT_UNDERFLOW = 100;
+    private static final int MAX_INPUT_OVERFLOW_REPLAY_INCREASE = 120;
 
     private static final Logger logger = LoggerFactory.getLogger(ServerCharacterPredictionSystem.class);
 
@@ -68,6 +71,9 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     @In
     private NetworkSystem networkSystem;
+
+    @In
+    private CharacterStateEventPositionMap characterStateEventPositionMap;
 
     private CharacterMover characterMover;
     private Map<EntityRef, CircularBuffer<CharacterStateEvent>> characterStates = Maps.newHashMap();
@@ -121,11 +127,19 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
-
-        float delta = input.getDelta() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW);
+        float delta = input.getDelta() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW );
+        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+            delta -= MAX_INPUT_OVERFLOW_REPLAY_INCREASE;
+        }
         if (delta < 0) {
             CharacterStateEvent newState = stepState(input, lastState, entity);
             stateBuffer.add(newState);
+
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING)  {
+                characterStateEventPositionMap.updateCharacterStateEvent(newState);
+            } else if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+                characterStateEventPositionMap.add(newState.getSequenceNumber(), newState.getPosition(), newState.getVelocity());
+            }
 
             characterMovementSystemUtility.setToState(entity, newState);
             lastInputEvent.put(entity, input);

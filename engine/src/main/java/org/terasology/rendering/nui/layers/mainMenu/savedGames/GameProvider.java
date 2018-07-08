@@ -38,20 +38,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-/**
- */
 public final class GameProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(GameProvider.class);
+    private static final String DEFAULT_GAME_NAME_PREFIX = "Game ";
 
     private GameProvider() {
     }
 
+    public static List<GameInfo> getSavedRecordings() {
+        Path recordingPath = PathManager.getInstance().getRecordingsPath();
+        return getSavedGameOrRecording(recordingPath);
+    }
+
     public static List<GameInfo> getSavedGames() {
-        Path savedGames = PathManager.getInstance().getSavesPath();
+        Path savePath = PathManager.getInstance().getSavesPath();
+        return getSavedGameOrRecording(savePath);
+    }
+
+    private static List<GameInfo> getSavedGameOrRecording(Path saveOrRecordingPath) {
         SortedMap<FileTime, Path> savedGamePaths = Maps.newTreeMap(Collections.reverseOrder());
         try (DirectoryStream<Path> stream =
-                Files.newDirectoryStream(savedGames)) {
+                     Files.newDirectoryStream(saveOrRecordingPath)) {
             for (Path entry : stream) {
                 if (Files.isRegularFile(entry.resolve(GameManifest.DEFAULT_FILE_NAME))) {
                     savedGamePaths.put(Files.getLastModifiedTime(entry.resolve(GameManifest.DEFAULT_FILE_NAME)), entry);
@@ -98,6 +106,24 @@ public final class GameProvider {
             logger.warn("Can't load an image", ex);
         }
         return null;
+    }
+
+    /**
+     * Generates the game name based on the game number of the last saved game
+     */
+    public static String getNextGameName() {
+        int gameNumber = 1;
+        for (GameInfo info : GameProvider.getSavedGames()) {
+            if (info.getManifest().getTitle().startsWith(DEFAULT_GAME_NAME_PREFIX)) {
+                String remainder = info.getManifest().getTitle().substring(DEFAULT_GAME_NAME_PREFIX.length());
+                try {
+                    gameNumber = Math.max(gameNumber, Integer.parseInt(remainder) + 1);
+                } catch (NumberFormatException e) {
+                    logger.trace("Could not parse {} as integer (not an error)", remainder, e);
+                }
+            }
+        }
+        return DEFAULT_GAME_NAME_PREFIX + gameNumber;
     }
 
 }

@@ -66,7 +66,9 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [FluidComputerIntegration](https://github.com/Terasology/FluidComputerIntegration) - allows for interactions with fluids via computers
 * [FunnyBlocks](https://github.com/Terasology/FunnyBlocks) - cheese wheels and bowling pins - why not
 * [Genome](https://github.com/Terasology/Genome) - genetics WOO! Complete with DNA letters and mutating plants. Part of the Wood & Stone line-up
+* [GooeyDefense](https://github.com/Terasology/GooeyDefense) - tower defense gameplay! Face down the hordes of Gooeys with defensive towers protecting a central shrine
 * [GooeysQuests](https://github.com/Terasology/GooeysQuests) - spawn our mascot Gooey (console: `spawnPrefab gooey`) then `e` click to interact for commands and quests!
+* [GooKeeper](https://github.com/Terasology/GooKeeper) - those wild Gooeys totally look like they'd be happy in some Zoo enclosures. Don't they? Then have visitors pay you!
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [HjerlHede](https://github.com/Terasology/HjerlHede) - a pure build module containing some Structure Template based buildings from the [Danish natural museum Hjerl Hede](http://hjerlhede.dk/en)
 * [HumanoidCharacters](https://github.com/Terasology/HumanoidCharacters) - holds humanoid characters, to make you look different than a basic floating block (or an old monkey head!)

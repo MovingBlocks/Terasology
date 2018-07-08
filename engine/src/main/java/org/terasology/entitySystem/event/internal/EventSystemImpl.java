@@ -37,6 +37,7 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.entitySystem.event.ConsumableEvent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.event.PendingEvent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
@@ -50,13 +51,14 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
+import org.terasology.recording.EventCatcher;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.world.block.BlockComponent;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -85,11 +87,15 @@ public class EventSystemImpl implements EventSystem {
 
     private EventLibrary eventLibrary;
     private NetworkSystem networkSystem;
+    private EventCatcher eventCatcher;
 
-    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
+
+    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EventCatcher eventCatcher) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
+        this.eventCatcher = eventCatcher;
+        this.eventCatcher.startTimer();
     }
 
     @Override
@@ -120,7 +126,7 @@ public class EventSystemImpl implements EventSystem {
     /**
      * Events are added to the event library if they have a network annotation
      *
-     * @param eventType
+     * @param eventType the type of the event to be checked
      * @return Whether the event should be added to the event library
      */
     private boolean shouldAddToLibrary(Class<? extends Event> eventType) {
@@ -258,11 +264,14 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+                eventCatcher.addEvent(new PendingEvent(entity, event));
+            }
             networkReplicate(entity, event);
 
             Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
             List<EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
-            Collections.sort(selectedHandlers, priorityComparator);
+            selectedHandlers.sort(priorityComparator);
 
             if (event instanceof ConsumableEvent) {
                 sendConsumableEvent(entity, event, selectedHandlers);
@@ -358,10 +367,13 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+                eventCatcher.addEvent(new PendingEvent(entity, event, component));
+            }
             SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
             if (handlers != null) {
                 List<EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
-                Collections.sort(eventHandlers, priorityComparator);
+                eventHandlers.sort(priorityComparator);
                 for (EventHandlerInfo eventHandler : eventHandlers) {
                     if (eventHandler.isValidFor(entity)) {
                         eventHandler.invoke(entity, event);

@@ -200,4 +200,8 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
                 return null;
         }
     }
+
+    public Map<Class<? extends T>, ClassMetadata<? extends T, ?>> getClassLookup() {
+        return this.classLookup;
+    }
 }

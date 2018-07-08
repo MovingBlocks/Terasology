@@ -37,21 +37,24 @@ import javax.swing.JFileChooser;
  * Manager class that keeps track of the game's various paths and save directories.
  */
 public final class PathManager {
-    public static final String TERASOLOGY_FOLDER_NAME = "Terasology";
-    public static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
+    private static final String TERASOLOGY_FOLDER_NAME = "Terasology";
+    private static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
 
     private static final String SAVED_GAMES_DIR = "saves";
+    private static final String RECORDINGS_LIBRARY_DIR = "recordings";
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
     private static final String MOD_DIR = "modules";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
     private static final String CONFIGS_DIR = "configs";
+    private static final String REGEX = "[^A-Za-z0-9-_ ]";
 
     private static PathManager instance;
     private Path installPath;
     private Path homePath;
     private Path savesPath;
+    private Path recordingsPath;
     private Path logPath;
     private Path shaderLogPath;
     private Path currentWorldPath;
@@ -209,6 +212,14 @@ public final class PathManager {
 
     /**
      *
+     * @return Path in which recordings are saved.
+     */
+    public Path getRecordingsPath() {
+        return recordingsPath;
+    }
+
+    /**
+     *
      * @return Path in which this execution's logs are saved.
      */
     public Path getLogPath() {
@@ -263,6 +274,8 @@ public final class PathManager {
         Files.createDirectories(homePath);
         savesPath = homePath.resolve(SAVED_GAMES_DIR);
         Files.createDirectories(savesPath);
+        recordingsPath = homePath.resolve(RECORDINGS_LIBRARY_DIR);
+        Files.createDirectories(recordingsPath);
         logPath = homePath.resolve(LOG_DIR);
         Files.createDirectories(logPath);
         shaderLogPath = logPath.resolve(SHADER_LOG_DIR);
@@ -290,6 +303,10 @@ public final class PathManager {
     }
 
     public Path getSavePath(String title) {
-        return savesPath.resolve(title.replaceAll("[^A-Za-z0-9-_ ]", ""));
+        return getSavesPath().resolve(title.replaceAll(REGEX, ""));
+    }
+
+    public Path getRecordingPath(String title) {
+        return getRecordingsPath().resolve(title.replaceAll(REGEX, ""));
     }
 }
