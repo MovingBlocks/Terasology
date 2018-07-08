@@ -54,7 +54,7 @@ public class BlockFamilyLibrary {
             RegisterBlockFamily registerInfo = entry.getAnnotation(RegisterBlockFamily.class);
             String id = registerInfo.value();
             logger.debug("Registering blockFamily {}", id);
-            library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry),registerInfo.value()), (Class<? extends BlockFamily>) entry);
+            library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry), registerInfo.value()), (Class<? extends BlockFamily>) entry);
 
         }
     }
@@ -69,7 +69,7 @@ public class BlockFamilyLibrary {
         ClassMetadata<? extends BlockFamily, ?> resolved = library.resolve(uri);
 
         if (uri == null || uri.isEmpty() || resolved == null) {
-            logger.error(" Failed to resolve Blockfamily {}",uri);
+            logger.error(" Failed to resolve Blockfamily {}", uri);
             return SymmetricFamily.class;
         }
         return resolved.getType();
@@ -147,7 +147,6 @@ public class BlockFamilyLibrary {
     }
 
 
-
     public static String[] getSections(Class<? extends AbstractBlockFamily> blockFamily) {
         if (blockFamily == null) {
             return new String[]{};
@@ -180,8 +179,4 @@ public class BlockFamilyLibrary {
         }
         return freeFormSupported.value();
     }
-
-
-
-
 }
