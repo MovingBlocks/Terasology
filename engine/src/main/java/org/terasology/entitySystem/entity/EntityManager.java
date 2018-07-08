@@ -94,4 +94,6 @@ public interface EntityManager extends EntityPool {
      */
     ComponentLibrary getComponentLibrary();
 
+    boolean moveToPool(long id, EngineEntityPool pool);
+
 }

@@ -16,12 +16,20 @@
 package org.terasology.logic.console.commands;
 
 import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityPool;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.chat.ChatMessageEvent;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.notifications.NotificationMessageEvent;
+import org.terasology.network.ClientComponent;
+import org.terasology.network.ColorComponent;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.Color;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.HashMap;
@@ -32,6 +40,8 @@ public class WorldCommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
+
+    private EntityRef entityRef;
 
     @Command(shortDescription = "Get information about different worlds and " +
             "entities present in each pool", runOnServer = true)
@@ -63,13 +73,42 @@ public class WorldCommands extends BaseComponentSystem {
     public String makeEntity(@CommandParam("The world in which the entity is formed") String worldName) {
         for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
             if(entry.getKey().getTitle().equalsIgnoreCase(worldName)) {
-                entry.getValue().create();
-                return "Entity created in " + entry.getKey().getTitle() + " world";
+                entityRef = entry.getValue().create();
+                return "Entity created in " + entry.getKey().getTitle() + " world with id " + entityRef.getId();
             }
         }
 
         return  worldName + " does not exist";
     }
 
+    @Command(shortDescription = "Moves the last created entity to another pool ", runOnServer = true)
+    public String moveEntity(@CommandParam("The world in which the entity is formed") String worldName) {
+        for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
+            if(entry.getKey().getTitle().equalsIgnoreCase(worldName)) {
+                entityManager.moveToPool(entityRef.getId(), entry.getValue());
+                return "Entity " + entityRef.getId() + " moved to " + entry.getKey().getTitle() + "world";
+            }
+        }
+
+        return  worldName + " does not exist";
+    }
+
+    @Command(shortDescription = "Random", runOnServer = true)
+    public String coolStuff(@Sender EntityRef sender) {
+        EntityRef simulatedEntity = entityManager.create("engine:multiWorldSim");
+
+
+        DisplayNameComponent displayNameComponent = simulatedEntity.getComponent(DisplayNameComponent.class);
+        displayNameComponent.name = "I-Travel-Worlds-"+simulatedEntity.getId();
+        simulatedEntity.saveComponent(displayNameComponent);
+
+        ColorComponent colorComponent = simulatedEntity.getComponent(ColorComponent.class);
+        colorComponent.color = Color.RED;
+        simulatedEntity.saveComponent(colorComponent);
+        sender.send(new ChatMessageEvent("yay", simulatedEntity));
+
+        return "done";
+
+    }
 
 }

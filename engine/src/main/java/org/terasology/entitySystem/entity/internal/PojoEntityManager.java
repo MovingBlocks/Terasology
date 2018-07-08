@@ -651,6 +651,7 @@ public class PojoEntityManager implements EngineEntityManager {
         poolMap.remove(id);
     }
 
+    @Override
     public boolean moveToPool(long id, EngineEntityPool pool) {
 
         if (getPool(id).isPresent() && getPool(id).get().equals(pool)) {
