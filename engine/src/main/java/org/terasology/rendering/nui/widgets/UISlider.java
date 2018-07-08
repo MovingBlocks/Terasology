@@ -39,7 +39,7 @@ public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
 
-    private static UISliderOnChangeTriggeredListener uiSliderOnChangeTriggeredListener;
+    private UISliderOnChangeTriggeredListener uiSliderOnChangeTriggeredListener;
 
     private InteractionListener tickerListener = new BaseInteractionListener() {
         private Vector2i offset = new Vector2i();
