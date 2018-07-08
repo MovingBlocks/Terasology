@@ -19,12 +19,9 @@ package org.terasology.physics.bullet.shapes;
 
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btCompoundShape;
-import org.terasology.math.Rotation;
 import org.terasology.math.Transform;
-import org.terasology.math.VecMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
 
 import java.util.ArrayList;

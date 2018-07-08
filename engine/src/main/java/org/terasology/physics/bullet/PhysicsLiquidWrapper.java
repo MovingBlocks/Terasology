@@ -38,11 +38,27 @@ public class PhysicsLiquidWrapper extends btVoxelContentProvider {
     }
 
     @Override
-    public btVoxelInfo getVoxel(int x, int y, int z) {
+    public void getVoxel(int x, int y, int z, btVoxelInfo info) {
         Block block = world.getBlock(x, y, z);
-        return new btVoxelInfo(false,false,block.getId(),x,y,z,((BulletCollisionShape)block.getCollisionShape()).underlyingShape,block.getCollisionOffset(),0,0,0);
 
+        btVector3 offset = new btVector3(block.getCollisionOffset().x,block.getCollisionOffset().y,block.getCollisionOffset().z);
+        btCollisionShape shape = ((BulletCollisionShape)block.getCollisionShape()).underlyingShape;
+
+        info.setTracable(false);
+        info.setBlocking(block.isLiquid());
+        info.setVoxelTypeId(block.getId());
+        info.setX(x);
+        info.setY(y);
+        info.setZ(z);
+        info.setCollisionShape(shape);
+        info.setCollisionOffset(offset);
+        info.setFriction(0);
+        info.setRestitution(0);
+        info.setRollingFriction(0);
+        offset.dispose();
     }
+
+
 
 
 }

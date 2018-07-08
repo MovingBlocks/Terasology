@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Rotation;
-import org.terasology.math.VecMath;
 import org.terasology.math.Yaw;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;

@@ -20,7 +20,6 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 
 import org.terasology.math.AABB;
 import org.terasology.math.Transform;
-import org.terasology.math.VecMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 

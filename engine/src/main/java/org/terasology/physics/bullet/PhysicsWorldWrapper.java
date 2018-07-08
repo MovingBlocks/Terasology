@@ -41,12 +41,28 @@ public class PhysicsWorldWrapper extends btVoxelContentProvider {
     }
 
     @Override
-    public btVoxelInfo getVoxel(int x, int y, int z) {
+    public void getVoxel(int x, int y, int z, btVoxelInfo info) {
         Block block = world.getBlock(x, y, z);
-        btCollisionShape shape = ((BulletCollisionShape)block.getCollisionShape()).underlyingShape;
-        return new btVoxelInfo(shape != null && block.isTargetable(),shape != null && block.isPenetrable(),block.getId(),x,y,z,shape,block.getCollisionOffset(),0,0,0);
 
+        btVector3 offset = new btVector3(block.getCollisionOffset().x,block.getCollisionOffset().y,block.getCollisionOffset().z);
+        btCollisionShape shape = ((BulletCollisionShape)block.getCollisionShape()).underlyingShape;
+
+        info.setTracable(shape != null && block.isTargetable());
+        info.setBlocking(shape != null && !block.isPenetrable());
+        info.setVoxelTypeId(block.getId());
+        info.setX(x);
+        info.setY(y);
+        info.setZ(z);
+        info.setCollisionShape(shape);
+        info.setCollisionOffset(offset);
+        info.setFriction(0);
+        info.setRestitution(0);
+        info.setRollingFriction(0);
+        info.dispose();
+        offset.dispose();
     }
+
+
 
 }
 

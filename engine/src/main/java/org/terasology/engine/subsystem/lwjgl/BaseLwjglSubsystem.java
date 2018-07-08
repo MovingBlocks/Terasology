@@ -39,7 +39,7 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
         if (!initialised) {
             initLogger();
             LWJGLHelper.initNativeLibs();
-            Bullet.init();
+            Bullet.init(true);
             initialised = true;
         }
     }

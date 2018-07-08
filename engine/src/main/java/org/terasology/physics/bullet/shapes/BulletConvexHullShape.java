@@ -16,15 +16,15 @@
 package org.terasology.physics.bullet.shapes;
 
 import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
-import org.terasology.math.VecMath;
+
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
+import org.terasology.physics.shapes.ConvexHullShape;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class BulletConvexHullShape extends BulletCollisionShape implements org.terasology.physics.shapes.ConvexHullShape {
+public class BulletConvexHullShape extends BulletCollisionShape implements ConvexHullShape {
     private final btConvexHullShape convexHullShape;
 
     public BulletConvexHullShape(List<Vector3f> vertices) {

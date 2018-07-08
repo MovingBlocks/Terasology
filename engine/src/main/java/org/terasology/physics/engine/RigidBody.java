@@ -16,6 +16,7 @@
 
 package org.terasology.physics.engine;
 
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -119,6 +120,9 @@ public interface RigidBody {
      * @param orientation the new rotation.
      */
     void setOrientation(Quat4f orientation);
+
+    Matrix4f getWorldTransform();
+    Matrix4f setWorldTransform(Matrix4f trans);
 
     /**
      * Sets the world location or position.

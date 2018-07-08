@@ -115,8 +115,8 @@ public class BulletPhysics implements PhysicsEngine {
 
     private  final btCollisionConfiguration defaultCollisionConfiguration;
     private final btSequentialImpulseConstraintSolver sequentialImpulseConstraintSolver;
-//    private final btRigidBody.btRigidBodyConstructionInfo blockConsInf;
-//    private final btRigidBody.btRigidBodyConstructionInfo liquidConsInfo;
+    private final btRigidBody.btRigidBodyConstructionInfo blockConsInf;
+    private final btRigidBody.btRigidBodyConstructionInfo liquidConsInfo;
 
 
     public BulletPhysics(WorldProvider world) {
@@ -132,28 +132,28 @@ public class BulletPhysics implements PhysicsEngine {
         discreteDynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(new btGhostPairCallback());
 
         //TODO: reimplement wrapper
-//
-//        PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(world);
-//        btVoxelShape worldShape = new btVoxelShape(wrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));
-//
-//        PhysicsLiquidWrapper liquidWrapper = new PhysicsLiquidWrapper(world);
-//        btVoxelShape liquidShape = new btVoxelShape(liquidWrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));//liquidWrapper);*/
-//
-//        Matrix4f matrix4f = new Matrix4f();
-//        matrix4f.setIdentity();
-//        btDefaultMotionState blockMotionState = new btDefaultMotionState(matrix4f);
-//
-//        blockConsInf = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
-//        BulletRigidBody rigidBody = new BulletRigidBody(blockConsInf);
-//        rigidBody.rb.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
-//        short mask = (short) (~(StandardCollisionGroup.STATIC.getFlag() | StandardCollisionGroup.LIQUID.getFlag()));
-//        discreteDynamicsWorld.addRigidBody(rigidBody.rb, combineGroups(StandardCollisionGroup.WORLD), mask);
-//
-//
-//        liquidConsInfo = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, liquidShape, new Vector3f());
-//        BulletRigidBody liquidBody = new BulletRigidBody(liquidConsInfo);
-//        liquidBody.rb.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
-//        discreteDynamicsWorld.addRigidBody(liquidBody.rb, combineGroups(StandardCollisionGroup.LIQUID), StandardCollisionGroup.SENSOR.getFlag());
+
+        PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(world);
+        btVoxelShape worldShape = new btVoxelShape(wrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));
+
+        PhysicsLiquidWrapper liquidWrapper = new PhysicsLiquidWrapper(world);
+        btVoxelShape liquidShape = new btVoxelShape(liquidWrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));//liquidWrapper);*/
+
+        Matrix4f matrix4f = new Matrix4f();
+        matrix4f.setIdentity();
+        btDefaultMotionState blockMotionState = new btDefaultMotionState(matrix4f);
+
+        blockConsInf = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
+        BulletRigidBody rigidBody = new BulletRigidBody(blockConsInf);
+        rigidBody.rb.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
+        short mask = (short) (~(StandardCollisionGroup.STATIC.getFlag() | StandardCollisionGroup.LIQUID.getFlag()));
+        discreteDynamicsWorld.addRigidBody(rigidBody.rb, combineGroups(StandardCollisionGroup.WORLD), mask);
+
+
+        liquidConsInfo = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, liquidShape, new Vector3f());
+        BulletRigidBody liquidBody = new BulletRigidBody(liquidConsInfo);
+        liquidBody.rb.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
+        discreteDynamicsWorld.addRigidBody(liquidBody.rb, combineGroups(StandardCollisionGroup.LIQUID), StandardCollisionGroup.SENSOR.getFlag());
 
     }
 
@@ -431,7 +431,7 @@ public class BulletPhysics implements PhysicsEngine {
             return false;
         } else {
             removeCollider(toRemove.collider);
-            toRemove.collider.dispose();
+//            toRemove.collider.dispose();
             return true;
         }
     }
@@ -854,29 +854,29 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
-        public void applyImpulse(org.terasology.math.geom.Vector3f impulse) {
+        public void applyImpulse(Vector3f impulse) {
             pendingImpulse.add(impulse);
         }
 
         @Override
-        public void applyForce(org.terasology.math.geom.Vector3f force) {
+        public void applyForce(Vector3f force) {
             pendingForce.add(force);
         }
 
         @Override
-        public void translate(org.terasology.math.geom.Vector3f translation) {
+        public void translate(Vector3f translation) {
             rb.translate(translation);
         }
 
         @Override
-        public org.terasology.math.geom.Quat4f getOrientation(org.terasology.math.geom.Quat4f out) {
+        public Quat4f getOrientation(Quat4f out) {
             Quat4f rotation = new Quat4f();
             rotation.set(rb.getWorldTransform());
             return rotation;
         }
 
         @Override
-        public org.terasology.math.geom.Vector3f getLocation(org.terasology.math.geom.Vector3f out) {
+        public Vector3f getLocation(Vector3f out) {
             Vector3f result = rb.getWorldTransform().getTranslation();
             out.x = result.x;
             out.y = result.y;
@@ -884,47 +884,47 @@ public class BulletPhysics implements PhysicsEngine {
             return out;
         }
 
-//        @Override
-//        public Matrix4f getWorldTransform()
-//        {
-//            return  rb.getWorldTransform();
-//        }
-//
-//        @Override
-//        public  Matrix4f setWorldTransform(Matrix4f trans)
-//        {
-//            rb.setWorldTransform(trans);
-//            return trans;
-//        }
+        @Override
+        public Matrix4f getWorldTransform()
+        {
+            return  rb.getWorldTransform();
+        }
 
         @Override
-        public org.terasology.math.geom.Vector3f getLinearVelocity(org.terasology.math.geom.Vector3f out) {
+        public  Matrix4f setWorldTransform(Matrix4f trans)
+        {
+            rb.setWorldTransform(trans);
+            return trans;
+        }
+
+        @Override
+        public Vector3f getLinearVelocity(Vector3f out) {
             return rb.getLinearVelocity();
         }
 
         @Override
-        public org.terasology.math.geom.Vector3f getAngularVelocity(org.terasology.math.geom.Vector3f out) {
+        public Vector3f getAngularVelocity(Vector3f out) {
             return rb.getAngularVelocity();// out;
         }
 
         @Override
-        public void setLinearVelocity(org.terasology.math.geom.Vector3f value) {
+        public void setLinearVelocity(Vector3f value) {
             rb.setLinearVelocity(value);
         }
 
         @Override
-        public void setAngularVelocity(org.terasology.math.geom.Vector3f value) {
+        public void setAngularVelocity(Vector3f value) {
             rb.setAngularVelocity(value);
         }
 
         @Override
-        public void setOrientation(org.terasology.math.geom.Quat4f orientation) {
+        public void setOrientation(Quat4f orientation) {
             Matrix4f transform =  rb.getWorldTransform();
             rb.setWorldTransform(new Matrix4f(orientation,transform.getTranslation(),1.0f));
         }
 
         @Override
-        public void setLocation(org.terasology.math.geom.Vector3f location) {
+        public void setLocation(Vector3f location) {
             Matrix4f translation = rb.getWorldTransform();
             Quat4f quaternion = new Quat4f();
             quaternion.set(translation);
@@ -934,16 +934,17 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
-        public void setVelocity(org.terasology.math.geom.Vector3f linear, org.terasology.math.geom.Vector3f angular) {
+        public void setVelocity(Vector3f linear, Vector3f angular) {
             rb.setLinearVelocity(linear);
             rb.setAngularVelocity(angular);
         }
 
         @Override
-        public void setTransform(org.terasology.math.geom.Vector3f location, org.terasology.math.geom.Quat4f orientation) {
+        public void setTransform(Vector3f location, Quat4f orientation) {
             Matrix4f transform =  new Matrix4f(rb.getWorldTransform());
             transform.set(new Matrix4f(orientation,location,1.0f));
             rb.setWorldTransform(transform);
+
         }
 
         @Override
@@ -955,8 +956,6 @@ public class BulletPhysics implements PhysicsEngine {
             if(isDisposed)
                 return;
             this.info.dispose();
-            this.rb.getMotionState().dispose();;
-            this.rb.getCollisionShape().dispose();
             this.rb.dispose();
             isDisposed = true;
 
@@ -995,10 +994,10 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
-        public org.terasology.math.geom.Vector3f getLocation() {
+        public Vector3f getLocation() {
             //collider.getWorldTransform(temp);
             Vector3f pos = collider.getWorldTransform().getTranslation();
-            return new org.terasology.math.geom.Vector3f(pos.x, pos.y, pos.z);
+            return new Vector3f(pos.x, pos.y, pos.z);
         }
 
         @Override

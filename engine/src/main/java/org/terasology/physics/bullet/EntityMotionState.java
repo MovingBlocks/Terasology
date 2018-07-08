@@ -17,12 +17,13 @@
 package org.terasology.physics.bullet;
 
 import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.audio.openAL.staticSound.OpenALSound;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.VecMath;
 import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Quat4f;
 
 /**
  * This motion state is used to connect rigid body entities to their rigid body in the bullet physics engine.
@@ -31,6 +32,8 @@ import org.terasology.math.geom.Vector3f;
  *
  */
 public class EntityMotionState extends btMotionState {
+    private static final Logger logger = LoggerFactory.getLogger(EntityMotionState.class);
+
     private EntityRef entity;
 
     /**
@@ -40,14 +43,14 @@ public class EntityMotionState extends btMotionState {
      *               LocationComponent of.
      */
     EntityMotionState(EntityRef entity) {
+        super();
         this.entity = entity;
     }
 
     @Override
     public void getWorldTransform(Matrix4f transform) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        Vector3f location = loc.getWorldPosition();
-        transform.set(new Matrix4f(loc.getWorldRotation(),new Vector3f(location.x,location.y,location.z),1.0f));
+        transform.set(new Matrix4f(loc.getWorldRotation(),loc.getWorldPosition(),1.0f));
     }
 
     @Override
@@ -55,6 +58,9 @@ public class EntityMotionState extends btMotionState {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(transform.getTranslation());
+            Quat4f rot = new Quat4f();
+            rot.set(transform);
+            loc.setWorldRotation(rot);
         }
     }
 
