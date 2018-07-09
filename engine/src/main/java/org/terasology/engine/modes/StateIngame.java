@@ -120,9 +120,11 @@ public class StateIngame implements GameState {
         chunkProvider.dispose();
 
         boolean save = networkSystem.getMode().isAuthority();
-        if (save && RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
-            ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
-            screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
+        if (save) {
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
+                final ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
+                screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
+            }
 
             storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
         }
