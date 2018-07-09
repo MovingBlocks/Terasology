@@ -55,8 +55,9 @@ import java.util.List;
 
 public class NewGameScreen extends CoreScreenLayer {
 
+    private static final Logger logger = LoggerFactory.getLogger(NewGameScreen.class);
+
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:newGameScreen");
-    private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
     private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
 
     @In
@@ -217,8 +218,6 @@ public class NewGameScreen extends CoreScreenLayer {
 
     // Sets the default generator of the passed in gameplay module. Make sure it's already selected.
     private void setDefaultGeneratorOfGameplayModule(Module module) {
-        ModuleConfig moduleConfig = config.getDefaultModSelection();
-
         // Set the default generator of the selected gameplay module
         SimpleUri defaultWorldGenerator = StandardModuleExtension.getDefaultWorldGenerator(module);
         if (defaultWorldGenerator != null) {
