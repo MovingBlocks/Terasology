@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,7 @@
 package org.terasology;
 
 import com.google.api.client.util.Lists;
-import org.junit.Before;
 import org.terasology.config.Config;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.StandardGameStatus;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.TerasologyEngineBuilder;
 import org.terasology.engine.modes.StateLoading;
@@ -35,6 +32,7 @@ import org.terasology.engine.subsystem.openvr.OpenVRInput;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.recording.RecordAndReplayUtils;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
@@ -47,13 +45,13 @@ public abstract class ReplayTestingEnvironment {
     private List<TerasologyEngine> engines = Lists.newArrayList();
 
 
-    public void setup() throws Exception {
+    protected void setup() throws Exception {
         host = createEngine();
         host.run(new StateMainMenu());
 
     }
 
-    private TerasologyEngine createEngine() throws Exception {
+    protected TerasologyEngine createEngine() throws Exception {
         TerasologyEngineBuilder builder = new TerasologyEngineBuilder();
         populateSubsystems(builder);
         Path homePath = Paths.get("");
@@ -84,7 +82,7 @@ public abstract class ReplayTestingEnvironment {
 
     }
 
-    private GameInfo getReplayInfo(String title) throws Exception {
+    protected GameInfo getReplayInfo(String title) throws Exception {
         List<GameInfo> recordingsInfo = GameProvider.getSavedRecordings();
         for(GameInfo info : recordingsInfo) {
             if (title.equals(info.getManifest().getTitle())) {
@@ -96,8 +94,8 @@ public abstract class ReplayTestingEnvironment {
 
     private void loadReplay(GameInfo replayInfo) {
         GameManifest manifest = replayInfo.getManifest();
-        host.getFromEngineContext(RecordAndReplayUtils.class).setGameTitle(manifest.getTitle());
-        Config config = host.getFromEngineContext(Config.class);
+        CoreRegistry.get(RecordAndReplayUtils.class).setGameTitle(manifest.getTitle());
+        Config config = CoreRegistry.get(Config.class);
         config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
         config.getWorldGeneration().setWorldTitle(manifest.getTitle());
         host.changeState(new StateLoading(manifest, NetworkMode.NONE));
