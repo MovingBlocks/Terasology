@@ -18,25 +18,48 @@ package org.terasology.recording;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.terasology.ReplayTestingEnvironment;
+import org.terasology.config.Config;
+import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.modes.StateLoading;
+import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
-
-public class ReplayTest extends ReplayTestingEnvironment {
+public class ReplayTest2 extends ReplayTestingEnvironment {
 
     private Thread t1 = new Thread() {
 
         @Override
         public void run() {
             try {
-                ReplayTest.super.setup();
+                TerasologyEngine engine = ReplayTest2.super.createEngine();
+                engine.initialize();
+                engine.changeState(new StateMainMenu());
+                engine.tick();
+
+                //replay part
+                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.PREPARING_REPLAY);
+                GameInfo replayInfo = ReplayTest2.super.getReplayInfo("Game 1");
+                GameManifest manifest = replayInfo.getManifest();
+                CoreRegistry.get(RecordAndReplayUtils.class).setGameTitle(manifest.getTitle());
+                Config config = CoreRegistry.get(Config.class);
+                config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
+                config.getWorldGeneration().setWorldTitle(manifest.getTitle());
+                engine.changeState(new StateLoading(manifest, NetworkMode.NONE));
+
+                //super.openReplay("Game 1");
+                //engine.changeState(new StateLoading(info.getManifest(), NetworkMode.NONE));
+                while (engine.tick()) {
+                    //do nothing;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -45,7 +68,7 @@ public class ReplayTest extends ReplayTestingEnvironment {
 
     @Ignore("Not ready yet, and should be ignored by jenkins")
     @Test
-    public void testReplayEnd() {
+    public void testReplayGame1() {
         t1.start();
         try {
             while (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAY_FINISHED) {
@@ -63,29 +86,5 @@ public class ReplayTest extends ReplayTestingEnvironment {
         }
     }
 
-    @Ignore("Not ready yet, and should be ignored by jenkins")
-    @Test
-    public void testReplayMiddle() {
-        t1.start();
-        try {
-            while (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAY_FINISHED) {
-                if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
-                    EventSystemReplayImpl eventSystem = (EventSystemReplayImpl) CoreRegistry.get(EventSystem.class);
-                    Vector3f initialPosition = new Vector3f(24.175291f, 13.407986f, 2.7723987f);
-                    LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-                    EntityRef character = localPlayer.getCharacterEntity();
-                    LocationComponent location = character.getComponent(LocationComponent.class);
-                    if(eventSystem.getLastRecordedEventPosition() >= 1343) {
-                        assertFalse(initialPosition.equals(location.getLocalPosition()));
-                    }
-                }
-
-                Thread.sleep(1000);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 }
