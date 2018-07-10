@@ -26,18 +26,17 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 
-public class ReplayTest extends ReplayTestingEnvironment {
+public class ReplayManualTest extends ReplayTestingEnvironment {
 
     private Thread t1 = new Thread() {
 
         @Override
         public void run() {
             try {
-                ReplayTest.super.openMainMenu();
+                ReplayManualTest.super.openMainMenu();
             } catch (Exception e) {
                 e.printStackTrace();
             }

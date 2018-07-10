@@ -1,0 +1,38 @@
+{
+  "title": "Example",
+  "seed": "AIj8MVblM4gYNrpOuuIO45iszg4mDGyK",
+  "time": 8395,
+  "registeredBlockFamilies": [
+    "BuilderSampleGameplay:Dirt",
+    "engine:unloaded",
+    "BuilderSampleGameplay:Grass",
+    "engine:air"
+  ],
+  "blockIdMap": {
+    "engine:air": 10,
+    "BuilderSampleGameplay:Dirt": 2,
+    "engine:unloaded": 1,
+    "BuilderSampleGameplay:Grass": 3
+  },
+  "biomeIdMap": {
+    "engine:unknown": 0
+  },
+  "worlds": {
+    "main": {
+      "title": "main",
+      "seed": "AIj8MVblM4gYNrpOuuIO45iszg4mDGyK",
+      "time": 43602960,
+      "worldGenerator": "BuilderSampleGameplay:builderSampleWorld"
+    }
+  },
+  "modules": [
+    {
+      "name": "engine",
+      "version": "2.0.1-SNAPSHOT"
+    },
+    {
+      "name": "BuilderSampleGameplay",
+      "version": "2.0.1-SNAPSHOT"
+    }
+  ]
+}
