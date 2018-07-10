@@ -27,6 +27,7 @@ import org.terasology.registry.CoreRegistry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 
 public class ReplayTest extends ReplayTestingEnvironment {
@@ -36,7 +37,7 @@ public class ReplayTest extends ReplayTestingEnvironment {
         @Override
         public void run() {
             try {
-                ReplayTest.super.setup();
+                ReplayTest.super.openMainMenu();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -58,6 +59,8 @@ public class ReplayTest extends ReplayTestingEnvironment {
             Vector3f finalPosition = new Vector3f(5.336535f, 19.406195f, -61.026585f);
             assertEquals(finalPosition, location.getLocalPosition());
             System.out.println("TESTS FINISHED");
+            super.getHost().shutdown();
+            t1.join();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,13 +78,15 @@ public class ReplayTest extends ReplayTestingEnvironment {
                     LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
                     EntityRef character = localPlayer.getCharacterEntity();
                     LocationComponent location = character.getComponent(LocationComponent.class);
-                    if(eventSystem.getLastRecordedEventPosition() >= 1343) {
-                        assertFalse(initialPosition.equals(location.getLocalPosition()));
+                    if (eventSystem.getLastRecordedEventPosition() >= 1343) {
+                        assertNotEquals(initialPosition, location.getLocalPosition());
                     }
                 }
 
                 Thread.sleep(1000);
             }
+            super.getHost().shutdown();
+            t1.join();
 
         } catch (Exception e) {
             e.printStackTrace();

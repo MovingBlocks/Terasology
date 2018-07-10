@@ -31,6 +31,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.subsystem.openvr.OpenVRInput;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
@@ -45,13 +46,39 @@ public abstract class ReplayTestingEnvironment {
     private List<TerasologyEngine> engines = Lists.newArrayList();
 
 
-    protected void setup() throws Exception {
+    protected void openMainMenu() throws Exception {
         host = createEngine();
         host.run(new StateMainMenu());
-
     }
 
-    protected TerasologyEngine createEngine() throws Exception {
+    protected void openReplay(String replayTitle) throws Exception {
+        host = createEngine();
+        host.initialize();
+        host.changeState(new StateMainMenu());
+        host.tick();
+        loadReplay(replayTitle);
+        mainLoop();
+        host.cleanup();
+    }
+
+    private void loadReplay(String replayTitle) throws Exception {
+        RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.PREPARING_REPLAY);
+        GameInfo replayInfo = getReplayInfo(replayTitle);
+        GameManifest manifest = replayInfo.getManifest();
+        CoreRegistry.get(RecordAndReplayUtils.class).setGameTitle(manifest.getTitle());
+        Config config = CoreRegistry.get(Config.class);
+        config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
+        config.getWorldGeneration().setWorldTitle(manifest.getTitle());
+        host.changeState(new StateLoading(manifest, NetworkMode.NONE));
+    }
+
+    private void mainLoop() {
+        while (host.tick()) {
+            //do nothing;
+        }
+    }
+
+    private TerasologyEngine createEngine() throws Exception {
         TerasologyEngineBuilder builder = new TerasologyEngineBuilder();
         populateSubsystems(builder);
         Path homePath = Paths.get("");
@@ -72,19 +99,10 @@ public abstract class ReplayTestingEnvironment {
         builder.add(new HibernationSubsystem());
     }
 
-    protected TerasologyEngine getHost() {
-        return host;
-    }
 
-    protected void openReplay(String title) throws Exception {
-        GameInfo replayInfo = getReplayInfo(title);
-        loadReplay(replayInfo);
-
-    }
-
-    protected GameInfo getReplayInfo(String title) throws Exception {
+    private GameInfo getReplayInfo(String title) throws Exception {
         List<GameInfo> recordingsInfo = GameProvider.getSavedRecordings();
-        for(GameInfo info : recordingsInfo) {
+        for (GameInfo info : recordingsInfo) {
             if (title.equals(info.getManifest().getTitle())) {
                 return info;
             }
@@ -92,13 +110,8 @@ public abstract class ReplayTestingEnvironment {
         throw new Exception("No replay found with this title: " + title);
     }
 
-    private void loadReplay(GameInfo replayInfo) {
-        GameManifest manifest = replayInfo.getManifest();
-        CoreRegistry.get(RecordAndReplayUtils.class).setGameTitle(manifest.getTitle());
-        Config config = CoreRegistry.get(Config.class);
-        config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
-        config.getWorldGeneration().setWorldTitle(manifest.getTitle());
-        host.changeState(new StateLoading(manifest, NetworkMode.NONE));
+    protected TerasologyEngine getHost() {
+        return this.host;
     }
 
 
