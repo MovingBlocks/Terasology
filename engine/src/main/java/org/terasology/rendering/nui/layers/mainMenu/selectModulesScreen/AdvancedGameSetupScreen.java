@@ -92,8 +92,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:advancedGameSetupScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
-    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) -> o1.getMetadata()
-            .getDisplayName().toString().compareTo(o2.getMetadata().getDisplayName().toString());
+    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = Comparator.comparing(o -> o.getMetadata()
+            .getDisplayName().toString());
     @In
     private ModuleManager moduleManager;
     @In
@@ -153,7 +153,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             }
         }
 
-        Collections.sort(sortedModules, moduleInfoComparator);
+        sortedModules.sort(moduleInfoComparator);
         allSortedModules = new ArrayList<>(sortedModules);
 
         final UIList<ModuleSelectionInfo> moduleList = find("moduleList", UIList.class);
@@ -161,7 +161,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             moduleList.setList(sortedModules);
             moduleList.setItemRenderer(new AbstractItemRenderer<ModuleSelectionInfo>() {
 
-                public String getString(ModuleSelectionInfo value) {
+                String getString(ModuleSelectionInfo value) {
                     return value.getMetadata().getDisplayName().toString();
                 }
 
@@ -202,12 +202,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
             moduleSearch = find("moduleSearch", ResettableUIText.class);
             if (moduleSearch != null) {
-                moduleSearch.subscribe(new TextChangeEventListener() {
-                    @Override
-                    public void onTextChange(String oldText, String newText) {
-                        filterModules();
-                    }
-                });
+                moduleSearch.subscribe((TextChangeEventListener) (oldText, newText) -> filterModules());
             }
 
             final Binding<ModuleMetadata> moduleInfoBinding = new ReadOnlyBinding<ModuleMetadata>() {
@@ -270,17 +265,17 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                     public String get() {
                         ModuleMetadata moduleMetadata = moduleInfoBinding.get();
                         if (moduleMetadata != null) {
-                            String dependenciesNames;
+                            StringBuilder dependenciesNames;
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
-                            if (dependencies != null && dependencies.size() > 0) {
-                                dependenciesNames = translationSystem
-                                        .translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
+                            if (dependencies != null && !dependencies.isEmpty()) {
+                                dependenciesNames = new StringBuilder(translationSystem
+                                        .translate("${engine:menu#module-dependencies-exist}") + ":" + '\n');
                                 for (DependencyInfo dependency : dependencies) {
-                                    dependenciesNames += "   " + dependency.getId().toString() + '\n';
+                                    dependenciesNames.append("   ").append(dependency.getId().toString()).append('\n');
                                 }
                             } else {
-                                dependenciesNames = translationSystem
-                                        .translate("${engine:menu#module-dependencies-empty}") + ".";
+                                dependenciesNames = new StringBuilder(translationSystem
+                                        .translate("${engine:menu#module-dependencies-empty}") + ".");
                             }
                             return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependenciesNames;
                         }
@@ -389,7 +384,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
 
-            for (AdvancedGameSetupScreen.CheckboxAssociation checkboxAssociation : AdvancedGameSetupScreen.CheckboxAssociation.values()) {
+            for (CheckboxAssociationEnum checkboxAssociation : CheckboxAssociationEnum.values()) {
                 String checkboxName = checkboxAssociation.getCheckboxName();
                 StandardModuleExtension standardModuleExtension = checkboxAssociation.getStandardModuleExtension();
 
@@ -422,8 +417,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 selectModulesConfig.toggleUncategorizedSelected();
                 boolean isUncategorizedSelected = selectModulesConfig.isUncategorizedSelected();
                 uncategorizedCheckbox.setChecked(isUncategorizedSelected);
-                for (AdvancedGameSetupScreen.CheckboxAssociation checkboxAssociation : AdvancedGameSetupScreen.CheckboxAssociation.values()) {
-                    String checkboxName = checkboxAssociation.getCheckboxName();
+                for (CheckboxAssociationEnum checkboxAssociation : CheckboxAssociationEnum.values()) {
+                   final  String checkboxName = checkboxAssociation.getCheckboxName();
                     UICheckbox checkbox = find(checkboxName, UICheckbox.class);
                     if (null != checkbox) {
                         checkbox.setEnabled(!isUncategorizedSelected);
@@ -432,8 +427,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 filterModules();
             });
         }
-        UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+
         WidgetUtil.trySubscribe(this, "continue", button -> {
+            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             universeSetupScreen.setEnvironment(universeWrapper);
             universeWrapper.setSeed(seed.getText());
             triggerForwardAnimation(universeSetupScreen);
@@ -500,12 +496,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     }
 
     private void localModuleFilter() {
-        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
-        while (iter.hasNext()) {
-            if (!iter.next().isPresent()) {
-                iter.remove();
-            }
-        }
+        sortedModules.removeIf(moduleSelectionInfo -> !moduleSelectionInfo.isPresent());
     }
 
     private void advancedModuleFilter() {
@@ -537,12 +528,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
     private void filterText() {
         String newText = moduleSearch.getText();
-        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
-        while (iter.hasNext()) {
-            if (!iter.next().getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
-                iter.remove();
-            }
-        }
+        sortedModules.removeIf(moduleSelectionInfo -> !moduleSelectionInfo.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase()));
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
@@ -698,34 +684,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
         setSelectedVersions(resolver.resolve(selectedModules));
         updateValidToSelect();
-    }
-
-    // TODO: should dynamically generate checkbox list from boolean
-    // StandardModuleExtensions rather than hardcoding associations here
-    private static enum CheckboxAssociation {
-        IS_LIBRARY("libraryCheckbox", StandardModuleExtension.IS_LIBRARY),
-        IS_ASSETPLAY("assetCheckbox", StandardModuleExtension.IS_ASSETPLAY),
-        IS_IS_WORLD("worldCheckbox", StandardModuleExtension.IS_WORLD),
-        IS_GAMEPLAY("gameplayCheckbox", StandardModuleExtension.IS_GAMEPLAY),
-        IS_AUGMENTATION("augmentationCheckbox", StandardModuleExtension.IS_AUGMENTATION),
-        IS_SPECIAL("specialCheckbox", StandardModuleExtension.IS_SPECIAL),
-        SERVER_SIDE_ONLY("serverSideOnlyCheckbox", StandardModuleExtension.SERVER_SIDE_ONLY);
-
-        private String checkboxName;
-        private StandardModuleExtension standardModuleExtension;
-
-        private CheckboxAssociation(String checkboxName, StandardModuleExtension standardModuleExtension) {
-            this.checkboxName = checkboxName;
-            this.standardModuleExtension = standardModuleExtension;
-        }
-
-        public String getCheckboxName() {
-            return checkboxName;
-        }
-
-        public StandardModuleExtension getStandardModuleExtension() {
-            return standardModuleExtension;
-        }
     }
 
     public void setUniverseWrapper(UniverseWrapper wrapper) {
