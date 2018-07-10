@@ -38,7 +38,7 @@ public class OnBlockItemPlaced implements Event {
      */
     private EntityRef instigator = EntityRef.NULL;
 
-    @deprecated
+    @Deprecated
     public OnBlockItemPlaced(Vector3i pos, EntityRef placedBlock) {
         this.position = pos;
         this.placedBlock = placedBlock;
