@@ -20,12 +20,25 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3i;
 
 /**
+ * This event gets called whenever a block item is placed in the world
  */
 public class OnBlockItemPlaced implements Event {
+    /**
+     * The position where the block is placed
+     */
     private Vector3i position;
-    private EntityRef placedBlock;
-    private EntityRef instigator;
 
+    /**
+     *  The entity corresponding to the placed block
+     */
+    private EntityRef placedBlock;
+
+    /**
+     * The entity which placed the block
+     */
+    private EntityRef instigator = EntityRef.NULL;
+
+    @deprecated
     public OnBlockItemPlaced(Vector3i pos, EntityRef placedBlock) {
         this.position = pos;
         this.placedBlock = placedBlock;
