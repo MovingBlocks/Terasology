@@ -71,6 +71,8 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
             gameManifest.setTitle(universeWrapper.getGameName());
 
+            gameManifest.setSeed(universeWrapper.getSeed());
+
             DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
             ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
             if (!result.isSuccess()) {

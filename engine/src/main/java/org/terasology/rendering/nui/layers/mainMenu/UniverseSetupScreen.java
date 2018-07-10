@@ -279,10 +279,10 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(ModuleManager.class, moduleManager);
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         context.put(UniverseWrapper.class, wrapper);
-        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
 
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
         if (result.isSuccess()) {
             environment = moduleManager.loadEnvironment(result.getModules(), false);
             context.put(ModuleEnvironment.class, environment);

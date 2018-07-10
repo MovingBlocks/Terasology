@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -55,6 +57,8 @@ import java.util.stream.Collectors;
  * can be changed by the re-roll button. Note that each world has a unique seed.
  */
 public class WorldPreGenerationScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorldPreGenerationScreen.class);
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
 

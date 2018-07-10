@@ -470,6 +470,10 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "continue", button -> {
+            // @TODO: create specific method for this purposes
+            // save selected modules to config
+            onClosed();
+
             final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             universeSetupScreen.setEnvironment(universeWrapper);
             universeWrapper.setSeed(seed.getText());
@@ -480,7 +484,11 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             if (StringUtils.isBlank(seed.getText())) {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game seed cannot be empty!");
             } else {
-                GameManifest gameManifest = GameManifestProvider.createDefaultGameManifest(universeWrapper, moduleManager, config);
+                // @TODO: create specific method for this purposes
+                // save selected modules to config
+                onClosed();
+
+                final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
                 if (gameManifest != null) {
                     gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 } else {
