@@ -91,7 +91,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:advancedGameSetupScreen");
 
-    private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdvancedGameSetupScreen.class);
     private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = Comparator.comparing(o -> o.getMetadata()
             .getDisplayName().toString());
     @In
@@ -124,11 +124,11 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
 
         refreshSelection();
+        filterModules();
     }
 
     @Override
     public void initialise() {
-
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor()
                 .submit(moduleManager.getInstallManager().updateRemoteRegistry());
@@ -426,6 +426,47 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 }
                 filterModules();
             });
+
+            UIButton resetAdvancedFilters = find("resetFilters", UIButton.class);
+            if (resetAdvancedFilters != null) {
+
+                //on clicking 'reset filters' button, uncheck all advanced filters
+                localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
+                uncategorizedCheckbox.setChecked(selectModulesConfig.isUncategorizedSelected());
+
+                resetAdvancedFilters.subscribe(button -> {
+                    if (selectModulesConfig.isLocalOnlySelected()){
+                        selectModulesConfig.toggleIsLocalOnlySelected();
+                        localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
+                    }
+
+                    if (selectModulesConfig.isUncategorizedSelected()){
+                        selectModulesConfig.toggleUncategorizedSelected();
+                        uncategorizedCheckbox.setChecked(selectModulesConfig.isUncategorizedSelected());
+                    }
+
+                    filterModules();
+                });
+
+                for (CheckboxAssociationEnum checkboxAssociation : CheckboxAssociationEnum.values()) {
+                    StandardModuleExtension standardModuleExtension = checkboxAssociation.getStandardModuleExtension();
+                    String checkboxName = checkboxAssociation.getCheckboxName();
+                    UICheckbox checkbox = find(checkboxName, UICheckbox.class);
+
+                    if (null != checkbox) {
+                        checkbox.setChecked(selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
+                        resetAdvancedFilters.subscribe(button -> {
+                            checkbox.setEnabled(!selectModulesConfig.isUncategorizedSelected());
+                            if (selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension)){
+                                selectModulesConfig.toggleStandardModuleExtensionSelected(standardModuleExtension);
+                                checkbox.setChecked(
+                                        selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
+                            }
+                            filterModules();
+                        });
+                    }
+                }
+            }
         }
 
         WidgetUtil.trySubscribe(this, "continue", button -> {
@@ -454,6 +495,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private void filterModules() {
         sortedModules.clear();
         sortedModules.addAll(allSortedModules);
+
         if (selectModulesConfig.isUncategorizedSelected()) {
             uncategorizedModuleFilter();
         } else {
@@ -600,6 +642,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 info.setOnlineVersion(remote);
             }
         }
+        filterModules();
     }
 
     @Override
@@ -624,6 +667,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
+        // @TODO: Check this comments. Do they still valid ?
         // moduleConfig passes the module collection to the Create Game Screen.
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.clear();
