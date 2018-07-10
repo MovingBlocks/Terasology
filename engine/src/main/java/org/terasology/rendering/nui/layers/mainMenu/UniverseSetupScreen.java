@@ -264,7 +264,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      * This method switches the environment of the game to a temporary one needed for
      * creating a game. It creates a new {@link Context} and only puts the minimum classes
      * needed for successful game creation.
-     * @param wrapper takes the {@link org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.AdvancedGameSetupScreen} and pushes it into the new context.
+     * @param wrapper takes the {@link org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen} and pushes it into the new context.
      */
     public void setEnvironment(UniverseWrapper wrapper) {
         context = new ContextImpl();
