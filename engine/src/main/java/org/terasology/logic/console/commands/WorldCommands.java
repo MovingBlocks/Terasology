@@ -41,7 +41,6 @@ public class WorldCommands extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
-    private EntityRef entityRef;
 
     @Command(shortDescription = "Get information about different worlds and " +
             "entities present in each pool", runOnServer = true)
@@ -68,12 +67,11 @@ public class WorldCommands extends BaseComponentSystem {
         return message.toString();
     }
 
-    @Command(shortDescription = "Get information about different worlds and " +
-            "entities present in each pool", runOnServer = true)
+    @Command(shortDescription = "Make new entity in a given pool", runOnServer = true)
     public String makeEntity(@CommandParam("The world in which the entity is formed") String worldName) {
         for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
             if(entry.getKey().getTitle().equalsIgnoreCase(worldName)) {
-                entityRef = entry.getValue().create();
+                EntityRef entityRef = entry.getValue().create();
                 return "Entity created in " + entry.getKey().getTitle() + " world with id " + entityRef.getId();
             }
         }
@@ -82,24 +80,43 @@ public class WorldCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Moves the last created entity to another pool ", runOnServer = true)
-    public String moveEntity(@CommandParam("The world in which the entity is formed") String worldName) {
+    public String moveEntity(@CommandParam("The world in which the entity is formed") String worldName,
+                             @CommandParam("Id of the entity to be moved") int id) {
+
         for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
-            if(entry.getKey().getTitle().equalsIgnoreCase(worldName)) {
-                entityManager.moveToPool(entityRef.getId(), entry.getValue());
-                return "Entity " + entityRef.getId() + " moved to " + entry.getKey().getTitle() + "world";
+            if (entry.getKey().getTitle().equalsIgnoreCase(worldName)) {
+                if (entityManager.moveToPool(id, entry.getValue())) {
+                    return "Entity " + id + " moved to " + entry.getKey().getTitle() + "world";
+                } else {
+                    return id + "could not be moved";
+                }
             }
         }
 
         return  worldName + " does not exist";
     }
 
+    @Command(shortDescription = "Check which pool an entity is in", runOnServer = true)
+    public String whereIs(@CommandParam("entity id") long id) {
+        Map<Long, EngineEntityPool> worldPoolMap = entityManager.getPoolMap();
+        if (worldPoolMap.containsKey(id)) {
+            EngineEntityPool pool = worldPoolMap.get(id);
+            for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
+                if (entry.getValue() == pool) {
+                    return id + " is present in " + entry.getKey().getTitle();
+                }
+            }
+        }
+        return id + " not found";
+    }
+
     @Command(shortDescription = "Random", runOnServer = true)
-    public String coolStuff(@Sender EntityRef sender) {
+    public String simulate(@Sender EntityRef sender) {
         EntityRef simulatedEntity = entityManager.create("engine:multiWorldSim");
 
 
         DisplayNameComponent displayNameComponent = simulatedEntity.getComponent(DisplayNameComponent.class);
-        displayNameComponent.name = "I-Travel-Worlds-"+simulatedEntity.getId();
+        displayNameComponent.name = "I-Travel-Worlds-" + simulatedEntity.getId();
         simulatedEntity.saveComponent(displayNameComponent);
 
         ColorComponent colorComponent = simulatedEntity.getComponent(ColorComponent.class);
