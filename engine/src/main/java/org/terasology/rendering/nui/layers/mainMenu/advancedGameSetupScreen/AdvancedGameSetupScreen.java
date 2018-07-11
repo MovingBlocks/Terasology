@@ -470,13 +470,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "continue", button -> {
-            // @TODO: create specific method for this purposes
-            // save selected modules to config
-            onClosed();
-
             final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
-            universeSetupScreen.setEnvironment(universeWrapper);
             universeWrapper.setSeed(seed.getText());
+            universeSetupScreen.setEnvironment(universeWrapper);
             triggerForwardAnimation(universeSetupScreen);
         });
 
@@ -484,10 +480,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             if (StringUtils.isBlank(seed.getText())) {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game seed cannot be empty!");
             } else {
-                // @TODO: create specific method for this purposes
-                // save selected modules to config
-                onClosed();
-
+                universeWrapper.setSeed(seed.getText());
+                saveConfiguration();
                 final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
                 if (gameManifest != null) {
                     gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
@@ -498,6 +492,12 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+    }
+
+    @Override
+    public void onClosed() {
+        super.onClosed();
+        saveConfiguration();
     }
 
     private void filterModules() {
@@ -673,10 +673,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
     }
 
-    @Override
-    public void onClosed() {
-        // @TODO: Check this comments. Do they still valid ?
-        // moduleConfig passes the module collection to the Create Game Screen.
+    private void saveConfiguration() {
+        // moduleConfig passes the module collection to other screens
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.clear();
         // Fetch all the selected/activated modules using allSortedModules

@@ -19,15 +19,10 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ResolutionResult;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -36,8 +31,6 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.world.WorldSetupWrapper;
-import org.terasology.world.internal.WorldInfo;
-import org.terasology.world.time.WorldTime;
 
 public class StartPlayingScreen extends CoreScreenLayer {
 
@@ -67,32 +60,12 @@ public class StartPlayingScreen extends CoreScreenLayer {
         );
 
         WidgetUtil.trySubscribe(this, "play", button -> {
-            GameManifest gameManifest = new GameManifest();
-
-            gameManifest.setTitle(universeWrapper.getGameName());
-
-            gameManifest.setSeed(universeWrapper.getSeed());
-
-            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-            if (!result.isSuccess()) {
-                MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                if (errorMessagePopup != null) {
-                    errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
-                }
-                return;
+            final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
+            if (gameManifest != null) {
+                gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            } else {
+                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
             }
-            for (Module module : result.getModules()) {
-                gameManifest.addModule(module.getId(), module.getVersion());
-            }
-
-            SimpleUri uri = world.getWorldGeneratorInfo().getUri();
-            // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
-            final float timeOffset = 0.50f;
-            WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, world.getWorldGenerator().getWorldSeed(),
-                    (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
-            gameManifest.addWorld(worldInfo);
-            gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         });
     }
 
