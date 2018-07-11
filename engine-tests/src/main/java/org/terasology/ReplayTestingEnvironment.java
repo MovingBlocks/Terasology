@@ -59,6 +59,8 @@ public abstract class ReplayTestingEnvironment {
         loadReplay(replayTitle);
         mainLoop();
         host.cleanup();
+        engines = Lists.newArrayList();
+        host = null;
     }
 
     private void loadReplay(String replayTitle) throws Exception {
