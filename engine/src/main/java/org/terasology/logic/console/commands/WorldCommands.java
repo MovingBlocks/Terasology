@@ -25,8 +25,6 @@ import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
-import org.terasology.logic.notifications.NotificationMessageEvent;
-import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Color;
@@ -54,7 +52,7 @@ public class WorldCommands extends BaseComponentSystem {
             poolCounts.put(engineEntityPools, 0L);
         }
         for (Map.Entry<Long, EngineEntityPool> entry : worldPoolMap.entrySet()) {
-            if(poolCounts.containsKey(entry.getValue())) {
+            if (poolCounts.containsKey(entry.getValue())) {
                 poolCounts.put(entry.getValue(), poolCounts.get(entry.getValue()) + 1);
             } else {
                 poolCounts.put(entry.getValue(), 1L);
@@ -70,13 +68,13 @@ public class WorldCommands extends BaseComponentSystem {
     @Command(shortDescription = "Make new entity in a given pool", runOnServer = true)
     public String makeEntity(@CommandParam("The world in which the entity is formed") String worldName) {
         for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
-            if(entry.getKey().getTitle().equalsIgnoreCase(worldName)) {
+            if (entry.getKey().getTitle().equalsIgnoreCase(worldName)) {
                 EntityRef entityRef = entry.getValue().create();
                 return "Entity created in " + entry.getKey().getTitle() + " world with id " + entityRef.getId();
             }
         }
 
-        return  worldName + " does not exist";
+        return worldName + " does not exist";
     }
 
     @Command(shortDescription = "Moves the last created entity to another pool ", runOnServer = true)
@@ -93,7 +91,7 @@ public class WorldCommands extends BaseComponentSystem {
             }
         }
 
-        return  worldName + " does not exist";
+        return worldName + " does not exist";
     }
 
     @Command(shortDescription = "Check which pool an entity is in", runOnServer = true)
