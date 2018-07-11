@@ -15,6 +15,7 @@
  */
 package org.terasology.recording;
 
+import org.junit.After;
 import org.junit.Test;
 import org.terasology.ReplayTestingEnvironment;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -22,7 +23,9 @@ import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.world.WorldProvider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -41,6 +44,12 @@ public class ExampleReplayTest extends ReplayTestingEnvironment {
             }
         }
     };
+
+   /* @After
+    public void closeGame() throws Exception {
+        super.getHost().shutdown();
+        replayThread.join();
+    }*/
 
     @Test
     public void testExampleRecordingPlayerPosition() {
@@ -71,7 +80,6 @@ public class ExampleReplayTest extends ReplayTestingEnvironment {
             Vector3f finalPosition = new Vector3f(25.189344f, 13.406443f, 8.6651945f);
             assertEquals(finalPosition, location.getLocalPosition()); // checks final position
 
-            //shutdowns the game
             super.getHost().shutdown();
             replayThread.join();
         } catch (Exception e) {
@@ -83,8 +91,30 @@ public class ExampleReplayTest extends ReplayTestingEnvironment {
     public void testExampleRecordingBlockPlacement() {
         replayThread.start();
         try {
+            while (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAYING) {
+                Thread.sleep(1000); //wait for the replay to finish prepearing things before we get the data to test things.
+            }
+            Vector3i blockLocation1 = new Vector3i(26, 12, -3);
+            Vector3i blockLocation2 = new Vector3i(26, 13, -3);
+            Vector3i blockLocation3 = new Vector3i(26, 12, -2);
 
+            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+            assertEquals(worldProvider.getBlock(blockLocation1).getDisplayName(), "Grass");
+            assertEquals(worldProvider.getBlock(blockLocation2).getDisplayName(), "Air");
+            assertEquals(worldProvider.getBlock(blockLocation3).getDisplayName(), "Grass");
+
+            while (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAY_FINISHED) {
+                Thread.sleep(1000);
+            }//The replay is finished at this point
+
+            assertEquals(worldProvider.getBlock(blockLocation1).getDisplayName(), "Grass");
+            assertEquals(worldProvider.getBlock(blockLocation2).getDisplayName(), "Grass");
+            assertEquals(worldProvider.getBlock(blockLocation3).getDisplayName(), "Air");
+
+            super.getHost().shutdown();
+            replayThread.join();
         } catch (Exception e) {
+            System.out.println("EXCEPTION!");
             e.printStackTrace();
         }
     }
