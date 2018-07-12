@@ -41,16 +41,27 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * A base class for replay tests to inherit to run a replay in a thread while testing some variables.
+ */
 public abstract class ReplayTestingEnvironment {
     private TerasologyEngine host;
     private List<TerasologyEngine> engines = Lists.newArrayList();
 
-
+    /**
+     * Opens the game in the Main Menu.
+     * @throws Exception
+     */
     protected void openMainMenu() throws Exception {
         host = createEngine();
         host.run(new StateMainMenu());
     }
 
+    /**
+     * Opens the game in a replay.
+     * @param replayTitle the name of the replay to be played when the game opens.
+     * @throws Exception
+     */
     protected void openReplay(String replayTitle) throws Exception {
         host = createEngine();
         host.initialize();
@@ -63,6 +74,11 @@ public abstract class ReplayTestingEnvironment {
         host = null;
     }
 
+    /**
+     * Load a replay while setting the RecordAndReplayStatus.
+     * @param replayTitle the name of the replay to be loaded.
+     * @throws Exception
+     */
     private void loadReplay(String replayTitle) throws Exception {
         RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.PREPARING_REPLAY);
         GameInfo replayInfo = getReplayInfo(replayTitle);
@@ -74,12 +90,20 @@ public abstract class ReplayTestingEnvironment {
         host.changeState(new StateLoading(manifest, NetworkMode.NONE));
     }
 
+    /**
+     * The game Main Loop where most of the processing time will be spent on.
+     */
     private void mainLoop() {
         while (host.tick()) {
             //do nothing;
         }
     }
 
+    /**
+     * Creates a headed TerasologyEngine.
+     * @return the created engine
+     * @throws Exception
+     */
     private TerasologyEngine createEngine() throws Exception {
         TerasologyEngineBuilder builder = new TerasologyEngineBuilder();
         populateSubsystems(builder);
@@ -90,6 +114,10 @@ public abstract class ReplayTestingEnvironment {
         return engine;
     }
 
+    /**
+     * Populates the engine builder with headed subsystems.
+     * @param builder the builder to be populated.
+     */
     private void populateSubsystems(TerasologyEngineBuilder builder) {
         builder.add(new LwjglAudio())
                 .add(new LwjglGraphics())
@@ -101,7 +129,12 @@ public abstract class ReplayTestingEnvironment {
         builder.add(new HibernationSubsystem());
     }
 
-
+    /**
+     * Searches the 'recordings' folder for a selected recording and returns its GameInfo if found.
+     * @param title the title of the recording.
+     * @return the GameInfo of the selected recording.
+     * @throws Exception
+     */
     private GameInfo getReplayInfo(String title) throws Exception {
         List<GameInfo> recordingsInfo = GameProvider.getSavedRecordings();
         for (GameInfo info : recordingsInfo) {

@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.recording.templates;
+package org.terasology.replayTests.templates;
 
 
 import org.junit.Ignore;
 import org.junit.Test;
 import org.terasology.ReplayTestingEnvironment;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.recording.EventSystemReplayImpl;
 import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.registry.CoreRegistry;
 
 
 /**
  * This is a template with comments to aid in the creation of a replay test.
+ * For more information about Replay Tests, see https://github.com/MovingBlocks/Terasology/wiki/Replay-Tests
  */
 public class ReplayTestTemplate extends ReplayTestingEnvironment { //Every replay test should extend ReplayTestingEnvironment
 
@@ -54,19 +52,33 @@ public class ReplayTestTemplate extends ReplayTestingEnvironment { //Every repla
     public void testTemplate() {
         replayThread.start(); //always start the thread before the test, so the replay can execute.
         try {
+
+            /*
+            This 'while' is useful because when it is over it means everything in the replay was loaded, which means it
+            is possible to test the replay's initial state, such as the player character's initial position.
+             */
+            while (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAYING) {
+                Thread.sleep(1000);
+            }
+
+            //the checks of initial states should be written here, between the 'while' statements.
+
             //The code inside this 'while' will execute while the replay is playing.
             while (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAY_FINISHED) {
                 //Tests can be written here to check something in the middle of a replay.
 
                 /*
-                Example of test: The test below gets the event system and checks if the RecordedEvent of number 1000 was
-                already processed. If it was, it tests something. This is useful to test, for example, if a block
-                disappeared after its destruction, if the player location changed after a certain movement event was sent.
+                Example of test: The test in the comment below gets the event system and checks if the RecordedEvent of
+                number 1000 was already processed. If it was, it tests something. This is useful to test, for example,
+                if a block disappeared after its destruction, if the player location changed after a certain movement
+                event was sent.
                  */
+                /*
                 EventSystemReplayImpl eventSystem = (EventSystemReplayImpl) CoreRegistry.get(EventSystem.class);
                 if (eventSystem.getLastRecordedEventPosition() >= 1000) {
                     //test something
                 }
+                */
 
                 //this sleep is optional and is used only to improve the game performance.
                 Thread.sleep(1000);
