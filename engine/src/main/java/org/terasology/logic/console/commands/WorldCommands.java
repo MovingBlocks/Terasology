@@ -44,12 +44,12 @@ public class WorldCommands extends BaseComponentSystem {
             "entities present in each pool", runOnServer = true)
     public String getUniverseInfo() {
         int worldCount = entityManager.getWorldPools().size();
-        StringBuilder message = new StringBuilder(100);
-        message.append("Number of world is " + worldCount + "\n");
+        StringBuilder message = new StringBuilder();
+        message.append("Number of worlds is " + worldCount + "\n");
         Map<Long, EngineEntityPool> worldPoolMap = entityManager.getPoolMap();
         Map<EngineEntityPool, Long> poolCounts = new HashMap<EngineEntityPool, Long>();
-        for (EngineEntityPool engineEntityPools : entityManager.getWorldPools()) {
-            poolCounts.put(engineEntityPools, 0L);
+        for (EngineEntityPool engineEntityPool : entityManager.getWorldPools()) {
+            poolCounts.put(engineEntityPool, 0L);
         }
         for (Map.Entry<Long, EngineEntityPool> entry : worldPoolMap.entrySet()) {
             if (poolCounts.containsKey(entry.getValue())) {
@@ -86,7 +86,7 @@ public class WorldCommands extends BaseComponentSystem {
                 if (entityManager.moveToPool(id, entry.getValue())) {
                     return "Entity " + id + " moved to " + entry.getKey().getTitle() + "world";
                 } else {
-                    return id + "could not be moved";
+                    return "Entity" + id + "could not be moved";
                 }
             }
         }
@@ -101,11 +101,11 @@ public class WorldCommands extends BaseComponentSystem {
             EngineEntityPool pool = worldPoolMap.get(id);
             for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
                 if (entry.getValue() == pool) {
-                    return id + " is present in " + entry.getKey().getTitle();
+                    return "Entity" + id + " is present in " + entry.getKey().getTitle();
                 }
             }
         }
-        return id + " not found";
+        return "Entity" + id + " not found";
     }
 
     @Command(shortDescription = "Random", runOnServer = true)
