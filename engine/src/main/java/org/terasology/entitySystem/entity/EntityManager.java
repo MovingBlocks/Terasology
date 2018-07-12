@@ -53,6 +53,8 @@ public interface EntityManager extends EntityPool {
 
     Map<Long, EngineEntityPool> getPoolMap();
 
+    Map<EngineEntityPool, Long> getPoolCounts();
+
     /**
      * Creates a new EntityRef in sector-scope
      *

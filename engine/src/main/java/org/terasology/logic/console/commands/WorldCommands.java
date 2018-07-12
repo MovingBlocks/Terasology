@@ -46,21 +46,14 @@ public class WorldCommands extends BaseComponentSystem {
         int worldCount = entityManager.getWorldPools().size();
         StringBuilder message = new StringBuilder();
         message.append("Number of worlds is " + worldCount + "\n");
-        Map<Long, EngineEntityPool> worldPoolMap = entityManager.getPoolMap();
-        Map<EngineEntityPool, Long> poolCounts = new HashMap<EngineEntityPool, Long>();
-        for (EngineEntityPool engineEntityPool : entityManager.getWorldPools()) {
-            poolCounts.put(engineEntityPool, 0L);
-        }
-        for (Map.Entry<Long, EngineEntityPool> entry : worldPoolMap.entrySet()) {
-            if (poolCounts.containsKey(entry.getValue())) {
-                poolCounts.put(entry.getValue(), poolCounts.get(entry.getValue()) + 1);
-            } else {
-                poolCounts.put(entry.getValue(), 1L);
-            }
-
-        }
+        //Map<Long, EngineEntityPool> worldPoolMap = entityManager.getPoolMap();
+        Map<EngineEntityPool, Long> poolCounts = entityManager.getPoolCounts();
         for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
-            message.append("Pool for " + entry.getKey().getTitle() + " has " + poolCounts.get(entry.getValue()) + " entities \n");
+            if(poolCounts.get(entry.getValue()) == null) {
+                message.append("Pool for " + entry.getKey().getTitle() + " has " + 0 + " entities \n");
+            } else {
+                message.append("Pool for " + entry.getKey().getTitle() + " has " + poolCounts.get(entry.getValue()) + " entities \n");
+            }
         }
         return message.toString();
     }

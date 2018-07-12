@@ -49,6 +49,7 @@ import org.terasology.world.internal.WorldInfo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,6 +69,7 @@ public class PojoEntityManager implements EngineEntityManager {
     private PojoSectorManager sectorManager = new PojoSectorManager(this);
     private Map<Long, EngineEntityPool> poolMap = new MapMaker().initialCapacity(1000).makeMap();
     private List<EngineEntityPool> worldPools = Lists.newArrayList();
+    private Map<EngineEntityPool, Long> poolCounts = new HashMap<EngineEntityPool, Long>();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
     private Set<EntityDestroySubscriber> destroySubscribers = Sets.newLinkedHashSet();
@@ -333,6 +335,11 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     public Map<Long, EngineEntityPool> getPoolMap() {
         return poolMap;
+    }
+
+    @Override
+    public Map<EngineEntityPool, Long> getPoolCounts() {
+        return poolCounts;
     }
 
     /**
@@ -634,6 +641,11 @@ public class PojoEntityManager implements EngineEntityManager {
     public void assignToPool(long entityId, EngineEntityPool pool) {
         if (poolMap.get(entityId) != pool) {
             poolMap.put(entityId, pool);
+            if (!poolCounts.containsKey(pool)) {
+                poolCounts.put(pool, 1L);
+            } else {
+                poolCounts.put(pool, poolCounts.get(pool) + 1L);
+            }
         }
     }
 
@@ -671,6 +683,8 @@ public class PojoEntityManager implements EngineEntityManager {
 
         //Remove from the existing pool
         Optional<BaseEntityRef> maybeRef = oldPool.remove(id);
+        //Decrease the count of entities in that pool
+        poolCounts.put(oldPool, poolCounts.get(oldPool) - 1);
         if (!maybeRef.isPresent()) {
             return false;
         }
