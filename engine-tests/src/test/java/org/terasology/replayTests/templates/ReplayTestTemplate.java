@@ -16,6 +16,7 @@
 package org.terasology.replayTests.templates;
 
 
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.terasology.ReplayTestingEnvironment;
@@ -47,6 +48,13 @@ public class ReplayTestTemplate extends ReplayTestingEnvironment { //Every repla
         }
     };
 
+    @After
+    public void closeReplay() throws Exception {
+        //these last two lines are important to correctly shutdown the game after the tests are done.
+        super.getHost().shutdown();
+        replayThread.join();
+    }
+
     @Ignore("This is just a template and should be ignored by Jenkins.")
     @Test
     public void testTemplate() {
@@ -58,7 +66,7 @@ public class ReplayTestTemplate extends ReplayTestingEnvironment { //Every repla
             is possible to test the replay's initial state, such as the player character's initial position.
              */
             while (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAYING) {
-                Thread.sleep(1000);
+                Thread.sleep(1000); //this sleep is optional and is used only to improve the game performance.
             }
 
             //the checks of initial states should be written here, between the 'while' statements.
@@ -84,13 +92,8 @@ public class ReplayTestTemplate extends ReplayTestingEnvironment { //Every repla
                 Thread.sleep(1000);
             }
             //tests can be written here to test something at the end of a replay.
-
-            //these last two lines are important to correctly shutdown the game after the tests are done.
-            super.getHost().shutdown();
-            replayThread.join();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

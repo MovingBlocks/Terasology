@@ -15,6 +15,8 @@
  */
 package org.terasology.replayTests;
 
+import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.terasology.ReplayTestingEnvironment;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -46,7 +48,13 @@ public class ExampleReplayTest extends ReplayTestingEnvironment {
         }
     };
 
+    @After
+    public void closeReplay() throws Exception {
+        super.getHost().shutdown();
+        replayThread.join();
+    }
 
+    @Ignore("These are headed tests and should be ignored by Jenkins.")
     @Test
     public void testExampleRecordingPlayerPosition() {
         replayThread.start();
@@ -75,14 +83,12 @@ public class ExampleReplayTest extends ReplayTestingEnvironment {
             location = character.getComponent(LocationComponent.class);
             Vector3f finalPosition = new Vector3f(25.189344f, 13.406443f, 8.6651945f);
             assertEquals(finalPosition, location.getLocalPosition()); // checks final position
-
-            super.getHost().shutdown();
-            replayThread.join();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @Ignore("These are headed tests and should be ignored by Jenkins.")
     @Test
     public void testExampleRecordingBlockPlacement() {
         replayThread.start();
@@ -108,9 +114,6 @@ public class ExampleReplayTest extends ReplayTestingEnvironment {
             assertEquals(worldProvider.getBlock(blockLocation1).getDisplayName(), "Grass");
             assertEquals(worldProvider.getBlock(blockLocation2).getDisplayName(), "Grass");
             assertEquals(worldProvider.getBlock(blockLocation3).getDisplayName(), "Air");
-
-            super.getHost().shutdown();
-            replayThread.join();
         } catch (Exception e) {
             System.out.println("EXCEPTION!");
             e.printStackTrace();
