@@ -37,6 +37,6 @@ public class BulletBoxShape extends BulletCollisionShape implements BoxShape {
 
     @Override
     public Vector3f getHalfExtentsWithoutMargin() {
-        return boxShape.getHalfExtentsWithoutMargin();
+        return boxShape.getHalfExtentsWithoutMargin().mul(2);
     }
 }

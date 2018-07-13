@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,25 @@
  */
 package org.terasology.physics.bullet.shapes;
 
-
-import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
-
-import org.terasology.math.AABB;
-import org.terasology.math.Transform;
-import org.terasology.math.geom.Matrix4f;
+import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
+import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
 
-public abstract class BulletCollisionShape implements CollisionShape {
-    public btCollisionShape underlyingShape;
 
-    @Override
-    public AABB getAABB(Transform transform) {
+public class BulletCylinderShape extends  BulletCollisionShape{
 
-        Vector3f min = new Vector3f();
-        Vector3f max = new Vector3f();
-        Matrix4f m = new Matrix4f();
-        underlyingShape.getAabb(m,min,max);
+    private final btCylinderShape cylinderShape;
 
-        return AABB.createMinMax(min, max).move(transform.origin);
+    public BulletCylinderShape(Vector3f halfExtents) {
+
+        this.cylinderShape = new btCylinderShape(halfExtents);
+        this.underlyingShape = cylinderShape;
     }
 
+    @Override
+    public CollisionShape rotate(Quat4f rot) {
+        return this;
+    }
 }

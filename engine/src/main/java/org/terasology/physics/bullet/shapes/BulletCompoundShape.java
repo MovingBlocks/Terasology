@@ -15,19 +15,18 @@
  */
 package org.terasology.physics.bullet.shapes;
 
-
-
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btCompoundShape;
 import org.terasology.math.Transform;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
+import org.terasology.physics.shapes.CompoundShape;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BulletCompoundShape extends BulletCollisionShape implements org.terasology.physics.shapes.CompoundShape {
+public class BulletCompoundShape extends BulletCollisionShape implements CompoundShape {
     private final btCompoundShape compoundShape;
     private List<BulletCompoundShapeChild> childList;
 
@@ -43,7 +42,7 @@ public class BulletCompoundShape extends BulletCollisionShape implements org.ter
     }
 
     @Override
-    public void addChildShape(org.terasology.math.Transform transform, CollisionShape collisionShape) {
+    public void addChildShape(Transform transform, CollisionShape collisionShape) {
         BulletCollisionShape bulletCollisionShape = (BulletCollisionShape) collisionShape;
         compoundShape.addChildShape(new Matrix4f(transform.rotation,transform.origin,transform.scale),((BulletCollisionShape) collisionShape).underlyingShape);
         childList.add(new BulletCompoundShapeChild(new Transform(transform.origin,transform.rotation,transform.scale), bulletCollisionShape,compoundShape.getChildShape(compoundShape.getNumChildShapes() -1 )));
@@ -53,15 +52,12 @@ public class BulletCompoundShape extends BulletCollisionShape implements org.ter
 
     @Override
     public CollisionShape rotate(Quat4f rot) {
-        btCompoundShape newShape = new btCompoundShape();
+        BulletCompoundShape shape = new BulletCompoundShape();
         for (BulletCompoundShapeChild child : childList) {
             CollisionShape rotatedChild = child.childShape.rotate(rot);
-
-//            rot.rotate(child.transform.origin)
-//            Vector3f offset = com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), child.transform.origin, new javax.vecmath.Vector3f());
-//            newShape.addChildShape(new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), offset, 1.0f)), ((BulletCollisionShape) rotatedChild).underlyingShape);
+            shape.addChildShape(new Transform(child.transform.origin,new Quat4f(),child.transform.scale),rotatedChild);
         }
-        return new BulletCompoundShape(newShape);
+        return shape;
     }
 
     private static class BulletCompoundShapeChild {

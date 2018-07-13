@@ -16,39 +16,57 @@
 package org.terasology.physics.bullet.shapes;
 
 import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
-
+import com.google.common.collect.Lists;
+import org.lwjgl.BufferUtils;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.ConvexHullShape;
 
+import java.nio.FloatBuffer;
 import java.util.List;
 
+
 public class BulletConvexHullShape extends BulletCollisionShape implements ConvexHullShape {
+    // TODO: Handle scale
     private final btConvexHullShape convexHullShape;
 
     public BulletConvexHullShape(List<Vector3f> vertices) {
-//        ObjectArrayList<javax.vecmath.Vector3f> vertexList = new ObjectArrayList<>();
-//
-//        vertexList.addAll(vertices.stream().map(VecMath::to).collect(Collectors.toList()));
-//
-//        convexHullShape = new ConvexHullShape(vertexList);
-        convexHullShape = null;
-        underlyingShape = convexHullShape;
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(vertices.size() * 3);
+        for(int i = 0; i < vertices.size(); i++){
+            Vector3f vertex = vertices.get(i);
+            buffer.put(vertex.x);
+            buffer.put(vertex.y);
+            buffer.put(vertex.z);
+        }
+        this.convexHullShape = new btConvexHullShape(buffer,vertices.size(),3 * Float.BYTES);
+        this.underlyingShape = convexHullShape;
     }
 
-//    private BulletConvexHullShape(ObjectArrayList<javax.vecmath.Vector3f> vertexList) {
-//        convexHullShape = new ConvexHullShape(vertexList);
-//        underlyingShape = convexHullShape;
-//    }
+    public BulletConvexHullShape(FloatBuffer buffer,int numPoints,int stride){
+        this.convexHullShape = new btConvexHullShape(buffer,numPoints,stride);
+        this.underlyingShape = convexHullShape;
+    }
 
     @Override
     public CollisionShape rotate(Quat4f rot) {
-//        ObjectArrayList<javax.vecmath.Vector3f> transformedVerts = new ObjectArrayList<>();
-//        for (javax.vecmath.Vector3f vert : convexHullShape.getPoints()) {
-//            transformedVerts.add(com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), vert, new javax.vecmath.Vector3f()));
-//        }
-//        return new BulletConvexHullShape(transformedVerts);
-        return null;
+        List<Vector3f> verts = Lists.newArrayList();
+        for(int x = 0; x < convexHullShape.getNumPoints(); x++){
+            Vector3f p = convexHullShape.getScaledPoint(x);
+            new Matrix4f(rot,Vector3f.zero(),1.0f).transformPoint(p);
+            verts.add(p);
+        }
+        return new BulletConvexHullShape(verts);
+    }
+
+    @Override
+    public Vector3f[] getVertices() {
+        Vector3f[] verts = new Vector3f[convexHullShape.getNumPoints()];
+        for(int x = 0; x < convexHullShape.getNumPoints(); x++){
+            Vector3f p = convexHullShape.getScaledPoint(x);
+            verts[x] = p;
+        }
+        return verts;
     }
 }
