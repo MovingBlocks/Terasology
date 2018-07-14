@@ -104,6 +104,11 @@ public class UIButton extends CoreWidget {
     };
 
     /**
+     * The {@code Binding} containing the boolean representing of active status, false by default.
+     */
+    private Binding<Boolean> active = new DefaultBinding<>(false);
+
+    /**
      * Creates an empty {@code UIButton}.
      */
     public UIButton() {
@@ -176,7 +181,7 @@ public class UIButton extends CoreWidget {
      * Retrieves the current mode of this {@code UIButton}.
      * <p><ul>
      * <li> DISABLED_MODE - The {@code UIButton} is disabled
-     * <li> DOWN_MODE - The {@code UIButton} is being pressed
+     * <li> DOWN_MODE - The {@code UIButton} is being pressed or active
      * <li> HOVER_MODE - The mouse is hovering over the {@code UIButton}
      * <li> DEFAULT_MODE - The default mode if no other modes are applicable
      * </ul></p>
@@ -187,7 +192,7 @@ public class UIButton extends CoreWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (down) {
+        } else if (down || isActive()) {
             return DOWN_MODE;
         } else if (interactionListener.isMouseOver()) {
             return HOVER_MODE;
@@ -328,5 +333,19 @@ public class UIButton extends CoreWidget {
      */
     public void unsubscribe(ActivateEventListener listener) {
         listeners.remove(listener);
+    }
+
+    /**
+     * Sets the active status of this {@code UIButton}.
+     */
+    public void setActive(boolean val) {
+        this.active.set(val);
+    }
+
+    /**
+     * Returns if the button is active or not.
+     */
+    public boolean isActive() {
+        return active.get();
     }
 }
