@@ -9,7 +9,6 @@
                 "id": "breathBar",
                 "icon": "engine:icons#bubble",
                 "family": "breathBar",
-                "emptyIcon": "engine:icons#burstBubble",
                 "halfIconMode": "shrink",
                 "spacing": 2,
                 "maxIcons": 10,
@@ -33,7 +32,6 @@
             {
                 "type": "UICrosshair",
                 "id": "crosshair",
-                "crosshairIcon": "engine:gui#crosshair",
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,
