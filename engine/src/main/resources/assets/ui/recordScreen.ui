@@ -201,12 +201,6 @@
                       "id": "load",
                       "text": "${engine:menu#load-game}",
                       "enabled": false
-                  },
-                  {
-                      "type": "UIButton",
-                      "id": "details",
-                      "text": "${engine:menu#save-game-details}",
-                      "enabled": false
                   }
               ],
               "layoutInfo": {

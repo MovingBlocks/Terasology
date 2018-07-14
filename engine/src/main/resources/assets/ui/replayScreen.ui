@@ -207,12 +207,6 @@
                       "id": "delete",
                       "text": "${engine:menu#delete-game}",
                       "enabled": false
-                  },
-                  {
-                      "type": "UIButton",
-                      "id": "details",
-                      "text": "${engine:menu#save-game-details}",
-                      "enabled": false
                   }
               ],
               "layoutInfo": {

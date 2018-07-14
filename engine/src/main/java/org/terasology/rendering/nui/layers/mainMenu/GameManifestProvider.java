@@ -43,14 +43,16 @@ public class GameManifestProvider {
     }
 
     /**
-     * Generates game manifest with default settings (world generator, list of modules).
+     * Generates game manifest with default settings (title, seed) if not specified.
+     * Uses default world generator, and modules selection.
+     * @TODO: rewrite/fix it when code will be more stable
      *
      * @param universeWrapper  contains the universe level properties
      * @param moduleManager    resolves modules
      * @param config           provides default module selection, world generator
      * @return                 game manifest with default settings
      */
-    public static GameManifest createDefaultGameManifest(final UniverseWrapper universeWrapper, final ModuleManager moduleManager, final Config config) {
+    public static GameManifest createGameManifest(final UniverseWrapper universeWrapper, final ModuleManager moduleManager, final Config config) {
         GameManifest gameManifest = new GameManifest();
         if (StringUtils.isNotBlank(universeWrapper.getGameName())) {
             gameManifest.setTitle(universeWrapper.getGameName());

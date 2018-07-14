@@ -116,18 +116,15 @@ public class StateIngame implements GameState {
 
     @Override
     public void dispose(boolean shuttingDown) {
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
-            ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
-            screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
-        }
-
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.dispose();
 
         boolean save = networkSystem.getMode().isAuthority();
         if (save) {
-            ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
-            screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
+            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
+                final ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
+                screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
+            }
 
             storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
         }

@@ -42,7 +42,7 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.AdvancedGameSetupScreen;
+import org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -55,8 +55,9 @@ import java.util.List;
 
 public class NewGameScreen extends CoreScreenLayer {
 
+    private static final Logger logger = LoggerFactory.getLogger(NewGameScreen.class);
+
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:newGameScreen");
-    private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
     private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
 
     @In
@@ -152,7 +153,7 @@ public class NewGameScreen extends CoreScreenLayer {
             if (gameName.getText().isEmpty()) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game name cannot be empty");
             } else {
-                GameManifest gameManifest = GameManifestProvider.createDefaultGameManifest(universeWrapper, moduleManager, config);
+                GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
                 if (gameManifest != null) {
                     gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 } else {
@@ -217,8 +218,6 @@ public class NewGameScreen extends CoreScreenLayer {
 
     // Sets the default generator of the passed in gameplay module. Make sure it's already selected.
     private void setDefaultGeneratorOfGameplayModule(Module module) {
-        ModuleConfig moduleConfig = config.getDefaultModSelection();
-
         // Set the default generator of the selected gameplay module
         SimpleUri defaultWorldGenerator = StandardModuleExtension.getDefaultWorldGenerator(module);
         if (defaultWorldGenerator != null) {

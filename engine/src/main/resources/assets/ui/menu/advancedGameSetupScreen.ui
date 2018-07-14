@@ -227,6 +227,26 @@
                     "target": "TOP"
                   }
                 }
+              },
+              {
+                "type": "RowLayout",
+                "id": "advancedFilterResetButton",
+                "horizontalSpacing": 8,
+                "contents": [
+                  {
+                    "type": "UIButton",
+                    "id": "resetFilters",
+                    "text": "${engine:menu#select-modules-filter-reset}"
+                  }
+                ],
+                "layoutInfo": {
+                  "width": 250,
+                  "height": 24,
+                  "position-horizontal-center": {},
+                  "position-bottom": {
+                    "target": "BOTTOM"
+                  }
+                }
               }
             ]
           },

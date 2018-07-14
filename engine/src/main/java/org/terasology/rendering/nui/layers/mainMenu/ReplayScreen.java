@@ -27,12 +27,9 @@ import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
 
 import java.nio.file.Path;
 
@@ -49,33 +46,20 @@ public class ReplayScreen extends SelectionScreen {
 
     @Override
     public void initialise() {
-        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+        super.initialise();
 
-        final UILabel saveGamePath = find("saveGamePath", UILabel.class);
-        if (saveGamePath != null) {
-            Path recordingPath = PathManager.getInstance().getRecordingsPath();
-            saveGamePath.setText(
-                    translationSystem.translate("${engine:menu#save-game-path} ") +
-                            recordingPath.toAbsolutePath().toString()); //save path
-        }
+        initSaveGamePathWidget(PathManager.getInstance().getRecordingsPath());
 
-        final UIList<GameInfo> gameList = find("gameList", UIList.class);
-
-        refreshList(gameList);
-
-        gameList.subscribeSelection((widget, item) -> {
+        getGameInfos().subscribeSelection((widget, item) -> {
             find("load", UIButton.class).setEnabled(item != null);
             find("delete", UIButton.class).setEnabled(item != null);
             updateDescription(item);
         });
 
-        super.startWorldGeneratorAndModuleNames();
-
-        gameList.select(0);
-        gameList.subscribe((widget, item) -> loadGame(item));
+        getGameInfos().subscribe((widget, item) -> loadGame(item));
 
         WidgetUtil.trySubscribe(this, "load", button -> {
-            GameInfo gameInfo = gameList.getSelection();
+            GameInfo gameInfo = getGameInfos().getSelection();
             if (gameInfo != null) {
                 loadGame(gameInfo);
             }
@@ -85,7 +69,7 @@ public class ReplayScreen extends SelectionScreen {
             TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
             confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup-title}"),
                     translationSystem.translate("${engine:menu#remove-confirmation-popup-message}"));
-            confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), () -> removeSelectedReplay(gameList));
+            confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::removeSelectedReplay);
             confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
         });
 
@@ -95,11 +79,15 @@ public class ReplayScreen extends SelectionScreen {
         });
     }
 
-    private void removeSelectedReplay(final UIList<GameInfo> gameList) {
-        Path world = PathManager.getInstance().getRecordingPath(gameList.getSelection().getManifest().getTitle());
-        super.remove(gameList, world, REMOVE_STRING);
+    @Override
+    public void onOpened() {
+        refreshGameInfoList(GameProvider.getSavedRecordings());
     }
 
+    private void removeSelectedReplay() {
+        final Path world = PathManager.getInstance().getRecordingPath(getGameInfos().getSelection().getManifest().getTitle());
+        remove(getGameInfos(), world, REMOVE_STRING);
+    }
 
     private void loadGame(GameInfo item) {
         try {
@@ -112,10 +100,6 @@ public class ReplayScreen extends SelectionScreen {
             logger.error("Failed to load saved game", e);
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
         }
-    }
-
-    private void refreshList(UIList<GameInfo> gameList) {
-        gameList.setList(GameProvider.getSavedRecordings());
     }
 
     void setRecordAndReplayUtils(RecordAndReplayUtils recordAndReplayUtils) {

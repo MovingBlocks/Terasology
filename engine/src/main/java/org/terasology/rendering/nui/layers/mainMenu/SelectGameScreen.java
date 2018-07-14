@@ -25,14 +25,12 @@ import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen.GameDetailsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,7 +44,7 @@ public class SelectGameScreen extends SelectionScreen {
 
     @Override
     public void initialise() {
-        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+        super.initialise();
 
         UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
         if (gameTypeTitle != null) {
@@ -62,32 +60,19 @@ public class SelectGameScreen extends SelectionScreen {
             });
         }
 
-        final UILabel saveGamePath = find("saveGamePath", UILabel.class);
-        if (saveGamePath != null) {
-            Path savePath = PathManager.getInstance().getSavesPath();
-            saveGamePath.setText(
-                    translationSystem.translate("${engine:menu#save-game-path} ") +
-                            savePath.toAbsolutePath().toString()); //save path
-        }
+        initSaveGamePathWidget(PathManager.getInstance().getSavesPath());
 
-        final UIList<GameInfo> gameList = find("gameList", UIList.class);
-
-        refreshList(gameList);
-
-        gameList.subscribeSelection((widget, item) -> {
+        getGameInfos().subscribeSelection((widget, item) -> {
             find("load", UIButton.class).setEnabled(item != null);
             find("delete", UIButton.class).setEnabled(item != null);
             find("details", UIButton.class).setEnabled(item != null);
             updateDescription(item);
         });
 
-        super.startWorldGeneratorAndModuleNames();
-
-        gameList.select(0);
-        gameList.subscribe((widget, item) -> loadGame(item));
+        getGameInfos().subscribe((widget, item) -> loadGame(item));
 
         WidgetUtil.trySubscribe(this, "load", button -> {
-            GameInfo gameInfo = gameList.getSelection();
+            final GameInfo gameInfo = getGameInfos().getSelection();
             if (gameInfo != null) {
                 loadGame(gameInfo);
             }
@@ -97,47 +82,49 @@ public class SelectGameScreen extends SelectionScreen {
             TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
             confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup-title}"),
                     translationSystem.translate("${engine:menu#remove-confirmation-popup-message}"));
-            confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), () -> removeSelectedGame(gameList));
+            confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::removeSelectedGame);
             confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
         });
-        NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
-        WidgetUtil.trySubscribe(this, "create", button -> {
-            newGameScreen.setUniverseWrapper(universeWrapper);
-            triggerForwardAnimation(newGameScreen);
-        });
+
+        WidgetUtil.trySubscribe(this, "create", button -> showNewGameScreen());
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
         WidgetUtil.trySubscribe(this, "details", button -> {
-            GameInfo gameInfo = gameList.getSelection();
+            final GameInfo gameInfo = getGameInfos().getSelection();
             if (gameInfo != null) {
-                GameDetailsScreen detailsScreen = getManager().createScreen(GameDetailsScreen.ASSET_URI, GameDetailsScreen.class);
+                final GameDetailsScreen detailsScreen = getManager().createScreen(GameDetailsScreen.ASSET_URI, GameDetailsScreen.class);
                 detailsScreen.setGameInfo(gameInfo);
                 detailsScreen.setPreviewImage(previewImage.getImage());
                 getManager().pushScreen(detailsScreen);
             }
         });
-
     }
 
-    private void removeSelectedGame(final UIList<GameInfo> gameList) {
-        Path world = PathManager.getInstance().getSavePath(gameList.getSelection().getManifest().getTitle());
-        super.remove(gameList, world, REMOVE_STRING);
+    private void removeSelectedGame() {
+        final Path world = PathManager.getInstance().getSavePath(getGameInfos().getSelection().getManifest().getTitle());
+        remove(getGameInfos(), world, REMOVE_STRING);
     }
-
 
     @Override
     public void onOpened() {
-        super.superOnOpened();
+        super.onOpened();
+
         if (GameProvider.getSavedGames().isEmpty()) {
-            NewGameScreen screen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
-            screen.setUniverseWrapper(universeWrapper);
-            getManager().pushScreen(screen);
+            showNewGameScreen();
         }
 
         if (isLoadingAsServer() && !super.config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }
+
+        refreshGameInfoList(GameProvider.getSavedGames());
+    }
+
+    private void showNewGameScreen() {
+        final NewGameScreen screen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
+        screen.setUniverseWrapper(universeWrapper);
+        getManager().pushScreen(screen);
     }
 
     private void loadGame(GameInfo item) {
@@ -160,8 +147,7 @@ public class SelectGameScreen extends SelectionScreen {
             }
         }
         try {
-            GameManifest manifest = item.getManifest();
-
+            final GameManifest manifest = item.getManifest();
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
@@ -177,10 +163,6 @@ public class SelectGameScreen extends SelectionScreen {
 
     public void setUniverseWrapper(UniverseWrapper wrapper) {
         this.universeWrapper = wrapper;
-    }
-
-    private void refreshList(UIList<GameInfo> gameList) {
-        gameList.setList(GameProvider.getSavedGames());
     }
 
 }
