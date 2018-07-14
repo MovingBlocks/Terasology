@@ -98,7 +98,7 @@ public class BlockItemSystem extends BaseComponentSystem {
                 PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
                 worldProvider.getWorldEntity().send(placeBlocks);
                 if (!placeBlocks.isConsumed()) {
-                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos)));
+                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
                 } else {
                     event.consume();
                 }
