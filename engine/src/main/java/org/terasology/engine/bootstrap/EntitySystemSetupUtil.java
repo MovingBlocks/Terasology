@@ -43,6 +43,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.recording.CharacterStateEventPositionMap;
+import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.EventCatcher;
 import org.terasology.recording.RecordAndReplayUtils;
@@ -126,10 +127,11 @@ public final class EntitySystemSetupUtil {
         //Record and Replay
         RecordAndReplayUtils recordAndReplayUtils = context.get(RecordAndReplayUtils.class);
         CharacterStateEventPositionMap characterStateEventPositionMap = context.get(CharacterStateEventPositionMap.class);
+        DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = context.get(DirectionAndOriginPosRecorderList.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         EntityIdMap entityIdMap = new EntityIdMap();
         context.put(EntityIdMap.class, entityIdMap);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap, recordAndReplayUtils, characterStateEventPositionMap);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
 
@@ -183,6 +185,7 @@ public final class EntitySystemSetupUtil {
         selectedClassesToRecord.add(PlaySoundEvent.class);
         selectedClassesToRecord.add(CameraTargetChangedEvent.class);
         selectedClassesToRecord.add(CharacterMoveInputEvent.class);
+        //selectedClassesToRecord.add(AttackEvent.class);
         //selectedClassesToRecord.add(GetMaxSpeedEvent.class);
         return selectedClassesToRecord;
     }

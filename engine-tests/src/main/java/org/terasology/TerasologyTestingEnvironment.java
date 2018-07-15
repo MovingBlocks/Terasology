@@ -39,7 +39,9 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
+import org.terasology.recording.DirectionAndOriginPosRecorder;
 import org.terasology.recording.CharacterStateEventPositionMap;
+import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
@@ -102,7 +104,9 @@ public abstract class TerasologyTestingEnvironment {
         context.put(RecordAndReplayUtils.class, recordAndReplayUtils);
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         context.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, entityIdMap, recordAndReplayUtils, characterStateEventPositionMap);
+        DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
+        context.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, entityIdMap, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");

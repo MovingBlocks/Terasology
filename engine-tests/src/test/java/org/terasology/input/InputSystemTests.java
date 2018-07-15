@@ -22,6 +22,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.internal.BindableButtonImpl;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
+import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.EntityIdMap;
 import org.terasology.registry.InjectionHelper;
 
@@ -76,7 +77,7 @@ public class InputSystemTests {
 
     private void setUpLocalPlayer(Context context) {
         LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setEntityIdMap(new EntityIdMap());
+        localPlayer.setRecordAndReplayClasses(new EntityIdMap(), new DirectionAndOriginPosRecorderList());
         clientEntity = mock(EntityRef.class);
         ClientComponent clientComponent = new ClientComponent();
         characterEntity = mock(EntityRef.class);
