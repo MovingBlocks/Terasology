@@ -30,7 +30,6 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.internal.WorldInfo;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RegisterSystem
@@ -46,14 +45,9 @@ public class WorldCommands extends BaseComponentSystem {
         int worldCount = entityManager.getWorldPools().size();
         StringBuilder message = new StringBuilder();
         message.append("Number of worlds is " + worldCount + "\n");
-        //Map<Long, EngineEntityPool> worldPoolMap = entityManager.getPoolMap();
         Map<EngineEntityPool, Long> poolCounts = entityManager.getPoolCounts();
         for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
-            if(poolCounts.get(entry.getValue()) == null) {
-                message.append("Pool for " + entry.getKey().getTitle() + " has " + 0 + " entities \n");
-            } else {
-                message.append("Pool for " + entry.getKey().getTitle() + " has " + poolCounts.get(entry.getValue()) + " entities \n");
-            }
+            message.append("Pool for " + entry.getKey().getTitle() + " has " + entry.getValue().getActiveEntityCount() + " entities \n");
         }
         return message.toString();
     }
