@@ -22,9 +22,7 @@ import com.google.gson.GsonBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector4f;
-import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -42,6 +40,7 @@ public class GsonTypeSerializationLibraryAdapterFactoryTest {
                     "someRect",
                     Rect2i.createFromMinAndSize(-3, -3, 10, 10)
             ),
+            ImmutableMap.of(0, 1, 1, 0),
             -0xDECAF
     );
 
@@ -58,6 +57,7 @@ public class GsonTypeSerializationLibraryAdapterFactoryTest {
 
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapterFactory(typeAdapterFactory)
+            .setExclusionStrategies(new GsonMapExclusionStrategy())
             .create();
 
     @Test
@@ -78,12 +78,18 @@ public class GsonTypeSerializationLibraryAdapterFactoryTest {
         private final Color color;
         private final Set<Vector4f> vector4fs;
         private final Map<String, Rect2i> rect2iMap;
+
+        // Will not be serialized
+        private final Map<Integer, Integer> intMap;
+        
         private final int i;
 
-        private TestClass(Color color, Set<Vector4f> vector4fs, Map<String, Rect2i> rect2iMap, int i) {
+        private TestClass(Color color, Set<Vector4f> vector4fs, Map<String, Rect2i> rect2iMap,
+                          Map<Integer, Integer> intMap, int i) {
             this.color = color;
             this.vector4fs = vector4fs;
             this.rect2iMap = rect2iMap;
+            this.intMap = intMap;
             this.i = i;
         }
 
