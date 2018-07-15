@@ -22,7 +22,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyRegistry;
+import org.terasology.world.block.family.BlockFamilyLibrary;
 import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Collections;
@@ -48,17 +48,17 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
     }
 
     public boolean isFreeform() {
-        return BlockFamilyRegistry.isFreeformSupported(getData().getBlockFamily());
+        return BlockFamilyLibrary.isFreeformSupported(getData().getBlockFamily());
     }
 
     public BlockFamily createFamily(BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(!isFreeform());
-        return BlockFamilyRegistry.createFamily(getData().getBlockFamily(), this, blockBuilderHelper);
+        return BlockFamilyLibrary.createFamily(getData().getBlockFamily(), this, blockBuilderHelper);
     }
 
     public BlockFamily createFamily(BlockShape shape, BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(isFreeform());
-        return BlockFamilyRegistry.createFamily(getData().getBlockFamily(), this, shape, blockBuilderHelper);
+        return BlockFamilyLibrary.createFamily(getData().getBlockFamily(), this, shape, blockBuilderHelper);
     }
 
 

@@ -81,10 +81,8 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.family.AttachedToSurfaceFamily;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyRegistry;
-import org.terasology.world.block.family.HorizontalFamily;
+import org.terasology.world.block.family.BlockFamilyLibrary;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
@@ -137,6 +135,9 @@ public class HeadlessEnvironment extends Environment {
         RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
         Path savePath = PathManager.getInstance().getSavePath("world1");
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
+
+        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
+        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment,context));
 
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
                 engineEntityManager, blockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils));
@@ -201,11 +202,8 @@ public class HeadlessEnvironment extends Environment {
         assetTypeManager.registerCoreAssetType(StaticSound.class, NullSound::new, "sounds");
         assetTypeManager.registerCoreAssetType(StreamingSound.class, NullStreamingSound::new, "music");
 
-        BlockFamilyRegistry blockFamilyFactoryRegistry = new BlockFamilyRegistry();
-        blockFamilyFactoryRegistry.setBlockFamily("horizontal", HorizontalFamily.class);
-        blockFamilyFactoryRegistry.setBlockFamily("alignToSurface", AttachedToSurfaceFamily.class);
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
-                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), blockFamilyFactoryRegistry));
+                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
 
         assetTypeManager.registerCoreAssetType(UISkin.class,
                 UISkin::new, "skins");

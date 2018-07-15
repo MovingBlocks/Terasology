@@ -15,9 +15,14 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.ParameterProvider;
 import org.terasology.util.reflection.SimpleClassFactory;
@@ -25,7 +30,6 @@ import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -34,10 +38,43 @@ import java.util.Optional;
  * The Registry maps a string id to an associated class implementation of a block Family.
  * </p>
  */
-public class BlockFamilyRegistry {
-    private static final Logger logger = LoggerFactory.getLogger(BlockFamilyRegistry.class);
-    private Map<String, Class<? extends AbstractBlockFamily>> registryMap = Maps.newHashMap();
-    
+public class BlockFamilyLibrary {
+    private static final Logger logger = LoggerFactory.getLogger(BlockFamilyLibrary.class);
+
+    private ClassLibrary<BlockFamily> library;
+
+    public BlockFamilyLibrary(ModuleEnvironment moduleEnvironment, Context context) {
+        library = new DefaultClassLibrary<>(context);
+        for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
+
+            if (!BlockFamily.class.isAssignableFrom(entry)) {
+                logger.error("Cannot load {}, must be a subclass of BlockFamily", entry.getSimpleName());
+                continue;
+            }
+            RegisterBlockFamily registerInfo = entry.getAnnotation(RegisterBlockFamily.class);
+            String id = registerInfo.value();
+            logger.debug("Registering blockFamily {}", id);
+            library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry), registerInfo.value()), (Class<? extends BlockFamily>) entry);
+
+        }
+    }
+
+    /**
+     * returns the class representing the block family based off the registered id.
+     *
+     * @param uri
+     * @return
+     */
+    public Class<? extends BlockFamily> getBlockFamily(String uri) {
+        ClassMetadata<? extends BlockFamily, ?> resolved = library.resolve(uri);
+
+        if (uri == null || uri.isEmpty() || resolved == null) {
+            logger.error(" Failed to resolve Blockfamily {}", uri);
+            return SymmetricFamily.class;
+        }
+        return resolved.getType();
+    }
+
     /**
      * Create a family based on the type and instantiate from the the family definition of the block and builder
      *
@@ -64,14 +101,14 @@ public class BlockFamilyRegistry {
             if (result.getURI() == null) {
                 throw new Exception("Family Is missng a BlockUri");
             }
-    
+
             return result;
         } catch (Exception e) {
             logger.error("Failed to load blockFamily {}", blockFamily, e);
         }
         return null;
     }
-    
+
     /**
      * Create a family based on the type and instantiate from the the family definition of the block and builder
      *
@@ -98,7 +135,7 @@ public class BlockFamilyRegistry {
             });
             BlockFamily result = simpleClassFactory.instantiateClass(blockFamily).get();
             InjectionHelper.inject(result);
-    
+
             if (result.getURI() == null) {
                 throw new Exception("Family Is missng a BlockUri");
             }
@@ -108,8 +145,8 @@ public class BlockFamilyRegistry {
         }
         return null;
     }
-    
-    
+
+
     public static String[] getSections(Class<? extends AbstractBlockFamily> blockFamily) {
         if (blockFamily == null) {
             return new String[]{};
@@ -120,7 +157,7 @@ public class BlockFamilyRegistry {
         }
         return sections.value();
     }
-    
+
     public static MultiSection[] getMultiSections(Class<? extends AbstractBlockFamily> blockFamily) {
         if (blockFamily == null) {
             return new MultiSection[]{};
@@ -131,7 +168,7 @@ public class BlockFamilyRegistry {
         }
         return sections.value();
     }
-    
+
     public static boolean isFreeformSupported(Class<? extends AbstractBlockFamily> blockFamily) {
         if (blockFamily == null) {
             return false;
@@ -141,32 +178,5 @@ public class BlockFamilyRegistry {
             return false;
         }
         return freeFormSupported.value();
-    }
-    
-    /**
-     * attach the block to the registry
-     *
-     * @param id
-     * @param blockFamily
-     */
-    public void setBlockFamily(String id, Class<? extends AbstractBlockFamily> blockFamily) {
-        registryMap.put(id.toLowerCase(), blockFamily);
-    }
-    
-    /**
-     * returns the class representing the block family based off the registered id.
-     *
-     * @param blockFamilyId
-     * @return
-     */
-    public Class<? extends AbstractBlockFamily> getBlockFamily(String blockFamilyId) {
-        if (blockFamilyId == null || blockFamilyId.isEmpty()) {
-            return SymmetricFamily.class;
-        }
-        return registryMap.get(blockFamilyId.toLowerCase());
-    }
-    
-    public void clear() {
-        registryMap.clear();
     }
 }
