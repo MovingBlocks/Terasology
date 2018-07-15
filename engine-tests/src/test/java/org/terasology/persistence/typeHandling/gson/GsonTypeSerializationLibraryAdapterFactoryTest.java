@@ -18,7 +18,6 @@ package org.terasology.persistence.typeHandling.gson;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.terasology.math.geom.Rect2i;
@@ -52,13 +51,7 @@ public class GsonTypeSerializationLibraryAdapterFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary =
             TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
 
-    private final GsonTypeSerializationLibraryAdapterFactory typeAdapterFactory =
-            new GsonTypeSerializationLibraryAdapterFactory(typeSerializationLibrary);
-
-    private final Gson gson = new GsonBuilder()
-            .registerTypeAdapterFactory(typeAdapterFactory)
-            .setExclusionStrategies(new GsonMapExclusionStrategy())
-            .create();
+    private final Gson gson = GsonUtility.createGsonWithTypeSerializationLibrary(typeSerializationLibrary);
 
     @Test
     public void testSerialize() {
@@ -81,7 +74,7 @@ public class GsonTypeSerializationLibraryAdapterFactoryTest {
 
         // Will not be serialized
         private final Map<Integer, Integer> intMap;
-        
+
         private final int i;
 
         private TestClass(Color color, Set<Vector4f> vector4fs, Map<String, Rect2i> rect2iMap,
