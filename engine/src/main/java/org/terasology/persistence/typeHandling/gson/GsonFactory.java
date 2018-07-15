@@ -55,11 +55,12 @@ public class GsonFactory {
      *
      * @param typeHandlerEntries The type handlers to use during serialization.
      */
+    @SuppressWarnings("unchecked")
     public static Gson createGsonWithTypeHandlers(TypeHandlerEntry<?>... typeHandlerEntries) {
         GsonTypeHandlerAdapterFactory typeAdapterFactory = new GsonTypeHandlerAdapterFactory();
 
         for (TypeHandlerEntry typeHandlerEntry : typeHandlerEntries) {
-            typeAdapterFactory.addTypeHandler(typeHandlerEntry.type, typeHandlerEntry.typeHandler);
+            typeAdapterFactory.addTypeHandler(typeHandlerEntry);
         }
 
         return createDefaultGsonBuilder()

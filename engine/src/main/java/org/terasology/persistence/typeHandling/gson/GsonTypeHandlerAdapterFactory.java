@@ -38,6 +38,16 @@ public class GsonTypeHandlerAdapterFactory implements TypeAdapterFactory {
 
     /**
      * Adds a {@link TypeHandler} to the {@link #typeHandlerMap} for the given type.
+     *
+     * @param typeHandlerEntry The {@link TypeHandlerEntry} encapsulating the {@link TypeHandler} for
+     *                         the given type.
+     */
+    public <T> void addTypeHandler(TypeHandlerEntry<T> typeHandlerEntry) {
+        addTypeHandler(typeHandlerEntry.type, typeHandlerEntry.typeHandler);
+    }
+
+    /**
+     * Adds a {@link TypeHandler} to the {@link #typeHandlerMap} for the given type.
      * @param type The {@link Class} of the type.
      * @param typeHandler The {@link TypeHandler} for the type.
      */
