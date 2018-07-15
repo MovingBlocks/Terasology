@@ -15,6 +15,7 @@
  */
 package org.terasology.persistence.typeHandling.gson;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -26,12 +27,16 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import java.lang.reflect.Type;
 
 /**
+ * Adapts a {@link TypeHandler} as a legacy Gson {@link JsonSerializer} and {@link JsonDeserializer}.
+ * Instances of {@link LegacyGsonTypeHandlerAdapter}, when registered as type adapters in a {@link Gson}
+ * object, can be used to (de)serialize objects to JSON (via Gson) with the rules specified by
+ * the {@link #typeHandler}.
  */
-public class JsonTypeHandlerAdapter<T> implements JsonDeserializer<T>, JsonSerializer<T> {
+public class LegacyGsonTypeHandlerAdapter<T> implements JsonDeserializer<T>, JsonSerializer<T> {
 
     private TypeHandler<T> typeHandler;
 
-    public JsonTypeHandlerAdapter(TypeHandler<T> handler) {
+    public LegacyGsonTypeHandlerAdapter(TypeHandler<T> handler) {
         this.typeHandler = handler;
     }
 
