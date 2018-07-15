@@ -20,12 +20,26 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapterFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
+/**
+ * Class containing static factory methods for generating {@link Gson} objects that follow Terasology
+ * serialization rules and support Terasology TypeHandlers.
+ */
 public class GsonFactory {
+    /**
+     * Create a {@link GsonBuilder} with options set to comply with Terasology JSON serialization rules.
+     */
     public static GsonBuilder createDefaultGsonBuilder() {
         return new GsonBuilder()
                 .setExclusionStrategies(new GsonMapExclusionStrategy());
     }
 
+    /**
+     * Create a {@link Gson} object which uses type handlers loaded from the given
+     * {@link TypeSerializationLibrary} and complies with Terasology JSON serialization rules.
+     *
+     * @param typeSerializationLibrary The {@link TypeSerializationLibrary} to load type handler
+     *                                 definitions from
+     */
     public static Gson createGsonWithTypeSerializationLibrary(TypeSerializationLibrary typeSerializationLibrary) {
         TypeAdapterFactory typeAdapterFactory =
                 new GsonTypeSerializationLibraryAdapterFactory(typeSerializationLibrary);
@@ -35,11 +49,17 @@ public class GsonFactory {
                 .create();
     }
 
-    public static Gson createGsonWithTypeHandlers(TypeHandlerEntry<?>... typeHandlerPairs) {
+    /**
+     * Create a {@link Gson} object which uses the given type handlers and complies with Terasology
+     * JSON serialization rules.
+     *
+     * @param typeHandlerEntries The type handlers to use during serialization.
+     */
+    public static Gson createGsonWithTypeHandlers(TypeHandlerEntry<?>... typeHandlerEntries) {
         GsonTypeHandlerAdapterFactory typeAdapterFactory = new GsonTypeHandlerAdapterFactory();
 
-        for (TypeHandlerEntry typeHandlerPair : typeHandlerPairs) {
-            typeAdapterFactory.addTypeHandler(typeHandlerPair.type, typeHandlerPair.typeHandler);
+        for (TypeHandlerEntry typeHandlerEntry : typeHandlerEntries) {
+            typeAdapterFactory.addTypeHandler(typeHandlerEntry.type, typeHandlerEntry.typeHandler);
         }
 
         return createDefaultGsonBuilder()
