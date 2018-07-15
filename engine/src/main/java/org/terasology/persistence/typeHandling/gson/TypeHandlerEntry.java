@@ -18,10 +18,15 @@ package org.terasology.persistence.typeHandling.gson;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 public class TypeHandlerEntry<T> {
-    public Class<T> type;
-    public TypeHandler<T> typeHandler;
+    public final Class<T> type;
+    public final TypeHandler<T> typeHandler;
+
+    private TypeHandlerEntry(Class<T> type, TypeHandler<T> typeHandler) {
+        this.type = type;
+        this.typeHandler = typeHandler;
+    }
 
     public static <U> TypeHandlerEntry<U> of(Class<U> type, TypeHandler<U> typeHandler) {
-        return new TypeHandlerEntry<>();
+        return new TypeHandlerEntry<>(type, typeHandler);
     }
 }
