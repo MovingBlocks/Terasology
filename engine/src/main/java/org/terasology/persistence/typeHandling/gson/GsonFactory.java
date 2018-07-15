@@ -20,7 +20,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapterFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
-public class GsonUtility {
+public class GsonFactory {
     public static GsonBuilder createDefaultGsonBuilder() {
         return new GsonBuilder()
                 .setExclusionStrategies(new GsonMapExclusionStrategy());
