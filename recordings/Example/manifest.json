@@ -1,7 +1,7 @@
 {
   "title": "Example",
   "seed": "AIj8MVblM4gYNrpOuuIO45iszg4mDGyK",
-  "time": 8395,
+  "time": 68415,
   "registeredBlockFamilies": [
     "BuilderSampleGameplay:Dirt",
     "engine:unloaded",
@@ -21,7 +21,7 @@
     "main": {
       "title": "main",
       "seed": "AIj8MVblM4gYNrpOuuIO45iszg4mDGyK",
-      "time": 43602960,
+      "time": 46483920,
       "worldGenerator": "BuilderSampleGameplay:builderSampleWorld"
     }
   },
