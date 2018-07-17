@@ -21,10 +21,10 @@ import com.google.gson.TypeAdapterFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 /**
- * Class containing static factory methods for generating {@link Gson} objects that follow Terasology
+ * Class containing static factory methods for generating {@link GsonBuilder} objects that follow Terasology
  * serialization rules and support Terasology TypeHandlers.
  */
-public class GsonFactory {
+public class GsonBuilderFactory {
     /**
      * Create a {@link GsonBuilder} with options set to comply with Terasology JSON serialization rules.
      */
@@ -34,29 +34,28 @@ public class GsonFactory {
     }
 
     /**
-     * Create a {@link Gson} object which uses type handlers loaded from the given
+     * Create a {@link GsonBuilder} which uses type handlers loaded from the given
      * {@link TypeSerializationLibrary} and complies with Terasology JSON serialization rules.
      *
      * @param typeSerializationLibrary The {@link TypeSerializationLibrary} to load type handler
      *                                 definitions from
      */
-    public static Gson createGsonWithTypeSerializationLibrary(TypeSerializationLibrary typeSerializationLibrary) {
+    public static GsonBuilder createGsonBuilderWithTypeSerializationLibrary(TypeSerializationLibrary typeSerializationLibrary) {
         TypeAdapterFactory typeAdapterFactory =
                 new GsonTypeSerializationLibraryAdapterFactory(typeSerializationLibrary);
 
         return createDefaultGsonBuilder()
-                .registerTypeAdapterFactory(typeAdapterFactory)
-                .create();
+                .registerTypeAdapterFactory(typeAdapterFactory);
     }
 
     /**
-     * Create a {@link Gson} object which uses the given type handlers and complies with Terasology
+     * Create a {@link GsonBuilder} which uses the given type handlers and complies with Terasology
      * JSON serialization rules.
      *
      * @param typeHandlerEntries The type handlers to use during serialization.
      */
     @SuppressWarnings("unchecked")
-    public static Gson createGsonWithTypeHandlers(TypeHandlerEntry<?>... typeHandlerEntries) {
+    public static GsonBuilder createGsonBuilderWithTypeHandlers(TypeHandlerEntry<?>... typeHandlerEntries) {
         GsonTypeHandlerAdapterFactory typeAdapterFactory = new GsonTypeHandlerAdapterFactory();
 
         for (TypeHandlerEntry typeHandlerEntry : typeHandlerEntries) {
@@ -64,7 +63,6 @@ public class GsonFactory {
         }
 
         return createDefaultGsonBuilder()
-                .registerTypeAdapterFactory(typeAdapterFactory)
-                .create();
+                .registerTypeAdapterFactory(typeAdapterFactory);
     }
 }

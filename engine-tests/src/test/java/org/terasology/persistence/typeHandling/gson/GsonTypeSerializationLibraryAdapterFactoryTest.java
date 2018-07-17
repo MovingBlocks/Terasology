@@ -51,7 +51,9 @@ public class GsonTypeSerializationLibraryAdapterFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary =
             TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
 
-    private final Gson gson = GsonFactory.createGsonWithTypeSerializationLibrary(typeSerializationLibrary);
+    private final Gson gson =
+            GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeSerializationLibrary)
+            .create();
 
     @Test
     public void testSerialize() {

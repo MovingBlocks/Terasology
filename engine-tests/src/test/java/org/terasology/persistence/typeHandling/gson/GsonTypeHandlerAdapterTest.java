@@ -30,9 +30,10 @@ public class GsonTypeHandlerAdapterTest {
     private static final String OBJECT_JSON_HEX = "{\"color\":DEADBEEF,\"i\":-123}";
     private static final TestClass OBJECT = new TestClass(new Color(0xDEADBEEF), -123);
 
-    private final Gson gson = GsonFactory.createGsonWithTypeHandlers(
+    private final Gson gson = GsonBuilderFactory.createGsonBuilderWithTypeHandlers(
             TypeHandlerEntry.of(Color.class, new ColorTypeHandler())
-    );
+    )
+            .create();
 
     /**
      * {@link GsonTypeHandlerAdapter#read(JsonReader)} is tested by deserializing an object from JSON
