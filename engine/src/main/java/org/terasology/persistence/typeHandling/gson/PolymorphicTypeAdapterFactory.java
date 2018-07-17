@@ -30,6 +30,13 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * A {@link TypeAdapterFactory} that generates type adapters which read and write type information for
+ * sub-types of the given base type. The type information allows the generated type adapters to dynamically
+ * identify which sub-type instance is being read or written when it is given a base type reference.
+ *
+ * @param <T> The base type.
+ */
 public class PolymorphicTypeAdapterFactory<T> implements TypeAdapterFactory {
     private static final String TYPE_FIELD_NAME = "@type";
 
