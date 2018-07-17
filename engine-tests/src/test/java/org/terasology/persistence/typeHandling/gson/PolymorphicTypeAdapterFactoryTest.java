@@ -30,17 +30,32 @@ public class PolymorphicTypeAdapterFactoryTest {
     private static final Animal CAT = new Animal("Cat");
     private static final Cheetah CHEETAH = new Cheetah(21);
 
-    private final Gson gson = new GsonBuilder()
+    private final Gson baseClassGson = new GsonBuilder()
             .registerTypeAdapterFactory(PolymorphicTypeAdapterFactory.of(Animal.class))
             .create();
 
+    private final Gson interfaceGson = new GsonBuilder()
+            .registerTypeAdapterFactory(PolymorphicTypeAdapterFactory.of(Walker.class))
+            .create();
+
     @Test
-    public void testBaseClass() {
+    public void testInterfaceReference() {
+        Walker walker = CAT;
+
+        String json = interfaceGson.toJson(walker);
+
+        Walker newAnimal = interfaceGson.fromJson(json, Walker.class);
+
+        Assert.assertTrue(newAnimal instanceof Animal);
+    }
+
+    @Test
+    public void testBaseClassReference() {
         Animal animal = CHEETAH;
 
-        String json = gson.toJson(animal);
+        String json = baseClassGson.toJson(animal);
 
-        Animal newAnimal = gson.fromJson(json, Animal.class);
+        Animal newAnimal = baseClassGson.fromJson(json, Animal.class);
 
         Assert.assertTrue(newAnimal instanceof Cheetah);
     }
@@ -49,22 +64,35 @@ public class PolymorphicTypeAdapterFactoryTest {
     public void testInnerField() {
         Capsule capsule = new Capsule(DOG);
 
-        String json = gson.toJson(capsule);
+        String json = baseClassGson.toJson(capsule);
 
-        Capsule newCapsule = gson.fromJson(json, Capsule.class);
+        Capsule newCapsule = baseClassGson.fromJson(json, Capsule.class);
         Assert.assertTrue(newCapsule.animal instanceof Dog);
     }
 
     @Test
-    public void testPolymorphicList() {
+    public void testBaseClassList() {
         List<Animal> animals = Lists.newArrayList(CAT, DOG, CHEETAH);
 
-        String json = gson.toJson(animals);
+        String json = baseClassGson.toJson(animals);
 
-        List<Animal> newAnimals = gson.fromJson(json, new TypeToken<List<Animal>>(){}.getType());
+        List<Animal> newAnimals = baseClassGson.fromJson(json, new TypeToken<List<Animal>>(){}.getType());
 
         Assert.assertTrue(newAnimals.get(1) instanceof Dog);
         Assert.assertTrue(newAnimals.get(2) instanceof Cheetah);
+    }
+
+    @Test
+    public void testInterfaceList() {
+        List<Walker> walkers = Lists.newArrayList(CAT, DOG, CHEETAH);
+
+        String json = interfaceGson.toJson(walkers);
+
+        List<Walker> newWalkers = interfaceGson.fromJson(json, new TypeToken<List<Walker>>(){}.getType());
+
+        Assert.assertTrue(newWalkers.get(0) instanceof Animal);
+        Assert.assertTrue(newWalkers.get(1) instanceof Dog);
+        Assert.assertTrue(newWalkers.get(2) instanceof Cheetah);
     }
 
     private static class Capsule {
@@ -75,7 +103,10 @@ public class PolymorphicTypeAdapterFactoryTest {
         }
     }
 
-    private static class Animal {
+    private interface Walker {
+    }
+
+    private static class Animal implements Walker {
         private final String name;
 
         private Animal(String name) {
