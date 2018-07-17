@@ -113,6 +113,10 @@ public class PolymorphicTypeAdapterFactory<T> implements TypeAdapterFactory {
                     valueClass = baseClass;
                 }
 
+                if (!baseClass.isAssignableFrom(valueClass)) {
+                    throw new JsonParseException(valueClass.getName() + " does not derive from " + baseClass.getName());
+                }
+
                 TypeToken<?> valueType = TypeToken.get(valueClass);
                 TypeAdapter<R> delegate = (TypeAdapter<R>)
                         gson.getDelegateAdapter(PolymorphicTypeAdapterFactory.this, valueType);
