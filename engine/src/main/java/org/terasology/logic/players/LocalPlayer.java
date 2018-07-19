@@ -30,7 +30,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.CoreRegistry;
 
@@ -40,7 +39,6 @@ public class LocalPlayer {
     private int nextActivationId;
 
     //Record and Replay classes
-    private EntityIdMap entityIdMap;
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
 
     public LocalPlayer() {
@@ -54,11 +52,6 @@ public class LocalPlayer {
     // TODO: instance. If that can be avoided the code in the following method
     // TODO: might be more rightfully placed in the LocalPlayer constructor.
     public void setClientEntity(EntityRef entity) {
-
-        //Gets the client ids for record and replay
-        if (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.NOT_ACTIVATED) {
-            this.entityIdMap.add("client", entity.getId());
-        }
         this.clientEntity = entity;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         if (clientComp != null) {
@@ -67,10 +60,8 @@ public class LocalPlayer {
         }
     }
 
-    public void setRecordAndReplayClasses(EntityIdMap idMap, DirectionAndOriginPosRecorderList list) {
-        this.entityIdMap = idMap;
+    public void setRecordAndReplayClasses(DirectionAndOriginPosRecorderList list) {
         this.directionAndOriginPosRecorderList = list;
-
     }
 
     public EntityRef getClientEntity() {

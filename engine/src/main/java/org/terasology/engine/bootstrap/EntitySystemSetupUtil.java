@@ -44,7 +44,6 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.EventCatcher;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordAndReplayStatus;
@@ -129,14 +128,12 @@ public final class EntitySystemSetupUtil {
         CharacterStateEventPositionMap characterStateEventPositionMap = context.get(CharacterStateEventPositionMap.class);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = context.get(DirectionAndOriginPosRecorderList.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
-        EntityIdMap entityIdMap = new EntityIdMap();
-        context.put(EntityIdMap.class, entityIdMap);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, entityIdMap, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
 
         // Event System
-        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library, recordedEventStore, entityIdMap,
+        EventSystem eventSystem = createEventSystem(networkSystem, entityManager, library, recordedEventStore,
                 recordAndReplaySerializer, recordAndReplayUtils);
         entityManager.setEventSystem(eventSystem);
         context.put(EventSystem.class, eventSystem);
@@ -148,13 +145,13 @@ public final class EntitySystemSetupUtil {
     }
 
     private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library,
-                                                 RecordedEventStore recordedEventStore, EntityIdMap entityIdMap,
-                                                 RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils) {
+                                                 RecordedEventStore recordedEventStore, RecordAndReplaySerializer recordAndReplaySerializer,
+                                                 RecordAndReplayUtils recordAndReplayUtils) {
         EventSystem eventSystem;
         List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
         if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager, recordedEventStore,
-                    entityIdMap, recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToRecord);
+                    recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToRecord);
         } else {
             EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord, recordedEventStore);
             eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem, eventCatcher);

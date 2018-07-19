@@ -69,11 +69,10 @@ public class EventSystemReplayImplTest {
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
 
         RecordedEventStore eventStore = new RecordedEventStore();
-        EntityIdMap entityIdMap = new EntityIdMap();
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore, entityIdMap, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
         RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAYING);
         entity = entityManager.create();
         Long id = entity.getId();
@@ -85,7 +84,7 @@ public class EventSystemReplayImplTest {
         selectedClassesToReplay.add(InputEvent.class);
 
         eventSystem = new EventSystemReplayImpl(entitySystemLibrary.getEventLibrary(), networkSystem, entityManager,
-                eventStore, entityIdMap, recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToReplay);
+                eventStore, recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToReplay);
 
         entityManager.setEventSystem(eventSystem);
 

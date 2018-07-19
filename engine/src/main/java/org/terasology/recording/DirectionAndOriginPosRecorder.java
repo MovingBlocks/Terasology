@@ -43,14 +43,6 @@ public class DirectionAndOriginPosRecorder {
         return this.directionAndOriginData.pollFirst();
     }
 
-    public Deque<Vector3f[]> getDirectionAndOriginData() {
-        return directionAndOriginData;
-    }
-
-    public void setDirectionAndOriginData(Deque<Vector3f[]> directionAndOriginData) {
-        this.directionAndOriginData = directionAndOriginData;
-    }
-
     public void reset() {
         this.directionAndOriginData = new ArrayDeque<>();
     }

@@ -43,7 +43,6 @@ import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.EntityIdMap;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
@@ -93,7 +92,7 @@ public class StateHeadlessSetup implements GameState {
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setRecordAndReplayClasses(context.get(EntityIdMap.class), context.get(DirectionAndOriginPosRecorderList.class));
+        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class));
         context.put(LocalPlayer.class, localPlayer);
         localPlayer.setClientEntity(localPlayerEntity);
 

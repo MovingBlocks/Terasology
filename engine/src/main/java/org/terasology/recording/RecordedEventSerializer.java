@@ -75,7 +75,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Serializes RecordedEvents
+ * Serializes and deserializes RecordedEvents.
  */
 class RecordedEventSerializer {
 

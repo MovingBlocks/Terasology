@@ -130,7 +130,6 @@ class EventCopier {
             logger.error("ERROR!!! Event not Identified: " + originalEvent.toString(), exception);
         }
         return null;
-
     }
 
     private KeyEvent createNewKeyEvent(KeyEvent originalEvent) {

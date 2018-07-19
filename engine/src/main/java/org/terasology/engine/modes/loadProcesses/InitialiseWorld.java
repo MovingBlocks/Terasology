@@ -36,7 +36,6 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadOnlyStorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.EntityIdMap;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
@@ -163,7 +162,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setRecordAndReplayClasses(context.get(EntityIdMap.class), context.get(DirectionAndOriginPosRecorderList.class));
+        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class));
         context.put(LocalPlayer.class, localPlayer);
         context.put(Camera.class, worldRenderer.getActiveCamera());
 

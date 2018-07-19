@@ -73,8 +73,9 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Event System used during a replay. It works almost the same as EventSystemImpl, with most methods being exactly the
  * same, with the exception of 'send' and 'process'. On the 'process' method, the recorded events are loaded from a file
- * to the RecordedEventStore and then they are processed for a certain amount of time. The 'send' method calls the
- * 'process' method if the replay state is still activated and the event is of a type selected to be replayed.
+ * to the RecordedEventStore and then they are processed for a certain amount of time. The 'send' filters which events can
+ * be sent by the engine during a replay. This is important to ensure that the recorded events are replayed correctly
+ * and that the player does not interfere with the replay.
  */
 public class EventSystemReplayImpl implements EventSystem {
 
@@ -104,8 +105,6 @@ public class EventSystemReplayImpl implements EventSystem {
     private EngineEntityManager entityManager;
     /** Where the RecordedEvents are deserialized */
     private RecordedEventStore recordedEventStore;
-    /** The entity id map from the record game to the replay */
-    private EntityIdMap entityIdMap;
     /** Class responsible for deserializing recorded data */
     private RecordAndReplaySerializer recordAndReplaySerializer;
     /** Responsible for knowing the game name of the recording */
@@ -115,15 +114,13 @@ public class EventSystemReplayImpl implements EventSystem {
 
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
-                                 RecordedEventStore recordedEventStore, EntityIdMap entityIdMap,
-                                 RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils,
-                                 List<Class<?>> selectedClassesToReplay) {
+                                 RecordedEventStore recordedEventStore, RecordAndReplaySerializer recordAndReplaySerializer,
+                                 RecordAndReplayUtils recordAndReplayUtils, List<Class<?>> selectedClassesToReplay) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
         this.entityManager = entityManager;
         this.recordedEventStore = recordedEventStore;
-        this.entityIdMap = entityIdMap;
         this.recordAndReplaySerializer = recordAndReplaySerializer;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.selectedClassesToReplay = selectedClassesToReplay;
@@ -179,7 +176,6 @@ public class EventSystemReplayImpl implements EventSystem {
 
     /**
      * Processes recorded and pending events. If recordedEvents is not loaded, load it from RecordedEventStore.
-     * Processes recorded events for a certain amount of time and only if the timestamp is right.
      */
     @Override
     public void process() {
@@ -195,6 +191,9 @@ public class EventSystemReplayImpl implements EventSystem {
         }
     }
 
+    /**
+     * Processes recorded events for a certain amount of time and only if the timestamp is right.
+     */
     private void processRecordedEvents() {
         if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING && !this.areRecordedEventsLoaded) {
             initialiseReplayData();
@@ -212,6 +211,9 @@ public class EventSystemReplayImpl implements EventSystem {
         }
     }
 
+    /**
+     * Empty the RecordedEventStore and sets the RecordAndReplayStatus.
+     */
     private void finishReplay() {
         recordedEventStore.popEvents();
         RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
@@ -261,19 +263,13 @@ public class EventSystemReplayImpl implements EventSystem {
     }
 
     /**
-     * Maps the entities IDs to get the correct entity, even if the id changed from record to replay.
-     * @param recordedEvent the RecordedEvent to have its id checked and converted.
-     * @return the equivalent EntityRef to the one during the recording.
+     * Since only the EntityRef's id is saved in the RecordedEvent, it is necessary to get the real EntityRef when
+     * processing a RecordedEvent.
+     * @param recordedEvent The recorded event containing the ID of the entity to be gotten.
+     * @return the EntityRef with the id recorded in the RecordedEvent.
      */
     private EntityRef getEntityRef(RecordedEvent recordedEvent) {
-        EntityRef entity;
-        String previousName = entityIdMap.getNameFromPrevious(recordedEvent.getEntityId());
-        if (previousName != null) {
-            entity = this.entityManager.getEntity(entityIdMap.getId(previousName));
-        } else {
-            entity = this.entityManager.getEntity(recordedEvent.getEntityId());
-        }
-        return entity;
+        return this.entityManager.getEntity(recordedEvent.getEntityId());
     }
 
     @Override
