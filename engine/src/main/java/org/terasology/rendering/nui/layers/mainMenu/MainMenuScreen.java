@@ -23,6 +23,7 @@ import org.terasology.engine.NonNativeJVMDetector;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.In;
@@ -47,6 +48,9 @@ public class MainMenuScreen extends CoreScreenLayer {
 
     @In
     private TranslationSystem translationSystem;
+
+    @In
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     private UILabel storageServiceStatus;
     private StorageServiceWorkerStatus storageServiceWorkerStatus; //keep track of previous status to avoid performance drop due to updating UI when no change happened
@@ -82,7 +86,7 @@ public class MainMenuScreen extends CoreScreenLayer {
             triggerForwardAnimation(selectScreen);
         });
         WidgetUtil.trySubscribe(this, "record", button -> {
-            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.PREPARING_RECORD);
+            recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.PREPARING_RECORD);
             RecordAndReplayUtils recordAndReplayUtils = engine.createChildContext().get(RecordAndReplayUtils.class);
             recordScreen.setRecordAndReplayUtils(recordAndReplayUtils);
             triggerForwardAnimation(recordScreen);
@@ -90,7 +94,7 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "replay", button -> {
             RecordAndReplayUtils recordAndReplayUtils = engine.createChildContext().get(RecordAndReplayUtils.class);
             replayScreen.setRecordAndReplayUtils(recordAndReplayUtils);
-            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.PREPARING_REPLAY);
+            recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.PREPARING_REPLAY);
             triggerForwardAnimation(replayScreen);
         });
         WidgetUtil.trySubscribe(this, "join", button -> {

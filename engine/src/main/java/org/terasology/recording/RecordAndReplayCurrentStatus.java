@@ -15,21 +15,20 @@
  */
 package org.terasology.recording;
 
-/**
- * The Status of Record and Replay.
- */
-public enum RecordAndReplayStatus {
-    NOT_ACTIVATED, PREPARING_RECORD, RECORDING, PREPARING_REPLAY, REPLAYING, REPLAY_FINISHED;
+public class RecordAndReplayCurrentStatus {
 
-    /** Status of the Record and Replay in the current game */
-    /*
-    private static RecordAndReplayStatus currentStatus = NOT_ACTIVATED;
+    /** Current status of the Record and Replay */
+    private RecordAndReplayStatus status;
 
-    public static RecordAndReplayStatus getStatus() {
-        return currentStatus;
+    public RecordAndReplayCurrentStatus() {
+        this.status = RecordAndReplayStatus.NOT_ACTIVATED;
     }
 
-    public static void setStatus(RecordAndReplayStatus status) {
-        currentStatus = status;
-    }*/
+    public RecordAndReplayStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RecordAndReplayStatus status) {
+        this.status = status;
+    }
 }

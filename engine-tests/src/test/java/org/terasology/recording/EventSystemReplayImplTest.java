@@ -51,6 +51,7 @@ public class EventSystemReplayImplTest {
     private EntityRef entity;
     private EventSystem eventSystem;
     private TestEventHandler handler;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
 
 
@@ -68,12 +69,13 @@ public class EventSystemReplayImplTest {
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
 
+        recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
         RecordedEventStore eventStore = new RecordedEventStore();
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
-        RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAYING);
+        recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAYING);
         entity = entityManager.create();
         Long id = entity.getId();
         eventStore.add(new RecordedEvent(id, new AttackButton(), 1, 1));
@@ -84,7 +86,7 @@ public class EventSystemReplayImplTest {
         selectedClassesToReplay.add(InputEvent.class);
 
         eventSystem = new EventSystemReplayImpl(entitySystemLibrary.getEventLibrary(), networkSystem, entityManager,
-                eventStore, recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToReplay);
+                eventStore, recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToReplay, recordAndReplayCurrentStatus);
 
         entityManager.setEventSystem(eventSystem);
 
@@ -95,12 +97,12 @@ public class EventSystemReplayImplTest {
 
     @Test
     public void testReplayStatus() {
-        assertEquals(RecordAndReplayStatus.REPLAYING, RecordAndReplayStatus.getCurrentStatus());
+        assertEquals(RecordAndReplayStatus.REPLAYING, recordAndReplayCurrentStatus.getStatus());
         long startTime = System.currentTimeMillis();
         while ((System.currentTimeMillis() - startTime) < 30) {
             eventSystem.process();
         }
-        assertEquals(RecordAndReplayStatus.REPLAY_FINISHED, RecordAndReplayStatus.getCurrentStatus());
+        assertEquals(RecordAndReplayStatus.REPLAY_FINISHED, recordAndReplayCurrentStatus.getStatus());
     }
 
     @Test
@@ -150,7 +152,7 @@ public class EventSystemReplayImplTest {
 
     @After
     public void cleanStates() {
-        RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+        recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.NOT_ACTIVATED);
     }
 
     public static class TestEventHandler extends BaseComponentSystem {

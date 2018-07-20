@@ -30,6 +30,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.CoreRegistry;
 
@@ -40,6 +41,7 @@ public class LocalPlayer {
 
     //Record and Replay classes
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     public LocalPlayer() {
 
@@ -60,8 +62,9 @@ public class LocalPlayer {
         }
     }
 
-    public void setRecordAndReplayClasses(DirectionAndOriginPosRecorderList list) {
+    public void setRecordAndReplayClasses(DirectionAndOriginPosRecorderList list, RecordAndReplayCurrentStatus status) {
         this.directionAndOriginPosRecorderList = list;
+        this.recordAndReplayCurrentStatus = status;
     }
 
     public EntityRef getClientEntity() {
@@ -203,9 +206,9 @@ public class LocalPlayer {
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         Vector3f direction = getViewDirection();
         Vector3f originPos = getViewPosition();
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().add(direction, originPos);
-        } else if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+        } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
             Vector3f[] data = this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().poll();
             direction = data[0];
             originPos = data[1];

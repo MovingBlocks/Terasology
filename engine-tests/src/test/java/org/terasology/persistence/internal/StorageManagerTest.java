@@ -46,6 +46,7 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
@@ -96,6 +97,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     private Path savePath;
     private RecordAndReplaySerializer recordAndReplaySerializer;
     private RecordAndReplayUtils recordAndReplayUtils;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     @Before
     public void setup() throws Exception {
@@ -117,10 +119,11 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
+        recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
 
         esm = new ReadWriteStorageManager(savePath, moduleEnvironment, entityManager, blockManager, biomeManager,
-                false, recordAndReplaySerializer, recordAndReplayUtils);
+                false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         context.put(StorageManager.class, esm);
 
         this.character = entityManager.create();
@@ -222,7 +225,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
 
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                biomeManager, false, recordAndReplaySerializer, recordAndReplayUtils);
+                biomeManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
@@ -243,7 +246,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                biomeManager, false, recordAndReplaySerializer, recordAndReplayUtils);
+                biomeManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
@@ -295,7 +298,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                biomeManager, storeChunkInZips, recordAndReplaySerializer, recordAndReplayUtils);
+                biomeManager, storeChunkInZips, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -330,7 +333,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                biomeManager, false, recordAndReplaySerializer, recordAndReplayUtils);
+                biomeManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);

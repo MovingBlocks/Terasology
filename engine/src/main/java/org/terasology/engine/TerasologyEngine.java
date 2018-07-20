@@ -58,6 +58,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -155,6 +156,8 @@ public class TerasologyEngine implements GameEngine {
         this.timeSubsystem = timeSubsystem;
 
         //Record and Replay classes
+        RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
+        rootContext.put(RecordAndReplayCurrentStatus.class, recordAndReplayCurrentStatus);
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         rootContext.put(RecordAndReplayUtils.class, recordAndReplayUtils);
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();

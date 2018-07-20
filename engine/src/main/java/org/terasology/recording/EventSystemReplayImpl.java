@@ -111,11 +111,14 @@ public class EventSystemReplayImpl implements EventSystem {
     private RecordAndReplayUtils recordAndReplayUtils;
     /** List of classes selected to replay */
     private List<Class<?>> selectedClassesToReplay;
+    /** The current Status of Record And Replay */
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EngineEntityManager entityManager,
                                  RecordedEventStore recordedEventStore, RecordAndReplaySerializer recordAndReplaySerializer,
-                                 RecordAndReplayUtils recordAndReplayUtils, List<Class<?>> selectedClassesToReplay) {
+                                 RecordAndReplayUtils recordAndReplayUtils, List<Class<?>> selectedClassesToReplay,
+                                 RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
@@ -124,6 +127,7 @@ public class EventSystemReplayImpl implements EventSystem {
         this.recordAndReplaySerializer = recordAndReplaySerializer;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.selectedClassesToReplay = selectedClassesToReplay;
+        this.recordAndReplayCurrentStatus = recordAndReplayCurrentStatus;
     }
 
     /**
@@ -195,11 +199,11 @@ public class EventSystemReplayImpl implements EventSystem {
      * Processes recorded events for a certain amount of time and only if the timestamp is right.
      */
     private void processRecordedEvents() {
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING && !this.areRecordedEventsLoaded) {
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING && !this.areRecordedEventsLoaded) {
             initialiseReplayData();
         }
         //If replay is ready, process some recorded events if the time is right.
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
             processRecordedEventsBatch(1);
             if (this.recordedEvents.isEmpty()) {
                 if (recordAndReplayUtils.getFileCount() <= recordAndReplayUtils.getFileAmount()) { //Get next recorded events file
@@ -216,7 +220,7 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     private void finishReplay() {
         recordedEventStore.popEvents();
-        RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
+        recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
     }
 
     private void loadNextRecordedEventFile() {
@@ -431,7 +435,7 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     @Override
     public void send(EntityRef entity, Event event) {
-        if (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAYING || !isSelectedToReplayEvent(event)) {
+        if (recordAndReplayCurrentStatus.getStatus() != RecordAndReplayStatus.REPLAYING || !isSelectedToReplayEvent(event)) {
             originalSend(entity, event);
         }
     }
@@ -446,7 +450,7 @@ public class EventSystemReplayImpl implements EventSystem {
      */
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-        if (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.REPLAYING || !isSelectedToReplayEvent(event)) {
+        if (recordAndReplayCurrentStatus.getStatus() != RecordAndReplayStatus.REPLAYING || !isSelectedToReplayEvent(event)) {
             originalSend(entity, event, component);
         }
     }

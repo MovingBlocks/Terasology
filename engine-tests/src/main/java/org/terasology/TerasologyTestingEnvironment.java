@@ -41,6 +41,7 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
@@ -84,6 +85,7 @@ public abstract class TerasologyTestingEnvironment {
     @Before
     public void setup() throws Exception {
         context.put(ModuleManager.class, moduleManager);
+        RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
         mockTime = mock(EngineTime.class);
         context.put(Time.class, mockTime);
@@ -107,7 +109,7 @@ public abstract class TerasologyTestingEnvironment {
 
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, mockBlockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils));
+                engineEntityManager, mockBlockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);

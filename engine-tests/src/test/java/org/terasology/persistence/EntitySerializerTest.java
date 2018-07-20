@@ -43,6 +43,7 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.protobuf.EntityData;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.utilities.Assets;
@@ -70,6 +71,7 @@ public class EntitySerializerTest {
     public static void setupClass() throws Exception {
         context = new ContextImpl();
         CoreRegistry.setContext(context);
+        context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
         moduleManager = ModuleManagerFactory.create();
         context.put(ModuleManager.class, moduleManager);
 

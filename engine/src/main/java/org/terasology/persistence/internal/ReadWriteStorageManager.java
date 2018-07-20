@@ -44,6 +44,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
@@ -111,6 +112,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private EntitySetDeltaRecorder entitySetDeltaRecorder;
     private RecordAndReplaySerializer recordAndReplaySerializer;
     private RecordAndReplayUtils recordAndReplayUtils;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
     /**
      * A component library that provides a copy() method that replaces {@link EntityRef}s which {@link EntityRef}s
      * that will use the privateEntityManager.
@@ -119,13 +121,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
                                    BlockManager blockManager, BiomeManager biomeManager, RecordAndReplaySerializer recordAndReplaySerializer,
-                                   RecordAndReplayUtils recordAndReplayUtils) throws IOException {
-        this(savePath, environment, entityManager, blockManager, biomeManager, true, recordAndReplaySerializer, recordAndReplayUtils);
+                                   RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
+        this(savePath, environment, entityManager, blockManager, biomeManager, true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
     }
 
     ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
                                    BlockManager blockManager, BiomeManager biomeManager, boolean storeChunksInZips,
-                                   RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils) throws IOException {
+                                   RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils,
+                            RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
         super(savePath, environment, entityManager, blockManager, biomeManager, storeChunksInZips);
 
         entityManager.subscribeForDestruction(this);
@@ -141,6 +144,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         this.entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
         this.recordAndReplaySerializer = recordAndReplaySerializer;
         this.recordAndReplayUtils = recordAndReplayUtils;
+        this.recordAndReplayCurrentStatus = recordAndReplayCurrentStatus;
 
     }
 
@@ -153,7 +157,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     @Override
     public void finishSavingAndShutdown() {
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             recordAndReplayUtils.setShutdownRequested(true);
         }
         saveThreadManager.shutdown(new ShutdownTask(), true);
@@ -246,7 +250,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
     private void waitForCompletionOfPreviousSave() {
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
             recordAndReplayUtils.setShutdownRequested(true); //Important to trigger complete serialization in a recording
         }
         if (saveTransaction != null && saveTransaction.getResult() == null) {
@@ -259,7 +263,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private SaveTransaction createSaveTransaction() {
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
                 entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock,
-                recordAndReplaySerializer, recordAndReplayUtils);
+                recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
 
         ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);

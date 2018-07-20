@@ -36,6 +36,7 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadOnlyStorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
@@ -124,9 +125,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         StorageManager storageManager;
         RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
         RecordAndReplayUtils recordAndReplayUtils = context.get(RecordAndReplayUtils.class);
+        RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils)
+                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus)
                     : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);
@@ -162,7 +164,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class));
+        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class), context.get(RecordAndReplayCurrentStatus.class));
         context.put(LocalPlayer.class, localPlayer);
         context.put(Camera.class, worldRenderer.getActiveCamera());
 
@@ -171,7 +173,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
     private Path getSaveOrRecordingPath() {
         Path saveOrRecordingPath;
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+        if (context.get(RecordAndReplayCurrentStatus.class).getStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             saveOrRecordingPath = PathManager.getInstance().getRecordingPath(gameManifest.getTitle());
         } else {
             saveOrRecordingPath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
