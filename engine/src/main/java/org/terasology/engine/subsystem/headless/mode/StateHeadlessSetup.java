@@ -140,9 +140,9 @@ public class StateHeadlessSetup implements GameState {
 
         gameManifest.setTitle(worldGenConfig.getWorldTitle());
         gameManifest.setSeed(worldGenConfig.getDefaultSeed());
-
+        final float timeOffSet = 0.50f;
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorUri);
+                (long) (WorldTime.DAY_LENGTH * timeOffSet), worldGeneratorUri);
         gameManifest.addWorld(worldInfo);
         return gameManifest;
     }
