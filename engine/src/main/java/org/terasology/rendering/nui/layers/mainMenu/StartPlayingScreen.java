@@ -19,10 +19,13 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.SimpleUri;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.module.Module;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -31,6 +34,10 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.world.WorldSetupWrapper;
+import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.time.WorldTime;
+
+import java.util.List;
 
 public class StartPlayingScreen extends CoreScreenLayer {
 
@@ -49,8 +56,9 @@ public class StartPlayingScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
 
     private Texture texture;
-    private WorldSetupWrapper world;
+    private List<WorldSetupWrapper> worldSetupWrappers;
     private UniverseWrapper universeWrapper;
+    private WorldSetupWrapper targetWorld;
 
     @Override
     public void initialise() {
@@ -66,6 +74,24 @@ public class StartPlayingScreen extends CoreScreenLayer {
             } else {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
             }
+
+
+            SimpleUri uri;
+            WorldInfo worldInfo;
+            //gameManifest.addWorld(worldInfo);
+            int i = 0;
+            for (WorldSetupWrapper world : worldSetupWrappers) {
+                if (world != targetWorld) {
+                    i++;
+                    uri = world.getWorldGeneratorInfo().getUri();
+                    worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD + i, world.getWorldGenerator().getWorldSeed(),
+                            (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
+                    gameManifest.addWorld(worldInfo);
+                }
+
+            }
+
+            gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         });
     }
 
@@ -75,18 +101,19 @@ public class StartPlayingScreen extends CoreScreenLayer {
         previewImage.setImage(texture);
 
         UILabel subitle = find("subtitle", UILabel.class);
-        subitle.setText(translationSystem.translate("${engine:menu#start-playing}") + " in " + world.getWorldName().toString());
+        subitle.setText(translationSystem.translate("${engine:menu#start-playing}") + " in " + targetWorld.getWorldName().toString());
     }
 
     /**
      * This method is called before the screen comes to the forefront to set the world
      * in which the player is about to spawn.
-     * @param targetWorld The world in which the player is going to spawn.
+     * @param worldSetupWrapperList The world in which the player is going to spawn.
      * @param targetWorldTexture The world texture generated in {@link WorldPreGenerationScreen} to be displayed on this screen.
      */
-    public void setTargetWorld(WorldSetupWrapper targetWorld, Texture targetWorldTexture, Context context) {
+    public void setTargetWorld(List<WorldSetupWrapper> worldSetupWrapperList, WorldSetupWrapper spawnWorld, Texture targetWorldTexture, Context context) {
         texture = targetWorldTexture;
-        world = targetWorld;
+        worldSetupWrappers = worldSetupWrapperList;
         universeWrapper = context.get(UniverseWrapper.class);
+        targetWorld = spawnWorld;
     }
 }

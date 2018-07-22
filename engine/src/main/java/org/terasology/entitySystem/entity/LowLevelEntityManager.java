@@ -44,6 +44,8 @@ public interface LowLevelEntityManager extends EntityManager {
      */
     EngineEntityPool getGlobalPool();
 
+    EngineEntityPool getCurrentWorldPool();
+
     /**
      * @return the sector manager
      */
