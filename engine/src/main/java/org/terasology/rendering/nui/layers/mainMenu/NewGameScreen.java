@@ -50,7 +50,7 @@ import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class NewGameScreen extends CoreScreenLayer {
@@ -188,8 +188,7 @@ public class NewGameScreen extends CoreScreenLayer {
                 }
             }
         }
-        Collections.sort(gameplayModules, (o1, o2) ->
-                o1.getMetadata().getDisplayName().value().compareTo(o2.getMetadata().getDisplayName().value()));
+        gameplayModules.sort(Comparator.comparing(o -> o.getMetadata().getDisplayName().value()));
 
         return gameplayModules;
     }

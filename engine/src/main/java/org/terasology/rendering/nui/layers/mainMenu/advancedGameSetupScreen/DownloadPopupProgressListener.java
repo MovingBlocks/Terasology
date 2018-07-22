@@ -18,12 +18,12 @@ package org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.utilities.download.MultiFileTransferProgressListener;
 
-final class DownloadPopupProgressListener implements MultiFileTransferProgressListener {
+public final class DownloadPopupProgressListener implements MultiFileTransferProgressListener {
 
     private static final String POPUP_TITLE = "Downloading required modules, please wait...";
     private WaitPopup popup;
 
-    DownloadPopupProgressListener(WaitPopup popup) {
+    public DownloadPopupProgressListener(WaitPopup popup) {
         this.popup = popup;
     }
 
