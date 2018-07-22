@@ -241,7 +241,7 @@ public class PojoEntityManager implements EngineEntityManager {
         for (Component c : other.iterateComponents()) {
             newEntityComponents.add(componentLibrary.copy(c));
         }
-        return globalPool.create(newEntityComponents);
+        return getCurrentWorldPool().create(newEntityComponents);
     }
 
     @Override
