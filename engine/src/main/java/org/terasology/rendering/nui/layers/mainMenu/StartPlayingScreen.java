@@ -75,7 +75,6 @@ public class StartPlayingScreen extends CoreScreenLayer {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
             }
 
-            final float timeOffset = 0.50f;
 
             SimpleUri uri;
             WorldInfo worldInfo;
@@ -85,9 +84,8 @@ public class StartPlayingScreen extends CoreScreenLayer {
                 if (world != targetWorld) {
                     i++;
                     uri = world.getWorldGeneratorInfo().getUri();
-                    // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
                     worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD + i, world.getWorldGenerator().getWorldSeed(),
-                            (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
+                            (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
                     gameManifest.addWorld(worldInfo);
                 }
 
