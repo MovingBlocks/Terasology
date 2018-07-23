@@ -24,16 +24,23 @@ import java.lang.reflect.Type;
  * and {@link #type} correctly represents {@link T} whether it is generic or a wildcard type.
  *
  * <p>
- * Clients must create a subclass so that the full type information can be retrieved at run-time:
+ * Clients must create a subclass so that the proper {@link Type} can be retrieved at run-time:
  *
  * <p>
  * {@code TypeInfo<List<String>> list = new TypeInfo<List<String>>() {}; }
  *
  * <p>
- * However, if the type is a simple class, {@link TypeInfo#of(Class)} will suffice:
+ * However, if the {@link Type} for the given type is already available, {@link TypeInfo#of(Type)}
+ * can be used:
  *
  * <p>
- * {@code TypeInfo<String> list = TypeInfo.of(String.class); }
+ * {@code TypeInfo fieldType = TypeInfo.of(field.getGenericType()); }
+ *
+ * <p>
+ * Alternatively, if the type is a simple class, {@link TypeInfo#of(Class)} will suffice:
+ *
+ * <p>
+ * {@code TypeInfo<String> string = TypeInfo.of(String.class); }
  *
  * @param <T> The type for which type information is to be generated.
  */
@@ -62,6 +69,20 @@ public class TypeInfo<T> {
         this.hashCode = type.hashCode();
     }
 
+    /**
+     * Creates a {@link TypeInfo} for the given type.
+     */
+    public static TypeInfo<?> of(Type type) {
+        return new TypeInfo(type);
+    }
+
+    /**
+     * Creates a {@link TypeInfo} for the given {@link Class}.
+     */
+    public static <T> TypeInfo<T> of(Class<T> type) {
+        return new TypeInfo<>(type);
+    }
+
     public Class<? super T> getRawType() {
         return rawType;
     }
@@ -73,12 +94,5 @@ public class TypeInfo<T> {
     @Override
     public final int hashCode() {
         return this.hashCode;
-    }
-
-    /**
-     * Create a {@link TypeInfo} for the given {@link Class}.
-     */
-    public static <T> TypeInfo<T> of(Class<T> type) {
-        return new TypeInfo<>(type);
     }
 }
