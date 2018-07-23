@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeHandling.coreTypes;
+package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import org.junit.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.Optional;
