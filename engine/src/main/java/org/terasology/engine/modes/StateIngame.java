@@ -40,6 +40,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -121,7 +122,7 @@ public class StateIngame implements GameState {
 
         boolean save = networkSystem.getMode().isAuthority();
         if (save) {
-            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
+            if (context.get(RecordAndReplayCurrentStatus.class).getStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
                 final ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
                 screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
             }

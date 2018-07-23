@@ -21,14 +21,26 @@ import org.terasology.math.geom.Vector3f;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Saves the "position" and "velocity" variable for every CharacterStateEvent so that the player location can be
+ * reproduced correctly during a replay.
+ */
 public class CharacterStateEventPositionMap {
 
+    /** map in which the key is the "sequenceNumber" of the CharacterStateEvent and the value is an array with the
+     * "position" and "velocity" variables. */
     private Map<Integer, Vector3f[]> idToData;
 
     public CharacterStateEventPositionMap() {
         this.idToData = new HashMap<>();
     }
 
+    /**
+     * Add a new "position" and "velocity" to the map.
+     * @param sequenceNumber the sequenceNumber of the CharacterStateEvent.
+     * @param position the position of the event.
+     * @param velocity the velocity of the event.
+     */
     public void add(int sequenceNumber, Vector3f position, Vector3f velocity) {
         Vector3f[] data = new Vector3f[2];
         data[0] = new Vector3f(position);
@@ -52,6 +64,10 @@ public class CharacterStateEventPositionMap {
         this.idToData = new HashMap<>();
     }
 
+    /**
+     * Used in a replay to update a CharacterStateEvent with the correct values of "position" and "velocity".
+     * @param event the event to be updated.
+     */
     public void updateCharacterStateEvent(CharacterStateEvent event) {
         Vector3f[] data = this.idToData.get(event.getSequenceNumber());
         event.setPosition(data[0]);

@@ -52,6 +52,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 import org.terasology.recording.EventCatcher;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.world.block.BlockComponent;
 
@@ -88,14 +89,16 @@ public class EventSystemImpl implements EventSystem {
     private EventLibrary eventLibrary;
     private NetworkSystem networkSystem;
     private EventCatcher eventCatcher;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
 
-    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EventCatcher eventCatcher) {
+    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, EventCatcher eventCatcher, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
         this.eventCatcher = eventCatcher;
         this.eventCatcher.startTimer();
+        this.recordAndReplayCurrentStatus = recordAndReplayCurrentStatus;
     }
 
     @Override
@@ -264,7 +267,7 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
-            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
                 eventCatcher.addEvent(new PendingEvent(entity, event));
             }
             networkReplicate(entity, event);
@@ -367,7 +370,7 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
-            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
                 eventCatcher.addEvent(new PendingEvent(entity, event, component));
             }
             SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());

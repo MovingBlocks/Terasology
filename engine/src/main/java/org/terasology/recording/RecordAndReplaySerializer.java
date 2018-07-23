@@ -15,7 +15,6 @@
  */
 package org.terasology.recording;
 
-import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -43,37 +42,33 @@ public final class RecordAndReplaySerializer {
     private static final Logger logger = LoggerFactory.getLogger(RecordAndReplaySerializer.class);
     private static final String EVENT_DIR = "/events";
     private static final String JSON = ".json";
-    private static final String REF_ID_MAP = "/ref_id_map" + JSON;
     private static final String FILE_AMOUNT = "/file_amount" + JSON;
     private static final String STATE_EVENT_POSITION = "/state_event_position" + JSON;
     private static final String DIRECTION_ORIGIN_LIST = "/direction_origin_list" + JSON;
 
     private EntityManager entityManager;
     private RecordedEventStore recordedEventStore;
-    private EntityIdMap entityIdMap;
     private RecordAndReplayUtils recordAndReplayUtils;
     private CharacterStateEventPositionMap characterStateEventPositionMap;
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
 
-    public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store, EntityIdMap idMap,
+    public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store,
                                      RecordAndReplayUtils recordAndReplayUtils, CharacterStateEventPositionMap characterStateEventPositionMap,
                                      DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList) {
         this.entityManager = manager;
         this.recordedEventStore = store;
-        this.entityIdMap = idMap;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.characterStateEventPositionMap = characterStateEventPositionMap;
         this.directionAndOriginPosRecorderList = directionAndOriginPosRecorderList;
     }
 
     /**
-     * Serialize RecordedEvents, EntityIdMap and some RecordAndReplayUtils data.
+     * Serialize the recorded data.
      */
     public void serializeRecordAndReplayData() {
         String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
         serializeRecordedEvents(recordingPath);
         Gson gson = new GsonBuilder().create();
-        serializeRefIdMap(gson, recordingPath);
         serializeFileAmount(gson, recordingPath);
         serializeCharacterStateEventPositonMap(gson, recordingPath);
         serializeAttackEventExtraRecorder(gson, recordingPath);
@@ -93,13 +88,12 @@ public final class RecordAndReplaySerializer {
     }
 
     /**
-     * Deserialize RecordedEvents, EntityIdMap and some RecordAndReplayUtils data.
+     * Deserialize recorded data.
      */
     public void deserializeRecordAndReplayData() {
         String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
         deserializeRecordedEvents(recordingPath);
         Gson gson = new GsonBuilder().create();
-        deserializeRefIdMap(gson, recordingPath);
         deserializeFileAmount(gson, recordingPath);
         deserializeCharacterStateEventPositonMap(gson, recordingPath);
         deserializeAttackEventExtraRecorder(gson, recordingPath);
@@ -115,30 +109,6 @@ public final class RecordAndReplaySerializer {
         recordAndReplayUtils.setFileCount(recordAndReplayUtils.getFileCount() + 1);
         recordedEventStore.setEvents(serializer.deserializeRecordedEvents(filepath));
         logger.info("RecordedEvents Deserialization completed!");
-    }
-
-    private void serializeRefIdMap(Gson gson, String recordingPath) {
-        try {
-            JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + REF_ID_MAP));
-            gson.toJson(entityIdMap.getCurrentMap(), HashBiMap.class, writer);
-            writer.close();
-            logger.info("RefIdMap Serialization completed!");
-        } catch (Exception e) {
-            logger.error("Error while serializing Entity ID Map:", e);
-        }
-    }
-
-    private void deserializeRefIdMap(Gson gson, String recordingPath) {
-        try {
-            JsonParser parser = new JsonParser();
-            JsonElement jsonElement = parser.parse(new FileReader(recordingPath + REF_ID_MAP));
-            Type typeOfHashMap = new TypeToken<HashMap<String, Long>>() { }.getType();
-            Map<String, Long> previousMap = gson.fromJson(jsonElement, typeOfHashMap);
-            entityIdMap.setPreviousMap(HashBiMap.create(previousMap));
-            logger.info("RefIdMap Deserialization completed!");
-        } catch (Exception e) {
-            logger.error("Error while deserializing Entity ID Map:", e);
-        }
     }
 
     private void serializeFileAmount(Gson gson, String recordingPath) {
@@ -196,7 +166,7 @@ public final class RecordAndReplaySerializer {
             writer.close();
             directionAndOriginPosRecorderList.reset();
             logger.info("AttackEvent extras serialization completed!");
-        } catch( Exception e) {
+        } catch (Exception e) {
             logger.error("Error while serializing AttackEvent extras:", e);
         }
     }
@@ -209,7 +179,7 @@ public final class RecordAndReplaySerializer {
             ArrayList<DirectionAndOriginPosRecorder> list = gson.fromJson(jsonElement, type);
             directionAndOriginPosRecorderList.setList(list);
             logger.info("AttackEvent extras deserialization completed!");
-        } catch( Exception e) {
+        } catch (Exception e) {
             logger.error("Error while deserializing AttackEvent extras:", e);
         }
     }

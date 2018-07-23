@@ -31,6 +31,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
@@ -98,6 +99,7 @@ public class SaveTransaction extends AbstractTask {
     //Record and Replay
     private RecordAndReplaySerializer recordAndReplaySerializer;
     private RecordAndReplayUtils recordAndReplayUtils;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
 
     public SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
@@ -107,7 +109,8 @@ public class SaveTransaction extends AbstractTask {
                            GameManifest gameManifest, boolean storeChunksInZips,
                            StoragePathProvider storagePathProvider, Lock worldDirectoryWriteLock,
                            RecordAndReplaySerializer recordAndReplaySerializer,
-                           RecordAndReplayUtils recordAndReplayUtils) {
+                           RecordAndReplayUtils recordAndReplayUtils,
+                           RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
         this.privateEntityManager = privateEntityManager;
         this.deltaToSave = deltaToSave;
         this.unloadedPlayers = unloadedPlayers;
@@ -122,6 +125,7 @@ public class SaveTransaction extends AbstractTask {
         this.worldDirectoryWriteLock = worldDirectoryWriteLock;
         this.recordAndReplaySerializer = recordAndReplaySerializer;
         this.recordAndReplayUtils = recordAndReplayUtils;
+        this.recordAndReplayCurrentStatus = recordAndReplayCurrentStatus;
     }
 
 
@@ -160,11 +164,11 @@ public class SaveTransaction extends AbstractTask {
     }
 
     private void saveRecordingData() {
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             if (recordAndReplayUtils.isShutdownRequested()) {
                 recordAndReplaySerializer.serializeRecordAndReplayData();
 
-                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.NOT_ACTIVATED);
                 recordAndReplayUtils.reset();
             } else {
                 String recordingPath = PathManager.getInstance().getRecordingPath(recordAndReplayUtils.getGameTitle()).toString();
@@ -175,12 +179,12 @@ public class SaveTransaction extends AbstractTask {
 
     private boolean isReplay() {
         boolean isReplay = false;
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAY_FINISHED
-                || RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAY_FINISHED
+                || recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
 
             isReplay = true;
             if (recordAndReplayUtils.isShutdownRequested()) {
-                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.NOT_ACTIVATED);
                 recordAndReplayUtils.reset();
             }
 

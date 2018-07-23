@@ -20,9 +20,13 @@ package org.terasology.recording;
  * shutdown was requested, and the amount of files used to serialize RecordedEvents.
  */
 public class RecordAndReplayUtils {
+    /** The title of the game that is being recorded or replayed. */
     private String gameTitle;
+    /** If a shutdown was requested. */
     private boolean shutdownRequested;
+    /** The number of the current "event" file that is being recorded or replayed. */
     private int fileCount;
+    /** The total amount of "event" files of a recording. */
     private int fileAmount;
 
     public RecordAndReplayUtils() {

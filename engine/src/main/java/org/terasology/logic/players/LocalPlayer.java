@@ -30,7 +30,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.EntityIdMap;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.CoreRegistry;
 
@@ -40,8 +40,8 @@ public class LocalPlayer {
     private int nextActivationId;
 
     //Record and Replay classes
-    private EntityIdMap entityIdMap;
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     public LocalPlayer() {
 
@@ -54,11 +54,6 @@ public class LocalPlayer {
     // TODO: instance. If that can be avoided the code in the following method
     // TODO: might be more rightfully placed in the LocalPlayer constructor.
     public void setClientEntity(EntityRef entity) {
-
-        //Gets the client ids for record and replay
-        if (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.NOT_ACTIVATED) {
-            this.entityIdMap.add("client", entity.getId());
-        }
         this.clientEntity = entity;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         if (clientComp != null) {
@@ -67,10 +62,9 @@ public class LocalPlayer {
         }
     }
 
-    public void setRecordAndReplayClasses(EntityIdMap idMap, DirectionAndOriginPosRecorderList list) {
-        this.entityIdMap = idMap;
+    public void setRecordAndReplayClasses(DirectionAndOriginPosRecorderList list, RecordAndReplayCurrentStatus status) {
         this.directionAndOriginPosRecorderList = list;
-
+        this.recordAndReplayCurrentStatus = status;
     }
 
     public EntityRef getClientEntity() {
@@ -212,9 +206,9 @@ public class LocalPlayer {
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         Vector3f direction = getViewDirection();
         Vector3f originPos = getViewPosition();
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().add(direction, originPos);
-        } else if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+        } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
             Vector3f[] data = this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().poll();
             direction = data[0];
             originPos = data[1];

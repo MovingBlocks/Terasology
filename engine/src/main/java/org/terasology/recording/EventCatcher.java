@@ -31,12 +31,20 @@ public class EventCatcher {
     private EventCopier eventCopier;
     private RecordedEventStore recordedEventStore;
 
+    /**
+     *
+     * @param selectedClassesToRecord A list of classes that should be recorded and sent to the RecordedEventStore.
+     * @param recordedEventStore The Store that will save the events selected to be recorded.
+     */
     public EventCatcher(List<Class<?>> selectedClassesToRecord, RecordedEventStore recordedEventStore) {
         this.selectedClassesToRecord = selectedClassesToRecord;
         this.eventCopier = new EventCopier();
         this.recordedEventStore = recordedEventStore;
     }
 
+    /**
+     * Starts the timer to generate the correct timestamp in which an event was sent and stored.
+     */
     public void startTimer() {
         this.startTime = System.currentTimeMillis();
         this.eventCounter = 0;

@@ -23,9 +23,11 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
@@ -43,6 +45,9 @@ public class ReplayScreen extends SelectionScreen {
     private static final Logger logger = LoggerFactory.getLogger(ReplayScreen.class);
 
     private RecordAndReplayUtils recordAndReplayUtils;
+
+    @In
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     @Override
     public void initialise() {
@@ -74,7 +79,7 @@ public class ReplayScreen extends SelectionScreen {
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> {
-            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+            recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.NOT_ACTIVATED);
             triggerBackAnimation();
         });
     }

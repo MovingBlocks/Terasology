@@ -32,10 +32,16 @@ public class DirectionAndOriginPosRecorderList {
         }
     }
 
+    /**
+     * @return the DirectionAndOriginPosRecorder used to save AttackEvent data in CharacterSystem.
+     */
     public DirectionAndOriginPosRecorder getAttackEventDirectionAndOriginPosRecorder() {
         return this.list.get(0);
     }
 
+    /**
+     * @return the DirectionAndOriginPosRecorder used to save TargetOrOwnedEntity data in LocalPlayer.
+     */
     public DirectionAndOriginPosRecorder getTargetOrOwnedEntityDirectionAndOriginPosRecorder() {
         return this.list.get(1);
     }
