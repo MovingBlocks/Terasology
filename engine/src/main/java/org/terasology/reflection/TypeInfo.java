@@ -95,4 +95,11 @@ public class TypeInfo<T> {
     public final int hashCode() {
         return this.hashCode;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        return o instanceof TypeInfo<?>
+                && ReflectionUtil.typeEquals(type, ((TypeInfo<?>) o).type);
+    }
 }
