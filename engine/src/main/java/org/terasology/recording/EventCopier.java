@@ -44,11 +44,11 @@ class EventCopier {
     private static final Logger logger = LoggerFactory.getLogger(EventCopier.class);
 
 
-    EventCopier() {
+    public EventCopier() {
 
     }
 
-    Event copyEvent(Event toBeCopied) {
+    public Event copyEvent(Event toBeCopied) {
         if (toBeCopied instanceof PlaySoundEvent) {
             return toBeCopied;
         } else if (toBeCopied instanceof BindButtonEvent) {

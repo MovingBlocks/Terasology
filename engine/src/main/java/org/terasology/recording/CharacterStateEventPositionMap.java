@@ -27,8 +27,7 @@ import java.util.Map;
  */
 public class CharacterStateEventPositionMap {
 
-    /** map in which the key is the "sequenceNumber" of the CharacterStateEvent and the value is an array with the
-     * "position" and "velocity" variables. */
+    /** Map in which the key is the "sequenceNumber" of the CharacterStateEvent and the value is an array with the "position" and "velocity" variables. */
     private Map<Integer, Vector3f[]> idToData;
 
     public CharacterStateEventPositionMap() {
