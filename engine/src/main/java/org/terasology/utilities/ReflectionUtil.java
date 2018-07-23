@@ -21,10 +21,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.terasology.rendering.nui.UIWidget;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -61,8 +64,14 @@ public final class ReflectionUtil {
             return (Class<?>) type;
         } else if (type instanceof ParameterizedType) {
             return (Class<?>) ((ParameterizedType) type).getRawType();
+        } else if (type instanceof GenericArrayType) {
+            GenericArrayType genericArrayType = (GenericArrayType) type;
+            return Array.newInstance(getClassOfType(genericArrayType.getGenericComponentType()), 0).getClass();
+        } else if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            return getClassOfType(wildcardType.getUpperBounds()[0]);
         }
-        return null;
+        return Object.class;
     }
 
     public static Method findGetter(Field field) {
