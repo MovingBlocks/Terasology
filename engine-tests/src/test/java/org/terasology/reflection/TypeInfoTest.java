@@ -28,6 +28,15 @@ import static org.junit.Assert.assertTrue;
 
 public class TypeInfoTest {
     @Test
+    public void testSimpleTypeInfo() {
+        TypeInfo<String> typeInfo = TypeInfo.of(String.class);
+
+        assertEquals(String.class, typeInfo.getRawType());
+        assertTrue(typeInfo.getType() instanceof Class);
+        assertEquals(typeInfo.getRawType(), typeInfo.getType());
+    }
+
+    @Test
     public void testListTypeInfo() {
         TypeInfo<List<Integer>> typeInfo = new TypeInfo<List<Integer>>() {
         };
