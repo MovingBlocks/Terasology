@@ -70,9 +70,9 @@ public final class EnvironmentSwitchHandler {
             if (copyStrategy.getAnnotation(RegisterCopyStrategy.class) == null) {
                 continue;
             }
-            Class<?> targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
-            if (targetType != null) {
-                registerCopyStrategy(copyStrategyLibrary, targetType, copyStrategy);
+            Type targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
+            if (targetType instanceof Class) {
+                registerCopyStrategy(copyStrategyLibrary, (Class<?>) targetType, copyStrategy);
             } else {
                 logger.error("Cannot register CopyStrategy '{}' - unable to determine target type", copyStrategy);
             }
