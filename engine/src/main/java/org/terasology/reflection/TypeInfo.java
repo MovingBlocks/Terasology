@@ -23,9 +23,17 @@ import java.lang.reflect.Type;
  * Represents the type {@link T}. The type information generated is more comprehensive than {@link Class},
  * and {@link #type} correctly represents {@link T} whether it is generic or a wildcard type.
  *
- * Clients must create a subclass so that type information for the type can be retrieved at run-time:
+ * <p>
+ * Clients must create a subclass so that the full type information can be retrieved at run-time:
  *
- * {@code TypeToken<List<String>> list = new TypeToken<List<String>>() {};}
+ * <p>
+ * {@code TypeInfo<List<String>> list = new TypeInfo<List<String>>() {}; }
+ *
+ * <p>
+ * However, if the type is a simple class, {@link TypeInfo#of(Class)} will suffice:
+ *
+ * <p>
+ * {@code TypeInfo<String> list = TypeInfo.of(String.class); }
  *
  * @param <T> The type for which type information is to be generated.
  */
@@ -35,12 +43,21 @@ public class TypeInfo<T> {
     private final int hashCode;
 
     /**
-     * Constructs a new type literal. Derives represented class from type
-     * parameter.
+     * Constructs a new {@link TypeInfo} where the represented type is derived from the type parameter.
      */
     @SuppressWarnings("unchecked")
     protected TypeInfo() {
         this.type = ReflectionUtil.getTypeParameterForSuper(getClass(), TypeInfo.class, 0);
+        this.rawType = (Class<? super T>) ReflectionUtil.getClassOfType(type);
+        this.hashCode = type.hashCode();
+    }
+
+    /**
+     * Constructs a new {@link TypeInfo} directly from the type.
+     */
+    @SuppressWarnings("unchecked")
+    protected TypeInfo(Type type) {
+        this.type = type;
         this.rawType = (Class<? super T>) ReflectionUtil.getClassOfType(type);
         this.hashCode = type.hashCode();
     }
@@ -56,5 +73,12 @@ public class TypeInfo<T> {
     @Override
     public final int hashCode() {
         return this.hashCode;
+    }
+
+    /**
+     * Create a {@link TypeInfo} for the given {@link Class}.
+     */
+    public static <T> TypeInfo<T> of(Class<T> type) {
+        return new TypeInfo<>(type);
     }
 }
