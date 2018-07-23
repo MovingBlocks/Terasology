@@ -131,7 +131,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
-        float delta = input.getDelta() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW );
+        float delta = input.getDeltaMs() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW );
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
             delta -= MAX_INPUT_OVERFLOW_REPLAY_INCREASE;
         }
