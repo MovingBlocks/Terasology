@@ -32,6 +32,7 @@ import java.lang.reflect.Type;
  * object, can be used to (de)serialize objects to JSON (via Gson) with the rules specified by
  * the {@link #typeHandler}.
  */
+@Deprecated
 public class LegacyGsonTypeHandlerAdapter<T> implements JsonDeserializer<T>, JsonSerializer<T> {
 
     private TypeHandler<T> typeHandler;
