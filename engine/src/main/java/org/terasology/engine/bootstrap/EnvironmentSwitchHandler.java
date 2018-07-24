@@ -80,7 +80,7 @@ public final class EnvironmentSwitchHandler {
 
         ReflectFactory reflectFactory = context.get(ReflectFactory.class);
         TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
-        typeSerializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        typeSerializationLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
         context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
 
         // Entity System Library
@@ -186,7 +186,7 @@ public final class EnvironmentSwitchHandler {
                 if (opt.isPresent()) {
                     TypeHandler instance = InjectionHelper.createWithConstructorInjection(handler, context);
                     InjectionHelper.inject(instance, context);
-                    library.add((Class) opt.get(), instance);
+                    library.addTypeHandler((Class) opt.get(), instance);
                 }
             }
         }

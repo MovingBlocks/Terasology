@@ -48,14 +48,14 @@ public class TypeSerializationLibraryTest {
 
     @Test
     public void testEnumHandler() {
-        TypeHandler<AnEnum> handler = typeSerializationLibrary.getHandlerFor(AnEnum.class);
+        TypeHandler<AnEnum> handler = typeSerializationLibrary.getTypeHandler(AnEnum.class);
 
         assertTrue(handler instanceof EnumTypeHandler);
     }
 
     @Test
     public void testMappedContainerHandler() {
-        TypeHandler<AMappedContainer> handler = typeSerializationLibrary.getHandlerFor(AMappedContainer.class);
+        TypeHandler<AMappedContainer> handler = typeSerializationLibrary.getTypeHandler(AMappedContainer.class);
 
         assertTrue(handler instanceof MappedContainerTypeHandler);
     }
@@ -63,17 +63,17 @@ public class TypeSerializationLibraryTest {
     @Test
     public void testCollectionHandler() {
         TypeHandler<Set<Integer>> setHandler =
-                typeSerializationLibrary.getHandlerFor(new TypeInfo<Set<Integer>>() {});
+                typeSerializationLibrary.getTypeHandler(new TypeInfo<Set<Integer>>() {});
 
         assertTrue(setHandler instanceof SetTypeHandler);
 
         TypeHandler<List<Integer>> listHandler =
-                typeSerializationLibrary.getHandlerFor(new TypeInfo<List<Integer>>() {});
+                typeSerializationLibrary.getTypeHandler(new TypeInfo<List<Integer>>() {});
 
         assertTrue(listHandler instanceof ListTypeHandler);
 
         TypeHandler<Queue<Integer>> queueHandler =
-                typeSerializationLibrary.getHandlerFor(new TypeInfo<Queue<Integer>>() {});
+                typeSerializationLibrary.getTypeHandler(new TypeInfo<Queue<Integer>>() {});
 
         assertTrue(queueHandler instanceof QueueTypeHandler);
     }
@@ -81,7 +81,7 @@ public class TypeSerializationLibraryTest {
     @Test
     public void testStringMapHandler() {
         TypeHandler<Map<String, Integer>> handler =
-                typeSerializationLibrary.getHandlerFor(new TypeInfo<Map<String, Integer>>() {});
+                typeSerializationLibrary.getTypeHandler(new TypeInfo<Map<String, Integer>>() {});
 
         assertTrue(handler instanceof StringMapTypeHandler);
     }
@@ -89,7 +89,7 @@ public class TypeSerializationLibraryTest {
     @Test
     public void testInvalidTypeHandler() {
         TypeHandler<Map<Integer, Integer>> handler =
-                typeSerializationLibrary.getHandlerFor(new TypeInfo<Map<Integer, Integer>>() {});
+                typeSerializationLibrary.getTypeHandler(new TypeInfo<Map<Integer, Integer>>() {});
 
         assertNull(handler);
     }

@@ -68,8 +68,8 @@ public class RegisterBlocks extends SingleStepLoadProcess {
             blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), false);
         }
         context.put(BlockManager.class, blockManager);
-        context.get(TypeSerializationLibrary.class).add(Block.class, new BlockTypeHandler(blockManager));
-        context.get(TypeSerializationLibrary.class).add(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
+        context.get(TypeSerializationLibrary.class).addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
+        context.get(TypeSerializationLibrary.class).addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
 
         blockManager.initialise(gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap());
 

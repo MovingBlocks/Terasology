@@ -77,7 +77,7 @@ public class MappedContainerTypeHandlerFactory implements TypeHandlerFactory {
     private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type, TypeSerializationLibrary typeSerializationLibrary) {
         Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
         for (FieldMetadata<?, ?> field : type.getFields()) {
-            TypeHandler<?> handler = typeSerializationLibrary.getHandlerFor(field.getField().getGenericType());
+            TypeHandler<?> handler = typeSerializationLibrary.getTypeHandler(field.getField().getGenericType());
             if (handler != null) {
                 handlerMap.put(field, handler);
             } else {

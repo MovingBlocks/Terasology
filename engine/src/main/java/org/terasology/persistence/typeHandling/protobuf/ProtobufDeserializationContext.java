@@ -37,7 +37,7 @@ public class ProtobufDeserializationContext implements DeserializationContext {
 
     @Override
     public <T> T deserializeAs(PersistedData data, Class<T> type) {
-        TypeHandler<?> handler = typeSerializationLibrary.getHandlerFor(type);
+        TypeHandler<?> handler = typeSerializationLibrary.getTypeHandler(type);
         if (handler == null) {
             throw new DeserializationException("No handler found for " + type);
         }

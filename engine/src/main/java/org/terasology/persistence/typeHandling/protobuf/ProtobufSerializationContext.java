@@ -199,13 +199,13 @@ public class ProtobufSerializationContext implements SerializationContext {
 
     @Override
     public <T> PersistedData create(T data, Class<? extends T> type) {
-        TypeHandler<T> handler = (TypeHandler<T>) library.getHandlerFor(type);
+        TypeHandler<T> handler = (TypeHandler<T>) library.getTypeHandler(type);
         return handler.serialize(data, this);
     }
 
     @Override
     public <T> PersistedData create(Collection<T> data, Class<T> type) {
-        TypeHandler<T> handler = (TypeHandler<T>) library.getHandlerFor(type);
+        TypeHandler<T> handler = (TypeHandler<T>) library.getTypeHandler(type);
         return handler.serializeCollection(data, this);
 
     }

@@ -20,13 +20,11 @@ import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.MappedContainerTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
@@ -58,7 +56,7 @@ public class MappedContainerTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof MappedContainerTypeHandler);
 
         // Verify that the Integer and String TypeHandlers were loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getHandlerFor(ArgumentMatchers.eq(TypeInfo.of(Integer.TYPE).getType()));
-        verify(typeSerializationLibrary).getHandlerFor(ArgumentMatchers.eq(TypeInfo.of(String.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.TYPE).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(String.class).getType()));
     }
 }

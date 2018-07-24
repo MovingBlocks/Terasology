@@ -107,21 +107,21 @@ public class TypeSerializationLibrary {
     public TypeSerializationLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
         this.reflectFactory = factory;
         this.copyStrategies = copyStrategies;
-        add(Boolean.class, new BooleanTypeHandler());
-        add(Boolean.TYPE, new BooleanTypeHandler());
-        add(Byte.class, new ByteTypeHandler());
-        add(Byte.TYPE, new ByteTypeHandler());
-        add(Double.class, new DoubleTypeHandler());
-        add(Double.TYPE, new DoubleTypeHandler());
-        add(Float.class, new FloatTypeHandler());
-        add(Float.TYPE, new FloatTypeHandler());
-        add(Integer.class, new IntTypeHandler());
-        add(Integer.TYPE, new IntTypeHandler());
-        add(Long.class, new LongTypeHandler());
-        add(Long.TYPE, new LongTypeHandler());
-        add(String.class, new StringTypeHandler());
-        add(Number.class, new NumberTypeHandler());
-        add(byte[].class, new ByteArrayTypeHandler());
+        addTypeHandler(Boolean.class, new BooleanTypeHandler());
+        addTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
+        addTypeHandler(Byte.class, new ByteTypeHandler());
+        addTypeHandler(Byte.TYPE, new ByteTypeHandler());
+        addTypeHandler(Double.class, new DoubleTypeHandler());
+        addTypeHandler(Double.TYPE, new DoubleTypeHandler());
+        addTypeHandler(Float.class, new FloatTypeHandler());
+        addTypeHandler(Float.TYPE, new FloatTypeHandler());
+        addTypeHandler(Integer.class, new IntTypeHandler());
+        addTypeHandler(Integer.TYPE, new IntTypeHandler());
+        addTypeHandler(Long.class, new LongTypeHandler());
+        addTypeHandler(Long.TYPE, new LongTypeHandler());
+        addTypeHandler(String.class, new StringTypeHandler());
+        addTypeHandler(Number.class, new NumberTypeHandler());
+        addTypeHandler(byte[].class, new ByteArrayTypeHandler());
 
         addTypeHandlerFactory(new EnumTypeHandlerFactory());
         addTypeHandlerFactory(new CollectionTypeHandlerFactory());
@@ -145,33 +145,33 @@ public class TypeSerializationLibrary {
                                                                 CopyStrategyLibrary copyStrategies) {
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(factory, copyStrategies);
 
-        serializationLibrary.add(Color.class, new ColorTypeHandler());
-        serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
+        serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
+        serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
         // TODO: Add AssetTypeHandlerFactory
-        serializationLibrary.add(Texture.class, new AssetTypeHandler<>(Texture.class));
-        serializationLibrary.add(UIElement.class, new AssetTypeHandler<>(UIElement.class));
-        serializationLibrary.add(Mesh.class, new AssetTypeHandler<>(Mesh.class));
-        serializationLibrary.add(StaticSound.class, new AssetTypeHandler<>(StaticSound.class));
-        serializationLibrary.add(StreamingSound.class, new AssetTypeHandler<>(StreamingSound.class));
-        serializationLibrary.add(Material.class, new AssetTypeHandler<>(Material.class));
-        serializationLibrary.add(Name.class, new NameTypeHandler());
-        serializationLibrary.add(SkeletalMesh.class, new AssetTypeHandler<>(SkeletalMesh.class));
-        serializationLibrary.add(MeshAnimation.class, new AssetTypeHandler<>(MeshAnimation.class));
-        serializationLibrary.add(TextureRegion.class, new TextureRegionTypeHandler());
+        serializationLibrary.addTypeHandler(Texture.class, new AssetTypeHandler<>(Texture.class));
+        serializationLibrary.addTypeHandler(UIElement.class, new AssetTypeHandler<>(UIElement.class));
+        serializationLibrary.addTypeHandler(Mesh.class, new AssetTypeHandler<>(Mesh.class));
+        serializationLibrary.addTypeHandler(StaticSound.class, new AssetTypeHandler<>(StaticSound.class));
+        serializationLibrary.addTypeHandler(StreamingSound.class, new AssetTypeHandler<>(StreamingSound.class));
+        serializationLibrary.addTypeHandler(Material.class, new AssetTypeHandler<>(Material.class));
+        serializationLibrary.addTypeHandler(Name.class, new NameTypeHandler());
+        serializationLibrary.addTypeHandler(SkeletalMesh.class, new AssetTypeHandler<>(SkeletalMesh.class));
+        serializationLibrary.addTypeHandler(MeshAnimation.class, new AssetTypeHandler<>(MeshAnimation.class));
+        serializationLibrary.addTypeHandler(TextureRegion.class, new TextureRegionTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new TextureRegionAssetTypeHandlerFactory());
 
-        serializationLibrary.add(Vector4f.class, new Vector4fTypeHandler());
-        serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
-        serializationLibrary.add(Vector2f.class, new Vector2fTypeHandler());
-        serializationLibrary.add(Vector3i.class, new Vector3iTypeHandler());
-        serializationLibrary.add(Vector2i.class, new Vector2iTypeHandler());
-        serializationLibrary.add(Rect2i.class, new Rect2iTypeHandler());
-        serializationLibrary.add(Rect2f.class, new Rect2fTypeHandler());
-        serializationLibrary.add(Region3i.class, new Region3iTypeHandler());
-        serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
-        serializationLibrary.add(BehaviorTree.class, new AssetTypeHandler<>(BehaviorTree.class));
-        serializationLibrary.add(IntegerRange.class, new IntegerRangeHandler());
+        serializationLibrary.addTypeHandler(Vector4f.class, new Vector4fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2f.class, new Vector2fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3i.class, new Vector3iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2i.class, new Vector2iTypeHandler());
+        serializationLibrary.addTypeHandler(Rect2i.class, new Rect2iTypeHandler());
+        serializationLibrary.addTypeHandler(Rect2f.class, new Rect2fTypeHandler());
+        serializationLibrary.addTypeHandler(Region3i.class, new Region3iTypeHandler());
+        serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
+        serializationLibrary.addTypeHandler(BehaviorTree.class, new AssetTypeHandler<>(BehaviorTree.class));
+        serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
 
         return serializationLibrary;
     }
@@ -197,13 +197,11 @@ public class TypeSerializationLibrary {
         typeHandlerFactories.add(typeHandlerFactory);
     }
 
-    // TODO: Rename to registerTypeHandler
-    public <T> void add(Class<T> typeClass, TypeHandler<T> typeHandler) {
-        add(TypeInfo.of(typeClass), typeHandler);
+    public <T> void addTypeHandler(Class<T> typeClass, TypeHandler<T> typeHandler) {
+        addTypeHandler(TypeInfo.of(typeClass), typeHandler);
     }
 
-    // TODO: Rename to registerTypeHandler
-    public <T> void add(TypeInfo<T> type, TypeHandler<T> typeHandler) {
+    public <T> void addTypeHandler(TypeInfo<T> type, TypeHandler<T> typeHandler) {
         TypeHandlerFactory factory = new TypeHandlerFactory() {
             @SuppressWarnings("unchecked")
             @Override
@@ -215,19 +213,16 @@ public class TypeSerializationLibrary {
         addTypeHandlerFactory(factory);
     }
 
-    // TODO: Rename to getTypeHandler
-    public TypeHandler<?> getHandlerFor(Type type) {
-        return getHandlerFor(TypeInfo.of(type));
+    public TypeHandler<?> getTypeHandler(Type type) {
+        return getTypeHandler(TypeInfo.of(type));
     }
 
-    // TODO: Rename to getTypeHandler
-    public <T> TypeHandler<T> getHandlerFor(Class<T> typeClass) {
-        return getHandlerFor(TypeInfo.of(typeClass));
+    public <T> TypeHandler<T> getTypeHandler(Class<T> typeClass) {
+        return getTypeHandler(TypeInfo.of(typeClass));
     }
 
-    // TODO: Rename to getTypeHandler
     @SuppressWarnings("unchecked")
-    public <T> TypeHandler<T> getHandlerFor(TypeInfo<T> type) {
+    public <T> TypeHandler<T> getTypeHandler(TypeInfo<T> type) {
         if (typeHandlerCache.containsKey(type)) {
             return (TypeHandler<T>) typeHandlerCache.get(type);
         }
@@ -249,7 +244,7 @@ public class TypeSerializationLibrary {
     private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
         Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
         for (FieldMetadata<?, ?> field : type.getFields()) {
-            TypeHandler<?> handler = getHandlerFor(field.getField().getGenericType());
+            TypeHandler<?> handler = getTypeHandler(field.getField().getGenericType());
             if (handler != null) {
                 handlerMap.put(field, handler);
             } else {

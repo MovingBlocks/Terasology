@@ -54,7 +54,7 @@ public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        TypeHandler<?> elementTypeHandler = typeSerializationLibrary.getHandlerFor(elementType);
+        TypeHandler<?> elementTypeHandler = typeSerializationLibrary.getTypeHandler(elementType);
 
         TypeHandler<?> typeHandler;
 

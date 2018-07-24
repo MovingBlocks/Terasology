@@ -162,7 +162,7 @@ public class HeadlessEnvironment extends Environment {
     protected void setupCollisionManager() {
         CollisionGroupManager collisionGroupManager = new CollisionGroupManager();
         context.put(CollisionGroupManager.class, collisionGroupManager);
-        context.get(TypeSerializationLibrary.class).add(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
+        context.get(TypeSerializationLibrary.class).addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
     }
 
     @Override
@@ -171,8 +171,8 @@ public class HeadlessEnvironment extends Environment {
         BlockManagerImpl blockManager = new BlockManagerImpl(worldAtlas, assetManager);
         context.put(BlockManager.class, blockManager);
         TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
-        typeSerializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
-        typeSerializationLibrary.add(Block.class, new BlockTypeHandler(blockManager));
+        typeSerializationLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
+        typeSerializationLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
     }
 
     @Override

@@ -97,8 +97,8 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         TranslationSystem translationSystem = CoreRegistry.get(TranslationSystem.class);
         TypeSerializationLibrary library = new TypeSerializationLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
-        library.add(UISkin.class, new AssetTypeHandler<>(UISkin.class));
-        library.add(Border.class, new BorderTypeHandler());
+        library.addTypeHandler(UISkin.class, new AssetTypeHandler<>(UISkin.class));
+        library.addTypeHandler(Border.class, new BorderTypeHandler());
 
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new GsonTypeSerializationLibraryAdapterFactory(library))

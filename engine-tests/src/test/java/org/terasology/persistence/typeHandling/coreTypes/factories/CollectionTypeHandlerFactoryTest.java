@@ -48,7 +48,7 @@ public class CollectionTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof ListTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getHandlerFor(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class CollectionTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof SetTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getHandlerFor(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
     }
 
     @Test
@@ -76,6 +76,6 @@ public class CollectionTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof QueueTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getHandlerFor(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
     }
 }

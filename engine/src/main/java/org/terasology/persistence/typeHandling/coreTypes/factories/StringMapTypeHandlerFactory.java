@@ -50,7 +50,7 @@ public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        TypeHandler<T> valueTypeHandler = (TypeHandler<T>) typeSerializationLibrary.getHandlerFor(valueType);
+        TypeHandler<T> valueTypeHandler = (TypeHandler<T>) typeSerializationLibrary.getTypeHandler(valueType);
 
         return Optional.of((TypeHandler<T>) new StringMapTypeHandler<>(valueTypeHandler));
     }
