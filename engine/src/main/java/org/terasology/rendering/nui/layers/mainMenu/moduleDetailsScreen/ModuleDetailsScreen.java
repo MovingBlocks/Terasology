@@ -56,7 +56,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -141,9 +143,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
         bindDependencyDescription();
 
-        WidgetUtil.trySubscribe(this, "close", button -> {
-            triggerBackAnimation();
-        });
+        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
         tryFind("description", UIText.class).ifPresent(w -> w.bindText(new ReadOnlyBinding<String>() {
             @Override
@@ -188,7 +188,8 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     }
 
     private List<DependencyInfo> getSortedDependencies(final Module module) {
-        return module.getMetadata().getDependencies().stream()
+        return module.getMetadata()
+                .getDependencies().stream()
                 .sorted(Comparator.comparing(DependencyInfo::getId))
                 .collect(Collectors.toList());
     }
@@ -294,6 +295,14 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                         canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });
+        dependencies.subscribe(((widget, item) -> {
+            if (item != null) {
+                modules.getList().stream()
+                        .filter(m -> item.getId().equals(m.getId()))
+                        .findFirst()
+                        .ifPresent(m -> modules.setSelection(m));
+            }
+        }));
     }
 
     private void setUpUpdateModuleButton() {
@@ -337,10 +346,24 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         popup.startOperation(operation, true);
     }
 
+    private Set<Module> getAllModuleDependencies(final Collection<Module> modules) {
+        return modules.stream()
+                .filter(Objects::nonNull)
+                .map(Module::getMetadata)
+                .map(ModuleMetadata::getDependencies)
+                .flatMap(Collection::stream)
+                .filter(dep -> Objects.nonNull(dep.getId()))
+                .map(dep -> moduleManager.getRegistry().getLatestModuleVersion(dep.getId()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
     public void setModules(final Collection<Module> modules) {
         if (modules != null) {
+            final Set<Module> mods = new HashSet<>(modules);
+            mods.addAll(getAllModuleDependencies(modules));
             this.modules.setList(
-                    modules.stream()
+                    mods.stream()
                             .sorted(Comparator.comparing(Module::getId))
                             .collect(Collectors.toList())
             );

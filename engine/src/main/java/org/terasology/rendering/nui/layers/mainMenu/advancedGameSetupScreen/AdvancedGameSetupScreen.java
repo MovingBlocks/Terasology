@@ -52,11 +52,12 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
-import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.GameManifestProvider;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.UniverseSetupScreen;
 import org.terasology.rendering.nui.layers.mainMenu.UniverseWrapper;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
+import org.terasology.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
 import org.terasology.rendering.nui.widgets.ResettableUIText;
 import org.terasology.rendering.nui.widgets.TextChangeEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
@@ -74,6 +75,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -108,7 +110,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
     private List<ModuleSelectionInfo> allSortedModules;
-    private DependencyResolver resolver;
+    private DependencyResolver dependencyResolver;
     private Future<Void> remoteModuleRegistryUpdater;
     private boolean needsUpdate = true;
     private ResettableUIText moduleSearch;
@@ -140,7 +142,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
         selectModulesConfig = config.getSelectModulesConfig();
 
-        resolver = new DependencyResolver(moduleManager.getRegistry());
+        dependencyResolver = new DependencyResolver(moduleManager.getRegistry());
 
         modulesLookup = Maps.newHashMap();
         sortedModules = Lists.newArrayList();
@@ -466,6 +468,27 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         });
                     }
                 }
+
+                final UIButton moduleDetails = find("moduleDetails", UIButton.class);
+                if (moduleDetails != null) {
+                    moduleDetails.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return !sortedModules.isEmpty();
+                        }
+                    });
+                    moduleDetails.subscribe(b -> {
+                        final ModuleDetailsScreen moduleDetailsScreen = getManager().createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
+                        moduleDetailsScreen.setModules(
+                                sortedModules.stream()
+                                        .map(ModuleSelectionInfo::getMetadata)
+                                        .filter(Objects::nonNull)
+                                        .map(meta -> moduleManager.getRegistry().getLatestModuleVersion(meta.getId()))
+                                        .filter(Objects::nonNull)
+                                        .collect(Collectors.toList()));
+                        getManager().pushScreen(moduleDetailsScreen);
+                    });
+                }
             }
         }
 
@@ -614,8 +637,12 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         selectedModules.addAll(sortedModules.stream().filter(ModuleSelectionInfo::isSelected)
                 .map(info -> info.getMetadata().getId()).collect(Collectors.toList()));
         Name[] selectedModulesArray = selectedModules.toArray(new Name[selectedModules.size()]);
-        sortedModules.stream().filter(info -> !info.isSelected()).forEach(info -> info
-                .setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess()));
+        sortedModules.stream()
+                .filter(info -> !info.isSelected())
+                .forEach(info -> info.setValidToSelect(
+                        dependencyResolver.resolve(info.getMetadata().getId(), selectedModulesArray)
+                                .isSuccess()
+                ));
     }
 
     private void setSelectedVersions(ResolutionResult currentSelectionResults) {
@@ -709,8 +736,10 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     }
 
     private List<Name> getExplicitlySelectedModules() {
-        return allSortedModules.stream().filter(ModuleSelectionInfo::isExplicitSelection)
-                .map(info -> info.getMetadata().getId()).collect(Collectors.toCollection(ArrayList::new));
+        return allSortedModules.stream()
+                .filter(ModuleSelectionInfo::isExplicitSelection)
+                .map(info -> info.getMetadata().getId())
+                .collect(Collectors.toList());
     }
 
     private void deselect(ModuleSelectionInfo target) {
@@ -732,7 +761,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         for (ModuleSelectionInfo info : sortedModules) {
             info.setSelectedVersion(null);
         }
-        setSelectedVersions(resolver.resolve(selectedModules));
+        setSelectedVersions(dependencyResolver.resolve(selectedModules));
         updateValidToSelect();
     }
 

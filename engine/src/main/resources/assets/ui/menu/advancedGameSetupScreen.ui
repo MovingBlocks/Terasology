@@ -443,6 +443,11 @@
             "type": "UIButton",
             "text": "${engine:menu#start-game}",
             "id": "play"
+          },
+          {
+              "type": "UIButton",
+              "text": "${engine:menu#game-details-module-details}",
+              "id": "moduleDetails"
           }
         ],
         "layoutInfo": {
