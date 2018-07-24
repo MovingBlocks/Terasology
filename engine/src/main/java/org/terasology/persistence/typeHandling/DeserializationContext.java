@@ -32,18 +32,4 @@ public interface DeserializationContext {
      * @throws org.terasology.persistence.typeHandling.DeserializationException if the data cannot be deserialized as type.
      */
     <T> T deserializeAs(PersistedData data, Class<T> type);
-
-    /**
-     * Atempts to deserialize the given persisted data as a List of the specified type. Type handlers should take care not to invoke this on the type they handle
-     * or otherwise in a recursive manner.
-     *
-     * @param data The persisted data to deserialize - should be an array
-     * @param type The type of the objects in the collection to deserialize as
-     * @param <T>
-     * @return A list of objects of type
-     * @throws org.terasology.persistence.typeHandling.DeserializationException if the data cannot be deserialized as type
-     * @throws java.lang.IllegalStateException if the data is not an array.
-     */
-    <T> List<T> deserializeCollection(PersistedData data, Class<T> type);
-
 }
