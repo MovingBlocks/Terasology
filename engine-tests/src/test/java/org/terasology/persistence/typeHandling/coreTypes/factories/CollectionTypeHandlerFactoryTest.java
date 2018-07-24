@@ -20,19 +20,22 @@ import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ListTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.QueueTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.SetTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class ListTypeHandlerFactoryTest {
+public class CollectionTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
-    private final ListTypeHandlerFactory typeHandlerFactory = new ListTypeHandlerFactory();
+    private final CollectionTypeHandlerFactory typeHandlerFactory = new CollectionTypeHandlerFactory();
 
     @Test
     public void testList() {
@@ -49,12 +52,30 @@ public class ListTypeHandlerFactoryTest {
     }
 
     @Test
-    public void testNonList() {
+    public void testSet() {
         TypeInfo<Set<Integer>> listTypeInfo = new TypeInfo<Set<Integer>>() {};
 
         Optional<TypeHandler<Set<Integer>>> typeHandler =
                 typeHandlerFactory.create(listTypeInfo, typeSerializationLibrary);
 
-        assertFalse(typeHandler.isPresent());
+        assertTrue(typeHandler.isPresent());
+        assertTrue(typeHandler.get() instanceof SetTypeHandler);
+
+        // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
+        verify(typeSerializationLibrary).getHandlerFor(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+    }
+
+    @Test
+    public void testQueue() {
+        TypeInfo<Queue<Integer>> listTypeInfo = new TypeInfo<Queue<Integer>>() {};
+
+        Optional<TypeHandler<Queue<Integer>>> typeHandler =
+                typeHandlerFactory.create(listTypeInfo, typeSerializationLibrary);
+
+        assertTrue(typeHandler.isPresent());
+        assertTrue(typeHandler.get() instanceof QueueTypeHandler);
+
+        // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
+        verify(typeSerializationLibrary).getHandlerFor(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
     }
 }
