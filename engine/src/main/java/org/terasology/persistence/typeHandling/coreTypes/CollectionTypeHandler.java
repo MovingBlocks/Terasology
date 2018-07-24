@@ -19,14 +19,13 @@ import com.google.common.collect.Lists;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.util.Collection;
 import java.util.List;
 
-public class CollectionTypeHandler<E> extends SimpleTypeHandler<Collection<E>> {
+public class CollectionTypeHandler<E> implements TypeHandler<Collection<E>> {
     private TypeHandler<E> elementTypeHandler;
     private ObjectConstructor<? extends Collection<E>> constructor;
 
