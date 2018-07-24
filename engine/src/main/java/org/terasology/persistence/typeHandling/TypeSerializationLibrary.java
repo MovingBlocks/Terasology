@@ -68,6 +68,7 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
@@ -95,6 +96,9 @@ public class TypeSerializationLibrary {
 
     private Map<TypeInfo<?>, TypeHandler<?>> typeHandlerCache = Maps.newHashMap();
 
+    private Map<Type, InstanceCreator<?>> instanceCreators = Maps.newHashMap();
+    private ConstructorLibrary constructorLibrary;
+
     private ReflectFactory reflectFactory;
     private CopyStrategyLibrary copyStrategies;
 
@@ -107,6 +111,9 @@ public class TypeSerializationLibrary {
     public TypeSerializationLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
         this.reflectFactory = factory;
         this.copyStrategies = copyStrategies;
+
+        constructorLibrary = new ConstructorLibrary(instanceCreators, reflectFactory);
+
         addTypeHandler(Boolean.class, new BooleanTypeHandler());
         addTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
         addTypeHandler(Byte.class, new ByteTypeHandler());
@@ -210,6 +217,14 @@ public class TypeSerializationLibrary {
         };
 
         addTypeHandlerFactory(factory);
+    }
+
+    public <T> void addInstanceCreator(Class<T> typeClass, InstanceCreator<T> instanceCreator) {
+        addInstanceCreator(TypeInfo.of(typeClass), instanceCreator);
+    }
+
+    public <T> void addInstanceCreator(TypeInfo<T> typeInfo, InstanceCreator<T> instanceCreator) {
+        instanceCreators.put(typeInfo.getType(), instanceCreator);
     }
 
     public TypeHandler<?> getTypeHandler(Type type) {
