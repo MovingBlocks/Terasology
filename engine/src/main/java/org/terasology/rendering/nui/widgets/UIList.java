@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
@@ -25,8 +26,10 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 
@@ -306,6 +309,38 @@ public class UIList<T> extends CoreWidget {
             }
             return false;
         }
+
+        @Override
+        public void onMouseOver(NUIMouseOverEvent event) {
+            super.onMouseOver(event);
+            if (isMouseOver()) {
+                focusManager.setFocus(UIList.this);
+            }
+        }
     }
 
+    private int getCurrentIndex() {
+        return list.get().indexOf(selection.get());
+    }
+
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown()) {
+            int keyId = event.getKey().getId();
+            int currentIndex = getCurrentIndex();
+            if (currentIndex != -1) {
+                if (keyId == Keyboard.KeyId.UP) {
+                    select(currentIndex - 1);
+                    return true;
+                } else if (keyId == Keyboard.KeyId.DOWN) {
+                    select(currentIndex + 1);
+                    return true;
+                } else if (keyId == Keyboard.KeyId.ENTER || keyId == Keyboard.KeyId.SPACE) {
+                    activate(currentIndex);
+                    return true;
+                }
+            }
+        }
+        return super.onKeyEvent(event);
+    }
 }

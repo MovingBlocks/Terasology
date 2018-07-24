@@ -105,49 +105,47 @@
                                 "layoutInfo": {
                                     "position-top": {
                                         "target": "TOP"
-                                     },
-                                     "position-bottom": {
+                                    },
+                                    "position-bottom": {
                                         "target": "BOTTOM",
                                         "offset": 130
-                                     }
+                                    }
                                 }
                             },
                             {
                                 "type": "ScrollableArea",
                                 "family": "shortDescription",
-                                "contents": [
-                                    {
-                                        "type": "ColumnLayout",
-                                        "id": "shortDescriptionItems",
-                                        "columns": 2,
-                                        "column-widths": [0.2, 0.8],
-                                        "verticalSpacing": 16,
-                                        "horizontalSpacing": 4,
-                                        "fillVerticalSpace": false,
-                                        "contents": [
-                                            {
-                                                "type": "UILabel",
-                                                "text": "${engine:menu#world-generator}: ",
-                                                "family": "description"
-                                            },
-                                            {
-                                                "type": "UILabel",
-                                                "id": "worldGenerator",
-                                                "family": "description"
-                                            },
-                                            {
-                                                "type": "UILabel",
-                                                "text": "${engine:menu#module-list}: ",
-                                                "family": "description"
-                                            },
-                                            {
-                                                "type": "UILabel",
-                                                "id": "moduleNames",
-                                                "family": "description"
-                                            }
-                                        ]
-                                    }
-                                ],
+                                "content": {
+                                    "type": "ColumnLayout",
+                                    "id": "shortDescriptionItems",
+                                    "columns": 2,
+                                    "column-widths": [0.2, 0.8],
+                                    "verticalSpacing": 16,
+                                    "horizontalSpacing": 4,
+                                    "fillVerticalSpace": false,
+                                    "contents": [
+                                        {
+                                            "type": "UILabel",
+                                            "text": "${engine:menu#world-generator}: ",
+                                            "family": "description"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "id": "worldGenerator",
+                                            "family": "description"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "text": "${engine:menu#module-list}: ",
+                                            "family": "description"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "id": "moduleNames",
+                                            "family": "description"
+                                        }
+                                    ]
+                                },
                                 "layoutInfo": {
                                     "position-top": {
                                         "target": "BOTTOM",
