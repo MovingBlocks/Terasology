@@ -25,6 +25,7 @@ import org.terasology.engine.module.ExtraDataModuleExtension;
 import org.terasology.engine.module.ModuleInstaller;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.RemoteModuleExtension;
+import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
@@ -378,7 +379,10 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 getRemoteSize(module) +
                 '\n' +
                 translationSystem.translate("${engine:menu#game-details-module-last-update-date}") + ": " +
-                getLastUpdateDate(module);
+                getLastUpdateDate(module) +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-categories}") + ": " +
+                getModuleTags(module);
     }
 
     private String getOriginModuleUrl(Module module) {
@@ -416,6 +420,13 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 .map(RemoteModuleExtension::getLastUpdated)
                 .map(dateFormat::format)
                 .orElse("");
+    }
+
+    private String getModuleTags(final Module module) {
+        return StandardModuleExtension.booleanPropertySet().stream()
+                .filter(ext -> ext.isProvidedBy(module))
+                .map(StandardModuleExtension::getKey)
+                .collect(Collectors.joining(", "));
     }
 
 }

@@ -21,7 +21,7 @@ import org.terasology.engine.module.StandardModuleExtension;
 // StandardModuleExtensions rather than hardcoding associations here
 public enum CheckboxAssociationEnum {
     IS_LIBRARY("libraryCheckbox", StandardModuleExtension.IS_LIBRARY),
-    IS_ASSETPLAY("assetCheckbox", StandardModuleExtension.IS_ASSETPLAY),
+    IS_ASSET("assetCheckbox", StandardModuleExtension.IS_ASSET),
     IS_IS_WORLD("worldCheckbox", StandardModuleExtension.IS_WORLD),
     IS_GAMEPLAY("gameplayCheckbox", StandardModuleExtension.IS_GAMEPLAY),
     IS_AUGMENTATION("augmentationCheckbox", StandardModuleExtension.IS_AUGMENTATION),
@@ -31,7 +31,7 @@ public enum CheckboxAssociationEnum {
     private String checkboxName;
     private StandardModuleExtension standardModuleExtension;
 
-    private CheckboxAssociationEnum(String checkboxName, StandardModuleExtension standardModuleExtension) {
+    CheckboxAssociationEnum(String checkboxName, StandardModuleExtension standardModuleExtension) {
         this.checkboxName = checkboxName;
         this.standardModuleExtension = standardModuleExtension;
     }

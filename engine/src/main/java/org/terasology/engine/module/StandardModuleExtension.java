@@ -31,7 +31,7 @@ public enum StandardModuleExtension implements ModuleExtension {
 
     SERVER_SIDE_ONLY("serverSideOnly", Boolean.class),
     IS_GAMEPLAY("isGameplay", Boolean.class),
-    IS_ASSETPLAY("isAsset", Boolean.class),
+    IS_ASSET("isAsset", Boolean.class),
     IS_WORLD("isWorld", Boolean.class),
     IS_LIBRARY("isLibrary", Boolean.class),
     IS_SPECIAL("isSpecial", Boolean.class),

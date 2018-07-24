@@ -164,6 +164,7 @@
     "game-details-errors-message-body": "game-details-errors-message-body",
     "game-details-biomes-error": "game-details-biomes-error",
     "game-details-show-errors": "game-details-show-errors",
+    "game-details-module-categories": "game-details-module-categories",
     "game-details-module-details": "game-details-module-details",
     "game-details-module-dependencies": "game-details-module-dependencies",
     "game-details-module-id": "game-details-module-id",
