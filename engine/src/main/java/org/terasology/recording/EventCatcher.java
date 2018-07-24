@@ -32,7 +32,8 @@ public class EventCatcher {
     private RecordedEventStore recordedEventStore;
 
     /**
-     *
+     * EventCatcher constructor that receives a list of event classes it is supposed to record, and the RecordedEventStore that
+     * will store said event classes.
      * @param selectedClassesToRecord A list of classes that should be recorded and sent to the RecordedEventStore.
      * @param recordedEventStore The Store that will save the events selected to be recorded.
      */
