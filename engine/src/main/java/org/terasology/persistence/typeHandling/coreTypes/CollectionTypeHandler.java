@@ -15,6 +15,7 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
+import com.google.common.collect.Lists;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
@@ -36,20 +37,22 @@ public class CollectionTypeHandler<E> extends SimpleTypeHandler<Collection<E>> {
 
     @Override
     public PersistedData serialize(Collection<E> value, SerializationContext context) {
-        if (value != null && value.size() > 0) {
-            return elementTypeHandler.serializeCollection(value, context);
+        List<PersistedData> items = Lists.newArrayList();
+
+        for (E element : value) {
+            items.add(elementTypeHandler.serialize(element, context));
         }
 
-        return context.createNull();
+        return context.create(items);
     }
 
     @Override
     public Collection<E> deserialize(PersistedData data, DeserializationContext context) {
         Collection<E> collection = constructor.construct();
 
-        List<E> elements = elementTypeHandler.deserializeCollection(data, context);
-
-        collection.addAll(elements);
+        for (PersistedData item : data.getAsArray()) {
+            collection.add(elementTypeHandler.deserialize(item, context));
+        }
 
         return collection;
     }
