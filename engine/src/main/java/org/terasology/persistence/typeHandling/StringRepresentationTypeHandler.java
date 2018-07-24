@@ -15,11 +15,6 @@
  */
 package org.terasology.persistence.typeHandling;
 
-import com.google.common.collect.Lists;
-
-import java.util.Collection;
-import java.util.List;
-
 /**
  */
 public abstract class StringRepresentationTypeHandler<T> implements TypeHandler<T> {
@@ -46,30 +41,4 @@ public abstract class StringRepresentationTypeHandler<T> implements TypeHandler<
         return null;
     }
 
-    @Override
-    public PersistedData serializeCollection(Collection<T> value, SerializationContext context) {
-        String[] result = new String[value.size()];
-        int index = 0;
-        for (T item : value) {
-            if (item != null) {
-                result[index++] = getAsString(item);
-            } else {
-                result[index++] = "";
-            }
-        }
-        return context.create(result);
-    }
-
-    @Override
-    public List<T> deserializeCollection(PersistedData data, DeserializationContext context) {
-        List<T> result = Lists.newArrayList();
-        for (String item : data.getAsArray().getAsStringArray()) {
-            if (item == null || item.isEmpty()) {
-                result.add(null);
-            } else {
-                result.add(getFromString(item));
-            }
-        }
-        return result;
-    }
 }
