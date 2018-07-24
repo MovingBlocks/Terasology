@@ -20,24 +20,27 @@ import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.coreTypes.ListTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.QueueTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.SetTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.reflect.ConstructorLibrary;
+import org.terasology.reflection.reflect.ObjectConstructor;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
 
 /**
  * Creates type handlers for {@link Collection} types.
  */
 public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(CollectionTypeHandlerFactory.class);
+
+    private ConstructorLibrary constructorLibrary;
+
+    public CollectionTypeHandlerFactory(ConstructorLibrary constructorLibrary) {
+        this.constructorLibrary = constructorLibrary;
+    }
 
     @Override
     public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
@@ -56,21 +59,11 @@ public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
 
         TypeHandler<?> elementTypeHandler = typeSerializationLibrary.getTypeHandler(elementType);
 
-        TypeHandler<?> typeHandler;
+        ObjectConstructor<T> collectionConstructor = constructorLibrary.get(typeInfo);
 
-        // TODO: Replace with generic CollectionTypeHandler
-        if (List.class.isAssignableFrom(rawType)) {
-            typeHandler = new ListTypeHandler<>(elementTypeHandler);
-        } else if (Queue.class.isAssignableFrom(rawType)) {
-            typeHandler = new QueueTypeHandler<>(elementTypeHandler);
-        }
-        else if (Set.class.isAssignableFrom(rawType)) {
-            typeHandler = new SetTypeHandler<>(elementTypeHandler);
-        }
-        else {
-            return Optional.empty();
-        }
+        @SuppressWarnings({"unchecked"})
+        TypeHandler<T> typeHandler = new CollectionTypeHandler(elementTypeHandler, collectionConstructor);
 
-        return Optional.of((TypeHandler<T>) typeHandler);
+        return Optional.of(typeHandler);
     }
 }

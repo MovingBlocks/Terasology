@@ -15,38 +15,42 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.reflection.reflect.ObjectConstructor;
 
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Queue;
 
-public class QueueTypeHandler<E> extends SimpleTypeHandler<Queue<E>> {
-    private TypeHandler<E> contentsType;
+public class CollectionTypeHandler<E> extends SimpleTypeHandler<Collection<E>> {
+    private TypeHandler<E> elementTypeHandler;
+    private ObjectConstructor<? extends Collection<E>> constructor;
 
-    public QueueTypeHandler(TypeHandler<E> type) {
-        this.contentsType = type;
+    public CollectionTypeHandler(TypeHandler<E> elementTypeHandler, ObjectConstructor<? extends Collection<E>> constructor) {
+        this.elementTypeHandler = elementTypeHandler;
+        this.constructor = constructor;
     }
 
     @Override
-    public PersistedData serialize(Queue<E> value, SerializationContext context) {
-        if (value.size() > 0) {
-            return contentsType.serializeCollection(value, context);
+    public PersistedData serialize(Collection<E> value, SerializationContext context) {
+        if (value != null && value.size() > 0) {
+            return elementTypeHandler.serializeCollection(value, context);
         }
+
         return context.createNull();
     }
 
     @Override
-    public Queue<E> deserialize(PersistedData data, DeserializationContext context) {
-        List<E> list = contentsType.deserializeCollection(data, context);
-        return new LinkedList<>(list);
-    }
+    public Collection<E> deserialize(PersistedData data, DeserializationContext context) {
+        Collection<E> collection = constructor.construct();
 
+        List<E> elements = elementTypeHandler.deserializeCollection(data, context);
+
+        collection.addAll(elements);
+
+        return collection;
+    }
 }

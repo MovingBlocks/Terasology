@@ -131,7 +131,7 @@ public class TypeSerializationLibrary {
         addTypeHandler(byte[].class, new ByteArrayTypeHandler());
 
         addTypeHandlerFactory(new EnumTypeHandlerFactory());
-        addTypeHandlerFactory(new CollectionTypeHandlerFactory());
+        addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new StringMapTypeHandlerFactory());
         addTypeHandlerFactory(new MappedContainerTypeHandlerFactory(reflectFactory, this.copyStrategies));
     }

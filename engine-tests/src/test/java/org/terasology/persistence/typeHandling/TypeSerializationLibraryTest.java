@@ -16,11 +16,9 @@
 package org.terasology.persistence.typeHandling;
 
 import org.junit.Test;
+import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.ListTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.MappedContainerTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.QueueTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.SetTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
@@ -65,17 +63,17 @@ public class TypeSerializationLibraryTest {
         TypeHandler<Set<Integer>> setHandler =
                 typeSerializationLibrary.getTypeHandler(new TypeInfo<Set<Integer>>() {});
 
-        assertTrue(setHandler instanceof SetTypeHandler);
+        assertTrue(setHandler instanceof CollectionTypeHandler);
 
         TypeHandler<List<Integer>> listHandler =
                 typeSerializationLibrary.getTypeHandler(new TypeInfo<List<Integer>>() {});
 
-        assertTrue(listHandler instanceof ListTypeHandler);
+        assertTrue(listHandler instanceof CollectionTypeHandler);
 
         TypeHandler<Queue<Integer>> queueHandler =
                 typeSerializationLibrary.getTypeHandler(new TypeInfo<Queue<Integer>>() {});
 
-        assertTrue(queueHandler instanceof QueueTypeHandler);
+        assertTrue(queueHandler instanceof CollectionTypeHandler);
     }
 
     @Test
