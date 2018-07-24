@@ -52,8 +52,8 @@ import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionAssetTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Rect2fTypeHandler;
@@ -75,7 +75,6 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.asset.UIElement;
 
@@ -159,7 +158,9 @@ public class TypeSerializationLibrary {
         serializationLibrary.add(SkeletalMesh.class, new AssetTypeHandler<>(SkeletalMesh.class));
         serializationLibrary.add(MeshAnimation.class, new AssetTypeHandler<>(MeshAnimation.class));
         serializationLibrary.add(TextureRegion.class, new TextureRegionTypeHandler());
-        serializationLibrary.add(TextureRegionAsset.class, new TextureRegionAssetTypeHandler());
+
+        serializationLibrary.addTypeHandlerFactory(new TextureRegionAssetTypeHandlerFactory());
+
         serializationLibrary.add(Vector4f.class, new Vector4fTypeHandler());
         serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.add(Vector2f.class, new Vector2fTypeHandler());
