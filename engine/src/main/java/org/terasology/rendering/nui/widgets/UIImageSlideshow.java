@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.widgets.slideshow;
+package org.terasology.rendering.nui.widgets;
 
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
@@ -29,15 +29,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This widget displays images in sequence in an image slideshow. Switching images automatically after a time period.
+ * This widget displays images in sequence in an image slideshow.
+ * Switching images automatically after a time period or manually.
  */
-public class UITimedImageSlideshow extends CoreWidget {
+public class UIImageSlideshow extends CoreWidget {
 
     private Binding<UIWidget> currentImage = new DefaultBinding<>();
     private List<UIImage> images = new ArrayList<>();
     private boolean active = true;
-    private float imageDisplayTime = 0f;
     private int index = 0;
+    private float imageDisplayTime = 0f;
 
     /**
      * Speed of slideshow (in seconds).
@@ -51,41 +52,16 @@ public class UITimedImageSlideshow extends CoreWidget {
     @LayoutConfig
     private boolean infinite = true;
 
+    /**
+     * Whether the slideshow automatically switch images.
+     */
+    @LayoutConfig
+    private boolean auto = true;
+
     @Override
     public void onDraw(Canvas canvas) {
         if (currentImage.get() != null) {
             currentImage.get().onDraw(canvas);
-        }
-    }
-
-    @Override
-    public void update(float delta) {
-        if (isActive()) {
-            imageDisplayTime += delta;
-            if (imageDisplayTime >= speed) {
-                imageDisplayTime = 0f;
-                nextImage();
-            }
-        }
-        super.update(delta);
-    }
-
-    private void nextImage() {
-        int size = images.size();
-        int prevIndex = index;
-        if (size > 0) {
-            if (index == size - 1) {
-                if (infinite) {
-                    index = 0;
-                } else {
-                    stop();
-                }
-            } else {
-                index++;
-            }
-            if (prevIndex != index) {
-                currentImage.set(images.get(index));
-            }
         }
     }
 
@@ -95,6 +71,18 @@ public class UITimedImageSlideshow extends CoreWidget {
             return currentImage.get().getPreferredContentSize(canvas, sizeHint);
         }
         return Vector2i.zero();
+    }
+
+    @Override
+    public void update(float delta) {
+        if (auto && active) {
+            imageDisplayTime += delta;
+            if (imageDisplayTime >= speed) {
+                imageDisplayTime = 0f;
+                nextImage();
+            }
+        }
+        super.update(delta);
     }
 
     /**
@@ -128,22 +116,73 @@ public class UITimedImageSlideshow extends CoreWidget {
         images = new ArrayList<>();
     }
 
-    protected boolean isActive() {
-        return active;
-    }
-
     /**
-     * Starts the slideshow.
+     * Starts automatic slideshow.
      */
     public void start() {
         active = true;
     }
 
     /**
-     * Stops the slideshow.
+     * Stops automatic slideshow.
      */
     public void stop() {
         active = false;
     }
 
+    /**
+     * Switches to next image of list.
+     */
+    public void nextImage() {
+        int size = images.size();
+        int prevIndex = index;
+        if (size > 0) {
+            if (index == size - 1) {
+                if (infinite) {
+                    index = 0;
+                } else {
+                    stop();
+                }
+            } else {
+                index++;
+            }
+            if (prevIndex != index) {
+                currentImage.set(images.get(index));
+            }
+        }
+    }
+
+    /**
+     * Switches to previous image of list.
+     */
+    public void prevImage() {
+        int size = images.size();
+        int prevIndex = index;
+        if (size > 0) {
+            if (index == 0) {
+                if (infinite) {
+                    index = size - 1;
+                } else {
+                    stop();
+                }
+            } else {
+                index--;
+            }
+            if (prevIndex != index) {
+                currentImage.set(images.get(index));
+            }
+        }
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public List<UIImage> getImages() {
+        return images;
+    }
 }

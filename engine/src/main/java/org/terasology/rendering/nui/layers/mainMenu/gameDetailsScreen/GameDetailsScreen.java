@@ -35,7 +35,6 @@ import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -49,11 +48,12 @@ import org.terasology.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDe
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UITabBox;
 import org.terasology.rendering.nui.widgets.UIText;
-import org.terasology.rendering.nui.widgets.slideshow.UITimedImageSlideshow;
+import org.terasology.rendering.nui.widgets.UIImageSlideshow;
 import org.terasology.utilities.time.DateTimeHelper;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
@@ -103,6 +103,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private Map<String, List<String>> blockFamilyIds;
     private List<String> errors;
     private UIButton openModuleDetails;
+    private UIImageSlideshow previewSlideshow;
 
     @Override
     public void initialise() {
@@ -118,14 +119,17 @@ public class GameDetailsScreen extends CoreScreenLayer {
         worldDescription = find("worldDescription", ScrollableArea.class);
         descriptionContainer = find("descriptionContainer", ScrollableArea.class);
         openModuleDetails = find("openModuleDetails", UIButton.class);
+        previewSlideshow = find("preview", UIImageSlideshow.class);
 
         if (descriptionContainer != null && worldDescription != null && descriptionTitle != null &&
-                gameModules != null && gameWorlds != null && biomes != null && blocks != null && openModuleDetails != null) {
+                gameModules != null && gameWorlds != null && biomes != null && blocks != null && openModuleDetails != null ||
+                previewSlideshow != null) {
 
             setUpGameModules();
             setUpGameWorlds();
             setUpBlocks();
             setUpBiomes();
+            setUpPreviewSlideshow();
 
             openModuleDetails.subscribe(button -> openModuleDetailsScreen());
 
@@ -276,6 +280,31 @@ public class GameDetailsScreen extends CoreScreenLayer {
             descriptionContainer.setVisible(false);
             worldDescription.setVisible(true);
         });
+    }
+
+    private void setUpPreviewSlideshow() {
+        tryFind("slideLeft", UIButton.class).ifPresent(
+                slideLeft -> {
+                    slideLeft.subscribe(b -> previewSlideshow.prevImage());
+                    slideLeft.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return previewSlideshow.getImages().size() > 1;
+                        }
+                    });
+                }
+        );
+        tryFind("slideRight", UIButton.class).ifPresent(
+                slideRight -> {
+                    slideRight.subscribe(b -> previewSlideshow.nextImage());
+                    slideRight.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return previewSlideshow.getImages().size() > 1;
+                        }
+                    });
+                }
+        );
     }
 
     private void setUpGameModules() {
@@ -519,10 +548,10 @@ public class GameDetailsScreen extends CoreScreenLayer {
         this.gameInfo = gameInfo;
     }
 
-    public void setPreviewImage(TextureRegion texture) {
-        UITimedImageSlideshow slider = find("preview", UITimedImageSlideshow.class);
-        if (slider != null) {
-            slider.addImage(texture);
+    public void setPreviews(final List<UIImage> textures) {
+        if (textures != null && !textures.isEmpty()) {
+            previewSlideshow.clean();
+            textures.forEach(previewSlideshow::addImage);
         }
     }
 }

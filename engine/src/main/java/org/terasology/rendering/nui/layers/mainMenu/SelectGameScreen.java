@@ -99,7 +99,7 @@ public class SelectGameScreen extends SelectionScreen {
             if (gameInfo != null) {
                 final GameDetailsScreen detailsScreen = getManager().createScreen(GameDetailsScreen.ASSET_URI, GameDetailsScreen.class);
                 detailsScreen.setGameInfo(gameInfo);
-                detailsScreen.setPreviewImage(previewImage.getImage());
+                detailsScreen.setPreviews(previewSlideshow.getImages());
                 getManager().pushScreen(detailsScreen);
             }
         });
