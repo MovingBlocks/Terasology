@@ -142,6 +142,10 @@ public final class Config {
         return config.getSelectModulesConfig();
     }
 
+    public UniverseConfig getUniverseConfig() {
+        return config.getUniverseConfig();
+    }
+
     /**
      * Saves this config to the default configuration file
      */
@@ -215,6 +219,7 @@ public final class Config {
                 .registerTypeAdapter(SetMultimap.class, new SetMultimapTypeAdapter<>(Input.class))
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
                 .registerTypeAdapter(Input.class, new InputHandler())
+                //.registerTypeAdapter(UniverseConfig.class, new UniverseConfig.Handler())
 
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
