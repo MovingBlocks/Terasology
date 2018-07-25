@@ -640,16 +640,18 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 if (info == null) {
                     info = ModuleSelectionInfo.remote(remote);
                     modulesLookup.put(remote.getId(), info);
-                    int pos = Collections.binarySearch(sortedModules, info, moduleInfoComparator);
-                    if (pos < 0) { // not yet in the (sorted) list
-                        sortedModules.add(-pos - 1, info); // use "insertion point" to keep the list sorted
-                        allSortedModules.clear();
-                        allSortedModules.addAll(sortedModules);
-                    }
                 }
                 info.setOnlineVersion(remote);
             }
         }
+        sortedModules.clear();
+        allSortedModules.clear();
+
+        sortedModules.addAll(modulesLookup.values());
+        sortedModules.sort(moduleInfoComparator);
+
+        allSortedModules.addAll(sortedModules);
+
         filterModules();
     }
 
