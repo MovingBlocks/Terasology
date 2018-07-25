@@ -239,28 +239,43 @@ public final class ReflectionUtil {
     }
 
     private static <T> Type getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
-        Class targetClass = getClassOfType(target);
-        if (superClass.equals(getClassOfType(targetClass.getGenericSuperclass()))) {
-            Type superType = targetClass.getGenericSuperclass();
-            if (superType instanceof ParameterizedType) {
-                if (((ParameterizedType) superType).getRawType().equals(superClass)) {
-                    return ((ParameterizedType) superType).getActualTypeArguments()[index];
-                }
+        for (Class targetClass = getClassOfType(target);
+             !Object.class.equals(targetClass);
+             target = targetClass.getGenericSuperclass(), targetClass = getClassOfType(target)) {
+            if (superClass.equals(targetClass)) {
+                return getTypeParameter(target, index);
             }
         }
-        return getTypeParameterForSuperClass(targetClass.getGenericSuperclass(), superClass, index);
+
+        return null;
     }
 
     private static <T> Type getTypeParameterForSuperInterface(Type target, Class<T> superClass, int index) {
         Class targetClass = getClassOfType(target);
-        for (Type superType : targetClass.getGenericInterfaces()) {
-            if (superType instanceof ParameterizedType) {
-                if (((ParameterizedType) superType).getRawType().equals(superClass)) {
-                    return ((ParameterizedType) superType).getActualTypeArguments()[index];
-                }
+
+        if (Object.class.equals(targetClass)) {
+            return null;
+        }
+
+        if (targetClass.equals(superClass)) {
+            return getTypeParameter(target, index);
+        }
+
+        Type genericSuperclass = targetClass.getGenericSuperclass();
+
+        if (!Object.class.equals(genericSuperclass) && genericSuperclass != null) {
+            return getTypeParameterForSuperInterface(genericSuperclass, superClass, index);
+        }
+
+        for (Type genericInterface : targetClass.getGenericInterfaces()) {
+            Type typeParameter = getTypeParameterForSuperInterface(genericInterface, superClass, index);
+
+            if (typeParameter != null) {
+                return typeParameter;
             }
         }
-        return getTypeParameterForSuperInterface(targetClass.getGenericSuperclass(), superClass, index);
+
+        return null;
     }
 
     public static Object readField(Object object, String fieldName) {
