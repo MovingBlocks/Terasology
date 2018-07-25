@@ -114,6 +114,8 @@ public class TypeSerializationLibrary {
 
         constructorLibrary = new ConstructorLibrary(instanceCreators, reflectFactory);
 
+        addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
+
         addTypeHandler(Boolean.class, new BooleanTypeHandler());
         addTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
         addTypeHandler(Byte.class, new ByteTypeHandler());
@@ -133,7 +135,6 @@ public class TypeSerializationLibrary {
         addTypeHandlerFactory(new EnumTypeHandlerFactory());
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new StringMapTypeHandlerFactory());
-        addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(reflectFactory, this.copyStrategies));
     }
 
     /**
