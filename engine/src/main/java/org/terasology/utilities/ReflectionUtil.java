@@ -278,41 +278,31 @@ public final class ReflectionUtil {
         return null;
     }
 
-    public static Type resolveFieldType(Type classType, Type fieldType) {
-        Class<?> classClass = getClassOfType(classType);
+    public static Type resolveType(Type contextType, Type type) {
+        Class<?> contextClass = getClassOfType(contextType);
 
         // T field;
-        if (fieldType instanceof TypeVariable<?>) {
-            TypeVariable<?> typeVariable = (TypeVariable<?>) fieldType;
+        if (type instanceof TypeVariable<?>) {
+            TypeVariable<?> typeVariable = (TypeVariable<?>) type;
 
-            Preconditions.checkArgument(typeVariable.getGenericDeclaration() instanceof Class,
-                    "fieldType has not been declared in a class and cannot be a field's type");
+            Type resolvedType = resolveTypeVariable(contextType, typeVariable, contextClass);
 
-            Class<?> declaringClass = (Class<?>) typeVariable.getGenericDeclaration();
-
-            Preconditions.checkArgument(declaringClass.isAssignableFrom(classClass),
-                    "Field was not declared in class " + classClass);
-
-            List<TypeVariable<?>> typeParameters =
-                    Arrays.asList(declaringClass.getTypeParameters());
-
-            int typeParameterIndex = typeParameters.indexOf(typeVariable);
-
-            if (!classClass.equals(declaringClass)) {
-                return getTypeParameterForSuper(classType, declaringClass, typeParameterIndex);
+            if (resolvedType == null) {
+                return typeVariable;
             }
-            return getTypeParameter(classType, typeParameterIndex);
+
+            return resolvedType;
         }
 
         // T[] field || List<T>[] field;
-        if (fieldType instanceof GenericArrayType) {
-            GenericArrayType arrayType = (GenericArrayType) fieldType;
+        if (type instanceof GenericArrayType) {
+            GenericArrayType arrayType = (GenericArrayType) type;
 
             Type componentType = arrayType.getGenericComponentType();
-            Type resolvedComponentType = resolveFieldType(classType, componentType);
+            Type resolvedComponentType = resolveType(contextType, componentType);
 
             if (resolvedComponentType == componentType) {
-                return fieldType;
+                return type;
             } else {
                 return new GenericArrayType() {
                     final Type genericComponentType = resolvedComponentType;
@@ -324,7 +314,30 @@ public final class ReflectionUtil {
             }
         }
 
-        return fieldType;
+        return type;
+    }
+
+    private static Type resolveTypeVariable(Type contextType, TypeVariable<?> typeVariable, Class<?> contextClass) {
+        if (!(typeVariable.getGenericDeclaration() instanceof Class)) {
+            // We cannot resolve type variables declared by a method, quit
+            return typeVariable;
+        }
+
+        Class<?> declaringClass = (Class<?>) typeVariable.getGenericDeclaration();
+
+        Preconditions.checkArgument(declaringClass.isAssignableFrom(contextClass),
+                "Type variable was not declared in context class " + contextClass);
+
+        List<TypeVariable<?>> typeParameters =
+                Arrays.asList(declaringClass.getTypeParameters());
+
+        int typeParameterIndex = typeParameters.indexOf(typeVariable);
+
+        if (!contextClass.equals(declaringClass)) {
+            return getTypeParameterForSuper(contextType, declaringClass, typeParameterIndex);
+        }
+
+        return getTypeParameter(contextType, typeParameterIndex);
     }
 
     public static Object readField(Object object, String fieldName) {
