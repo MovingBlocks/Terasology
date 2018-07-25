@@ -46,7 +46,7 @@ import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.EnumTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.coreTypes.factories.MappedContainerTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.StringMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
@@ -133,7 +133,7 @@ public class TypeSerializationLibrary {
         addTypeHandlerFactory(new EnumTypeHandlerFactory());
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new StringMapTypeHandlerFactory());
-        addTypeHandlerFactory(new MappedContainerTypeHandlerFactory(reflectFactory, this.copyStrategies));
+        addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(reflectFactory, this.copyStrategies));
     }
 
     /**

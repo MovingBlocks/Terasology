@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.coreTypes.MappedContainerTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -31,12 +31,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class MappedContainerTypeHandlerFactoryTest {
+public class ObjectFieldMapTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
 
     private final ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
     private final CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-    private final MappedContainerTypeHandlerFactory typeHandlerFactory = new MappedContainerTypeHandlerFactory(
+    private final ObjectFieldMapTypeHandlerFactory typeHandlerFactory = new ObjectFieldMapTypeHandlerFactory(
             reflectFactory, copyStrategyLibrary
     );
 
@@ -53,7 +53,7 @@ public class MappedContainerTypeHandlerFactoryTest {
 
 
         assertTrue(typeHandler.isPresent());
-        assertTrue(typeHandler.get() instanceof MappedContainerTypeHandler);
+        assertTrue(typeHandler.get() instanceof ObjectFieldMapTypeHandler);
 
         // Verify that the Integer and String TypeHandlers were loaded from the TypeSerializationLibrary
         verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.TYPE).getType()));
