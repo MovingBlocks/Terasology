@@ -287,8 +287,13 @@ public final class ReflectionUtil {
 
             Type resolvedTypeVariable = resolveTypeVariable(contextType, typeVariable, contextClass);
 
-            if (resolvedTypeVariable == null || resolvedTypeVariable == typeVariable) {
+            if (resolvedTypeVariable == typeVariable) {
                 return typeVariable;
+            }
+
+            if (resolvedTypeVariable == null) {
+                // TypeVariable not specified (i.e. raw type), return Object
+                return Object.class;
             }
 
             return resolveType(contextType, resolvedTypeVariable);
@@ -313,9 +318,9 @@ public final class ReflectionUtil {
                 return parameterizedType;
             }
 
-            return new ParameterizedType() {
-                final Type rawType = parameterizedType.getRawType();
+            final Type rawType = parameterizedType.getRawType();
 
+            return new ParameterizedType() {
                 @Override
                 public Type[] getActualTypeArguments() {
                     return resolvedTypeArguments;
@@ -397,6 +402,7 @@ public final class ReflectionUtil {
             if (resolvedTypeArgument != types[i]) {
                 if (!changed) {
                     types = types.clone();
+                    changed = true;
                 }
 
                 types[i] = resolvedTypeArgument;
@@ -422,11 +428,7 @@ public final class ReflectionUtil {
 
         int typeParameterIndex = typeParameters.indexOf(typeVariable);
 
-        if (!contextClass.equals(declaringClass)) {
-            return getTypeParameterForSuper(contextType, declaringClass, typeParameterIndex);
-        }
-
-        return getTypeParameter(contextType, typeParameterIndex);
+        return getTypeParameterForSuper(contextType, declaringClass, typeParameterIndex);
     }
 
     public static Object readField(Object object, String fieldName) {
