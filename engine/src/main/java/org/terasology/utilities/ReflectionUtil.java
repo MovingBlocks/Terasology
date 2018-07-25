@@ -305,24 +305,13 @@ public final class ReflectionUtil {
 
             Type[] typeArguments = parameterizedType.getActualTypeArguments();
 
-            for (int i = 0; i < typeArguments.length; i++) {
-                Type resolvedTypeArgument = resolveType(contextType, typeArguments[i]);
+            Type[] resolvedTypeArguments = resolveTypes(contextType, typeArguments);
 
-                if (resolvedTypeArgument != typeArguments[i]) {
-                    if (!changed) {
-                        typeArguments = typeArguments.clone();
-                        changed = true;
-                    }
-
-                    typeArguments[i] = resolvedTypeArgument;
-                }
-            }
+            changed |= resolvedTypeArguments != typeArguments;
 
             if (!changed) {
                 return parameterizedType;
             }
-
-            Type[] resolvedTypeArguments = typeArguments;
 
             return new ParameterizedType() {
                 final Type rawType = parameterizedType.getRawType();
@@ -364,7 +353,57 @@ public final class ReflectionUtil {
             }
         }
 
+        // List<? extends T> field;
+        if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            Type[] lowerBounds = wildcardType.getLowerBounds();
+            Type[] upperBounds = wildcardType.getUpperBounds();
+
+            boolean changed = false;
+
+            // Technically not required as language supports only one bound, but generalizing
+            Type[] resolvedLowerBounds = resolveTypes(contextType, lowerBounds);
+            changed |= resolvedLowerBounds != lowerBounds;
+
+            Type[] resolvedUpperBounds = resolveTypes(contextType, upperBounds);
+            changed |= resolvedUpperBounds != upperBounds;
+
+            if (!changed) {
+                return wildcardType;
+            }
+
+            return new WildcardType() {
+                @Override
+                public Type[] getUpperBounds() {
+                    return resolvedUpperBounds;
+                }
+
+                @Override
+                public Type[] getLowerBounds() {
+                    return resolvedLowerBounds;
+                }
+            };
+        }
+
         return type;
+    }
+
+    private static Type[] resolveTypes(Type contextType, Type[] types) {
+        boolean changed = false;
+
+        for (int i = 0; i < types.length; i++) {
+            Type resolvedTypeArgument = resolveType(contextType, types[i]);
+
+            if (resolvedTypeArgument != types[i]) {
+                if (!changed) {
+                    types = types.clone();
+                }
+
+                types[i] = resolvedTypeArgument;
+            }
+        }
+
+        return types;
     }
 
     private static Type resolveTypeVariable(Type contextType, TypeVariable<?> typeVariable, Class<?> contextClass) {
