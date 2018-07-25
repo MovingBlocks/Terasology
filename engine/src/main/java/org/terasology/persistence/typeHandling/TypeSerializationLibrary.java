@@ -193,7 +193,6 @@ public class TypeSerializationLibrary {
     }
 
     public void addTypeHandlerFactory(TypeHandlerFactory typeHandlerFactory) {
-        // TODO: Reverse direction of typeHandlerFactories so that later added factories override older ones
         typeHandlerFactories.add(typeHandlerFactory);
     }
 
@@ -227,7 +226,9 @@ public class TypeSerializationLibrary {
             return (TypeHandler<T>) typeHandlerCache.get(type);
         }
 
-        for (TypeHandlerFactory typeHandlerFactory : typeHandlerFactories) {
+        // TODO: Explore reversing typeHandlerFactories itself before building object
+        for (int i = typeHandlerFactories.size() - 1; i >= 0; i--) {
+            TypeHandlerFactory typeHandlerFactory = typeHandlerFactories.get(i);
             Optional<TypeHandler<T>> typeHandler = typeHandlerFactory.create(type, this);
 
             if (typeHandler.isPresent()) {
