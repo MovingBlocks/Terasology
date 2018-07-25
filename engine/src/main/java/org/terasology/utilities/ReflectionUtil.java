@@ -285,13 +285,63 @@ public final class ReflectionUtil {
         if (type instanceof TypeVariable<?>) {
             TypeVariable<?> typeVariable = (TypeVariable<?>) type;
 
-            Type resolvedType = resolveTypeVariable(contextType, typeVariable, contextClass);
+            Type resolvedTypeVariable = resolveTypeVariable(contextType, typeVariable, contextClass);
 
-            if (resolvedType == null) {
+            if (resolvedTypeVariable == null || resolvedTypeVariable == typeVariable) {
                 return typeVariable;
             }
 
-            return resolvedType;
+            return resolveType(contextType, resolvedTypeVariable);
+        }
+
+        // List<T> field;
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+
+            Type ownerType = parameterizedType.getOwnerType();
+            Type resolvedOwnerType = resolveType(contextType, ownerType);
+
+            boolean changed = resolvedOwnerType != ownerType;
+
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+
+            for (int i = 0; i < typeArguments.length; i++) {
+                Type resolvedTypeArgument = resolveType(contextType, typeArguments[i]);
+
+                if (resolvedTypeArgument != typeArguments[i]) {
+                    if (!changed) {
+                        typeArguments = typeArguments.clone();
+                        changed = true;
+                    }
+
+                    typeArguments[i] = resolvedTypeArgument;
+                }
+            }
+
+            if (!changed) {
+                return parameterizedType;
+            }
+
+            Type[] resolvedTypeArguments = typeArguments;
+
+            return new ParameterizedType() {
+                final Type rawType = parameterizedType.getRawType();
+
+                @Override
+                public Type[] getActualTypeArguments() {
+                    return resolvedTypeArguments;
+                }
+
+                @Override
+                public Type getRawType() {
+                    return rawType;
+                }
+
+                @Override
+                public Type getOwnerType() {
+                    return resolvedOwnerType;
+                }
+            };
         }
 
         // T[] field || List<T>[] field;
