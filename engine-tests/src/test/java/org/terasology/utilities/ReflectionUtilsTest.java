@@ -23,7 +23,6 @@ import org.terasology.reflection.copy.CopyStrategy;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -53,7 +52,7 @@ public class ReflectionUtilsTest {
     }
 
     @Test
-    public void testResolveFieldType() {
+    public void testResolveType() {
         class SomeClass<T> {
             private T t;
 
@@ -65,7 +64,7 @@ public class ReflectionUtilsTest {
         TypeInfo<SomeClass<Float>> typeInfo = new TypeInfo<SomeClass<Float>>() {
         };
 
-        Type resolvedFieldType = ReflectionUtil.resolveFieldType(
+        Type resolvedFieldType = ReflectionUtil.resolveType(
                 typeInfo.getType(),
                 typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
