@@ -18,9 +18,12 @@ package org.terasology.utilities;
 import org.junit.Test;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategy;
 
+import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -36,7 +39,7 @@ public class ReflectionUtilsTest {
 
     @Test
     public void testGetParameterForGenericInterface() throws Exception {
-        assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(ParameterisedInterfaceImplementor.class, CopyStrategy.class, 0));
+        assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(SubInterfaceImplementor.class, CopyStrategy.class, 0));
     }
 
     @Test
@@ -47,6 +50,36 @@ public class ReflectionUtilsTest {
     @Test
     public void testGetParameterForUnboundGenericInterface() throws Exception {
         assertTrue(ReflectionUtil.getTypeParameterForSuper(UnboundInterfaceImplementor.class, CopyStrategy.class, 0) instanceof TypeVariable);
+    }
+
+    @Test
+    public void testResolveFieldType() {
+        class SomeClass<T> {
+            private T t;
+
+            SomeClass(T t) {
+                this.t = t;
+            }
+        }
+
+        TypeInfo<SomeClass<Float>> typeInfo = new TypeInfo<SomeClass<Float>>() {
+        };
+
+        Type resolvedFieldType = ReflectionUtil.resolveFieldType(
+                typeInfo.getType(),
+                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+        );
+
+        assertEquals(Float.class, resolvedFieldType);
+    }
+
+    interface GenericInterfaceSubInterface extends CopyStrategy<Integer> {}
+
+    class SubInterfaceImplementor implements GenericInterfaceSubInterface {
+        @Override
+        public Integer copy(Integer value) {
+            return null;
+        }
     }
 
     public static class ParameterisedInterfaceImplementor implements CopyStrategy<Integer> {
