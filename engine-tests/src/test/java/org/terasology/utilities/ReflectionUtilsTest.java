@@ -22,8 +22,10 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategy;
 
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -101,6 +103,35 @@ public class ReflectionUtilsTest {
         );
 
         assertEquals(Float[].class.getComponentType(), resolvedFieldType.getGenericComponentType());
+    }
+
+    @Test
+    public void testResolveWildcardType() {
+        class SomeClass<T, U> {
+            private CopyStrategy<? extends T> t;
+            private CopyStrategy<? super U> u;
+        }
+
+        TypeInfo<SomeClass<Float, Integer>> typeInfo = new TypeInfo<SomeClass<Float, Integer>>() {
+        };
+
+        ParameterizedType resolvedFieldType = (ParameterizedType) ReflectionUtil.resolveType(
+                typeInfo.getType(),
+                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+        );
+
+        WildcardType resolvedWildcardType = (WildcardType) resolvedFieldType.getActualTypeArguments()[0];
+
+        assertEquals(Float.class, resolvedWildcardType.getUpperBounds()[0]);
+
+        resolvedFieldType = (ParameterizedType) ReflectionUtil.resolveType(
+                typeInfo.getType(),
+                typeInfo.getRawType().getDeclaredFields()[1].getGenericType()
+        );
+
+        resolvedWildcardType = (WildcardType) resolvedFieldType.getActualTypeArguments()[0];
+
+        assertEquals(Integer.class, resolvedWildcardType.getLowerBounds()[0]);
     }
 
     interface GenericInterfaceSubInterface extends CopyStrategy<Integer> {}
