@@ -21,6 +21,7 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 
 import java.lang.reflect.Type;
 
@@ -43,7 +44,7 @@ public class GsonTypeSerializationLibraryAdapterFactory implements TypeAdapterFa
 
         TypeHandler<T> typeHandler = (TypeHandler<T>) typeSerializationLibrary.getTypeHandler(rawType);
 
-        if (typeHandler == null) {
+        if (typeHandler == null || typeHandler instanceof ObjectFieldMapTypeHandler) {
             return null;
         }
 
