@@ -278,6 +278,34 @@ public final class ReflectionUtil {
         return null;
     }
 
+    public static Type resolveFieldType(Type classType, Type fieldType) {
+        Class<?> classClass = getClassOfType(classType);
+
+        if (fieldType instanceof TypeVariable<?>) {
+            TypeVariable<?> typeVariable = (TypeVariable<?>) fieldType;
+
+            Preconditions.checkArgument(typeVariable.getGenericDeclaration() instanceof Class,
+                    "fieldType has not been declared in a class and cannot be a field's type");
+
+            Class<?> declaringClass = (Class<?>) typeVariable.getGenericDeclaration();
+
+            Preconditions.checkArgument(declaringClass.isAssignableFrom(classClass),
+                    "Field was not declared in class " + classClass);
+
+            List<TypeVariable<?>> typeParameters =
+                    Arrays.asList(declaringClass.getTypeParameters());
+
+            int typeParameterIndex = typeParameters.indexOf(typeVariable);
+
+            if (!classClass.equals(declaringClass)) {
+                return getTypeParameterForSuper(classType, declaringClass, typeParameterIndex);
+            }
+            return getTypeParameter(classType, typeParameterIndex);
+        }
+
+        return fieldType;
+    }
+
     public static Object readField(Object object, String fieldName) {
         Class<?> cls = object.getClass();
         for (Class<?> c = cls; c != null; c = c.getSuperclass()) {
