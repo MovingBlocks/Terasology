@@ -68,6 +68,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
         );
 
         WidgetUtil.trySubscribe(this, "play", button -> {
+            universeWrapper.setTargetWorld(targetWorld);
             final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
             if (gameManifest != null) {
                 gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));

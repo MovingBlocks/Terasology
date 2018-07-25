@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import org.terasology.rendering.world.WorldSetupWrapper;
+
 /**
  * A class which stores the universe level properties for a game like whether
  * the game is single-player or multi-player, seed value and the game name.
@@ -24,6 +26,7 @@ public class UniverseWrapper {
     private  String seed;
     private  boolean loadingAsServer;
     private  String gameName;
+    private WorldSetupWrapper targetWorld;
 
     public void setSeed(String seed) {
         this.seed = seed;
@@ -47,5 +50,13 @@ public class UniverseWrapper {
 
     public String getGameName() {
         return gameName;
+    }
+
+    public void setTargetWorld(WorldSetupWrapper targetWorld) {
+        this.targetWorld = targetWorld;
+    }
+
+    public WorldSetupWrapper getTargetWorld() {
+        return targetWorld;
     }
 }
