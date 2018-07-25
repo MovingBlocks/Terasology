@@ -23,7 +23,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
-import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -50,11 +49,9 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
     public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
         Class<? super T> typeClass = typeInfo.getRawType();
 
-        if (typeClass.getAnnotation(MappedContainer.class) != null
-                && !Modifier.isAbstract(typeClass.getModifiers())
+        if (!Modifier.isAbstract(typeClass.getModifiers())
                 && !typeClass.isLocalClass()
-                && !(typeClass.isMemberClass()
-                && !Modifier.isStatic(typeClass.getModifiers()))) {
+                && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
             try {
                 ClassMetadata<?, ?> metadata = new DefaultClassMetadata<>(new SimpleUri(), typeClass,
                         reflectFactory, copyStrategies);
