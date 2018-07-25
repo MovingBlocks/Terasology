@@ -22,7 +22,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.coreTypes.MappedContainerTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -35,13 +35,13 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Optional;
 
-public class MappedContainerTypeHandlerFactory implements TypeHandlerFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MappedContainerTypeHandlerFactory.class);
+public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectFieldMapTypeHandlerFactory.class);
 
     private ReflectFactory reflectFactory;
     private CopyStrategyLibrary copyStrategies;
 
-    public MappedContainerTypeHandlerFactory(ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategies) {
+    public ObjectFieldMapTypeHandlerFactory(ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategies) {
         this.reflectFactory = reflectFactory;
         this.copyStrategies = copyStrategies;
     }
@@ -60,7 +60,7 @@ public class MappedContainerTypeHandlerFactory implements TypeHandlerFactory {
                         reflectFactory, copyStrategies);
 
                 @SuppressWarnings({"unchecked"})
-                MappedContainerTypeHandler<T> mappedHandler = new MappedContainerTypeHandler(typeClass,
+                ObjectFieldMapTypeHandler<T> mappedHandler = new ObjectFieldMapTypeHandler(typeClass,
                         getFieldHandlerMap(metadata, typeSerializationLibrary));
 
                 return Optional.of(mappedHandler);

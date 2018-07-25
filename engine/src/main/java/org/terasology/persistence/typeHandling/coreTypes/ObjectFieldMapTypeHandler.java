@@ -29,15 +29,15 @@ import java.util.Map;
 
 /**
  */
-public class MappedContainerTypeHandler<T> implements TypeHandler<T> {
+public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(MappedContainerTypeHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ObjectFieldMapTypeHandler.class);
 
     private Map<String, FieldMetadata<T, ?>> fieldByName = Maps.newHashMap();
     private Map<FieldMetadata<T, ?>, TypeHandler<?>> mappedFields;
     private Class<T> clazz;
 
-    public MappedContainerTypeHandler(Class<T> clazz, Map<FieldMetadata<T, ?>, TypeHandler<?>> mappedFields) {
+    public ObjectFieldMapTypeHandler(Class<T> clazz, Map<FieldMetadata<T, ?>, TypeHandler<?>> mappedFields) {
         this.clazz = clazz;
         this.mappedFields = mappedFields;
         for (FieldMetadata<T, ?> field : mappedFields.keySet()) {
