@@ -41,7 +41,7 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
         this.clazz = clazz;
         this.mappedFields = mappedFields;
         for (FieldMetadata<T, ?> field : mappedFields.keySet()) {
-            this.fieldByName.put(UriUtil.normalise(field.getName()), field);
+            this.fieldByName.put(field.getName(), field);
         }
     }
 
@@ -69,7 +69,7 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
         try {
             T result = clazz.newInstance();
             for (Map.Entry<String, PersistedData> entry : data.getAsValueMap().entrySet()) {
-                FieldMetadata fieldInfo = fieldByName.get(UriUtil.normalise(entry.getKey()));
+                FieldMetadata fieldInfo = fieldByName.get(entry.getKey());
                 if (fieldInfo != null) {
                     TypeHandler handler = mappedFields.get(fieldInfo);
                     Object val = handler.deserialize(entry.getValue(), context);
