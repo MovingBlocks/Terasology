@@ -18,31 +18,29 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.SimpleUri;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.DefaultClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ConstructorLibrary;
+import org.terasology.utilities.ReflectionUtil;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObjectFieldMapTypeHandlerFactory.class);
 
-    private ReflectFactory reflectFactory;
-    private CopyStrategyLibrary copyStrategies;
+    private ConstructorLibrary constructorLibrary;
 
-    public ObjectFieldMapTypeHandlerFactory(ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategies) {
-        this.reflectFactory = reflectFactory;
-        this.copyStrategies = copyStrategies;
+    public ObjectFieldMapTypeHandlerFactory(ConstructorLibrary constructorLibrary) {
+        this.constructorLibrary = constructorLibrary;
     }
 
     @Override
@@ -52,35 +50,39 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
         if (!Modifier.isAbstract(typeClass.getModifiers())
                 && !typeClass.isLocalClass()
                 && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
-            try {
-                ClassMetadata<?, ?> metadata = new DefaultClassMetadata<>(new SimpleUri(), typeClass,
-                        reflectFactory, copyStrategies);
+            Map<Field, TypeHandler<?>> fieldTypeHandlerMap = Maps.newHashMap();
 
-                @SuppressWarnings({"unchecked"})
-                ObjectFieldMapTypeHandler<T> mappedHandler = new ObjectFieldMapTypeHandler(typeClass,
-                        getFieldHandlerMap(metadata, typeSerializationLibrary));
+            getResolvedFields(typeInfo).forEach(
+                    (field, type) -> {
+                        fieldTypeHandlerMap.put(field, typeSerializationLibrary.getTypeHandler(type));
+                    }
+            );
 
-                return Optional.of(mappedHandler);
-            } catch (NoSuchMethodException e) {
-                LOGGER.error("Unable to register field of type {}: no publicly accessible default constructor",
-                        typeClass.getSimpleName());
-                return Optional.empty();
-            }
+            ObjectFieldMapTypeHandler<T> mappedHandler =
+                    new ObjectFieldMapTypeHandler<>(constructorLibrary.get(typeInfo), fieldTypeHandlerMap);
+
+            return Optional.of(mappedHandler);
         }
 
         return Optional.empty();
     }
 
-    private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type, TypeSerializationLibrary typeSerializationLibrary) {
-        Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
-        for (FieldMetadata<?, ?> field : type.getFields()) {
-            TypeHandler<?> handler = typeSerializationLibrary.getTypeHandler(field.getField().getGenericType());
-            if (handler != null) {
-                handlerMap.put(field, handler);
-            } else {
-                LOGGER.info("Unsupported field: '{}.{}'", type.getUri(), field.getName());
+    private <T> Map<Field, Type> getResolvedFields(TypeInfo<T> typeInfo) {
+        Map<Field, Type> fields = Maps.newLinkedHashMap();
+
+        Type type = typeInfo.getType();
+        Class<? super T> rawType = typeInfo.getRawType();
+
+        while (!Object.class.equals(rawType)) {
+            for (Field field : rawType.getDeclaredFields()) {
+                field.setAccessible(true);
+                Type fieldType = ReflectionUtil.resolveType(type, field.getGenericType());
+                fields.put(field, fieldType);
             }
+
+            rawType = rawType.getSuperclass();
         }
-        return handlerMap;
+
+        return fields;
     }
 }

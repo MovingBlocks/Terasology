@@ -18,13 +18,13 @@ package org.terasology.persistence.typeHandling.coreTypes;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.engine.module.UriUtil;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.reflection.reflect.ObjectConstructor;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -33,14 +33,14 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectFieldMapTypeHandler.class);
 
-    private Map<String, FieldMetadata<T, ?>> fieldByName = Maps.newHashMap();
-    private Map<FieldMetadata<T, ?>, TypeHandler<?>> mappedFields;
-    private Class<T> clazz;
+    private Map<String, Field> fieldByName = Maps.newHashMap();
+    private Map<Field, TypeHandler<?>> mappedFields;
+    private ObjectConstructor<T> constructor;
 
-    public ObjectFieldMapTypeHandler(Class<T> clazz, Map<FieldMetadata<T, ?>, TypeHandler<?>> mappedFields) {
-        this.clazz = clazz;
-        this.mappedFields = mappedFields;
-        for (FieldMetadata<T, ?> field : mappedFields.keySet()) {
+    public ObjectFieldMapTypeHandler(ObjectConstructor<T> constructor, Map<Field, TypeHandler<?>> fieldTypeHandlers) {
+        this.constructor = constructor;
+        this.mappedFields = fieldTypeHandlers;
+        for (Field field : fieldTypeHandlers.keySet()) {
             this.fieldByName.put(field.getName(), field);
         }
     }
@@ -51,13 +51,23 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
             return context.createNull();
         }
         Map<String, PersistedData> mappedData = Maps.newLinkedHashMap();
-        for (Map.Entry<FieldMetadata<T, ?>, TypeHandler<?>> entry : mappedFields.entrySet()) {
-            Object val = entry.getKey().getValue(value);
+        for (Map.Entry<Field, TypeHandler<?>> entry : mappedFields.entrySet()) {
+            Field field = entry.getKey();
+
+            Object val;
+
+            try {
+                val = field.get(value);
+            } catch (IllegalAccessException e) {
+                logger.error("Field {} is inaccessible", field);
+                continue;
+            }
+
             if (val != null) {
                 TypeHandler handler = entry.getValue();
                 PersistedData fieldValue = handler.serialize(val, context);
                 if (fieldValue != null) {
-                    mappedData.put(entry.getKey().getName(), fieldValue);
+                    mappedData.put(field.getName(), fieldValue);
                 }
             }
         }
@@ -67,13 +77,13 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
     @Override
     public T deserialize(PersistedData data, DeserializationContext context) {
         try {
-            T result = clazz.newInstance();
+            T result = constructor.construct();
             for (Map.Entry<String, PersistedData> entry : data.getAsValueMap().entrySet()) {
-                FieldMetadata fieldInfo = fieldByName.get(entry.getKey());
-                if (fieldInfo != null) {
-                    TypeHandler handler = mappedFields.get(fieldInfo);
+                Field field = fieldByName.get(entry.getKey());
+                if (field != null) {
+                    TypeHandler handler = mappedFields.get(field);
                     Object val = handler.deserialize(entry.getValue(), context);
-                    fieldInfo.setValue(result, val);
+                    field.set(result, val);
                 }
             }
             return result;
