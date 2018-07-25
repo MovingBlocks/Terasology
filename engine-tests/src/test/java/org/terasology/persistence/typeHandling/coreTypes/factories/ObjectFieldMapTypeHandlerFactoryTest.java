@@ -20,7 +20,6 @@ import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
-import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -40,16 +39,15 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
             reflectFactory, copyStrategyLibrary
     );
 
-    @MappedContainer
-    public static class AMappedContainer {
+    public static class SomeClass {
         public int someInt;
         public String someString;
     }
 
     @Test
-    public void testMappedContainer() {
-        Optional<TypeHandler<AMappedContainer>> typeHandler =
-                typeHandlerFactory.create(TypeInfo.of(AMappedContainer.class), typeSerializationLibrary);
+    public void testObject() {
+        Optional<TypeHandler<SomeClass>> typeHandler =
+                typeHandlerFactory.create(TypeInfo.of(SomeClass.class), typeSerializationLibrary);
 
 
         assertTrue(typeHandler.isPresent());
