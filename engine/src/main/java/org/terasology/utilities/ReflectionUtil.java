@@ -281,6 +281,7 @@ public final class ReflectionUtil {
     public static Type resolveFieldType(Type classType, Type fieldType) {
         Class<?> classClass = getClassOfType(classType);
 
+        // T field;
         if (fieldType instanceof TypeVariable<?>) {
             TypeVariable<?> typeVariable = (TypeVariable<?>) fieldType;
 
@@ -301,6 +302,26 @@ public final class ReflectionUtil {
                 return getTypeParameterForSuper(classType, declaringClass, typeParameterIndex);
             }
             return getTypeParameter(classType, typeParameterIndex);
+        }
+
+        // T[] field || List<T>[] field;
+        if (fieldType instanceof GenericArrayType) {
+            GenericArrayType arrayType = (GenericArrayType) fieldType;
+
+            Type componentType = arrayType.getGenericComponentType();
+            Type resolvedComponentType = resolveFieldType(classType, componentType);
+
+            if (resolvedComponentType == componentType) {
+                return fieldType;
+            } else {
+                return new GenericArrayType() {
+                    final Type genericComponentType = resolvedComponentType;
+                    @Override
+                    public Type getGenericComponentType() {
+                        return genericComponentType;
+                    }
+                };
+            }
         }
 
         return fieldType;
