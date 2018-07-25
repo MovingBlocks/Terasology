@@ -21,6 +21,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategy;
 
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
@@ -52,13 +53,9 @@ public class ReflectionUtilsTest {
     }
 
     @Test
-    public void testResolveType() {
+    public void testResolveTypeVariable() {
         class SomeClass<T> {
             private T t;
-
-            SomeClass(T t) {
-                this.t = t;
-            }
         }
 
         TypeInfo<SomeClass<Float>> typeInfo = new TypeInfo<SomeClass<Float>>() {
@@ -70,6 +67,40 @@ public class ReflectionUtilsTest {
         );
 
         assertEquals(Float.class, resolvedFieldType);
+    }
+
+    @Test
+    public void testResolveParameterizedType() {
+        class SomeClass<T> {
+            private CopyStrategy<T> t;
+        }
+
+        TypeInfo<SomeClass<Float>> typeInfo = new TypeInfo<SomeClass<Float>>() {
+        };
+
+        Type resolvedFieldType = ReflectionUtil.resolveType(
+                typeInfo.getType(),
+                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+        );
+
+        assertEquals(new TypeInfo<CopyStrategy<Float>>() {}.getType(), resolvedFieldType);
+    }
+
+    @Test
+    public void testResolveGenericArray() {
+        class SomeClass<T> {
+            private T[] t;
+        }
+
+        TypeInfo<SomeClass<Float>> typeInfo = new TypeInfo<SomeClass<Float>>() {
+        };
+
+        GenericArrayType resolvedFieldType = (GenericArrayType) ReflectionUtil.resolveType(
+                typeInfo.getType(),
+                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+        );
+
+        assertEquals(Float[].class.getComponentType(), resolvedFieldType.getGenericComponentType());
     }
 
     interface GenericInterfaceSubInterface extends CopyStrategy<Integer> {}
