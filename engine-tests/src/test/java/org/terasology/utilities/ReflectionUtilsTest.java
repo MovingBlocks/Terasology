@@ -89,6 +89,56 @@ public class ReflectionUtilsTest {
     }
 
     @Test
+    public void testResolveRawParameterizedType() {
+        class SomeClass<T> {
+            private CopyStrategy<T> t;
+            private T o;
+        }
+
+        TypeInfo<SomeClass> typeInfo = new TypeInfo<SomeClass>() {
+        };
+
+        Type resolvedFieldType = ReflectionUtil.resolveType(
+                typeInfo.getType(),
+                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+        );
+
+        assertEquals(new TypeInfo<CopyStrategy<Object>>() {}.getType(), resolvedFieldType);
+
+        resolvedFieldType = ReflectionUtil.resolveType(
+                typeInfo.getType(),
+                typeInfo.getRawType().getDeclaredFields()[1].getGenericType()
+        );
+
+        assertEquals(TypeInfo.of(Object.class).getType(), resolvedFieldType);
+    }
+
+    @Test
+    public void testResolveNothing() {
+        class SomeClass {
+            private CopyStrategy<Integer> t;
+            private String o;
+        }
+
+        TypeInfo<SomeClass> typeInfo = new TypeInfo<SomeClass>() {
+        };
+
+        Type resolvedFieldType = ReflectionUtil.resolveType(
+                typeInfo.getType(),
+                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+        );
+
+        assertEquals(new TypeInfo<CopyStrategy<Integer>>() {}.getType(), resolvedFieldType);
+
+        resolvedFieldType = ReflectionUtil.resolveType(
+                typeInfo.getType(),
+                typeInfo.getRawType().getDeclaredFields()[1].getGenericType()
+        );
+
+        assertEquals(TypeInfo.of(String.class).getType(), resolvedFieldType);
+    }
+
+    @Test
     public void testResolveGenericArray() {
         class SomeClass<T> {
             private T[] t;
