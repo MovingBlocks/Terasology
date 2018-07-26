@@ -25,6 +25,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.TypeInfo;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -59,13 +60,18 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
         }
 
         TypeHandler<T> chosenHandler = delegateHandler;
-        Class<?> runtimeClass = value.getClass();
+        Class<?> runtimeClass = getRuntimeTypeIfMoreSpecific(typeInfo, value);
 
         if (!typeInfo.getRawType().equals(runtimeClass)) {
             TypeHandler<T> runtimeTypeHandler =
                     (TypeHandler<T>) typeSerializationLibrary.getTypeHandler(runtimeClass);
 
-            if (!(runtimeTypeHandler instanceof ObjectFieldMapTypeHandler)) {
+            if (delegateHandler == null) {
+                chosenHandler = runtimeTypeHandler;
+            } else if (runtimeTypeHandler.getClass().equals(delegateHandler.getClass())) {
+                // Both handlers are of same type, use delegateHandler
+                chosenHandler = delegateHandler;
+            } else if (!(runtimeTypeHandler instanceof ObjectFieldMapTypeHandler)) {
                 // Custom handler for runtime type
                 chosenHandler = runtimeTypeHandler;
             } else if (!(delegateHandler instanceof ObjectFieldMapTypeHandler)) {
@@ -80,7 +86,7 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
             return delegateHandler.serialize(value, serializer);
         }
 
-        Map<String, PersistedData> typeValuePersistedDataMap = Maps.newHashMap();
+        Map<String, PersistedData> typeValuePersistedDataMap = Maps.newLinkedHashMap();
 
         typeValuePersistedDataMap.put(
                 TYPE_FIELD,
@@ -93,6 +99,25 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
         );
 
         return serializer.serialize(typeValuePersistedDataMap);
+    }
+
+    private static <T> Class<?> getRuntimeTypeIfMoreSpecific(TypeInfo<T> typeInfo, T value) {
+        if (value == null) {
+            return typeInfo.getRawType();
+        }
+
+        Class<?> runtimeClass = value.getClass();
+
+        if (typeInfo.getRawType().isInterface()) {
+            // Given type is interface, use runtime type which will be a class and will have data
+            return runtimeClass;
+        } else if (typeInfo.getType() instanceof Class) {
+            // If given type is a simple class, use more specific runtime type
+            return runtimeClass;
+        }
+
+        // Given type has more information than runtime type, use that
+        return typeInfo.getRawType();
     }
 
     @Override
