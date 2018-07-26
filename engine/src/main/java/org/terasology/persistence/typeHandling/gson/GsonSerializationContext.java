@@ -207,11 +207,6 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public <T> PersistedData create(T data, Class<? extends T> type) {
-        return new GsonPersistedData(context.serialize(data, type));
-    }
-
-    @Override
     public PersistedData createNull() {
         return NULL_INSTANCE;
     }
