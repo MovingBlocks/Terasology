@@ -51,8 +51,7 @@ public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        // TODO: Use getTypeParameterFromSuper
-        Type elementType = ReflectionUtil.getTypeParameter(typeInfo.getType(), 0);
+        Type elementType = ReflectionUtil.getTypeParameterForSuper(typeInfo.getType(), Collection.class, 0);
 
         if (elementType == null) {
             LOGGER.error("Collection is not parameterized and cannot be serialized");
