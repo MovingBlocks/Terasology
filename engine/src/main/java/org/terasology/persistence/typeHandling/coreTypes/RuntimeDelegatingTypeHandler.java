@@ -18,7 +18,6 @@ package org.terasology.persistence.typeHandling.coreTypes;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.SerializationContext;
@@ -97,15 +96,15 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
     }
 
     @Override
-    public T deserialize(PersistedData data, DeserializationContext context) {
+    public T deserialize(PersistedData data) {
         if (!data.isValueMap()) {
-            return delegateHandler.deserialize(data, context);
+            return delegateHandler.deserialize(data);
         }
 
         PersistedDataMap valueMap = data.getAsValueMap();
 
         if (!valueMap.has(TYPE_FIELD) || !valueMap.has(VALUE_FIELD)) {
-            return delegateHandler.deserialize(data, context);
+            return delegateHandler.deserialize(data);
         }
 
         String typeName = valueMap.getAsString(TYPE_FIELD);
@@ -125,7 +124,7 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
 
         PersistedData valueData = valueMap.get(VALUE_FIELD);
 
-        return typeHandler.deserialize(valueData, context);
+        return typeHandler.deserialize(valueData);
 
     }
 }

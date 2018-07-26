@@ -18,7 +18,6 @@ package org.terasology.persistence.typeHandling.coreTypes;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -50,7 +49,7 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
     }
 
     @Override
-    public T deserialize(PersistedData data, DeserializationContext context) {
+    public T deserialize(PersistedData data) {
         if (data.isString()) {
             T result = caseInsensitiveLookup.get(data.getAsString().toLowerCase(Locale.ENGLISH));
             if (result == null) {

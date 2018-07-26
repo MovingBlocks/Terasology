@@ -18,7 +18,6 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 import gnu.trove.iterator.TLongIterator;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
@@ -45,7 +44,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     }
 
     @Override
-    public EntityRef deserialize(PersistedData data, DeserializationContext context) {
+    public EntityRef deserialize(PersistedData data) {
         if (data.isNumber()) {
             return entityManager.getEntity(data.getAsLong());
         }

@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.extensionTypes;
 
 import gnu.trove.list.TIntList;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
@@ -39,7 +38,7 @@ public class ColorTypeHandler implements org.terasology.persistence.typeHandling
     }
 
     @Override
-    public Color deserialize(PersistedData data, DeserializationContext context) {
+    public Color deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 3) {

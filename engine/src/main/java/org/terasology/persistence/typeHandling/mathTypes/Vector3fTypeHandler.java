@@ -17,7 +17,6 @@ package org.terasology.persistence.typeHandling.mathTypes;
 
 import gnu.trove.list.TFloatList;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
@@ -36,7 +35,7 @@ public class Vector3fTypeHandler implements org.terasology.persistence.typeHandl
     }
 
     @Override
-    public Vector3f deserialize(PersistedData data, DeserializationContext context) {
+    public Vector3f deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 2) {

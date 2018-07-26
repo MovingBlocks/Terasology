@@ -28,7 +28,6 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.module.Module;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -184,7 +183,6 @@ public class ComponentSerializer {
     private <T extends Component> Component deserializeOnto(Component targetComponent, EntityData.Component componentData,
                                                             ComponentMetadata<T> componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
-        DeserializationContext context = new ProtobufDeserializationContext(typeSerializationLibrary);
         Map<FieldMetadata<?, ?>, PersistedData> dataMap = Maps.newHashMapWithExpectedSize(componentData.getFieldCount());
         for (EntityData.NameValue field : componentData.getFieldList()) {
             FieldMetadata<?, ?> fieldInfo = null;
@@ -199,7 +197,7 @@ public class ComponentSerializer {
                 logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getUri());
             }
         }
-        serializer.deserializeOnto(targetComponent, dataMap, context, fieldCheck);
+        serializer.deserializeOnto(targetComponent, dataMap, fieldCheck);
         return targetComponent;
     }
 

@@ -16,7 +16,6 @@
 
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -34,7 +33,7 @@ public class NumberTypeHandler implements TypeHandler<Number> {
     }
 
     @Override
-    public Number deserialize(PersistedData data, DeserializationContext context) {
+    public Number deserialize(PersistedData data) {
         if (data.isNumber()) {
             return data.getAsDouble();
         }

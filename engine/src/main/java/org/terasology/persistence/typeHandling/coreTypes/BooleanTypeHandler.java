@@ -15,7 +15,6 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -33,7 +32,7 @@ public class BooleanTypeHandler implements TypeHandler<Boolean> {
     }
 
     @Override
-    public Boolean deserialize(PersistedData data, DeserializationContext context) {
+    public Boolean deserialize(PersistedData data) {
         if (data.isBoolean()) {
             return data.getAsBoolean();
         }

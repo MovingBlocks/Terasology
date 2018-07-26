@@ -15,7 +15,6 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -33,7 +32,7 @@ public class ByteTypeHandler implements TypeHandler<Byte> {
     }
 
     @Override
-    public Byte deserialize(PersistedData data, DeserializationContext context) {
+    public Byte deserialize(PersistedData data) {
         if (data.isBytes()) {
             return data.getAsBytes()[0];
         } else if (data.isNumber()) {

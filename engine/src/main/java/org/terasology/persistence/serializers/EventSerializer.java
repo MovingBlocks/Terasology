@@ -26,13 +26,11 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufDeserializationContext;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufSerializationContext;
 import org.terasology.protobuf.EntityData;
@@ -48,7 +46,6 @@ public class EventSerializer {
     private TypeSerializationLibrary typeSerializationLibrary;
     private BiMap<Class<? extends Event>, Integer> idTable = ImmutableBiMap.<Class<? extends Event>, Integer>builder().build();
     private SerializationContext serializationContext;
-    private DeserializationContext deserializationContext;
 
     /**
      * Creates the event serializer.
@@ -58,7 +55,6 @@ public class EventSerializer {
     public EventSerializer(EventLibrary eventLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.eventLibrary = eventLibrary;
         this.typeSerializationLibrary = typeSerializationLibrary;
-        this.deserializationContext = new ProtobufDeserializationContext(typeSerializationLibrary);
         this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
     }
 
@@ -110,7 +106,7 @@ public class EventSerializer {
                 continue;
             }
             if (fieldInfo.isReplicated()) {
-                serializer.deserializeOnto(targetEvent, fieldInfo, new ProtobufPersistedData(eventData.getFieldValue(i)), deserializationContext);
+                serializer.deserializeOnto(targetEvent, fieldInfo, new ProtobufPersistedData(eventData.getFieldValue(i)));
             }
         }
         return targetEvent;

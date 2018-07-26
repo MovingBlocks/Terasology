@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.SerializationContext;
@@ -56,12 +55,12 @@ public class Rect2iTypeHandler implements org.terasology.persistence.typeHandlin
     }
 
     @Override
-    public Rect2i deserialize(PersistedData data, DeserializationContext context) {
+    public Rect2i deserialize(PersistedData data) {
         if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
 
-            Vector2i min = vector2iTypeHandler.deserialize(map.get(MIN_FIELD), context);
-            Vector2i size = vector2iTypeHandler.deserialize(map.get(SIZE_FIELD), context);
+            Vector2i min = vector2iTypeHandler.deserialize(map.get(MIN_FIELD));
+            Vector2i size = vector2iTypeHandler.deserialize(map.get(SIZE_FIELD));
 
             return Rect2i.createFromMinAndSize(min, size);
         }

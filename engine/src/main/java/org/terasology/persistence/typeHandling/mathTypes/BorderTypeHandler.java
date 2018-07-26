@@ -17,7 +17,6 @@ package org.terasology.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.Border;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.SerializationContext;
@@ -47,7 +46,7 @@ public class BorderTypeHandler implements org.terasology.persistence.typeHandlin
     }
 
     @Override
-    public Border deserialize(PersistedData data, DeserializationContext context) {
+    public Border deserialize(PersistedData data) {
         if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
             return new Border(map.getAsInteger(LEFT_FIELD), map.getAsInteger(RIGHT_FIELD), map.getAsInteger(TOP_FIELD), map.getAsInteger(BOTTOM_FIELD));

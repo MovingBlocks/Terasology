@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
@@ -57,7 +56,7 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
     }
 
     @Override
-    public EntityRef deserialize(PersistedData data, DeserializationContext context) {
+    public EntityRef deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray array = data.getAsArray();
             if (array.isNumberArray() && array.size() == 3) {

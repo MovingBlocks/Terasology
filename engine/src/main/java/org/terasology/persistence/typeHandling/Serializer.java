@@ -86,15 +86,14 @@ public class Serializer {
      * @param target        The object to deserialize the field onto
      * @param fieldMetadata The metadata of the field
      * @param data          The serialized value of the field
-     * @param context       The deserialization context
      */
-    public void deserializeOnto(Object target, FieldMetadata<?, ?> fieldMetadata, PersistedData data, DeserializationContext context) {
+    public void deserializeOnto(Object target, FieldMetadata<?, ?> fieldMetadata, PersistedData data) {
         TypeHandler<?> handler = getHandlerFor(fieldMetadata);
         if (handler == null) {
             logger.error("No type handler for type {} used by {}::{}", fieldMetadata.getType(), target.getClass(), fieldMetadata);
         } else {
             try {
-                Object deserializedValue = handler.deserialize(data, context);
+                Object deserializedValue = handler.deserialize(data);
                 fieldMetadata.setValue(target, deserializedValue);
             } catch (DeserializationException e) {
                 logger.error("Unable to deserialize field '{}' from '{}'", fieldMetadata.getName(), data.toString(), e);
@@ -107,10 +106,9 @@ public class Serializer {
      *
      * @param target  The object to deserialize onto
      * @param values  The collection of values to apply to the object
-     * @param context The deserialization context
      */
-    public void deserializeOnto(Object target, PersistedDataMap values, DeserializationContext context) {
-        deserializeOnto(target, values, DeserializeFieldCheck.NullCheck.newInstance(), context);
+    public void deserializeOnto(Object target, PersistedDataMap values) {
+        deserializeOnto(target, values, DeserializeFieldCheck.NullCheck.newInstance());
     }
 
     /**
@@ -120,12 +118,12 @@ public class Serializer {
      * @param values The collection of values to apply to the object
      * @param check  A check to filter which fields to deserialize
      */
-    public void deserializeOnto(Object target, PersistedDataMap values, DeserializeFieldCheck check, DeserializationContext context) {
+    public void deserializeOnto(Object target, PersistedDataMap values, DeserializeFieldCheck check) {
         for (Map.Entry<String, PersistedData> field : values.entrySet()) {
             FieldMetadata<?, ?> fieldInfo = classMetadata.getField(field.getKey());
 
             if (fieldInfo != null && check.shouldDeserialize(classMetadata, fieldInfo)) {
-                deserializeOnto(target, fieldInfo, field.getValue(), context);
+                deserializeOnto(target, fieldInfo, field.getValue());
             } else if (fieldInfo == null) {
                 logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getKey(), classMetadata.getUri());
             }
@@ -138,8 +136,8 @@ public class Serializer {
      * @param target The object to deserialize onto
      * @param values The collection of values to apply to the object
      */
-    public void deserializeOnto(Object target, Map<FieldMetadata<?, ?>, PersistedData> values, DeserializationContext context) {
-        deserializeOnto(target, values, context, DeserializeFieldCheck.NullCheck.newInstance());
+    public void deserializeOnto(Object target, Map<FieldMetadata<?, ?>, PersistedData> values) {
+        deserializeOnto(target, values, DeserializeFieldCheck.NullCheck.newInstance());
     }
 
     /**
@@ -149,10 +147,10 @@ public class Serializer {
      * @param values The collection of values to apply to the object
      * @param check  A check to filter which fields to deserialize
      */
-    public void deserializeOnto(Object target, Map<FieldMetadata<?, ?>, PersistedData> values, DeserializationContext context, DeserializeFieldCheck check) {
+    public void deserializeOnto(Object target, Map<FieldMetadata<?, ?>, PersistedData> values, DeserializeFieldCheck check) {
         for (Map.Entry<FieldMetadata<?, ?>, PersistedData> field : values.entrySet()) {
             if (check.shouldDeserialize(classMetadata, field.getKey())) {
-                deserializeOnto(target, field.getKey(), field.getValue(), context);
+                deserializeOnto(target, field.getKey(), field.getValue());
             }
         }
     }
