@@ -55,7 +55,7 @@ public class EventSerializer {
     public EventSerializer(EventLibrary eventLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.eventLibrary = eventLibrary;
         this.typeSerializationLibrary = typeSerializationLibrary;
-        this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
+        this.serializationContext = new ProtobufSerializationContext();
     }
 
     /**
