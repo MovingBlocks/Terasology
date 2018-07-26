@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 
 public class CollectionTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
-    private final CollectionTypeHandlerFactory typeHandlerFactory = new CollectionTypeHandlerFactory(new ConstructorLibrary(Maps.newHashMap(), new ReflectionReflectFactory()));
+    private final CollectionTypeHandlerFactory typeHandlerFactory = new CollectionTypeHandlerFactory(new ConstructorLibrary(Maps.newHashMap()));
 
     @Test
     public void testList() {

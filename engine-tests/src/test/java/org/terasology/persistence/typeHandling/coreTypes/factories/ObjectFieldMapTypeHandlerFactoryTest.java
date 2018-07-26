@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 public class ObjectFieldMapTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
 
-    private final ConstructorLibrary constructorLibrary = new ConstructorLibrary(Maps.newHashMap(), new ReflectionReflectFactory());
+    private final ConstructorLibrary constructorLibrary = new ConstructorLibrary(Maps.newHashMap());
     private final ObjectFieldMapTypeHandlerFactory typeHandlerFactory = new ObjectFieldMapTypeHandlerFactory(
             constructorLibrary);
 

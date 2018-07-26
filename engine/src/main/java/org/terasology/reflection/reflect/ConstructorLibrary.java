@@ -18,6 +18,8 @@
  */
 package org.terasology.reflection.reflect;
 
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Primitives;
 import org.terasology.persistence.typeHandling.InstanceCreator;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.reflection.TypeInfo;
@@ -27,11 +29,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -46,11 +51,9 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 public class ConstructorLibrary {
     private final Map<Type, InstanceCreator<?>> instanceCreators;
-    private final ReflectFactory reflectFactory;
 
-    public ConstructorLibrary(Map<Type, InstanceCreator<?>> instanceCreators, ReflectFactory reflectFactory) {
+    public ConstructorLibrary(Map<Type, InstanceCreator<?>> instanceCreators) {
         this.instanceCreators = instanceCreators;
-        this.reflectFactory = reflectFactory;
     }
 
     public <T> ObjectConstructor<T> get(TypeInfo<T> typeInfo) {
@@ -73,27 +76,33 @@ public class ConstructorLibrary {
             return () -> rawTypeCreator.createInstance(type);
         }
 
-        ObjectConstructor<T> defaultConstructor = newDefaultConstructor(rawType);
-        if (defaultConstructor != null) {
-            return defaultConstructor;
-        }
-
         ObjectConstructor<T> defaultImplementation = newDefaultImplementationConstructor(type, rawType);
         if (defaultImplementation != null) {
             return defaultImplementation;
         }
 
-        // We should never have to reach here
-        return null;
-    }
+        return () -> {
+            @SuppressWarnings({"unchecked"})
+            Constructor<T> constructor = (Constructor<T>) Arrays.stream(rawType.getDeclaredConstructors())
+                    .min(Comparator.comparingInt(c -> c.getParameterTypes().length))
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("Type " + rawType + " does not have a constructor")
+                    );
 
-    @SuppressWarnings("unchecked")
-    private <T> ObjectConstructor<T> newDefaultConstructor(Class<? super T> rawType) {
-        try {
-            return (ObjectConstructor<T>) reflectFactory.createConstructor(rawType);
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
+            constructor.setAccessible(true);
+            final List<Object> params = Lists.newArrayList();
+
+            try {
+                for (Class<?> pType : constructor.getParameterTypes()) {
+                    params.add((pType.isPrimitive()) ? Primitives.wrap(pType).newInstance() : null);
+                }
+
+                return constructor.newInstance(params.toArray());
+
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new IllegalArgumentException("Type " + rawType + "cannot be instantiated");
+            }
+        };
     }
 
     /**
