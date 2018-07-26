@@ -24,7 +24,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.IntegerRange;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
@@ -52,7 +51,6 @@ import org.terasology.persistence.typeHandling.extensionTypes.factories.AssetTyp
 import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Rect2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Region3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
@@ -61,6 +59,7 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.mathTypes.factories.Region3iTypeHandlerFactory;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -161,7 +160,7 @@ public class TypeSerializationLibrary {
         serializationLibrary.addTypeHandler(Vector2i.class, new Vector2iTypeHandler());
         serializationLibrary.addTypeHandlerFactory(new Rect2iTypeHandlerFactory());
         serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());
-        serializationLibrary.addTypeHandler(Region3i.class, new Region3iTypeHandler());
+        serializationLibrary.addTypeHandlerFactory(new Region3iTypeHandlerFactory());
         serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
 
