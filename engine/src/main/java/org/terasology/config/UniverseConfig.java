@@ -23,27 +23,31 @@ import java.util.List;
 
 public class UniverseConfig {
     private List<WorldInfo> worlds = Lists.newArrayList();
-    private WorldInfo spawnWorld;
+    private String spawnWorldTitle;
     private String universeSeed;
 
     public UniverseConfig() {
         worlds.clear();
     }
 
-    public void addWorldManager(WorldInfo worldManager) {
-        if (worldManager.getTitle().equals(TerasologyConstants.MAIN_WORLD)) {
+    public void addWorldManager(WorldInfo worldInfo) {
+        if (worldInfo.getTitle().equals(TerasologyConstants.MAIN_WORLD)) {
             worlds.clear();
-            this.spawnWorld = worldManager;
+            this.spawnWorldTitle = worldInfo.getTitle();
         }
-        worlds.add(worldManager);
+        worlds.add(worldInfo);
     }
 
-    public void setSpawnWorld(WorldInfo targetWorld) {
-        spawnWorld = targetWorld;
+    public void setSpawnWorldTitle(String targetWorldTitle) {
+        spawnWorldTitle = targetWorldTitle;
     }
 
     public void setUniverseSeed(String seed) {
         universeSeed = seed;
+    }
+
+    public String getSpawnWorldTitle() {
+        return spawnWorldTitle;
     }
 
 }

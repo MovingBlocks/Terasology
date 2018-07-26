@@ -89,7 +89,7 @@ public class GameManifestProvider {
 
         gameManifest.addWorld(worldInfo);
         config.getUniverseConfig().addWorldManager(worldInfo);
-        config.getUniverseConfig().setSpawnWorld(worldInfo);
+        config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
         config.getUniverseConfig().setUniverseSeed(universeWrapper.getSeed());
         return gameManifest;
     }
