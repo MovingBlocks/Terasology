@@ -32,7 +32,7 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufSerializationContext;
+import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.metadata.FieldMetadata;
 
@@ -56,7 +56,7 @@ public class ComponentSerializer {
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
     private boolean usingFieldIds;
     private TypeSerializationLibrary typeSerializationLibrary;
-    private ProtobufSerializationContext serializationContext;
+    private ProtobufPersistedDataSerializer serializationContext;
 
     /**
      * Creates the component serializer.
@@ -66,7 +66,7 @@ public class ComponentSerializer {
     public ComponentSerializer(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.componentLibrary = componentLibrary;
         this.typeSerializationLibrary = typeSerializationLibrary;
-        this.serializationContext = new ProtobufSerializationContext();
+        this.serializationContext = new ProtobufPersistedDataSerializer();
     }
 
     public void setUsingFieldIds(boolean usingFieldIds) {

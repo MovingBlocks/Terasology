@@ -23,7 +23,7 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
@@ -43,17 +43,17 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
     }
 
     @Override
-    public PersistedData serialize(EntityRef value, SerializationContext context) {
+    public PersistedData serialize(EntityRef value, PersistedDataSerializer serializer) {
         BlockComponent blockComponent = value.getComponent(BlockComponent.class);
         if (blockComponent != null) {
             Vector3i pos = blockComponent.getPosition();
-            return context.create(pos.x, pos.y, pos.z);
+            return serializer.create(pos.x, pos.y, pos.z);
         }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {
-            return context.create(netComponent.getNetworkId());
+            return serializer.create(netComponent.getNetworkId());
         }
-        return context.createNull();
+        return serializer.createNull();
     }
 
     @Override

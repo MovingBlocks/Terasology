@@ -16,15 +16,15 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 public class ByteArrayTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<byte[]> {
 	@Override
-	public PersistedData serialize(byte[] value, SerializationContext context) {
+	public PersistedData serialize(byte[] value, PersistedDataSerializer serializer) {
 		if (value == null) {
-			return context.createNull();
+			return serializer.createNull();
 		} else {
-			return context.create(value);
+			return serializer.create(value);
 		}
 	}
 

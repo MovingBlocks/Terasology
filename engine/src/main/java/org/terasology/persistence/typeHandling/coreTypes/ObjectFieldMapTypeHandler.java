@@ -19,7 +19,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
@@ -47,9 +47,9 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
     }
 
     @Override
-    public PersistedData serialize(T value, SerializationContext context) {
+    public PersistedData serialize(T value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return context.createNull();
+            return serializer.createNull();
         }
         Map<String, PersistedData> mappedData = Maps.newLinkedHashMap();
         for (Map.Entry<Field, TypeHandler<?>> entry : mappedFields.entrySet()) {
@@ -66,13 +66,13 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
 
             if (val != null) {
                 TypeHandler handler = entry.getValue();
-                PersistedData fieldValue = handler.serialize(val, context);
+                PersistedData fieldValue = handler.serialize(val, serializer);
                 if (fieldValue != null) {
                     mappedData.put(field.getName(), fieldValue);
                 }
             }
         }
-        return context.create(mappedData);
+        return serializer.create(mappedData);
     }
 
     @Override

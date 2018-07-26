@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling.coreTypes;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.Test;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
@@ -51,7 +51,7 @@ public class RuntimeDelegatingTypeHandlerTest {
 
     @Test
     public void testSerialize() {
-        SerializationContext context = mock(SerializationContext.class);
+        PersistedDataSerializer context = mock(PersistedDataSerializer.class);
 
         Class<Sub> subType = Sub.class;
         Type baseType = TypeInfo.of(Base.class).getType();

@@ -19,7 +19,7 @@ import com.google.common.collect.Maps;
 import org.terasology.math.Border;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 import java.util.Map;
 
@@ -32,17 +32,17 @@ public class BorderTypeHandler implements org.terasology.persistence.typeHandlin
     private static final String BOTTOM_FIELD = "bottom";
 
     @Override
-    public PersistedData serialize(Border value, SerializationContext context) {
+    public PersistedData serialize(Border value, PersistedDataSerializer serializer) {
         if (value != null) {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
-            map.put(LEFT_FIELD, context.create(value.getLeft()));
-            map.put(RIGHT_FIELD, context.create(value.getRight()));
-            map.put(TOP_FIELD, context.create(value.getTop()));
-            map.put(BOTTOM_FIELD, context.create(value.getBottom()));
-            return context.create(map);
+            map.put(LEFT_FIELD, serializer.create(value.getLeft()));
+            map.put(RIGHT_FIELD, serializer.create(value.getRight()));
+            map.put(TOP_FIELD, serializer.create(value.getTop()));
+            map.put(BOTTOM_FIELD, serializer.create(value.getBottom()));
+            return serializer.create(map);
         }
 
-        return context.createNull();
+        return serializer.createNull();
     }
 
     @Override

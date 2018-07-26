@@ -19,18 +19,18 @@ import gnu.trove.list.TIntList;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 /**
  */
 public class Vector2iTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Vector2i> {
 
     @Override
-    public PersistedData serialize(Vector2i value, SerializationContext context) {
+    public PersistedData serialize(Vector2i value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return context.createNull();
+            return serializer.createNull();
         } else {
-            return context.create(value.x, value.y);
+            return serializer.create(value.x, value.y);
         }
     }
 

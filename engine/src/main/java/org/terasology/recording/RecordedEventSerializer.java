@@ -48,7 +48,7 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedData;
-import org.terasology.persistence.typeHandling.gson.GsonSerializationContext;
+import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.naming.Name;
@@ -127,7 +127,7 @@ class RecordedEventSerializer {
 
     private void writeSpecificEventData(JsonWriter writer, Event event) {
         try {
-            GsonSerializationContext serializationContext = new GsonSerializationContext();
+            GsonPersistedDataSerializer serializationContext = new GsonPersistedDataSerializer();
             Gson gson = new GsonBuilder().create();
             if (event instanceof InputEvent) {
                 InputEvent e = (InputEvent) event;
@@ -194,7 +194,7 @@ class RecordedEventSerializer {
         }
     }
 
-    private void writeVector3fData(JsonWriter writer, GsonSerializationContext serializationContext, InputEvent e) throws IOException {
+    private void writeVector3fData(JsonWriter writer, GsonPersistedDataSerializer serializationContext, InputEvent e) throws IOException {
         if (e.getHitNormal() == null) {
             writeDefaultVector3fData(writer);
         } else {
@@ -202,7 +202,7 @@ class RecordedEventSerializer {
         }
     }
 
-    private void writeRealVector3fData(JsonWriter writer, GsonSerializationContext serializationContext, InputEvent e) throws IOException {
+    private void writeRealVector3fData(JsonWriter writer, GsonPersistedDataSerializer serializationContext, InputEvent e) throws IOException {
         TypeHandler handler = typeSerializationLibrary.getTypeHandler(Vector3f.class);
         GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getHitNormal(), serializationContext);
         writer.name("hitNormal");
@@ -256,7 +256,7 @@ class RecordedEventSerializer {
         writer.endObject();
     }
 
-    private void writeInputEventInstanceData(JsonWriter writer, Event event, GsonSerializationContext serializationContext) throws Exception {
+    private void writeInputEventInstanceData(JsonWriter writer, Event event, GsonPersistedDataSerializer serializationContext) throws Exception {
         if (event instanceof MouseWheelEvent) {
             MouseWheelEvent e = (MouseWheelEvent) event;
             writer.name("wheelTurns").value(e.getWheelTurns());

@@ -20,13 +20,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TLongIterator;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -34,7 +33,7 @@ import java.util.Map;
 
 /**
  */
-public class GsonSerializationContext implements SerializationContext {
+public class GsonPersistedDataSerializer implements PersistedDataSerializer {
 
     private static final PersistedData NULL_INSTANCE = new GsonPersistedData(JsonNull.INSTANCE);
 

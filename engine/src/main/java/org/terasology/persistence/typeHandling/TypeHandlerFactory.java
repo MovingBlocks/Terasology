@@ -30,7 +30,7 @@ public interface TypeHandlerFactory {
      *
      * This method is usually called only once for a type, so all expensive pre-computations and reflection
      * operations can be performed here so that the generated
-     * {@link TypeHandler#serialize(Object, SerializationContext)} and
+     * {@link TypeHandler#serialize(Object, PersistedDataSerializer)} and
      * {@link TypeHandler#deserialize(PersistedData)} implementations are fast.
      *
      * @param typeInfo The {@link TypeInfo} of the type for which a {@link TypeHandler} must be generated.

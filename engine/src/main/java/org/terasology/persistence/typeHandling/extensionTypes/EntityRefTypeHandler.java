@@ -20,7 +20,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.List;
@@ -36,11 +36,11 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     }
 
     @Override
-    public PersistedData serialize(EntityRef value, SerializationContext context) {
+    public PersistedData serialize(EntityRef value, PersistedDataSerializer serializer) {
         if (value.exists() && value.isPersistent()) {
-            return context.create(value.getId());
+            return serializer.create(value.getId());
         }
-        return context.createNull();
+        return serializer.createNull();
     }
 
     @Override

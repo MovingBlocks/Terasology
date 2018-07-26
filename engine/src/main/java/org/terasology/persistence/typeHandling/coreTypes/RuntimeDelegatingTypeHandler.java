@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.TypeInfo;
@@ -52,10 +52,10 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
     }
 
     @Override
-    public PersistedData serialize(T value, SerializationContext context) {
+    public PersistedData serialize(T value, PersistedDataSerializer serializer) {
         // If primitive, don't go looking for the runtime type, serialize as is
         if (typeInfo.getRawType().isPrimitive()) {
-            return delegateHandler.serialize(value, context);
+            return delegateHandler.serialize(value, serializer);
         }
 
         TypeHandler<T> chosenHandler = delegateHandler;
@@ -77,22 +77,22 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
         }
 
         if (chosenHandler == delegateHandler) {
-            return delegateHandler.serialize(value, context);
+            return delegateHandler.serialize(value, serializer);
         }
 
         Map<String, PersistedData> typeValuePersistedDataMap = Maps.newHashMap();
 
         typeValuePersistedDataMap.put(
                 TYPE_FIELD,
-                context.create(runtimeClass.getName())
+                serializer.create(runtimeClass.getName())
         );
 
         typeValuePersistedDataMap.put(
                 VALUE_FIELD,
-                chosenHandler.serialize(value, context)
+                chosenHandler.serialize(value, serializer)
         );
 
-        return context.create(typeValuePersistedDataMap);
+        return serializer.create(typeValuePersistedDataMap);
     }
 
     @Override

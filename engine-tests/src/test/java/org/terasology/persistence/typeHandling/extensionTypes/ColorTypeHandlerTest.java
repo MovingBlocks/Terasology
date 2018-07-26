@@ -22,7 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.rendering.nui.Color;
@@ -36,9 +36,9 @@ public class ColorTypeHandlerTest {
 
     @Test
     public void testSerialize() {
-        SerializationContext serializationContext = Mockito.mock(SerializationContext.class);
-        handler.serialize(new Color(0x010380FF), serializationContext);
-        Mockito.verify(serializationContext).create(1, 3, 128, 255);
+        PersistedDataSerializer persistedDataSerializer = Mockito.mock(PersistedDataSerializer.class);
+        handler.serialize(new Color(0x010380FF), persistedDataSerializer);
+        Mockito.verify(persistedDataSerializer).create(1, 3, 128, 255);
     }
 
     @Test

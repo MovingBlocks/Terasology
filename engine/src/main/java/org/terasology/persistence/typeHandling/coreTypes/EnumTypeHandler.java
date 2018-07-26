@@ -19,7 +19,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Locale;
@@ -41,11 +41,11 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
     }
 
     @Override
-    public PersistedData serialize(T value, SerializationContext context) {
+    public PersistedData serialize(T value, PersistedDataSerializer serializer) {
         if (value != null) {
-            return context.create(value.toString());
+            return serializer.create(value.toString());
         }
-        return context.createNull();
+        return serializer.createNull();
     }
 
     @Override

@@ -22,7 +22,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Map;
@@ -41,16 +41,16 @@ public class Region3iTypeHandler implements org.terasology.persistence.typeHandl
     }
 
     @Override
-    public PersistedData serialize(Region3i value, SerializationContext context) {
+    public PersistedData serialize(Region3i value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return context.createNull();
+            return serializer.createNull();
         } else {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
 
-            map.put(MIN_FIELD, vector3iTypeHandler.serialize(value.min(), context));
-            map.put(SIZE_FIELD, vector3iTypeHandler.serialize(value.size(), context));
+            map.put(MIN_FIELD, vector3iTypeHandler.serialize(value.min(), serializer));
+            map.put(SIZE_FIELD, vector3iTypeHandler.serialize(value.size(), serializer));
 
-            return context.create(map);
+            return serializer.create(map);
         }
     }
 
