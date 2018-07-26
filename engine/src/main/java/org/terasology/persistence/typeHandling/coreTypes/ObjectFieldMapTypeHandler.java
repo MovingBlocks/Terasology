@@ -28,6 +28,8 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
+ * Serializes objects as a fieldName -> fieldValue map. It is used as the last resort while serializing an
+ * object through a {@link org.terasology.persistence.typeHandling.TypeSerializationLibrary}.
  */
 public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
 

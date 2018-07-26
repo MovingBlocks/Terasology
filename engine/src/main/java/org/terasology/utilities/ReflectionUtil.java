@@ -281,6 +281,16 @@ public final class ReflectionUtil {
         return null;
     }
 
+    /**
+     * Resolves all {@link TypeVariable}s in {@code type} to concrete types as per the type
+     * parameter definitions in {@code contextType}. All {@link TypeVariable}s in {@code type}
+     * should have been declared in {@code contextType} or one of its supertypes, otherwise an error
+     * will be thrown.
+     *
+     * @param contextType The {@link Type} which contains all type parameter definitions used in {@code type}.
+     * @param type The {@link Type} whose {@link TypeVariable}s are to be resolved.
+     * @return A copy of {@code type} with all {@link TypeVariable}s resolved.
+     */
     public static Type resolveType(Type contextType, Type type) {
         Class<?> contextClass = getClassOfType(contextType);
 

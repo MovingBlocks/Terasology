@@ -28,6 +28,14 @@ import org.terasology.reflection.TypeInfo;
 
 import java.util.Map;
 
+/**
+ * Delegates serialization of a value to a handler of its runtime type if needed. It is used in
+ * cases where a subclass instance can be referred to as its supertype. As such, it is meant
+ * for internal use in another {@link TypeHandler} only, and is never directly registered
+ * in a {@link TypeSerializationLibrary}.
+ *
+ * @param <T> The base type whose instances may be delegated to a subtype's {@link TypeHandler} at runtime.
+ */
 public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
     private static final String TYPE_FIELD = "@type";
     private static final String VALUE_FIELD = "@value";

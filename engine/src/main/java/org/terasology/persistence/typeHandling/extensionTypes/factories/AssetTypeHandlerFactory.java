@@ -24,6 +24,10 @@ import org.terasology.reflection.TypeInfo;
 
 import java.util.Optional;
 
+/**
+ * Generates an {@link AssetTypeHandler} for each type extending {@link Asset} so that an
+ * {@link AssetTypeHandler} does not have to be manually registered for each subtype of {@link Asset}.
+ */
 public class AssetTypeHandlerFactory implements TypeHandlerFactory {
     @Override
     public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
