@@ -34,14 +34,22 @@ public class Rect2fTypeHandler implements TypeHandler<Rect2f> {
     private static final String MIN_FIELD = "min";
     private static final String SIZE_FIELD = "size";
 
+    private TypeHandler<Vector2f> vector2fTypeHandler;
+
+    public Rect2fTypeHandler(TypeHandler<Vector2f> vector2fTypeHandler) {
+        this.vector2fTypeHandler = vector2fTypeHandler;
+    }
+
     @Override
     public PersistedData serialize(Rect2f value, SerializationContext context) {
         if (value == null) {
             return context.createNull();
         } else {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
-            map.put(MIN_FIELD, context.create(value.min(), Vector2f.class));
-            map.put(SIZE_FIELD, context.create(value.size(), Vector2f.class));
+
+            map.put(MIN_FIELD, vector2fTypeHandler.serialize(value.min(), context));
+            map.put(SIZE_FIELD, vector2fTypeHandler.serialize(value.size(), context));
+
             return context.create(map);
         }
     }
@@ -50,8 +58,10 @@ public class Rect2fTypeHandler implements TypeHandler<Rect2f> {
     public Rect2f deserialize(PersistedData data, DeserializationContext context) {
         if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
-            Vector2f min = context.deserializeAs(map.get(MIN_FIELD), Vector2f.class);
-            Vector2f size = context.deserializeAs(map.get(SIZE_FIELD), Vector2f.class);
+
+            Vector2f min = vector2fTypeHandler.deserialize(map.get(MIN_FIELD), context);
+            Vector2f size = vector2fTypeHandler.deserialize(map.get(SIZE_FIELD), context);
+
             return Rect2f.createFromMinAndSize(min, size);
         }
         return null;
