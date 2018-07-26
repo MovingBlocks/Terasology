@@ -27,9 +27,9 @@ public abstract class StringRepresentationTypeHandler<T> implements TypeHandler<
     public PersistedData serialize(T value, PersistedDataSerializer serializer) {
         String stringValue = getAsString(value);
         if (stringValue == null) {
-            return serializer.createNull();
+            return serializer.serializeNull();
         } else {
-            return serializer.create(stringValue);
+            return serializer.serialize(stringValue);
         }
     }
 

@@ -26,9 +26,9 @@ public class StringTypeHandler implements TypeHandler<String> {
     @Override
     public PersistedData serialize(String value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return serializer.createNull();
+            return serializer.serializeNull();
         } else {
-            return serializer.create(value);
+            return serializer.serialize(value);
         }
     }
 

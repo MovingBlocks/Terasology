@@ -41,7 +41,7 @@ public class StringMapTypeHandler<T> implements TypeHandler<Map<String, T>> {
                 map.put(entry.getKey(), item);
             }
         }
-        return serializer.create(map);
+        return serializer.serialize(map);
     }
 
     @Override

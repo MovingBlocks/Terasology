@@ -43,14 +43,14 @@ public class Region3iTypeHandler implements org.terasology.persistence.typeHandl
     @Override
     public PersistedData serialize(Region3i value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return serializer.createNull();
+            return serializer.serializeNull();
         } else {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
 
             map.put(MIN_FIELD, vector3iTypeHandler.serialize(value.min(), serializer));
             map.put(SIZE_FIELD, vector3iTypeHandler.serialize(value.size(), serializer));
 
-            return serializer.create(map);
+            return serializer.serialize(map);
         }
     }
 

@@ -37,7 +37,7 @@ public class EnumTypeHandlerSerializerTest {
         when(nullData.isNull()).thenReturn(true);
 
         PersistedDataSerializer persistedDataSerializer = mock(PersistedDataSerializer.class);
-        when(persistedDataSerializer.createNull()).thenReturn(nullData);
+        when(persistedDataSerializer.serializeNull()).thenReturn(nullData);
         EnumTypeHandler<TestEnum> handler = new EnumTypeHandler<>(TestEnum.class);
         PersistedData serializedNull = handler.serialize(null, persistedDataSerializer);
         assertEquals(nullData, serializedNull);
@@ -53,7 +53,7 @@ public class EnumTypeHandlerSerializerTest {
         when(data.isString()).thenReturn(true);
 
         PersistedDataSerializer persistedDataSerializer = mock(PersistedDataSerializer.class);
-        when(persistedDataSerializer.create(TestEnum.NON_NULL.toString())).thenReturn(data);
+        when(persistedDataSerializer.serialize(TestEnum.NON_NULL.toString())).thenReturn(data);
         EnumTypeHandler<TestEnum> handler = new EnumTypeHandler<>(TestEnum.class);
         PersistedData serializedNonNull = handler.serialize(TestEnum.NON_NULL, persistedDataSerializer);
         assertEquals(data, serializedNonNull);

@@ -35,14 +35,14 @@ public class BorderTypeHandler implements org.terasology.persistence.typeHandlin
     public PersistedData serialize(Border value, PersistedDataSerializer serializer) {
         if (value != null) {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
-            map.put(LEFT_FIELD, serializer.create(value.getLeft()));
-            map.put(RIGHT_FIELD, serializer.create(value.getRight()));
-            map.put(TOP_FIELD, serializer.create(value.getTop()));
-            map.put(BOTTOM_FIELD, serializer.create(value.getBottom()));
-            return serializer.create(map);
+            map.put(LEFT_FIELD, serializer.serialize(value.getLeft()));
+            map.put(RIGHT_FIELD, serializer.serialize(value.getRight()));
+            map.put(TOP_FIELD, serializer.serialize(value.getTop()));
+            map.put(BOTTOM_FIELD, serializer.serialize(value.getBottom()));
+            return serializer.serialize(map);
         }
 
-        return serializer.createNull();
+        return serializer.serializeNull();
     }
 
     @Override

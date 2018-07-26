@@ -43,14 +43,14 @@ public class Rect2iTypeHandler implements org.terasology.persistence.typeHandlin
     @Override
     public PersistedData serialize(Rect2i value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return serializer.createNull();
+            return serializer.serializeNull();
         } else {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
 
             map.put(MIN_FIELD, vector2iTypeHandler.serialize(value.min(), serializer));
             map.put(SIZE_FIELD, vector2iTypeHandler.serialize(value.size(), serializer));
 
-            return serializer.create(map);
+            return serializer.serialize(map);
         }
     }
 

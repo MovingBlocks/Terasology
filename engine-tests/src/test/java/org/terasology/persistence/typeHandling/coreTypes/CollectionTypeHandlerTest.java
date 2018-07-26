@@ -53,7 +53,7 @@ public class CollectionTypeHandlerTest {
 
         verify(elementTypeHandler, times(collection.size())).serialize(any(), any());
 
-        verify(context).create(argThat(new ArgumentMatcher<Iterable<PersistedData>>() {
+        verify(context).serialize(argThat(new ArgumentMatcher<Iterable<PersistedData>>() {
             @Override
             public boolean matches(Iterable<PersistedData> argument) {
                 return argument instanceof Collection && ((Collection) argument).size() == collection.size();

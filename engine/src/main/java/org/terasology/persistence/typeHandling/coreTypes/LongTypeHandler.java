@@ -26,9 +26,9 @@ public class LongTypeHandler implements TypeHandler<Long> {
     @Override
     public PersistedData serialize(Long value, PersistedDataSerializer serializer) {
         if (value != null) {
-            return serializer.create(value);
+            return serializer.serialize(value);
         }
-        return serializer.createNull();
+        return serializer.serializeNull();
     }
 
     @Override

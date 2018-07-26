@@ -41,7 +41,7 @@ public class CollectionTypeHandler<E> implements TypeHandler<Collection<E>> {
             items.add(elementTypeHandler.serialize(element, serializer));
         }
 
-        return serializer.create(items);
+        return serializer.serialize(items);
     }
 
     @Override

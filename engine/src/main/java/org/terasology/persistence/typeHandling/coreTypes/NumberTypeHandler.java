@@ -27,9 +27,9 @@ public class NumberTypeHandler implements TypeHandler<Number> {
     @Override
     public PersistedData serialize(Number value, PersistedDataSerializer serializer) {
         if (value != null) {
-            return serializer.create(value.doubleValue());
+            return serializer.serialize(value.doubleValue());
         }
-        return serializer.createNull();
+        return serializer.serializeNull();
     }
 
     @Override

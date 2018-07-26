@@ -64,7 +64,7 @@ public class Serializer {
                 return handler.serialize(rawValue, context);
             }
         }
-        return context.createNull();
+        return context.serializeNull();
     }
 
     /**

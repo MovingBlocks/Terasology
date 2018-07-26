@@ -26,9 +26,9 @@ public class IntTypeHandler implements TypeHandler<Integer> {
     @Override
     public PersistedData serialize(Integer value, PersistedDataSerializer serializer) {
         if (value != null) {
-            return serializer.create(value);
+            return serializer.serialize(value);
         }
-        return serializer.createNull();
+        return serializer.serializeNull();
     }
 
     @Override

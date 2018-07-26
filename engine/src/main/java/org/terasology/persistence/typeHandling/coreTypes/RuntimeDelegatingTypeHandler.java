@@ -84,7 +84,7 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
 
         typeValuePersistedDataMap.put(
                 TYPE_FIELD,
-                serializer.create(runtimeClass.getName())
+                serializer.serialize(runtimeClass.getName())
         );
 
         typeValuePersistedDataMap.put(
@@ -92,7 +92,7 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
                 chosenHandler.serialize(value, serializer)
         );
 
-        return serializer.create(typeValuePersistedDataMap);
+        return serializer.serialize(typeValuePersistedDataMap);
     }
 
     @Override

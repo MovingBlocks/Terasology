@@ -38,7 +38,7 @@ public class ColorTypeHandlerTest {
     public void testSerialize() {
         PersistedDataSerializer persistedDataSerializer = Mockito.mock(PersistedDataSerializer.class);
         handler.serialize(new Color(0x010380FF), persistedDataSerializer);
-        Mockito.verify(persistedDataSerializer).create(1, 3, 128, 255);
+        Mockito.verify(persistedDataSerializer).serialize(1, 3, 128, 255);
     }
 
     @Test

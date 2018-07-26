@@ -38,9 +38,9 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     @Override
     public PersistedData serialize(EntityRef value, PersistedDataSerializer serializer) {
         if (value.exists() && value.isPersistent()) {
-            return serializer.create(value.getId());
+            return serializer.serialize(value.getId());
         }
-        return serializer.createNull();
+        return serializer.serializeNull();
     }
 
     @Override
