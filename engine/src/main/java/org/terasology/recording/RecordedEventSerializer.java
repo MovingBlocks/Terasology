@@ -133,7 +133,7 @@ class RecordedEventSerializer {
 
     private void writeSpecificEventData(JsonWriter writer, Event event) {
         try {
-            GsonSerializationContext serializationContext = new GsonSerializationContext(null);
+            GsonSerializationContext serializationContext = new GsonSerializationContext();
             Gson gson = new GsonBuilder().create();
             if (event instanceof InputEvent) {
                 InputEvent e = (InputEvent) event;

@@ -38,12 +38,6 @@ public class GsonSerializationContext implements SerializationContext {
 
     private static final PersistedData NULL_INSTANCE = new GsonPersistedData(JsonNull.INSTANCE);
 
-    private JsonSerializationContext context;
-
-    public GsonSerializationContext(JsonSerializationContext context) {
-        this.context = context;
-    }
-
     @Override
     public PersistedData create(String value) {
         return new GsonPersistedData(new JsonPrimitive(value));
