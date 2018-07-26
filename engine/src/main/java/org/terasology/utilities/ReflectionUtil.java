@@ -241,7 +241,8 @@ public final class ReflectionUtil {
     private static <T> Type getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
         for (Class targetClass = getClassOfType(target);
              !Object.class.equals(targetClass);
-             target = targetClass.getGenericSuperclass(), targetClass = getClassOfType(target)) {
+             target = resolveType(target, targetClass.getGenericSuperclass()),
+                     targetClass = getClassOfType(target)) {
             if (superClass.equals(targetClass)) {
                 return getTypeParameter(target, index);
             }
@@ -261,13 +262,15 @@ public final class ReflectionUtil {
             return getTypeParameter(target, index);
         }
 
-        Type genericSuperclass = targetClass.getGenericSuperclass();
+        Type genericSuperclass = resolveType(target, targetClass.getGenericSuperclass());
 
         if (!Object.class.equals(genericSuperclass) && genericSuperclass != null) {
             return getTypeParameterForSuperInterface(genericSuperclass, superClass, index);
         }
 
         for (Type genericInterface : targetClass.getGenericInterfaces()) {
+            genericInterface = resolveType(target, genericInterface);
+
             Type typeParameter = getTypeParameterForSuperInterface(genericInterface, superClass, index);
 
             if (typeParameter != null) {

@@ -33,6 +33,15 @@ import static org.junit.Assert.assertTrue;
 /**
  */
 public class ReflectionUtilsTest {
+    @Test
+    public void testGetClassOfTypeWildcard() {
+        class C<T> {}
+
+        ParameterizedType cType = (ParameterizedType) new TypeInfo<C<?>>() {}.getType();
+        Type wildcardType = cType.getActualTypeArguments()[0];
+
+        assertEquals(Object.class, ReflectionUtil.getClassOfType(wildcardType));
+    }
 
     @Test
     public void testGetParameterForField() throws Exception {
@@ -51,7 +60,31 @@ public class ReflectionUtilsTest {
 
     @Test
     public void testGetParameterForUnboundGenericInterface() throws Exception {
-        assertTrue(ReflectionUtil.getTypeParameterForSuper(UnboundInterfaceImplementor.class, CopyStrategy.class, 0) instanceof TypeVariable);
+        Type parameter = ReflectionUtil.getTypeParameterForSuper(new TypeInfo<UnboundInterfaceImplementor<?>>() {}.getType(), CopyStrategy.class, 0);
+
+        assertTrue(parameter instanceof WildcardType);
+    }
+
+    @Test
+    public void testGetTypeParameterForGenericSupertypeInGenericSubclass() {
+        class SubInterface<T> implements CopyStrategy<T> {
+            @Override
+            public T copy(T value) {
+                return null;
+            }
+        }
+
+        class SuperClass<T> {}
+
+        class SubClass<T> extends SuperClass<T> {}
+
+        Type subInterfaceType = new TypeInfo<SubInterface<Integer>>() {}.getType();
+
+        assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(subInterfaceType, CopyStrategy.class, 0));
+
+        Type subClassType = new TypeInfo<SubClass<Integer>>() {}.getType();
+
+        assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(subClassType, SuperClass.class, 0));
     }
 
     @Test
