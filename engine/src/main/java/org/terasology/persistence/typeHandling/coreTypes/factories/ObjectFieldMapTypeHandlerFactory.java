@@ -80,6 +80,10 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
 
         while (!Object.class.equals(rawType)) {
             for (Field field : rawType.getDeclaredFields()) {
+                if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+
                 field.setAccessible(true);
                 Type fieldType = ReflectionUtil.resolveType(type, field.getGenericType());
                 fields.put(field, fieldType);

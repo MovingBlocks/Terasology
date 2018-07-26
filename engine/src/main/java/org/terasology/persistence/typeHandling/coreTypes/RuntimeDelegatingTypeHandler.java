@@ -54,6 +54,11 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
 
     @Override
     public PersistedData serialize(T value, SerializationContext context) {
+        // If primitive, don't go looking for the runtime type, serialize as is
+        if (typeInfo.getRawType().isPrimitive()) {
+            return delegateHandler.serialize(value, context);
+        }
+
         TypeHandler<T> chosenHandler = delegateHandler;
         Class<?> runtimeClass = value.getClass();
 
@@ -120,7 +125,7 @@ public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
 
         PersistedData valueData = valueMap.get(VALUE_FIELD);
 
-        return typeHandler.deserialize(data, context);
+        return typeHandler.deserialize(valueData, context);
 
     }
 }
