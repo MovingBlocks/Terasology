@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import org.junit.Test;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 
@@ -43,8 +42,7 @@ public class EnumTypeHandlerSerializerTest {
         PersistedData serializedNull = handler.serialize(null, serializationContext);
         assertEquals(nullData, serializedNull);
 
-        DeserializationContext deserializationContext = mock(DeserializationContext.class);
-        TestEnum deserializedValue = handler.deserialize(nullData, deserializationContext);
+        TestEnum deserializedValue = handler.deserialize(nullData);
         assertEquals(null, deserializedValue);
     }
 
@@ -60,8 +58,7 @@ public class EnumTypeHandlerSerializerTest {
         PersistedData serializedNonNull = handler.serialize(TestEnum.NON_NULL, serializationContext);
         assertEquals(data, serializedNonNull);
 
-        DeserializationContext deserializationContext = mock(DeserializationContext.class);
-        TestEnum deserializedValue = handler.deserialize(data, deserializationContext);
+        TestEnum deserializedValue = handler.deserialize(data);
         assertEquals(TestEnum.NON_NULL, deserializedValue);
     }
 }

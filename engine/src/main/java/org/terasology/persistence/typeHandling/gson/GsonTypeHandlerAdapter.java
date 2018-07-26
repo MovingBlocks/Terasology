@@ -62,7 +62,7 @@ public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
                 .getElement();
 
         this.deserializer = (json, typeOfT, context) ->
-                typeHandler.deserialize(new GsonPersistedData(json), new GsonDeserializationContext(context));
+                typeHandler.deserialize(new GsonPersistedData(json));
 
         this.gson = gson;
         this.typeToken = typeToken;

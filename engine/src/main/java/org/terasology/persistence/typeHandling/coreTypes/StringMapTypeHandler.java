@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Maps;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -46,11 +45,11 @@ public class StringMapTypeHandler<T> implements TypeHandler<Map<String, T>> {
     }
 
     @Override
-    public Map<String, T> deserialize(PersistedData data, DeserializationContext context) {
+    public Map<String, T> deserialize(PersistedData data) {
         Map<String, T> result = Maps.newLinkedHashMap();
         if (data.isValueMap()) {
             for (Map.Entry<String, PersistedData> item : data.getAsValueMap().entrySet()) {
-                result.put(item.getKey(), contentsHandler.deserialize(item.getValue(), context));
+                result.put(item.getKey(), contentsHandler.deserialize(item.getValue()));
             }
         }
         return result;

@@ -34,7 +34,7 @@ public abstract class StringRepresentationTypeHandler<T> implements TypeHandler<
     }
 
     @Override
-    public T deserialize(PersistedData data, DeserializationContext context) {
+    public T deserialize(PersistedData data) {
         if (data.isString()) {
             return getFromString(data.getAsString());
         }

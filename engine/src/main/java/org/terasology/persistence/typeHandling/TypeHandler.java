@@ -15,9 +15,6 @@
  */
 package org.terasology.persistence.typeHandling;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
  */
 public interface TypeHandler<T> {
@@ -39,5 +36,5 @@ public interface TypeHandler<T> {
      * @return The deserialized value.
      * @throws org.terasology.persistence.typeHandling.DeserializationException if there was an error deserializing the data
      */
-    T deserialize(PersistedData data, DeserializationContext context);
+    T deserialize(PersistedData data);
 }

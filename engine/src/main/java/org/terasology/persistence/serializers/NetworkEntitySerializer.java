@@ -234,7 +234,7 @@ public class NetworkEntitySerializer {
                 ReplicatedFieldMetadata fieldMetadata = metadata.getField(fieldId);
                 if (fieldMetadata != null && fieldCheck.shouldDeserialize(metadata, fieldMetadata)) {
                     logger.trace("Deserializing field {} of component {} as value {}", fieldMetadata, metadata, entityData.getFieldValue(fieldPos));
-                    serializer.deserializeOnto(component, fieldMetadata, new ProtobufPersistedData(entityData.getFieldValue(fieldPos)), deserializationContext);
+                    serializer.deserializeOnto(component, fieldMetadata, new ProtobufPersistedData(entityData.getFieldValue(fieldPos)));
                 }
                 fieldPos++;
             }

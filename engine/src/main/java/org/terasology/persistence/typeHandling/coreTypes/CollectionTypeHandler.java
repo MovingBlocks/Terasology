@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Lists;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -46,11 +45,11 @@ public class CollectionTypeHandler<E> implements TypeHandler<Collection<E>> {
     }
 
     @Override
-    public Collection<E> deserialize(PersistedData data, DeserializationContext context) {
+    public Collection<E> deserialize(PersistedData data) {
         Collection<E> collection = constructor.construct();
 
         for (PersistedData item : data.getAsArray()) {
-            collection.add(elementTypeHandler.deserialize(item, context));
+            collection.add(elementTypeHandler.deserialize(item));
         }
 
         return collection;

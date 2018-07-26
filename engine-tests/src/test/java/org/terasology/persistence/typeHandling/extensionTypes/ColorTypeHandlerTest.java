@@ -21,7 +21,6 @@ import com.google.gson.JsonArray;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
@@ -34,7 +33,6 @@ import org.terasology.rendering.nui.Color;
 public class ColorTypeHandlerTest {
 
     private final ColorTypeHandler handler = new ColorTypeHandler();
-    private final DeserializationContext deserializationContext = Mockito.mock(DeserializationContext.class);
 
     @Test
     public void testSerialize() {
@@ -46,7 +44,7 @@ public class ColorTypeHandlerTest {
     @Test
     public void testDeserializeHex() {
         PersistedData data = new PersistedString("DEADBEEF");
-        Color color = handler.deserialize(data, deserializationContext);
+        Color color = handler.deserialize(data);
         Assert.assertEquals(0xDEADBEEF, color.rgba());
     }
 
@@ -54,7 +52,7 @@ public class ColorTypeHandlerTest {
     public void testDeserializeArray() {
         JsonArray array = new Gson().fromJson("[12, 34, 56, 78]", JsonArray.class);
         PersistedData data = new GsonPersistedDataArray(array);
-        Color color = handler.deserialize(data, deserializationContext);
+        Color color = handler.deserialize(data);
         Assert.assertEquals(12, color.r());
         Assert.assertEquals(34, color.g());
         Assert.assertEquals(56, color.b());

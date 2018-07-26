@@ -15,7 +15,6 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -33,7 +32,7 @@ public class LongTypeHandler implements TypeHandler<Long> {
     }
 
     @Override
-    public Long deserialize(PersistedData data, DeserializationContext context) {
+    public Long deserialize(PersistedData data) {
         if (data.isNumber()) {
             return data.getAsLong();
         }

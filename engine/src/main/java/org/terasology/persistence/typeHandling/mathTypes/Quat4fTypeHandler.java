@@ -17,7 +17,6 @@ package org.terasology.persistence.typeHandling.mathTypes;
 
 import gnu.trove.list.TFloatList;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
@@ -37,7 +36,7 @@ public class Quat4fTypeHandler implements org.terasology.persistence.typeHandlin
     }
 
     @Override
-    public Quat4f deserialize(PersistedData data, DeserializationContext context) {
+    public Quat4f deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 3) {

@@ -16,31 +16,17 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.TLongList;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.ArgumentMatchers;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
-import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -93,14 +79,10 @@ public class CollectionTypeHandlerTest {
             jsonArray.add(i);
         }
 
-        DeserializationContext context = mock(DeserializationContext.class);
-
-        typeHandler.deserialize(new GsonPersistedDataArray(jsonArray), context);
+        typeHandler.deserialize(new GsonPersistedDataArray(jsonArray));
 
         verify(constructor).construct();
 
-        verify(elementTypeHandler, times(jsonArray.size())).deserialize(any(), any());
-
-        verifyZeroInteractions(context);
+        verify(elementTypeHandler, times(jsonArray.size())).deserialize(any());
     }
 }

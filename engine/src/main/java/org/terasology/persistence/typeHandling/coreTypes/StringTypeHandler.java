@@ -15,7 +15,6 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -34,7 +33,7 @@ public class StringTypeHandler implements TypeHandler<String> {
     }
 
     @Override
-    public String deserialize(PersistedData data, DeserializationContext context) {
+    public String deserialize(PersistedData data) {
         if (data.isString()) {
             return data.getAsString();
         }
