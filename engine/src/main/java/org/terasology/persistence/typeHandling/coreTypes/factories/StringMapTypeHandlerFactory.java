@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.utilities.ReflectionUtil;
@@ -38,6 +39,7 @@ public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
+        // TODO: Replace with getTypeParameterFromSuper
         Type keyType = ReflectionUtil.getTypeParameter(typeInfo.getType(), 0);
         Type valueType = ReflectionUtil.getTypeParameter(typeInfo.getType(), 1);
 
@@ -50,7 +52,11 @@ public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        TypeHandler<T> valueTypeHandler = (TypeHandler<T>) typeSerializationLibrary.getTypeHandler(valueType);
+        TypeHandler<T> valueTypeHandler = new RuntimeDelegatingTypeHandler(
+                typeSerializationLibrary.getTypeHandler(valueType),
+                TypeInfo.of(valueType),
+                typeSerializationLibrary
+        );
 
         return Optional.of((TypeHandler<T>) new StringMapTypeHandler<>(valueTypeHandler));
     }
