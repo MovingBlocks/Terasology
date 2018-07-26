@@ -48,7 +48,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
-import org.terasology.persistence.typeHandling.gson.GsonDeserializationContext;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedData;
 import org.terasology.persistence.typeHandling.gson.GsonSerializationContext;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -365,7 +364,6 @@ class RecordedEventSerializer {
     private Event deserializeSpecificEventData(JsonObject jsonObject, String className) {
         Event result = null;
         Gson gson = new GsonBuilder().create();
-        GsonDeserializationContext deserializationContext = new GsonDeserializationContext(null);
         if (className.equals(CameraTargetChangedEvent.class.getName())) {
             EntityRef oldTarget = new RecordedEntityRef(jsonObject.get("OldTarget").getAsLong(), (LowLevelEntityManager) this.entityManager);
             EntityRef newTarget =  new RecordedEntityRef(jsonObject.get("NewTarget").getAsLong(), (LowLevelEntityManager) this.entityManager);
@@ -407,14 +405,14 @@ class RecordedEventSerializer {
             EntityRef instigator = new RecordedEntityRef(jsonObject.get("instigator").getAsLong(), (LowLevelEntityManager) this.entityManager);
             EntityRef directCause = new RecordedEntityRef(jsonObject.get("directCause").getAsLong(), (LowLevelEntityManager) this.entityManager);
             result = new AttackEvent(instigator, directCause);
-        } else if (getInputEventSpecificType(jsonObject, className, deserializationContext) != null) { //input events
-            result = getInputEventSpecificType(jsonObject, className, deserializationContext);
+        } else if (getInputEventSpecificType(jsonObject, className) != null) { //input events
+            result = getInputEventSpecificType(jsonObject, className);
         }
 
         return result;
     }
 
-    private InputEvent getInputEventSpecificType(JsonObject jsonObject, String className, GsonDeserializationContext deserializationContext) {
+    private InputEvent getInputEventSpecificType(JsonObject jsonObject, String className) {
         InputEvent newEvent = null;
         try {
             Class clazz = this.inputEventClassMap.get(className);
@@ -474,7 +472,7 @@ class RecordedEventSerializer {
             }
 
             if (newEvent instanceof BindButtonEvent) {
-                bindButtonEventSetup((BindButtonEvent) newEvent, jsonObject, deserializationContext);
+                bindButtonEventSetup((BindButtonEvent) newEvent, jsonObject);
             } else if (newEvent instanceof BindAxisEvent) {
                 bindAxisEvent((BindAxisEvent) newEvent, jsonObject);
             }
@@ -486,7 +484,7 @@ class RecordedEventSerializer {
         return newEvent;
     }
 
-    private void bindButtonEventSetup(BindButtonEvent event, JsonObject jsonObject, GsonDeserializationContext deserializationContext) {
+    private void bindButtonEventSetup(BindButtonEvent event, JsonObject jsonObject) {
         GsonPersistedData data = new GsonPersistedData(jsonObject.get("state"));
         TypeHandler typeHandler = typeSerializationLibrary.getTypeHandler(ButtonState.class);
         ButtonState state = (ButtonState) typeHandler.deserialize(data);

@@ -37,7 +37,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufDeserializationContext;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufSerializationContext;
 import org.terasology.protobuf.EntityData;
@@ -55,7 +54,6 @@ public class NetworkEntitySerializer {
     private ComponentLibrary componentLibrary;
     private TypeSerializationLibrary typeSerializationLibrary;
     private ProtobufSerializationContext serializationContext;
-    private ProtobufDeserializationContext deserializationContext;
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
 
     public NetworkEntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
@@ -63,7 +61,6 @@ public class NetworkEntitySerializer {
         this.componentLibrary = componentLibrary;
         this.typeSerializationLibrary = typeSerializationLibrary;
         this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
-        this.deserializationContext = new ProtobufDeserializationContext(typeSerializationLibrary);
     }
 
     public void setComponentSerializeCheck(ComponentSerializeCheck componentSerializeCheck) {

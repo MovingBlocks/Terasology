@@ -31,7 +31,6 @@ import org.terasology.module.Module;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufDeserializationContext;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufSerializationContext;
 import org.terasology.protobuf.EntityData;
@@ -58,7 +57,6 @@ public class ComponentSerializer {
     private boolean usingFieldIds;
     private TypeSerializationLibrary typeSerializationLibrary;
     private ProtobufSerializationContext serializationContext;
-    private ProtobufDeserializationContext deserializationContext;
 
     /**
      * Creates the component serializer.
@@ -69,7 +67,6 @@ public class ComponentSerializer {
         this.componentLibrary = componentLibrary;
         this.typeSerializationLibrary = typeSerializationLibrary;
         this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
-        this.deserializationContext = new ProtobufDeserializationContext(typeSerializationLibrary);
     }
 
     public void setUsingFieldIds(boolean usingFieldIds) {
