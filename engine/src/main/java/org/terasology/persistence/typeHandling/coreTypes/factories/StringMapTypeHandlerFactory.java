@@ -39,9 +39,8 @@ public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        // TODO: Replace with getTypeParameterFromSuper
-        Type keyType = ReflectionUtil.getTypeParameter(typeInfo.getType(), 0);
-        Type valueType = ReflectionUtil.getTypeParameter(typeInfo.getType(), 1);
+        Type keyType = ReflectionUtil.getTypeParameterForSuper(typeInfo.getType(), Map.class, 0);
+        Type valueType = ReflectionUtil.getTypeParameterForSuper(typeInfo.getType(), Map.class, 1);
 
         if (!String.class.equals(keyType)) {
             return Optional.empty();
