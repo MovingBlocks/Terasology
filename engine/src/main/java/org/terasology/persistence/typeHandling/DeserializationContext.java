@@ -21,15 +21,4 @@ import java.util.List;
  */
 public interface DeserializationContext {
 
-    /**
-     * Attempts to deserialize the given persisted data as the specified type. Type handlers should take care not to invoke this on the type they handle or otherwise in
-     * a recursive manner.
-     *
-     * @param data The persisted data to deserialize
-     * @param type The type of the deserialized object.
-     * @param <T> The type of the deserialized object.
-     * @return An object of type
-     * @throws org.terasology.persistence.typeHandling.DeserializationException if the data cannot be deserialized as type.
-     */
-    <T> T deserializeAs(PersistedData data, Class<T> type);
 }

@@ -16,10 +16,7 @@
 package org.terasology.persistence.typeHandling.gson;
 
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonParseException;
 import org.terasology.persistence.typeHandling.DeserializationContext;
-import org.terasology.persistence.typeHandling.DeserializationException;
-import org.terasology.persistence.typeHandling.PersistedData;
 
 /**
  */
@@ -29,16 +26,6 @@ public class GsonDeserializationContext implements DeserializationContext {
 
     public GsonDeserializationContext(JsonDeserializationContext context) {
         this.context = context;
-    }
-
-    @Override
-    public <T> T deserializeAs(PersistedData data, Class<T> type) {
-        GsonPersistedData gsonData = (GsonPersistedData) data;
-        try {
-            return context.deserialize(gsonData.getElement(), type);
-        } catch (JsonParseException jpe) {
-            throw new DeserializationException("Failed to deserialize data as " + type, jpe);
-        }
     }
 
 }
