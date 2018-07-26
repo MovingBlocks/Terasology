@@ -60,7 +60,7 @@ public class NetworkEntitySerializer {
         this.entityManager = entityManager;
         this.componentLibrary = componentLibrary;
         this.typeSerializationLibrary = typeSerializationLibrary;
-        this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
+        this.serializationContext = new ProtobufSerializationContext();
     }
 
     public void setComponentSerializeCheck(ComponentSerializeCheck componentSerializeCheck) {

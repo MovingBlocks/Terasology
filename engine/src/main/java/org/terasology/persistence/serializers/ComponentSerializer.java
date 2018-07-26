@@ -66,7 +66,7 @@ public class ComponentSerializer {
     public ComponentSerializer(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.componentLibrary = componentLibrary;
         this.typeSerializationLibrary = typeSerializationLibrary;
-        this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
+        this.serializationContext = new ProtobufSerializationContext();
     }
 
     public void setUsingFieldIds(boolean usingFieldIds) {
