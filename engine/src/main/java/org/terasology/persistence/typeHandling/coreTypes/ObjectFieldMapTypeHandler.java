@@ -81,12 +81,18 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
         try {
             T result = constructor.construct();
             for (Map.Entry<String, PersistedData> entry : data.getAsValueMap().entrySet()) {
-                Field field = fieldByName.get(entry.getKey());
-                if (field != null) {
-                    TypeHandler handler = mappedFields.get(field);
-                    Object val = handler.deserialize(entry.getValue(), context);
-                    field.set(result, val);
+                String fieldName = entry.getKey();
+                Field field = fieldByName.get(fieldName);
+
+                if (field == null) {
+                    logger.error("Cound not find field with name {}", fieldName);
+                    continue;
                 }
+
+                TypeHandler handler = mappedFields.get(field);
+                Object fieldValue = handler.deserialize(entry.getValue(), context);
+
+                field.set(result, fieldValue);
             }
             return result;
         } catch (Exception e) {
@@ -94,5 +100,4 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
         }
         return null;
     }
-
 }
