@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.IntegerRange;
-import org.terasology.math.Region3i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
@@ -51,7 +50,6 @@ import org.terasology.persistence.typeHandling.extensionTypes.factories.AssetTyp
 import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Region3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
@@ -102,7 +100,7 @@ public class TypeSerializationLibrary {
         this.reflectFactory = factory;
         this.copyStrategies = copyStrategies;
 
-        constructorLibrary = new ConstructorLibrary(instanceCreators, reflectFactory);
+        constructorLibrary = new ConstructorLibrary(instanceCreators);
 
         addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
 

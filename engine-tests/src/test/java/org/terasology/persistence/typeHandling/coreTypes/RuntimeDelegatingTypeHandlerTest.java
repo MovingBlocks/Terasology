@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 
 public class RuntimeDelegatingTypeHandlerTest {
     private final ConstructorLibrary constructorLibrary =
-            new ConstructorLibrary(Maps.newHashMap(), new ReflectionReflectFactory());
+            new ConstructorLibrary(Maps.newHashMap());
 
     private final CollectionTypeHandlerFactory collectionHandlerFactory =
             new CollectionTypeHandlerFactory(constructorLibrary);
