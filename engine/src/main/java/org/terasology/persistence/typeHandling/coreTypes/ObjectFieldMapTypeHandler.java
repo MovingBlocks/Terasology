@@ -49,7 +49,7 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
     @Override
     public PersistedData serialize(T value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return serializer.createNull();
+            return serializer.serializeNull();
         }
         Map<String, PersistedData> mappedData = Maps.newLinkedHashMap();
         for (Map.Entry<Field, TypeHandler<?>> entry : mappedFields.entrySet()) {
@@ -72,7 +72,7 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
                 }
             }
         }
-        return serializer.create(mappedData);
+        return serializer.serialize(mappedData);
     }
 
     @Override

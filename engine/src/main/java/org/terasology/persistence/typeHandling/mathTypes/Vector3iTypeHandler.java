@@ -28,9 +28,9 @@ public class Vector3iTypeHandler implements org.terasology.persistence.typeHandl
     @Override
     public PersistedData serialize(Vector3i value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return serializer.createNull();
+            return serializer.serializeNull();
         } else {
-            return serializer.create(value.x, value.y, value.z);
+            return serializer.serialize(value.x, value.y, value.z);
         }
     }
 

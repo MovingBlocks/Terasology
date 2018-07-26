@@ -26,9 +26,9 @@ public class ByteTypeHandler implements TypeHandler<Byte> {
     @Override
     public PersistedData serialize(Byte value, PersistedDataSerializer serializer) {
         if (value != null) {
-            return serializer.create(new byte[]{value});
+            return serializer.serialize(new byte[]{value});
         }
-        return serializer.createNull();
+        return serializer.serializeNull();
     }
 
     @Override

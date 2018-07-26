@@ -22,9 +22,9 @@ public class ByteArrayTypeHandler implements org.terasology.persistence.typeHand
 	@Override
 	public PersistedData serialize(byte[] value, PersistedDataSerializer serializer) {
 		if (value == null) {
-			return serializer.createNull();
+			return serializer.serializeNull();
 		} else {
-			return serializer.create(value);
+			return serializer.serialize(value);
 		}
 	}
 

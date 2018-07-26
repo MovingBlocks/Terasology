@@ -43,9 +43,9 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
     @Override
     public PersistedData serialize(T value, PersistedDataSerializer serializer) {
         if (value != null) {
-            return serializer.create(value.toString());
+            return serializer.serialize(value.toString());
         }
-        return serializer.createNull();
+        return serializer.serializeNull();
     }
 
     @Override

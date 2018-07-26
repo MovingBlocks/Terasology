@@ -28,9 +28,9 @@ public class Quat4fTypeHandler implements org.terasology.persistence.typeHandlin
     @Override
     public PersistedData serialize(Quat4f value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return serializer.createNull();
+            return serializer.serializeNull();
         } else {
-            return serializer.create(value.x, value.y, value.z, value.w);
+            return serializer.serialize(value.x, value.y, value.z, value.w);
         }
 
     }

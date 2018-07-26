@@ -33,27 +33,27 @@ import java.util.Map;
 public class ProtobufPersistedDataSerializer implements PersistedDataSerializer {
 
     @Override
-    public PersistedData create(String value) {
-        return createStrings(Arrays.asList(value));
+    public PersistedData serialize(String value) {
+        return serializeStrings(Arrays.asList(value));
     }
 
     @Override
-    public PersistedData create(String... values) {
-        return createStrings(Arrays.asList(values));
+    public PersistedData serialize(String... values) {
+        return serializeStrings(Arrays.asList(values));
     }
 
     @Override
-    public PersistedData createStrings(Iterable<String> value) {
+    public PersistedData serializeStrings(Iterable<String> value) {
         return new ProtobufPersistedData(EntityData.Value.newBuilder().addAllString(value).build());
     }
 
     @Override
-    public PersistedData create(float value) {
+    public PersistedData serialize(float value) {
         return new ProtobufPersistedData(EntityData.Value.newBuilder().addFloat(value).build());
     }
 
     @Override
-    public PersistedData create(float... values) {
+    public PersistedData serialize(float... values) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         for (float val : values) {
             builder.addFloat(val);
@@ -62,7 +62,7 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(TFloatIterator value) {
+    public PersistedData serialize(TFloatIterator value) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         while (value.hasNext()) {
             builder.addFloat(value.next());
@@ -71,12 +71,12 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(int value) {
+    public PersistedData serialize(int value) {
         return new ProtobufPersistedData(EntityData.Value.newBuilder().addInteger(value).build());
     }
 
     @Override
-    public PersistedData create(int... values) {
+    public PersistedData serialize(int... values) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         for (int val : values) {
             builder.addInteger(val);
@@ -85,7 +85,7 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(TIntIterator value) {
+    public PersistedData serialize(TIntIterator value) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         while (value.hasNext()) {
             builder.addInteger(value.next());
@@ -94,12 +94,12 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(long value) {
+    public PersistedData serialize(long value) {
         return new ProtobufPersistedData(EntityData.Value.newBuilder().addLong(value).build());
     }
 
     @Override
-    public PersistedData create(long... values) {
+    public PersistedData serialize(long... values) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         for (long val : values) {
             builder.addLong(val);
@@ -108,7 +108,7 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(TLongIterator value) {
+    public PersistedData serialize(TLongIterator value) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         while (value.hasNext()) {
             builder.addLong(value.next());
@@ -117,12 +117,12 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(boolean value) {
+    public PersistedData serialize(boolean value) {
         return new ProtobufPersistedData(EntityData.Value.newBuilder().addBoolean(value).build());
     }
 
     @Override
-    public PersistedData create(boolean... values) {
+    public PersistedData serialize(boolean... values) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         for (boolean val : values) {
             builder.addBoolean(val);
@@ -131,12 +131,12 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(double value) {
+    public PersistedData serialize(double value) {
         return new ProtobufPersistedData(EntityData.Value.newBuilder().addDouble(value).build());
     }
 
     @Override
-    public PersistedData create(double... values) {
+    public PersistedData serialize(double... values) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         for (double val : values) {
             builder.addDouble(val);
@@ -145,7 +145,7 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(TDoubleIterator value) {
+    public PersistedData serialize(TDoubleIterator value) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         while (value.hasNext()) {
             builder.addDouble(value.next());
@@ -154,22 +154,22 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(byte[] value) {
+    public PersistedData serialize(byte[] value) {
         return new ProtobufPersistedData(EntityData.Value.newBuilder().setBytes(ByteString.copyFrom(value)).build());
     }
 
     @Override
-    public PersistedData create(ByteBuffer value) {
+    public PersistedData serialize(ByteBuffer value) {
         return new ProtobufPersistedData(EntityData.Value.newBuilder().setBytes(ByteString.copyFrom(value)).build());
     }
 
     @Override
-    public PersistedData create(PersistedData... data) {
-        return create(Arrays.asList(data));
+    public PersistedData serialize(PersistedData... data) {
+        return serialize(Arrays.asList(data));
     }
 
     @Override
-    public PersistedData create(Iterable<PersistedData> data) {
+    public PersistedData serialize(Iterable<PersistedData> data) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         for (PersistedData value : data) {
             builder.addValue(((ProtobufPersistedData) value).getValue());
@@ -178,7 +178,7 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData create(Map<String, PersistedData> data) {
+    public PersistedData serialize(Map<String, PersistedData> data) {
         EntityData.Value.Builder builder = EntityData.Value.newBuilder();
         for (Map.Entry<String, PersistedData> entry : data.entrySet()) {
             builder.addNameValue(EntityData.NameValue.newBuilder()
@@ -189,7 +189,7 @@ public class ProtobufPersistedDataSerializer implements PersistedDataSerializer 
     }
 
     @Override
-    public PersistedData createNull() {
+    public PersistedData serializeNull() {
         return new ProtobufPersistedData(EntityData.Value.newBuilder().build());
     }
 }

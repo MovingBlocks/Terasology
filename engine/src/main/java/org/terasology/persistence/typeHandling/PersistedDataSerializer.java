@@ -34,157 +34,157 @@ public interface PersistedDataSerializer {
      * @param value
      * @return A serialized string
      */
-    PersistedData create(String value);
+    PersistedData serialize(String value);
 
     /**
      * Serializes an array of strings.
      * @param values
      * @return A serialized array of strings.
      */
-    PersistedData create(String... values);
+    PersistedData serialize(String... values);
 
     /**
      * Serializes a collection of strings. Null values will be stripped.
      * @param value
      * @return A serialized array of strings
      */
-    PersistedData createStrings(Iterable<String> value);
+    PersistedData serializeStrings(Iterable<String> value);
 
     /**
      * Serializes a single float
      * @param value
      * @return A serialized float
      */
-    PersistedData create(float value);
+    PersistedData serialize(float value);
 
     /**
      * Serializes an array of floats
      * @param values
      * @return A serialized array of floats
      */
-    PersistedData create(float... values);
+    PersistedData serialize(float... values);
 
     /**
      * Serializes a collection of floats
      * @param value
      * @return A serialized array of floats
      */
-    PersistedData create(TFloatIterator value);
+    PersistedData serialize(TFloatIterator value);
 
     /**
      * Serializes a single integer
      * @param value
      * @return A serialized integer
      */
-    PersistedData create(int value);
+    PersistedData serialize(int value);
 
     /**
      * Serializes an array of integers
      * @param values
      * @return A serialized array of integers
      */
-    PersistedData create(int... values);
+    PersistedData serialize(int... values);
 
     /**
      * Serializes a collection of integers
      * @param value
      * @return A serialized array of integers
      */
-    PersistedData create(TIntIterator value);
+    PersistedData serialize(TIntIterator value);
 
     /**
      * Serializes a single long
      * @param value
      * @return A serialized long
      */
-    PersistedData create(long value);
+    PersistedData serialize(long value);
 
     /**
      * Serializes an array of longs
      * @param values
      * @return A serialized array of longs
      */
-    PersistedData create(long... values);
+    PersistedData serialize(long... values);
 
     /**
      * Serializes a collection of longs
      * @param value
      * @return A serialized array of longs
      */
-    PersistedData create(TLongIterator value);
+    PersistedData serialize(TLongIterator value);
 
     /**
      * Serializes a single boolean
      * @param value
      * @return A serialized boolean
      */
-    PersistedData create(boolean value);
+    PersistedData serialize(boolean value);
 
     /**
      * Serializes an array of booleans
      * @param values
      * @return A serialized array of booleans
      */
-    PersistedData create(boolean... values);
+    PersistedData serialize(boolean... values);
 
     /**
      * Serializes a single double
      * @param value
      * @return A serialized double
      */
-    PersistedData create(double value);
+    PersistedData serialize(double value);
 
     /**
      * Serializes an array of doubles
      * @param values
      * @return A serialized array double
      */
-    PersistedData create(double... values);
+    PersistedData serialize(double... values);
 
     /**
      * Serializes a collection of doubles
      * @param value
      * @return A serialized array of double
      */
-    PersistedData create(TDoubleIterator value);
+    PersistedData serialize(TDoubleIterator value);
 
     /**
      * Serializes an array of bytes
      * @param value
      * @return Serialized bytes
      */
-    PersistedData create(byte[] value);
+    PersistedData serialize(byte[] value);
 
     /**
      * Serializes a buffer of bytes
      * @param value
      * @return Serialized bytes
      */
-    PersistedData create(ByteBuffer value);
+    PersistedData serialize(ByteBuffer value);
 
     /**
      * Serializes an array of values
      * @param values
      * @return
      */
-    PersistedData create(PersistedData... values);
+    PersistedData serialize(PersistedData... values);
 
     /**
      * Serializes a collection of values
      * @param data
      * @return
      */
-    PersistedData create(Iterable<PersistedData> data);
+    PersistedData serialize(Iterable<PersistedData> data);
 
     /**
      * Serializes a map of name-value pairs
      * @param data
      * @return
      */
-    PersistedData create(Map<String, PersistedData> data);
+    PersistedData serialize(Map<String, PersistedData> data);
 
     /**
      * @return A 'null' PersistedData
      */
-    PersistedData createNull();
+    PersistedData serializeNull();
 }

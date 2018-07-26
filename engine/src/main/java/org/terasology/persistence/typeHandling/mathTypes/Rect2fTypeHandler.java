@@ -42,14 +42,14 @@ public class Rect2fTypeHandler implements TypeHandler<Rect2f> {
     @Override
     public PersistedData serialize(Rect2f value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return serializer.createNull();
+            return serializer.serializeNull();
         } else {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
 
             map.put(MIN_FIELD, vector2fTypeHandler.serialize(value.min(), serializer));
             map.put(SIZE_FIELD, vector2fTypeHandler.serialize(value.size(), serializer));
 
-            return serializer.create(map);
+            return serializer.serialize(map);
         }
     }
 

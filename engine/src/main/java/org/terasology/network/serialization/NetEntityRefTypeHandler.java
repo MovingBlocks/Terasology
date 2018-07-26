@@ -47,13 +47,13 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
         BlockComponent blockComponent = value.getComponent(BlockComponent.class);
         if (blockComponent != null) {
             Vector3i pos = blockComponent.position;
-            return serializer.create(pos.x, pos.y, pos.z);
+            return serializer.serialize(pos.x, pos.y, pos.z);
         }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {
-            return serializer.create(netComponent.getNetworkId());
+            return serializer.serialize(netComponent.getNetworkId());
         }
-        return serializer.createNull();
+        return serializer.serializeNull();
     }
 
     @Override
