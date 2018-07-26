@@ -22,7 +22,6 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TLongIterator;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
@@ -194,12 +193,6 @@ public class ProtobufSerializationContext implements SerializationContext {
                     .setValue(((ProtobufPersistedData) entry.getValue()).getValue()).build());
         }
         return new ProtobufPersistedData(builder.build());
-    }
-
-    @Override
-    public <T> PersistedData create(T data, Class<? extends T> type) {
-        TypeHandler<T> handler = (TypeHandler<T>) library.getTypeHandler(type);
-        return handler.serialize(data, this);
     }
 
     @Override
