@@ -22,6 +22,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.utilities.ReflectionUtil;
@@ -29,10 +30,8 @@ import org.terasology.utilities.ReflectionUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObjectFieldMapTypeHandlerFactory.class);
@@ -53,9 +52,15 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
             Map<Field, TypeHandler<?>> fieldTypeHandlerMap = Maps.newHashMap();
 
             getResolvedFields(typeInfo).forEach(
-                    (field, type) -> {
-                        fieldTypeHandlerMap.put(field, typeSerializationLibrary.getTypeHandler(type));
-                    }
+                    (field, fieldType) ->
+                            fieldTypeHandlerMap.put(
+                                    field,
+                                    new RuntimeDelegatingTypeHandler(
+                                            typeSerializationLibrary.getTypeHandler(fieldType),
+                                            TypeInfo.of(fieldType),
+                                            typeSerializationLibrary
+                                    )
+                            )
             );
 
             ObjectFieldMapTypeHandler<T> mappedHandler =
