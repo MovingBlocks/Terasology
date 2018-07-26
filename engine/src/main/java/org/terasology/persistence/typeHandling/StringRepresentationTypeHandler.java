@@ -24,12 +24,12 @@ public abstract class StringRepresentationTypeHandler<T> implements TypeHandler<
     public abstract T getFromString(String representation);
 
     @Override
-    public PersistedData serialize(T value, SerializationContext context) {
+    public PersistedData serialize(T value, PersistedDataSerializer serializer) {
         String stringValue = getAsString(value);
         if (stringValue == null) {
-            return context.createNull();
+            return serializer.createNull();
         } else {
-            return context.create(stringValue);
+            return serializer.create(stringValue);
         }
     }
 

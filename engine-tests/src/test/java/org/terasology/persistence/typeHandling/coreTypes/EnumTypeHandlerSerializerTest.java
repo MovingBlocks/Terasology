@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes;
 
 import org.junit.Test;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -36,10 +36,10 @@ public class EnumTypeHandlerSerializerTest {
         PersistedData nullData = mock(PersistedData.class);
         when(nullData.isNull()).thenReturn(true);
 
-        SerializationContext serializationContext = mock(SerializationContext.class);
-        when(serializationContext.createNull()).thenReturn(nullData);
+        PersistedDataSerializer persistedDataSerializer = mock(PersistedDataSerializer.class);
+        when(persistedDataSerializer.createNull()).thenReturn(nullData);
         EnumTypeHandler<TestEnum> handler = new EnumTypeHandler<>(TestEnum.class);
-        PersistedData serializedNull = handler.serialize(null, serializationContext);
+        PersistedData serializedNull = handler.serialize(null, persistedDataSerializer);
         assertEquals(nullData, serializedNull);
 
         TestEnum deserializedValue = handler.deserialize(nullData);
@@ -52,10 +52,10 @@ public class EnumTypeHandlerSerializerTest {
         when(data.getAsString()).thenReturn(TestEnum.NON_NULL.toString());
         when(data.isString()).thenReturn(true);
 
-        SerializationContext serializationContext = mock(SerializationContext.class);
-        when(serializationContext.create(TestEnum.NON_NULL.toString())).thenReturn(data);
+        PersistedDataSerializer persistedDataSerializer = mock(PersistedDataSerializer.class);
+        when(persistedDataSerializer.create(TestEnum.NON_NULL.toString())).thenReturn(data);
         EnumTypeHandler<TestEnum> handler = new EnumTypeHandler<>(TestEnum.class);
-        PersistedData serializedNonNull = handler.serialize(TestEnum.NON_NULL, serializationContext);
+        PersistedData serializedNonNull = handler.serialize(TestEnum.NON_NULL, persistedDataSerializer);
         assertEquals(data, serializedNonNull);
 
         TestEnum deserializedValue = handler.deserialize(data);

@@ -58,7 +58,7 @@ public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
         this.typeHandler = typeHandler;
 
         this.serializer = (src, typeOfSrc, context) ->
-                ((GsonPersistedData) typeHandler.serialize(src, new GsonSerializationContext()))
+                ((GsonPersistedData) typeHandler.serialize(src, new GsonPersistedDataSerializer()))
                 .getElement();
 
         this.deserializer = (json, typeOfT, context) ->

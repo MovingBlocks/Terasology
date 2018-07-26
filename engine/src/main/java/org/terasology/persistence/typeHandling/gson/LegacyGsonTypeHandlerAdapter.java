@@ -48,6 +48,6 @@ public class LegacyGsonTypeHandlerAdapter<T> implements JsonDeserializer<T>, Jso
 
     @Override
     public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
-        return ((GsonPersistedData) typeHandler.serialize(src, new GsonSerializationContext())).getElement();
+        return ((GsonPersistedData) typeHandler.serialize(src, new GsonPersistedDataSerializer())).getElement();
     }
 }

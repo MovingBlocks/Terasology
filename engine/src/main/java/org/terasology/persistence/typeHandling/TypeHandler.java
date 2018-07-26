@@ -24,10 +24,10 @@ public interface TypeHandler<T> {
      * This method should return null if the value cannot or should not be serialized. An example would be if value itself is null.
      *
      * @param value The value to serialize - may be null
-     * @param context The persistence context to serialize into
+     * @param serializer The serializer used to serialize simple values
      * @return The serialized value.
      */
-    PersistedData serialize(T value, SerializationContext context);
+    PersistedData serialize(T value, PersistedDataSerializer serializer);
 
     /**
      * Deserializes a single value.

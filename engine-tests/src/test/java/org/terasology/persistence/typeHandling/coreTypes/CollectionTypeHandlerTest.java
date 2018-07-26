@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.stubbing.Answer;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
@@ -47,7 +47,7 @@ public class CollectionTypeHandlerTest {
         Collection<Integer> collection = constructor.construct();
         collection.addAll(Collections.nCopies(500, -1));
 
-        SerializationContext context = mock(SerializationContext.class);
+        PersistedDataSerializer context = mock(PersistedDataSerializer.class);
 
         typeHandler.serialize(collection, context);
 

@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Lists;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
@@ -34,14 +34,14 @@ public class CollectionTypeHandler<E> implements TypeHandler<Collection<E>> {
     }
 
     @Override
-    public PersistedData serialize(Collection<E> value, SerializationContext context) {
+    public PersistedData serialize(Collection<E> value, PersistedDataSerializer serializer) {
         List<PersistedData> items = Lists.newArrayList();
 
         for (E element : value) {
-            items.add(elementTypeHandler.serialize(element, context));
+            items.add(elementTypeHandler.serialize(element, serializer));
         }
 
-        return context.create(items);
+        return serializer.create(items);
     }
 
     @Override

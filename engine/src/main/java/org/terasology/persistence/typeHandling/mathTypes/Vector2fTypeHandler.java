@@ -20,18 +20,18 @@ import gnu.trove.list.TFloatList;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 /**
  */
 public class Vector2fTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Vector2f> {
 
     @Override
-    public PersistedData serialize(Vector2f value, SerializationContext context) {
+    public PersistedData serialize(Vector2f value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return context.createNull();
+            return serializer.createNull();
         } else {
-            return context.create(value.x, value.y);
+            return serializer.create(value.x, value.y);
         }
 
     }

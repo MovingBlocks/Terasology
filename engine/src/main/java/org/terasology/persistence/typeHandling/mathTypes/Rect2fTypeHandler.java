@@ -21,7 +21,7 @@ import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Map;
@@ -40,16 +40,16 @@ public class Rect2fTypeHandler implements TypeHandler<Rect2f> {
     }
 
     @Override
-    public PersistedData serialize(Rect2f value, SerializationContext context) {
+    public PersistedData serialize(Rect2f value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return context.createNull();
+            return serializer.createNull();
         } else {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
 
-            map.put(MIN_FIELD, vector2fTypeHandler.serialize(value.min(), context));
-            map.put(SIZE_FIELD, vector2fTypeHandler.serialize(value.size(), context));
+            map.put(MIN_FIELD, vector2fTypeHandler.serialize(value.min(), serializer));
+            map.put(SIZE_FIELD, vector2fTypeHandler.serialize(value.size(), serializer));
 
-            return context.create(map);
+            return serializer.create(map);
         }
     }
 

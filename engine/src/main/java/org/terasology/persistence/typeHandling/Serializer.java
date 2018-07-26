@@ -56,7 +56,7 @@ public class Serializer {
      * @return The serialized value of the field
      */
     @SuppressWarnings("unchecked")
-    public PersistedData serialize(FieldMetadata<?, ?> field, Object container, SerializationContext context) {
+    public PersistedData serialize(FieldMetadata<?, ?> field, Object container, PersistedDataSerializer context) {
         Object rawValue = field.getValue(container);
         if (rawValue != null) {
             TypeHandler handler = getHandlerFor(field);
@@ -76,7 +76,7 @@ public class Serializer {
      * @return The serialized value
      */
     @SuppressWarnings("unchecked")
-    public PersistedData serializeValue(FieldMetadata<?, ?> fieldMetadata, Object rawValue, SerializationContext context) {
+    public PersistedData serializeValue(FieldMetadata<?, ?> fieldMetadata, Object rawValue, PersistedDataSerializer context) {
         return fieldHandlers.get(fieldMetadata).serialize(rawValue, context);
     }
 

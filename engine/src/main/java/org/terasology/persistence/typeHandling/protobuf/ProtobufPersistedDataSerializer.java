@@ -21,7 +21,7 @@ import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TLongIterator;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.protobuf.EntityData;
 
 import java.nio.ByteBuffer;
@@ -30,7 +30,7 @@ import java.util.Map;
 
 /**
  */
-public class ProtobufSerializationContext implements SerializationContext {
+public class ProtobufPersistedDataSerializer implements PersistedDataSerializer {
 
     @Override
     public PersistedData create(String value) {

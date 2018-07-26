@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  *
  */
-public interface SerializationContext {
+public interface PersistedDataSerializer {
 
     /**
      * Serializes a single string

@@ -16,7 +16,7 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 /**
@@ -24,11 +24,11 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 public class StringTypeHandler implements TypeHandler<String> {
 
     @Override
-    public PersistedData serialize(String value, SerializationContext context) {
+    public PersistedData serialize(String value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return context.createNull();
+            return serializer.createNull();
         } else {
-            return context.create(value);
+            return serializer.create(value);
         }
     }
 

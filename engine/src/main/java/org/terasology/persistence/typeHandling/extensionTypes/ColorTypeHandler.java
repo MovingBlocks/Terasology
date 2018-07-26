@@ -19,7 +19,7 @@ import gnu.trove.list.TIntList;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.rendering.nui.Color;
 
 /**
@@ -29,11 +29,11 @@ import org.terasology.rendering.nui.Color;
 public class ColorTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Color> {
 
     @Override
-    public PersistedData serialize(Color value, SerializationContext context) {
+    public PersistedData serialize(Color value, PersistedDataSerializer serializer) {
         if (value == null) {
-            return context.createNull();
+            return serializer.createNull();
         } else {
-            return context.create(value.r(), value.g(), value.b(), value.a());
+            return serializer.create(value.r(), value.g(), value.b(), value.a());
         }
     }
 
