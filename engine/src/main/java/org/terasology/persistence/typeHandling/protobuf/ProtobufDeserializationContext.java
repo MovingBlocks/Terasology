@@ -16,9 +16,6 @@
 package org.terasology.persistence.typeHandling.protobuf;
 
 import org.terasology.persistence.typeHandling.DeserializationContext;
-import org.terasology.persistence.typeHandling.DeserializationException;
-import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 /**
@@ -29,15 +26,6 @@ public class ProtobufDeserializationContext implements DeserializationContext {
 
     public ProtobufDeserializationContext(TypeSerializationLibrary typeSerializationLibrary) {
         this.typeSerializationLibrary = typeSerializationLibrary;
-    }
-
-    @Override
-    public <T> T deserializeAs(PersistedData data, Class<T> type) {
-        TypeHandler<?> handler = typeSerializationLibrary.getTypeHandler(type);
-        if (handler == null) {
-            throw new DeserializationException("No handler found for " + type);
-        }
-        return type.cast(handler.deserialize(data, this));
     }
 
 }
