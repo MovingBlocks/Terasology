@@ -18,6 +18,7 @@
  */
 package org.terasology.reflection.reflect;
 
+import com.google.common.base.Defaults;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Primitives;
 import org.terasology.persistence.typeHandling.InstanceCreator;
@@ -94,7 +95,7 @@ public class ConstructorLibrary {
 
             try {
                 for (Class<?> pType : constructor.getParameterTypes()) {
-                    params.add((pType.isPrimitive()) ? Primitives.wrap(pType).newInstance() : null);
+                    params.add(Defaults.defaultValue(Primitives.unwrap(pType)));
                 }
 
                 return constructor.newInstance(params.toArray());
