@@ -30,7 +30,6 @@ import java.util.List;
  */
 public class UIImageSlideshow extends CoreWidget {
 
-    private UIImage currentImage;
     private boolean active = true;
     private int index = 0;
     private float imageDisplayTime = 0f;
@@ -61,15 +60,15 @@ public class UIImageSlideshow extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (currentImage != null) {
-            currentImage.onDraw(canvas);
+        if (images.get(index) != null) {
+            images.get(index).onDraw(canvas);
         }
     }
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        if (currentImage != null) {
-            return currentImage.getPreferredContentSize(canvas, sizeHint);
+        if (images.get(index) != null) {
+            return images.get(index).getPreferredContentSize(canvas, sizeHint);
         }
         return Vector2i.zero();
     }
@@ -92,9 +91,8 @@ public class UIImageSlideshow extends CoreWidget {
      * @param image the image to show.
      */
     public void addImage(final UIImage image) {
-        images.add(image);
-        if (currentImage == null) {
-            currentImage = images.get(index);
+        if (image != null) {
+            images.add(image);
         }
     }
 
@@ -113,7 +111,6 @@ public class UIImageSlideshow extends CoreWidget {
     public void clean() {
         index = 0;
         imageDisplayTime = 0f;
-        currentImage = null;
         images = new ArrayList<>();
     }
 
@@ -136,7 +133,6 @@ public class UIImageSlideshow extends CoreWidget {
      */
     public void nextImage() {
         int size = images.size();
-        int prevIndex = index;
         if (size > 0) {
             if (index == size - 1) {
                 if (infinite) {
@@ -147,9 +143,6 @@ public class UIImageSlideshow extends CoreWidget {
             } else {
                 index++;
             }
-            if (prevIndex != index) {
-                currentImage = images.get(index);
-            }
         }
     }
 
@@ -158,7 +151,6 @@ public class UIImageSlideshow extends CoreWidget {
      */
     public void prevImage() {
         int size = images.size();
-        int prevIndex = index;
         if (size > 0) {
             if (index == 0) {
                 if (infinite) {
@@ -168,9 +160,6 @@ public class UIImageSlideshow extends CoreWidget {
                 }
             } else {
                 index--;
-            }
-            if (prevIndex != index) {
-                currentImage = images.get(index);
             }
         }
     }
