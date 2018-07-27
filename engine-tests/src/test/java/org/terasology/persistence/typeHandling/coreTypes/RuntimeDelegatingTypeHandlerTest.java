@@ -24,7 +24,6 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -56,8 +55,10 @@ public class RuntimeDelegatingTypeHandlerTest {
         Class<Sub> subType = Sub.class;
         Type baseType = TypeInfo.of(Base.class).getType();
 
+        abstract class SubHandler implements TypeHandler<Sub> {}
+
         TypeHandler baseTypeHandler = mock(TypeHandler.class);
-        TypeHandler<Sub> subTypeHandler = mock(TypeHandler.class);
+        TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);
 
         when(typeSerializationLibrary.getTypeHandler(eq(baseType))).thenReturn(baseTypeHandler);
         when(typeSerializationLibrary.getTypeHandler(eq(subType))).thenReturn(subTypeHandler);
