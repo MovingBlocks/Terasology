@@ -20,10 +20,6 @@ import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.widgets.UIImage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +30,16 @@ import java.util.List;
  */
 public class UIImageSlideshow extends CoreWidget {
 
-    private Binding<UIWidget> currentImage = new DefaultBinding<>();
-    private List<UIImage> images = new ArrayList<>();
+    private UIImage currentImage;
     private boolean active = true;
     private int index = 0;
     private float imageDisplayTime = 0f;
+
+    /**
+     * List of images to show.
+     */
+    @LayoutConfig
+    private List<UIImage> images = new ArrayList<>();
 
     /**
      * Speed of slideshow (in seconds).
@@ -60,15 +61,15 @@ public class UIImageSlideshow extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (currentImage.get() != null) {
-            currentImage.get().onDraw(canvas);
+        if (currentImage != null) {
+            currentImage.onDraw(canvas);
         }
     }
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        if (currentImage.get() != null) {
-            return currentImage.get().getPreferredContentSize(canvas, sizeHint);
+        if (currentImage != null) {
+            return currentImage.getPreferredContentSize(canvas, sizeHint);
         }
         return Vector2i.zero();
     }
@@ -92,8 +93,8 @@ public class UIImageSlideshow extends CoreWidget {
      */
     public void addImage(final UIImage image) {
         images.add(image);
-        if (currentImage.get() == null) {
-            currentImage.set(images.get(index));
+        if (currentImage == null) {
+            currentImage = images.get(index);
         }
     }
 
@@ -112,7 +113,7 @@ public class UIImageSlideshow extends CoreWidget {
     public void clean() {
         index = 0;
         imageDisplayTime = 0f;
-        currentImage.set(null);
+        currentImage = null;
         images = new ArrayList<>();
     }
 
@@ -147,7 +148,7 @@ public class UIImageSlideshow extends CoreWidget {
                 index++;
             }
             if (prevIndex != index) {
-                currentImage.set(images.get(index));
+                currentImage = images.get(index);
             }
         }
     }
@@ -169,7 +170,7 @@ public class UIImageSlideshow extends CoreWidget {
                 index--;
             }
             if (prevIndex != index) {
-                currentImage.set(images.get(index));
+                currentImage = images.get(index);
             }
         }
     }

@@ -122,7 +122,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
         previewSlideshow = find("preview", UIImageSlideshow.class);
 
         if (descriptionContainer != null && worldDescription != null && descriptionTitle != null &&
-                gameModules != null && gameWorlds != null && biomes != null && blocks != null && openModuleDetails != null ||
+                gameModules != null && gameWorlds != null && biomes != null && blocks != null && openModuleDetails != null &&
                 previewSlideshow != null) {
 
             setUpGameModules();
@@ -548,10 +548,10 @@ public class GameDetailsScreen extends CoreScreenLayer {
         this.gameInfo = gameInfo;
     }
 
-    public void setPreviews(final List<UIImage> textures) {
-        if (textures != null && !textures.isEmpty()) {
+    public void setPreviews(final List<UIImage> images) {
+        if (images != null && !images.isEmpty()) {
             previewSlideshow.clean();
-            textures.forEach(previewSlideshow::addImage);
+            images.forEach(previewSlideshow::addImage);
         }
     }
 }
