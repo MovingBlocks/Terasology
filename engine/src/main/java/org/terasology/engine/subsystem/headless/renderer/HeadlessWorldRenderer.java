@@ -23,6 +23,9 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
+import org.terasology.recording.RecordAndReplaySerializer;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
@@ -54,10 +57,14 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     private Vector3i chunkPos = new Vector3i();
 
     private Config config;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+    private RecordAndReplaySerializer recordAndReplaySerializer;
 
     public HeadlessWorldRenderer(Context context) {
         this.worldProvider = context.get(WorldProvider.class);
         this.chunkProvider = context.get(ChunkProvider.class);
+        this.recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
+        this.recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(noCamera);
         config = context.get(Config.class);
@@ -126,7 +133,16 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
     @Override
     public void render(RenderingStage mono) {
-        // TODO Auto-generated method stub
+        //Activate record when the preparations are ready
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
+            recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.RECORDING);
+        }
+
+        //Activate the replay when the preparations are ready
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+            recordAndReplaySerializer.deserializeRecordAndReplayData();
+            recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAYING);
+        }
     }
 
     @Override

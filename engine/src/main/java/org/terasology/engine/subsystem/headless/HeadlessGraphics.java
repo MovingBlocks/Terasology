@@ -18,6 +18,7 @@ package org.terasology.engine.subsystem.headless;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
+import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
@@ -89,6 +90,11 @@ public class HeadlessGraphics implements EngineSubsystem {
 
     private void initHeadless(Context context) {
         context.put(ShaderManager.class, new ShaderManagerHeadless());
+    }
+
+    @Override
+    public void postUpdate(GameState currentState, float delta) {
+        currentState.render();
     }
 
 }
