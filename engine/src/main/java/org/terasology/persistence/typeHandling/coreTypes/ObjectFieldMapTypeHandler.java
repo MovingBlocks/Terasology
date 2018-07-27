@@ -15,6 +15,7 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
+import com.google.common.base.Defaults;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Serializes objects as a fieldName -> fieldValue map. It is used as the last resort while serializing an
@@ -64,7 +66,7 @@ public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
                 continue;
             }
 
-            if (val != null) {
+            if (!Objects.equals(val, Defaults.defaultValue(field.getType()))) {
                 TypeHandler handler = entry.getValue();
                 PersistedData fieldValue = handler.serialize(val, serializer);
                 if (fieldValue != null) {
