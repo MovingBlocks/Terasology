@@ -62,14 +62,12 @@ import org.terasology.world.internal.WorldInfo;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -404,23 +402,12 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private void openModuleDetailsScreen() {
         final ModuleDetailsScreen moduleDetailsScreen = getManager().createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
 
-        final Set<Module> allModules = gameModules.getList().stream()
-                .map(ModuleSelectionInfo::getModule)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        allModules.addAll(gameModules.getList().stream()
-                .map(ModuleSelectionInfo::getModule)
-                .filter(Objects::nonNull)
-                .map(Module::getMetadata)
-                .map(ModuleMetadata::getDependencies)
-                .flatMap(Collection::stream)
-                .filter(dep -> Objects.nonNull(dep.getId()))
-                .map(dep -> moduleManager.getRegistry().getLatestModuleVersion(dep.getId()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet()));
-
-        moduleDetailsScreen.setModules(allModules);
+        moduleDetailsScreen.setModules(
+                gameModules.getList().stream()
+                        .map(ModuleSelectionInfo::getModule)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet())
+        );
         getManager().pushScreen(moduleDetailsScreen);
     }
 

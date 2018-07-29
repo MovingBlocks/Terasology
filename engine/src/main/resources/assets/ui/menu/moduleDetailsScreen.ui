@@ -141,7 +141,6 @@
                                                     "id": "description"
                                                 },
                                                 "layoutInfo": {
-
                                                     "position-top": {
                                                         "target": "TOP",
                                                         "widget": "moduleDescriptionTitle",
@@ -153,6 +152,7 @@
                                                 "type": "UIButtonWebBrowser",
                                                 "text": "${engine:menu#open-in-browser}",
                                                 "id": "openInBrowser",
+                                                "enabled": false,
                                                 "layoutInfo": {
                                                     "width": 150,
                                                     "height": 32,
