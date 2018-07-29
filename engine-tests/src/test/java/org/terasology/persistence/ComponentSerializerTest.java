@@ -72,8 +72,8 @@ public class ComponentSerializerTest {
         CoreRegistry.setContext(context);
 
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
-        serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
-        serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         context.put(NetworkSystem.class, networkSystem);

@@ -21,11 +21,10 @@ import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 /**
  */
-public class Vector3fTypeHandler extends SimpleTypeHandler<Vector3f> {
+public class Vector3fTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Vector3f> {
 
     @Override
     public PersistedData serialize(Vector3f value, SerializationContext context) {

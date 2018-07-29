@@ -40,21 +40,4 @@ public interface TypeHandler<T> {
      * @throws org.terasology.persistence.typeHandling.DeserializationException if there was an error deserializing the data
      */
     T deserialize(PersistedData data, DeserializationContext context);
-
-    /**
-     * Serializes a collection of this type.  This allows for efficiency for types that can be serialized more efficiently in this way, such as primitives
-     *
-     * @param value The values to serialize
-     * @return The serialized values.
-     */
-    PersistedData serializeCollection(Collection<T> value, SerializationContext context);
-
-    /**
-     * Deserializes a collection of this type.
-     *
-     * @param data The persisted data to deserialize from
-     * @return A list of the resultant values.
-     * @throws org.terasology.persistence.typeHandling.DeserializationException if there was an error deserializing the data
-     */
-    List<T> deserializeCollection(PersistedData data, DeserializationContext context);
 }

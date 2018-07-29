@@ -24,13 +24,12 @@ import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 import java.util.Map;
 
 /**
  */
-public class Rect2iTypeHandler extends SimpleTypeHandler<Rect2i> {
+public class Rect2iTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Rect2i> {
 
     private static final String MIN_FIELD = "min";
     private static final String SIZE_FIELD = "size";

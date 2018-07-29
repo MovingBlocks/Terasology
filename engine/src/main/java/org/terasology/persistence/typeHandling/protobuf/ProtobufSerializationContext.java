@@ -28,7 +28,6 @@ import org.terasology.protobuf.EntityData;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -199,15 +198,8 @@ public class ProtobufSerializationContext implements SerializationContext {
 
     @Override
     public <T> PersistedData create(T data, Class<? extends T> type) {
-        TypeHandler<T> handler = (TypeHandler<T>) library.getHandlerFor(type);
+        TypeHandler<T> handler = (TypeHandler<T>) library.getTypeHandler(type);
         return handler.serialize(data, this);
-    }
-
-    @Override
-    public <T> PersistedData create(Collection<T> data, Class<T> type) {
-        TypeHandler<T> handler = (TypeHandler<T>) library.getHandlerFor(type);
-        return handler.serializeCollection(data, this);
-
     }
 
     @Override

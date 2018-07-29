@@ -21,13 +21,12 @@ import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 import java.util.Map;
 
 /**
  */
-public class BorderTypeHandler extends SimpleTypeHandler<Border> {
+public class BorderTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Border> {
     private static final String LEFT_FIELD = "left";
     private static final String RIGHT_FIELD = "right";
     private static final String TOP_FIELD = "top";

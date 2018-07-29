@@ -15,14 +15,10 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import com.google.common.collect.Lists;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  */
@@ -45,16 +41,4 @@ public class StringTypeHandler implements TypeHandler<String> {
         return null;
     }
 
-    @Override
-    public PersistedData serializeCollection(Collection<String> value, SerializationContext context) {
-        return context.createStrings(value);
-    }
-
-    @Override
-    public List<String> deserializeCollection(PersistedData data, DeserializationContext context) {
-        if (data.isArray()) {
-            return Lists.newArrayList(data.getAsArray().getAsStringArray());
-        }
-        return Lists.newArrayList();
-    }
 }
