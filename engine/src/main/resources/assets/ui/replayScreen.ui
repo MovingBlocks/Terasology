@@ -112,7 +112,7 @@
                       "family": "description",
                       "contents": [
                           {
-                              "type": "UIImage",
+                              "type": "UIImageSlideshow",
                               "skin": "framed_image",
                               "id": "previewImage",
                               "layoutInfo": {

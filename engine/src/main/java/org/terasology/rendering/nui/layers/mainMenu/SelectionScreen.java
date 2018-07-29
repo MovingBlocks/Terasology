@@ -149,7 +149,7 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         previewSlideshow = find("previewImage", UIImageSlideshow.class);
         gameInfos = find("gameList", UIList.class);
         if (worldGenerator == null || moduleNames == null || gameInfos == null || previewSlideshow == null) {
-            logger.error("Screen can't be initialized correctly, because required widgets are missed!\nworldGenerator = {}, moduleNames = {}, previewSlideshow = {}, gameList = {}", worldGenerator, moduleNames, previewSlideshow, gameInfos);
+            logger.error("Screen can't be initialized correctly, because required widgets are missed! worldGenerator = {}, moduleNames = {}, previewSlideshow = {}, gameList = {}", worldGenerator, moduleNames, previewSlideshow, gameInfos);
             return false;
         }
         return true;
