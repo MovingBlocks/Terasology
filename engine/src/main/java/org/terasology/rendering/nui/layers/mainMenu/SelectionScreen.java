@@ -30,9 +30,9 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.rendering.nui.widgets.UIImageSlideshow;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.FilesUtil;
 
@@ -52,7 +52,7 @@ public abstract class SelectionScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectionScreen.class);
 
-    protected UIImage previewImage;
+    protected UIImageSlideshow previewSlideshow;
 
     @In
     protected Config config;
@@ -75,21 +75,21 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         super.onOpened();
     }
 
-    void updateDescription(GameInfo item) {
-        if (item == null) {
+    void updateDescription(final GameInfo gameInfo) {
+        if (gameInfo == null) {
             worldGenerator.setText("");
             moduleNames.setText("");
             loadPreviewImage(null);
             return;
         }
 
-        final String mainWorldGenerator = item.getManifest()
+        final String mainWorldGenerator = gameInfo.getManifest()
                 .getWorldInfo(TerasologyConstants.MAIN_WORLD)
                 .getWorldGenerator()
                 .getObjectName()
                 .toString();
 
-        final String commaSeparatedModules = item.getManifest()
+        final String commaSeparatedModules = gameInfo.getManifest()
                 .getModules()
                 .stream()
                 .map(NameVersion::getName)
@@ -100,15 +100,15 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         worldGenerator.setText(mainWorldGenerator);
         moduleNames.setText(commaSeparatedModules.length() > MODULES_LINE_LIMIT ? commaSeparatedModules.substring(0, MODULES_LINE_LIMIT) + "..." : commaSeparatedModules);
 
-        loadPreviewImage(item);
+        loadPreviewImage(gameInfo);
     }
 
-    private void loadPreviewImage(GameInfo item) {
+    private void loadPreviewImage(final GameInfo gameInfo) {
         Texture texture;
-        if (item != null && item.getPreviewImage() != null) {
+        if (gameInfo != null && gameInfo.getPreviewImage() != null) {
             TextureData textureData = null;
             try {
-                textureData = AWTTextureFormat.convertToTextureData(item.getPreviewImage(), Texture.FilterMode.LINEAR);
+                textureData = AWTTextureFormat.convertToTextureData(gameInfo.getPreviewImage(), Texture.FilterMode.LINEAR);
             } catch (IOException e) {
                 logger.error("Converting preview image to texture data {} failed", e);
             }
@@ -116,8 +116,8 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         } else {
             texture = Assets.getTexture(DEFAULT_PREVIEW_IMAGE_URI).get();
         }
-
-        previewImage.setImage(texture);
+        previewSlideshow.clean();
+        previewSlideshow.addImage(texture);
     }
 
     protected void remove(final UIList<GameInfo> gameList, Path world, String removeString) {
@@ -146,10 +146,10 @@ public abstract class SelectionScreen extends CoreScreenLayer {
     private boolean initScreenWidgets() {
         worldGenerator = find("worldGenerator", UILabel.class);
         moduleNames = find("moduleNames", UILabel.class);
-        previewImage = find("previewImage", UIImage.class);
+        previewSlideshow = find("previewImage", UIImageSlideshow.class);
         gameInfos = find("gameList", UIList.class);
-        if (worldGenerator == null || moduleNames == null || gameInfos == null || previewImage == null) {
-            logger.error("Screen can't be initialized correctly, because required widgets are missed!\nworldGenerator = {}, moduleNames = {}, previewImage = {}, gameList = {}", worldGenerator, moduleNames, previewImage, gameInfos);
+        if (worldGenerator == null || moduleNames == null || gameInfos == null || previewSlideshow == null) {
+            logger.error("Screen can't be initialized correctly, because required widgets are missed!\nworldGenerator = {}, moduleNames = {}, previewSlideshow = {}, gameList = {}", worldGenerator, moduleNames, previewSlideshow, gameInfos);
             return false;
         }
         return true;

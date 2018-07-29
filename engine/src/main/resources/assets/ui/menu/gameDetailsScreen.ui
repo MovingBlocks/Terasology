@@ -82,7 +82,7 @@
                                 },
                                 "contents": [
                                     {
-                                        "type": "UITimedImageSlideshow",
+                                        "type": "UIImageSlideshow",
                                         "id": "preview",
                                         "skin": "framed_image",
                                         "layoutInfo": {
@@ -90,6 +90,33 @@
                                             "position-horizontal-center": {},
                                             "position-top": {
                                                 "target": "TOP"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "RowLayout",
+                                        "id": "sliderActions",
+                                        "horizontalSpacing": 8,
+                                        "contents": [
+                                            {
+                                                "type": "UIButton",
+                                                "text": "Prev",
+                                                "id": "slideLeft"
+                                            },
+                                            {
+                                                "type": "UIButton",
+                                                "text": "Next",
+                                                "id": "slideRight"
+                                            }
+                                        ],
+                                        "layoutInfo": {
+                                            "width": 400,
+                                            "height": 32,
+                                            "position-horizontal-center": {},
+                                            "position-bottom": {
+                                                "target": "BOTTOM",
+                                                "widget": "preview",
+                                                "offset": 3
                                             }
                                         }
                                     },
@@ -103,7 +130,7 @@
                                             "position-horizontal-center": {},
                                             "position-top": {
                                                 "target": "BOTTOM",
-                                                "widget": "preview"
+                                                "widget": "sliderActions"
                                             }
                                         }
                                     },
