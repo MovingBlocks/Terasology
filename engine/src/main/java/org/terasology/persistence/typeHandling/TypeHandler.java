@@ -16,19 +16,28 @@
 package org.terasology.persistence.typeHandling;
 
 /**
+ * Serializes objects of type {@link T} to and from a {@link PersistedData}.
  */
 public abstract class TypeHandler<T> {
-
     /**
-     * Serializes a single value.
-     * This method should return null if the value cannot or should not be serialized. An example would be if value itself is null.
+     * Serializes a single non-null value.
      *
-     * @param value The value to serialize - may be null
+     * @param value      The value to serialize - will never be null.
      * @param serializer The serializer used to serialize simple values
      * @return The serialized value.
      */
     protected abstract PersistedData serializeNonNull(T value, PersistedDataSerializer serializer);
 
+    /**
+     * Serializes a single value.
+     *
+     * The default implementation of this method returns {@link PersistedDataSerializer#serializeNull()}
+     * if {@code value} is null, otherwise delegates to {@link #serializeNonNull}.
+     *
+     * @param value The value to serialize - may be null
+     * @param serializer The serializer used to serialize simple values
+     * @return The serialized value.
+     */
     public PersistedData serialize(T value, PersistedDataSerializer serializer) {
         if (value == null) {
             return serializer.serializeNull();
