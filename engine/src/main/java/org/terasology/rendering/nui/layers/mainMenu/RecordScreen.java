@@ -29,13 +29,14 @@ import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Screen for the record menu.
@@ -51,35 +52,59 @@ public class RecordScreen extends SelectionScreen {
     @In
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
+    // widgets
+    private UIButton load;
+    private UIButton close;
+
+
     @Override
     public void initialise() {
-        super.initialise();
+        initWidgets();
 
-        initSaveGamePathWidget(PathManager.getInstance().getSavesPath());
+        if (isValidScreen()) {
 
-        getGameInfos().subscribeSelection((widget, item) -> {
-            find("load", UIButton.class).setEnabled(item != null);
-            updateDescription(item);
-        });
+            initSaveGamePathWidget(PathManager.getInstance().getSavesPath());
 
-        getGameInfos().subscribe((widget, item) -> loadGame(item));
+            getGameInfos().subscribeSelection((widget, item) -> {
+                load.setEnabled(item != null);
+                updateDescription(item);
+            });
 
-        WidgetUtil.trySubscribe(this, "load", button -> {
-            final GameInfo gameInfo = getGameInfos().getSelection();
-            if (gameInfo != null) {
-                loadGame(gameInfo);
-            }
-        });
+            getGameInfos().subscribe((widget, item) -> loadGame(item));
 
-        WidgetUtil.trySubscribe(this, "close", button -> {
-            recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.NOT_ACTIVATED);
-            triggerBackAnimation();
-        });
+            load.subscribe(button -> {
+                final GameInfo gameInfo = getGameInfos().getSelection();
+                if (gameInfo != null) {
+                    loadGame(gameInfo);
+                }
+            });
+
+            close.subscribe(button -> {
+                recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                triggerBackAnimation();
+            });
+        }
     }
 
     @Override
     public void onOpened() {
-        refreshGameInfoList(GameProvider.getSavedGames());
+        if (isValidScreen()) {
+            refreshGameInfoList(GameProvider.getSavedGames());
+        } else {
+            final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.subscribeButton(e -> triggerBackAnimation());
+            getManager().pushScreen(popup);
+            // disable child widgets
+            setEnabled(false);
+        }
+    }
+
+    @Override
+    protected void initWidgets() {
+        super.initWidgets();
+        load = find("load", UIButton.class);
+        close = find("close", UIButton.class);
     }
 
     private void loadGame(GameInfo item) {
@@ -110,4 +135,16 @@ public class RecordScreen extends SelectionScreen {
     void setRecordAndReplayUtils(RecordAndReplayUtils recordAndReplayUtils) {
         this.recordAndReplayUtils = recordAndReplayUtils;
     }
+
+    @Override
+    protected boolean isValidScreen() {
+        if (Stream.of(load, close)
+                .anyMatch(Objects::isNull) ||
+                !super.isValidScreen()) {
+            logger.error("Can't initialize screen correctly. At least one widget was missed!");
+            return false;
+        }
+        return true;
+    }
+
 }

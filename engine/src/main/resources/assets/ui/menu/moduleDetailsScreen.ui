@@ -8,6 +8,7 @@
                 "type": "UILabel",
                 "id": "title",
                 "family": "subtitle",
+                "text": "${engine:menu#module-details-title}",
                 "layoutInfo": {
                     "height": 30,
                     "position-horizontal-center": {},
@@ -21,17 +22,17 @@
                 "type": "UIBox",
                 "id": "container",
                 "layoutInfo": {
-                    "width": 1005,
+                    "width": 1016,
                     "position-horizontal-center": {},
                     "position-top": {
                         "target": "BOTTOM",
-                        "offset": 30,
+                        "offset": 23,
                         "widget": "title"
                     },
                     "position-bottom": {
                         "target": "TOP",
                         "widget": "close",
-                        "offset": 8
+                        "offset": 6
                     }
                 }
             },
@@ -49,7 +50,7 @@
                     "position-bottom": {
                         "target": "TOP",
                         "widget": "close",
-                        "offset": 10
+                        "offset": 14
                     }
                 },
                 "contents": [
@@ -57,6 +58,7 @@
                         "type": "ColumnLayout",
                         "columns": 2,
                         "column-widths": [0.35, 0.65],
+                        "horizontalSpacing": 4,
                         "layoutInfo": {
                             "position-top": {
                                 "target": "TOP"
@@ -313,12 +315,9 @@
                                                                      "height": 32,
                                                                      "position-bottom": {
                                                                          "target": "BOTTOM",
-                                                                         "widget": "descriptionContainer",
-                                                                         "offset": 3
+                                                                         "widget": "descriptionContainer"
                                                                      },
-                                                                     "position-right": {
-                                                                         "offset": 3
-                                                                     }
+                                                                     "position-right": {}
                                                                 }
                                                             },
                                                         ]

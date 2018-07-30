@@ -129,6 +129,13 @@ public class UIImageSlideshow extends CoreWidget {
     }
 
     /**
+     * Checks active status of slideshow.
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
      * Switches to next image of list.
      */
     public void nextImage() {

@@ -70,7 +70,6 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -140,7 +139,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             seed.setText(new FastRandom().nextString(32));
         }
 
-        selectModulesConfig = config.getSelectModulesConfig();
+        // skip loading module configs, unselect all checkboxes by default
+        selectModulesConfig = new SelectModulesConfig();
+        selectModulesConfig.getSelectedStandardModuleExtensions().forEach(selectModulesConfig::unselectStandardModuleExtension);
 
         dependencyResolver = new DependencyResolver(moduleManager.getRegistry());
 
@@ -474,18 +475,26 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                     moduleDetails.bindEnabled(new ReadOnlyBinding<Boolean>() {
                         @Override
                         public Boolean get() {
-                            return !sortedModules.isEmpty();
+                            return !sortedModules.isEmpty() && sortedModules.stream().anyMatch(ModuleSelectionInfo::isPresent);
                         }
                     });
                     moduleDetails.subscribe(b -> {
                         final ModuleDetailsScreen moduleDetailsScreen = getManager().createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
-                        moduleDetailsScreen.setModules(
-                                sortedModules.stream()
-                                        .map(ModuleSelectionInfo::getMetadata)
-                                        .filter(Objects::nonNull)
-                                        .map(meta -> moduleManager.getRegistry().getLatestModuleVersion(meta.getId()))
-                                        .filter(Objects::nonNull)
-                                        .collect(Collectors.toList()));
+                        final Collection<Module> modules = sortedModules.stream()
+                                .map(ModuleSelectionInfo::getMetadata)
+                                .filter(Objects::nonNull)
+                                .map(meta -> moduleManager.getRegistry().getLatestModuleVersion(meta.getId()))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList());
+                        moduleDetailsScreen.setModules(modules);
+
+                        moduleDetailsScreen.setSelectedModule(
+                                modules.stream()
+                                        .filter(module -> module.getId().equals(moduleInfoBinding.get().getId()))
+                                        .findFirst()
+                                        .orElse(null)
+                        );
+
                         getManager().pushScreen(moduleDetailsScreen);
                     });
                 }
@@ -495,6 +504,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "continue", button -> {
             final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             universeWrapper.setSeed(seed.getText());
+            saveConfiguration();
             universeSetupScreen.setEnvironment(universeWrapper);
             triggerForwardAnimation(universeSetupScreen);
         });

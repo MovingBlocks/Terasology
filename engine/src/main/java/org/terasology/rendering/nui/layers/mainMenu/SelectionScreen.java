@@ -23,14 +23,13 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
+import org.terasology.persistence.internal.GamePreviewImageProvider;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.AWTTextureFormat;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.persistence.internal.GamePreviewImageProvider;
 import org.terasology.rendering.nui.widgets.UIImageSlideshow;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -44,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This abstract class has common methods and attributes used by SelectGameScreen, RecordScreen and ReplayScreen.
@@ -56,27 +56,21 @@ public abstract class SelectionScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectionScreen.class);
 
-    private UIImageSlideshow previewSlideshow;
-
     @In
     protected Config config;
 
     @In
     protected TranslationSystem translationSystem;
 
+    protected UIImageSlideshow previewSlideshow;
     private UILabel worldGenerator;
     private UILabel moduleNames;
-
     private UIList<GameInfo> gameInfos;
+    private UILabel saveGamePath;
 
     @Override
     public boolean isLowerLayerVisible() {
         return false;
-    }
-
-    @Override
-    public void onOpened() {
-        super.onOpened();
     }
 
     void updateDescription(final GameInfo gameInfo) {
@@ -150,24 +144,12 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         }
     }
 
-    @Override
-    public void initialise() {
-        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
-        if (!initScreenWidgets()) {
-            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't initialize the screen!");
-        }
-    }
-
-    private boolean initScreenWidgets() {
+    protected void initWidgets() {
         worldGenerator = find("worldGenerator", UILabel.class);
         moduleNames = find("moduleNames", UILabel.class);
         previewSlideshow = find("previewImage", UIImageSlideshow.class);
         gameInfos = find("gameList", UIList.class);
-        if (worldGenerator == null || moduleNames == null || gameInfos == null || previewSlideshow == null) {
-            logger.error("Screen can't be initialized correctly, because required widgets are missed! worldGenerator = {}, moduleNames = {}, previewSlideshow = {}, gameList = {}", worldGenerator, moduleNames, previewSlideshow, gameInfos);
-            return false;
-        }
-        return true;
+        saveGamePath = find("saveGamePath", UILabel.class);
     }
 
     UIList<GameInfo> getGameInfos() {
@@ -182,14 +164,18 @@ public abstract class SelectionScreen extends CoreScreenLayer {
     }
 
     void initSaveGamePathWidget(final Path savePath) {
-        final UILabel saveGamePath = find("saveGamePath", UILabel.class);
-        if (saveGamePath != null) {
-            saveGamePath.setText(
-                    translationSystem.translate("${engine:menu#save-game-path} ") +
-                            savePath.toAbsolutePath().toString());
-        } else {
-            logger.warn("Can't find saveGamePath widget!");
+        saveGamePath.setText(
+                translationSystem.translate("${engine:menu#save-game-path} ") +
+                        savePath.toAbsolutePath().toString());
+    }
+
+    protected boolean isValidScreen() {
+        if (Stream.of(worldGenerator, moduleNames, gameInfos, previewSlideshow, saveGamePath)
+                .anyMatch(Objects::isNull)) {
+            logger.error("Can't initialize screen correctly. At least one widget was missed!");
+            return false;
         }
+        return true;
     }
 
     public UIImageSlideshow getPreviewSlideshow() {

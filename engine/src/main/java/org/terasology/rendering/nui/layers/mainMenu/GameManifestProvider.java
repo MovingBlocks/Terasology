@@ -28,7 +28,6 @@ import org.terasology.module.Module;
 import org.terasology.module.ResolutionResult;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 

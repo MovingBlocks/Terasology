@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 
 public class GamePreviewImageProviderTest {
@@ -90,15 +91,18 @@ public class GamePreviewImageProviderTest {
     public void getNextGamePreviewImagePathOldestFileTest() throws IOException, InterruptedException {
         Files.createDirectories(TMP_PREVIEWS_FOLDER);
         Files.createFile(TMP_PREVIEWS_FOLDER.resolve("1.jpg"));
-        Thread.sleep(10);
         Files.createFile(TMP_PREVIEWS_FOLDER.resolve("2.jpg"));
         Files.createFile(TMP_PREVIEWS_FOLDER.resolve("3.jpg"));
         Files.createFile(TMP_PREVIEWS_FOLDER.resolve("4.jpg"));
         Files.createFile(TMP_PREVIEWS_FOLDER.resolve("5.jpg"));
 
+        final Path expectedOldestFile = TMP_PREVIEWS_FOLDER.resolve("3.jpg");
+
+        Files.setLastModifiedTime(expectedOldestFile, FileTime.fromMillis(0));
+
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
         Assert.assertNotNull(imagePath);
-        Assert.assertEquals(TMP_PREVIEWS_FOLDER.resolve("1.jpg"), imagePath);
+        Assert.assertEquals(expectedOldestFile, imagePath);
     }
 }

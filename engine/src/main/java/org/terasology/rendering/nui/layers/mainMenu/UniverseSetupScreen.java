@@ -206,12 +206,23 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "continue", button -> {
             final WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
             if (!worlds.isEmpty()) {
-                try {
-                    worldPreGenerationScreen.setEnvironment(context);
-                    triggerForwardAnimation(worldPreGenerationScreen);
-                } catch (UnresolvedWorldGeneratorException e) {
-                    e.printStackTrace();
-                }
+                final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+                loadPopup.setMessage("Loading", "please wait ...");
+                loadPopup.onSuccess(result -> {
+                    if (result != null && result) {
+                        triggerForwardAnimation(worldPreGenerationScreen);
+                    } else {
+                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't load world pre generation screen! Please, try again!");
+                    }
+                });
+                loadPopup.startOperation(() -> {
+                    try {
+                        worldPreGenerationScreen.setEnvironment(context);
+                    } catch (UnresolvedWorldGeneratorException e) {
+                        return false;
+                    }
+                    return true;
+                }, true);
             } else {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
             }

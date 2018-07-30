@@ -28,6 +28,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.input.Keyboard;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
@@ -40,9 +41,10 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -164,9 +166,14 @@ public class NewGameScreen extends CoreScreenLayer {
             }
         });
 
-        WidgetUtil.trySubscribe(this, "close", button ->
-                triggerBackAnimation()
-        );
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            if (GameProvider.isSavesFolderEmpty()) {
+                // skip selectGameScreen and get back directly to main screen
+                getManager().pushScreen("engine:mainMenuScreen");
+            } else {
+                triggerBackAnimation();
+            }
+        });
     }
 
     /**
@@ -279,5 +286,16 @@ public class NewGameScreen extends CoreScreenLayer {
         this.universeWrapper = wrapper;
     }
 
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
+            if (GameProvider.isSavesFolderEmpty()) {
+                // skip selectGameScreen and get back directly to main screen
+                getManager().pushScreen("engine:mainMenuScreen");
+                return true;
+            }
+        }
+        return super.onKeyEvent(event);
+    }
 }
 

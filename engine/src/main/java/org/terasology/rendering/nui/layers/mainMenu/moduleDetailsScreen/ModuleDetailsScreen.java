@@ -35,7 +35,6 @@ import org.terasology.naming.Version;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -62,8 +61,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
+/**
+ * Shows detailed information about modules.
+ */
 public class ModuleDetailsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:moduleDetailsScreen");
@@ -73,7 +76,6 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String DEFAULT_GITHUB_MODULE_URL = "https://github.com/Terasology/";
     private static final List INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay", "BuilderSampleGameplay");
-
     @In
     private ModuleManager moduleManager;
     @In
@@ -91,6 +93,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             return null;
         }
     };
+
     private UIList<Module> modules;
     private final Binding<Module> moduleInfoBinding = new ReadOnlyBinding<Module>() {
         @Override
@@ -109,63 +112,63 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     private UILabel required;
     private UIButtonWebBrowser openInBrowser;
     private UIButton updateModuleButton;
+    private UIText description;
+    private UIButton close;
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
+        initWidgets();
+
+        if (isScreenValid()) {
+
+            setUpModules();
+            setUpDependencies();
+            setUpUpdateModuleButton();
+            bindDependencyDescription();
+
+            close.subscribe(button -> triggerBackAnimation());
+
+            description.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    if (moduleInfoBinding.get() != null) {
+                        return getModuleDescription(moduleInfoBinding.get());
+                    }
+                    return "";
+                }
+            });
+        }
+    }
+
+    private void initWidgets() {
         moduleName = find("moduleName", UILabel.class);
         installedVersion = find("installedVersion", UILabel.class);
         minSupportedVersion = find("minSupportedVersion", UILabel.class);
         maxSupportedVersion = find("maxSupportedVersion", UILabel.class);
         onlineVersion = find("onlineVersion", UILabel.class);
         required = find("required", UILabel.class);
-
         modules = find("modules", UIList.class);
         dependencies = find("dependencies", UIList.class);
-
         openInBrowser = find("openInBrowser", UIButtonWebBrowser.class);
-
         updateModuleButton = find("update", UIButton.class);
-
-        if (moduleName == null || installedVersion == null || minSupportedVersion == null || maxSupportedVersion == null
-                || onlineVersion == null || required == null || dependencies == null || modules == null || openInBrowser == null || updateModuleButton == null) {
-            logger.error("Can't initialize screen correctly!");
-            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
-            triggerBackAnimation();
-            return;
-        }
-
-        setUpModules();
-
-        setUpDependencies();
-
-        setUpUpdateModuleButton();
-
-        bindDependencyDescription();
-
-        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
-
-        tryFind("description", UIText.class).ifPresent(w -> w.bindText(new ReadOnlyBinding<String>() {
-            @Override
-            public String get() {
-                if (moduleInfoBinding.get() != null) {
-                    return getModuleDescription(moduleInfoBinding.get());
-                }
-                return "";
-            }
-        }));
-
-        tryFind("title", UILabel.class)
-                .ifPresent(w -> w.setText(translationSystem.translate("${engine:menu#module-details-title}")));
+        description = find("description", UIText.class);
+        close = find("close", UIButton.class);
     }
 
     @Override
     public void onOpened() {
         super.onOpened();
 
-        modules.setSelection(null);
-        modules.select(0);
+        if (!isScreenValid()) {
+            final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.subscribeButton(e -> triggerBackAnimation());
+            getManager().pushScreen(popup);
+            // disable child widgets
+            setEnabled(false);
+        }
     }
 
     private void setUpModules() {
@@ -307,6 +310,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     }
 
     private void setUpUpdateModuleButton() {
+
         updateModuleButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
@@ -335,7 +339,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             messagePopup.setMessage("Error", ex.getMessage());
             return;
         }
-        ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
+        final ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
         confirmPopup.setMessage("Confirm Download", modulesToDownload.size() + " modules will be downloaded");
         confirmPopup.setOkHandler(() -> downloadModules(modulesToDownload));
     }
@@ -368,6 +372,14 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                             .sorted(Comparator.comparing(Module::getId))
                             .collect(Collectors.toList())
             );
+        }
+    }
+
+    public void setSelectedModule(final Module selectedModule) {
+        if (selectedModule != null) {
+            this.modules.setSelection(selectedModule);
+        } else {
+            this.modules.select(0);
         }
     }
 
@@ -452,4 +464,13 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 .collect(Collectors.joining(", "));
     }
 
+    private boolean isScreenValid() {
+        if (Stream.of(moduleName, installedVersion, minSupportedVersion, maxSupportedVersion, close,
+                onlineVersion, required, dependencies, modules, openInBrowser, updateModuleButton, description)
+                .anyMatch(Objects::isNull)) {
+            logger.error("Can't initialize screen correctly. At least one widget was missed!");
+            return false;
+        }
+        return true;
+    }
 }

@@ -36,7 +36,7 @@
                 "type": "UIBox",
                 "id": "container",
                 "layoutInfo": {
-                    "width": 1050,
+                    "width": 1016,
                     "position-horizontal-center": {},
                     "position-top": {
                         "target": "BOTTOM",
@@ -57,7 +57,7 @@
                 "verticalSpacing": 16,
                 "horizontalSpacing": 8,
                 "layoutInfo": {
-                    "width": 1034,
+                    "width": 1000,
                     "use-content-height": true,
                     "position-horizontal-center": {},
                     "position-top": {
