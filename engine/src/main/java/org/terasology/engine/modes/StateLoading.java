@@ -36,6 +36,7 @@ import org.terasology.engine.modes.loadProcesses.InitialiseComponentSystemManage
 import org.terasology.engine.modes.loadProcesses.InitialiseEntitySystem;
 import org.terasology.engine.modes.loadProcesses.InitialiseGraphics;
 import org.terasology.engine.modes.loadProcesses.InitialisePhysics;
+import org.terasology.engine.modes.loadProcesses.InitialiseRecordAndReplay;
 import org.terasology.engine.modes.loadProcesses.InitialiseRemoteWorld;
 import org.terasology.engine.modes.loadProcesses.InitialiseSystems;
 import org.terasology.engine.modes.loadProcesses.InitialiseWorld;
@@ -188,6 +189,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseBlockTypeEntities(context));
         loadProcesses.add(new CreateWorldEntity(context, gameManifest));
         loadProcesses.add(new InitialiseWorldGenerator(context));
+        loadProcesses.add(new InitialiseRecordAndReplay(context));
         if (netMode.isServer()) {
             boolean dedicated;
             if (netMode == NetworkMode.DEDICATED_SERVER) {

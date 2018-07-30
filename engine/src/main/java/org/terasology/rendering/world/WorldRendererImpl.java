@@ -32,9 +32,6 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -639,18 +636,6 @@ public final class WorldRendererImpl implements WorldRenderer {
             List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
             renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
             requestedTaskListRefresh = false;
-            RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
-            //Activate record when the preparations are ready
-            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
-                recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.RECORDING);
-            }
-
-            //Activate the replay when the preparations are ready
-            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-                RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
-                recordAndReplaySerializer.deserializeRecordAndReplayData();
-                recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAYING);
-            }
         }
     }
 
