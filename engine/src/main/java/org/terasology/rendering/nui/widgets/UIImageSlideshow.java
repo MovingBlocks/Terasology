@@ -60,14 +60,14 @@ public class UIImageSlideshow extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (images.get(index) != null) {
+        if (isImageExists()) {
             images.get(index).onDraw(canvas);
         }
     }
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        if (images.get(index) != null) {
+        if (isImageExists()) {
             return images.get(index).getPreferredContentSize(canvas, sizeHint);
         }
         return Vector2i.zero();
@@ -174,5 +174,9 @@ public class UIImageSlideshow extends CoreWidget {
 
     public List<UIImage> getImages() {
         return images;
+    }
+
+    private boolean isImageExists() {
+        return !images.isEmpty() && index < images.size() && images.get(index) != null;
     }
 }
