@@ -23,7 +23,7 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 /**
  */
-public class Vector2iTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Vector2i> {
+public class Vector2iTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector2i> {
 
     @Override
     public PersistedData serialize(Vector2i value, PersistedDataSerializer serializer) {

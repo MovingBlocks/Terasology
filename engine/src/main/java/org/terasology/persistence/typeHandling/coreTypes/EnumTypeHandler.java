@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  */
-public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
+public class EnumTypeHandler<T extends Enum> extends TypeHandler<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(EnumTypeHandler.class);
     private Class<T> enumType;

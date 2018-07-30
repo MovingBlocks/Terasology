@@ -55,7 +55,7 @@ public class RuntimeDelegatingTypeHandlerTest {
         Class<Sub> subType = Sub.class;
         Type baseType = TypeInfo.of(Base.class).getType();
 
-        abstract class SubHandler implements TypeHandler<Sub> {}
+        abstract class SubHandler extends TypeHandler<Sub> {}
 
         TypeHandler baseTypeHandler = mock(TypeHandler.class);
         TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);

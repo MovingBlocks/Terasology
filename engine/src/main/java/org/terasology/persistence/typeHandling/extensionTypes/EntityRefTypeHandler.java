@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  */
-public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
+public class EntityRefTypeHandler extends TypeHandler<EntityRef> {
 
     private EngineEntityManager entityManager;
 

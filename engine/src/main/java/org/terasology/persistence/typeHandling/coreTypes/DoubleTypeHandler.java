@@ -21,7 +21,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 /**
  */
-public class DoubleTypeHandler implements TypeHandler<Double> {
+public class DoubleTypeHandler extends TypeHandler<Double> {
 
     @Override
     public PersistedData serialize(Double value, PersistedDataSerializer serializer) {

@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  */
-public class StringMapTypeHandler<T> implements TypeHandler<Map<String, T>> {
+public class StringMapTypeHandler<T> extends TypeHandler<Map<String, T>> {
 
     private TypeHandler<T> contentsHandler;
 

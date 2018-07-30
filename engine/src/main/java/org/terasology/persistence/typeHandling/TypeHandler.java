@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling;
 
 /**
  */
-public interface TypeHandler<T> {
+public abstract class TypeHandler<T> {
 
     /**
      * Serializes a single value.
@@ -27,7 +27,7 @@ public interface TypeHandler<T> {
      * @param serializer The serializer used to serialize simple values
      * @return The serialized value.
      */
-    PersistedData serialize(T value, PersistedDataSerializer serializer);
+    public abstract PersistedData serialize(T value, PersistedDataSerializer serializer);
 
     /**
      * Deserializes a single value.
@@ -36,5 +36,5 @@ public interface TypeHandler<T> {
      * @return The deserialized value.
      * @throws org.terasology.persistence.typeHandling.DeserializationException if there was an error deserializing the data
      */
-    T deserialize(PersistedData data);
+    public abstract T deserialize(PersistedData data);
 }

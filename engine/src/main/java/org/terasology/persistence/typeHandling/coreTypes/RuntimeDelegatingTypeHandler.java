@@ -36,7 +36,7 @@ import java.util.Map;
  *
  * @param <T> The base type whose instances may be delegated to a subtype's {@link TypeHandler} at runtime.
  */
-public class RuntimeDelegatingTypeHandler<T> implements TypeHandler<T> {
+public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     private static final String TYPE_FIELD = "@type";
     private static final String VALUE_FIELD = "@value";
 

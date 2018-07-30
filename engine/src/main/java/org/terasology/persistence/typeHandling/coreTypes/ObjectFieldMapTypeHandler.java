@@ -32,7 +32,7 @@ import java.util.Objects;
  * Serializes objects as a fieldName -> fieldValue map. It is used as the last resort while serializing an
  * object through a {@link org.terasology.persistence.typeHandling.TypeSerializationLibrary}.
  */
-public class ObjectFieldMapTypeHandler<T> implements TypeHandler<T> {
+public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectFieldMapTypeHandler.class);
 

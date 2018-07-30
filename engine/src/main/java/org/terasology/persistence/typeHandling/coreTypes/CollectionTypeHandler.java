@@ -24,7 +24,7 @@ import org.terasology.reflection.reflect.ObjectConstructor;
 import java.util.Collection;
 import java.util.List;
 
-public class CollectionTypeHandler<E> implements TypeHandler<Collection<E>> {
+public class CollectionTypeHandler<E> extends TypeHandler<Collection<E>> {
     private TypeHandler<E> elementTypeHandler;
     private ObjectConstructor<? extends Collection<E>> constructor;
 

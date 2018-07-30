@@ -21,7 +21,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 /**
  */
-public class ByteTypeHandler implements TypeHandler<Byte> {
+public class ByteTypeHandler extends TypeHandler<Byte> {
 
     @Override
     public PersistedData serialize(Byte value, PersistedDataSerializer serializer) {

@@ -21,7 +21,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 /**
  */
-public class FloatTypeHandler implements TypeHandler<Float> {
+public class FloatTypeHandler extends TypeHandler<Float> {
 
     @Override
     public PersistedData serialize(Float value, PersistedDataSerializer serializer) {

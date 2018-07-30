@@ -22,7 +22,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 /**
  */
-public class NumberTypeHandler implements TypeHandler<Number> {
+public class NumberTypeHandler extends TypeHandler<Number> {
 
     @Override
     public PersistedData serialize(Number value, PersistedDataSerializer serializer) {

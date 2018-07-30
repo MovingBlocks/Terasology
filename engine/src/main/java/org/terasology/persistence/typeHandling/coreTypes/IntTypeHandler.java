@@ -21,7 +21,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 /**
  */
-public class IntTypeHandler implements TypeHandler<Integer> {
+public class IntTypeHandler extends TypeHandler<Integer> {
 
     @Override
     public PersistedData serialize(Integer value, PersistedDataSerializer serializer) {

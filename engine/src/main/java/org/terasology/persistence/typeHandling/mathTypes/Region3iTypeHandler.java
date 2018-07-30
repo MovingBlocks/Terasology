@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  */
-public class Region3iTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Region3i> {
+public class Region3iTypeHandler extends TypeHandler<Region3i> {
 
     private static final String MIN_FIELD = UriUtil.normalise("min");
     private static final String SIZE_FIELD = UriUtil.normalise("size");
