@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling.coreTypes;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
-public class ByteArrayTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<byte[]> {
+public class ByteArrayTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<byte[]> {
 	@Override
 	public PersistedData serialize(byte[] value, PersistedDataSerializer serializer) {
 		if (value == null) {

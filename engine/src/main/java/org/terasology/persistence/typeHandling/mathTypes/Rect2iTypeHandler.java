@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  */
-public class Rect2iTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Rect2i> {
+public class Rect2iTypeHandler extends TypeHandler<Rect2i> {
 
     private static final String MIN_FIELD = "min";
     private static final String SIZE_FIELD = "size";

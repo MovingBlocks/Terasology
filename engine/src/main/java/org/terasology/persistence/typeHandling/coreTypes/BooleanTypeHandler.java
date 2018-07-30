@@ -21,7 +21,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 /**
  */
-public class BooleanTypeHandler implements TypeHandler<Boolean> {
+public class BooleanTypeHandler extends TypeHandler<Boolean> {
 
     @Override
     public PersistedData serialize(Boolean value, PersistedDataSerializer serializer) {

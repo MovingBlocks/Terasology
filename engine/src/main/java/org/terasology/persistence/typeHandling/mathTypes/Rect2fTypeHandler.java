@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  */
-public class Rect2fTypeHandler implements TypeHandler<Rect2f> {
+public class Rect2fTypeHandler extends TypeHandler<Rect2f> {
 
     private static final String MIN_FIELD = "min";
     private static final String SIZE_FIELD = "size";

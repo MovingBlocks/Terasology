@@ -33,7 +33,7 @@ import org.terasology.world.block.BlockComponent;
  * For block entities the block position is used instead (this allows overriding simulated block entities).
  *
  */
-public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
+public class NetEntityRefTypeHandler extends TypeHandler<EntityRef> {
     private NetworkSystemImpl networkSystem;
     private BlockEntityRegistry blockEntityRegistry;
 

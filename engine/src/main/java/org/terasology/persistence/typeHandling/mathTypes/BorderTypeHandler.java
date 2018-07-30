@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  */
-public class BorderTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Border> {
+public class BorderTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Border> {
     private static final String LEFT_FIELD = "left";
     private static final String RIGHT_FIELD = "right";
     private static final String TOP_FIELD = "top";

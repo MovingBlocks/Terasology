@@ -21,7 +21,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 /**
  */
-public class LongTypeHandler implements TypeHandler<Long> {
+public class LongTypeHandler extends TypeHandler<Long> {
 
     @Override
     public PersistedData serialize(Long value, PersistedDataSerializer serializer) {
