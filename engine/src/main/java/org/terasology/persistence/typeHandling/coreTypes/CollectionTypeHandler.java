@@ -34,7 +34,7 @@ public class CollectionTypeHandler<E> extends TypeHandler<Collection<E>> {
     }
 
     @Override
-    public PersistedData serialize(Collection<E> value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Collection<E> value, PersistedDataSerializer serializer) {
         List<PersistedData> items = Lists.newArrayList();
 
         for (E element : value) {

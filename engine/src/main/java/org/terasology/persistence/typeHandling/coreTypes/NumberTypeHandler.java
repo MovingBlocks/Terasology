@@ -25,7 +25,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 public class NumberTypeHandler extends TypeHandler<Number> {
 
     @Override
-    public PersistedData serialize(Number value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Number value, PersistedDataSerializer serializer) {
         if (value != null) {
             return serializer.serialize(value.doubleValue());
         }

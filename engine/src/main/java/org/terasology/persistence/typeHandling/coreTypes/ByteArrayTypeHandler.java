@@ -20,7 +20,7 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 public class ByteArrayTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<byte[]> {
 	@Override
-	public PersistedData serialize(byte[] value, PersistedDataSerializer serializer) {
+	public PersistedData serializeNonNull(byte[] value, PersistedDataSerializer serializer) {
 		if (value == null) {
 			return serializer.serializeNull();
 		} else {

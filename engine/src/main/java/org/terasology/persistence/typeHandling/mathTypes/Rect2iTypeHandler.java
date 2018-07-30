@@ -41,7 +41,7 @@ public class Rect2iTypeHandler extends TypeHandler<Rect2i> {
     }
 
     @Override
-    public PersistedData serialize(Rect2i value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Rect2i value, PersistedDataSerializer serializer) {
         if (value == null) {
             return serializer.serializeNull();
         } else {

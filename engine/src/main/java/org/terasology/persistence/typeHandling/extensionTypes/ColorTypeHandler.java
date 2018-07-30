@@ -29,7 +29,7 @@ import org.terasology.rendering.nui.Color;
 public class ColorTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Color> {
 
     @Override
-    public PersistedData serialize(Color value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Color value, PersistedDataSerializer serializer) {
         if (value == null) {
             return serializer.serializeNull();
         } else {

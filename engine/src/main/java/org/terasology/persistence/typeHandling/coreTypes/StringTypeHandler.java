@@ -24,7 +24,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 public class StringTypeHandler extends TypeHandler<String> {
 
     @Override
-    public PersistedData serialize(String value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(String value, PersistedDataSerializer serializer) {
         if (value == null) {
             return serializer.serializeNull();
         } else {

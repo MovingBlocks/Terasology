@@ -41,7 +41,7 @@ public class Region3iTypeHandler extends TypeHandler<Region3i> {
     }
 
     @Override
-    public PersistedData serialize(Region3i value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Region3i value, PersistedDataSerializer serializer) {
         if (value == null) {
             return serializer.serializeNull();
         } else {

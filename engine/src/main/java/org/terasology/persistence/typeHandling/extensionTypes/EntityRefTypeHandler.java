@@ -36,7 +36,7 @@ public class EntityRefTypeHandler extends TypeHandler<EntityRef> {
     }
 
     @Override
-    public PersistedData serialize(EntityRef value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(EntityRef value, PersistedDataSerializer serializer) {
         if (value.exists() && value.isPersistent()) {
             return serializer.serialize(value.getId());
         }

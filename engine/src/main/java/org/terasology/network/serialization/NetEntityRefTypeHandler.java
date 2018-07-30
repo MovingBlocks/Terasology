@@ -43,7 +43,7 @@ public class NetEntityRefTypeHandler extends TypeHandler<EntityRef> {
     }
 
     @Override
-    public PersistedData serialize(EntityRef value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(EntityRef value, PersistedDataSerializer serializer) {
         BlockComponent blockComponent = value.getComponent(BlockComponent.class);
         if (blockComponent != null) {
             Vector3i pos = blockComponent.position;

@@ -25,7 +25,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.TypeInfo;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -53,7 +52,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     }
 
     @Override
-    public PersistedData serialize(T value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(T value, PersistedDataSerializer serializer) {
         // If primitive, don't go looking for the runtime type, serialize as is
         if (typeInfo.getRawType().isPrimitive()) {
             return delegateHandler.serialize(value, serializer);

@@ -27,7 +27,7 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 public class Vector4fTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector4f> {
 
     @Override
-    public PersistedData serialize(Vector4f value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Vector4f value, PersistedDataSerializer serializer) {
         if (value == null) {
             return serializer.serializeNull();
         } else {
