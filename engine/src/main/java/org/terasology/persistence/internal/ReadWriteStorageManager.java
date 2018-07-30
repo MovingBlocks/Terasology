@@ -24,6 +24,7 @@ import org.terasology.config.UniverseConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -50,6 +51,7 @@ import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.ShutdownTask;
 import org.terasology.utilities.concurrency.Task;
@@ -426,6 +428,10 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         saveTransaction = createSaveTransaction();
         saveThreadManager.offer(saveTransaction);
 
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.NOT_ACTIVATED) {
+            saveGamePreviewImage();
+        }
+
         for (ComponentSystem sys : componentSystemManager.iterateAll()) {
             sys.postSave();
         }
@@ -476,6 +482,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private void scheduleNextAutoSave() {
         long msBetweenAutoSave = config.getSystem().getMaxSecondsBetweenSaves() * 1000;
         nextAutoSave = System.currentTimeMillis() + msBetweenAutoSave;
+    }
+
+    private void saveGamePreviewImage() {
+        final ScreenGrabber screenGrabber = CoreRegistry.get(ScreenGrabber.class);
+        final Game game = CoreRegistry.get(Game.class);
+        if (screenGrabber != null && game != null) {
+            screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(game.getName()));
+        }
     }
 
     @Override

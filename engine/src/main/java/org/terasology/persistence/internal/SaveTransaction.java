@@ -147,6 +147,7 @@ public class SaveTransaction extends AbstractTask {
             saveTransactionHelper.cleanupSaveTransactionDirectory();
             applyDeltaToPrivateEntityManager();
             prepareChunksPlayersAndGlobalStore();
+            createPreviewImagesFolder();
             createSaveTransactionDirectory();
             writePlayerStores();
             writeGlobalStore();
@@ -161,6 +162,10 @@ public class SaveTransaction extends AbstractTask {
             logger.error("Save game creation failed", t);
             result = SaveTransactionResult.createFailureResult(t);
         }
+    }
+
+    private void createPreviewImagesFolder() throws IOException {
+        Files.createDirectories(storagePathProvider.getPreviewsPath());
     }
 
     private void saveRecordingData() {

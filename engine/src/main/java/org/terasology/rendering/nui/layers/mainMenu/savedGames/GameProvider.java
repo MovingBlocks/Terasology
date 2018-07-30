@@ -19,15 +19,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.stream.Collectors;
 
 public final class GameProvider {
 
@@ -54,6 +50,23 @@ public final class GameProvider {
     public static List<GameInfo> getSavedGames() {
         Path savePath = PathManager.getInstance().getSavesPath();
         return getSavedGameOrRecording(savePath);
+    }
+
+    /**
+     * Checks if saved games are present.
+     */
+    public static boolean isSavesFolderEmpty() {
+        Path savePath = PathManager.getInstance().getSavesPath();
+        if (savePath != null) {
+            try {
+                return Files.list(savePath)
+                        .filter(savedGameFolderPath -> Files.isDirectory(savedGameFolderPath))
+                        .collect(Collectors.toList()).isEmpty();
+            } catch (IOException e) {
+                logger.warn("Can't read saves path {}", savePath, e);
+            }
+        }
+        return true;
     }
 
     private static List<GameInfo> getSavedGameOrRecording(Path saveOrRecordingPath) {
@@ -82,8 +95,7 @@ public final class GameProvider {
                 try {
                     if (!info.getTitle().isEmpty()) {
                         Date date = new Date(world.getKey().toMillis());
-                        BufferedImage image = getSavedGamePreviewImage(world.getValue());
-                        result.add(new GameInfo(info, date, image));
+                        result.add(new GameInfo(info, date, world.getValue()));
                     }
                 } catch (NullPointerException npe) {
                     logger.error("The save file was corrupted for: " + world.toString() + ". The manifest can be found and restored at: " + gameManifest.toString(), npe);
@@ -95,18 +107,6 @@ public final class GameProvider {
         return result;
     }
 
-    private static BufferedImage getSavedGamePreviewImage(Path path) {
-        Path previewImagePath = path.resolve(TerasologyConstants.DEFAULT_GAME_PREVIEW_IMAGE_NAME);
-        if (!previewImagePath.toFile().exists()) {
-            return null;
-        }
-        try (InputStream in = new BufferedInputStream(Files.newInputStream(previewImagePath))) {
-            return ImageIO.read(in);
-        } catch (IOException ex) {
-            logger.warn("Can't load an image", ex);
-        }
-        return null;
-    }
 
     /**
      * Generates the game name based on the game number of the last saved game

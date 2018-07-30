@@ -30,15 +30,19 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.persistence.internal.GamePreviewImageProvider;
+import org.terasology.rendering.nui.widgets.UIImageSlideshow;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UIImageSlideshow;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.FilesUtil;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -46,13 +50,13 @@ import java.util.stream.Collectors;
  */
 public abstract class SelectionScreen extends CoreScreenLayer {
 
-    private static final ResourceUrn PREVIEW_IMAGE_URI = new ResourceUrn("engine:savedGamePreview");
+    private static final String PREVIEW_IMAGE_URI_PATTERN = "engine:savedGamePreview";
     private static final ResourceUrn DEFAULT_PREVIEW_IMAGE_URI = new ResourceUrn("engine:defaultPreview");
     private static final int MODULES_LINE_LIMIT = 180;
 
     private static final Logger logger = LoggerFactory.getLogger(SelectionScreen.class);
 
-    protected UIImageSlideshow previewSlideshow;
+    private UIImageSlideshow previewSlideshow;
 
     @In
     protected Config config;
@@ -79,7 +83,7 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         if (gameInfo == null) {
             worldGenerator.setText("");
             moduleNames.setText("");
-            loadPreviewImage(null);
+            loadPreviewImages(null);
             return;
         }
 
@@ -100,24 +104,35 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         worldGenerator.setText(mainWorldGenerator);
         moduleNames.setText(commaSeparatedModules.length() > MODULES_LINE_LIMIT ? commaSeparatedModules.substring(0, MODULES_LINE_LIMIT) + "..." : commaSeparatedModules);
 
-        loadPreviewImage(gameInfo);
+        loadPreviewImages(gameInfo);
     }
 
-    private void loadPreviewImage(final GameInfo gameInfo) {
-        Texture texture;
-        if (gameInfo != null && gameInfo.getPreviewImage() != null) {
-            TextureData textureData = null;
-            try {
-                textureData = AWTTextureFormat.convertToTextureData(gameInfo.getPreviewImage(), Texture.FilterMode.LINEAR);
-            } catch (IOException e) {
-                logger.error("Converting preview image to texture data {} failed", e);
-            }
-            texture = Assets.generateAsset(PREVIEW_IMAGE_URI, textureData, Texture.class);
-        } else {
-            texture = Assets.getTexture(DEFAULT_PREVIEW_IMAGE_URI).get();
+    private void loadPreviewImages(final GameInfo gameInfo) {
+        List<Texture> textures = new ArrayList<>();
+        if (gameInfo != null && gameInfo.getSavePath() != null) {
+            final List<BufferedImage> bufferedImages = GamePreviewImageProvider.getAllPreviewImages(gameInfo.getSavePath());
+            textures = bufferedImages
+                    .stream()
+                    .map(buffImage -> {
+                        TextureData textureData;
+                        try {
+                            textureData = AWTTextureFormat.convertToTextureData(buffImage, Texture.FilterMode.LINEAR);
+                        } catch (IOException e) {
+                            logger.error("Converting preview image to texture data {} failed", e);
+                            return null;
+                        }
+                        return Assets.generateAsset(new ResourceUrn(PREVIEW_IMAGE_URI_PATTERN + bufferedImages.indexOf(buffImage)), textureData, Texture.class);
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
         }
+
+        if (textures.isEmpty()) {
+            textures.add(Assets.getTexture(DEFAULT_PREVIEW_IMAGE_URI).get());
+        }
+
         previewSlideshow.clean();
-        previewSlideshow.addImage(texture);
+        textures.forEach(previewSlideshow::addImage);
     }
 
     protected void remove(final UIList<GameInfo> gameList, Path world, String removeString) {
@@ -175,5 +190,9 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         } else {
             logger.warn("Can't find saveGamePath widget!");
         }
+    }
+
+    public UIImageSlideshow getPreviewSlideshow() {
+        return previewSlideshow;
     }
 }
