@@ -50,4 +50,7 @@ public class UniverseConfig {
         return spawnWorldTitle;
     }
 
+    public List<WorldInfo> getWorlds() {
+        return worlds;
+    }
 }

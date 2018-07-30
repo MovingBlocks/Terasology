@@ -45,6 +45,7 @@ public class GameManifest {
 
     private String title = "";
     private String seed = "";
+    private String spawnWorld = "";
     private long time;
     private List<String> registeredBlockFamilies = Lists.newArrayList();
     private Map<String, Short> blockIdMap = Maps.newHashMap();
@@ -157,5 +158,13 @@ public class GameManifest {
 
     public void addModule(Name id, Version version) {
         modules.add(new NameVersion(id, version));
+    }
+
+    public void setSpawnWorld(String targetWorld) {
+        this.spawnWorld = targetWorld;
+    }
+
+    public String getSpawnWorld() {
+        return spawnWorld;
     }
 }

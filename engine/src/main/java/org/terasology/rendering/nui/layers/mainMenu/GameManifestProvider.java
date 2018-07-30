@@ -88,6 +88,7 @@ public class GameManifestProvider {
                 (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
 
         gameManifest.addWorld(worldInfo);
+        gameManifest.setSpawnWorld(worldInfo.getTitle());
         config.getUniverseConfig().addWorldManager(worldInfo);
         config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
         config.getUniverseConfig().setUniverseSeed(universeWrapper.getSeed());
