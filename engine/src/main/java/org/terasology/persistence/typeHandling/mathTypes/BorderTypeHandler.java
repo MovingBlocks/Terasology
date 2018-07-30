@@ -32,7 +32,7 @@ public class BorderTypeHandler extends org.terasology.persistence.typeHandling.T
     private static final String BOTTOM_FIELD = "bottom";
 
     @Override
-    public PersistedData serialize(Border value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Border value, PersistedDataSerializer serializer) {
         if (value != null) {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
             map.put(LEFT_FIELD, serializer.serialize(value.getLeft()));

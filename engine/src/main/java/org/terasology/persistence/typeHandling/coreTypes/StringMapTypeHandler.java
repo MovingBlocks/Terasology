@@ -33,7 +33,7 @@ public class StringMapTypeHandler<T> extends TypeHandler<Map<String, T>> {
     }
 
     @Override
-    public PersistedData serialize(Map<String, T> value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Map<String, T> value, PersistedDataSerializer serializer) {
         Map<String, PersistedData> map = Maps.newLinkedHashMap();
         for (Map.Entry<String, T> entry : value.entrySet()) {
             PersistedData item = contentsHandler.serialize(entry.getValue(), serializer);

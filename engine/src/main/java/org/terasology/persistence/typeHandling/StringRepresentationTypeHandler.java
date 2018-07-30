@@ -24,7 +24,7 @@ public abstract class StringRepresentationTypeHandler<T> extends TypeHandler<T> 
     public abstract T getFromString(String representation);
 
     @Override
-    public PersistedData serialize(T value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(T value, PersistedDataSerializer serializer) {
         String stringValue = getAsString(value);
         if (stringValue == null) {
             return serializer.serializeNull();

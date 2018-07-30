@@ -27,7 +27,15 @@ public abstract class TypeHandler<T> {
      * @param serializer The serializer used to serialize simple values
      * @return The serialized value.
      */
-    public abstract PersistedData serialize(T value, PersistedDataSerializer serializer);
+    protected abstract PersistedData serializeNonNull(T value, PersistedDataSerializer serializer);
+
+    public PersistedData serialize(T value, PersistedDataSerializer serializer) {
+        if (value == null) {
+            return serializer.serializeNull();
+        }
+
+        return serializeNonNull(value, serializer);
+    }
 
     /**
      * Deserializes a single value.

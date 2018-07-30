@@ -24,7 +24,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 public class LongTypeHandler extends TypeHandler<Long> {
 
     @Override
-    public PersistedData serialize(Long value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Long value, PersistedDataSerializer serializer) {
         if (value != null) {
             return serializer.serialize(value);
         }
