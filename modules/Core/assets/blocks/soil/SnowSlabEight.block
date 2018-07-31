@@ -1,0 +1,16 @@
+ {
+    "displayName": "Eighth Snow Slab",
+    "basedOn": "core:soil",
+    "rotation": "attachedToSurface",
+    "sides": {
+        "shape": "eightSlab"
+    },
+    "top": {
+        "shape": "eightSlab"
+    },
+    "penetrable": true,
+    "entity" : {
+           "prefab" : "slabStack"
+    },
+    "sounds": "Core:snow"
+}

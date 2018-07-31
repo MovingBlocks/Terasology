@@ -8,7 +8,7 @@
             "pick", "emptyVial", "whiteFluff", "cauliflower", "questionMark", "scroll", "apple", "emptyJug", "steelIngot", "coal", "ironOre", "", "", "skull", "whiteRecipe", "redSkull",
             "axe", "redVial", "redFluff", "redFlower", "bowl", "brownBook", "bananas", "waterJug", "copperIngot", "wick", "", "", "", "roundMeshedFlask", "redRecipe", "purpleSkull",
             "sickle", "orangeVial", "pinkFluff", "", "lantern", "redBook", "door", "", "goldIngot", "pole", "", "", "", "purplePotion", "yellowRecipe", "blueSkull",
-            "hammer", "greenVial", "greenFluff", "deathCap", "scissors", "blueBook", "", "", "ironIngot", "", "", "", "", "skullOnStick", "blueRecipe", "cyanSkull",
+            "hammer", "greenVial", "greenFluff", "deathCap", "scissors", "blueBook", "", "", "ironIngot", "snowshoes", "", "", "", "skullOnStick", "blueRecipe", "cyanSkull",
             "knife", "purpleVial", "purpleFluff", "lavender", "", "", "", "", "", "", "", "", "", "", "buildBlockJob", "greenSkull",
             "sword", "cyanVial", "cyanFluff", "", "candle", "", "", "", "", "", "", "", "", "", "removeBlockJob", "yellowSkull",
             "bow", "blueVial", "blueFluff", "", "dynamiteStick", "", "", "", "", "", "", "", "", "", "walkToJob", "orangeSkull",
