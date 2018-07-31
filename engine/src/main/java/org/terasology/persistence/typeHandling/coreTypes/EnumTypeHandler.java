@@ -24,6 +24,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  */
@@ -46,15 +47,15 @@ public class EnumTypeHandler<T extends Enum> extends TypeHandler<T> {
     }
 
     @Override
-    public T deserialize(PersistedData data) {
+    public Optional<T> deserialize(PersistedData data) {
         if (data.isString()) {
             T result = caseInsensitiveLookup.get(data.getAsString().toLowerCase(Locale.ENGLISH));
             if (result == null) {
                 logger.warn("Unknown enum value: '{}' for enum {}", data.getAsString(), enumType.getSimpleName());
             }
-            return result;
+            return Optional.ofNullable(result);
         }
-        return null;
+        return Optional.empty();
     }
 
 }

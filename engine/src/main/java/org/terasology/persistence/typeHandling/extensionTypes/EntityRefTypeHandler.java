@@ -24,6 +24,7 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  */
@@ -44,11 +45,11 @@ public class EntityRefTypeHandler extends TypeHandler<EntityRef> {
     }
 
     @Override
-    public EntityRef deserialize(PersistedData data) {
+    public Optional<EntityRef> deserialize(PersistedData data) {
         if (data.isNumber()) {
-            return entityManager.getEntity(data.getAsLong());
+            return Optional.ofNullable(entityManager.getEntity(data.getAsLong()));
         }
-        return EntityRef.NULL;
+        return Optional.ofNullable(EntityRef.NULL);
     }
 
     private void addEntitiesFromLongArray(List<EntityRef> result, PersistedDataArray array) {

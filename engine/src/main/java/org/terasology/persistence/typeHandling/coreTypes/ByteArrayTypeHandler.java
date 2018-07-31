@@ -18,6 +18,8 @@ package org.terasology.persistence.typeHandling.coreTypes;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
+import java.util.Optional;
+
 public class ByteArrayTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<byte[]> {
 	@Override
 	public PersistedData serializeNonNull(byte[] value, PersistedDataSerializer serializer) {
@@ -25,11 +27,11 @@ public class ByteArrayTypeHandler extends org.terasology.persistence.typeHandlin
 	}
 
 	@Override
-	public byte[] deserialize(PersistedData data) {
+	public Optional<byte[]> deserialize(PersistedData data) {
 		if (data.isBytes()) {
-			return data.getAsBytes();
+			return Optional.of(data.getAsBytes());
 		} else {
-			return null;
+			return Optional.empty();
 		}
 	}
 }

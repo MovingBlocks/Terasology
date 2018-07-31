@@ -20,12 +20,14 @@ import com.google.common.collect.Maps;
 
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  */
@@ -51,16 +53,23 @@ public class Rect2iTypeHandler extends TypeHandler<Rect2i> {
     }
 
     @Override
-    public Rect2i deserialize(PersistedData data) {
+    public Optional<Rect2i> deserialize(PersistedData data) {
         if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
 
-            Vector2i min = vector2iTypeHandler.deserialize(map.get(MIN_FIELD));
-            Vector2i size = vector2iTypeHandler.deserialize(map.get(SIZE_FIELD));
+            Vector2i min = vector2iTypeHandler.deserialize(map.get(MIN_FIELD))
+                    .orElseThrow(
+                            () -> new DeserializationException("Could not deserialize Rect2i." + MIN_FIELD)
+                    );
 
-            return Rect2i.createFromMinAndSize(min, size);
+            Vector2i size = vector2iTypeHandler.deserialize(map.get(SIZE_FIELD))
+                    .orElseThrow(
+                            () -> new DeserializationException("Could not deserialize Rect2i." + SIZE_FIELD)
+                    );
+
+            return Optional.ofNullable(Rect2i.createFromMinAndSize(min, size));
         }
-        return null;
+        return Optional.empty();
     }
 
 }

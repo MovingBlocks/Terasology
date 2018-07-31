@@ -21,6 +21,8 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
+import java.util.Optional;
+
 /**
  */
 public class Vector3iTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector3i> {
@@ -31,14 +33,14 @@ public class Vector3iTypeHandler extends org.terasology.persistence.typeHandling
     }
 
     @Override
-    public Vector3i deserialize(PersistedData data) {
+    public Optional<Vector3i> deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 2) {
                 TIntList ints = dataArray.getAsIntegerArray();
-                return new Vector3i(ints.get(0), ints.get(1), ints.get(2));
+                return Optional.of(new Vector3i(ints.get(0), ints.get(1), ints.get(2)));
             }
         }
-        return null;
+        return Optional.empty();
     }
 }

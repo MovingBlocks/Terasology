@@ -28,6 +28,8 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
 
+import java.util.Optional;
+
 /**
  * This type handler encodes EntityRef for network transferals. For normal entities, the Network Id of the entity is used.
  * For block entities the block position is used instead (this allows overriding simulated block entities).
@@ -57,19 +59,19 @@ public class NetEntityRefTypeHandler extends TypeHandler<EntityRef> {
     }
 
     @Override
-    public EntityRef deserialize(PersistedData data) {
+    public Optional<EntityRef> deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray array = data.getAsArray();
             if (array.isNumberArray() && array.size() == 3) {
                 TIntList items = data.getAsArray().getAsIntegerArray();
                 Vector3i pos = new Vector3i(items.get(0), items.get(1), items.get(2));
-                return blockEntityRegistry.getBlockEntityAt(pos);
+                return Optional.ofNullable(blockEntityRegistry.getBlockEntityAt(pos));
             }
         }
         if (data.isNumber()) {
-            return networkSystem.getEntity(data.getAsInteger());
+            return Optional.ofNullable(networkSystem.getEntity(data.getAsInteger()));
         }
-        return EntityRef.NULL;
+        return Optional.ofNullable(EntityRef.NULL);
     }
 
 }

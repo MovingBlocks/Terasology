@@ -15,6 +15,8 @@
  */
 package org.terasology.persistence.typeHandling;
 
+import java.util.Optional;
+
 /**
  * Serializes objects of type {@link T} to and from a {@link PersistedData}.
  */
@@ -50,8 +52,7 @@ public abstract class TypeHandler<T> {
      * Deserializes a single value.
      *
      * @param data The persisted data to deserialize from
-     * @return The deserialized value.
-     * @throws org.terasology.persistence.typeHandling.DeserializationException if there was an error deserializing the data
+     * @return The deserialized value. {@link Optional#empty()} if the value could not be deserialized.
      */
-    public abstract T deserialize(PersistedData data);
+    public abstract Optional<T> deserialize(PersistedData data);
 }

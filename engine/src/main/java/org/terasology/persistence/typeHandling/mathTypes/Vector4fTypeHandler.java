@@ -22,6 +22,8 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
+import java.util.Optional;
+
 /**
  */
 public class Vector4fTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector4f> {
@@ -32,14 +34,14 @@ public class Vector4fTypeHandler extends org.terasology.persistence.typeHandling
     }
 
     @Override
-    public Vector4f deserialize(PersistedData data) {
+    public Optional<Vector4f> deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 3) {
                 TFloatList floats = dataArray.getAsFloatArray();
-                return new Vector4f(floats.get(0), floats.get(1), floats.get(2), floats.get(3));
+                return Optional.of(new Vector4f(floats.get(0), floats.get(1), floats.get(2), floats.get(3)));
             }
         }
-        return null;
+        return Optional.empty();
     }
 }

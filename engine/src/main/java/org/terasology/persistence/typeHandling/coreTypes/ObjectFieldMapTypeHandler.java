@@ -27,6 +27,7 @@ import org.terasology.reflection.reflect.ObjectConstructor;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Serializes objects as a fieldName -> fieldValue map. It is used as the last resort while serializing an
@@ -75,7 +76,7 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
     }
 
     @Override
-    public T deserialize(PersistedData data) {
+    public Optional<T> deserialize(PersistedData data) {
         try {
             T result = constructor.construct();
             for (Map.Entry<String, PersistedData> entry : data.getAsValueMap().entrySet()) {
@@ -88,14 +89,18 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
                 }
 
                 TypeHandler handler = mappedFields.get(field);
-                Object fieldValue = handler.deserialize(entry.getValue());
+                Optional<?> fieldValue = handler.deserialize(entry.getValue());
 
-                field.set(result, fieldValue);
+                if (fieldValue.isPresent()) {
+                    field.set(result, fieldValue.get());
+                } else {
+                    logger.error("Could not deserialize field {}", field.getName());
+                }
             }
-            return result;
+            return Optional.ofNullable(result);
         } catch (Exception e) {
             logger.error("Unable to deserialize {}", data, e);
         }
-        return null;
+        return Optional.empty();
     }
 }

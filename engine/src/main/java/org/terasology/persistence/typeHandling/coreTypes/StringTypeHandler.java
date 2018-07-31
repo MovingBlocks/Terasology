@@ -19,6 +19,8 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
+import java.util.Optional;
+
 /**
  */
 public class StringTypeHandler extends TypeHandler<String> {
@@ -29,11 +31,11 @@ public class StringTypeHandler extends TypeHandler<String> {
     }
 
     @Override
-    public String deserialize(PersistedData data) {
+    public Optional<String> deserialize(PersistedData data) {
         if (data.isString()) {
-            return data.getAsString();
+            return Optional.ofNullable(data.getAsString());
         }
-        return null;
+        return Optional.empty();
     }
 
 }

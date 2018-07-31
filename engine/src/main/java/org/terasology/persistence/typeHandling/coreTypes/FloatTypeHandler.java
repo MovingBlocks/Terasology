@@ -19,6 +19,8 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
+import java.util.Optional;
+
 /**
  */
 public class FloatTypeHandler extends TypeHandler<Float> {
@@ -29,11 +31,11 @@ public class FloatTypeHandler extends TypeHandler<Float> {
     }
 
     @Override
-    public Float deserialize(PersistedData data) {
+    public Optional<Float> deserialize(PersistedData data) {
         if (data.isNumber()) {
-            return data.getAsFloat();
+            return Optional.of(data.getAsFloat());
         }
-        return null;
+        return Optional.empty();
     }
 
 }

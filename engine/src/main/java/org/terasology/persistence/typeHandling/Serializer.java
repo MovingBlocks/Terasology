@@ -93,7 +93,7 @@ public class Serializer {
             logger.error("No type handler for type {} used by {}::{}", fieldMetadata.getType(), target.getClass(), fieldMetadata);
         } else {
             try {
-                Object deserializedValue = handler.deserialize(data);
+                Object deserializedValue = handler.deserialize(data).orElse(null);
                 fieldMetadata.setValue(target, deserializedValue);
             } catch (DeserializationException e) {
                 logger.error("Unable to deserialize field '{}' from '{}'", fieldMetadata.getName(), data.toString(), e);
