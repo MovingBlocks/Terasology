@@ -41,7 +41,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 public class TypeHandlingIntegrationTest {
-    private static final String INSTANCE_JSON = "{\"list\":[50,51,-52,-53],\"animals\":[{\"@type\":\"org.terasology.persistence.typeHandling.TypeHandlingIntegrationTest$Dog\",\"@value\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"@type\":\"org.terasology.persistence.typeHandling.TypeHandlingIntegrationTest$Cheetah\",\"@value\":{\"name\":\"Cheetah\",\"spotColor\":[255,0,255,255]}}],\"data\":-559038737}";
+    private static final String INSTANCE_JSON = "{\"data\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"@type\":\"org.terasology.persistence.typeHandling.TypeHandlingIntegrationTest$Dog\",\"@value\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"@type\":\"org.terasology.persistence.typeHandling.TypeHandlingIntegrationTest$Cheetah\",\"@value\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
 
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
 
@@ -79,7 +79,7 @@ public class TypeHandlingIntegrationTest {
 
         PersistedData persistedData = new GsonPersistedData(jsonElement);
 
-        SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData);
+        SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData).get();
 
         assertEquals(INSTANCE, deserializedInstance);
     }
@@ -105,7 +105,7 @@ public class TypeHandlingIntegrationTest {
         }
 
         persistedData = new ProtobufPersistedData(value);
-        SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData);
+        SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData).get();
 
         assertEquals(INSTANCE, deserializedInstance);
     }

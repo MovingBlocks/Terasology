@@ -19,12 +19,14 @@ package org.terasology.persistence.typeHandling.mathTypes;
 import com.google.common.collect.Maps;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector2f;
+import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  */
@@ -50,16 +52,23 @@ public class Rect2fTypeHandler extends TypeHandler<Rect2f> {
     }
 
     @Override
-    public Rect2f deserialize(PersistedData data) {
+    public Optional<Rect2f> deserialize(PersistedData data) {
         if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
 
-            Vector2f min = vector2fTypeHandler.deserialize(map.get(MIN_FIELD));
-            Vector2f size = vector2fTypeHandler.deserialize(map.get(SIZE_FIELD));
+            Vector2f min = vector2fTypeHandler.deserialize(map.get(MIN_FIELD))
+                    .orElseThrow(
+                            () -> new DeserializationException("Could not deserialize Rect2f." + MIN_FIELD)
+                    );
 
-            return Rect2f.createFromMinAndSize(min, size);
+            Vector2f size = vector2fTypeHandler.deserialize(map.get(SIZE_FIELD))
+                    .orElseThrow(
+                            () -> new DeserializationException("Could not deserialize Rect2f." + SIZE_FIELD)
+                    );
+
+            return Optional.ofNullable(Rect2f.createFromMinAndSize(min, size));
         }
-        return null;
+        return Optional.empty();
     }
 
 }

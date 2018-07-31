@@ -20,6 +20,8 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
+import java.util.Optional;
+
 /**
  */
 public class NumberTypeHandler extends TypeHandler<Number> {
@@ -30,11 +32,11 @@ public class NumberTypeHandler extends TypeHandler<Number> {
     }
 
     @Override
-    public Number deserialize(PersistedData data) {
+    public Optional<Number> deserialize(PersistedData data) {
         if (data.isNumber()) {
-            return data.getAsDouble();
+            return Optional.of(data.getAsDouble());
         }
-        return null;
+        return Optional.empty();
     }
 
 }

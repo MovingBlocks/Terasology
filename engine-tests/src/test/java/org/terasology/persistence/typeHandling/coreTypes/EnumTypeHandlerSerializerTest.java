@@ -20,6 +20,7 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,8 +43,7 @@ public class EnumTypeHandlerSerializerTest {
         PersistedData serializedNull = handler.serialize(null, persistedDataSerializer);
         assertEquals(nullData, serializedNull);
 
-        TestEnum deserializedValue = handler.deserialize(nullData);
-        assertEquals(null, deserializedValue);
+        assertFalse(handler.deserialize(nullData).isPresent());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class EnumTypeHandlerSerializerTest {
         PersistedData serializedNonNull = handler.serialize(TestEnum.NON_NULL, persistedDataSerializer);
         assertEquals(data, serializedNonNull);
 
-        TestEnum deserializedValue = handler.deserialize(data);
+        TestEnum deserializedValue = handler.deserialize(data).get();
         assertEquals(TestEnum.NON_NULL, deserializedValue);
     }
 }

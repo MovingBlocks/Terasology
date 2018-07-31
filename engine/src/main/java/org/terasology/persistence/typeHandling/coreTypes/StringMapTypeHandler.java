@@ -21,6 +21,7 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  */
@@ -45,13 +46,18 @@ public class StringMapTypeHandler<T> extends TypeHandler<Map<String, T>> {
     }
 
     @Override
-    public Map<String, T> deserialize(PersistedData data) {
-        Map<String, T> result = Maps.newLinkedHashMap();
-        if (data.isValueMap()) {
-            for (Map.Entry<String, PersistedData> item : data.getAsValueMap().entrySet()) {
-                result.put(item.getKey(), contentsHandler.deserialize(item.getValue()));
-            }
+    public Optional<Map<String, T>> deserialize(PersistedData data) {
+        if (!data.isValueMap()) {
+            return Optional.empty();
         }
-        return result;
+
+        Map<String, T> result = Maps.newLinkedHashMap();
+
+        for (Map.Entry<String, PersistedData> item : data.getAsValueMap().entrySet()) {
+            Optional<T> optionalValue = contentsHandler.deserialize(item.getValue());
+            optionalValue.ifPresent(value -> result.put(item.getKey(), value));
+        }
+
+        return Optional.of(result);
     }
 }

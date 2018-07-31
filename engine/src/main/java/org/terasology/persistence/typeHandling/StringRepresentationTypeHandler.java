@@ -15,6 +15,8 @@
  */
 package org.terasology.persistence.typeHandling;
 
+import java.util.Optional;
+
 /**
  */
 public abstract class StringRepresentationTypeHandler<T> extends TypeHandler<T> {
@@ -30,11 +32,11 @@ public abstract class StringRepresentationTypeHandler<T> extends TypeHandler<T> 
     }
 
     @Override
-    public T deserialize(PersistedData data) {
+    public Optional<T> deserialize(PersistedData data) {
         if (data.isString()) {
-            return getFromString(data.getAsString());
+            return Optional.ofNullable(getFromString(data.getAsString()));
         }
-        return null;
+        return Optional.empty();
     }
 
 }

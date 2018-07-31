@@ -26,6 +26,7 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Delegates serialization of a value to a handler of its runtime type if needed. It is used in
@@ -120,7 +121,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     }
 
     @Override
-    public T deserialize(PersistedData data) {
+    public Optional<T> deserialize(PersistedData data) {
         if (!data.isValueMap()) {
             return delegateHandler.deserialize(data);
         }

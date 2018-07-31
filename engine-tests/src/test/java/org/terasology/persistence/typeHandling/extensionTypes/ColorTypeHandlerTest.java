@@ -44,7 +44,7 @@ public class ColorTypeHandlerTest {
     @Test
     public void testDeserializeHex() {
         PersistedData data = new PersistedString("DEADBEEF");
-        Color color = handler.deserialize(data);
+        Color color = handler.deserialize(data).get();
         Assert.assertEquals(0xDEADBEEF, color.rgba());
     }
 
@@ -52,7 +52,7 @@ public class ColorTypeHandlerTest {
     public void testDeserializeArray() {
         JsonArray array = new Gson().fromJson("[12, 34, 56, 78]", JsonArray.class);
         PersistedData data = new GsonPersistedDataArray(array);
-        Color color = handler.deserialize(data);
+        Color color = handler.deserialize(data).get();
         Assert.assertEquals(12, color.r());
         Assert.assertEquals(34, color.g());
         Assert.assertEquals(56, color.b());

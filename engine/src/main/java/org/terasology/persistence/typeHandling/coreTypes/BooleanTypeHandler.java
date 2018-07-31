@@ -19,6 +19,8 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
+import java.util.Optional;
+
 /**
  */
 public class BooleanTypeHandler extends TypeHandler<Boolean> {
@@ -29,11 +31,11 @@ public class BooleanTypeHandler extends TypeHandler<Boolean> {
     }
 
     @Override
-    public Boolean deserialize(PersistedData data) {
+    public Optional<Boolean> deserialize(PersistedData data) {
         if (data.isBoolean()) {
-            return data.getAsBoolean();
+            return Optional.of(data.getAsBoolean());
         }
-        return null;
+        return Optional.empty();
     }
 
 }

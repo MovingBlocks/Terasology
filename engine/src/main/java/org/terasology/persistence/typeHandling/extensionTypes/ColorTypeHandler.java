@@ -22,6 +22,8 @@ import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.rendering.nui.Color;
 
+import java.util.Optional;
+
 /**
  * Serializes {@link Color} instances to an int array <code>[r, g, b, a]</code>.
  * De-serializing also supports hexadecimal strings such as <code>"AAAAAAFF"</code>.
@@ -34,18 +36,19 @@ public class ColorTypeHandler extends org.terasology.persistence.typeHandling.Ty
     }
 
     @Override
-    public Color deserialize(PersistedData data) {
+    public Optional<Color> deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 3) {
                 TIntList vals = dataArray.getAsIntegerArray();
-                return new Color(vals.get(0), vals.get(1), vals.get(2), vals.get(3));
+                return Optional.of(new Color(vals.get(0), vals.get(1), vals.get(2), vals.get(3)));
             }
         }
         if (data.isString()) {
             String value = data.getAsString();
-            return new Color((int) Long.parseLong(value, 16));
+            return Optional.of(new Color((int) Long.parseLong(value, 16)));
         }
-        throw new DeserializationException("Expecting integer array or hex-string, but found: " + String.valueOf(data));
+
+        return Optional.empty();
     }
 }

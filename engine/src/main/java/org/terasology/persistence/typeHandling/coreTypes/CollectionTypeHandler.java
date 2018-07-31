@@ -23,6 +23,7 @@ import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class CollectionTypeHandler<E> extends TypeHandler<Collection<E>> {
     private TypeHandler<E> elementTypeHandler;
@@ -45,13 +46,14 @@ public class CollectionTypeHandler<E> extends TypeHandler<Collection<E>> {
     }
 
     @Override
-    public Collection<E> deserialize(PersistedData data) {
+    public Optional<Collection<E>> deserialize(PersistedData data) {
         Collection<E> collection = constructor.construct();
 
         for (PersistedData item : data.getAsArray()) {
-            collection.add(elementTypeHandler.deserialize(item));
+            Optional<E> element = elementTypeHandler.deserialize(item);
+            element.ifPresent(collection::add);
         }
 
-        return collection;
+        return Optional.ofNullable(collection);
     }
 }
