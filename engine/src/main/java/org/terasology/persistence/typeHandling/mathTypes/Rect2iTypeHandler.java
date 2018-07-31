@@ -57,15 +57,11 @@ public class Rect2iTypeHandler extends TypeHandler<Rect2i> {
         if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
 
-            Vector2i min = vector2iTypeHandler.deserialize(map.get(MIN_FIELD))
-                    .orElseThrow(
-                            () -> new DeserializationException("Could not deserialize Rect2i." + MIN_FIELD)
-                    );
+            Vector2i min = vector2iTypeHandler.deserializeOrThrow(map.get(MIN_FIELD),
+                    "Could not deserialize Rect2i." + MIN_FIELD);
 
-            Vector2i size = vector2iTypeHandler.deserialize(map.get(SIZE_FIELD))
-                    .orElseThrow(
-                            () -> new DeserializationException("Could not deserialize Rect2i." + SIZE_FIELD)
-                    );
+            Vector2i size = vector2iTypeHandler.deserializeOrThrow(map.get(SIZE_FIELD),
+                    "Could not deserialize Rect2i." + SIZE_FIELD);
 
             return Optional.ofNullable(Rect2i.createFromMinAndSize(min, size));
         }

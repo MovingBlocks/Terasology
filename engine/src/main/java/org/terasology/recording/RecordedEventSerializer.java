@@ -371,7 +371,7 @@ class RecordedEventSerializer {
             float volume = jsonObject.get("volume").getAsFloat();
             GsonPersistedData data = new GsonPersistedData(jsonObject.get("sound"));
             TypeHandler<StaticSound> handler = typeSerializationLibrary.getTypeHandler(StaticSound.class);
-            StaticSound sound = handler.deserialize(data).get();
+            StaticSound sound = handler.deserializeOrThrow(data);
             result = new PlaySoundEvent(sound, volume);
         } else if (className.equals(CharacterMoveInputEvent.class.getName())) {
             long delta = jsonObject.get("delta").getAsLong();
@@ -391,7 +391,7 @@ class RecordedEventSerializer {
             float baseValue = jsonObject.get("baseValue").getAsFloat();
             TypeHandler<MovementMode> handler = typeSerializationLibrary.getTypeHandler(MovementMode.class);
             GsonPersistedData data = new GsonPersistedData(jsonObject.get("movementMode"));
-            MovementMode movementMode = handler.deserialize(data).get();
+            MovementMode movementMode = handler.deserializeOrThrow(data);
             TFloatList modifiers = gson.fromJson(jsonObject.get("modifiers"), TFloatArrayList.class);
             TFloatList multipliers = gson.fromJson(jsonObject.get("multipliers"), TFloatArrayList.class);
             TFloatList postModifiers = gson.fromJson(jsonObject.get("postModifiers"), TFloatArrayList.class);
@@ -420,11 +420,11 @@ class RecordedEventSerializer {
             } else if (clazz.equals(KeyDownEvent.class) || clazz.equals(KeyRepeatEvent.class) || clazz.equals(KeyUpEvent.class)) { //KeyEvent
                 GsonPersistedData data = new GsonPersistedData(jsonObject.get("input"));
                 TypeHandler<Keyboard.Key> keyTypeHandler = typeSerializationLibrary.getTypeHandler(Keyboard.Key.class);
-                Keyboard.Key input = keyTypeHandler.deserialize(data).get();
+                Keyboard.Key input = keyTypeHandler.deserializeOrThrow(data);
                 data = new GsonPersistedData(jsonObject.get("state"));
                 TypeHandler<ButtonState> buttonStateTypeHandler =
                         typeSerializationLibrary.getTypeHandler(ButtonState.class);
-                ButtonState state = buttonStateTypeHandler.deserialize(data).get();
+                ButtonState state = buttonStateTypeHandler.deserializeOrThrow(data);
                 char keychar = jsonObject.get("keychar").getAsCharacter();
                 float delta = jsonObject.get("delta").getAsFloat();
                 KeyEvent aux;
@@ -443,11 +443,11 @@ class RecordedEventSerializer {
                 GsonPersistedData data = new GsonPersistedData(jsonObject.get("button"));
                 TypeHandler<MouseInput> mouseInputTypeHandler =
                         typeSerializationLibrary.getTypeHandler(MouseInput.class);
-                MouseInput button = mouseInputTypeHandler.deserialize(data).get();
+                MouseInput button = mouseInputTypeHandler.deserializeOrThrow(data);
                 data = new GsonPersistedData(jsonObject.get("state"));
                 TypeHandler<ButtonState> buttonStateTypeHandler =
                         typeSerializationLibrary.getTypeHandler(ButtonState.class);
-                ButtonState state = buttonStateTypeHandler.deserialize(data).get();
+                ButtonState state = buttonStateTypeHandler.deserializeOrThrow(data);
                 JsonObject aux = jsonObject.get("mousePosition").getAsJsonObject();
                 Vector2i mousePosition = new Vector2i(aux.get("x").getAsInt(), aux.get("y").getAsInt());
                 float delta = jsonObject.get("delta").getAsFloat();
@@ -458,7 +458,7 @@ class RecordedEventSerializer {
                 GsonPersistedData data = new GsonPersistedData(jsonObject.get("mouseAxis"));
                 TypeHandler<MouseAxisEvent.MouseAxis> typeHandler =
                         typeSerializationLibrary.getTypeHandler(MouseAxisEvent.MouseAxis.class);
-                MouseAxisEvent.MouseAxis mouseAxis = typeHandler.deserialize(data).get();
+                MouseAxisEvent.MouseAxis mouseAxis = typeHandler.deserializeOrThrow(data);
                 float value = jsonObject.get("value").getAsFloat();
                 float delta = jsonObject.get("delta").getAsFloat();
                 MouseAxisEvent aux = MouseAxisEvent.create(mouseAxis, value, delta);
@@ -491,14 +491,14 @@ class RecordedEventSerializer {
         GsonPersistedData data = new GsonPersistedData(jsonObject.get("state"));
         TypeHandler<ButtonState> buttonStateTypeHandler =
                 typeSerializationLibrary.getTypeHandler(ButtonState.class);
-        ButtonState state = buttonStateTypeHandler.deserialize(data).get();
+        ButtonState state = buttonStateTypeHandler.deserializeOrThrow(data);
         float delta = jsonObject.get("delta").getAsFloat();
         TypeHandler<Name> nameTypeHandler = typeSerializationLibrary.getTypeHandler(Name.class);
         JsonObject aux = jsonObject.get("id").getAsJsonObject();
         data = new GsonPersistedData(aux.get("moduleName"));
-        Name moduleName = nameTypeHandler.deserialize(data).get();
+        Name moduleName = nameTypeHandler.deserializeOrThrow(data);
         data = new GsonPersistedData(aux.get("objectName"));
-        Name objectName = nameTypeHandler.deserialize(data).get();
+        Name objectName = nameTypeHandler.deserializeOrThrow(data);
         SimpleUri id = new SimpleUri(moduleName, objectName);
         event.prepare(id, state, delta);
     }
