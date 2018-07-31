@@ -27,12 +27,7 @@ public class Quat4fTypeHandler extends org.terasology.persistence.typeHandling.T
 
     @Override
     public PersistedData serializeNonNull(Quat4f value, PersistedDataSerializer serializer) {
-        if (value == null) {
-            return serializer.serializeNull();
-        } else {
-            return serializer.serialize(value.x, value.y, value.z, value.w);
-        }
-
+        return serializer.serialize(value.x, value.y, value.z, value.w);
     }
 
     @Override

@@ -30,11 +30,7 @@ public class ColorTypeHandler extends org.terasology.persistence.typeHandling.Ty
 
     @Override
     public PersistedData serializeNonNull(Color value, PersistedDataSerializer serializer) {
-        if (value == null) {
-            return serializer.serializeNull();
-        } else {
-            return serializer.serialize(value.r(), value.g(), value.b(), value.a());
-        }
+        return serializer.serialize(value.r(), value.g(), value.b(), value.a());
     }
 
     @Override

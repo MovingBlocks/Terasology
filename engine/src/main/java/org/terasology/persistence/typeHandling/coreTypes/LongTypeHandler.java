@@ -25,10 +25,7 @@ public class LongTypeHandler extends TypeHandler<Long> {
 
     @Override
     public PersistedData serializeNonNull(Long value, PersistedDataSerializer serializer) {
-        if (value != null) {
-            return serializer.serialize(value);
-        }
-        return serializer.serializeNull();
+        return serializer.serialize(value);
     }
 
     @Override

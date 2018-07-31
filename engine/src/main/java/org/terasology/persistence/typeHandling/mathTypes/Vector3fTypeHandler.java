@@ -27,11 +27,7 @@ public class Vector3fTypeHandler extends org.terasology.persistence.typeHandling
 
     @Override
     public PersistedData serializeNonNull(Vector3f value, PersistedDataSerializer serializer) {
-        if (value == null) {
-            return serializer.serializeNull();
-        } else {
-            return serializer.serialize(value.x, value.y, value.z);
-        }
+        return serializer.serialize(value.x, value.y, value.z);
     }
 
     @Override
