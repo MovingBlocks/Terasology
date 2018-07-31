@@ -50,9 +50,6 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
 
     @Override
     public PersistedData serializeNonNull(T value, PersistedDataSerializer serializer) {
-        if (value == null) {
-            return serializer.serializeNull();
-        }
         Map<String, PersistedData> mappedData = Maps.newLinkedHashMap();
         for (Map.Entry<Field, TypeHandler<?>> entry : mappedFields.entrySet()) {
             Field field = entry.getKey();

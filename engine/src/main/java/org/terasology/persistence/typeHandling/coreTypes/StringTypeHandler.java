@@ -25,11 +25,7 @@ public class StringTypeHandler extends TypeHandler<String> {
 
     @Override
     public PersistedData serializeNonNull(String value, PersistedDataSerializer serializer) {
-        if (value == null) {
-            return serializer.serializeNull();
-        } else {
-            return serializer.serialize(value);
-        }
+        return serializer.serialize(value);
     }
 
     @Override

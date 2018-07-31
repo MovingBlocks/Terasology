@@ -26,11 +26,7 @@ public abstract class StringRepresentationTypeHandler<T> extends TypeHandler<T> 
     @Override
     public PersistedData serializeNonNull(T value, PersistedDataSerializer serializer) {
         String stringValue = getAsString(value);
-        if (stringValue == null) {
-            return serializer.serializeNull();
-        } else {
-            return serializer.serialize(stringValue);
-        }
+        return serializer.serialize(stringValue);
     }
 
     @Override

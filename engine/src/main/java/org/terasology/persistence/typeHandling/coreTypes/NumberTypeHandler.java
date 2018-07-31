@@ -26,10 +26,7 @@ public class NumberTypeHandler extends TypeHandler<Number> {
 
     @Override
     public PersistedData serializeNonNull(Number value, PersistedDataSerializer serializer) {
-        if (value != null) {
-            return serializer.serialize(value.doubleValue());
-        }
-        return serializer.serializeNull();
+        return serializer.serialize(value.doubleValue());
     }
 
     @Override

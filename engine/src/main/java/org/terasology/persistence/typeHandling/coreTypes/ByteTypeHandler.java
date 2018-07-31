@@ -25,10 +25,7 @@ public class ByteTypeHandler extends TypeHandler<Byte> {
 
     @Override
     public PersistedData serializeNonNull(Byte value, PersistedDataSerializer serializer) {
-        if (value != null) {
-            return serializer.serialize(new byte[]{value});
-        }
-        return serializer.serializeNull();
+        return serializer.serialize(new byte[]{value});
     }
 
     @Override

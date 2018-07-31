@@ -42,16 +42,12 @@ public class Rect2iTypeHandler extends TypeHandler<Rect2i> {
 
     @Override
     public PersistedData serializeNonNull(Rect2i value, PersistedDataSerializer serializer) {
-        if (value == null) {
-            return serializer.serializeNull();
-        } else {
-            Map<String, PersistedData> map = Maps.newLinkedHashMap();
+        Map<String, PersistedData> map = Maps.newLinkedHashMap();
 
-            map.put(MIN_FIELD, vector2iTypeHandler.serialize(value.min(), serializer));
-            map.put(SIZE_FIELD, vector2iTypeHandler.serialize(value.size(), serializer));
+        map.put(MIN_FIELD, vector2iTypeHandler.serialize(value.min(), serializer));
+        map.put(SIZE_FIELD, vector2iTypeHandler.serialize(value.size(), serializer));
 
-            return serializer.serialize(map);
-        }
+        return serializer.serialize(map);
     }
 
     @Override

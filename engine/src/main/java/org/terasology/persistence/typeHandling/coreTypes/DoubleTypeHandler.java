@@ -25,10 +25,7 @@ public class DoubleTypeHandler extends TypeHandler<Double> {
 
     @Override
     public PersistedData serializeNonNull(Double value, PersistedDataSerializer serializer) {
-        if (value != null) {
-            return serializer.serialize(value);
-        }
-        return serializer.serializeNull();
+        return serializer.serialize(value);
     }
 
     @Override

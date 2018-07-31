@@ -25,10 +25,7 @@ public class BooleanTypeHandler extends TypeHandler<Boolean> {
 
     @Override
     public PersistedData serializeNonNull(Boolean value, PersistedDataSerializer serializer) {
-        if (value != null) {
-            return serializer.serialize(value);
-        }
-        return serializer.serializeNull();
+        return serializer.serialize(value);
     }
 
     @Override
