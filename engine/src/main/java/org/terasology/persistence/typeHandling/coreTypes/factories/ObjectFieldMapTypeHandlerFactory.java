@@ -49,7 +49,7 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
         if (!Modifier.isAbstract(typeClass.getModifiers())
                 && !typeClass.isLocalClass()
                 && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
-            Map<Field, TypeHandler<?>> fieldTypeHandlerMap = Maps.newHashMap();
+            Map<Field, TypeHandler<?>> fieldTypeHandlerMap = Maps.newLinkedHashMap();
 
             getResolvedFields(typeInfo).forEach(
                     (field, fieldType) ->
