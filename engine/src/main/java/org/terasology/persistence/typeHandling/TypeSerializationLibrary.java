@@ -57,7 +57,6 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.mathTypes.factories.Region3iTypeHandlerFactory;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -158,7 +157,6 @@ public class TypeSerializationLibrary {
         serializationLibrary.addTypeHandler(Vector2i.class, new Vector2iTypeHandler());
         serializationLibrary.addTypeHandlerFactory(new Rect2iTypeHandlerFactory());
         serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());
-        serializationLibrary.addTypeHandlerFactory(new Region3iTypeHandlerFactory());
         serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
 
