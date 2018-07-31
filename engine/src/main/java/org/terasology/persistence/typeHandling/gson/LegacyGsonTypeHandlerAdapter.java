@@ -43,7 +43,7 @@ public class LegacyGsonTypeHandlerAdapter<T> implements JsonDeserializer<T>, Jso
 
     @Override
     public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return typeHandler.deserialize(new GsonPersistedData(json)).orElse(null);
+        return typeHandler.deserializeOrNull(new GsonPersistedData(json));
     }
 
     @Override
