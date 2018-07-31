@@ -93,7 +93,21 @@ public abstract class TypeHandler<T> {
      * @throws DeserializationException if {@code data} could not be deserialized to a value of type {@link T}.
      */
     public final T deserializeOrThrow(PersistedData data) throws DeserializationException {
+        return deserializeOrThrow(data, "Unable to deserialize " + data);
+    }
+
+    /**
+     * Deserializes a single value to the type {@link T}. If the type was not serialized
+     * (i.e. {@link #deserialize(PersistedData)} returned {@link Optional#empty()}), a
+     * {@link DeserializationException} is thrown.
+     *
+     * @param data The persisted data to deserialize from.
+     * @param errorMessage The error message to use if the value could not be deserialized.
+     * @return The deserialized value.
+     * @throws DeserializationException if {@code data} could not be deserialized to a value of type {@link T}.
+     */
+    public final T deserializeOrThrow(PersistedData data, String errorMessage) throws DeserializationException {
         return deserialize(data)
-                .orElseThrow(() -> new DeserializationException("Unable to deserialize " + data));
+                .orElseThrow(() -> new DeserializationException(errorMessage));
     }
 }
