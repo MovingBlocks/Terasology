@@ -47,6 +47,10 @@ public class CollectionTypeHandler<E> extends TypeHandler<Collection<E>> {
 
     @Override
     public Optional<Collection<E>> deserialize(PersistedData data) {
+        if (!data.isArray()) {
+            return Optional.empty();
+        }
+
         Collection<E> collection = constructor.construct();
 
         for (PersistedData item : data.getAsArray()) {
