@@ -77,6 +77,10 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
 
     @Override
     public Optional<T> deserialize(PersistedData data) {
+        if (!data.isValueMap()) {
+            return Optional.empty();
+        }
+
         try {
             T result = constructor.construct();
             for (Map.Entry<String, PersistedData> entry : data.getAsValueMap().entrySet()) {
