@@ -38,6 +38,7 @@ import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.LongTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.factories.ArrayTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.EnumTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
@@ -117,6 +118,8 @@ public class TypeSerializationLibrary {
         addTypeHandler(Long.TYPE, new LongTypeHandler());
         addTypeHandler(String.class, new StringTypeHandler());
         addTypeHandler(Number.class, new NumberTypeHandler());
+
+        addTypeHandlerFactory(new ArrayTypeHandlerFactory());
         addTypeHandler(byte[].class, new ByteArrayTypeHandler());
 
         addTypeHandlerFactory(new EnumTypeHandlerFactory());
