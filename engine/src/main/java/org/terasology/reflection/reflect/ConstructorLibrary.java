@@ -18,12 +18,10 @@
  */
 package org.terasology.reflection.reflect;
 
-import com.google.common.base.Defaults;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Primitives;
 import org.terasology.persistence.typeHandling.InstanceCreator;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.reflect.internal.UnsafeAllocator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +35,6 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -77,31 +74,58 @@ public class ConstructorLibrary {
             return () -> rawTypeCreator.createInstance(type);
         }
 
+        ObjectConstructor<T> defaultConstructor = newDefaultConstructor(rawType);
+        if (defaultConstructor != null) {
+            return defaultConstructor;
+        }
+
         ObjectConstructor<T> defaultImplementation = newDefaultImplementationConstructor(type, rawType);
         if (defaultImplementation != null) {
             return defaultImplementation;
         }
 
-        return () -> {
-            @SuppressWarnings({"unchecked"})
-            Constructor<T> constructor = (Constructor<T>) Arrays.stream(rawType.getDeclaredConstructors())
-                    .min(Comparator.comparingInt(c -> c.getParameterTypes().length))
-                    .orElseThrow(() ->
-                            new IllegalArgumentException("Type " + rawType + " does not have a constructor")
-                    );
+        return newUnsafeAllocator(typeInfo);
+    }
 
-            constructor.setAccessible(true);
-            final List<Object> params = Lists.newArrayList();
-
-            try {
-                for (Class<?> pType : constructor.getParameterTypes()) {
-                    params.add(Defaults.defaultValue(Primitives.unwrap(pType)));
+    private <T> ObjectConstructor<T> newUnsafeAllocator(TypeInfo<T> typeInfo) {
+        return new ObjectConstructor<T>() {
+            private final UnsafeAllocator unsafeAllocator = UnsafeAllocator.create();
+            @SuppressWarnings("unchecked")
+            @Override public T construct() {
+                try {
+                    Object newInstance = unsafeAllocator.newInstance(typeInfo.getRawType());
+                    return (T) newInstance;
+                } catch (Exception e) {
+                    throw new RuntimeException("Unable to create an instance of " + typeInfo.getType() +
+                            ". Registering an InstanceCreator for this type may fix this problem.", e);
                 }
+            }
+        };
+    }
 
-                return constructor.newInstance(params.toArray());
+    private <T> ObjectConstructor<T> newDefaultConstructor(Class<? super T> rawType) {
+        @SuppressWarnings("unchecked") // T is the same raw type as is requested
+                Constructor<T> constructor = (Constructor<T>) Arrays.stream(rawType.getDeclaredConstructors())
+                .min(Comparator.comparingInt(c -> c.getParameterTypes().length))
+                .orElse(null);
 
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new IllegalArgumentException("Type " + rawType + "cannot be instantiated");
+        if (constructor == null || constructor.getParameterTypes().length != 0) {
+            return null;
+        }
+
+        if (!constructor.isAccessible()) {
+            constructor.setAccessible(true);
+        }
+        return () -> {
+            try {
+                return constructor.newInstance();
+            } catch (InstantiationException e) {
+                throw new RuntimeException("Failed to invoke " + constructor + " with no args", e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException("Failed to invoke " + constructor + " with no args",
+                        e.getTargetException());
+            } catch (IllegalAccessException e) {
+                throw new AssertionError(e);
             }
         };
     }
