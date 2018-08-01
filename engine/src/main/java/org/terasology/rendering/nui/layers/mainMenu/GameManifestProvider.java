@@ -64,8 +64,6 @@ public class GameManifestProvider {
             gameManifest.setTitle(GameProvider.getNextGameName());
         }
 
-        String seed = universeWrapper.getTargetWorld().getWorldName().toString() + 0;
-        gameManifest.setSeed(seed);
 
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
@@ -78,17 +76,20 @@ public class GameManifestProvider {
         }
 
         SimpleUri uri;
+        String seed;
         if (universeWrapper.getTargetWorld() != null) {
             uri = universeWrapper.getTargetWorld().getWorldGenerator().getUri();
+            seed = universeWrapper.getTargetWorld().getWorldName().toString() + 0;
+            gameManifest.setSeed(seed);
         } else {
             uri = config.getWorldGeneration().getDefaultGenerator();
+            seed = universeWrapper.getSeed();
         }
         // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, seed,
                 (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
 
         gameManifest.addWorld(worldInfo);
-        gameManifest.setSpawnWorld(worldInfo.getTitle());
         config.getUniverseConfig().addWorldManager(worldInfo);
         config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
         config.getUniverseConfig().setUniverseSeed(universeWrapper.getSeed());
