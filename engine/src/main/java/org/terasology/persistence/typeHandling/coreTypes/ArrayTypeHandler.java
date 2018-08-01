@@ -24,13 +24,19 @@ import org.terasology.reflection.TypeInfo;
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Serializes arrays of type {@code E[]}.
  *
+ * {@link ArrayTypeHandler} extends {@link TypeHandler<Object>} because the type parameter {@link E}
+ * supports only wrapper types, and primitive array to wrapper type array (and vice versa) casts are
+ * unsupported. The array is accessed via the {@link Array} utility class as an {@link Object} so that
+ * the cast can be avoided.
+ *
  * @param <E> The type of an element in the array to serialize.
  */
-public class ArrayTypeHandler<E> extends TypeHandler<E[]> {
+public class ArrayTypeHandler<E> extends TypeHandler<Object> {
     private TypeHandler<E> elementTypeHandler;
     private TypeInfo<E> elementType;
 
@@ -40,10 +46,11 @@ public class ArrayTypeHandler<E> extends TypeHandler<E[]> {
     }
 
     @Override
-    protected PersistedData serializeNonNull(E[] value, PersistedDataSerializer serializer) {
+    protected PersistedData serializeNonNull(Object value, PersistedDataSerializer serializer) {
         List<PersistedData> items = Lists.newArrayList();
 
-        for (E element : value) {
+        for (int i = 0; i < Array.getLength(value); i++) {
+            E element = (E) Array.get(value, i);
             items.add(elementTypeHandler.serialize(element, serializer));
         }
 
@@ -51,17 +58,22 @@ public class ArrayTypeHandler<E> extends TypeHandler<E[]> {
     }
 
     @Override
-    public Optional<E[]> deserialize(PersistedData data) {
+    public Optional<Object> deserialize(PersistedData data) {
         if (!data.isArray()) {
             return Optional.empty();
         }
 
         @SuppressWarnings({"unchecked"})
-        E[] array = data.getAsArray().getAsValueArray().stream()
+        List<E> items = data.getAsArray().getAsValueArray().stream()
                 .map(itemData -> elementTypeHandler.deserialize(itemData))
                 .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toArray(size -> (E[]) Array.newInstance(elementType.getRawType(), size));
+                .map(Optional::get).collect(Collectors.toList());
+
+        Object array = Array.newInstance(elementType.getRawType(), items.size());
+
+        for (int i = 0; i < items.size(); i++) {
+            Array.set(array, i, items.get(i));
+        }
 
         return Optional.of(array);
     }
