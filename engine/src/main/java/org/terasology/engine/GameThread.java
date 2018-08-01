@@ -108,6 +108,13 @@ public final class GameThread {
     }
 
     /**
+     * Sets the game thread to null. Should called after a test that calls engine.initialise() is finished.
+     */
+    public static void reset() {
+        gameThread = null;
+    }
+
+    /**
      * A process decorated allowing a thread to block until the process has been run.
      */
     private static class BlockingProcess implements Runnable {

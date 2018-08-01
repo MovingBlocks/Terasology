@@ -114,7 +114,7 @@ class RecordedEventSerializer {
                 writer.beginObject();
                 writer.name("entityRef_ID").value(event.getEntityId());
                 writer.name("timestamp").value(event.getTimestamp());
-                writer.name("position").value(event.getPosition());
+                writer.name("index").value(event.getIndex());
                 writer.name("event_class").value(event.getEvent().getClass().getName());
                 writer.name("event_data");
                 writer.beginObject();
@@ -341,10 +341,10 @@ class RecordedEventSerializer {
                 jsonObject = element.getAsJsonObject();
                 String className = jsonObject.get("event_class").getAsString();
                 long refId = jsonObject.get("entityRef_ID").getAsLong();
-                long position = jsonObject.get("position").getAsLong();
+                long index = jsonObject.get("index").getAsLong();
                 long timestamp = jsonObject.get("timestamp").getAsLong();
                 Event event = deserializeSpecificEventData(jsonObject.get("event_data").getAsJsonObject(), className);
-                RecordedEvent re = new RecordedEvent(refId, event, timestamp, position);
+                RecordedEvent re = new RecordedEvent(refId, event, timestamp, index);
                 events.add(re);
             }
         } catch (Exception e) {
