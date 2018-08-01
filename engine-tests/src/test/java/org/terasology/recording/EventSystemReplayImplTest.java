@@ -68,13 +68,12 @@ public class EventSystemReplayImplTest {
         entityManager.setPrefabManager(new PojoPrefabManager(context));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-
         recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
         RecordedEventStore eventStore = new RecordedEventStore();
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, null);
         recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAYING);
         entity = entityManager.create();
         Long id = entity.getId();

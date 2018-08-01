@@ -42,6 +42,7 @@ import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -72,7 +73,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Serializes and deserializes RecordedEvents.
@@ -83,9 +86,11 @@ class RecordedEventSerializer {
     private static final double DEFAULT_DOUBLE_VALUE = 0.0;
     private TypeSerializationLibrary typeSerializationLibrary;
     private EntityManager entityManager;
+    private ModuleEnvironment moduleEnvironment;
+    private Map<String, Class<? extends InputEvent>> inputEventClassMap;
 
 
-    RecordedEventSerializer(EntityManager entityManager) {
+    RecordedEventSerializer(EntityManager entityManager, ModuleEnvironment moduleEnvironment) {
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         this.typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
@@ -96,6 +101,7 @@ class RecordedEventSerializer {
         typeSerializationLibrary.addTypeHandler(MouseInput.class, new EnumTypeHandler<>(MouseInput.class));
         typeSerializationLibrary.addTypeHandler(MovementMode.class, new EnumTypeHandler<>(MovementMode.class));
         this.entityManager = entityManager;
+        this.moduleEnvironment = moduleEnvironment;
     }
 
     void serializeRecordedEvents(List<RecordedEvent> events, String filePath) {
@@ -324,6 +330,7 @@ class RecordedEventSerializer {
 
     List<RecordedEvent> deserializeRecordedEvents(String path) {
         List<RecordedEvent> events = new ArrayList<>();
+        createInputEventClassMap();
         JsonObject jsonObject;
         try {
             JsonParser parser = new JsonParser();
@@ -345,6 +352,14 @@ class RecordedEventSerializer {
         }
 
         return events;
+    }
+
+    private void createInputEventClassMap() {
+        this.inputEventClassMap = new HashMap<>();
+        Iterable<Class<? extends InputEvent>> classes = moduleEnvironment.getSubtypesOf(InputEvent.class);
+        for (Class<? extends InputEvent> c : classes) {
+            this.inputEventClassMap.put(c.getName(), c);
+        }
     }
 
     private Event deserializeSpecificEventData(JsonObject jsonObject, String className) {
@@ -402,7 +417,7 @@ class RecordedEventSerializer {
     private InputEvent getInputEventSpecificType(JsonObject jsonObject, String className, GsonDeserializationContext deserializationContext) {
         InputEvent newEvent = null;
         try {
-            Class clazz = Class.forName(className);
+            Class clazz = this.inputEventClassMap.get(className);
             if (BindButtonEvent.class.isAssignableFrom(clazz) || BindAxisEvent.class.isAssignableFrom(clazz)) {
                 newEvent = (InputEvent) clazz.getConstructor().newInstance();
             } else if (clazz.equals(KeyDownEvent.class) || clazz.equals(KeyRepeatEvent.class) || clazz.equals(KeyUpEvent.class)) { //KeyEvent

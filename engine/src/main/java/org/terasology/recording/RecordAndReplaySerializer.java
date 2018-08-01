@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.ModuleEnvironment;
 
 import java.io.FileWriter;
 import java.io.FileReader;
@@ -51,15 +52,17 @@ public final class RecordAndReplaySerializer {
     private RecordAndReplayUtils recordAndReplayUtils;
     private CharacterStateEventPositionMap characterStateEventPositionMap;
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
+    private RecordedEventSerializer recordedEventSerializer;
 
     public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store,
                                      RecordAndReplayUtils recordAndReplayUtils, CharacterStateEventPositionMap characterStateEventPositionMap,
-                                     DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList) {
+                                     DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList, ModuleEnvironment moduleEnvironment) {
         this.entityManager = manager;
         this.recordedEventStore = store;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.characterStateEventPositionMap = characterStateEventPositionMap;
         this.directionAndOriginPosRecorderList = directionAndOriginPosRecorderList;
+        this.recordedEventSerializer = new RecordedEventSerializer(entityManager, moduleEnvironment);
     }
 
     /**
@@ -79,11 +82,10 @@ public final class RecordAndReplaySerializer {
      * @param recordingPath path where the data should be saved.
      */
     public void serializeRecordedEvents(String recordingPath) {
-        RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
         String filepath = recordingPath + EVENT_DIR + recordAndReplayUtils.getFileCount() + JSON;
         recordAndReplayUtils.setFileAmount(recordAndReplayUtils.getFileAmount() + 1);
         recordAndReplayUtils.setFileCount(recordAndReplayUtils.getFileCount() + 1);
-        serializer.serializeRecordedEvents(recordedEventStore.popEvents(), filepath);
+        recordedEventSerializer.serializeRecordedEvents(recordedEventStore.popEvents(), filepath);
         logger.info("RecordedEvents Serialization completed!");
     }
 
@@ -104,10 +106,9 @@ public final class RecordAndReplaySerializer {
      * @param recordingPath path where the data was saved.
      */
     void deserializeRecordedEvents(String recordingPath) {
-        RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
         String filepath = recordingPath + EVENT_DIR + recordAndReplayUtils.getFileCount() + JSON;
         recordAndReplayUtils.setFileCount(recordAndReplayUtils.getFileCount() + 1);
-        recordedEventStore.setEvents(serializer.deserializeRecordedEvents(filepath));
+        recordedEventStore.setEvents(recordedEventSerializer.deserializeRecordedEvents(filepath));
         logger.info("RecordedEvents Deserialization completed!");
     }
 
