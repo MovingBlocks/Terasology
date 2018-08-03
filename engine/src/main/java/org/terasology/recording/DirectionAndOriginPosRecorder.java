@@ -21,8 +21,10 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * Saves the variables 'direction' and 'originData' to be used on replays since holding the mouse buttons can cause weird
- * behavior during replays.
+ * During Record and Replay development, it was noticed that sometimes holding the right or left mouse button caused
+ * some issues in a recording. The temporary solution to this problem was to record the "direction" and "originPos" variables
+ * in the "activateTargetOrOwnedEntity" method of the LocalPlayer and "onAttackRequest" method in the CharacterSystem class.
+ * This class is responsible for saving those variables and updating them during a replay.
  */
 public class DirectionAndOriginPosRecorder {
 

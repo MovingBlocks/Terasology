@@ -22,8 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Saves the "position" and "velocity" variable for every CharacterStateEvent so that the player location can be
- * reproduced correctly during a replay.
+ * When a CharacterMoveInputEvent is caught by ServerCharacterPredictionSystem, a new CharacterStateEvent is created and
+ * processed without passing through the EventSystem. Since this event is important to reproduce the player's location,
+ * this class is used to record its "position" and "velocity" attribute and update it during a Replay.
  */
 public class CharacterStateEventPositionMap {
 

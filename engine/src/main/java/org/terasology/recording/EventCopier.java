@@ -37,7 +37,8 @@ import org.terasology.logic.characters.events.AttackEvent;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Responsible for making deep copies for the event types supported by Record And Replay.
+ * Responsible for making deep copies of the events to be recorded. It is necessary to record copies instead of the
+ * events themselves since the events can change during the game.
  */
 class EventCopier {
 
