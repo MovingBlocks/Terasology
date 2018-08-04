@@ -36,7 +36,9 @@ import org.terasology.module.sandbox.APIScanner;
 import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
+import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
+import org.terasology.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.naming.Name;
 
 
@@ -61,6 +63,7 @@ import java.util.stream.Collectors;
 public class ModuleManagerImpl implements ModuleManager {
     private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
     private StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
+    private PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
 
     private ModuleRegistry registry;
     private ModuleEnvironment environment;
@@ -214,7 +217,7 @@ public class ModuleManagerImpl implements ModuleManager {
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
         finalModules.addAll(registry.stream().filter(Module::isOnClasspath).collect(Collectors.toList()));
-        ModuleEnvironment newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.<BytecodeInjector>emptyList());
+        ModuleEnvironment newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory, Collections.<BytecodeInjector>emptyList());
         if (asPrimary) {
             environment = newEnvironment;
         }
