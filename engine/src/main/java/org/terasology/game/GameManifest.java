@@ -158,4 +158,5 @@ public class GameManifest {
     public void addModule(Name id, Version version) {
         modules.add(new NameVersion(id, version));
     }
+
 }

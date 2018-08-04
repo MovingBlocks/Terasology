@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.config.UniverseConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
@@ -62,6 +63,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.internal.WorldInfo;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -359,6 +361,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        UniverseConfig universeConfig = config.getUniverseConfig();
         Time time = CoreRegistry.get(Time.class);
         Game game = CoreRegistry.get(Game.class);
 
@@ -380,8 +383,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             String id = biomeManager.getBiomeId(biome);
             biomeIdMap.put(id, shortId);
         }
+        List<WorldInfo> worlds = universeConfig.getWorlds();
+        for (WorldInfo worldInfo: worlds) {
+            gameManifest.addWorld(worldInfo);
+        }
         gameManifest.setBiomeIdMap(biomeIdMap);
-        gameManifest.addWorld(worldProvider.getWorldInfo());
         saveTransactionBuilder.setGameManifest(gameManifest);
     }
 

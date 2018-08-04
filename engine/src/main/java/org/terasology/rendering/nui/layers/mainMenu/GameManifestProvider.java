@@ -26,6 +26,7 @@ import org.terasology.game.GameManifest;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ResolutionResult;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.internal.WorldInfo;
@@ -36,6 +37,9 @@ import org.terasology.world.time.WorldTime;
  * Generates new games manifest according to input data.
  */
 public class GameManifestProvider {
+
+    @In
+    private Config config;
 
     private static final Logger logger = LoggerFactory.getLogger(GameManifestProvider.class);
 
@@ -60,13 +64,6 @@ public class GameManifestProvider {
             gameManifest.setTitle(GameProvider.getNextGameName());
         }
 
-        String seed;
-        if (StringUtils.isNotBlank(universeWrapper.getSeed())) {
-            seed = universeWrapper.getSeed();
-        } else {
-            seed = new FastRandom().nextString(32);
-        }
-        gameManifest.setSeed(seed);
 
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
@@ -78,12 +75,24 @@ public class GameManifestProvider {
             gameManifest.addModule(module.getId(), module.getVersion());
         }
 
-        SimpleUri uri = config.getWorldGeneration().getDefaultGenerator();
+        SimpleUri uri;
+        String seed;
+        if (universeWrapper.getTargetWorld() != null) {
+            uri = universeWrapper.getTargetWorld().getWorldGenerator().getUri();
+            seed = universeWrapper.getTargetWorld().getWorldName().toString() + 0;
+            gameManifest.setSeed(seed);
+        } else {
+            uri = config.getWorldGeneration().getDefaultGenerator();
+            seed = universeWrapper.getSeed();
+        }
         // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, seed,
                 (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
 
         gameManifest.addWorld(worldInfo);
+        config.getUniverseConfig().addWorldManager(worldInfo);
+        config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
+        config.getUniverseConfig().setUniverseSeed(universeWrapper.getSeed());
         return gameManifest;
     }
 }

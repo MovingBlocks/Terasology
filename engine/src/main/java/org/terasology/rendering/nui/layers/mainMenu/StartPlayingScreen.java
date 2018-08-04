@@ -68,6 +68,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
         );
 
         WidgetUtil.trySubscribe(this, "play", button -> {
+            universeWrapper.setTargetWorld(targetWorld);
             final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
             if (gameManifest != null) {
                 gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
@@ -87,6 +88,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
                     worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD + i, world.getWorldGenerator().getWorldSeed(),
                             (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
                     gameManifest.addWorld(worldInfo);
+                    config.getUniverseConfig().addWorldManager(worldInfo);
                 }
 
             }
