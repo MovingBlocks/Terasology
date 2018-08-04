@@ -19,7 +19,8 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * Data from a Recorded Event.
+ * Saves a recorded event, the id of the entity it was sent against, the component it was sent with, the timestamp in
+ * which it was sent and its index. This is the class that's serialized and deserialized in the "event files".
  */
 public class RecordedEvent {
 

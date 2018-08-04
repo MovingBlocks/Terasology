@@ -16,8 +16,7 @@
 package org.terasology.recording;
 
 /**
- * Saves data important for Record and Replay, such as the RecordAndReplayStatus, the title of the current game, if a
- * shutdown was requested, and the amount of files used to serialize RecordedEvents.
+ * Saves some variables important for Record and Replay.
  */
 public class RecordAndReplayUtils {
     /** The title of the game that is being recorded or replayed. */

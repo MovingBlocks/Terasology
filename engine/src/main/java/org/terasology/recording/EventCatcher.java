@@ -21,7 +21,8 @@ import org.terasology.entitySystem.event.PendingEvent;
 import java.util.List;
 
 /**
- * This class is responsible for catching the events during a Record and send the desired ones to the RecordedEventStore.
+ * Gets the events sent in the EventSystemImpl and adds their copies to the RecordedEventStore if they are of a type
+ * selected to be recorded.
  */
 public class EventCatcher {
 
