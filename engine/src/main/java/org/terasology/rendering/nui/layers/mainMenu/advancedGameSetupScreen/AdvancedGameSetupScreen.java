@@ -587,7 +587,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             Collection<StandardModuleExtension> selectedStandardModuleExtensions = selectModulesConfig
                     .getSelectedStandardModuleExtensions();
             for (StandardModuleExtension standardModuleExtension : selectedStandardModuleExtensions) {
-                if (standardModuleExtension.isProvidedBy(module)) {
+                if (standardModuleExtension != null && standardModuleExtension.isProvidedBy(module)) {
                     matches = true;
                     break;
                 }
