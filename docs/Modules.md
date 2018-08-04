@@ -62,6 +62,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Equipment](https://github.com/Terasology/Equipment) - an equipment system with a character screen (`c`) showing stats and slots for various equipment types
 * [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system
 * [Fences](https://github.com/Terasology/Fences) - fences!
+* [FlexiblePathfinding](https://github.com/Terasology/FlexiblePathfinding) - a more flexible variant pathfinding framework
 * [Fluid](https://github.com/Terasology/Fluid) - adds support for fluid in non-world situations (such as for storage in workstations)
 * [FluidComputerIntegration](https://github.com/Terasology/FluidComputerIntegration) - allows for interactions with fluids via computers
 * [FunnyBlocks](https://github.com/Terasology/FunnyBlocks) - cheese wheels and bowling pins - why not
@@ -81,6 +82,8 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [ItemRendering](https://github.com/Terasology/ItemRendering) - a library for displaying "holographic" items in the world
 * [JoshariasSurvival](https://github.com/Terasology/JoshariasSurvival) - formerly known as TerraTech - gameplay template for a machine-centric survival style
 * [Journal](https://github.com/Terasology/Journal) - allows the player to use an in-game journal for gameplay notifications and such. Default toggle key `J`
+* [Kallisti](https://github.com/Terasology/Kallisti) - library for embedding fantasy computer virtual machines in game engines. See also its [non-module variant](https://github.com/MovingBlocks/Kallisti)
+* [KComputers](https://github.com/Terasology/KComputers) - computer implementation of Kallisti with Terasology-side content
 * [Lakes](https://github.com/Terasology/Lakes) - add lakes to any enabled world generator, both surface lakes and subterranean ones (water and lava both!)
 * [LegacyMusic](https://github.com/Terasology/LegacyMusic) - older music pieces predating the official soundtrack
 * [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
