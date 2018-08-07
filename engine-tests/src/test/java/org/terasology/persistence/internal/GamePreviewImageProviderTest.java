@@ -35,20 +35,17 @@ public class GamePreviewImageProviderTest {
     private static final String PREVIEWS = "previews";
     private static final String DEFAULT_IMAGE_NAME = "1.jpg";
     private static final Path TMP_FOLDER = Paths.get("out", "test", "engine-tests", "tmp", PREVIEWS).toAbsolutePath();
+    private static final Path TMP_PREVIEWS_FOLDER = TMP_FOLDER.resolve(PREVIEWS);
 
     @Before
     public void setUp() throws IOException {
+        FileUtils.deleteDirectory(new File(TMP_FOLDER.toUri()));
         Files.createDirectories(TMP_FOLDER);
     }
 
     @AfterClass
     public static void clean() throws IOException {
-        FileUtils.deleteDirectory(new File(TMP_FOLDER.toUri()));
-    }
-
-    @After
-    public void cleanUp() throws IOException {
-        FileUtils.cleanDirectory(new File(TMP_FOLDER.toUri()));
+        FileUtils.deleteDirectory(new File(Paths.get("out", "test", "engine-tests", "tmp").toUri()));
     }
 
     @Test
@@ -61,8 +58,8 @@ public class GamePreviewImageProviderTest {
 
     @Test
     public void getAllPreviewImagesNotEmptyFolderButEmptyFileTest() throws IOException {
-        Files.createDirectories(TMP_FOLDER.resolve(PREVIEWS));
-        Files.createFile(TMP_FOLDER.resolve(PREVIEWS).resolve(DEFAULT_IMAGE_NAME));
+        Files.createDirectories(TMP_PREVIEWS_FOLDER);
+        Files.createFile(TMP_PREVIEWS_FOLDER.resolve(DEFAULT_IMAGE_NAME));
 
         final List<BufferedImage> result = GamePreviewImageProvider.getAllPreviewImages(TMP_FOLDER);
 
@@ -75,32 +72,33 @@ public class GamePreviewImageProviderTest {
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
         Assert.assertNotNull(imagePath);
-        Assert.assertEquals(TMP_FOLDER.resolve(PREVIEWS).resolve(DEFAULT_IMAGE_NAME), imagePath);
+        Assert.assertEquals(TMP_PREVIEWS_FOLDER.resolve(DEFAULT_IMAGE_NAME), imagePath);
     }
 
     @Test
     public void getNextGamePreviewImagePathNotEmptyFolderTest() throws IOException {
-        Files.createDirectories(TMP_FOLDER.resolve(PREVIEWS));
-        Files.createFile(TMP_FOLDER.resolve(PREVIEWS).resolve(DEFAULT_IMAGE_NAME));
+        Files.createDirectories(TMP_PREVIEWS_FOLDER);
+        Files.createFile(TMP_PREVIEWS_FOLDER.resolve(DEFAULT_IMAGE_NAME));
 
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
         Assert.assertNotNull(imagePath);
-        Assert.assertEquals(TMP_FOLDER.resolve(PREVIEWS).resolve("2.jpg"), imagePath);
+        Assert.assertEquals(TMP_PREVIEWS_FOLDER.resolve("2.jpg"), imagePath);
     }
 
     @Test
-    public void getNextGamePreviewImagePathOldestFileTest() throws IOException {
-        Files.createDirectories(TMP_FOLDER.resolve(PREVIEWS));
-        Files.createFile(TMP_FOLDER.resolve(PREVIEWS).resolve("1.jpg"));
-        Files.createFile(TMP_FOLDER.resolve(PREVIEWS).resolve("2.jpg"));
-        Files.createFile(TMP_FOLDER.resolve(PREVIEWS).resolve("3.jpg"));
-        Files.createFile(TMP_FOLDER.resolve(PREVIEWS).resolve("4.jpg"));
-        Files.createFile(TMP_FOLDER.resolve(PREVIEWS).resolve("5.jpg"));
+    public void getNextGamePreviewImagePathOldestFileTest() throws IOException, InterruptedException {
+        Files.createDirectories(TMP_PREVIEWS_FOLDER);
+        Files.createFile(TMP_PREVIEWS_FOLDER.resolve("1.jpg"));
+        Thread.sleep(10);
+        Files.createFile(TMP_PREVIEWS_FOLDER.resolve("2.jpg"));
+        Files.createFile(TMP_PREVIEWS_FOLDER.resolve("3.jpg"));
+        Files.createFile(TMP_PREVIEWS_FOLDER.resolve("4.jpg"));
+        Files.createFile(TMP_PREVIEWS_FOLDER.resolve("5.jpg"));
 
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
         Assert.assertNotNull(imagePath);
-        Assert.assertEquals(TMP_FOLDER.resolve(PREVIEWS).resolve("1.jpg"), imagePath);
+        Assert.assertEquals(TMP_PREVIEWS_FOLDER.resolve("1.jpg"), imagePath);
     }
 }

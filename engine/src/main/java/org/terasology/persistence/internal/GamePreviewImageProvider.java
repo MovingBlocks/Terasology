@@ -120,7 +120,7 @@ public final class GamePreviewImageProvider {
         Path oldestPath = null;
         for (Path path : paths) {
             try {
-                FileTime fileTime = Files.getLastModifiedTime(path);
+                final FileTime fileTime = Files.getLastModifiedTime(path);
                 if (oldestTime == null || fileTime.compareTo(oldestTime) < 0) {
                     oldestTime = fileTime;
                     oldestPath = path;
