@@ -99,7 +99,7 @@ public class SelectGameScreen extends SelectionScreen {
             if (gameInfo != null) {
                 final GameDetailsScreen detailsScreen = getManager().createScreen(GameDetailsScreen.ASSET_URI, GameDetailsScreen.class);
                 detailsScreen.setGameInfo(gameInfo);
-                detailsScreen.setPreviews(previewSlideshow.getImages());
+                detailsScreen.setPreviews(getPreviewSlideshow().getImages());
                 getManager().pushScreen(detailsScreen);
             }
         });
@@ -114,7 +114,7 @@ public class SelectGameScreen extends SelectionScreen {
     public void onOpened() {
         super.onOpened();
 
-        if (GameProvider.getSavedGames().isEmpty()) {
+        if (GameProvider.isSavesFolderEmpty()) {
             final NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
             newGameScreen.setUniverseWrapper(universeWrapper);
             getManager().pushScreen(newGameScreen);

@@ -20,10 +20,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.persistence.internal.GamePreviewImageProvider;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import javax.imageio.ImageIO;
@@ -137,8 +137,8 @@ public class ScreenGrabber {
      */
     private void saveScreenshotTask(ByteBuffer buffer, int width, int height) {
         final String format = renderingConfig.getScreenshotFormat();
-        Path screenshotPath = getScreenshotPath(width, height, format);
-        BufferedImage image = convertByteBufferToBufferedImage(buffer, width, height);
+        final Path screenshotPath = getScreenshotPath(width, height, format);
+        final BufferedImage image = convertByteBufferToBufferedImage(buffer, width, height);
         writeImageToFile(image, screenshotPath, format);
     }
 
@@ -195,12 +195,12 @@ public class ScreenGrabber {
     /**
      * Schedules the saving of game preview screenshot.
      *
-     * @param path to save folder
+     * @param saveDirPath to save folder
      */
-    public void takeGamePreview(Path path)
+    public void takeGamePreview(final Path saveDirPath)
     {
         this.savingGamePreview = true;
-        this.savedGamePath = path.resolve(TerasologyConstants.DEFAULT_GAME_PREVIEW_IMAGE_NAME);
+        this.savedGamePath = GamePreviewImageProvider.getNextGamePreviewImagePath(saveDirPath);
         this.saveScreenshot();
     }
 }
