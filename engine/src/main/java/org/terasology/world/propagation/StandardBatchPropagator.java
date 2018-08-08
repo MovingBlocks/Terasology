@@ -28,6 +28,7 @@ import org.terasology.world.chunks.LitChunk;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Batch propagator that works on a set of changed blocks
@@ -36,6 +37,7 @@ import java.util.Set;
 public class StandardBatchPropagator implements BatchPropagator {
 
     private static final byte NO_VALUE = 0;
+    private static final Side[] BLOCK_SIDES = Side.values();
 
     private PropagationRules rules;
     private PropagatorWorldView world;
@@ -49,7 +51,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         this.world = world;
         this.rules = rules;
 
-        for (Side side : Side.values()) {
+        for (Side side : BLOCK_SIDES) {
             Vector3i delta = new Vector3i(side.getVector3i());
             if (delta.x < 0) {
                 delta.x += ChunkConstants.SIZE_X;
@@ -106,7 +108,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             reduce(blockChange.getPosition(), oldValue);
         }
 
-        for (Side side : Side.values()) {
+        for (Side side : BLOCK_SIDES) {
             PropagationComparison comparison = rules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), side);
             if (comparison.isRestricting() && existingValue > 0) {
                 reduce(blockChange.getPosition(), existingValue);
@@ -158,7 +160,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             world.setValueAt(pos, NO_VALUE);
         }
 
-        for (Side side : Side.values()) {
+        for (Side side : BLOCK_SIDES) {
             byte expectedValue = rules.propagateValue(oldValue, side, block);
             Vector3i adjPos = side.getAdjacentPos(pos);
             if (rules.canSpreadOutOf(block, side)) {
@@ -197,7 +199,7 @@ public class StandardBatchPropagator implements BatchPropagator {
 
     private void push(Vector3i pos, byte value) {
         Block block = world.getBlockAt(pos);
-        for (Side side : Side.values()) {
+        for (Side side : BLOCK_SIDES) {
             byte spreadValue = rules.propagateValue(value, side, block);
             Vector3i adjPos = side.getAdjacentPos(pos);
             if (rules.canSpreadOutOf(block, side)) {
