@@ -201,8 +201,8 @@ public class StandardBatchPropagator implements BatchPropagator {
         Block block = world.getBlockAt(pos);
         for (Side side : BLOCK_SIDES) {
             byte spreadValue = rules.propagateValue(value, side, block);
-            Vector3i adjPos = side.getAdjacentPos(pos);
             if (rules.canSpreadOutOf(block, side)) {
+                Vector3i adjPos = side.getAdjacentPos(pos);
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue < spreadValue && adjValue != PropagatorWorldView.UNAVAILABLE) {
                     Block adjBlock = world.getBlockAt(adjPos);
