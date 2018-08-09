@@ -28,7 +28,6 @@ import org.terasology.world.chunks.LitChunk;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Batch propagator that works on a set of changed blocks
