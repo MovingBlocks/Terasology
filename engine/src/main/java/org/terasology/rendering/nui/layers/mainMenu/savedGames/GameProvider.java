@@ -60,8 +60,10 @@ public final class GameProvider {
         if (savePath != null) {
             try {
                 return Files.list(savePath)
-                        .filter(savedGameFolderPath -> Files.isDirectory(savedGameFolderPath))
-                        .collect(Collectors.toList()).isEmpty();
+                        .filter(savedGameFolderPath -> Files.isDirectory(savedGameFolderPath)
+                                && Files.isRegularFile(savedGameFolderPath.resolve(GameManifest.DEFAULT_FILE_NAME)))
+                        .collect(Collectors.toList())
+                        .isEmpty();
             } catch (IOException e) {
                 logger.warn("Can't read saves path {}", savePath, e);
             }

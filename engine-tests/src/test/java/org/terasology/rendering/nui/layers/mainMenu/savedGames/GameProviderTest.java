@@ -144,6 +144,7 @@ public class GameProviderTest {
     @Test
     public void notEmptySavesGameFolderTest() throws IOException {
         Files.createDirectories(TMP_SAVE_GAME_PATH);
+        Files.createFile(TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME));
         final boolean res = GameProvider.isSavesFolderEmpty();
         Assert.assertFalse(res);
     }
