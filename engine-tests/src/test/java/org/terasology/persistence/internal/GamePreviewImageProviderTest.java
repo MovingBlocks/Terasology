@@ -40,13 +40,13 @@ public class GamePreviewImageProviderTest {
 
     @Before
     public void setUp() throws IOException {
-        FileUtils.deleteDirectory(new File(TMP_FOLDER.toUri()));
+        FileUtils.forceDelete(new File(TMP_FOLDER.toUri()));
         Files.createDirectories(TMP_FOLDER);
     }
 
     @AfterClass
     public static void clean() throws IOException {
-        FileUtils.deleteDirectory(new File(Paths.get("out", "test", "engine-tests", "tmp").toUri()));
+        FileUtils.forceDelete(new File(Paths.get("out", "test", "engine-tests", "tmp").toUri()));
     }
 
     @Test
