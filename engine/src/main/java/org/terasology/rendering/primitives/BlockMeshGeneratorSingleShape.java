@@ -35,7 +35,6 @@ import java.util.Map;
 public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockMeshGeneratorSingleShape.class);
-    private static final Side[] BLOCK_SIDES = Side.values();
 
     private Block block;
     private Mesh mesh;
@@ -67,7 +66,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
         // Gather adjacent blocks
         Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
-        for (Side side : BLOCK_SIDES) {
+        for (Side side : Side.getAllSides()) {
             Vector3i offset = side.getVector3i();
             Block blockToCheck = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
             adjacentBlocks.put(side, blockToCheck);
@@ -98,7 +97,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
         boolean[] drawDir = new boolean[6];
 
-        for (Side side : BLOCK_SIDES) {
+        for (Side side : Side.getAllSides()) {
             drawDir[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side);
         }
 
@@ -122,7 +121,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             drawDir[Side.TOP.ordinal()] |= !blockToCheck.isLiquid();
 
             if (bottomBlock.isLiquid() || bottomBlock.getMeshGenerator() == null) {
-                for (Side dir : BLOCK_SIDES) {
+                for (Side dir : Side.getAllSides()) {
                     if (drawDir[dir.ordinal()]) {
                         Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(dir), selfBiome);
                         selfBlock.getLoweredLiquidMesh(dir).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
@@ -132,7 +131,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             }
         }
 
-        for (Side dir : BLOCK_SIDES) {
+        for (Side dir : Side.getAllSides()) {
             if (drawDir[dir.ordinal()]) {
                 Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(dir), selfBiome);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?

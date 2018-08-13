@@ -73,7 +73,7 @@ public class BlockShapeImpl extends BlockShape {
         for (BlockPart part : BlockPart.values()) {
             this.meshParts.put(part, data.getMeshPart(part));
         }
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             this.fullSide.put(side, data.isBlockingSide(side));
         }
         this.baseCollisionShape = data.getCollisionShape();
