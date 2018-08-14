@@ -155,7 +155,14 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
     }
 
     @Override
-    public void postSave() {
+    public void postAutoSave() {
+        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+        EntityRef movingItem = playerEntity.getComponent(CharacterComponent.class).movingItem;
 
+        EntityRef targetEntity = movingItem;
+        EntityRef fromEntity = playerEntity;
+        int fromSlot = 0;
+
+        CoreRegistry.get(InventoryManager.class).switchItem(fromEntity, getTransferEntity(), fromSlot, targetEntity, 0);
     }
 }
