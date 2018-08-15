@@ -30,6 +30,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
+import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.ControlWidget;
@@ -41,6 +42,8 @@ import java.util.List;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class InventoryUIClientSystem extends BaseComponentSystem {
+
+    int itemMovedSlot = -1;
 
     private static final Logger logger = LoggerFactory.getLogger(InventoryCell.class);
 
@@ -114,55 +117,72 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
         EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
         EntityRef movingItem = playerEntity.getComponent(CharacterComponent.class).movingItem;
 
+        EntityRef movingItemItem = CoreRegistry.get(InventoryManager.class).getItemInSlot(movingItem, 0);
+
         EntityRef fromEntity = movingItem;
         int fromSlot = 0;
 
         InventoryComponent playerInventory = playerEntity.getComponent(InventoryComponent.class);
-        if (playerInventory == null) {
-            return;
-        }
-        CharacterComponent characterComponent = playerEntity.getComponent(CharacterComponent.class);
-        if (characterComponent == null) {
-            logger.error("Character entity of player had no character component");
-            return;
-        }
-        int totalSlotCount = playerInventory.itemSlots.size();
 
-        EntityRef interactionTarget = characterComponent.predictedInteractionTarget;
-        InventoryComponent interactionTargetInventory = interactionTarget.getComponent(InventoryComponent.class);
+        if (movingItemItem != EntityRef.NULL) {
 
 
-        EntityRef targetEntity;
-        List<Integer> toSlots = new ArrayList<>(totalSlotCount);
-        if (fromEntity.equals(playerEntity)) {
 
-            if (interactionTarget.exists() && interactionTargetInventory != null) {
-                targetEntity = interactionTarget;
-                toSlots = numbersBetween(0, interactionTargetInventory.itemSlots.size());
+            if (playerInventory == null) {
+                return;
+            }
+            CharacterComponent characterComponent = playerEntity.getComponent(CharacterComponent.class);
+            if (characterComponent == null) {
+                logger.error("Character entity of player had no character component");
+                return;
+            }
+            int totalSlotCount = playerInventory.itemSlots.size();
+
+            EntityRef interactionTarget = characterComponent.predictedInteractionTarget;
+            InventoryComponent interactionTargetInventory = interactionTarget.getComponent(InventoryComponent.class);
+
+
+            EntityRef targetEntity;
+            List<Integer> toSlots = new ArrayList<>(totalSlotCount);
+            if (fromEntity.equals(playerEntity)) {
+
+                if (interactionTarget.exists() && interactionTargetInventory != null) {
+                    targetEntity = interactionTarget;
+                    toSlots = numbersBetween(0, interactionTargetInventory.itemSlots.size());
+                } else {
+                    targetEntity = playerEntity;
+
+                    toSlots = numbersBetween(0, totalSlotCount);
+
+                }
             } else {
                 targetEntity = playerEntity;
-
                 toSlots = numbersBetween(0, totalSlotCount);
-
             }
-        } else {
-            targetEntity = playerEntity;
-            toSlots = numbersBetween(0, totalSlotCount);
+
+            CoreRegistry.get(InventoryManager.class).moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
+
+            System.out.println("Moving Item Item (Pre): " + movingItemItem);
+            itemMovedSlot = CoreRegistry.get(InventoryManager.class).findSlotWithItem(targetEntity, movingItemItem);
+            System.out.println("Item Moved Slot (Pre): " + itemMovedSlot);
         }
-
-        CoreRegistry.get(InventoryManager.class).moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
-
     }
 
     @Override
     public void postAutoSave() {
-        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
-        EntityRef movingItem = playerEntity.getComponent(CharacterComponent.class).movingItem;
+        System.out.println("Item Moved Slot (Post): " + itemMovedSlot);
 
-        EntityRef targetEntity = movingItem;
-        EntityRef fromEntity = playerEntity;
-        int fromSlot = 0;
+        if (itemMovedSlot != -1) {
+            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+            EntityRef movingItem = playerEntity.getComponent(CharacterComponent.class).movingItem;
 
-        CoreRegistry.get(InventoryManager.class).switchItem(fromEntity, getTransferEntity(), fromSlot, targetEntity, 0);
+            EntityRef targetEntity = movingItem;
+            EntityRef fromEntity = playerEntity;
+            int fromSlot = itemMovedSlot;
+
+            CoreRegistry.get(InventoryManager.class).switchItem(fromEntity, getTransferEntity(), fromSlot, targetEntity, 0);
+
+            itemMovedSlot = -1;
+        }
     }
 }
