@@ -42,13 +42,21 @@ import java.util.List;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class InventoryUIClientSystem extends BaseComponentSystem {
-
-    int itemMovedSlot = -1;
+    
+    EntityRef movingItemItem = EntityRef.NULL;
+    
+    int movingItemCount = 0;
 
     private static final Logger logger = LoggerFactory.getLogger(InventoryCell.class);
 
     @In
     private NUIManager nuiManager;
+    
+    @In
+    private InventoryManager invManager;
+    
+    @In
+    private LocalPlayer localPlayer;
 
     @Override
     public void initialise() {
@@ -101,7 +109,7 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
     }
 
     private EntityRef getTransferEntity() {
-        return CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
+        return localPlayer.getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
     }
 
     @Override
@@ -114,12 +122,14 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
           similar to what was needed here to take them out of the transfer
           slot and sort them into the inventory.
         */
-        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
-        EntityRef movingItem = playerEntity.getComponent(CharacterComponent.class).movingItem;
+        EntityRef playerEntity = localPlayer.getCharacterEntity();
+        EntityRef movingItemSlot = playerEntity.getComponent(CharacterComponent.class).movingItem;
 
-        EntityRef movingItemItem = CoreRegistry.get(InventoryManager.class).getItemInSlot(movingItem, 0);
+        movingItemItem = invManager.getItemInSlot(movingItemSlot, 0);
+        
+        movingItemCount = invManager.getStackSize(movingItemItem);
 
-        EntityRef fromEntity = movingItem;
+        EntityRef fromEntity = movingItemSlot;
         int fromSlot = 0;
 
         InventoryComponent playerInventory = playerEntity.getComponent(InventoryComponent.class);
@@ -160,29 +170,42 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
                 toSlots = numbersBetween(0, totalSlotCount);
             }
 
-            CoreRegistry.get(InventoryManager.class).moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
-
-            System.out.println("Moving Item Item (Pre): " + movingItemItem);
-            itemMovedSlot = CoreRegistry.get(InventoryManager.class).findSlotWithItem(targetEntity, movingItemItem);
-            System.out.println("Item Moved Slot (Pre): " + itemMovedSlot);
+            invManager.moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
         }
     }
 
     @Override
     public void postAutoSave() {
-        System.out.println("Item Moved Slot (Post): " + itemMovedSlot);
-
-        if (itemMovedSlot != -1) {
-            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+        if (movingItemItem != EntityRef.NULL) {
+            EntityRef playerEntity = localPlayer.getCharacterEntity();
             EntityRef movingItem = playerEntity.getComponent(CharacterComponent.class).movingItem;
 
             EntityRef targetEntity = movingItem;
             EntityRef fromEntity = playerEntity;
-            int fromSlot = itemMovedSlot;
 
-            CoreRegistry.get(InventoryManager.class).switchItem(fromEntity, getTransferEntity(), fromSlot, targetEntity, 0);
+            int currentSlot = playerEntity.getComponent(InventoryComponent.class).itemSlots.size() - 1;
 
-            itemMovedSlot = -1;
+            while (currentSlot >= 0 && movingItemCount > 0) {
+
+                EntityRef currentItem = invManager.getItemInSlot(playerEntity, currentSlot);
+                int currentItemCount = invManager.getStackSize(currentItem);
+                boolean correctItem = (currentItem == movingItemItem);
+                System.out.println("Current Item: " + currentItemCount);
+                System.out.println("Moving Item Item: " + movingItemCount);
+
+                if (correctItem && movingItemCount <= currentItemCount) {
+                    invManager.moveItem(fromEntity, getTransferEntity(), currentSlot, targetEntity, 0, movingItemCount);
+                    movingItemCount = 0;
+                } else if (correctItem) {
+                    invManager.moveItem(fromEntity, getTransferEntity(), currentSlot, targetEntity, 0, currentItemCount);
+                    movingItemCount -= currentItemCount;
+                }
+
+                currentSlot--;
+                System.out.println("Current slot: " + currentSlot);
+            }
         }
+
+        movingItemItem = EntityRef.NULL;
     }
 }
