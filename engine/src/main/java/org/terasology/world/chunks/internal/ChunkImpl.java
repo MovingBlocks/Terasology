@@ -260,6 +260,29 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public void setRawLiquid(BaseVector3i pos, byte state) {
+        setRawLiquid(pos.x(), pos.y(), pos.z(), state);
+    }
+
+    @Override
+    public void setRawLiquid(int x, int y, int z, byte newState) {
+        if (extraData == extraDataSnapshot) {
+            extraData = extraData.copy();
+        }
+        extraData.set(x, y, z, newState);
+    }
+
+    @Override
+    public byte getRawLiquid(BaseVector3i pos) {
+        return getRawLiquid(pos.x(), pos.y(), pos.z());
+    }
+
+    @Override
+    public byte getRawLiquid(int x, int y, int z) {
+        return (byte) extraData.get(x, y, z);
+    }
+
+    @Override
     public Biome getBiome(int x, int y, int z) {
         return biomeManager.getBiomeByShortId((short) biomeData.get(x, y, z));
     }

@@ -160,6 +160,16 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
+    public boolean setRawLiquid(int x, int y, int z, byte newData, byte oldData) {
+        return false;
+    }
+
+    @Override
+    public byte getRawLiquid(int x, int y, int z) {
+        return 0;
+    }
+
+    @Override
     public byte getLight(int x, int y, int z) {
         return 0;
     }

@@ -163,6 +163,26 @@ public interface WorldProviderCore {
     LiquidData getLiquid(int x, int y, int z);
 
     /**
+     * @param x
+     * @param y
+     * @param z
+     * @param newData
+     * @param oldData
+     * @return Whether the liquid change was made successfully. Will fail if the current data doesn't match the oldData, or if the underlying chunk is not available
+     */
+    boolean setRawLiquid(int x, int y, int z, byte newData, byte oldData);
+
+    /**
+     * Returns the liquid state at the given position.
+     *
+     * @param x The X-coordinate
+     * @param y The Y-coordinate
+     * @param z The Z-coordinate
+     * @return The liquid data of the block
+     */
+    byte getRawLiquid(int x, int y, int z);
+
+    /**
      * Returns the block at the given position.
      *
      * @param x The X-coordinate

@@ -63,6 +63,16 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
+    public boolean setRawLiquid(Vector3i pos, byte state, byte oldState) {
+        return core.setRawLiquid(pos.x, pos.y, pos.z, state, oldState);
+    }
+
+    @Override
+    public byte getRawLiquid(Vector3i blockPos) {
+        return core.getRawLiquid(blockPos.x, blockPos.y, blockPos.z);
+    }
+
+    @Override
     public Block getBlock(Vector3f pos) {
         return getBlock(new Vector3i(pos, RoundingMode.HALF_UP));
     }

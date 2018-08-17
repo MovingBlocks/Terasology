@@ -113,6 +113,16 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
+    public boolean setRawLiquid(int x, int y, int z, byte newState, byte oldState) {
+        return base.setRawLiquid(x, y, z, newState, oldState);
+    }
+
+    @Override
+    public byte getRawLiquid(int x, int y, int z) {
+        return base.getRawLiquid(x, y, z);
+    }
+
+    @Override
     public Block getBlock(int x, int y, int z) {
         return base.getBlock(x, y, z);
     }
