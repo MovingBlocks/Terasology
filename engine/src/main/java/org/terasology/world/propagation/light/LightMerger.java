@@ -89,7 +89,7 @@ public class LightMerger<T> {
 
         for (BatchPropagator propagator : propagators) {
             // Propagate Inwards
-            for (Side side : Side.values()) {
+            for (Side side : Side.getAllSides()) {
                 Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPosition());
                 LitChunk adjChunk = chunkProvider.getChunkUnready(adjChunkPos);
                 if (adjChunk != null) {
@@ -98,7 +98,7 @@ public class LightMerger<T> {
             }
 
             // Propagate Outwards
-            for (Side side : Side.values()) {
+            for (Side side : Side.getAllSides()) {
                 Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPosition());
                 LitChunk adjChunk = chunkProvider.getChunk(adjChunkPos);
                 if (adjChunk != null) {

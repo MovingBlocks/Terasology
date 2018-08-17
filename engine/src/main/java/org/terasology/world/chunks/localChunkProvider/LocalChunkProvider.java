@@ -467,7 +467,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     private List<Chunk> listAdjacentChunks(Chunk chunk) {
         final Vector3i centerChunkPosition = chunk.getPosition();
         List<Chunk> adjacentChunks = new ArrayList<>(6);
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             final Vector3i adjacentChunkPosition = side.getAdjacentPos(centerChunkPosition);
             final Chunk adjacentChunk = chunkCache.get(adjacentChunkPosition);
             if (adjacentChunk != null) {

@@ -49,7 +49,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         this.world = world;
         this.rules = rules;
 
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             Vector3i delta = new Vector3i(side.getVector3i());
             if (delta.x < 0) {
                 delta.x += ChunkConstants.SIZE_X;
@@ -106,7 +106,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             reduce(blockChange.getPosition(), oldValue);
         }
 
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             PropagationComparison comparison = rules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), side);
             if (comparison.isRestricting() && existingValue > 0) {
                 reduce(blockChange.getPosition(), existingValue);
@@ -158,7 +158,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             world.setValueAt(pos, NO_VALUE);
         }
 
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             byte expectedValue = rules.propagateValue(oldValue, side, block);
             Vector3i adjPos = side.getAdjacentPos(pos);
             if (rules.canSpreadOutOf(block, side)) {
@@ -197,10 +197,10 @@ public class StandardBatchPropagator implements BatchPropagator {
 
     private void push(Vector3i pos, byte value) {
         Block block = world.getBlockAt(pos);
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             byte spreadValue = rules.propagateValue(value, side, block);
-            Vector3i adjPos = side.getAdjacentPos(pos);
             if (rules.canSpreadOutOf(block, side)) {
+                Vector3i adjPos = side.getAdjacentPos(pos);
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue < spreadValue && adjValue != PropagatorWorldView.UNAVAILABLE) {
                     Block adjBlock = world.getBlockAt(adjPos);

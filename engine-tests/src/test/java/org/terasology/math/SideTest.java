@@ -25,7 +25,7 @@ public class SideTest {
 
     @Test
     public void testSideInDirection() {
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             assertEquals(side, Side.inDirection(side.getVector3i().x, side.getVector3i().y, side.getVector3i().z));
         }
     }
