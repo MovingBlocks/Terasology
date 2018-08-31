@@ -4,7 +4,6 @@
 {
     "liquid": true,
     "water": true,
-    "shape": "engine:TrimmedLoweredCube",
     "hardness": 0,
     "attachmentAllowed": false,
     "translucent": true,
