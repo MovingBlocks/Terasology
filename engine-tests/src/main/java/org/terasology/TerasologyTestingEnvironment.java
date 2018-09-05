@@ -47,6 +47,7 @@ import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -97,6 +98,7 @@ public abstract class TerasologyTestingEnvironment {
         engineEntityManager = context.get(EngineEntityManager.class);
         BlockManager mockBlockManager = context.get(BlockManager.class); // 'mock' added to avoid hiding a field
         BiomeManager biomeManager = context.get(BiomeManager.class);
+        ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         context.put(RecordAndReplayUtils.class, recordAndReplayUtils);
@@ -109,7 +111,7 @@ public abstract class TerasologyTestingEnvironment {
 
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, mockBlockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+                engineEntityManager, mockBlockManager, biomeManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);

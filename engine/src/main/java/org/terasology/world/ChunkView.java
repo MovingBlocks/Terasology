@@ -185,6 +185,46 @@ public interface ChunkView {
      * @param newState
      */
     void setLiquid(int x, int y, int z, LiquidData newState);
+    
+    /**
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
+     *
+     * @param i The index of the extra data field
+     * @param x
+     * @param y
+     * @param z
+     * @return The ith extra-data value at the given position
+     */
+    int getExtraData(int i, int x, int y, int z);
+    
+    /**
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
+     *
+     * @param i The index of the extra data field
+     * @param pos
+     * @return The ith extra-data value at the given position
+     */
+    int getExtraData(int i, Vector3i pos);
+    
+    /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param i The index of the extra data field
+     * @param x
+     * @param y
+     * @param z
+     * @param value
+     */
+    void setExtraData(int i, int x, int y, int z, int value);
+    
+    /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param i The index of the extra data field
+     * @param pos
+     * @param value
+     */
+    void setExtraData(int i, Vector3i pos, int value);
 
     /**
      * Converts a coordinate from view-space to world space.

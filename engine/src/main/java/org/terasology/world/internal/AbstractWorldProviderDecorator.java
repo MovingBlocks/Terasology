@@ -141,6 +141,16 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     public byte getTotalLight(int x, int y, int z) {
         return base.getTotalLight(x, y, z);
     }
+    
+    @Override
+    public int getExtraData(int i, int x, int y, int z) {
+        return base.getExtraData(i, x, y, z);
+    }
+    
+    @Override
+    public int setExtraData(int i, Vector3i pos, int value) {
+        return base.setExtraData(i, pos, value);
+    }
 
     @Override
     public void dispose() {

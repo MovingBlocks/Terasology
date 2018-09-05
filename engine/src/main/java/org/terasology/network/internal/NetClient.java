@@ -119,6 +119,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
     private BlockingQueue<NetData.BiomeChangeMessage> queuedOutgoingBiomeChanges = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<NetData.ExtraDataChangeMessage> queuedOutgoingExtraDataChanges = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private final List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
 
@@ -418,6 +419,18 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         }
     }
 
+    @Override
+    public void onExtraDataChanged(int i, Vector3i pos, int newData, int oldData) {
+        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
+        if (relevantChunks.contains(chunkPos)) {
+            queuedOutgoingExtraDataChanges.add(NetData.ExtraDataChangeMessage.newBuilder()
+                    .setIndex(i)
+                    .setPos(NetMessageUtil.convert(pos))
+                    .setNewData(newData)
+                    .build());
+        }
+    }
+
     private void processReceivedMessages() {
         List<NetData.NetMessage> messages = Lists.newArrayListWithExpectedSize(queuedIncomingMessage.size());
         queuedIncomingMessage.drainTo(messages);
@@ -439,6 +452,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         List<NetData.BiomeChangeMessage> biomeChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBiomeChanges.size());
         queuedOutgoingBiomeChanges.drainTo(biomeChanges);
         message.addAllBiomeChange(biomeChanges);
+        
+        List<NetData.ExtraDataChangeMessage> extraDataChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingExtraDataChanges.size());
+        queuedOutgoingExtraDataChanges.drainTo(extraDataChanges);
+        message.addAllExtraDataChange(extraDataChanges);
 
         message.addAllEvent(queuedOutgoingEvents);
         queuedOutgoingEvents.clear();

@@ -53,6 +53,7 @@ import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.ManagedChunk;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -112,6 +113,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private BlockManager blockManager;
     private BiomeManager biomeManager;
+    private ExtraBlockDataManager extraDataManager;
     private final ChunkCache chunkCache;
     private final Supplier<ChunkFinalizer> chunkFinalizerSupplier;
     private BlockEntityRegistry registry;
@@ -120,25 +122,28 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     //TODO Remove this old constructor at the end of the chunk overhaul
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                              BlockManager blockManager, BiomeManager biomeManager) {
+                              BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
         this(storageManager,
                 entityManager,
                 generator,
                 blockManager,
                 biomeManager,
+                extraDataManager,
                 new LightMergingChunkFinalizer(),
                 LightMergingChunkFinalizer::new,
                 new ConcurrentMapChunkCache());
     }
 
     LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                       BlockManager blockManager, BiomeManager biomeManager, ChunkFinalizer chunkFinalizer,
-                       Supplier<ChunkFinalizer> chunkFinalizerSupplier, ChunkCache chunkCache) {
+                       BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager,
+                       ChunkFinalizer chunkFinalizer, Supplier<ChunkFinalizer> chunkFinalizerSupplier,
+                       ChunkCache chunkCache) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
         this.blockManager = blockManager;
         this.biomeManager = biomeManager;
+        this.extraDataManager = extraDataManager;
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         this.chunkFinalizer = chunkFinalizer;
@@ -648,7 +653,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                     Chunk chunk;
                     EntityBufferImpl buffer = new EntityBufferImpl();
                     if (chunkStore == null) {
-                        chunk = new ChunkImpl(getPosition(), blockManager, biomeManager);
+                        chunk = new ChunkImpl(getPosition(), blockManager, biomeManager, extraDataManager);
                         generator.createChunk(chunk, buffer);
                     } else {
                         chunk = chunkStore.getChunk();

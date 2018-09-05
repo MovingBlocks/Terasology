@@ -26,6 +26,7 @@ import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.generation.impl.EntityBufferImpl;
 import org.terasology.world.generator.WorldGenerator;
@@ -50,12 +51,14 @@ public class MapWorldProvider implements WorldProviderCore {
     private WorldGenerator worldGenerator;
     private BlockManager blockManager;
     private BiomeManager biomeManager;
+    private ExtraBlockDataManager extraDataManager;
     private EntityBufferImpl entityBuffer;
 
-    public MapWorldProvider(WorldGenerator worldGenerator, BlockManager blockManager, BiomeManager biomeManager) {
+    public MapWorldProvider(WorldGenerator worldGenerator, BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
         this.worldGenerator = worldGenerator;
         this.blockManager = blockManager;
         this.biomeManager = biomeManager;
+        this.extraDataManager = extraDataManager;
         entityBuffer = new EntityBufferImpl();
     }
 
@@ -113,7 +116,7 @@ public class MapWorldProvider implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
         Chunk chunk = chunks.get(chunkPos);
         if (chunk == null && worldGenerator != null) {
-            chunk = new ChunkImpl(chunkPos, blockManager, biomeManager);
+            chunk = new ChunkImpl(chunkPos, blockManager, biomeManager, extraDataManager);
             worldGenerator.createChunk(chunk, entityBuffer);
             chunks.put(chunkPos, chunk);
         }
@@ -171,6 +174,16 @@ public class MapWorldProvider implements WorldProviderCore {
 
     @Override
     public byte getTotalLight(int x, int y, int z) {
+        return 0;
+    }
+    
+    @Override
+    public int setExtraData(int i, Vector3i pos, int value) {
+        return 0;
+    }
+    
+    @Override
+    public int getExtraData(int i, int x, int y, int z) {
         return 0;
     }
 
