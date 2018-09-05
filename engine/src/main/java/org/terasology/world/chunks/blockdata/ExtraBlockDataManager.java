@@ -67,6 +67,12 @@ public class ExtraBlockDataManager {
     private Map<String,Integer> slots;
     private TeraArray.Factory<? extends TeraArray>[] slotFactories;
     
+    // For testing purposes: don't add any fields.
+    public ExtraBlockDataManager() {
+        slots = new HashMap<>();
+        slotFactories = new TeraArray.Factory[0];
+    }
+    
     public ExtraBlockDataManager(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         Collection<Block> blocks = context.get(BlockManager.class).listRegisteredBlocks();
