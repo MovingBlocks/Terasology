@@ -139,7 +139,6 @@ public class BlockBuilder implements BlockBuilderHelper {
         Block block = new Block();
         block.setLiquid(def.isLiquid());
         block.setWater(def.isWater());
-        block.setLava(def.isLava());
         block.setGrass(def.isGrass());
         block.setIce(def.isIce());
         block.setHardness(def.getHardness());
