@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 /**
  */
 public class BlockTile extends Asset<TileData> {
-    private BufferedImage image;
+    private BufferedImage[] images;
     private boolean autoBlock;
     private List<Consumer<BlockTile>> reloadListeners = Collections.synchronizedList(Lists.newArrayList());
 
@@ -37,8 +37,12 @@ public class BlockTile extends Asset<TileData> {
         reload(data);
     }
 
-    public BufferedImage getImage() {
-        return image;
+    public BufferedImage getImage(int i) {
+        return images[i];
+    }
+    
+    public int getLength() {
+        return images.length;
     }
 
     public boolean isAutoBlock() {
@@ -55,7 +59,7 @@ public class BlockTile extends Asset<TileData> {
 
     @Override
     protected void doReload(TileData tileData) {
-        this.image = tileData.getImage();
+        this.images = tileData.getImages();
         this.autoBlock = tileData.isAutoBlock();
         for (Consumer<BlockTile> listener : reloadListeners) {
             listener.accept(this);

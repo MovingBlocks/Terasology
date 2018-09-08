@@ -186,15 +186,16 @@ public class BlockBuilder implements BlockBuilderHelper {
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             Vector2f atlasPos;
+            BlockTile tile = tiles.get(part);
             if (tiles.get(part) == null) {
                 atlasPos = new Vector2f();
             } else {
-                atlasPos = worldAtlas.getTexCoords(tiles.get(part), shape.getMeshPart(part) != null);
+                atlasPos = worldAtlas.getTexCoords(tile, shape.getMeshPart(part) != null);
             }
             BlockPart targetPart = part.rotate(rot);
             textureAtlasPositions.put(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize()));
+                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize(), tile.getLength()));
             }
         }
         return new BlockAppearance(meshParts, textureAtlasPositions);
@@ -215,7 +216,7 @@ public class BlockBuilder implements BlockBuilderHelper {
                 BlockMeshPart meshPart = shape
                         .getMeshPart(part)
                         .rotate(Rotation.none().getQuat4f())
-                        .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize());
+                        .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize(), blockTile.getLength());
                 block.setLoweredLiquidMesh(part.getSide(), meshPart);
             }
         }
