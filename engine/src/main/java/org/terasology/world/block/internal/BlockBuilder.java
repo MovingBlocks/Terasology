@@ -185,16 +185,19 @@ public class BlockBuilder implements BlockBuilderHelper {
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             Vector2f atlasPos;
+            int frameCount;
             BlockTile tile = tiles.get(part);
-            if (tiles.get(part) == null) {
+            if (tile == null) {
                 atlasPos = new Vector2f();
+                frameCount = 1;
             } else {
                 atlasPos = worldAtlas.getTexCoords(tile, shape.getMeshPart(part) != null);
+                frameCount = tile.getLength();
             }
             BlockPart targetPart = part.rotate(rot);
             textureAtlasPositions.put(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize(), tile.getLength()));
+                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize(), frameCount));
             }
         }
         return new BlockAppearance(meshParts, textureAtlasPositions);
