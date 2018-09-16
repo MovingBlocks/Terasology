@@ -124,10 +124,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      */
     private ComponentLibrary entityRefReplacingComponentLibrary;
 
-    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                   BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
+    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager,
+                                   BiomeManager biomeManager, ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
                                    RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
-        this(savePath, environment, entityManager, blockManager, biomeManager, extraDataManager, true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+        this(savePath, environment, entityManager, blockManager, biomeManager, extraDataManager,
+            true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
     }
 
     ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,

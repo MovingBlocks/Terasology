@@ -139,7 +139,7 @@ public class ChunkImpl implements Chunk {
     @Override
     public int getEstimatedMemoryConsumptionInBytes() {
         int extraDataSize = 0;
-        for (int i=0; i<extraData.length; i++) {
+        for (int i = 0; i < extraData.length; i++) {
             extraDataSize += extraData[i].getEstimatedMemoryConsumptionInBytes();
         }
         return blockData.getEstimatedMemoryConsumptionInBytes()
@@ -163,7 +163,9 @@ public class ChunkImpl implements Chunk {
         return blockManager.getBlock(id);
     }
 
-    // This could be made to check for and clear extraData fields as appropriate, but that could take an excessive amount of time, so whatever sets a block to something extraData sensitive should also initialise the extra data.
+    // This could be made to check for and clear extraData fields as appropriate,
+    // but that could take an excessive amount of time,
+    // so whatever sets a block to something extraData sensitive should also initialise the extra data.
     @Override
     public Block setBlock(int x, int y, int z, Block block) {
         if (blockData == blockDataSnapshot) {
@@ -386,7 +388,7 @@ public class ChunkImpl implements Chunk {
             int liquidSize = liquidData.getEstimatedMemoryConsumptionInBytes();
             int biomeSize = biomeData.getEstimatedMemoryConsumptionInBytes();
             int extraSize = 0;
-            for (int i=0; i<extraData.length; i++) {
+            for (int i = 0; i < extraData.length; i++) {
                 extraSize += extraData[i].getEstimatedMemoryConsumptionInBytes();
             }
             int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + liquidSize + biomeSize + extraSize;
@@ -395,7 +397,7 @@ public class ChunkImpl implements Chunk {
             lightData = def.deflate(lightData);
             liquidData = def.deflate(liquidData);
             biomeData = def.deflate(biomeData);
-            for (int i=0; i<extraData.length; i++) {
+            for (int i = 0; i < extraData.length; i++) {
                 extraData[i] = def.deflate(extraData[i]);
             }
 
@@ -404,7 +406,7 @@ public class ChunkImpl implements Chunk {
             int liquidReduced = liquidData.getEstimatedMemoryConsumptionInBytes();
             int biomeReduced = biomeData.getEstimatedMemoryConsumptionInBytes();
             int extraReduced = 0;
-            for (int i=0; i<extraData.length; i++) {
+            for (int i = 0; i < extraData.length; i++) {
                 extraReduced += extraData[i].getEstimatedMemoryConsumptionInBytes();
             }
             int totalReduced = blocksReduced + sunlightRegenSize + sunlightSize + lightReduced + liquidReduced + biomeReduced + extraReduced;
@@ -441,7 +443,7 @@ public class ChunkImpl implements Chunk {
             lightData = def.deflate(lightData);
             liquidData = def.deflate(liquidData);
             biomeData = def.deflate(biomeData);
-            for (int i=0; i<extraData.length; i++) {
+            for (int i = 0; i < extraData.length; i++) {
                 extraData[i] = def.deflate(extraData[i]);
             }
             ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());

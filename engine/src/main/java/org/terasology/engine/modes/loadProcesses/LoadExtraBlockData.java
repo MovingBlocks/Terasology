@@ -19,6 +19,10 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.context.Context;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
+/**
+ * Sets up an ExtraBlockDataManager based on @ExtraBlockSystem classes from the loaded modules.
+ * Depends on block definitions and module classes already being loaded.
+ */
 public class LoadExtraBlockData extends SingleStepLoadProcess {
     private final Context context;
     

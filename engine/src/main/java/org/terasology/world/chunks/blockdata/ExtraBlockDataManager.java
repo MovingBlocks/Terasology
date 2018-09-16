@@ -57,28 +57,33 @@ import java.util.Set;
 @API
 public class ExtraBlockDataManager {
     private static final Logger logger = LoggerFactory.getLogger(ExtraBlockDataManager.class);
-    private static final Map<Integer,TeraArray.Factory<? extends TeraArray>> teraArrayFactories = new HashMap<>();
+    private static final Map<Integer, TeraArray.Factory<? extends TeraArray>> TERA_ARRAY_FACTORIES = new HashMap<>();
     static {
-        teraArrayFactories.put(4, new TeraSparseArray4Bit.Factory());
-        teraArrayFactories.put(8, new TeraSparseArray8Bit.Factory());
-        teraArrayFactories.put(16,new TeraSparseArray16Bit.Factory());
+        TERA_ARRAY_FACTORIES.put(4,  new TeraSparseArray4Bit.Factory());
+        TERA_ARRAY_FACTORIES.put(8,  new TeraSparseArray8Bit.Factory());
+        TERA_ARRAY_FACTORIES.put(16, new TeraSparseArray16Bit.Factory());
     }
     
-    private Map<String,Integer> slots;
+    private Map<String, Integer> slots;
     private TeraArray.Factory<? extends TeraArray>[] slotFactories;
     
-    // For testing purposes: don't add any fields.
+    /**
+     * Construct a trivial instance for testing purposes: don't add any data-fields.
+     */
     public ExtraBlockDataManager() {
         slots = new HashMap<>();
         slotFactories = new TeraArray.Factory[0];
     }
     
+    /**
+     * Set extra-data fields based on the modules available through the context.
+     */
     public ExtraBlockDataManager(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         Collection<Block> blocks = context.get(BlockManager.class).listRegisteredBlocks();
         
-        HashMap<Integer, HashMap<String, HashSet<Block>>> fieldss = new HashMap<>();
-        teraArrayFactories.forEach((size, fac) -> fieldss.put(size, new HashMap<>()));
+        Map<Integer, Map<String, Set<Block>>> fieldss = new HashMap<>();
+        TERA_ARRAY_FACTORIES.forEach((size, fac) -> fieldss.put(size, new HashMap<>()));
         
         for (Class<?> type : environment.getTypesAnnotatedWith(ExtraDataSystem.class)) {
             for (Method method : type.getMethods()) {
@@ -86,20 +91,22 @@ public class ExtraBlockDataManager {
                 if (registerAnnotation != null) {
                     String errorType = validRegistrationMethod(method, registerAnnotation);
                     if (errorType != null) {
-                        logger.error("Unable to register extra block data: "+errorType+" for {}.{}: should be \"public static boolean {}(Block block)\", and bitSize should be 4, 8 or 16.", type.getName(), method.getName(), method.getName());
+                        logger.error("Unable to register extra block data: " + errorType +
+                            " for {}.{}: should be \"public static boolean {}(Block block)\", and bitSize should be 4, 8 or 16.",
+                            type.getName(), method.getName(), method.getName());
                         continue;
                     }
                     method.setAccessible(true);
-                    HashSet<Block> includedBlocks = new HashSet<>();
+                    Set<Block> includedBlocks = new HashSet<>();
                     for (Block block : blocks) {
                         try {
                             if ((boolean) method.invoke(null, block)) {
                                 includedBlocks.add(block);
                             }
-                        } catch(IllegalAccessException e) {
+                        } catch (IllegalAccessException e) {
                             // This should not get to this point.
                             throw new RuntimeException("Incorrect access modifier on register extra data method", e);
-                        } catch(InvocationTargetException e) {
+                        } catch (InvocationTargetException e) {
                             throw new RuntimeException(e);
                         }
                     }
@@ -117,7 +124,7 @@ public class ExtraBlockDataManager {
                 for (String label : clique) {
                     slots.put(label, tempSlotTypes.size());
                 }
-                tempSlotTypes.add(teraArrayFactories.get(size));
+                tempSlotTypes.add(TERA_ARRAY_FACTORIES.get(size));
             }
         });
         slotFactories = tempSlotTypes.toArray(new TeraArray.Factory<?>[0]);
@@ -132,91 +139,15 @@ public class ExtraBlockDataManager {
     
     private static String validRegistrationMethod(Method method, RegisterExtraData annotation) {
         Class<?>[] argumentTypes = method.getParameterTypes();
-        return method.getReturnType() != boolean.class ? "incorrect return type" :
-               //! method.isAccessible() ? "method not accessible" :
-               ! teraArrayFactories.containsKey(annotation.bitSize()) ? "invalid bitSize" :
-               ! Modifier.isStatic(method.getModifiers()) ? "method not static" :
-               argumentTypes.length != 1 ? "arguments list has wrong length" :
-               argumentTypes[0] != Block.class ? "incorrect argument type" :
-               null;
+        return method.getReturnType() != boolean.class ? "incorrect return type"
+               : !TERA_ARRAY_FACTORIES.containsKey(annotation.bitSize()) ? "invalid bitSize"
+               : !Modifier.isStatic(method.getModifiers()) ? "method not static"
+               : argumentTypes.length != 1 ? "arguments list has wrong length"
+               : argumentTypes[0] != Block.class ? "incorrect argument type"
+               : null;
     }
     
-    private static class Graph {
-        public String[] verts;
-        public HashMap<String, Set<String>> edges;
-        
-        public Graph(String[] verts, HashMap<String, Set<String>> edges) {
-            this.verts = verts;
-            this.edges = edges;
-        }
-        
-        public Graph(String[] verts) {
-            this.verts = verts;
-            this.edges = new HashMap<>();
-            for (String vert : verts) {
-                edges.put(vert, new HashSet());
-            }
-        }
-        
-        public Graph addEdge(String s0, String s1) {
-            edges.get(s0).add(s1);
-            edges.get(s1).add(s0);
-            return this;
-        }
-        
-        public Graph removeEdge(String s0, String s1) {
-            edges.get(s0).remove(s1);
-            edges.get(s1).remove(s0);
-            return this;
-        }
-        
-        // Creates a new graph containing the complement of the contraction of the complement.
-        public Graph ntract(String s0, String s1) {
-            int v0, v1 = -1;
-            for (int i=0; i<verts.length; i++) {
-                if (verts[i].equals(s0)) {
-                    v0 = i;
-                }
-                if (verts[i].equals(s1)) {
-                    v1 = i;
-                }
-            }
-            String[] newVerts = new String[verts.length-1];
-            System.arraycopy(verts, 0, newVerts, 0, v1);
-            System.arraycopy(verts, v1+1, newVerts, v1, verts.length-v1-1);
-            HashMap<String, Set<String>> newEdges = new HashMap<>();
-            for (String s : verts) {
-                newEdges.put(s, new HashSet<>(edges.get(s)));
-            }
-            newEdges.remove(s1);
-            Set<String> e0 = newEdges.get(s0);
-            Set<String> e1 = edges.get(s1);
-            for (String s2 : verts) {
-                if (e0.contains(s2) && !e1.contains(s2)) {
-                    e0.remove(s2);
-                    newEdges.get(s2).remove(s0);
-                }
-                if (e1.contains(s2)) {
-                    newEdges.get(s2).remove(s1);
-                }
-            }
-            return new Graph(newVerts, newEdges);
-        }
-        
-        public String toString() {
-            String result = "Graph:";
-            for (int i=0; i<verts.length; i++) {
-                result += " (" + verts[i] + " ->";
-                for (String v : edges.get(verts[i])) {
-                    result += " " + v;
-                }
-                result += ")";
-            }
-            return result;
-        }
-    }
-    
-    private static Graph getDisjointnessGraph(Map<String, HashSet<Block>> fields) {
+    private static Graph getDisjointnessGraph(Map<String, Set<Block>> fields) {
         Graph graph = new Graph(fields.keySet().toArray(new String[0]));
         fields.forEach((name0, blockSet0) ->
             fields.forEach((name1, blockSet1) -> {
@@ -238,26 +169,30 @@ public class ExtraBlockDataManager {
     }
     
     //This is exponential time, but the problem is known to be NP-hard in general and large cases are unlikely to come up.
+    /**
+     * Find the smallest-possible number of cliques that contain all of the vertices of the graph.
+     * Used to determine how to most efficiently assign aliases of requested extra-data fields.
+     */
     private static ArrayList<ArrayList<String>> findCliqueCover(Graph graph) {
         return findCliqueCover(graph, Integer.MAX_VALUE, "");
     }
     
     private static ArrayList<ArrayList<String>> findCliqueCover(Graph graph, int bestSize, String tabs) {
-        verboseLog(tabs+"findCliqueCover up to "+bestSize+", "+graph.toString());
-        for (int i=0; i<graph.verts.length; i++) {
-            if (i >= bestSize-1) {
-                verboseLog(tabs+"giving up");
+        verboseLog(tabs + "findCliqueCover up to " + bestSize + ", " + graph.toString());
+        for (int i = 0; i < graph.verts.length; i++) {
+            if (i >= bestSize - 1) {
+                verboseLog(tabs + "giving up");
                 return null;
             }
             String v0 = graph.verts[i];
             if (!graph.edges.get(v0).isEmpty()) {
-                verboseLog(tabs+"Selected vertex "+v0);
+                verboseLog(tabs + "Selected vertex " + v0);
                 String v1 = graph.edges.get(v0).iterator().next();
-                ArrayList<ArrayList<String>> bestCover0 = findCliqueCover(graph.ntract(v0,v1), bestSize, tabs+"----");
+                ArrayList<ArrayList<String>> bestCover0 = findCliqueCover(graph.ntract(v0, v1), bestSize, tabs + "----");
                 int bestSize0 = bestCover0 == null ? bestSize : bestCover0.size();
-                graph.removeEdge(v0,v1);
-                ArrayList<ArrayList<String>> bestCover1 = findCliqueCover(graph, bestSize0, tabs+"    ");
-                graph.addEdge(v0,v1);
+                graph.removeEdge(v0, v1);
+                ArrayList<ArrayList<String>> bestCover1 = findCliqueCover(graph, bestSize0, tabs + "    ");
+                graph.addEdge(v0, v1);
                 if (bestCover1 != null) {
                     return bestCover1;
                 } else {
@@ -268,9 +203,9 @@ public class ExtraBlockDataManager {
                 }
             }
         }
-        verboseLog(tabs+"done, "+graph.verts.length);
+        verboseLog(tabs + "done, " + graph.verts.length);
         ArrayList<ArrayList<String>> bestCover = new ArrayList<>();
-        for (int i=0; i<graph.verts.length; i++) {
+        for (int i = 0; i < graph.verts.length; i++) {
             ArrayList<String> singleton = new ArrayList<>();
             singleton.add(graph.verts[i]);
             bestCover.add(singleton);
@@ -297,9 +232,89 @@ public class ExtraBlockDataManager {
     
     public TeraArray[] makeDataArrays(int sizeX, int sizeY, int sizeZ) {
         TeraArray[] extraData = new TeraArray[slotFactories.length];
-        for (int i=0; i<extraData.length; i++) {
+        for (int i = 0; i < extraData.length; i++) {
             extraData[i] = slotFactories[i].create(sizeX, sizeY, sizeZ);
         }
         return extraData;
+    }
+    
+    /**
+     * Undirected graphs with string-labelled vertices.
+     * Used to represent the overlaps between requested extra-data fields.
+     */
+    private static class Graph {
+        public String[] verts;
+        public Map<String, Set<String>> edges;
+        
+        Graph(String[] verts, Map<String, Set<String>> edges) {
+            this.verts = verts;
+            this.edges = edges;
+        }
+        
+        Graph(String[] verts) {
+            this.verts = verts;
+            this.edges = new HashMap<>();
+            for (String vert : verts) {
+                edges.put(vert, new HashSet());
+            }
+        }
+        
+        public Graph addEdge(String s0, String s1) {
+            edges.get(s0).add(s1);
+            edges.get(s1).add(s0);
+            return this;
+        }
+        
+        public Graph removeEdge(String s0, String s1) {
+            edges.get(s0).remove(s1);
+            edges.get(s1).remove(s0);
+            return this;
+        }
+        
+        // Creates a new graph containing the complement of the contraction of the complement.
+        public Graph ntract(String s0, String s1) {
+            int v0 = -1;
+            int v1 = -1;
+            for (int i = 0; i < verts.length; i++) {
+                if (verts[i].equals(s0)) {
+                    v0 = i;
+                }
+                if (verts[i].equals(s1)) {
+                    v1 = i;
+                }
+            }
+            String[] newVerts = new String[verts.length - 1];
+            System.arraycopy(verts, 0, newVerts, 0, v1);
+            System.arraycopy(verts, v1 + 1, newVerts, v1, verts.length - v1 - 1);
+            Map<String, Set<String>> newEdges = new HashMap<>();
+            for (String s : verts) {
+                newEdges.put(s, new HashSet<>(edges.get(s)));
+            }
+            newEdges.remove(s1);
+            Set<String> e0 = newEdges.get(s0);
+            Set<String> e1 = edges.get(s1);
+            for (String s2 : verts) {
+                if (e0.contains(s2) && !e1.contains(s2)) {
+                    e0.remove(s2);
+                    newEdges.get(s2).remove(s0);
+                }
+                if (e1.contains(s2)) {
+                    newEdges.get(s2).remove(s1);
+                }
+            }
+            return new Graph(newVerts, newEdges);
+        }
+        
+        public String toString() {
+            String result = "Graph:";
+            for (int i = 0; i < verts.length; i++) {
+                result += " (" + verts[i] + " ->";
+                for (String v : edges.get(verts[i])) {
+                    result += " " + v;
+                }
+                result += ")";
+            }
+            return result;
+        }
     }
 }

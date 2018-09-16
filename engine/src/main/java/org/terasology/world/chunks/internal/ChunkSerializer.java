@@ -43,7 +43,7 @@ public final class ChunkSerializer {
         b.setBlockData(runLengthEncode16(blockData));
         b.setLiquidData(runLengthEncode8(liquidData));
         b.setBiomeData(runLengthEncode16(biomeData));
-        for (int i=0; i<extraData.length; i++) {
+        for (int i = 0; i < extraData.length; i++) {
             b.addExtraData(runLengthEncode16(extraData[i]));
         }
 
@@ -67,7 +67,7 @@ public final class ChunkSerializer {
         final TeraArray liquidData = runLengthDecode(message.getLiquidData());
         final TeraArray biomeData = runLengthDecode(message.getBiomeData());
         final TeraArray[] extraData = extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
-        for (int i=0; i<extraData.length; i++) {
+        for (int i = 0; i < extraData.length; i++) {
             runLengthDecode(message.getExtraData(i), extraData[i]);
         }
         return new ChunkImpl(pos, blockData, liquidData, biomeData, extraData, blockManager, biomeManager);
@@ -156,6 +156,10 @@ public final class ChunkSerializer {
         return new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z, decodedData);
     }
     
+    /**
+     * Decode compressed data into an existing TeraArray.
+     * Generic w.r.t. TeraArray subclasses, allowing the data to be used for any type of TeraArray.
+     */
     private static void runLengthDecode(EntityData.RunLengthEncoding16 data, TeraArray array) {
         int index = 0;
         int count = 0;
