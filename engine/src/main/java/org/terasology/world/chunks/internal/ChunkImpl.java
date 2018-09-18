@@ -298,26 +298,26 @@ public class ChunkImpl implements Chunk {
     }
     
     @Override
-    public int getExtraData(int i, int x, int y, int z) {
-        return extraData[i].get(x, y, z);
+    public int getExtraData(int index, int x, int y, int z) {
+        return extraData[index].get(x, y, z);
     }
     
     @Override
-    public int getExtraData(int i, BaseVector3i pos) {
-        return getExtraData(i, pos.x(), pos.y(), pos.z());
+    public int getExtraData(int index, BaseVector3i pos) {
+        return getExtraData(index, pos.x(), pos.y(), pos.z());
     }
     
     @Override
-    public void setExtraData(int i, int x, int y, int z, int value) {
-        if (extraDataSnapshots != null && extraData[i] == extraDataSnapshots[i]) {
-            extraData[i] = extraData[i].copy();
+    public void setExtraData(int index, int x, int y, int z, int value) {
+        if (extraDataSnapshots != null && extraData[index] == extraDataSnapshots[index]) {
+            extraData[index] = extraData[index].copy();
         }
-        extraData[i].set(x, y, z, value);
+        extraData[index].set(x, y, z, value);
     }
     
     @Override
-    public void setExtraData(int i, BaseVector3i pos, int value) {
-        setExtraData(i, pos.x(), pos.y(), pos.z(), value);
+    public void setExtraData(int index, BaseVector3i pos, int value) {
+        setExtraData(index, pos.x(), pos.y(), pos.z(), value);
     }
 
     @Override

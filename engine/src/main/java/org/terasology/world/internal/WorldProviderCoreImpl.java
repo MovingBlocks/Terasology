@@ -281,11 +281,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
     }
     
-    private void notifyExtraDataChanged(int i, Vector3i pos, int newData, int oldData) {
+    private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
         // TODO: Change to match block and biome, if those changes are made.
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
-                listener.onExtraDataChanged(i, pos, newData, oldData);
+                listener.onExtraDataChanged(index, pos, newData, oldData);
             }
         }
     }
@@ -393,25 +393,25 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public int getExtraData(int i, int x, int y, int z) {
+    public int getExtraData(int index, int x, int y, int z) {
         CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPosX(x), ChunkMath.calcChunkPosY(y), ChunkMath.calcChunkPosZ(z));
         if (chunk != null) {
-            return chunk.getExtraData(i, ChunkMath.calcBlockPosX(x), ChunkMath.calcBlockPosY(y), ChunkMath.calcBlockPosZ(z));
+            return chunk.getExtraData(index, ChunkMath.calcBlockPosX(x), ChunkMath.calcBlockPosY(y), ChunkMath.calcBlockPosZ(z));
         }
         return 0;
     }
 
     @Override
-    public int setExtraData(int i, Vector3i worldPos, int value) {
+    public int setExtraData(int index, Vector3i worldPos, int value) {
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
-            int oldValue = chunk.getExtraData(i, blockPos.x, blockPos.y, blockPos.z);
-            chunk.setExtraData(i, blockPos.x, blockPos.y, blockPos.z, value);
+            int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);
+            chunk.setExtraData(index, blockPos.x, blockPos.y, blockPos.z, value);
             if (oldValue != value) {
                 setDirtyChunksNear(worldPos);
-                notifyExtraDataChanged(i, worldPos, value, oldValue);
+                notifyExtraDataChanged(index, worldPos, value, oldValue);
             }
             return oldValue;
         }

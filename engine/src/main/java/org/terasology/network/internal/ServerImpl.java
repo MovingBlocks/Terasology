@@ -297,7 +297,10 @@ public class ServerImpl implements Server {
             }
         }
     }
-
+    
+    /**
+     * Apply the block changes from the message to the local world.
+     */
     private void processBlockChanges(NetData.NetMessage message) {
         for (NetData.BlockChangeMessage blockChange : message.getBlockChangeList()) {
             Block newBlock = blockManager.getBlock((short) blockChange.getNewBlock());
@@ -312,7 +315,10 @@ public class ServerImpl implements Server {
             }
         }
     }
-
+    
+    /**
+     * Apply the biome changes from the message to the local world.
+     */
     private void processBiomeChanges(NetData.NetMessage message) {
         for (NetData.BiomeChangeMessage biomeChange : message.getBiomeChangeList()) {
             logger.debug("Received block change to {}", blockManager.getBlock((short) biomeChange.getNewBiome()));
@@ -328,6 +334,9 @@ public class ServerImpl implements Server {
         }
     }
     
+    /**
+     * Apply the extra-data changes from the message to the local world.
+     */
     private void processExtraDataChanges(NetData.NetMessage message) {
         for (NetData.ExtraDataChangeMessage extraDataChange : message.getExtraDataChangeList()) {
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);

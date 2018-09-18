@@ -240,30 +240,30 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public int getExtraData(int i, Vector3i pos) {
-        return getExtraData(i, pos.x, pos.y, pos.z);
+    public int getExtraData(int index, Vector3i pos) {
+        return getExtraData(index, pos.x, pos.y, pos.z);
     }
 
     @Override
-    public int getExtraData(int i, int blockX, int blockY, int blockZ) {
+    public int getExtraData(int index, int blockX, int blockY, int blockZ) {
         if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
             return 0;
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getExtraData(i, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
+        return chunks[chunkIndex].getExtraData(index, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
     }
 
     @Override
-    public void setExtraData(int i, Vector3i pos, int value) {
-        setExtraData(i, pos.x, pos.y, pos.z, value);
+    public void setExtraData(int index, Vector3i pos, int value) {
+        setExtraData(index, pos.x, pos.y, pos.z, value);
     }
 
     @Override
-    public void setExtraData(int i, int blockX, int blockY, int blockZ, int value) {
+    public void setExtraData(int index, int blockX, int blockY, int blockZ, int value) {
         if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setExtraData(i, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), value);
+            chunks[chunkIndex].setExtraData(index, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), value);
         } else {
             throw new IllegalStateException("Attempted to modify extra data though an unlocked view");
         }

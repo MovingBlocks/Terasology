@@ -178,12 +178,12 @@ public class MapWorldProvider implements WorldProviderCore {
     }
     
     @Override
-    public int setExtraData(int i, Vector3i pos, int value) {
+    public int setExtraData(int index, Vector3i pos, int value) {
         return 0;
     }
     
     @Override
-    public int getExtraData(int i, int x, int y, int z) {
+    public int getExtraData(int index, int x, int y, int z) {
         return 0;
     }
 

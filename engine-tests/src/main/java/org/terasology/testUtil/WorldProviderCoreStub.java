@@ -176,10 +176,10 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
     
     @Override
-    public int setExtraData(int i, Vector3i pos, int value) {
-        extendExtraDataTo(i);
-        Integer prevValue = extraData.get(i).get(pos);
-        extraData.get(i).put(pos, value);
+    public int setExtraData(int index, Vector3i pos, int value) {
+        extendExtraDataTo(index);
+        Integer prevValue = extraData.get(index).get(pos);
+        extraData.get(index).put(pos, value);
         if (prevValue == null) {
             return 0;
         }
@@ -187,9 +187,9 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
     
     @Override
-    public int getExtraData(int i, int x, int y, int z) {
-        extendExtraDataTo(i);
-        Integer prevValue = extraData.get(i).get(new Vector3i(x, y, z));
+    public int getExtraData(int index, int x, int y, int z) {
+        extendExtraDataTo(index);
+        Integer prevValue = extraData.get(index).get(new Vector3i(x, y, z));
         if (prevValue == null) {
             return 0;
         }

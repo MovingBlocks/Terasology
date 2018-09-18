@@ -106,12 +106,12 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
         return core.getTotalLight(pos.x, pos.y, pos.z);
     }
     
-    public int getExtraData(int i, Vector3i pos) {
-        return core.getExtraData(i, pos.x, pos.y, pos.z);
+    public int getExtraData(int index, Vector3i pos) {
+        return core.getExtraData(index, pos.x, pos.y, pos.z);
     }
     
-    public int setExtraData(int i, int x, int y, int z, int value) {
-        return core.setExtraData(i, new Vector3i(x, y, z), value);
+    public int setExtraData(int index, int x, int y, int z, int value) {
+        return core.setExtraData(index, new Vector3i(x, y, z), value);
     }
     
     public int getExtraData(String fieldName, int x, int y, int z) {
