@@ -177,29 +177,20 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     
     @Override
     public int setExtraData(int index, Vector3i pos, int value) {
-        extendExtraDataTo(index);
-        Integer prevValue = extraData.get(index).get(pos);
-        extraData.get(index).put(pos, value);
-        if (prevValue == null) {
-            return 0;
-        }
-        return prevValue;
+        Integer prevValue = getExtraDataLayer(index).put(pos, value);
+        return prevValue == null ? 0 : prevValue;
     }
     
     @Override
     public int getExtraData(int index, int x, int y, int z) {
-        extendExtraDataTo(index);
-        Integer prevValue = extraData.get(index).get(new Vector3i(x, y, z));
-        if (prevValue == null) {
-            return 0;
-        }
-        return prevValue;
+        return getExtraDataLayer(index).getOrDefault(new Vector3i(x, y, z), 0);
     }
     
-    private void extendExtraDataTo(int i) {
-        while (extraData.size() <= i) {
+    private Map<Vector3i, Integer> getExtraDataLayer(int index) {
+        while (extraData.size() <= index) {
             extraData.add(Maps.newHashMap());
         }
+        return extraData.get(index);
     }
 
     @Override
