@@ -36,7 +36,7 @@ public class PrepareWorld implements LoadProcess {
 
     @Override
     public String getMessage() {
-        return "Caching World...";
+        return "${engine:menu#catching-world}";
     }
 
     @Override

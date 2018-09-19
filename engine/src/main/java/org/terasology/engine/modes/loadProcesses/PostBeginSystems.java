@@ -40,7 +40,7 @@ public class PostBeginSystems extends StepBasedLoadProcess {
 
     @Override
     public String getMessage() {
-        return "Post-Initialise Systems";
+        return "${engine:menu#post-initialise-systems}";
     }
 
     @Override

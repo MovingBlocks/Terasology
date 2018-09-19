@@ -417,5 +417,15 @@
     "world-generator": "World Generator",
     "world-pre-generation": "World Pre-generation",
     "world-seed": "Seed",
-    "world-setup": "World Setup"
+    "world-setup": "World Setup",
+    "catching-world": "Catching World...",
+    "awaiting-character-spawn": "Awaiting Character Spawn...",
+    "ensuring-save-game-consistency": "Ensuring save game consistency",
+    "init-record-replay": "Initialising Record and Replay...",
+    "scanning-for-assets": "Scanning for Assets...",
+    "caching-blocks": "Caching Blocks...",
+    "caching-textures": "Caching Textures...",
+    "loading-prefabs": "Loading Prefabs...",
+    "post-initialise-systems": "Post-Initialise Systems",
+    "reticulating-splines": "Reticulating Splines"
 }
