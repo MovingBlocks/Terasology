@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -151,21 +152,12 @@ public class ExtraBlockDataManager {
         Graph graph = new Graph(fields.keySet().toArray(new String[0]));
         fields.forEach((name0, blockSet0) ->
             fields.forEach((name1, blockSet1) -> {
-                if (name0.compareTo(name1) < 0 && isDisjoint(blockSet0, blockSet1)) {
+                if (name0.compareTo(name1) < 0 && Collections.disjoint(blockSet0, blockSet1)) {
                     graph.addEdge(name0, name1);
                 }
             })
         );
         return graph;
-    }
-    
-    private static <T> boolean isDisjoint(Set<T> s0, Set<T> s1) {
-        for (T t : s0) {
-            if (s1.contains(t)) {
-                return false;
-            }
-        }
-        return true;
     }
     
     //This is exponential time, but the problem is known to be NP-hard in general and large cases are unlikely to come up.
@@ -179,15 +171,15 @@ public class ExtraBlockDataManager {
     
     private static ArrayList<ArrayList<String>> findCliqueCover(Graph graph, int bestSize, String tabs) {
         verboseLog(tabs + "findCliqueCover up to " + bestSize + ", " + graph.toString());
-        for (int i = 0; i < graph.verts.length; i++) {
+        for (int i = 0; i < graph.size(); i++) {
             if (i >= bestSize - 1) {
                 verboseLog(tabs + "giving up");
                 return null;
             }
-            String v0 = graph.verts[i];
-            if (!graph.edges.get(v0).isEmpty()) {
+            String v0 = graph.getVert(i);
+            if (!graph.getEdges(v0).isEmpty()) {
                 verboseLog(tabs + "Selected vertex " + v0);
-                String v1 = graph.edges.get(v0).iterator().next();
+                String v1 = graph.getEdges(v0).iterator().next();
                 ArrayList<ArrayList<String>> bestCover0 = findCliqueCover(graph.ntract(v0, v1), bestSize, tabs + "----");
                 int bestSize0 = bestCover0 == null ? bestSize : bestCover0.size();
                 graph.removeEdge(v0, v1);
@@ -203,11 +195,11 @@ public class ExtraBlockDataManager {
                 }
             }
         }
-        verboseLog(tabs + "done, " + graph.verts.length);
+        verboseLog(tabs + "done, " + graph.size());
         ArrayList<ArrayList<String>> bestCover = new ArrayList<>();
-        for (int i = 0; i < graph.verts.length; i++) {
+        for (int i = 0; i < graph.size(); i++) {
             ArrayList<String> singleton = new ArrayList<>();
-            singleton.add(graph.verts[i]);
+            singleton.add(graph.getVert(i));
             bestCover.add(singleton);
         }
         return bestCover;
@@ -243,20 +235,32 @@ public class ExtraBlockDataManager {
      * Used to represent the overlaps between requested extra-data fields.
      */
     private static class Graph {
-        public String[] verts;
-        public Map<String, Set<String>> edges;
+        private String[] verts;
+        private Map<String, Set<String>> edges;
         
-        Graph(String[] verts, Map<String, Set<String>> edges) {
+        private Graph(String[] verts, Map<String, Set<String>> edges) {
             this.verts = verts;
             this.edges = edges;
         }
         
         Graph(String[] verts) {
-            this.verts = verts;
+            this.verts = verts.clone();
             this.edges = new HashMap<>();
             for (String vert : verts) {
                 edges.put(vert, new HashSet());
             }
+        }
+        
+        public int size() {
+            return verts.length;
+        }
+        
+        public String getVert(int i) {
+            return verts[i];
+        }
+        
+        public Set<String> getEdges(String v) {
+            return Collections.unmodifiableSet(edges.get(v));
         }
         
         public Graph addEdge(String s0, String s1) {
