@@ -167,15 +167,10 @@ public final class ChunkMath {
     }
 
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
-        Vector3i minPos = new Vector3i(-extent, -extent, -extent);
-        minPos.add(pos);
-        Vector3i maxPos = new Vector3i(extent, extent, extent);
-        maxPos.add(pos);
+        Vector3i minPos = Vector3i.one().mul(-extent).add(pos);
+        Vector3i maxPos = Vector3i.one().mul(+extent).add(pos);
 
-        Vector3i minChunk = calcChunkPos(minPos);
-        Vector3i maxChunk = calcChunkPos(maxPos);
-
-        return Region3i.createFromMinMax(minChunk, maxChunk);
+        return Region3i.createFromMinMax(calcChunkPos(minPos), calcChunkPos(maxPos));
     }
 
     // TODO: This doesn't belong in this class, move it.

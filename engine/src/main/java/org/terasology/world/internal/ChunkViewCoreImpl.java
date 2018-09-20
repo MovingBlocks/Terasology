@@ -281,9 +281,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         this.chunkFilterSize = new Vector3i(TeraMath.ceilPowerOfTwo(chunkSize.x) - 1, TeraMath.ceilPowerOfTwo(chunkSize.y) - 1, TeraMath.ceilPowerOfTwo(chunkSize.z) - 1);
         this.chunkPower = new Vector3i(TeraMath.sizeOfPower(chunkSize.x), TeraMath.sizeOfPower(chunkSize.y), TeraMath.sizeOfPower(chunkSize.z));
 
-        Vector3i blockMin = new Vector3i();
-        blockMin.sub(offset);
-        blockMin.mul(chunkSize.x, chunkSize.y, chunkSize.z);
+        Vector3i blockMin = Vector3i.zero().sub(offset).mul(chunkSize.x, chunkSize.y, chunkSize.z);
         Vector3i blockSize = chunkRegion.size();
         blockSize.mul(chunkSize.x, chunkSize.y, chunkSize.z);
         this.blockRegion = Region3i.createFromMinAndSize(blockMin, blockSize);

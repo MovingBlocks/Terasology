@@ -46,6 +46,8 @@ import org.terasology.world.block.family.BlockFamily;
 
 import java.util.Map;
 
+import static org.terasology.math.Vector3iOperators.add;
+
 // TODO: Predict placement client-side (and handle confirm/denial)
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockItemSystem extends BaseComponentSystem {
@@ -87,8 +89,7 @@ public class BlockItemSystem extends BaseComponentSystem {
             return;
         }
         Vector3i targetBlock = blockComponent.getPosition();
-        Vector3i placementPos = new Vector3i(targetBlock);
-        placementPos.add(surfaceSide.getVector3i());
+        Vector3i placementPos = add(targetBlock, surfaceSide.getVector3i());
 
         Block block = type.getBlockForPlacement(placementPos, surfaceSide, secondaryDirection);
 

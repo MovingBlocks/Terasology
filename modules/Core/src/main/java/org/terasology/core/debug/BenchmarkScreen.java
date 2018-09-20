@@ -35,6 +35,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.terasology.math.Vector3iOperators.sub;
+
 /**
  * This screen can be shown with the showScreen command in order to measure the performance of the block placement.
  */
@@ -147,8 +149,7 @@ public class BenchmarkScreen extends BaseInteractionScreen {
         Vector3i chunkAboveCharacter = ChunkMath.calcChunkPos(charecterPos);
         chunkAboveCharacter.addY(1);
         Vector3i chunkRelativePos = ChunkMath.calcBlockPos(charecterPos);
-        Vector3i characterChunkOriginPos = new Vector3i(charecterPos);
-        characterChunkOriginPos.sub(chunkRelativePos);
+        Vector3i characterChunkOriginPos = sub(charecterPos, chunkRelativePos);
 
         Vector3i chunkAboveOrigin = new Vector3i(characterChunkOriginPos);
         chunkAboveOrigin.addY(ChunkConstants.CHUNK_SIZE.getY());

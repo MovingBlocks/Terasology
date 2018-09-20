@@ -23,6 +23,8 @@ import org.terasology.math.geom.Vector3i;
 import java.util.EnumMap;
 import java.util.EnumSet;
 
+import static org.terasology.math.Vector3iOperators.add;
+
 /**
  * The six sides of a block and a slew of related utility.
  * <br><br>
@@ -295,9 +297,7 @@ public enum Side {
     }
 
     public Vector3i getAdjacentPos(Vector3i position) {
-        Vector3i result = new Vector3i(position);
-        result.add(vector3iDir);
-        return result;
+        return add(position, vector3iDir);
     }
 
     public Side getRelativeSide(Direction direction) {
