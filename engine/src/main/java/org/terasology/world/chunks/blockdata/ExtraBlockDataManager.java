@@ -80,6 +80,34 @@ public class ExtraBlockDataManager {
      * Set extra-data fields based on the modules available through the context.
      */
     public ExtraBlockDataManager(Context context) {
+        Map<Integer, Map<String, Set<Block>>> fieldss = getFieldsFromAnnotations(context);
+        
+        // Work out which fields don't overlap and can be aliased together.
+        slots = new HashMap<>();
+        ArrayList<TeraArray.Factory<?>> tempSlotTypes = new ArrayList<>();
+        fieldss.forEach((size, fields) -> {
+            Graph disjointnessGraph = getDisjointnessGraph(fields);
+            ArrayList<ArrayList<String>> cliques = findCliqueCover(disjointnessGraph);
+            for (ArrayList<String> clique : cliques) {
+                for (String label : clique) {
+                    slots.put(label, tempSlotTypes.size());
+                }
+                tempSlotTypes.add(TERA_ARRAY_FACTORIES.get(size));
+            }
+        });
+        slotFactories = tempSlotTypes.toArray(new TeraArray.Factory<?>[0]);
+        
+        String loggingOutput = "Extra data slots registered:";
+        boolean first = true;
+        for (Map.Entry<String, Integer> entry : slots.entrySet()) {
+            loggingOutput += (first ? " " : ", ") + entry.getKey() + " -> " + entry.getValue();
+            first = false;
+        }
+        logger.info(loggingOutput);
+    }
+    
+    // Find requests for extensions and which blocks they apply to.
+    private Map<Integer, Map<String, Set<Block>>> getFieldsFromAnnotations(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         Collection<Block> blocks = context.get(BlockManager.class).listRegisteredBlocks();
         
@@ -115,27 +143,7 @@ public class ExtraBlockDataManager {
                 }
             }
         }
-        
-        slots = new HashMap<>();
-        ArrayList<TeraArray.Factory<?>> tempSlotTypes = new ArrayList<>();
-        fieldss.forEach((size, fields) -> {
-            Graph disjointnessGraph = getDisjointnessGraph(fields);
-            ArrayList<ArrayList<String>> cliques = findCliqueCover(disjointnessGraph);
-            for (ArrayList<String> clique : cliques) {
-                for (String label : clique) {
-                    slots.put(label, tempSlotTypes.size());
-                }
-                tempSlotTypes.add(TERA_ARRAY_FACTORIES.get(size));
-            }
-        });
-        slotFactories = tempSlotTypes.toArray(new TeraArray.Factory<?>[0]);
-        String loggingOutput = "Extra data slots registered:";
-        boolean first = true;
-        for (Map.Entry<String, Integer> entry : slots.entrySet()) {
-            loggingOutput += (first ? " " : ", ") + entry.getKey() + " -> " + entry.getValue();
-            first = false;
-        }
-        logger.info(loggingOutput);
+        return fieldss;
     }
     
     private static String validRegistrationMethod(Method method, RegisterExtraData annotation) {
