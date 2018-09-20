@@ -106,3 +106,5 @@ whitelist.json
 blacklist.json
 
 # Ignore weird stuff that might be obsolete
+
+*.iml
