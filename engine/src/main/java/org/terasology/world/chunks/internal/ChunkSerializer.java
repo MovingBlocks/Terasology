@@ -168,10 +168,10 @@ public final class ChunkSerializer {
         for (int y = 0; y < array.getSizeY(); ++y) {
             for (int z = 0; z < array.getSizeZ(); ++z) {
                 for (int x = 0; x < array.getSizeX(); ++x) {
-                    if (index >= data.getRunLengthsCount()) {
-                        break outer;
-                    }
                     if (count == 0) {
+                        if (index >= data.getRunLengthsCount()) {
+                            break outer;
+                        }
                         count = data.getRunLengths(index);
                         value = data.getValues(index);
                         index++;
