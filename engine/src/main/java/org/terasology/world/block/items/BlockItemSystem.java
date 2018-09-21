@@ -86,7 +86,7 @@ public class BlockItemSystem extends BaseComponentSystem {
             event.consume();
             return;
         }
-        Vector3i targetBlock = blockComponent.getPosition();
+        Vector3i targetBlock = new Vector3i(blockComponent.position);
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
 
