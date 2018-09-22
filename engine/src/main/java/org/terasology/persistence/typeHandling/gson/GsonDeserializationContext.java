@@ -15,14 +15,11 @@
  */
 package org.terasology.persistence.typeHandling.gson;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonParseException;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
-
-import java.util.List;
 
 /**
  */
@@ -44,15 +41,4 @@ public class GsonDeserializationContext implements DeserializationContext {
         }
     }
 
-    @Override
-    public <T> List<T> deserializeCollection(PersistedData data, Class<T> type) {
-        if (!data.isArray()) {
-            throw new IllegalStateException("Data is not an array");
-        }
-        List<T> result = Lists.newArrayList();
-        for (PersistedData item : data.getAsArray()) {
-            result.add(deserializeAs(item, type));
-        }
-        return result;
-    }
 }

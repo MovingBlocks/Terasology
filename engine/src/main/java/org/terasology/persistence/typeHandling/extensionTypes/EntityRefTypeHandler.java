@@ -15,10 +15,7 @@
  */
 package org.terasology.persistence.typeHandling.extensionTypes;
 
-import com.google.common.collect.Lists;
 import gnu.trove.iterator.TLongIterator;
-import gnu.trove.list.TLongList;
-import gnu.trove.list.array.TLongArrayList;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.persistence.typeHandling.DeserializationContext;
@@ -27,7 +24,6 @@ import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -54,31 +50,6 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
             return entityManager.getEntity(data.getAsLong());
         }
         return EntityRef.NULL;
-    }
-
-    @Override
-    public PersistedData serializeCollection(Collection<EntityRef> value, SerializationContext context) {
-        TLongList items = new TLongArrayList();
-        for (EntityRef ref : value) {
-            if (!ref.exists()) {
-                items.add(0L);
-            } else {
-                if (ref.isPersistent()) {
-                    items.add((ref).getId());
-                } else {
-                    items.add(0L);
-                }
-            }
-        }
-        return context.create(items.iterator());
-    }
-
-    @Override
-    public List<EntityRef> deserializeCollection(PersistedData data, DeserializationContext context) {
-        PersistedDataArray array = data.getAsArray();
-        List<EntityRef> result = Lists.newArrayListWithCapacity(array.size());
-        addEntitiesFromLongArray(result, array);
-        return result;
     }
 
     private void addEntitiesFromLongArray(List<EntityRef> result, PersistedDataArray array) {

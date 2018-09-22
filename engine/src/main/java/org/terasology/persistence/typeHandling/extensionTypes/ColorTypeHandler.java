@@ -21,14 +21,13 @@ import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.rendering.nui.Color;
 
 /**
  * Serializes {@link Color} instances to an int array <code>[r, g, b, a]</code>.
  * De-serializing also supports hexadecimal strings such as <code>"AAAAAAFF"</code>.
  */
-public class ColorTypeHandler extends SimpleTypeHandler<Color> {
+public class ColorTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Color> {
 
     @Override
     public PersistedData serialize(Color value, SerializationContext context) {

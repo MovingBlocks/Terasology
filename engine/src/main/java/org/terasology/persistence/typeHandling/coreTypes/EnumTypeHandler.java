@@ -15,22 +15,16 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  */
@@ -67,22 +61,4 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
         return null;
     }
 
-    @Override
-    public PersistedData serializeCollection(Collection<T> value, SerializationContext context) {
-        List<String> values = value.stream().map(T::toString).collect(Collectors.toCollection(ArrayList::new));
-        return context.createStrings(values);
-    }
-
-    @Override
-    public List<T> deserializeCollection(PersistedData data, DeserializationContext context) {
-        if (data.isArray()) {
-            PersistedDataArray array = data.getAsArray();
-            List<T> result = Lists.newArrayListWithCapacity(array.size());
-            for (PersistedData item : array) {
-                result.add(deserialize(item, context));
-            }
-            return result;
-        }
-        return Lists.newArrayList();
-    }
 }

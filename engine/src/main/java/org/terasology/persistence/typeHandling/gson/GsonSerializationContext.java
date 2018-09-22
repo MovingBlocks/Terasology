@@ -30,7 +30,6 @@ import org.terasology.persistence.typeHandling.SerializationContext;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -210,15 +209,6 @@ public class GsonSerializationContext implements SerializationContext {
     @Override
     public <T> PersistedData create(T data, Class<? extends T> type) {
         return new GsonPersistedData(context.serialize(data, type));
-    }
-
-    @Override
-    public <T> PersistedData create(Collection<T> data, Class<T> type) {
-        JsonArray array = new JsonArray();
-        for (T item : data) {
-            array.add(context.serialize(item, type));
-        }
-        return new GsonPersistedData(array);
     }
 
     @Override
