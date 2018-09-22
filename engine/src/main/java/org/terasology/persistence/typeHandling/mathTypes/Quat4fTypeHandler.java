@@ -21,11 +21,10 @@ import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 /**
  */
-public class Quat4fTypeHandler extends SimpleTypeHandler<Quat4f> {
+public class Quat4fTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Quat4f> {
 
     @Override
     public PersistedData serialize(Quat4f value, SerializationContext context) {

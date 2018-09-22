@@ -194,16 +194,6 @@ public interface SerializationContext {
     <T> PersistedData create(T data, Class<? extends T> type);
 
     /**
-     * Attempts to serialize the given data using registered an appropriate type handler. Type handlers should take care not to invoke this on the type they
-     * handle or otherwise in a recursive manner.
-     * @param data
-     * @param type
-     * @param <T>
-     * @return The serialized data
-     */
-    <T> PersistedData create(Collection<T> data, Class<T> type);
-
-    /**
      * @return A 'null' PersistedData
      */
     PersistedData createNull();

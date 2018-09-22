@@ -19,14 +19,13 @@ import com.google.common.collect.Maps;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Map;
 
 /**
  */
-public class StringMapTypeHandler<T> extends SimpleTypeHandler<Map<String, T>> {
+public class StringMapTypeHandler<T> implements TypeHandler<Map<String, T>> {
 
     private TypeHandler<T> contentsHandler;
 

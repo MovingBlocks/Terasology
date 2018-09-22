@@ -15,16 +15,10 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Longs;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  */
@@ -46,25 +40,4 @@ public class LongTypeHandler implements TypeHandler<Long> {
         return null;
     }
 
-    @Override
-    public PersistedData serializeCollection(Collection<Long> value, SerializationContext context) {
-        return context.create(Longs.toArray(value));
-    }
-
-    @Override
-    public List<Long> deserializeCollection(PersistedData data, DeserializationContext context) {
-        if (data.isArray()) {
-            PersistedDataArray array = data.getAsArray();
-            List<Long> result = Lists.newArrayListWithCapacity(array.size());
-            for (PersistedData item : array) {
-                if (item.isNumber()) {
-                    result.add(item.getAsLong());
-                } else {
-                    result.add(null);
-                }
-            }
-            return result;
-        }
-        return Lists.newArrayList();
-    }
 }
