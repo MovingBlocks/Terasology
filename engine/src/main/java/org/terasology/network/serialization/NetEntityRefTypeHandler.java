@@ -21,20 +21,21 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
+
+import java.util.Optional;
 
 /**
  * This type handler encodes EntityRef for network transferals. For normal entities, the Network Id of the entity is used.
  * For block entities the block position is used instead (this allows overriding simulated block entities).
  *
  */
-public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
+public class NetEntityRefTypeHandler extends TypeHandler<EntityRef> {
     private NetworkSystemImpl networkSystem;
     private BlockEntityRegistry blockEntityRegistry;
 
@@ -44,33 +45,33 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
     }
 
     @Override
-    public PersistedData serialize(EntityRef value, SerializationContext context) {
+    public PersistedData serializeNonNull(EntityRef value, PersistedDataSerializer serializer) {
         BlockComponent blockComponent = value.getComponent(BlockComponent.class);
         if (blockComponent != null) {
             Vector3i pos = blockComponent.getPosition();
-            return context.create(pos.x, pos.y, pos.z);
+            return serializer.serialize(pos.x, pos.y, pos.z);
         }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {
-            return context.create(netComponent.getNetworkId());
+            return serializer.serialize(netComponent.getNetworkId());
         }
-        return context.createNull();
+        return serializer.serializeNull();
     }
 
     @Override
-    public EntityRef deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<EntityRef> deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray array = data.getAsArray();
             if (array.isNumberArray() && array.size() == 3) {
                 TIntList items = data.getAsArray().getAsIntegerArray();
                 Vector3i pos = new Vector3i(items.get(0), items.get(1), items.get(2));
-                return blockEntityRegistry.getBlockEntityAt(pos);
+                return Optional.ofNullable(blockEntityRegistry.getBlockEntityAt(pos));
             }
         }
         if (data.isNumber()) {
-            return networkSystem.getEntity(data.getAsInteger());
+            return Optional.ofNullable(networkSystem.getEntity(data.getAsInteger()));
         }
-        return EntityRef.NULL;
+        return Optional.ofNullable(EntityRef.NULL);
     }
 
 }

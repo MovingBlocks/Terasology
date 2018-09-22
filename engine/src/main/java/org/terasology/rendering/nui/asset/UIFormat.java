@@ -34,12 +34,10 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.math.Border;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.gson.GsonTypeSerializationLibraryAdapterFactory;
-import org.terasology.persistence.typeHandling.mathTypes.BorderTypeHandler;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
@@ -98,7 +96,6 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         TranslationSystem translationSystem = CoreRegistry.get(TranslationSystem.class);
         TypeSerializationLibrary library = new TypeSerializationLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
         library.addTypeHandler(UISkin.class, new AssetTypeHandler<>(UISkin.class));
-        library.addTypeHandler(Border.class, new BorderTypeHandler());
 
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new GsonTypeSerializationLibraryAdapterFactory(library))

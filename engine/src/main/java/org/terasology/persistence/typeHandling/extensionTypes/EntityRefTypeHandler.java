@@ -18,17 +18,17 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 import gnu.trove.iterator.TLongIterator;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  */
-public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
+public class EntityRefTypeHandler extends TypeHandler<EntityRef> {
 
     private EngineEntityManager entityManager;
 
@@ -37,19 +37,19 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     }
 
     @Override
-    public PersistedData serialize(EntityRef value, SerializationContext context) {
+    public PersistedData serializeNonNull(EntityRef value, PersistedDataSerializer serializer) {
         if (value.exists() && value.isPersistent()) {
-            return context.create(value.getId());
+            return serializer.serialize(value.getId());
         }
-        return context.createNull();
+        return serializer.serializeNull();
     }
 
     @Override
-    public EntityRef deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<EntityRef> deserialize(PersistedData data) {
         if (data.isNumber()) {
-            return entityManager.getEntity(data.getAsLong());
+            return Optional.ofNullable(entityManager.getEntity(data.getAsLong()));
         }
-        return EntityRef.NULL;
+        return Optional.ofNullable(EntityRef.NULL);
     }
 
     private void addEntitiesFromLongArray(List<EntityRef> result, PersistedDataArray array) {

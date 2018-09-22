@@ -15,48 +15,51 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
+import com.google.common.collect.Maps;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.coreTypes.MappedContainerTypeHandler;
-import org.terasology.reflection.MappedContainer;
+import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class MappedContainerTypeHandlerFactoryTest {
+public class ObjectFieldMapTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
 
-    private final ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-    private final CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-    private final MappedContainerTypeHandlerFactory typeHandlerFactory = new MappedContainerTypeHandlerFactory(
-            reflectFactory, copyStrategyLibrary
-    );
+    private final ConstructorLibrary constructorLibrary = new ConstructorLibrary(Maps.newHashMap());
+    private final ObjectFieldMapTypeHandlerFactory typeHandlerFactory = new ObjectFieldMapTypeHandlerFactory(
+            constructorLibrary);
 
-    @MappedContainer
-    public static class AMappedContainer {
-        public int someInt;
-        public String someString;
+    private static class SomeClass<T> {
+        private T t;
+        private List<T> list;
     }
 
     @Test
-    public void testMappedContainer() {
-        Optional<TypeHandler<AMappedContainer>> typeHandler =
-                typeHandlerFactory.create(TypeInfo.of(AMappedContainer.class), typeSerializationLibrary);
-
+    public void testObject() {
+        Optional<TypeHandler<SomeClass<Integer>>> typeHandler =
+                typeHandlerFactory.create(new TypeInfo<SomeClass<Integer>>() {}, typeSerializationLibrary);
 
         assertTrue(typeHandler.isPresent());
-        assertTrue(typeHandler.get() instanceof MappedContainerTypeHandler);
+        assertTrue(typeHandler.get() instanceof ObjectFieldMapTypeHandler);
 
-        // Verify that the Integer and String TypeHandlers were loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.TYPE).getType()));
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(String.class).getType()));
+        // Verify that the Integer and List<Integer> TypeHandlers were loaded from the TypeSerializationLibrary
+        verify(typeSerializationLibrary).getTypeHandler(
+                ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType())
+        );
+
+        verify(typeSerializationLibrary).getTypeHandler(
+                ArgumentMatchers.eq(new TypeInfo<List<Integer>>() {}.getType())
+        );
     }
 }

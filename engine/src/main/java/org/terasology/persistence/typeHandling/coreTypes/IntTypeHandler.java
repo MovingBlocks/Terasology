@@ -15,29 +15,27 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
+
+import java.util.Optional;
 
 /**
  */
-public class IntTypeHandler implements TypeHandler<Integer> {
+public class IntTypeHandler extends TypeHandler<Integer> {
 
     @Override
-    public PersistedData serialize(Integer value, SerializationContext context) {
-        if (value != null) {
-            return context.create(value);
-        }
-        return context.createNull();
+    public PersistedData serializeNonNull(Integer value, PersistedDataSerializer serializer) {
+        return serializer.serialize(value);
     }
 
     @Override
-    public Integer deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<Integer> deserialize(PersistedData data) {
         if (data.isNumber()) {
-            return data.getAsInteger();
+            return Optional.of(data.getAsInteger());
         }
-        return null;
+        return Optional.empty();
     }
 
 }

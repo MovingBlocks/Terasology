@@ -16,16 +16,16 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Lists;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
-public class CollectionTypeHandler<E> implements TypeHandler<Collection<E>> {
+public class CollectionTypeHandler<E> extends TypeHandler<Collection<E>> {
     private TypeHandler<E> elementTypeHandler;
     private ObjectConstructor<? extends Collection<E>> constructor;
 
@@ -35,24 +35,29 @@ public class CollectionTypeHandler<E> implements TypeHandler<Collection<E>> {
     }
 
     @Override
-    public PersistedData serialize(Collection<E> value, SerializationContext context) {
+    public PersistedData serializeNonNull(Collection<E> value, PersistedDataSerializer serializer) {
         List<PersistedData> items = Lists.newArrayList();
 
         for (E element : value) {
-            items.add(elementTypeHandler.serialize(element, context));
+            items.add(elementTypeHandler.serialize(element, serializer));
         }
 
-        return context.create(items);
+        return serializer.serialize(items);
     }
 
     @Override
-    public Collection<E> deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<Collection<E>> deserialize(PersistedData data) {
+        if (!data.isArray()) {
+            return Optional.empty();
+        }
+
         Collection<E> collection = constructor.construct();
 
         for (PersistedData item : data.getAsArray()) {
-            collection.add(elementTypeHandler.deserialize(item, context));
+            Optional<E> element = elementTypeHandler.deserialize(item);
+            element.ifPresent(collection::add);
         }
 
-        return collection;
+        return Optional.ofNullable(collection);
     }
 }

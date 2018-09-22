@@ -20,13 +20,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TLongIterator;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -34,28 +33,22 @@ import java.util.Map;
 
 /**
  */
-public class GsonSerializationContext implements SerializationContext {
+public class GsonPersistedDataSerializer implements PersistedDataSerializer {
 
     private static final PersistedData NULL_INSTANCE = new GsonPersistedData(JsonNull.INSTANCE);
 
-    private JsonSerializationContext context;
-
-    public GsonSerializationContext(JsonSerializationContext context) {
-        this.context = context;
-    }
-
     @Override
-    public PersistedData create(String value) {
+    public PersistedData serialize(String value) {
         return new GsonPersistedData(new JsonPrimitive(value));
     }
 
     @Override
-    public PersistedData create(String... values) {
-        return createStrings(Arrays.asList(values));
+    public PersistedData serialize(String... values) {
+        return serializeStrings(Arrays.asList(values));
     }
 
     @Override
-    public PersistedData createStrings(Iterable<String> value) {
+    public PersistedData serializeStrings(Iterable<String> value) {
         JsonArray array = new JsonArray();
         for (String val : value) {
             array.add(new JsonPrimitive(val));
@@ -64,12 +57,12 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(float value) {
+    public PersistedData serialize(float value) {
         return new GsonPersistedData(new JsonPrimitive(value));
     }
 
     @Override
-    public PersistedData create(float... values) {
+    public PersistedData serialize(float... values) {
         JsonArray array = new JsonArray();
         for (float val : values) {
             array.add(new JsonPrimitive(val));
@@ -78,7 +71,7 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(TFloatIterator value) {
+    public PersistedData serialize(TFloatIterator value) {
         JsonArray array = new JsonArray();
         while (value.hasNext()) {
             array.add(new JsonPrimitive(value.next()));
@@ -87,12 +80,12 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(int value) {
+    public PersistedData serialize(int value) {
         return new GsonPersistedData(new JsonPrimitive(value));
     }
 
     @Override
-    public PersistedData create(int... values) {
+    public PersistedData serialize(int... values) {
         JsonArray array = new JsonArray();
         for (int val : values) {
             array.add(new JsonPrimitive(val));
@@ -101,7 +94,7 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(TIntIterator value) {
+    public PersistedData serialize(TIntIterator value) {
         JsonArray array = new JsonArray();
         while (value.hasNext()) {
             array.add(new JsonPrimitive(value.next()));
@@ -110,12 +103,12 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(long value) {
+    public PersistedData serialize(long value) {
         return new GsonPersistedData(new JsonPrimitive(value));
     }
 
     @Override
-    public PersistedData create(long... values) {
+    public PersistedData serialize(long... values) {
         JsonArray array = new JsonArray();
         for (long val : values) {
             array.add(new JsonPrimitive(val));
@@ -124,7 +117,7 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(TLongIterator value) {
+    public PersistedData serialize(TLongIterator value) {
         JsonArray array = new JsonArray();
         while (value.hasNext()) {
             array.add(new JsonPrimitive(value.next()));
@@ -133,12 +126,12 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(boolean value) {
+    public PersistedData serialize(boolean value) {
         return new GsonPersistedData(new JsonPrimitive(value));
     }
 
     @Override
-    public PersistedData create(boolean... values) {
+    public PersistedData serialize(boolean... values) {
         JsonArray array = new JsonArray();
         for (boolean val : values) {
             array.add(new JsonPrimitive(val));
@@ -147,12 +140,12 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(double value) {
+    public PersistedData serialize(double value) {
         return new GsonPersistedData(new JsonPrimitive(value));
     }
 
     @Override
-    public PersistedData create(double... values) {
+    public PersistedData serialize(double... values) {
         JsonArray array = new JsonArray();
         for (double val : values) {
             array.add(new JsonPrimitive(val));
@@ -161,7 +154,7 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(TDoubleIterator value) {
+    public PersistedData serialize(TDoubleIterator value) {
         JsonArray array = new JsonArray();
         while (value.hasNext()) {
             array.add(new JsonPrimitive(value.next()));
@@ -170,22 +163,22 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(byte[] value) {
+    public PersistedData serialize(byte[] value) {
         return new GsonPersistedData(new JsonPrimitive(BaseEncoding.base64().encode(value)));
     }
 
     @Override
-    public PersistedData create(ByteBuffer value) {
-        return create(value.array());
+    public PersistedData serialize(ByteBuffer value) {
+        return serialize(value.array());
     }
 
     @Override
-    public PersistedData create(PersistedData... data) {
-        return create(Arrays.asList(data));
+    public PersistedData serialize(PersistedData... data) {
+        return serialize(Arrays.asList(data));
     }
 
     @Override
-    public PersistedData create(Iterable<PersistedData> data) {
+    public PersistedData serialize(Iterable<PersistedData> data) {
         JsonArray result = new JsonArray();
         for (PersistedData val : data) {
             if (val != null) {
@@ -198,7 +191,7 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public PersistedData create(Map<String, PersistedData> data) {
+    public PersistedData serialize(Map<String, PersistedData> data) {
         JsonObject object = new JsonObject();
         for (Map.Entry<String, PersistedData> entry : data.entrySet()) {
             object.add(entry.getKey(), ((GsonPersistedData) entry.getValue()).getElement());
@@ -207,12 +200,7 @@ public class GsonSerializationContext implements SerializationContext {
     }
 
     @Override
-    public <T> PersistedData create(T data, Class<? extends T> type) {
-        return new GsonPersistedData(context.serialize(data, type));
-    }
-
-    @Override
-    public PersistedData createNull() {
+    public PersistedData serializeNull() {
         return NULL_INSTANCE;
     }
 }

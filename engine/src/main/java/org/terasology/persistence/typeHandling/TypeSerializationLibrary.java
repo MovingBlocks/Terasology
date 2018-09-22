@@ -20,15 +20,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.StreamingSound;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.math.IntegerRange;
-import org.terasology.math.Region3i;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
@@ -44,40 +38,34 @@ import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.LongTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.factories.ArrayTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.EnumTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.coreTypes.factories.MappedContainerTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.StringMapTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Rect2fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Rect2iTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Region3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.asset.UIElement;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -112,7 +100,9 @@ public class TypeSerializationLibrary {
         this.reflectFactory = factory;
         this.copyStrategies = copyStrategies;
 
-        constructorLibrary = new ConstructorLibrary(instanceCreators, reflectFactory);
+        constructorLibrary = new ConstructorLibrary(instanceCreators);
+
+        addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
 
         addTypeHandler(Boolean.class, new BooleanTypeHandler());
         addTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
@@ -128,12 +118,13 @@ public class TypeSerializationLibrary {
         addTypeHandler(Long.TYPE, new LongTypeHandler());
         addTypeHandler(String.class, new StringTypeHandler());
         addTypeHandler(Number.class, new NumberTypeHandler());
+
+        addTypeHandlerFactory(new ArrayTypeHandlerFactory());
         addTypeHandler(byte[].class, new ByteArrayTypeHandler());
 
         addTypeHandlerFactory(new EnumTypeHandlerFactory());
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new StringMapTypeHandlerFactory());
-        addTypeHandlerFactory(new MappedContainerTypeHandlerFactory(reflectFactory, this.copyStrategies));
     }
 
     /**
@@ -154,16 +145,10 @@ public class TypeSerializationLibrary {
 
         serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
         serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
-        // TODO: Add AssetTypeHandlerFactory
-        serializationLibrary.addTypeHandler(Texture.class, new AssetTypeHandler<>(Texture.class));
-        serializationLibrary.addTypeHandler(UIElement.class, new AssetTypeHandler<>(UIElement.class));
-        serializationLibrary.addTypeHandler(Mesh.class, new AssetTypeHandler<>(Mesh.class));
-        serializationLibrary.addTypeHandler(StaticSound.class, new AssetTypeHandler<>(StaticSound.class));
-        serializationLibrary.addTypeHandler(StreamingSound.class, new AssetTypeHandler<>(StreamingSound.class));
-        serializationLibrary.addTypeHandler(Material.class, new AssetTypeHandler<>(Material.class));
+
+        serializationLibrary.addTypeHandlerFactory(new AssetTypeHandlerFactory());
+
         serializationLibrary.addTypeHandler(Name.class, new NameTypeHandler());
-        serializationLibrary.addTypeHandler(SkeletalMesh.class, new AssetTypeHandler<>(SkeletalMesh.class));
-        serializationLibrary.addTypeHandler(MeshAnimation.class, new AssetTypeHandler<>(MeshAnimation.class));
         serializationLibrary.addTypeHandler(TextureRegion.class, new TextureRegionTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new TextureRegionAssetTypeHandlerFactory());
@@ -173,11 +158,9 @@ public class TypeSerializationLibrary {
         serializationLibrary.addTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         serializationLibrary.addTypeHandler(Vector3i.class, new Vector3iTypeHandler());
         serializationLibrary.addTypeHandler(Vector2i.class, new Vector2iTypeHandler());
-        serializationLibrary.addTypeHandler(Rect2i.class, new Rect2iTypeHandler());
-        serializationLibrary.addTypeHandler(Rect2f.class, new Rect2fTypeHandler());
-        serializationLibrary.addTypeHandler(Region3i.class, new Region3iTypeHandler());
+        serializationLibrary.addTypeHandlerFactory(new Rect2iTypeHandlerFactory());
+        serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());
         serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
-        serializationLibrary.addTypeHandler(BehaviorTree.class, new AssetTypeHandler<>(BehaviorTree.class));
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
 
         return serializationLibrary;

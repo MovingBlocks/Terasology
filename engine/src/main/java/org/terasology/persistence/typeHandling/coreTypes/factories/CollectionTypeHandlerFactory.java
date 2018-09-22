@@ -21,6 +21,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
@@ -50,14 +51,18 @@ public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        Type elementType = ReflectionUtil.getTypeParameter(typeInfo.getType(), 0);
+        Type elementType = ReflectionUtil.getTypeParameterForSuper(typeInfo.getType(), Collection.class, 0);
 
         if (elementType == null) {
             LOGGER.error("Collection is not parameterized and cannot be serialized");
             return Optional.empty();
         }
 
-        TypeHandler<?> elementTypeHandler = typeSerializationLibrary.getTypeHandler(elementType);
+        TypeHandler<?> elementTypeHandler = new RuntimeDelegatingTypeHandler(
+                typeSerializationLibrary.getTypeHandler(elementType),
+                TypeInfo.of(elementType),
+                typeSerializationLibrary
+        );
 
         ObjectConstructor<T> collectionConstructor = constructorLibrary.get(typeInfo);
 

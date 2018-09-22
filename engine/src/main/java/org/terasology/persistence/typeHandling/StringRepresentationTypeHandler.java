@@ -15,30 +15,28 @@
  */
 package org.terasology.persistence.typeHandling;
 
+import java.util.Optional;
+
 /**
  */
-public abstract class StringRepresentationTypeHandler<T> implements TypeHandler<T> {
+public abstract class StringRepresentationTypeHandler<T> extends TypeHandler<T> {
 
     public abstract String getAsString(T item);
 
     public abstract T getFromString(String representation);
 
     @Override
-    public PersistedData serialize(T value, SerializationContext context) {
+    public PersistedData serializeNonNull(T value, PersistedDataSerializer serializer) {
         String stringValue = getAsString(value);
-        if (stringValue == null) {
-            return context.createNull();
-        } else {
-            return context.create(stringValue);
-        }
+        return serializer.serialize(stringValue);
     }
 
     @Override
-    public T deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<T> deserialize(PersistedData data) {
         if (data.isString()) {
-            return getFromString(data.getAsString());
+            return Optional.ofNullable(getFromString(data.getAsString()));
         }
-        return null;
+        return Optional.empty();
     }
 
 }

@@ -23,6 +23,7 @@ import org.mockito.stubbing.Answer;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.util.Collection;
@@ -31,57 +32,51 @@ import java.util.Collections;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-public class CollectionTypeHandlerTest {
+public class ArrayTypeHandlerTest {
+    private static final int ARRAY_SIZE = 500;
+
     @Test
     public void testSerialize() {
         IntTypeHandler elementTypeHandler = mock(IntTypeHandler.class);
 
-        ObjectConstructor<Collection<Integer>> constructor = Queues::newArrayDeque;
-
-        CollectionTypeHandler<Integer> typeHandler = new CollectionTypeHandler<>(
+        ArrayTypeHandler<Integer> typeHandler = new ArrayTypeHandler<>(
                 elementTypeHandler,
-                constructor
+                TypeInfo.of(Integer.class)
         );
 
-        Collection<Integer> collection = constructor.construct();
-        collection.addAll(Collections.nCopies(500, -1));
+        Integer[] array = new Integer[ARRAY_SIZE];
+        final int[] c = {0};
+        Collections.nCopies(array.length, -1).forEach(i -> array[c[0]++] = i);
 
         PersistedDataSerializer context = mock(PersistedDataSerializer.class);
 
-        typeHandler.serialize(collection, context);
+        typeHandler.serialize(array, context);
 
-        verify(elementTypeHandler, times(collection.size())).serialize(any(), any());
+        verify(elementTypeHandler, times(array.length)).serialize(any(), any());
 
-        verify(context).serialize(argThat(new ArgumentMatcher<Iterable<PersistedData>>() {
-            @Override
-            public boolean matches(Iterable<PersistedData> argument) {
-                return argument instanceof Collection && ((Collection) argument).size() == collection.size();
-            }
-        }));
+        verify(context).serialize(argThat((ArgumentMatcher<Iterable<PersistedData>>) argument ->
+                argument instanceof Collection && ((Collection) argument).size() == array.length));
     }
 
     @Test
     public void testDeserialize() {
         IntTypeHandler elementTypeHandler = mock(IntTypeHandler.class);
 
-        ObjectConstructor<Collection<Integer>> constructor = mock(ObjectConstructor.class);
-        when(constructor.construct()).then((Answer<Collection<Integer>>) invocation -> Queues.newArrayDeque());
-
-        CollectionTypeHandler<Integer> typeHandler = new CollectionTypeHandler<>(
+        ArrayTypeHandler<Integer> typeHandler = new ArrayTypeHandler<>(
                 elementTypeHandler,
-                constructor
+                TypeInfo.of(Integer.class)
         );
 
         JsonArray jsonArray = new JsonArray();
 
-        for (Integer i : Collections.nCopies(500, -1)) {
+        for (Integer i : Collections.nCopies(ARRAY_SIZE, -1)) {
             jsonArray.add(i);
         }
 
         typeHandler.deserialize(new GsonPersistedDataArray(jsonArray));
-
-        verify(constructor).construct();
 
         verify(elementTypeHandler, times(jsonArray.size())).deserialize(any());
     }

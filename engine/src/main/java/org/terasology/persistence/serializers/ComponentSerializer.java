@@ -28,13 +28,11 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.module.Module;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufDeserializationContext;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufSerializationContext;
+import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.metadata.FieldMetadata;
 
@@ -58,8 +56,7 @@ public class ComponentSerializer {
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
     private boolean usingFieldIds;
     private TypeSerializationLibrary typeSerializationLibrary;
-    private ProtobufSerializationContext serializationContext;
-    private ProtobufDeserializationContext deserializationContext;
+    private ProtobufPersistedDataSerializer serializationContext;
 
     /**
      * Creates the component serializer.
@@ -69,8 +66,7 @@ public class ComponentSerializer {
     public ComponentSerializer(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.componentLibrary = componentLibrary;
         this.typeSerializationLibrary = typeSerializationLibrary;
-        this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
-        this.deserializationContext = new ProtobufDeserializationContext(typeSerializationLibrary);
+        this.serializationContext = new ProtobufPersistedDataSerializer();
     }
 
     public void setUsingFieldIds(boolean usingFieldIds) {
@@ -184,7 +180,6 @@ public class ComponentSerializer {
     private <T extends Component> Component deserializeOnto(Component targetComponent, EntityData.Component componentData,
                                                             ComponentMetadata<T> componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
-        DeserializationContext context = new ProtobufDeserializationContext(typeSerializationLibrary);
         Map<FieldMetadata<?, ?>, PersistedData> dataMap = Maps.newHashMapWithExpectedSize(componentData.getFieldCount());
         for (EntityData.NameValue field : componentData.getFieldList()) {
             FieldMetadata<?, ?> fieldInfo = null;
@@ -199,7 +194,7 @@ public class ComponentSerializer {
                 logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getUri());
             }
         }
-        serializer.deserializeOnto(targetComponent, dataMap, context, fieldCheck);
+        serializer.deserializeOnto(targetComponent, dataMap, fieldCheck);
         return targetComponent;
     }
 

@@ -15,29 +15,27 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
+
+import java.util.Optional;
 
 /**
  */
-public class FloatTypeHandler implements TypeHandler<Float> {
+public class FloatTypeHandler extends TypeHandler<Float> {
 
     @Override
-    public PersistedData serialize(Float value, SerializationContext context) {
-        if (value != null) {
-            return context.create(value);
-        }
-        return context.createNull();
+    public PersistedData serializeNonNull(Float value, PersistedDataSerializer serializer) {
+        return serializer.serialize(value);
     }
 
     @Override
-    public Float deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<Float> deserialize(PersistedData data) {
         if (data.isNumber()) {
-            return data.getAsFloat();
+            return Optional.of(data.getAsFloat());
         }
-        return null;
+        return Optional.empty();
     }
 
 }

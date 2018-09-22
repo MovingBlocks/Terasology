@@ -239,28 +239,209 @@ public final class ReflectionUtil {
     }
 
     private static <T> Type getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
-        Class targetClass = getClassOfType(target);
-        if (superClass.equals(getClassOfType(targetClass.getGenericSuperclass()))) {
-            Type superType = targetClass.getGenericSuperclass();
-            if (superType instanceof ParameterizedType) {
-                if (((ParameterizedType) superType).getRawType().equals(superClass)) {
-                    return ((ParameterizedType) superType).getActualTypeArguments()[index];
-                }
+        for (Class targetClass = getClassOfType(target);
+             !Object.class.equals(targetClass);
+             target = resolveType(target, targetClass.getGenericSuperclass()),
+                     targetClass = getClassOfType(target)) {
+            if (superClass.equals(targetClass)) {
+                return getTypeParameter(target, index);
             }
         }
-        return getTypeParameterForSuperClass(targetClass.getGenericSuperclass(), superClass, index);
+
+        return null;
     }
 
     private static <T> Type getTypeParameterForSuperInterface(Type target, Class<T> superClass, int index) {
         Class targetClass = getClassOfType(target);
-        for (Type superType : targetClass.getGenericInterfaces()) {
-            if (superType instanceof ParameterizedType) {
-                if (((ParameterizedType) superType).getRawType().equals(superClass)) {
-                    return ((ParameterizedType) superType).getActualTypeArguments()[index];
-                }
+
+        if (Object.class.equals(targetClass)) {
+            return null;
+        }
+
+        if (targetClass.equals(superClass)) {
+            return getTypeParameter(target, index);
+        }
+
+        Type genericSuperclass = resolveType(target, targetClass.getGenericSuperclass());
+
+        if (!Object.class.equals(genericSuperclass) && genericSuperclass != null) {
+            return getTypeParameterForSuperInterface(genericSuperclass, superClass, index);
+        }
+
+        for (Type genericInterface : targetClass.getGenericInterfaces()) {
+            genericInterface = resolveType(target, genericInterface);
+
+            Type typeParameter = getTypeParameterForSuperInterface(genericInterface, superClass, index);
+
+            if (typeParameter != null) {
+                return typeParameter;
             }
         }
-        return getTypeParameterForSuperInterface(targetClass.getGenericSuperclass(), superClass, index);
+
+        return null;
+    }
+
+    /**
+     * Resolves all {@link TypeVariable}s in {@code type} to concrete types as per the type
+     * parameter definitions in {@code contextType}. All {@link TypeVariable}s in {@code type}
+     * should have been declared in {@code contextType} or one of its supertypes, otherwise an error
+     * will be thrown.
+     *
+     * @param contextType The {@link Type} which contains all type parameter definitions used in {@code type}.
+     * @param type The {@link Type} whose {@link TypeVariable}s are to be resolved.
+     * @return A copy of {@code type} with all {@link TypeVariable}s resolved.
+     */
+    public static Type resolveType(Type contextType, Type type) {
+        Class<?> contextClass = getClassOfType(contextType);
+
+        // T field;
+        if (type instanceof TypeVariable<?>) {
+            TypeVariable<?> typeVariable = (TypeVariable<?>) type;
+
+            Type resolvedTypeVariable = resolveTypeVariable(contextType, typeVariable, contextClass);
+
+            if (resolvedTypeVariable == typeVariable) {
+                return typeVariable;
+            }
+
+            if (resolvedTypeVariable == null) {
+                // TypeVariable not specified (i.e. raw type), return Object
+                return Object.class;
+            }
+
+            return resolveType(contextType, resolvedTypeVariable);
+        }
+
+        // List<T> field;
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+
+            Type ownerType = parameterizedType.getOwnerType();
+            Type resolvedOwnerType = resolveType(contextType, ownerType);
+
+            boolean changed = resolvedOwnerType != ownerType;
+
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+
+            Type[] resolvedTypeArguments = resolveTypes(contextType, typeArguments);
+
+            changed |= resolvedTypeArguments != typeArguments;
+
+            if (!changed) {
+                return parameterizedType;
+            }
+
+            final Type rawType = parameterizedType.getRawType();
+
+            return new ParameterizedType() {
+                @Override
+                public Type[] getActualTypeArguments() {
+                    return resolvedTypeArguments;
+                }
+
+                @Override
+                public Type getRawType() {
+                    return rawType;
+                }
+
+                @Override
+                public Type getOwnerType() {
+                    return resolvedOwnerType;
+                }
+            };
+        }
+
+        // T[] field || List<T>[] field;
+        if (type instanceof GenericArrayType) {
+            GenericArrayType arrayType = (GenericArrayType) type;
+
+            Type componentType = arrayType.getGenericComponentType();
+            Type resolvedComponentType = resolveType(contextType, componentType);
+
+            if (resolvedComponentType == componentType) {
+                return type;
+            } else {
+                return new GenericArrayType() {
+                    final Type genericComponentType = resolvedComponentType;
+                    @Override
+                    public Type getGenericComponentType() {
+                        return genericComponentType;
+                    }
+                };
+            }
+        }
+
+        // List<? extends T> field;
+        if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            Type[] lowerBounds = wildcardType.getLowerBounds();
+            Type[] upperBounds = wildcardType.getUpperBounds();
+
+            boolean changed = false;
+
+            // Technically not required as language supports only one bound, but generalizing
+            Type[] resolvedLowerBounds = resolveTypes(contextType, lowerBounds);
+            changed |= resolvedLowerBounds != lowerBounds;
+
+            Type[] resolvedUpperBounds = resolveTypes(contextType, upperBounds);
+            changed |= resolvedUpperBounds != upperBounds;
+
+            if (!changed) {
+                return wildcardType;
+            }
+
+            return new WildcardType() {
+                @Override
+                public Type[] getUpperBounds() {
+                    return resolvedUpperBounds;
+                }
+
+                @Override
+                public Type[] getLowerBounds() {
+                    return resolvedLowerBounds;
+                }
+            };
+        }
+
+        return type;
+    }
+
+    private static Type[] resolveTypes(Type contextType, Type[] types) {
+        boolean changed = false;
+
+        for (int i = 0; i < types.length; i++) {
+            Type resolvedTypeArgument = resolveType(contextType, types[i]);
+
+            if (resolvedTypeArgument != types[i]) {
+                if (!changed) {
+                    types = types.clone();
+                    changed = true;
+                }
+
+                types[i] = resolvedTypeArgument;
+            }
+        }
+
+        return types;
+    }
+
+    private static Type resolveTypeVariable(Type contextType, TypeVariable<?> typeVariable, Class<?> contextClass) {
+        if (!(typeVariable.getGenericDeclaration() instanceof Class)) {
+            // We cannot resolve type variables declared by a method, quit
+            return typeVariable;
+        }
+
+        Class<?> declaringClass = (Class<?>) typeVariable.getGenericDeclaration();
+
+        Preconditions.checkArgument(declaringClass.isAssignableFrom(contextClass),
+                "Type variable was not declared in context class " + contextClass);
+
+        List<TypeVariable<?>> typeParameters =
+                Arrays.asList(declaringClass.getTypeParameters());
+
+        int typeParameterIndex = typeParameters.indexOf(typeVariable);
+
+        return getTypeParameterForSuper(contextType, declaringClass, typeParameterIndex);
     }
 
     public static Object readField(Object object, String fieldName) {

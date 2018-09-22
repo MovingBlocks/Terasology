@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,48 +15,46 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.coreTypes.ArrayTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.utilities.ReflectionUtil;
 
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.Optional;
 
-public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StringMapTypeHandler.class);
 
-    @SuppressWarnings("unchecked")
+/**
+ * Creates type handlers for arrays.
+ */
+public class ArrayTypeHandlerFactory implements TypeHandlerFactory {
     @Override
     public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
-        if (!Map.class.isAssignableFrom(typeInfo.getRawType())) {
+        Type type = typeInfo.getType();
+
+        if (!(type instanceof GenericArrayType || type instanceof Class && ((Class<?>) type).isArray())) {
             return Optional.empty();
         }
 
-        Type keyType = ReflectionUtil.getTypeParameterForSuper(typeInfo.getType(), Map.class, 0);
-        Type valueType = ReflectionUtil.getTypeParameterForSuper(typeInfo.getType(), Map.class, 1);
+        Type elementType = type instanceof GenericArrayType
+                ? ((GenericArrayType) type).getGenericComponentType()
+                : ((Class<?>) type).getComponentType();
 
-        if (!String.class.equals(keyType)) {
-            return Optional.empty();
-        }
+        TypeInfo<?> elementTypeInfo = TypeInfo.of(elementType);
 
-        if (valueType == null) {
-            LOGGER.error("Map is not parameterized and cannot be serialized");
-            return Optional.empty();
-        }
-
-        TypeHandler<T> valueTypeHandler = new RuntimeDelegatingTypeHandler(
-                typeSerializationLibrary.getTypeHandler(valueType),
-                TypeInfo.of(valueType),
+        TypeHandler<?> elementTypeHandler = new RuntimeDelegatingTypeHandler(
+                typeSerializationLibrary.getTypeHandler(elementType),
+                elementTypeInfo,
                 typeSerializationLibrary
         );
 
-        return Optional.of((TypeHandler<T>) new StringMapTypeHandler<>(valueTypeHandler));
+
+        @SuppressWarnings({"unchecked"})
+        TypeHandler<T> typeHandler = new ArrayTypeHandler(elementTypeHandler, elementTypeInfo);
+
+        return Optional.of(typeHandler);
     }
 }

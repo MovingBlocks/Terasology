@@ -15,29 +15,27 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
+
+import java.util.Optional;
 
 /**
  */
-public class DoubleTypeHandler implements TypeHandler<Double> {
+public class DoubleTypeHandler extends TypeHandler<Double> {
 
     @Override
-    public PersistedData serialize(Double value, SerializationContext context) {
-        if (value != null) {
-            return context.create(value);
-        }
-        return context.createNull();
+    public PersistedData serializeNonNull(Double value, PersistedDataSerializer serializer) {
+        return serializer.serialize(value);
     }
 
     @Override
-    public Double deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<Double> deserialize(PersistedData data) {
         if (data.isNumber()) {
-            return data.getAsDouble();
+            return Optional.of(data.getAsDouble());
         }
-        return null;
+        return Optional.empty();
     }
 
 }
