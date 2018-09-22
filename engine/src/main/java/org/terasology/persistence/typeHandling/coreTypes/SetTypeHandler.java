@@ -13,47 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
-import java.util.Map;
+import java.util.Set;
 
 /**
  */
-public class StringMapTypeHandler<T> extends SimpleTypeHandler<Map<String, T>> {
-
+public class SetTypeHandler<T> extends SimpleTypeHandler<Set<T>> {
     private TypeHandler<T> contentsHandler;
 
-    public StringMapTypeHandler(TypeHandler contentsHandler) {
+    public SetTypeHandler(TypeHandler contentsHandler) {
         this.contentsHandler = contentsHandler;
     }
 
-    @Override
-    public PersistedData serialize(Map<String, T> value, SerializationContext context) {
-        Map<String, PersistedData> map = Maps.newLinkedHashMap();
-        for (Map.Entry<String, T> entry : value.entrySet()) {
-            PersistedData item = contentsHandler.serialize(entry.getValue(), context);
-            if (!item.isNull()) {
-                map.put(entry.getKey(), item);
-            }
-        }
-        return context.create(map);
+    public TypeHandler getContentsHandler() {
+        return contentsHandler;
     }
 
     @Override
-    public Map<String, T> deserialize(PersistedData data, DeserializationContext context) {
-        Map<String, T> result = Maps.newLinkedHashMap();
-        if (data.isValueMap()) {
-            for (Map.Entry<String, PersistedData> item : data.getAsValueMap().entrySet()) {
-                result.put(item.getKey(), contentsHandler.deserialize(item.getValue(), context));
-            }
-        }
-        return result;
+    public PersistedData serialize(Set<T> value, SerializationContext context) {
+        return contentsHandler.serializeCollection(value, context);
+    }
+
+    @Override
+    public Set<T> deserialize(PersistedData data, DeserializationContext context) {
+        return Sets.newLinkedHashSet(contentsHandler.deserializeCollection(data, context));
     }
 }

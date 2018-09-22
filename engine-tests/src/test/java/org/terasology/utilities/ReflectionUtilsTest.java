@@ -20,10 +20,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.reflection.copy.CopyStrategy;
 
-import java.lang.reflect.TypeVariable;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  */
@@ -46,7 +43,7 @@ public class ReflectionUtilsTest {
 
     @Test
     public void testGetParameterForUnboundGenericInterface() throws Exception {
-        assertTrue(ReflectionUtil.getTypeParameterForSuper(UnboundInterfaceImplementor.class, CopyStrategy.class, 0) instanceof TypeVariable);
+        assertEquals(null, ReflectionUtil.getTypeParameterForSuper(UnboundInterfaceImplementor.class, CopyStrategy.class, 0));
     }
 
     public static class ParameterisedInterfaceImplementor implements CopyStrategy<Integer> {

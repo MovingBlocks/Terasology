@@ -15,27 +15,38 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandler;
 
-public class ByteArrayTypeHandler extends SimpleTypeHandler<byte[]> {
-	@Override
-	public PersistedData serialize(byte[] value, SerializationContext context) {
-		if (value == null) {
-			return context.createNull();
-		} else {
-			return context.create(value);
-		}
-	}
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
-	@Override
-	public byte[] deserialize(PersistedData data, DeserializationContext context) {
-		if (data.isBytes()) {
-			return data.getAsBytes();
-		} else {
-			return null;
-		}
-	}
+public class QueueTypeHandler<E> extends SimpleTypeHandler<Queue<E>> {
+    private TypeHandler<E> contentsType;
+
+    public QueueTypeHandler(TypeHandler<E> type) {
+        this.contentsType = type;
+    }
+
+    @Override
+    public PersistedData serialize(Queue<E> value, SerializationContext context) {
+        if (value.size() > 0) {
+            return contentsType.serializeCollection(value, context);
+        }
+        return context.createNull();
+    }
+
+    @Override
+    public Queue<E> deserialize(PersistedData data, DeserializationContext context) {
+        List<E> list = contentsType.deserializeCollection(data, context);
+        return new LinkedList<>(list);
+    }
+
 }

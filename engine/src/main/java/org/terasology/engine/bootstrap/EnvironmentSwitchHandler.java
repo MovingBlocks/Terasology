@@ -70,9 +70,9 @@ public final class EnvironmentSwitchHandler {
             if (copyStrategy.getAnnotation(RegisterCopyStrategy.class) == null) {
                 continue;
             }
-            Type targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
-            if (targetType instanceof Class) {
-                registerCopyStrategy(copyStrategyLibrary, (Class<?>) targetType, copyStrategy);
+            Class<?> targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
+            if (targetType != null) {
+                registerCopyStrategy(copyStrategyLibrary, targetType, copyStrategy);
             } else {
                 logger.error("Cannot register CopyStrategy '{}' - unable to determine target type", copyStrategy);
             }
@@ -80,7 +80,7 @@ public final class EnvironmentSwitchHandler {
 
         ReflectFactory reflectFactory = context.get(ReflectFactory.class);
         TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
-        typeSerializationLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        typeSerializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
         context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
 
         // Entity System Library
@@ -186,7 +186,7 @@ public final class EnvironmentSwitchHandler {
                 if (opt.isPresent()) {
                     TypeHandler instance = InjectionHelper.createWithConstructorInjection(handler, context);
                     InjectionHelper.inject(instance, context);
-                    library.addTypeHandler((Class) opt.get(), instance);
+                    library.add((Class) opt.get(), instance);
                 }
             }
         }

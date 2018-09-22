@@ -23,13 +23,14 @@ import org.terasology.engine.module.UriUtil;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Map;
 
 /**
  */
-public class MappedContainerTypeHandler<T> implements TypeHandler<T> {
+public class MappedContainerTypeHandler<T> extends SimpleTypeHandler<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(MappedContainerTypeHandler.class);
 
