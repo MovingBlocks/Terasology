@@ -22,6 +22,7 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -56,4 +57,19 @@ public class StringMapTypeHandlerFactoryTest {
                 typeHandlerFactory.create(listTypeInfo, typeSerializationLibrary);
 
         assertFalse(typeHandler.isPresent());
-    }}
+    }
+
+    @Test
+    public void testNonGenericMap() {
+        class IntMap extends HashMap<String, Integer> {}
+
+        Optional<TypeHandler<IntMap>> typeHandler =
+                typeHandlerFactory.create(TypeInfo.of(IntMap.class), typeSerializationLibrary);
+
+        assertTrue(typeHandler.isPresent());
+        assertTrue(typeHandler.get() instanceof StringMapTypeHandler);
+
+        // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+    }
+}

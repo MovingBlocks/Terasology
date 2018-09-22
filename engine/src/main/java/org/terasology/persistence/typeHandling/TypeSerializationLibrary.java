@@ -46,13 +46,14 @@ import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.EnumTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.coreTypes.factories.MappedContainerTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.StringMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
@@ -114,6 +115,8 @@ public class TypeSerializationLibrary {
 
         constructorLibrary = new ConstructorLibrary(instanceCreators, reflectFactory);
 
+        addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
+
         addTypeHandler(Boolean.class, new BooleanTypeHandler());
         addTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
         addTypeHandler(Byte.class, new ByteTypeHandler());
@@ -133,7 +136,6 @@ public class TypeSerializationLibrary {
         addTypeHandlerFactory(new EnumTypeHandlerFactory());
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new StringMapTypeHandlerFactory());
-        addTypeHandlerFactory(new MappedContainerTypeHandlerFactory(reflectFactory, this.copyStrategies));
     }
 
     /**
@@ -154,16 +156,10 @@ public class TypeSerializationLibrary {
 
         serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
         serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
-        // TODO: Add AssetTypeHandlerFactory
-        serializationLibrary.addTypeHandler(Texture.class, new AssetTypeHandler<>(Texture.class));
-        serializationLibrary.addTypeHandler(UIElement.class, new AssetTypeHandler<>(UIElement.class));
-        serializationLibrary.addTypeHandler(Mesh.class, new AssetTypeHandler<>(Mesh.class));
-        serializationLibrary.addTypeHandler(StaticSound.class, new AssetTypeHandler<>(StaticSound.class));
-        serializationLibrary.addTypeHandler(StreamingSound.class, new AssetTypeHandler<>(StreamingSound.class));
-        serializationLibrary.addTypeHandler(Material.class, new AssetTypeHandler<>(Material.class));
+
+        serializationLibrary.addTypeHandlerFactory(new AssetTypeHandlerFactory());
+
         serializationLibrary.addTypeHandler(Name.class, new NameTypeHandler());
-        serializationLibrary.addTypeHandler(SkeletalMesh.class, new AssetTypeHandler<>(SkeletalMesh.class));
-        serializationLibrary.addTypeHandler(MeshAnimation.class, new AssetTypeHandler<>(MeshAnimation.class));
         serializationLibrary.addTypeHandler(TextureRegion.class, new TextureRegionTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new TextureRegionAssetTypeHandlerFactory());
@@ -177,7 +173,6 @@ public class TypeSerializationLibrary {
         serializationLibrary.addTypeHandler(Rect2f.class, new Rect2fTypeHandler());
         serializationLibrary.addTypeHandler(Region3i.class, new Region3iTypeHandler());
         serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
-        serializationLibrary.addTypeHandler(BehaviorTree.class, new AssetTypeHandler<>(BehaviorTree.class));
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
 
         return serializationLibrary;

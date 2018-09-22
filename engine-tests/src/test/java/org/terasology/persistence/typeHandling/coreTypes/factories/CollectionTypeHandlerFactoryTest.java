@@ -25,6 +25,7 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -72,6 +73,20 @@ public class CollectionTypeHandlerFactoryTest {
 
         Optional<TypeHandler<Queue<Integer>>> typeHandler =
                 typeHandlerFactory.create(listTypeInfo, typeSerializationLibrary);
+
+        assertTrue(typeHandler.isPresent());
+        assertTrue(typeHandler.get() instanceof CollectionTypeHandler);
+
+        // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+    }
+
+    @Test
+    public void testNonGenericCollection() {
+        class IntList extends ArrayList<Integer> {}
+
+        Optional<TypeHandler<IntList>> typeHandler =
+                typeHandlerFactory.create(TypeInfo.of(IntList.class), typeSerializationLibrary);
 
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof CollectionTypeHandler);

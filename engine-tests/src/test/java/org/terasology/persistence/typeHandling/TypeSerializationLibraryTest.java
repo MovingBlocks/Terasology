@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling;
 import org.junit.Test;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.MappedContainerTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
@@ -55,7 +55,7 @@ public class TypeSerializationLibraryTest {
     public void testMappedContainerHandler() {
         TypeHandler<AMappedContainer> handler = typeSerializationLibrary.getTypeHandler(AMappedContainer.class);
 
-        assertTrue(handler instanceof MappedContainerTypeHandler);
+        assertTrue(handler instanceof ObjectFieldMapTypeHandler);
     }
 
     @Test
