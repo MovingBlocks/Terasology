@@ -21,6 +21,8 @@ import org.terasology.math.geom.Vector3i;
 
 import java.nio.file.Path;
 
+import static org.terasology.math.Vector3iOperators.div;
+
 /**
  */
 public class StoragePathProvider {
@@ -115,8 +117,7 @@ public class StoragePathProvider {
     }
 
     public Vector3i getChunkZipPosition(Vector3i chunkPos) {
-        Vector3i result = new Vector3i(chunkPos);
-        result.div(CHUNK_ZIP_DIM);
+        Vector3i result = div(chunkPos, CHUNK_ZIP_DIM);
         if (chunkPos.x < 0) {
             result.x -= 1;
         }

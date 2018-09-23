@@ -38,6 +38,8 @@ import org.terasology.world.block.items.OnBlockItemPlaced;
 
 import java.util.Set;
 
+import static org.terasology.math.Vector3iOperators.add;
+
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(NeighbourBlockFamilyUpdateSystem.class);
@@ -110,8 +112,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
 
     private void processUpdateForBlockLocation(Vector3i blockLocation) {
         for (Side side : Side.getAllSides()) {
-            Vector3i neighborLocation = new Vector3i(blockLocation);
-            neighborLocation.add(side.getVector3i());
+            Vector3i neighborLocation = add(blockLocation, side.getVector3i());
             if (worldProvider.isBlockRelevant(neighborLocation)) {
                 Block neighborBlock = worldProvider.getBlock(neighborLocation);
                 final BlockFamily blockFamily = neighborBlock.getBlockFamily();

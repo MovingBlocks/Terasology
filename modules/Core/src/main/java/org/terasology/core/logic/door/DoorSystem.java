@@ -48,6 +48,8 @@ import org.terasology.world.block.regions.BlockRegionComponent;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.terasology.math.Vector3iOperators.add;
+
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class DoorSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(DoorSystem.class);
@@ -86,8 +88,7 @@ public class DoorSystem extends BaseComponentSystem {
         offset.sub(targetBlockComp.getPosition().toVector3f());
         Side offsetDir = Side.inDirection(offset);
 
-        Vector3i primePos = new Vector3i(targetBlockComp.getPosition());
-        primePos.add(offsetDir.getVector3i());
+        Vector3i primePos = add(targetBlockComp.getPosition(), offsetDir.getVector3i());
         Block primeBlock = worldProvider.getBlock(primePos);
         if (!primeBlock.isReplacementAllowed()) {
             event.consume();
@@ -172,8 +173,7 @@ public class DoorSystem extends BaseComponentSystem {
     }
 
     private boolean canAttachTo(Vector3i doorPos, Side side) {
-        Vector3i adjacentBlockPos = new Vector3i(doorPos);
-        adjacentBlockPos.add(side.getVector3i());
+        Vector3i adjacentBlockPos = add(doorPos, side.getVector3i());
         Block adjacentBlock = worldProvider.getBlock(adjacentBlockPos);
         return adjacentBlock.isAttachmentAllowed();
     }

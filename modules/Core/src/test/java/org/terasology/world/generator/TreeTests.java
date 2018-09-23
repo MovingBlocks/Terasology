@@ -43,6 +43,8 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
+import static org.terasology.math.Vector3iOperators.sub;
+
 /**
  * TODO: more flexibility for estimated extents
  */
@@ -136,7 +138,7 @@ public class TreeTests {
             treeGen.generate(blockManagerLocal, chunk, random, relPos.x, relPos.y, relPos.z);
         }
 
-        Vector3i ext = new Vector3i(max).sub(min);
+        Vector3i ext = sub(max, min);
 //        logger.info(String.format("Min: %12s  Max: %12s  Extent: %s", min, max, ext));
 
         return ext;
