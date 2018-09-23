@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package org.terasology.world;
+package org.terasology.world.chunks.blockdata;
 
-import org.terasology.math.geom.Vector3i;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.block.Block;
+import org.terasology.module.sandbox.API;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Annotation for classes which register extra per-block data fields.
+ * Methods for this purpose must also be annotated with {@link org.terasology.world.chunks.blockdata.RegisterExtraData}.
  */
-public interface WorldChangeListener {
-
-    void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock);
-
-    void onBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome);
-    
-    void onExtraDataChanged(int i, Vector3i pos, int newData, int oldData);
+@API
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface ExtraDataSystem {
 }

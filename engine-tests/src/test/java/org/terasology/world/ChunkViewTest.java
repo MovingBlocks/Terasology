@@ -36,6 +36,7 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
@@ -50,6 +51,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     Block solidBlock;
     private BlockManager blockManager;
     private BiomeManager biomeManager;
+    private ExtraBlockDataManager extraDataManager;
 
     @Before
     public void setup() throws IOException {
@@ -59,6 +61,8 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
 
         biomeManager = Mockito.mock(BiomeManager.class);
+        
+        extraDataManager = new ExtraBlockDataManager();
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");
@@ -149,6 +153,6 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     }
 
     private Chunk createChunk(int x, int y, int z) {
-        return new ChunkImpl(new Vector3i(x, y, z), blockManager, biomeManager);
+        return new ChunkImpl(new Vector3i(x, y, z), blockManager, biomeManager, extraDataManager);
     }
 }
