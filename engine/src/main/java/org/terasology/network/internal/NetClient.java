@@ -348,9 +348,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         try {
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
-                if (relevantChunks.contains(ChunkMath.calcChunkPos(blockComp.getPosition()))) {
+                if (relevantChunks.contains(ChunkMath.calcChunkPos(blockComp.position))) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                            .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
+                            .setTargetBlockPos(NetMessageUtil.convert(blockComp.position))
                             .setEvent(eventSerializer.serialize(event)).build());
                 }
             } else {
@@ -517,7 +517,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             if (blockComponent != null) {
-                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.getPosition()));
+                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.position));
             }
             message.addCreateEntity(createMessage);
         }
