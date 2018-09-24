@@ -15,8 +15,15 @@
  */
 package org.terasology.engine;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.crashreporter.CrashReporter;
@@ -51,14 +58,8 @@ import org.terasology.splash.overlay.RectOverlay;
 import org.terasology.splash.overlay.TextOverlay;
 import org.terasology.splash.overlay.TriggerImageOverlay;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
@@ -101,6 +102,7 @@ public final class Terasology {
     private static final String LOAD_LAST_GAME = "-loadlastgame";
     private static final String NO_CRASH_REPORT = "-noCrashReport";
     private static final String NO_SAVE_GAMES = "-noSaveGames";
+	private static final String PERMISSIVE_SECURITY = "-permissiveSecurity";
     private static final String NO_SOUND = "-noSound";
     private static final String NO_SPLASH = "-noSplash";
     private static final String SERVER_PORT = "-serverPort=";
@@ -251,6 +253,7 @@ public final class Terasology {
                 LOAD_LAST_GAME,
                 NO_CRASH_REPORT,
                 NO_SAVE_GAMES,
+				PERMISSIVE_SECURITY,
                 NO_SOUND,
                 NO_SPLASH,
                 OVERRIDE_DEFAULT_CONFIG + "<path>",
@@ -286,6 +289,8 @@ public final class Terasology {
         System.out.println();
         System.out.println("To disable the splash screen use the " + NO_SPLASH + " launch argument.");
         System.out.println();
+		System.out.println("To disable the permissive security check use the " + PERMISSIVE_SECURITY + " launch argument.");
+		System.out.println();
         System.out.println("To change the port the server is hosted on use the " + SERVER_PORT + " launch argument.");
         System.out.println();
         System.out.println("To override the default generated config (useful for headless server) use the " + OVERRIDE_DEFAULT_CONFIG + " launch argument");
@@ -330,6 +335,8 @@ public final class Terasology {
                 splashEnabled = false;
             } else if (arg.equals(NO_SAVE_GAMES)) {
                 System.setProperty(SystemConfig.SAVED_GAMES_ENABLED_PROPERTY, "false");
+			} else if (arg.equals(PERMISSIVE_SECURITY)) {
+				System.setProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY, "true");
             } else if (arg.equals(NO_CRASH_REPORT)) {
                 crashReportEnabled = false;
             } else if (arg.equals(NO_SOUND)) {
