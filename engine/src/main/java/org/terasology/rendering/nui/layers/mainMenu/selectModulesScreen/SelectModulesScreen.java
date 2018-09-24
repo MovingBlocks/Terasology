@@ -693,9 +693,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
 	private void refreshSelection() {
 		List<Name> selectedModules = getExplicitlySelectedModules();
-		for (ModuleSelectionInfo info : sortedModules) {
-			info.setSelectedVersion(null);
-		}
+		if (sortedModules != null)
+			for (ModuleSelectionInfo info : sortedModules)
+				if (info != null)
+					info.setSelectedVersion(null);
 		setSelectedVersions(resolver.resolve(selectedModules));
 		updateValidToSelect();
 	}
