@@ -85,9 +85,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
 	public void onOpened() {
 		super.onOpened();
 
-		for (ModuleSelectionInfo info : sortedModules) {
-			info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
-		}
+		if (sortedModules != null)
+			for (ModuleSelectionInfo info : sortedModules)
+				if (info != null)
+					info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
 
 		refreshSelection();
 		filterModules();
@@ -626,23 +627,26 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
 	@Override
 	public void onClosed() {
-		// moduleConfig passes the module collection to the Create Game Screen.
-		ModuleConfig moduleConfig = config.getDefaultModSelection();
-		moduleConfig.clear();
-		// Fetch all the selected/activated modules using allSortedModules
-		// instead of fetching only selected/activated modules from filtered collection
-		// of modules using sortedModules
-		allSortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection())
-				.forEach(info -> moduleConfig.addModule(info.getMetadata().getId()));
-		SimpleUri defaultGenerator = config.getWorldGeneration().getDefaultGenerator();
-		ModuleSelectionInfo info = modulesLookup.get(defaultGenerator.getModuleName());
-		if (info != null && !info.isSelected()) {
-			config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
+		if (config != null) {
+			// moduleConfig passes the module collection to the Create Game Screen.
+			ModuleConfig moduleConfig = config.getDefaultModSelection();
+			moduleConfig.clear();
+			// Fetch all the selected/activated modules using allSortedModules
+			// instead of fetching only selected/activated modules from filtered collection
+			// of modules using sortedModules
+			allSortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection())
+					.forEach(info -> moduleConfig.addModule(info.getMetadata().getId()));
+			SimpleUri defaultGenerator = config.getWorldGeneration().getDefaultGenerator();
+			ModuleSelectionInfo info = modulesLookup.get(defaultGenerator.getModuleName());
+			if (info != null && !info.isSelected()) {
+				config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
+			}
 		}
 
 		worldGenManager.refresh();
 
-		config.save();
+		if (config != null)
+			config.save();
 	}
 
 	@Override
