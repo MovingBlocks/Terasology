@@ -439,18 +439,21 @@ public class SelectModulesScreen extends CoreScreenLayer {
 	}
 
 	private void filterModules() {
-		sortedModules.clear();
-		sortedModules.addAll(allSortedModules);
+		if (sortedModules != null) {
+			sortedModules.clear();
+			if (allSortedModules != null)
+				sortedModules.addAll(allSortedModules);
+		}
 
-		if (selectModulesConfig.isUncategorizedSelected()) {
+		if (selectModulesConfig != null && selectModulesConfig.isUncategorizedSelected()) {
 			uncategorizedModuleFilter();
-		} else {
+		} else if (selectModulesConfig != null) {
 			if (selectModulesConfig.isAnyStandardModuleExtensionSelected()) {
 				advancedModuleFilter();
 			}
 		}
 
-		if (selectModulesConfig.isLocalOnlySelected()) {
+		if (selectModulesConfig != null && selectModulesConfig.isLocalOnlySelected()) {
 			localModuleFilter();
 		}
 
@@ -563,10 +566,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
 	private void updateValidToSelect() {
 		List<Name> selectedModules = Lists.newArrayList();
-		selectedModules.addAll(sortedModules.stream().filter(ModuleSelectionInfo::isSelected)
-				                       .map(info -> info.getMetadata().getId()).collect(Collectors.toList()));
+		if (sortedModules != null) selectedModules.addAll(sortedModules.stream().filter(ModuleSelectionInfo::isSelected)
+				                                                  .map(info -> info.getMetadata().getId())
+				                                                  .collect(Collectors.toList()));
 		Name[] selectedModulesArray = selectedModules.toArray(new Name[selectedModules.size()]);
-		sortedModules.stream().filter(info -> !info.isSelected()).forEach(info -> info
+		if (sortedModules != null) sortedModules.stream().filter(info -> !info.isSelected()).forEach(info -> info
 				.setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess()));
 	}
 
@@ -693,11 +697,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
 	private void refreshSelection() {
 		List<Name> selectedModules = getExplicitlySelectedModules();
-		if (sortedModules != null)
-			for (ModuleSelectionInfo info : sortedModules)
-				if (info != null)
-					info.setSelectedVersion(null);
-		setSelectedVersions(resolver.resolve(selectedModules));
+		if (sortedModules != null) for (ModuleSelectionInfo info : sortedModules)
+			if (info != null) info.setSelectedVersion(null);
+		if (resolver != null && selectedModules != null) setSelectedVersions(resolver.resolve(selectedModules));
 		updateValidToSelect();
 	}
 
