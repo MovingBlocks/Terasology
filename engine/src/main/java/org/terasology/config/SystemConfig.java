@@ -23,6 +23,7 @@ import java.util.Locale.Category;
  */
 public class SystemConfig {
     public static final String SAVED_GAMES_ENABLED_PROPERTY = "org.terasology.savedGamesEnabled";
+	public static final String PERMISSIVE_SECURITY_ENABLED_PROPERTY = "org.terasology.permissiveSecurityEnabled";
 
     private long dayNightLengthInMs;
     private int maxThreads;
@@ -31,6 +32,7 @@ public class SystemConfig {
     private boolean debugEnabled;
     private boolean monitoringEnabled;
     private boolean writeSaveGamesEnabled;
+	private boolean permissiveSecurityEnabled;
     private String locale;
 
     public long getDayNightLengthInMs() {
@@ -92,6 +94,18 @@ public class SystemConfig {
     public void setWriteSaveGamesEnabled(boolean writeSaveGamesEnabled) {
         this.writeSaveGamesEnabled = writeSaveGamesEnabled;
     }
+
+	public boolean isPermissiveSecurityEnabled() {
+		String property = System.getProperty(PERMISSIVE_SECURITY_ENABLED_PROPERTY);
+		if (property != null) {
+			return Boolean.parseBoolean(property);
+		}
+		return permissiveSecurityEnabled;
+	}
+
+	public void setPermissiveSecurity(boolean permissiveSecurityEnabled) {
+		this.permissiveSecurityEnabled = permissiveSecurityEnabled;
+	}
 
     public Locale getLocale() {
         if (locale == null) {
