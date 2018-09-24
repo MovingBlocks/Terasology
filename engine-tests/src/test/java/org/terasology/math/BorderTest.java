@@ -55,7 +55,4 @@ public class BorderTest {
         assertFalse(b1.equals(b2));
         assertFalse(b1.equals(o));
     }
-
-
-
 }
