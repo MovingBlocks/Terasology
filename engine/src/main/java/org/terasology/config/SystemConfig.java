@@ -23,6 +23,7 @@ import java.util.Locale.Category;
  */
 public class SystemConfig {
     public static final String SAVED_GAMES_ENABLED_PROPERTY = "org.terasology.savedGamesEnabled";
+    public static final String PERMISSIVE_SECURITY_ENABLED_PEOPERTY = "org.terasology.permissiveSecurityEnabled";
 
     private long dayNightLengthInMs;
     private int maxThreads;
