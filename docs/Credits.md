@@ -238,6 +238,7 @@ Contributors
  [dave2s](https://github.com/dave2s),
  [asiekierka](https://github.com/asiekierka)
  [llvieira](https://github.com/llvieira)
+ [pardovot](https://github.com/pardovot)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
