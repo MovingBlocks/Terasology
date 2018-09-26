@@ -19,7 +19,6 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.liquid.LiquidData;
 
 /**
  * A chunk view is a way of accessing multiple chunks for modification in a performant manner.
@@ -154,38 +153,6 @@ public interface ChunkView {
      */
     void setBiome(int x, int y, int z, Biome biome);
 
-    /**
-     * @param pos
-     * @return The state of liquid at the given position. This will be no liquid outside the view.
-     */
-    LiquidData getLiquid(Vector3i pos);
-
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @return The state of liquid at the given position. This will be no liquid outside the view.
-     */
-    LiquidData getLiquid(int x, int y, int z);
-
-    /**
-     * Sets the liquid state at the given position, if it is within the view
-     *
-     * @param pos
-     * @param newState
-     */
-    void setLiquid(Vector3i pos, LiquidData newState);
-
-    /**
-     * Sets the liquid state at the given position, if it is within the view
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @param newState
-     */
-    void setLiquid(int x, int y, int z, LiquidData newState);
-    
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *

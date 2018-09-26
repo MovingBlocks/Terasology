@@ -33,7 +33,6 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCore;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
 
@@ -149,16 +148,6 @@ public class MapWorldProvider implements WorldProviderCore {
 
     @Override
     public ChunkViewCore getWorldViewAround(Vector3i chunk) {
-        return null;
-    }
-
-    @Override
-    public boolean setLiquid(int x, int y, int z, LiquidData newData, LiquidData oldData) {
-        return false;
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
         return null;
     }
 

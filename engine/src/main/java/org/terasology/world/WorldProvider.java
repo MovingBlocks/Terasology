@@ -19,7 +19,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.WorldProviderCore;
-import org.terasology.world.liquid.LiquidData;
 
 /**
  * Provides the basic interface for all world providers.
@@ -36,22 +35,6 @@ public interface WorldProvider extends WorldProviderCore {
     boolean isBlockRelevant(Vector3i pos);
 
     boolean isBlockRelevant(Vector3f pos);
-
-    /**
-     * @param pos
-     * @param state    The new value of the liquid state
-     * @param oldState The expected previous value of the liquid state
-     * @return Whether the liquid change was made successfully. Will fail of oldState != the current state, or if the underlying chunk is not available
-     */
-    boolean setLiquid(Vector3i pos, LiquidData state, LiquidData oldState);
-
-    /**
-     * Returns the liquid state at the given position.
-     *
-     * @param blockPos
-     * @return The state of the block
-     */
-    LiquidData getLiquid(Vector3i blockPos);
 
     /**
      * Returns the block value at the given position.

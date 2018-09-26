@@ -27,7 +27,6 @@ import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.liquid.LiquidData;
 
 /**
  */
@@ -176,36 +175,6 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
             chunks[chunkIndex].setBiome(pos.x, pos.y, pos.z, biome);
         } else {
             logger.warn("Attempt to modify biome outside of the view");
-        }
-    }
-
-    @Override
-    public LiquidData getLiquid(Vector3i pos) {
-        return getLiquid(pos.x, pos.y, pos.z);
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        if (!blockRegion.encompasses(x, y, z)) {
-            return new LiquidData();
-        }
-
-        int chunkIndex = relChunkIndex(x, y, z);
-        return chunks[chunkIndex].getLiquid(ChunkMath.calcBlockPos(x, y, z, chunkFilterSize));
-    }
-
-    @Override
-    public void setLiquid(Vector3i pos, LiquidData newState) {
-        setLiquid(pos.x, pos.y, pos.z, newState);
-    }
-
-    @Override
-    public void setLiquid(int x, int y, int z, LiquidData newState) {
-        if (blockRegion.encompasses(x, y, z)) {
-            int chunkIndex = relChunkIndex(x, y, z);
-            chunks[chunkIndex].setLiquid(ChunkMath.calcBlockPos(x, y, z, chunkFilterSize), newState);
-        } else {
-            throw new IllegalStateException("Attempted to modify liquid data though an unlocked view");
         }
     }
 
