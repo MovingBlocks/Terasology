@@ -333,7 +333,7 @@ public final class Terasology {
             } else if (arg.equals(NO_SAVE_GAMES)) {
                 System.setProperty(SystemConfig.SAVED_GAMES_ENABLED_PROPERTY, "false");
             } else if (arg.equals(PERMISSIVE_SECURITY)) {
-                System.setProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PEOPERTY, "true");
+                System.setProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY, "true");
             } else if (arg.equals(NO_CRASH_REPORT)) {
                 crashReportEnabled = false;
             } else if (arg.equals(NO_SOUND)) {

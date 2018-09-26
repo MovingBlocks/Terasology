@@ -218,7 +218,7 @@ public class ModuleManagerImpl implements ModuleManager {
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
         finalModules.addAll(registry.stream().filter(Module::isOnClasspath).collect(Collectors.toList()));
         ModuleEnvironment newEnvironment;
-        boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PEOPERTY));
+        boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
             newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory, Collections.<BytecodeInjector>emptyList());
         } else {
