@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * An axis-aligned bounding box. Provides basic support for inclusion
- * and intersection tests.
- *
+ * An axis-aligned bounding box. Provides basic support for inclusion and intersection tests.
  */
 public final class AABB {
 
@@ -47,7 +45,7 @@ public final class AABB {
     }
 
     /**
-     * Creates a new AABB from the given minimum and maximum points.
+     * Creates a new AABB from the given minimum and maximum points, both inclusive.
      *
      * @param min The minimum of the AABB.
      * @param max The maximum of the AABB.
@@ -61,7 +59,7 @@ public final class AABB {
      * Creates a new AABB with the given center and extents.
      *
      * @param center The center of the AABB.
-     * @param extents The extents of the AABB.
+     * @param extent The extent of the AABB.
      * @return The created AABB.
      */
     public static AABB createCenterExtent(Vector3f center, Vector3f extent) {
@@ -82,9 +80,9 @@ public final class AABB {
     }
 
     /**
-     * Creates a new AABB that encapsulates a set of AABBs
+     * Creates a new AABB that encapsulates a set of AABBs.
      *
-     * @param others
+     * @param others The other AABBs that'll define the extents of the new one.
      */
     public static AABB createEncompassing(Iterable<AABB> others) {
         Vector3f min;
