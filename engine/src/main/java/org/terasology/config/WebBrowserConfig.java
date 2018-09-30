@@ -15,8 +15,23 @@
  */
 package org.terasology.config;
 
-/**
- * Created by lucas on 30/09/18.
- */
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
 public class WebBrowserConfig {
+
+    private List<String> safeURLs = Lists.newArrayList();
+
+    public void addSafeURL(String url) {
+        safeURLs.add(url);
+    }
+
+    public List<String> getSafeURLs() {
+        return safeURLs;
+    }
+
+    public void setSafeURLs(List<String> safeURLs) {
+        this.safeURLs = safeURLs;
+    }
 }
