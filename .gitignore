@@ -87,6 +87,8 @@ config.cfg
 entityDump.txt
 nuiEditorAutosave.json
 
+engine-tests/out/*
+
 # Historical Output
 /SAVED_WORLDS/
 /worlds/
@@ -106,3 +108,5 @@ whitelist.json
 blacklist.json
 
 # Ignore weird stuff that might be obsolete
+
+*.iml
