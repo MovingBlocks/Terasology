@@ -87,6 +87,8 @@ config.cfg
 entityDump.txt
 nuiEditorAutosave.json
 
+engine-tests/out/*
+
 # Historical Output
 /SAVED_WORLDS/
 /worlds/
