@@ -16,15 +16,16 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.WebBrowserConfig;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
 
-public class ConfirmURLPopup extends CoreScreenLayer {
+public class ConfirmUrlPopup extends CoreScreenLayer {
 
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:confirmURLPopup!instance");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:confirmUrlPopup!instance");
 
     private Runnable leftActon;
     private Runnable rightAction;
@@ -33,13 +34,6 @@ public class ConfirmURLPopup extends CoreScreenLayer {
     public void initialise() {
         WidgetUtil.trySubscribe(this, "leftButton", button -> buttonCallback(leftActon));
         WidgetUtil.trySubscribe(this, "rightButton", button -> buttonCallback(rightAction));
-
-        UICheckbox saveURL = find("saveURL", UICheckbox.class);
-        saveURL.setChecked(false);
-        saveURL.subscribe(e -> {
-            // save url in config.cfg
-            System.out.println("Save URL checkbox");
-        });
     }
 
     private void buttonCallback(Runnable action) {
@@ -60,5 +54,20 @@ public class ConfirmURLPopup extends CoreScreenLayer {
     public void setMessage(String title, String message) {
         find("title", UILabel.class).setText(title);
         find("message", UILabel.class).setText(message);
+    }
+
+    public void setCheckbox(WebBrowserConfig webBrowserConfig, String url) {
+        UICheckbox saveUrl = find("saveUrl", UICheckbox.class);
+        saveUrl.setChecked(false);
+
+        saveUrl.subscribe(checkbox -> {
+            boolean isTrustedUrl = saveUrl.isChecked();
+
+            if (isTrustedUrl) {
+                webBrowserConfig.addTrustedUrls(url);
+            } else {
+                webBrowserConfig.removeTrustedUrl(url);
+            }
+        });
     }
 }

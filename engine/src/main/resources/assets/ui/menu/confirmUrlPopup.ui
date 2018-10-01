@@ -1,5 +1,5 @@
 {
-    "type": "confirmURLPopup",
+    "type": "confirmUrlPopup",
     "skin": "messageBox",
     "contents": {
         "type": "relativeLayout",
@@ -47,7 +47,7 @@
                             "contents": [
                                 {
                                     "type": "UICheckbox",
-                                    "id": "saveURL",
+                                    "id": "saveUrl",
                                     "family": "option-grid"
                                 },
                                 {

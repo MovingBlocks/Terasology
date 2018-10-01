@@ -19,19 +19,26 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
+/**
+ * Holds all the trusted URLs.
+ */
 public class WebBrowserConfig {
 
-    private List<String> safeURLs = Lists.newArrayList();
+    private List<String> trustedUrls = Lists.newArrayList();
 
-    public void addSafeURL(String url) {
-        safeURLs.add(url);
+    public void addTrustedUrls(String url) {
+        trustedUrls.add(url);
     }
 
-    public List<String> getSafeURLs() {
-        return safeURLs;
+    public void removeTrustedUrl(String url) {
+        trustedUrls.remove(url);
     }
 
-    public void setSafeURLs(List<String> safeURLs) {
-        this.safeURLs = safeURLs;
+    public boolean isUrlTrusted(String url) {
+        return trustedUrls.contains(url);
+    }
+
+    public List<String> getTrustedUrls() {
+        return trustedUrls;
     }
 }

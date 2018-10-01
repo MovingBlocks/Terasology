@@ -22,17 +22,13 @@ import org.terasology.config.Config;
 import org.terasology.config.WebBrowserConfig;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
-import org.terasology.rendering.nui.layers.mainMenu.ConfirmURLPopup;
+import org.terasology.rendering.nui.layers.mainMenu.ConfirmUrlPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.rendering.nui.layers.mainMenu.TwoButtonPopup;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -61,6 +57,9 @@ public class UIButtonWebBrowser extends UIButton {
      */
     private TranslationSystem translationSystem;
 
+    /**
+     * Responsible for holding all the trusted URLs.
+     */
     private WebBrowserConfig webBrowserConfig;
 
     public UIButtonWebBrowser() {
@@ -115,11 +114,12 @@ public class UIButtonWebBrowser extends UIButton {
             return;
         }
 
-        ConfirmURLPopup confirmURLPopup = nuiManager.pushScreen(ConfirmURLPopup.ASSET_URI, ConfirmURLPopup.class);
-        confirmURLPopup.setMessage(translationSystem.translate("${engine:menu#button-web-browser-confirmation-title}"), translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}") + "\n" + getLink());
-        confirmURLPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::confirm);
-        confirmURLPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {
+        ConfirmUrlPopup confirmUrlPopup = nuiManager.pushScreen(ConfirmUrlPopup.ASSET_URI, ConfirmUrlPopup.class);
+        confirmUrlPopup.setMessage(translationSystem.translate("${engine:menu#button-web-browser-confirmation-title}"), translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}") + "\n" + getLink());
+        confirmUrlPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::confirm);
+        confirmUrlPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {
         });
+        confirmUrlPopup.setCheckbox(webBrowserConfig, getLink());
     }
 
     private void showErrorPopup(final String message) {
@@ -137,7 +137,7 @@ public class UIButtonWebBrowser extends UIButton {
     }
 
     public UIButtonWebBrowser setLink(String link) {
-        boolean safeURL = webBrowserConfig.getSafeURLs().contains(link);
+        boolean safeURL = webBrowserConfig.isUrlTrusted(link);
 
         confirmed.set(safeURL);
         this.link = link;
