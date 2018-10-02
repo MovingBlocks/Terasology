@@ -28,7 +28,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmUrlPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

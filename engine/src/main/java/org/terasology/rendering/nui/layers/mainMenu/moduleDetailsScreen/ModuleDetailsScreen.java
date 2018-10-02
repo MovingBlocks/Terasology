@@ -199,23 +199,18 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     }
 
     private void updateOpenInBrowserButton() {
-        openInBrowser.setEnabled(true);
-        openInBrowser.setLink("https://github.com/llvieira")
-                .setNuiManager(getManager())
-                .setTranslationSystem(translationSystem);
-//
-//        openInBrowser.setEnabled(false);
-//        final Module module = moduleInfoBinding.get();
-//        if (module == null) {
-//            return;
-//        }
-//        final String moduleOrigin = getOriginModuleUrl(moduleManager.getRegistry().getLatestModuleVersion(module.getMetadata().getId()));
-//        if (StringUtils.isNotBlank(moduleOrigin)) {
-//            openInBrowser.setEnabled(true);
-//            openInBrowser.setLink(moduleOrigin)
-//                    .setNuiManager(getManager())
-//                    .setTranslationSystem(translationSystem);
-//        }
+        openInBrowser.setEnabled(false);
+        final Module module = moduleInfoBinding.get();
+        if (module == null) {
+            return;
+        }
+        final String moduleOrigin = getOriginModuleUrl(moduleManager.getRegistry().getLatestModuleVersion(module.getMetadata().getId()));
+        if (StringUtils.isNotBlank(moduleOrigin)) {
+            openInBrowser.setEnabled(true);
+            openInBrowser.setLink(moduleOrigin)
+                    .setNuiManager(getManager())
+                    .setTranslationSystem(translationSystem);
+        }
     }
 
     private void bindDependencyDescription() {
