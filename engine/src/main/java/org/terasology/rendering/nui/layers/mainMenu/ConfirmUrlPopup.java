@@ -32,8 +32,10 @@ public class ConfirmUrlPopup extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        WidgetUtil.trySubscribe(this, "leftButton", button -> buttonCallback(leftActon));
-        WidgetUtil.trySubscribe(this, "rightButton", button -> buttonCallback(rightAction));
+        WidgetUtil.trySubscribe(this, "leftButton",
+                button -> buttonCallback(leftActon));
+        WidgetUtil.trySubscribe(this, "rightButton",
+                button -> buttonCallback(rightAction));
     }
 
     private void buttonCallback(Runnable action) {
@@ -42,32 +44,50 @@ public class ConfirmUrlPopup extends CoreScreenLayer {
     }
 
     public void setLeftButton(String text, Runnable action) {
-        find("leftButton", UIButton.class).setText(text);
+        UIButton leftButton = find("leftButton", UIButton.class);
+        if (leftButton != null) {
+            leftButton.setText(text);
+        }
+
         leftActon = action;
     }
 
     public void setRightButton(String text, Runnable action) {
-        find("rightButton", UIButton.class).setText(text);
+        UIButton rightButton = find("rightButton", UIButton.class);
+        if (rightButton != null) {
+            rightButton.setText(text);
+        }
+
         rightAction = action;
     }
 
     public void setMessage(String title, String message) {
-        find("title", UILabel.class).setText(title);
-        find("message", UILabel.class).setText(message);
+        UILabel titleLabel = find("title", UILabel.class);
+        if (titleLabel != null) {
+            titleLabel.setText(title);
+        }
+
+        UILabel messageLabel = find("message", UILabel.class);
+        if (messageLabel != null) {
+            messageLabel.setText(message);
+        }
     }
 
     public void setCheckbox(WebBrowserConfig webBrowserConfig, String url) {
         UICheckbox saveUrl = find("saveUrl", UICheckbox.class);
-        saveUrl.setChecked(false);
 
-        saveUrl.subscribe(checkbox -> {
-            boolean isTrustedUrl = saveUrl.isChecked();
+        if (saveUrl != null && webBrowserConfig != null) {
+            saveUrl.setChecked(false);
 
-            if (isTrustedUrl) {
-                webBrowserConfig.addTrustedUrls(url);
-            } else {
-                webBrowserConfig.removeTrustedUrl(url);
-            }
-        });
+            saveUrl.subscribe(checkbox -> {
+                boolean isTrustedUrl = saveUrl.isChecked();
+
+                if (isTrustedUrl) {
+                    webBrowserConfig.addTrustedUrls(url);
+                } else {
+                    webBrowserConfig.removeTrustedUrl(url);
+                }
+            });
+        }
     }
 }
