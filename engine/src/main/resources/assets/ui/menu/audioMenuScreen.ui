@@ -1,6 +1,6 @@
 {
     "type": "AudioSettingsScreen",
-    "skin": "mainmenu",
+    "skin": "settingsmenu",
     "contents": {
         "type": "relativeLayout",
         "contents": [

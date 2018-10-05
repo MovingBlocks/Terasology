@@ -1,6 +1,6 @@
 {
     "type": "PlayerSettingsScreen",
-    "skin": "mainmenu",
+    "skin": "settingsmenu",
     "contents": {
         "type": "relativeLayout",
         "contents": [
@@ -126,11 +126,11 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": ""
+                            "text": "${engine:menu#experimental}"
                         },
                         {
                             "type": "UILabel",
-                            "text": "${engine:menu#experimental}:                                                                        "
+                            "text": ""
                         },
                         {
                             "type": "UILabel",
