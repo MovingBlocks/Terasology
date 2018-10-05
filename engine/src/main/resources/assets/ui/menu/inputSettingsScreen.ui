@@ -1,6 +1,6 @@
 {
     "type": "InputSettingsScreen",
-    "skin": "mainmenu",
+    "skin": "settingsmenu",
     "contents": {
         "type": "RelativeLayout",
         "contents": [
