@@ -22,11 +22,11 @@ import java.awt.*;
 public class AdvancedMonitor extends JFrame {
 
     private final JTabbedPane tabs;
-
-    private final ThreadMonitorPanel threadMonitor;
-    private final ChunkMonitorPanel chunkMonitor;
-    private final PerformanceMonitorPanel perfMonitor;
-
+    private final MyThreadMonitorPanel myThreadMonitorPanel;
+//    private final ThreadMonitorPanel threadMonitor;
+//    private final ChunkMonitorPanel chunkMonitor;
+//    private final PerformanceMonitorPanel perfMonitor;
+//
     public AdvancedMonitor() {
         this("Advanced Monitoring Tool", 10, 10, 800, 600);
     }
@@ -35,22 +35,30 @@ public class AdvancedMonitor extends JFrame {
         setTitle(title);
         setBounds(x, y, width, height);
         setLayout(new BorderLayout());
-
+//
         tabs = new JTabbedPane();
+//
+        myThreadMonitorPanel = new MyThreadMonitorPanel();
+        myThreadMonitorPanel.setVisible(true);
 
-        threadMonitor = new ThreadMonitorPanel();
-        threadMonitor.setVisible(true);
+//        threadMonitor = new ThreadMonitorPanel();
+//        threadMonitor.setVisible(true);
 
-        chunkMonitor = new ChunkMonitorPanel();
-        chunkMonitor.setVisible(true);
-
-        perfMonitor = new PerformanceMonitorPanel();
-        perfMonitor.setVisible(true);
-
-        tabs.add("Threads", threadMonitor);
-        tabs.add("Chunks", chunkMonitor);
-        tabs.add("Performance", perfMonitor);
-
+//        chunkMonitor = new ChunkMonitorPanel();
+//        chunkMonitor.setVisible(true);
+//
+//        perfMonitor = new PerformanceMonitorPanel();
+//        perfMonitor.setVisible(true);
+//
+        tabs.add("MyThreads", myThreadMonitorPanel);
+//        tabs.add("Threads", threadMonitor);;
+//        tabs.add("Chunks", chunkMonitor);
+//        tabs.add("Performance", perfMonitor);
+//
         add(tabs, BorderLayout.CENTER);
+    }
+
+    public void cancel() {
+        myThreadMonitorPanel.cancel();
     }
 }

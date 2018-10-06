@@ -21,6 +21,9 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.monitoring.gui.AdvancedMonitor;
 
+import javax.swing.*;
+import java.awt.event.WindowEvent;
+
 /**
  *
  */
@@ -37,14 +40,16 @@ public class MonitoringSubsystem implements EngineSubsystem {
     public void initialise(GameEngine engine, Context rootContext) {
         if (rootContext.get(Config.class).getSystem().isMonitoringEnabled()) {
             advancedMonitor = new AdvancedMonitor();
-            advancedMonitor.setVisible(true);
+            advancedMonitor.setVisible(true); // if I comment if the bugs disappears
         }
     }
 
     @Override
     public void shutdown() {
         if (advancedMonitor != null) {
+            advancedMonitor.cancel();
             advancedMonitor.setVisible(false);
+            advancedMonitor.dispose(); // why it is not working?
         }
     }
 }
