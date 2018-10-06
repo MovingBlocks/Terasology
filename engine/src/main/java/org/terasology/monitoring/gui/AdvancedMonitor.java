@@ -25,6 +25,7 @@ public class AdvancedMonitor extends JFrame {
     private final MyThreadMonitorPanel myThreadMonitorPanel;
 //    private final ThreadMonitorPanel threadMonitor;
 //    private final ChunkMonitorPanel chunkMonitor;
+    private final MyPerformanceMonitorPanel myPerformanceMonitorPanel;
 //    private final PerformanceMonitorPanel perfMonitor;
 //
     public AdvancedMonitor() {
@@ -47,18 +48,23 @@ public class AdvancedMonitor extends JFrame {
 //        chunkMonitor = new ChunkMonitorPanel();
 //        chunkMonitor.setVisible(true);
 //
+        myPerformanceMonitorPanel = new MyPerformanceMonitorPanel();
+        myPerformanceMonitorPanel.setVisible(true);
+
 //        perfMonitor = new PerformanceMonitorPanel();
 //        perfMonitor.setVisible(true);
 //
         tabs.add("MyThreads", myThreadMonitorPanel);
 //        tabs.add("Threads", threadMonitor);;
 //        tabs.add("Chunks", chunkMonitor);
+        tabs.add("Performance", myPerformanceMonitorPanel);
 //        tabs.add("Performance", perfMonitor);
 //
         add(tabs, BorderLayout.CENTER);
     }
 
-    public void cancel() {
-        myThreadMonitorPanel.cancel();
+    public void cancelThreadsRunning() {
+        myThreadMonitorPanel.cancelThreadsRunning();
+        myPerformanceMonitorPanel.cancelThreadsRunning();
     }
 }

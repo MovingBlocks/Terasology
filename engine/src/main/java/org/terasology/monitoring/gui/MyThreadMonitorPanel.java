@@ -20,67 +20,69 @@ import org.slf4j.LoggerFactory;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.SwingWorker;
+import javax.swing.JPanel;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.JLabel;
+import javax.swing.ListCellRenderer;
+import javax.swing.SwingConstants;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MyThreadMonitorPanel extends JPanel {
 
     private static final Color BACKGROUND = Color.white;
-    private static final Logger logger = LoggerFactory.getLogger(MyThreadMonitorPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyThreadMonitorPanel.class);
 
-    private final JList list;
-    private DefaultListModel model;
+    private DefaultListModel threadListModel;
     private UpdateRunner updateRunner;
 
     public MyThreadMonitorPanel() {
-        model = new DefaultListModel();
+        threadListModel = new DefaultListModel();
+
         setLayout(new BorderLayout());
-        list = new JList(model);
+
+        JList list = new JList(threadListModel);
         list.setCellRenderer(new ThreadListRenderer());
         list.setVisible(true);
         add(list, BorderLayout.CENTER);
+
         updateRunner = new UpdateRunner();
         updateRunner.execute();
     }
 
-    public  void cancel() {
-        updateRunner.cancel(true);
-    }
-
-    public void updateList(List<SingleThreadMonitor> entries) {
-        model.removeAllElements();
+    private void updateList(List<SingleThreadMonitor> entries) {
+        threadListModel.removeAllElements();
         for (SingleThreadMonitor entry : entries) {
-            model.addElement(entry);
+            threadListModel.addElement(entry);
         }
     }
 
+    public void cancelThreadsRunning() {
+        LOGGER.info("Closing SwingWorker threads for Thread Monitor Panel...");
+        updateRunner.cancel(true);
+    }
+
     private class UpdateRunner extends SwingWorker<List<SingleThreadMonitor>, List<SingleThreadMonitor>> {
+        private final List<SingleThreadMonitor> monitors = new ArrayList<>();
 
         @Override
         protected List<SingleThreadMonitor> doInBackground() throws Exception {
-            while (!isCancelled()) {
-                List<SingleThreadMonitor> monitors = new ArrayList<>();
-                ThreadMonitor.getThreadMonitors(monitors, false);
 
-//                int entryCount = model.size() + 1;
-//
-//                System.out.println("Should be " + entryCount + " entries");
-//
-//                String[] entries = new String[entryCount];
-//
-//                for (int i = 0; i< entries.length; i++) {
-//                    entries[i] = "Entry " + i;
-//                }
+            while (!isCancelled()) {
+                ThreadMonitor.getThreadMonitors(monitors, false);
+                Collections.sort(monitors);
 
                 publish(new ArrayList<>(monitors));
 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-
-                }
+                Thread.sleep(500);
             }
 
             return null;
@@ -90,10 +92,6 @@ public class MyThreadMonitorPanel extends JPanel {
             for (List<SingleThreadMonitor> entry : entries) {
                 updateList(entry);
             }
-        }
-        @Override
-        protected void done() {
-//            updateList(Arrays.asList("done"));
         }
     }
 
@@ -108,6 +106,7 @@ public class MyThreadMonitorPanel extends JPanel {
             } else {
                 renderer.setMonitor(null);
             }
+
             return renderer;
         }
 
@@ -194,8 +193,9 @@ public class MyThreadMonitorPanel extends JPanel {
                     pError.setVisible(monitor.hasErrors());
                     if (monitor.hasErrors()) {
                         lErrorSpacer.setPreferredSize(dId);
-                        lError.setText(monitor.getNumErrors() + " Error(s), [" + monitor.getLastError().getClass().getSimpleName() + "] "
-                                + monitor.getLastError().getMessage());
+                        lError.setText(monitor.getNumErrors() + " Error(s), [" +
+                                monitor.getLastError().getClass().getSimpleName() + "] " +
+                                monitor.getLastError().getMessage());
                     }
                 } else {
                     lName.setText("");
