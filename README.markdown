@@ -2,7 +2,7 @@
 
 [![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
 [![Release](https://img.shields.io/github/release/MovingBlocks/Terasology.svg)](../../releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/latest/total.svg "Downloads")](../../releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/total.svg "Downloads")](../../releases/latest)
 [![Bounties](https://img.shields.io/bountysource/team/MovingBlocks/activity.svg)](https://www.bountysource.com/teams/MovingBlocks)
 [![License(code)](https://img.shields.io/badge/license(code)-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![License(art)](https://img.shields.io/badge/license(art)-CC%20BY%204.0-blue.svg)](http://creativecommons.org/licenses/by/4.0/)
