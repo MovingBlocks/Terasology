@@ -240,6 +240,36 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
+    public int getExtraData(int index, Vector3i pos) {
+        return getExtraData(index, pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public int getExtraData(int index, int blockX, int blockY, int blockZ) {
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return 0;
+        }
+
+        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+        return chunks[chunkIndex].getExtraData(index, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
+    }
+
+    @Override
+    public void setExtraData(int index, Vector3i pos, int value) {
+        setExtraData(index, pos.x, pos.y, pos.z, value);
+    }
+
+    @Override
+    public void setExtraData(int index, int blockX, int blockY, int blockZ, int value) {
+        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
+            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+            chunks[chunkIndex].setExtraData(index, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), value);
+        } else {
+            throw new IllegalStateException("Attempted to modify extra data though an unlocked view");
+        }
+    }
+
+    @Override
     public void setDirtyAround(Vector3i blockPos) {
         for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(blockPos, 1)) {
             chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);

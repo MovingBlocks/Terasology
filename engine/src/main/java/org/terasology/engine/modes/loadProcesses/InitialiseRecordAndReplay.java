@@ -36,7 +36,7 @@ public class InitialiseRecordAndReplay implements LoadProcess {
 
     @Override
     public String getMessage() {
-        return "Initialising Record and Replay...";
+        return "${engine:menu#init-record-replay}";
     }
 
     @Override

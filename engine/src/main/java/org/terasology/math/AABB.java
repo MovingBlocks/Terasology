@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * An axis-aligned bounding box. Provides basic support for inclusion
- * and intersection tests.
- *
+ * An axis-aligned bounding box. Provides basic support for inclusion and intersection tests.
  */
 public final class AABB {
 
@@ -46,10 +44,24 @@ public final class AABB {
         this.max = max;
     }
 
+    /**
+     * Creates a new AABB from the given minimum and maximum points, both inclusive.
+     *
+     * @param min The minimum of the AABB.
+     * @param max The maximum of the AABB.
+     * @return The created AABB.
+     */
     public static AABB createMinMax(Vector3f min, Vector3f max) {
         return new AABB(new Vector3f(min), new Vector3f(max));
     }
 
+    /**
+     * Creates a new AABB with the given center and extents.
+     *
+     * @param center The center of the AABB.
+     * @param extent The extent of the AABB.
+     * @return The created AABB.
+     */
     public static AABB createCenterExtent(Vector3f center, Vector3f extent) {
         Vector3f min = new Vector3f(center);
         min.sub(extent);
@@ -58,14 +70,19 @@ public final class AABB {
         return new AABB(min, max);
     }
 
+    /**
+     * Creates an empty AABB that does not contain any points.
+     *
+     * @return The created AABB.
+     */
     public static AABB createEmpty() {
         return new AABB(new Vector3f(), new Vector3f());
     }
 
     /**
-     * Creates a new AABB that encapsulates a set of AABBs
+     * Creates a new AABB that encapsulates a set of AABBs.
      *
-     * @param others
+     * @param others The other AABBs that'll define the extents of the new one.
      */
     public static AABB createEncompassing(Iterable<AABB> others) {
         Vector3f min;
@@ -88,6 +105,18 @@ public final class AABB {
         return new AABB(min, max);
     }
 
+    /**
+     * Creates a new AABB that contains the vertices as represented by a {@link TFloatList}.
+     *
+     * @param vertices The vertices to encompass. It is assumed that the X, Y, Z components of each
+     *                 vertex are stored consecutively in the {@link TFloatList}.
+     *
+     *                 For the {@code i}th vertex in the list, the X, Y, and Z components
+     *                 are stored at indices {@code 3 * i}, {@code 3 * i + 1}, and
+     *                 {@code 3 * i + 2} respectively.
+     *
+     * @return The created AABB.
+     */
     public static AABB createEncompasing(TFloatList vertices) {
         int vertexCount = vertices.size() / 3;
         if (vertexCount == 0) {
@@ -145,11 +174,25 @@ public final class AABB {
         return new AABB(newMin, newMax);
     }
 
+    /**
+     * Transform this AABB into a new AABB with the given rotation, offset and scale.
+     *
+     * @param rotation The rotation from the current AABB to the new AABB.
+     * @param offset The offset between the current AABB and the new AABB.
+     * @param scale The scale of the new AABB with respect to the old AABB.
+     * @return The new transformed AABB.
+     */
     public AABB transform(Quat4f rotation, Vector3f offset, float scale) {
         Transform transform = new Transform(offset, rotation, scale);
         return transform(transform);
     }
 
+    /**
+     * Transform this AABB into a new AABB with the given rotation, offset and scale as represented by the {@link Transform}.
+     *
+     * @param transform The {@link Transform} representing the offset, rotation, and scale transformation from this AABB to the new AABB.
+     * @return the new transformed AABB.
+     */
     public AABB transform(Transform transform) {
         return transform(transform, DEFAULT_MARGIN);
     }
@@ -263,48 +306,6 @@ public final class AABB {
         }
 
         return r;
-    }
-
-    public Vector3f getFirstHitPlane(Vector3f direction, Vector3f pos, Vector3f dimensions, boolean testX, boolean testY, boolean testZ) {
-        Vector3f hitNormal = new Vector3f();
-
-        float dist = Float.POSITIVE_INFINITY;
-
-        if (testX) {
-            float distX;
-            if (direction.x > 0) {
-                distX = (min.x - pos.x - dimensions.x) / direction.x;
-            } else {
-                distX = (max.x - pos.x + dimensions.x) / direction.x;
-            }
-            if (distX >= 0 && distX < dist) {
-                hitNormal.set(Math.copySign(1, direction.x), 0, 0);
-            }
-        }
-        if (testY) {
-            float distY;
-            if (direction.y > 0) {
-                distY = (min.y - pos.y - dimensions.y) / direction.y;
-            } else {
-                distY = (max.y - pos.y + dimensions.y) / direction.y;
-            }
-            if (distY >= 0 && distY < dist) {
-                hitNormal.set(0, Math.copySign(1, direction.y), 0);
-            }
-        }
-        if (testZ) {
-            float distZ;
-            if (direction.z > 0) {
-                distZ = (min.z - pos.z - dimensions.z) / direction.z;
-            } else {
-                distZ = (max.z - pos.z + dimensions.z) / direction.z;
-            }
-            if (distZ >= 0 && distZ < dist) {
-                hitNormal.set(0, 0, Math.copySign(1, direction.z));
-            }
-        }
-        return hitNormal;
-
     }
 
     /**
@@ -451,6 +452,13 @@ public final class AABB {
         return Objects.hashCode(min, max);
     }
 
+    /**
+     * Checks whether a given ray intersects the AABB.
+     *
+     * @param from The origin of the ray.
+     * @param direction The direction of the ray.
+     * @return True if the ray intersects the AABB, else false.
+     */
     public boolean intersectRectangle(Vector3f from, Vector3f direction) {
         Vector3f dirFrac = new Vector3f(
                 1.0f / direction.x,

@@ -123,8 +123,8 @@ public final class Block {
     private boolean stackable = true;
 
     private BlockAppearance primaryAppearance = new BlockAppearance();
-    // TODO: Remove once liquids have nicer generation
-    private Map<Side, BlockMeshPart> loweredLiquidMesh = Maps.newEnumMap(Side.class);
+    private Map<Side, BlockMeshPart> lowLiquidMesh = Maps.newEnumMap(Side.class);
+    private Map<Side, BlockMeshPart> topLiquidMesh = Maps.newEnumMap(Side.class);
 
     /* Collision */
     private CollisionShape collisionShape;
@@ -587,12 +587,20 @@ public final class Block {
         return new Tessellator().generateMesh(new ResourceUrn("engine", "blockmesh", uri.toString()));
     }
 
-    public BlockMeshPart getLoweredLiquidMesh(Side side) {
-        return loweredLiquidMesh.get(side);
+    public BlockMeshPart getLowLiquidMesh(Side side) {
+        return lowLiquidMesh.get(side);
     }
 
-    public void setLoweredLiquidMesh(Side side, BlockMeshPart meshPart) {
-        loweredLiquidMesh.put(side, meshPart);
+    public void setLowLiquidMesh(Side side, BlockMeshPart meshPart) {
+        lowLiquidMesh.put(side, meshPart);
+    }
+
+    public BlockMeshPart getTopLiquidMesh(Side side) {
+        return topLiquidMesh.get(side);
+    }
+
+    public void setTopLiquidMesh(Side side, BlockMeshPart meshPart) {
+        topLiquidMesh.put(side, meshPart);
     }
 
     /**

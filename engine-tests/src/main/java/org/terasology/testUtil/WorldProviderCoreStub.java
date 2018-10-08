@@ -17,6 +17,7 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Maps;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ public class WorldProviderCoreStub implements WorldProviderCore {
 
     private Map<Vector3i, Block> blocks = Maps.newHashMap();
     private Map<Vector3i, Biome> biomes = Maps.newHashMap();
+    private ArrayList<Map<Vector3i, Integer>> extraData = new ArrayList<>();
     private Block air;
     private Biome defaultBiome;
 
@@ -171,6 +173,24 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     @Override
     public byte getTotalLight(int x, int y, int z) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+    
+    @Override
+    public int setExtraData(int index, Vector3i pos, int value) {
+        Integer prevValue = getExtraDataLayer(index).put(pos, value);
+        return prevValue == null ? 0 : prevValue;
+    }
+    
+    @Override
+    public int getExtraData(int index, int x, int y, int z) {
+        return getExtraDataLayer(index).getOrDefault(new Vector3i(x, y, z), 0);
+    }
+    
+    private Map<Vector3i, Integer> getExtraDataLayer(int index) {
+        while (extraData.size() <= index) {
+            extraData.add(Maps.newHashMap());
+        }
+        return extraData.get(index);
     }
 
     @Override

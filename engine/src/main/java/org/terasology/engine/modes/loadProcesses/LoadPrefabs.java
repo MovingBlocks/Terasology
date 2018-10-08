@@ -33,7 +33,7 @@ public class LoadPrefabs extends StepBasedLoadProcess {
 
     @Override
     public String getMessage() {
-        return "Loading Prefabs...";
+        return "${engine:menu#loading-prefabs}";
     }
 
     @Override

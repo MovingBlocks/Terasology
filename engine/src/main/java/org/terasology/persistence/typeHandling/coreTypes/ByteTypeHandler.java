@@ -15,10 +15,15 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Bytes;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  */
@@ -43,4 +48,16 @@ public class ByteTypeHandler implements TypeHandler<Byte> {
         return null;
     }
 
+    @Override
+    public PersistedData serializeCollection(Collection<Byte> value, SerializationContext context) {
+        return context.create(Bytes.toArray(value));
+    }
+
+    @Override
+    public List<Byte> deserializeCollection(PersistedData data, DeserializationContext context) {
+        if (data.isBytes()) {
+            return Lists.newArrayList(Bytes.asList(data.getAsBytes()));
+        }
+        return Lists.newArrayList();
+    }
 }

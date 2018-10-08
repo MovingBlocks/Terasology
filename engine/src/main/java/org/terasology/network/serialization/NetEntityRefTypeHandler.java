@@ -16,6 +16,7 @@
 
 package org.terasology.network.serialization;
 
+import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
@@ -28,6 +29,9 @@ import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This type handler encodes EntityRef for network transferals. For normal entities, the Network Id of the entity is used.
@@ -47,8 +51,7 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
     public PersistedData serialize(EntityRef value, SerializationContext context) {
         BlockComponent blockComponent = value.getComponent(BlockComponent.class);
         if (blockComponent != null) {
-            Vector3i pos = blockComponent.getPosition();
-            return context.create(pos.x, pos.y, pos.z);
+            return context.create(blockComponent.position.x, blockComponent.position.y, blockComponent.position.z);
         }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {
@@ -71,6 +74,35 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
             return networkSystem.getEntity(data.getAsInteger());
         }
         return EntityRef.NULL;
+    }
+
+    @Override
+    public PersistedData serializeCollection(Collection<EntityRef> value, SerializationContext context) {
+        List<PersistedData> items = Lists.newArrayList();
+        for (EntityRef ref : value) {
+            BlockComponent blockComponent = ref.getComponent(BlockComponent.class);
+            if (blockComponent != null) {
+                Vector3i blockPos = blockComponent.getPosition();
+                items.add(context.create(blockPos.x, blockPos.y, blockPos.z));
+            } else {
+                NetworkComponent netComponent = ref.getComponent(NetworkComponent.class);
+                if (netComponent != null) {
+                    items.add(context.create(netComponent.getNetworkId()));
+                } else {
+                    items.add(context.createNull());
+                }
+            }
+        }
+        return context.create(items);
+    }
+
+    @Override
+    public List<EntityRef> deserializeCollection(PersistedData data, DeserializationContext context) {
+        List<EntityRef> result = Lists.newArrayListWithCapacity(data.getAsArray().size());
+        for (PersistedData item : data.getAsArray()) {
+            result.add(deserialize(item, context));
+        }
+        return result;
     }
 
 }

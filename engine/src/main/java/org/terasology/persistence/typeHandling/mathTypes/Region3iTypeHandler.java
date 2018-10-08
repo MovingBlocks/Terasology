@@ -24,12 +24,13 @@ import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 import java.util.Map;
 
 /**
  */
-public class Region3iTypeHandler implements org.terasology.persistence.typeHandling.TypeHandler<Region3i> {
+public class Region3iTypeHandler extends SimpleTypeHandler<Region3i> {
 
     private static final String MIN_FIELD = UriUtil.normalise("min");
     private static final String SIZE_FIELD = UriUtil.normalise("size");

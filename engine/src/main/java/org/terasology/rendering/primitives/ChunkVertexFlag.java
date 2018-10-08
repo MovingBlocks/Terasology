@@ -15,8 +15,11 @@
  */
 package org.terasology.rendering.primitives;
 
+import org.terasology.module.sandbox.API;
+
 /**
  */
+@API
 public enum ChunkVertexFlag {
     NORMAL(0, "BLOCK_HINT_NORMAL"),
     WATER(1, "BLOCK_HINT_WATER"),

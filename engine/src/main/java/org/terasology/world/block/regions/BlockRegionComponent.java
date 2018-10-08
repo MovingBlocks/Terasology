@@ -24,7 +24,7 @@ import org.terasology.network.Replicate;
  */
 public class BlockRegionComponent implements Component {
     @Replicate
-    public Region3i region = Region3i.EMPTY;
+    public Region3i region = Region3i.empty();
     public boolean overrideBlockEntities = true;
 
     public BlockRegionComponent() {

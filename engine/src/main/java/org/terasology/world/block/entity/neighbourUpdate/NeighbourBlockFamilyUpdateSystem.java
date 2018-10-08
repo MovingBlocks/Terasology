@@ -25,6 +25,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.math.Side;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
@@ -80,8 +81,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
             return;
         }
 
-        Vector3i targetBlock = blockComponent.getPosition();
-        processUpdateForBlockLocation(targetBlock);
+        processUpdateForBlockLocation(blockComponent.position);
     }
 
     private void notifyNeighboursOfChangedBlocks() {

@@ -25,9 +25,9 @@ import org.terasology.network.Replicate;
  */
 public final class BlockComponent implements Component {
     @Replicate
-    Vector3i position = new Vector3i();
+    public Vector3i position = new Vector3i();
     @Replicate
-    Block block;
+    public Block block;
 
     public BlockComponent() {
     }
@@ -37,18 +37,34 @@ public final class BlockComponent implements Component {
         this.position.set(pos);
     }
 
+    /**
+     * @deprecated Deprecated on 21/Sep/2018, because it is error prone (no defensive copy) and needlessly verbose.
+     */
+    @Deprecated
     public Vector3i getPosition() {
         return position;
     }
 
+    /**
+     * @deprecated Deprecated on 21/Sep/2018, because it is needlessly verbose.
+     */
+    @Deprecated
     public void setPosition(Vector3i pos) {
         position.set(pos);
     }
 
+    /**
+     * @deprecated Deprecated on 21/Sep/2018, because it is error prone (no defensive copy) and needlessly verbose.
+     */
+    @Deprecated
     public void setBlock(Block block) {
         this.block = block;
     }
 
+    /**
+     * @deprecated Deprecated on 21/Sep/2018, because it is error prone (no defensive copy) and needlessly verbose.
+     */
+    @Deprecated
     public Block getBlock() {
         return block;
     }

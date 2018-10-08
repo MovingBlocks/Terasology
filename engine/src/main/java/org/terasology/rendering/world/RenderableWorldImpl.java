@@ -65,7 +65,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private ChunkTessellator chunkTessellator;
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
     private final List<RenderableChunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
-    private Region3i renderableRegion = Region3i.EMPTY;
+    private Region3i renderableRegion = Region3i.empty();
     private ViewDistance currentViewDistance;
     private RenderQueuesHelper renderQueues;
 

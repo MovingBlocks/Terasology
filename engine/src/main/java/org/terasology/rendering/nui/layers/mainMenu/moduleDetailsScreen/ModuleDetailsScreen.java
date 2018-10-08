@@ -207,7 +207,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         final String moduleOrigin = getOriginModuleUrl(moduleManager.getRegistry().getLatestModuleVersion(module.getMetadata().getId()));
         if (StringUtils.isNotBlank(moduleOrigin)) {
             openInBrowser.setEnabled(true);
-            openInBrowser.setLink(moduleOrigin)
+            openInBrowser.setUrl(moduleOrigin)
                     .setNuiManager(getManager())
                     .setTranslationSystem(translationSystem);
         }

@@ -113,7 +113,7 @@ public final class EntitySystemSetupUtil {
 
         // Standard serialization library
         TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
-        typeSerializationLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler(entityManager));
+        typeSerializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
         entityManager.setTypeSerializerLibrary(typeSerializationLibrary);
 
         // Prefab Manager

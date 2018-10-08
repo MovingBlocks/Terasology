@@ -18,12 +18,15 @@ package org.terasology.rendering.nui.widgets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
+import org.terasology.config.WebBrowserConfig;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.layers.mainMenu.ConfirmUrlPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.rendering.nui.layers.mainMenu.TwoButtonPopup;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -31,18 +34,23 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * Button with predefined action - open the link in default web browser.
+ * Button with predefined action - open the URL in default web browser.
  */
 public class UIButtonWebBrowser extends UIButton {
 
-    private static final Logger logger = LoggerFactory.getLogger(UIButtonWebBrowser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UIButtonWebBrowser.class);
+    private static final String NEW_LINE = System.lineSeparator();
 
+    /**
+     * If false, a confirmation popup should appear asking
+     * for permission before opening the web browser, otherwise don't.
+     */
     private Binding<Boolean> confirmed = new DefaultBinding<>(false);
 
     /**
-     * The link to be opened in web browser.
+     * The URL to be opened in web browser.
      */
-    private String link = "";
+    private String url;
 
     /**
      * Responsible for creating popups.
@@ -54,60 +62,74 @@ public class UIButtonWebBrowser extends UIButton {
      */
     private TranslationSystem translationSystem;
 
-    public UIButtonWebBrowser() {
-        this.subscribe(openInDefaultBrowser);
-    }
-
     /**
-     * Does confirmation and activates default action.
+     * Responsible for holding all the trusted URLs.
      */
-    private void confirm() {
-        confirmed.set(true);
-        openInDefaultBrowser.onActivated(this);
-    }
+    private WebBrowserConfig webBrowserConfig;
 
-    private final ActivateEventListener openInDefaultBrowser = button -> {
+    private final ActivateEventListener openUrlInDefaultBrowser = button -> {
         if (!hasConfirmation()) {
-            logger.debug("Don't have confirmation for opening web browser.");
+            LOGGER.debug("Don't have confirmation for opening web browser.");
             showConfirmationPopup();
             return;
         }
         if (Desktop.isDesktopSupported()) {
             Desktop desktop = Desktop.getDesktop();
             try {
-                desktop.browse(new URI(this.link));
+                desktop.browse(new URI(this.url));
             } catch (IOException | URISyntaxException e) {
-                logger.warn("Can't open {} in default browser of your system.", this.link);
-                showErrorPopup("Can't open " + this.link + " in default browser of your system.");
+                LOGGER.warn("Can't open {} in default browser of your system.", this.url);
+                showErrorPopup("Can't open " + this.url + " in default browser of your system.");
             }
         } else {
             String os = System.getProperty("os.name").toLowerCase();
             Runtime runtime = Runtime.getRuntime();
             try {
                 if (os.contains("win")) {
-                    runtime.exec("rundll32 url.dll,FileProtocolHandler " + this.link);
+                    runtime.exec("rundll32 url.dll,FileProtocolHandler " + this.url);
                 } else if (os.contains("mac")) {
-                    runtime.exec("open " + this.link);
+                    runtime.exec("open " + this.url);
                 } else {
-                    runtime.exec("xdg-open " + this.link);
+                    runtime.exec("xdg-open " + this.url);
                 }
             } catch (IOException e) {
-                logger.warn("Can't recognize your OS and open the link {}.", this.link);
-                showErrorPopup("Can't recognize your OS and open the link " + this.link);
+                LOGGER.warn("Can't recognize your OS and open the url {}.", this.url);
+                showErrorPopup("Can't recognize your OS and open the url " + this.url);
             }
         }
     };
 
+    public UIButtonWebBrowser() {
+        this.url = "";
+
+        Config config = CoreRegistry.get(Config.class);
+        if (config != null) {
+            this.webBrowserConfig = config.getWebBrowserConfig();
+        }
+
+        this.subscribe(openUrlInDefaultBrowser);
+    }
+
+    /**
+     * Does confirmation and activates default action.
+     */
+    private void openBrowser() {
+        confirmed.set(true);
+        openUrlInDefaultBrowser.onActivated(this);
+    }
+
     private void showConfirmationPopup() {
         if (nuiManager == null || translationSystem == null) {
-            logger.error("Can't show confirmation popup!");
+            LOGGER.error("Can't show confirmation popup!");
             return;
         }
-        TwoButtonPopup confirmationPopup = nuiManager.pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
-        confirmationPopup.setMessage(translationSystem.translate("${engine:menu#button-web-browser-confirmation-title}"), translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}") + "\n" + getLink());
-        confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::confirm);
-        confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {
-        });
+
+        ConfirmUrlPopup confirmUrlPopup = nuiManager.pushScreen(ConfirmUrlPopup.ASSET_URI, ConfirmUrlPopup.class);
+        confirmUrlPopup.setMessage(translationSystem.translate("${engine:menu#button-web-browser-confirmation-title}"),
+                translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}") + NEW_LINE + this.url);
+        confirmUrlPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::openBrowser);
+        confirmUrlPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
+        confirmUrlPopup.setCheckbox(webBrowserConfig, this.url);
     }
 
     private void showErrorPopup(final String message) {
@@ -120,13 +142,18 @@ public class UIButtonWebBrowser extends UIButton {
         return confirmed.get() != null && confirmed.get();
     }
 
-    public String getLink() {
-        return link;
-    }
+    /**
+     * Sets the {@link UIButtonWebBrowser#url} value and sets {@link UIButtonWebBrowser#confirmed}
+     * to true if the given URL is already trusted, otherwise confirmed is false.
+     */
+    public UIButtonWebBrowser setUrl(String url) {
+        boolean trustedUrl = false;
+        if (webBrowserConfig != null) {
+            trustedUrl = webBrowserConfig.isUrlTrusted(url);
+        }
 
-    public UIButtonWebBrowser setLink(String link) {
-        confirmed.set(false);
-        this.link = link;
+        confirmed.set(trustedUrl);
+        this.url = url;
         return this;
     }
 

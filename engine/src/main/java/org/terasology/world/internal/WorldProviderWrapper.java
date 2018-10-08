@@ -22,6 +22,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.liquid.LiquidData;
 
 import java.math.RoundingMode;
@@ -31,10 +32,12 @@ import java.util.Collection;
  */
 public class WorldProviderWrapper extends AbstractWorldProviderDecorator implements WorldProvider {
     private WorldProviderCore core;
+    private ExtraBlockDataManager extraDataManager;
 
-    public WorldProviderWrapper(WorldProviderCore core) {
+    public WorldProviderWrapper(WorldProviderCore core, ExtraBlockDataManager extraDataManager) {
         super(core);
         this.core = core;
+        this.extraDataManager = extraDataManager;
     }
 
     @Override
@@ -101,6 +104,30 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     @Override
     public byte getTotalLight(Vector3i pos) {
         return core.getTotalLight(pos.x, pos.y, pos.z);
+    }
+    
+    public int getExtraData(int index, Vector3i pos) {
+        return core.getExtraData(index, pos.x, pos.y, pos.z);
+    }
+    
+    public int setExtraData(int index, int x, int y, int z, int value) {
+        return core.setExtraData(index, new Vector3i(x, y, z), value);
+    }
+    
+    public int getExtraData(String fieldName, int x, int y, int z) {
+        return core.getExtraData(extraDataManager.getSlotNumber(fieldName), x, y, z);
+    }
+    
+    public int getExtraData(String fieldName, Vector3i pos) {
+        return core.getExtraData(extraDataManager.getSlotNumber(fieldName), pos.x, pos.y, pos.z);
+    }
+    
+    public int setExtraData(String fieldName, int x, int y, int z, int value) {
+        return core.setExtraData(extraDataManager.getSlotNumber(fieldName), new Vector3i(x, y, z), value);
+    }
+    
+    public int setExtraData(String fieldName, Vector3i pos, int value) {
+        return core.setExtraData(extraDataManager.getSlotNumber(fieldName), pos, value);
     }
 
     @Override

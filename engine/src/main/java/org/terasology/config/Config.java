@@ -146,6 +146,10 @@ public final class Config {
         return config.getUniverseConfig();
     }
 
+    public WebBrowserConfig getWebBrowserConfig() {
+        return config.getWebBrowserConfig();
+    }
+
     /**
      * Saves this config to the default configuration file
      */

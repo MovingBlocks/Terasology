@@ -163,9 +163,9 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
             if (entityRef.hasComponent(BlockComponent.class)) {
                 BlockComponent blockComponent = entityRef.getComponent(BlockComponent.class);
                 // always destroy the block that caused the explosion
-                worldProvider.setBlock(blockComponent.getPosition(), blockManager.getBlock(BlockManager.AIR_ID));
+                worldProvider.setBlock(blockComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
                 // create the explosion from the block's location
-                doExplosion(explosionActionComponent, blockComponent.getPosition().toVector3f(), entityRef);
+                doExplosion(explosionActionComponent, blockComponent.position.toVector3f(), entityRef);
             } else if (entityRef.hasComponent(LocationComponent.class)) {
                 // get the position of the non-block entity to make it explode from there
                 Vector3f position = entityRef.getComponent(LocationComponent.class).getWorldPosition();

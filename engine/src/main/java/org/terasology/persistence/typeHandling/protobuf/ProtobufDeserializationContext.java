@@ -15,11 +15,15 @@
  */
 package org.terasology.persistence.typeHandling.protobuf;
 
+import com.google.common.collect.Lists;
+
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+
+import java.util.List;
 
 /**
  */
@@ -33,11 +37,22 @@ public class ProtobufDeserializationContext implements DeserializationContext {
 
     @Override
     public <T> T deserializeAs(PersistedData data, Class<T> type) {
-        TypeHandler<?> handler = typeSerializationLibrary.getTypeHandler(type);
+        TypeHandler<?> handler = typeSerializationLibrary.getHandlerFor(type);
         if (handler == null) {
             throw new DeserializationException("No handler found for " + type);
         }
         return type.cast(handler.deserialize(data, this));
     }
 
+    @Override
+    public <T> List<T> deserializeCollection(PersistedData data, Class<T> type) {
+        if (!data.isArray()) {
+            throw new IllegalStateException("Data is not an array");
+        }
+        List<T> result = Lists.newArrayList();
+        for (PersistedData item : data.getAsArray()) {
+            result.add(deserializeAs(item, type));
+        }
+        return result;
+    }
 }
