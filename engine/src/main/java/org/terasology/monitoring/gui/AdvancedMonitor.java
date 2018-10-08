@@ -21,50 +21,30 @@ import java.awt.*;
 @SuppressWarnings("serial")
 public class AdvancedMonitor extends JFrame {
 
-    private final JTabbedPane tabs;
-    private final MyThreadMonitorPanel myThreadMonitorPanel;
-//    private final ThreadMonitorPanel threadMonitor;
-    private final ChunkMonitorPanel chunkMonitor;
-    private final MyPerformanceMonitorPanel myPerformanceMonitorPanel;
-//    private final PerformanceMonitorPanel perfMonitor;
-//
     public AdvancedMonitor() {
         this("Advanced Monitoring Tool", 10, 10, 800, 600);
     }
 
-    public AdvancedMonitor(String title, int x, int y, int width, int height) {
+    private AdvancedMonitor(String title, int x, int y, int width, int height) {
         setTitle(title);
         setBounds(x, y, width, height);
         setLayout(new BorderLayout());
-//
-        tabs = new JTabbedPane();
-//
-        myThreadMonitorPanel = new MyThreadMonitorPanel();
-        myThreadMonitorPanel.setVisible(true);
 
-//        threadMonitor = new ThreadMonitorPanel();
-//        threadMonitor.setVisible(true);
+        JTabbedPane tabs = new JTabbedPane();
 
-        chunkMonitor = new ChunkMonitorPanel();
+        ThreadMonitorPanel threadMonitor = new ThreadMonitorPanel();
+        threadMonitor.setVisible(true);
+
+        ChunkMonitorPanel chunkMonitor = new ChunkMonitorPanel();
         chunkMonitor.setVisible(true);
-//
-        myPerformanceMonitorPanel = new MyPerformanceMonitorPanel();
-        myPerformanceMonitorPanel.setVisible(true);
 
-//        perfMonitor = new PerformanceMonitorPanel();
-//        perfMonitor.setVisible(true);
-//
-        tabs.add("MyThreads", myThreadMonitorPanel);
-//        tabs.add("Threads", threadMonitor);;
+        PerformanceMonitorPanel perfMonitor = new PerformanceMonitorPanel();
+        perfMonitor.setVisible(true);
+
+        tabs.add("Threads", threadMonitor);;
         tabs.add("Chunks", chunkMonitor);
-        tabs.add("Performance", myPerformanceMonitorPanel);
-//        tabs.add("Performance", perfMonitor);
-//
-        add(tabs, BorderLayout.CENTER);
-    }
+        tabs.add("Performance", perfMonitor);
 
-    public void cancelThreadsRunning() {
-        myThreadMonitorPanel.cancelThreadsRunning();
-        myPerformanceMonitorPanel.cancelThreadsRunning();
+        add(tabs, BorderLayout.CENTER);
     }
 }

@@ -44,7 +44,6 @@ public class MonitoringSubsystem implements EngineSubsystem {
     @Override
     public void shutdown() {
         if (advancedMonitor != null) {
-            advancedMonitor.cancelThreadsRunning();
             advancedMonitor.setVisible(false);
             advancedMonitor.dispose();
         }

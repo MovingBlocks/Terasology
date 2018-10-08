@@ -20,8 +20,6 @@ import gnu.trove.map.TObjectDoubleMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,16 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @SuppressWarnings("serial")
 public class PerformanceMonitorPanel extends JPanel {
-    private static final Logger logger = LoggerFactory.getLogger(PerformanceMonitorPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceMonitorPanel.class);
 
     private final HeaderPanel header;
     private final JList list;
 
+    private final BlockingQueue<Task> queue = new LinkedBlockingQueue<>();
 
     public PerformanceMonitorPanel() {
         setLayout(new BorderLayout());
@@ -176,25 +174,35 @@ public class PerformanceMonitorPanel extends JPanel {
         }
     }
 
-    private static final class PerformanceListModel extends AbstractListModel {
+    private class UpdateRunner extends SwingWorker<List<Entry>, List<Entry>> {
+
+        @Override
+        protected List<Entry> doInBackground() throws Exception {
+            while (true) {
+                final Task task = queue.poll(1000, TimeUnit.MILLISECONDS);
+                if (task != null) {
+                    task.execute();
+                }
+            }
+        }
+    }
+
+    private abstract static class Task {
+
+        public abstract void execute();
+    }
+
+    private final class PerformanceListModel extends AbstractListModel {
 
         private final List<Entry> list = new ArrayList<>();
         private final Map<String, Entry> map = new HashMap<>();
-        private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
         private PerformanceListModel() {
-            executor.execute(() -> {
-                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                try {
-                    while (true) {
-                        Thread.sleep(1000);
-                        try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Poll")) {
-                            updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
-                        }
-                    }
-                } catch (Exception e) {
-                    ThreadMonitor.addError(e);
-                    logger.error("Error executing performance monitor update", e);
+            queue.add(new Task() {
+                @Override
+                public void execute() {
+                    updateEntries(PerformanceMonitor.getRunningMean(),
+                            PerformanceMonitor.getDecayingSpikes());
                 }
             });
         }
@@ -202,11 +210,6 @@ public class PerformanceMonitorPanel extends JPanel {
         private void invokeIntervalAdded(final int a, final int b) {
             final Object source = this;
             SwingUtilities.invokeLater(() -> fireIntervalAdded(source, a, b));
-        }
-
-        private void invokeIntervalRemoved(final int a, final int b) {
-            final Object source = this;
-            SwingUtilities.invokeLater(() -> fireIntervalRemoved(source, a, b));
         }
 
         private void invokeContentsChanged(final int a, final int b) {

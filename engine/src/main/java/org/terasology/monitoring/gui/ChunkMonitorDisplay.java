@@ -91,17 +91,21 @@ public class ChunkMonitorDisplay extends JPanel {
     public ChunkMonitorDisplay(int refreshInterval, int chunkSize) {
         Preconditions.checkArgument(refreshInterval >= 500, "Parameter 'refreshInterval' has to be greater or equal 500 (" + refreshInterval + ")");
         Preconditions.checkArgument(chunkSize >= 6, "Parameter 'chunkSize' has to be greater or equal 6 (" + chunkSize + ")");
+
         addComponentListener(new ResizeListener());
+
         final MouseInputListener ml = new MouseInputListener();
         addMouseListener(ml);
         addMouseMotionListener(ml);
         addMouseWheelListener(ml);
+
         this.refreshInterval = refreshInterval;
         this.chunkSize = chunkSize;
+
         ChunkMonitor.registerForEvents(this);
         queue.offer(new InitialRequest());
-        UpdateRunner updateRunner = new UpdateRunner();
-        updateRunner.execute();
+
+        (new UpdateRunner()).execute();
     }
 
     private void fireChunkSelectedEvent(Vector3i pos) {
