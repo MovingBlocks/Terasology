@@ -17,23 +17,21 @@ package org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen;
 
 import org.terasology.engine.module.StandardModuleExtension;
 
-// TODO: should dynamically generate checkbox list from boolean
-// StandardModuleExtensions rather than hardcoding associations here
 public enum CheckboxAssociationEnum {
-    IS_LIBRARY("libraryCheckbox", StandardModuleExtension.IS_LIBRARY),
-    IS_ASSET("assetCheckbox", StandardModuleExtension.IS_ASSET),
-    IS_IS_WORLD("worldCheckbox", StandardModuleExtension.IS_WORLD),
-    IS_GAMEPLAY("gameplayCheckbox", StandardModuleExtension.IS_GAMEPLAY),
-    IS_AUGMENTATION("augmentationCheckbox", StandardModuleExtension.IS_AUGMENTATION),
-    IS_SPECIAL("specialCheckbox", StandardModuleExtension.IS_SPECIAL),
-    SERVER_SIDE_ONLY("serverSideOnlyCheckbox", StandardModuleExtension.SERVER_SIDE_ONLY);
+    IS_LIBRARY(StandardModuleExtension.IS_LIBRARY),
+    IS_ASSET(StandardModuleExtension.IS_ASSET),
+    IS_IS_WORLD(StandardModuleExtension.IS_WORLD),
+    IS_GAMEPLAY(StandardModuleExtension.IS_GAMEPLAY),
+    IS_AUGMENTATION(StandardModuleExtension.IS_AUGMENTATION),
+    IS_SPECIAL(StandardModuleExtension.IS_SPECIAL),
+    SERVER_SIDE_ONLY(StandardModuleExtension.SERVER_SIDE_ONLY);
 
     private String checkboxName;
     private StandardModuleExtension standardModuleExtension;
 
-    CheckboxAssociationEnum(String checkboxName, StandardModuleExtension standardModuleExtension) {
-        this.checkboxName = checkboxName;
+    CheckboxAssociationEnum(StandardModuleExtension standardModuleExtension) {
         this.standardModuleExtension = standardModuleExtension;
+        this.checkboxName = getCheckboxNameFor(standardModuleExtension);
     }
 
     public String getCheckboxName() {
@@ -42,5 +40,17 @@ public enum CheckboxAssociationEnum {
 
     public StandardModuleExtension getStandardModuleExtension() {
         return standardModuleExtension;
+    }
+
+    private static String getCheckboxNameFor(StandardModuleExtension standardModuleExtension) {
+        StringBuilder builder = new StringBuilder(standardModuleExtension.getKey());
+        final int prefixIndex = builder.indexOf("is");
+
+        if ( prefixIndex == 0 ) {
+            builder.delete(prefixIndex, prefixIndex + 2);
+            builder.setCharAt(0, Character.toLowerCase(builder.charAt(0)));
+        }
+
+        return builder.append("Checkbox").toString();
     }
 }
