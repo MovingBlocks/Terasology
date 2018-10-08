@@ -24,7 +24,7 @@ public class AdvancedMonitor extends JFrame {
     private final JTabbedPane tabs;
     private final MyThreadMonitorPanel myThreadMonitorPanel;
 //    private final ThreadMonitorPanel threadMonitor;
-//    private final ChunkMonitorPanel chunkMonitor;
+    private final ChunkMonitorPanel chunkMonitor;
     private final MyPerformanceMonitorPanel myPerformanceMonitorPanel;
 //    private final PerformanceMonitorPanel perfMonitor;
 //
@@ -45,8 +45,8 @@ public class AdvancedMonitor extends JFrame {
 //        threadMonitor = new ThreadMonitorPanel();
 //        threadMonitor.setVisible(true);
 
-//        chunkMonitor = new ChunkMonitorPanel();
-//        chunkMonitor.setVisible(true);
+        chunkMonitor = new ChunkMonitorPanel();
+        chunkMonitor.setVisible(true);
 //
         myPerformanceMonitorPanel = new MyPerformanceMonitorPanel();
         myPerformanceMonitorPanel.setVisible(true);
@@ -56,7 +56,7 @@ public class AdvancedMonitor extends JFrame {
 //
         tabs.add("MyThreads", myThreadMonitorPanel);
 //        tabs.add("Threads", threadMonitor);;
-//        tabs.add("Chunks", chunkMonitor);
+        tabs.add("Chunks", chunkMonitor);
         tabs.add("Performance", myPerformanceMonitorPanel);
 //        tabs.add("Performance", perfMonitor);
 //

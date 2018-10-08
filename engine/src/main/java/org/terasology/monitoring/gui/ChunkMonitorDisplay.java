@@ -25,16 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitorEntry;
 import org.terasology.monitoring.chunk.ChunkMonitorEvent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.chunks.Chunk;
 
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -52,8 +49,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -62,18 +57,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @SuppressWarnings("serial")
 public class ChunkMonitorDisplay extends JPanel {
 
-    public static final Color COLOR_COMPLETE = new Color(0, 38, 28);
-    public static final Color COLOR_INTERNAL_LIGHT_GENERATION_PENDING = new Color(4, 76, 41);
-    public static final Color COLOR_ADJACENCY_GENERATION_PENDING = new Color(150, 237, 137);
+    private static final Color COLOR_COMPLETE = new Color(0, 38, 28);
+    private static final Color COLOR_INTERNAL_LIGHT_GENERATION_PENDING = new Color(4, 76, 41);
 
-    public static final Color COLOR_HIGHLIGHT_TESSELLATION = Color.blue.brighter().brighter();
+    private static final Color COLOR_HIGHLIGHT_TESSELLATION = Color.blue.brighter().brighter();
 
-    public static final Color COLOR_SELECTED_CHUNK = new Color(255, 102, 0);
+    private static final Color COLOR_SELECTED_CHUNK = new Color(255, 102, 0);
 
-    public static final Color COLOR_DEAD = Color.lightGray;
-    public static final Color COLOR_INVALID = Color.red;
+    private static final Color COLOR_DEAD = Color.lightGray;
 
-    private static final Logger logger = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
 
     private final EventBus eventbus = new EventBus("ChunkMonitorDisplay");
     private final List<ChunkMonitorEntry> chunks = Lists.newArrayList();
@@ -94,8 +87,6 @@ public class ChunkMonitorDisplay extends JPanel {
     private Vector3i selectedChunk;
 
     private final BlockingQueue<Request> queue = new LinkedBlockingQueue<>();
-    private final transient ExecutorService executor;
-    private final transient Runnable renderTask;
 
     public ChunkMonitorDisplay(int refreshInterval, int chunkSize) {
         Preconditions.checkArgument(refreshInterval >= 500, "Parameter 'refreshInterval' has to be greater or equal 500 (" + refreshInterval + ")");
@@ -107,11 +98,10 @@ public class ChunkMonitorDisplay extends JPanel {
         addMouseWheelListener(ml);
         this.refreshInterval = refreshInterval;
         this.chunkSize = chunkSize;
-        this.executor = Executors.newSingleThreadExecutor();
-        this.renderTask = new RenderTask();
         ChunkMonitor.registerForEvents(this);
         queue.offer(new InitialRequest());
-        executor.execute(renderTask);
+        UpdateRunner updateRunner = new UpdateRunner();
+        updateRunner.execute();
     }
 
     private void fireChunkSelectedEvent(Vector3i pos) {
@@ -123,10 +113,6 @@ public class ChunkMonitorDisplay extends JPanel {
         int x = (p.x - centerOffsetX - offsetX) / chunkSize;
         int z = (p.y - centerOffsetY - offsetY) / chunkSize;
         return new Vector3i(x - 1, renderY, z);
-    }
-
-    private void updateDisplay() {
-        queue.offer(new RenderRequest());
     }
 
     private void updateDisplay(boolean fastResume) {
@@ -165,26 +151,6 @@ public class ChunkMonitorDisplay extends JPanel {
         return null;
     }
 
-    public int getChunkSize() {
-        return chunkSize;
-    }
-
-    public ChunkMonitorDisplay setChunkSize(int value) {
-        if (value != chunkSize) {
-            Preconditions.checkArgument(value >= 6, "Parameter 'value' has to be greater or equal 6 (" + value + ")");
-            chunkSize = value;
-            updateDisplay(true);
-        }
-        return this;
-    }
-
-    public Vector3i getSelectedChunk() {
-        if (selectedChunk == null) {
-            return null;
-        }
-        return new Vector3i(selectedChunk);
-    }
-
     public ChunkMonitorDisplay setSelectedChunk(Vector3i chunk) {
         if (selectedChunk == null) {
             if (chunk != null) {
@@ -202,19 +168,7 @@ public class ChunkMonitorDisplay extends JPanel {
         return this;
     }
 
-    public int getRenderY() {
-        return renderY;
-    }
-
-    public int getMinRenderY() {
-        return minRenderY;
-    }
-
-    public int getMaxRenderY() {
-        return maxRenderY;
-    }
-
-    public ChunkMonitorDisplay setRenderY(int value) {
+    private ChunkMonitorDisplay setRenderY(int value) {
         int clampedValue = value;
         if (value < minRenderY) {
             clampedValue = minRenderY;
@@ -229,52 +183,26 @@ public class ChunkMonitorDisplay extends JPanel {
         return this;
     }
 
-    public ChunkMonitorDisplay setRenderYDelta(int delta) {
+    private ChunkMonitorDisplay setRenderYDelta(int delta) {
         return setRenderY(renderY + delta);
     }
 
-    public boolean getFollowPlayer() {
-        return followPlayer;
-    }
-
-    public ChunkMonitorDisplay setFollowPlayer(boolean value) {
-        if (followPlayer != value) {
-            followPlayer = value;
-            updateDisplay();
-        }
-        return this;
-    }
-
-    public int getOffsetX() {
+    private int getOffsetX() {
         return offsetX;
     }
 
-    public int getOffsetY() {
+    private int getOffsetY() {
         return offsetY;
     }
 
-    public ChunkMonitorDisplay setOffset(int x, int y) {
+    private ChunkMonitorDisplay setOffset(int x, int y) {
         if (offsetX != x || offsetY != y) {
             this.offsetX = x;
             this.offsetY = y;
             updateDisplay(true);
         }
+
         return this;
-    }
-
-    public int getRefreshInterval() {
-        return refreshInterval;
-    }
-
-    public ChunkMonitorDisplay setRefreshInterval(int value) {
-        Preconditions.checkArgument(value >= 500, "Parameter 'value' has to be greater or equal 500 (" + value + ")");
-        this.refreshInterval = value;
-        return this;
-    }
-
-    public void registerForEvents(Object object) {
-        Preconditions.checkNotNull(object, "The parameter 'object' must not be null");
-        eventbus.register(object);
     }
 
     @Subscribe
@@ -298,10 +226,6 @@ public class ChunkMonitorDisplay extends JPanel {
         private int height;
         private BufferedImage imageA;
         private BufferedImage imageB;
-
-        ImageBuffer(int width, int height) {
-            resize(width, height);
-        }
 
         ImageBuffer() {
         }
@@ -338,7 +262,7 @@ public class ChunkMonitorDisplay extends JPanel {
                 }
             } catch (Exception e) {
                 imageB = null;
-                logger.error("Error allocating background buffer for chunk monitor display", e);
+                LOGGER.error("Error allocating background buffer for chunk monitor display", e);
             } finally {
                 lock.writeLock().unlock();
             }
@@ -397,10 +321,6 @@ public class ChunkMonitorDisplay extends JPanel {
 
         RenderRequest(boolean fastResume) {
             this.fastResume = fastResume;
-        }
-
-        RenderRequest() {
-            this.fastResume = false;
         }
 
         @Override
@@ -494,7 +414,6 @@ public class ChunkMonitorDisplay extends JPanel {
             return "Chunk Request";
         }
 
-        @Override
         public boolean isChunkEvent() {
             return true;
         }
@@ -534,7 +453,7 @@ public class ChunkMonitorDisplay extends JPanel {
                 if (entry != null) {
                     entry.addEvent(bEvent);
                 } else {
-                    logger.error("No chunk monitor entry found for position {}", pos);
+                    LOGGER.error("No chunk monitor entry found for position {}", pos);
                 }
             }
         }
@@ -633,10 +552,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    private final class RenderTask implements Runnable {
-
-        private RenderTask() {
-        }
+    private final class UpdateRunner extends SwingWorker<Void, Void> {
 
         private Rectangle calcBox(List<ChunkMonitorEntry> chunkEntries) {
             if (chunkEntries.isEmpty()) {
@@ -754,48 +670,38 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         @Override
-        public void run() {
-
-            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-
+        protected Void doInBackground() throws Exception {
             final List<Request> requests = new LinkedList<>();
 
-            try {
-                while (true) {
+            while (true) {
+                final long slept = poll(requests);
+                boolean needsRendering = false;
+                boolean fastResume = false;
 
-                    final long slept = poll(requests);
-                    boolean needsRendering = false;
-                    boolean fastResume = false;
-
-                    for (Request r : requests) {
-                        try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(r.getName())) {
-                            r.execute();
-                        } catch (Exception e) {
-                            ThreadMonitor.addError(e);
-                            logger.error("Thread error", e);
-                        } finally {
-                            needsRendering |= r.needsRendering();
-                            fastResume |= r.fastResume();
-                        }
-                    }
-
-                    requests.clear();
-
-                    if (followPlayer) {
-                        doFollowPlayer();
-                    }
-
-                    if (needsRendering) {
-                        render();
-                    }
-
-                    if (!fastResume && (slept <= 400)) {
-                        Thread.sleep(500 - slept);
+                for (Request request : requests) {
+                    try {
+                        request.execute();
+                    } catch (Exception e) {
+                        LOGGER.error("Thread error", e);
+                    } finally {
+                        needsRendering |= request.needsRendering();
+                        fastResume |= request.fastResume();
                     }
                 }
-            } catch (Exception e) {
-                ThreadMonitor.addError(e);
-                logger.error("Thread error", e);
+
+                requests.clear();
+
+                if (followPlayer) {
+                    doFollowPlayer();
+                }
+
+                if (needsRendering) {
+                    render();
+                }
+
+                if (!fastResume && (slept <= 400)) {
+                    Thread.sleep(500 - slept);
+                }
             }
         }
     }
