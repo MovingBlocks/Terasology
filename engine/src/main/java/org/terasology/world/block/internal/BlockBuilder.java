@@ -223,7 +223,6 @@ public class BlockBuilder implements BlockBuilderHelper {
                 BlockMeshPart topMeshPart = topShape
                         .getMeshPart(part)
                         .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize(), blockTile.getLength());
-                block.setLoweredLiquidMesh(part.getSide(), meshPart);
                 block.setTopLiquidMesh(part.getSide(), topMeshPart);
             }
         }
