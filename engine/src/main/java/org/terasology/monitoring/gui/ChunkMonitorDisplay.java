@@ -31,7 +31,9 @@ import org.terasology.monitoring.chunk.ChunkMonitorEvent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.chunks.Chunk;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -59,11 +61,8 @@ public class ChunkMonitorDisplay extends JPanel {
 
     private static final Color COLOR_COMPLETE = new Color(0, 38, 28);
     private static final Color COLOR_INTERNAL_LIGHT_GENERATION_PENDING = new Color(4, 76, 41);
-
     private static final Color COLOR_HIGHLIGHT_TESSELLATION = Color.blue.brighter().brighter();
-
     private static final Color COLOR_SELECTED_CHUNK = new Color(255, 102, 0);
-
     private static final Color COLOR_DEAD = Color.lightGray;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
@@ -73,6 +72,7 @@ public class ChunkMonitorDisplay extends JPanel {
     private final Map<Vector3i, ChunkMonitorEntry> map = Maps.newHashMap();
     private final ImageBuffer image = new ImageBuffer();
 
+    private boolean followPlayer = true;
     private int refreshInterval;
     private int centerOffsetX;
     private int centerOffsetY;
@@ -82,7 +82,6 @@ public class ChunkMonitorDisplay extends JPanel {
     private int renderY;
     private int minRenderY;
     private int maxRenderY;
-    private boolean followPlayer = true;
 
     private Vector3i selectedChunk;
 
@@ -677,36 +676,42 @@ public class ChunkMonitorDisplay extends JPanel {
         protected Void doInBackground() throws Exception {
             final List<Request> requests = new LinkedList<>();
 
-            while (true) {
-                final long slept = poll(requests);
-                boolean needsRendering = false;
-                boolean fastResume = false;
+            try {
+                while (true) {
+                    final long slept = poll(requests);
+                    boolean needsRendering = false;
+                    boolean fastResume = false;
 
-                for (Request request : requests) {
-                    try {
-                        request.execute();
-                    } catch (Exception e) {
-                        LOGGER.error("Thread error", e);
-                    } finally {
-                        needsRendering |= request.needsRendering();
-                        fastResume |= request.fastResume();
+                    for (Request request : requests) {
+                        try {
+                            request.execute();
+                        } catch (Exception e) {
+                            LOGGER.error("Thread error", e);
+                        } finally {
+                            needsRendering |= request.needsRendering();
+                            fastResume |= request.fastResume();
+                        }
+                    }
+
+                    requests.clear();
+
+                    if (followPlayer) {
+                        doFollowPlayer();
+                    }
+
+                    if (needsRendering) {
+                        render();
+                    }
+
+                    if (!fastResume && (slept <= 400)) {
+                        Thread.sleep(refreshInterval - slept);
                     }
                 }
-
-                requests.clear();
-
-                if (followPlayer) {
-                    doFollowPlayer();
-                }
-
-                if (needsRendering) {
-                    render();
-                }
-
-                if (!fastResume && (slept <= 400)) {
-                    Thread.sleep(500 - slept);
-                }
+            } catch (Exception e) {
+                LOGGER.error("Error executing thread monitor update", e);
             }
+
+            return null;
         }
     }
 }

@@ -21,8 +21,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.monitoring.PerformanceMonitor;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.AbstractListModel;
+import javax.swing.SwingConstants;
+import javax.swing.ListCellRenderer;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,25 +41,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 public class PerformanceMonitorPanel extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceMonitorPanel.class);
 
-    private final HeaderPanel header;
-    private final JList list;
-
     private final BlockingQueue<Task> queue = new LinkedBlockingQueue<>();
 
     public PerformanceMonitorPanel() {
         setLayout(new BorderLayout());
-        header = new HeaderPanel();
-        list = new JList(new PerformanceListModel());
+        HeaderPanel header = new HeaderPanel();
+
+        JList list = new JList(new PerformanceListModel());
         list.setCellRenderer(new PerformanceListRenderer(header));
         list.setVisible(true);
+
         add(header, BorderLayout.PAGE_START);
         add(list, BorderLayout.CENTER);
+
+        (new UpdateRunner()).execute();
     }
 
     private static class HeaderPanel extends JPanel {
@@ -178,12 +192,18 @@ public class PerformanceMonitorPanel extends JPanel {
 
         @Override
         protected List<Entry> doInBackground() throws Exception {
-            while (true) {
-                final Task task = queue.poll(1000, TimeUnit.MILLISECONDS);
-                if (task != null) {
-                    task.execute();
+            try {
+                while (true) {
+                    final Task task = queue.poll(1000, TimeUnit.MILLISECONDS);
+                    if (task != null) {
+                        task.execute();
+                    }
                 }
+            } catch (Exception e) {
+                LOGGER.error("Error executing performance monitor update", e);
             }
+
+            return null;
         }
     }
 

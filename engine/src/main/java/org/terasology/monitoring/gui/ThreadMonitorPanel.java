@@ -22,8 +22,19 @@ import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.monitoring.impl.ThreadMonitorEvent;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.AbstractListModel;
+import javax.swing.SwingConstants;
+import javax.swing.ListCellRenderer;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,14 +48,12 @@ public class ThreadMonitorPanel extends JPanel {
     private static final Color BACKGROUND = Color.white;
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadMonitorPanel.class);
 
-    private final JList list;
-
     private final BlockingQueue<Task> queue = new LinkedBlockingQueue<>();
 
     public ThreadMonitorPanel() {
         setLayout(new BorderLayout());
 
-        list = new JList(new ThreadListModel());
+        JList list = new JList(new ThreadListModel());
         list.setCellRenderer(new ThreadListRenderer());
         list.setVisible(true);
 
@@ -172,13 +181,18 @@ public class ThreadMonitorPanel extends JPanel {
 
         @Override
         protected Void doInBackground() throws Exception {
-
-            while (true) {
-                final Task task = queue.poll(500, TimeUnit.MILLISECONDS);
-                if (task != null) {
-                    task.execute();
+            try {
+                while (true) {
+                    final Task task = queue.poll(500, TimeUnit.MILLISECONDS);
+                    if (task != null) {
+                        task.execute();
+                    }
                 }
+            } catch (Exception e) {
+                LOGGER.error("Error executing thread monitor update", e);
             }
+
+            return null;
         }
     }
 

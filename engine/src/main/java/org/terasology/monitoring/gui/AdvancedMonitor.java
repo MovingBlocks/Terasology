@@ -38,12 +38,12 @@ public class AdvancedMonitor extends JFrame {
         ChunkMonitorPanel chunkMonitor = new ChunkMonitorPanel();
         chunkMonitor.setVisible(true);
 
-        PerformanceMonitorPanel perfMonitor = new PerformanceMonitorPanel();
-        perfMonitor.setVisible(true);
+        PerformanceMonitorPanel performanceMonitor = new PerformanceMonitorPanel();
+        performanceMonitor.setVisible(true);
 
         tabs.add("Threads", threadMonitor);;
         tabs.add("Chunks", chunkMonitor);
-        tabs.add("Performance", perfMonitor);
+        tabs.add("Performance", performanceMonitor);
 
         add(tabs, BorderLayout.CENTER);
     }
