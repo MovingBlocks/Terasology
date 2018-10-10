@@ -18,53 +18,68 @@ package org.terasology.monitoring.gui;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.monitoring.impl.ThreadMonitorEvent;
 
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.AbstractListModel;
-import javax.swing.SwingConstants;
+import javax.swing.JLabel;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import java.awt.Color;
+import javax.swing.AbstractListModel;
+import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Dimension;
+import java.awt.Component;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 public class ThreadMonitorPanel extends JPanel {
 
-    private static final Color BACKGROUND = Color.white;
+    private static final Color BACKGROUND = Color.WHITE;
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadMonitorPanel.class);
 
-    private final BlockingQueue<Task> queue = new LinkedBlockingQueue<>();
+    /**
+     * If true, the active monitoring thread in executor service should stop.
+     */
+    private boolean stopThread;
 
     public ThreadMonitorPanel() {
         setLayout(new BorderLayout());
-
         JList list = new JList(new ThreadListModel());
         list.setCellRenderer(new ThreadListRenderer());
         list.setVisible(true);
-
         add(list, BorderLayout.CENTER);
+    }
 
-        (new UpdateRunner()).execute();
+    public void stopThread() {
+        this.stopThread = true;
     }
 
     private abstract static class Task {
 
+        private String name;
+
+        Task(String name) {
+            this.name = name;
+        }
+
         public abstract void execute();
+
+        public String getName() {
+            return name;
+        }
+
     }
 
     private static class ThreadListRenderer implements ListCellRenderer {
@@ -96,7 +111,7 @@ public class ThreadMonitorPanel extends JPanel {
             private Dimension dId = new Dimension(0, 0);
             private Dimension dName = new Dimension(0, 0);
 
-             MyRenderer() {
+            MyRenderer() {
                 setBackground(BACKGROUND);
                 setLayout(new BorderLayout());
 
@@ -107,8 +122,8 @@ public class ThreadMonitorPanel extends JPanel {
                 pHead.add(pError, BorderLayout.PAGE_END);
 
                 lId.setHorizontalAlignment(SwingConstants.RIGHT);
-                lName.setForeground(Color.blue);
-                lCounters.setForeground(Color.gray);
+                lName.setForeground(Color.BLUE);
+                lCounters.setForeground(Color.GRAY);
 
                 pList.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 pList.setBackground(BACKGROUND);
@@ -122,7 +137,7 @@ public class ThreadMonitorPanel extends JPanel {
                 pError.add(lErrorSpacer);
                 pError.add(lError);
 
-                lError.setForeground(Color.red);
+                lError.setForeground(Color.RED);
 
                 add(pHead, BorderLayout.PAGE_START);
             }
@@ -150,14 +165,14 @@ public class ThreadMonitorPanel extends JPanel {
 
                     if (monitor.isAlive()) {
                         if (monitor.isActive()) {
-                            lActive.setForeground(Color.green);
+                            lActive.setForeground(Color.GREEN);
                             lActive.setText("Active");
                         } else {
-                            lActive.setForeground(Color.gray);
+                            lActive.setForeground(Color.GRAY);
                             lActive.setText("Inactive");
                         }
                     } else {
-                        lActive.setForeground(Color.red);
+                        lActive.setForeground(Color.RED);
                         lActive.setText("Disposed");
                     }
 
@@ -177,33 +192,15 @@ public class ThreadMonitorPanel extends JPanel {
         }
     }
 
-    private class UpdateRunner extends SwingWorker<Void, Void> {
-
-        @Override
-        protected Void doInBackground() throws Exception {
-            try {
-                while (true) {
-                    final Task task = queue.poll(500, TimeUnit.MILLISECONDS);
-                    if (task != null) {
-                        task.execute();
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.error("Error executing thread monitor update", e);
-            }
-
-            return null;
-        }
-    }
-
     private final class ThreadListModel extends AbstractListModel {
 
-        private final List<SingleThreadMonitor> monitors = new ArrayList<>();
+        private final java.util.List<SingleThreadMonitor> monitors = new ArrayList<>();
+        private final ExecutorService executor = Executors.newSingleThreadExecutor();
+        private final BlockingQueue<Task> queue = new LinkedBlockingQueue<>();
 
         private ThreadListModel() {
             ThreadMonitor.registerForEvents(this);
-
-            queue.add(new Task() {
+            queue.add(new Task("Sort Monitors") {
                 @Override
                 public void execute() {
                     ThreadMonitor.getThreadMonitors(monitors, false);
@@ -212,6 +209,30 @@ public class ThreadMonitorPanel extends JPanel {
                         invokeIntervalAdded(0, monitors.size() - 1);
                     }
                 }
+            });
+
+            executor.execute(() -> {
+                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                try {
+                    while (!stopThread) {
+                        final Task task = queue.poll(500, TimeUnit.MILLISECONDS);
+                        if (task != null) {
+                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getName())) {
+                                task.execute();
+                            }
+                        } else {
+                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Sort Monitors")) {
+                                Collections.sort(monitors);
+                                invokeContentsChanged(0, monitors.size() - 1);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    ThreadMonitor.addError(e);
+                    LOGGER.error("Error executing thread monitor update", e);
+                }
+
+                executor.shutdownNow();
             });
         }
 
@@ -230,7 +251,7 @@ public class ThreadMonitorPanel extends JPanel {
             if (event != null) {
                 switch (event.type) {
                     case MonitorAdded:
-                        queue.add(new Task() {
+                        queue.add(new Task("Register Monitor") {
                             @Override
                             public void execute() {
                                 if (!monitors.contains(event.monitor)) {

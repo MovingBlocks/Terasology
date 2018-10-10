@@ -20,20 +20,21 @@ import gnu.trove.map.TObjectDoubleMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.monitoring.ThreadActivity;
+import org.terasology.monitoring.ThreadMonitor;
 
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.AbstractListModel;
-import javax.swing.SwingConstants;
+import javax.swing.JLabel;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import java.awt.Color;
+import javax.swing.AbstractListModel;
+import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Dimension;
+import java.awt.Component;
+import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,28 +42,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @SuppressWarnings("serial")
 public class PerformanceMonitorPanel extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceMonitorPanel.class);
 
-    private final BlockingQueue<Task> queue = new LinkedBlockingQueue<>();
+    /**
+     * If true, the active monitoring thread in executor service should stop.
+     */
+    private boolean stopThread;
 
     public PerformanceMonitorPanel() {
         setLayout(new BorderLayout());
         HeaderPanel header = new HeaderPanel();
-
         JList list = new JList(new PerformanceListModel());
         list.setCellRenderer(new PerformanceListRenderer(header));
         list.setVisible(true);
-
         add(header, BorderLayout.PAGE_START);
         add(list, BorderLayout.CENTER);
+    }
 
-        (new UpdateRunner()).execute();
+    public void stopThread() {
+        stopThread = true;
     }
 
     private static class HeaderPanel extends JPanel {
@@ -149,15 +152,15 @@ public class PerformanceMonitorPanel extends JPanel {
             MyRenderer(HeaderPanel header) {
                 this.header = Preconditions.checkNotNull(header, "The parameter 'header' must not be null");
 
-                setBackground(Color.white);
+                setBackground(Color.WHITE);
                 setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
 
                 lMean.setHorizontalAlignment(SwingConstants.RIGHT);
-                lMean.setForeground(Color.gray);
+                lMean.setForeground(Color.GRAY);
                 lMean.setPreferredSize(header.lMean.getPreferredSize());
 
                 lSpike.setHorizontalAlignment(SwingConstants.RIGHT);
-                lSpike.setForeground(Color.gray);
+                lSpike.setForeground(Color.GRAY);
                 lSpike.setPreferredSize(header.lSpike.getPreferredSize());
 
                 add(lName);
@@ -168,7 +171,7 @@ public class PerformanceMonitorPanel extends JPanel {
             public void setEntry(Entry entry) {
                 if (entry != null) {
                     lName.setPreferredSize(null);
-                    lName.setForeground(entry.active ? Color.blue : Color.gray);
+                    lName.setForeground(entry.active ? Color.BLUE : Color.GRAY);
                     lName.setText(entry.name);
                     Dimension tmp = lName.getPreferredSize();
                     if (tmp.width > dName.width || tmp.height > dName.height) {
@@ -188,42 +191,28 @@ public class PerformanceMonitorPanel extends JPanel {
         }
     }
 
-    private class UpdateRunner extends SwingWorker<List<Entry>, List<Entry>> {
-
-        @Override
-        protected List<Entry> doInBackground() throws Exception {
-            try {
-                while (true) {
-                    final Task task = queue.poll(1000, TimeUnit.MILLISECONDS);
-                    if (task != null) {
-                        task.execute();
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.error("Error executing performance monitor update", e);
-            }
-
-            return null;
-        }
-    }
-
-    private abstract static class Task {
-
-        public abstract void execute();
-    }
-
     private final class PerformanceListModel extends AbstractListModel {
 
         private final List<Entry> list = new ArrayList<>();
         private final Map<String, Entry> map = new HashMap<>();
+        private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
         private PerformanceListModel() {
-            queue.add(new Task() {
-                @Override
-                public void execute() {
-                    updateEntries(PerformanceMonitor.getRunningMean(),
-                            PerformanceMonitor.getDecayingSpikes());
+            executor.execute(() -> {
+                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                try {
+                    while (!stopThread) {
+                        Thread.sleep(1000);
+                        try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Poll")) {
+                            updateEntries(PerformanceMonitor.getRunningMean(), PerformanceMonitor.getDecayingSpikes());
+                        }
+                    }
+                } catch (Exception e) {
+                    ThreadMonitor.addError(e);
+                    LOGGER.error("Error executing performance monitor update", e);
                 }
+
+                executor.shutdownNow();
             });
         }
 
@@ -261,6 +250,7 @@ public class PerformanceMonitorPanel extends JPanel {
                     }
                     return true;
                 });
+
                 Collections.sort(list);
                 invokeContentsChanged(0, list.size() - 1);
             }

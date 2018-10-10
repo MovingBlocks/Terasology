@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.monitoring.ThreadActivity;
+import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitorEntry;
 import org.terasology.monitoring.chunk.ChunkMonitorEvent;
@@ -33,7 +35,6 @@ import org.terasology.world.chunks.Chunk;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -51,6 +52,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -63,7 +66,7 @@ public class ChunkMonitorDisplay extends JPanel {
     private static final Color COLOR_INTERNAL_LIGHT_GENERATION_PENDING = new Color(4, 76, 41);
     private static final Color COLOR_HIGHLIGHT_TESSELLATION = Color.blue.brighter().brighter();
     private static final Color COLOR_SELECTED_CHUNK = new Color(255, 102, 0);
-    private static final Color COLOR_DEAD = Color.lightGray;
+    private static final Color COLOR_DEAD = Color.LIGHT_GRAY;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
 
@@ -72,7 +75,6 @@ public class ChunkMonitorDisplay extends JPanel {
     private final Map<Vector3i, ChunkMonitorEntry> map = Maps.newHashMap();
     private final ImageBuffer image = new ImageBuffer();
 
-    private boolean followPlayer = true;
     private int refreshInterval;
     private int centerOffsetX;
     private int centerOffsetY;
@@ -82,29 +84,38 @@ public class ChunkMonitorDisplay extends JPanel {
     private int renderY;
     private int minRenderY;
     private int maxRenderY;
+    private boolean followPlayer;
 
     private Vector3i selectedChunk;
 
-    private final BlockingQueue<Request> queue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Request> queue;
+    private final transient ExecutorService executor;
+
+    /**
+     * If true, the active monitoring thread in executor service should stop.
+     */
+    private boolean stopThread;
 
     public ChunkMonitorDisplay(int refreshInterval, int chunkSize) {
         Preconditions.checkArgument(refreshInterval >= 500, "Parameter 'refreshInterval' has to be greater or equal 500 (" + refreshInterval + ")");
         Preconditions.checkArgument(chunkSize >= 6, "Parameter 'chunkSize' has to be greater or equal 6 (" + chunkSize + ")");
-
         addComponentListener(new ResizeListener());
-
         final MouseInputListener ml = new MouseInputListener();
         addMouseListener(ml);
         addMouseMotionListener(ml);
         addMouseWheelListener(ml);
-
+        this.followPlayer = true;
         this.refreshInterval = refreshInterval;
         this.chunkSize = chunkSize;
-
+        this.executor = Executors.newSingleThreadExecutor();
         ChunkMonitor.registerForEvents(this);
-        queue.offer(new InitialRequest());
+        this.queue = new LinkedBlockingQueue<>();
+        this.queue.offer(new InitialRequest());
+        this.executor.execute(new RenderTask());
+    }
 
-        (new UpdateRunner()).execute();
+    public void stopThread() {
+        stopThread = true;
     }
 
     private void fireChunkSelectedEvent(Vector3i pos) {
@@ -171,7 +182,7 @@ public class ChunkMonitorDisplay extends JPanel {
         return this;
     }
 
-    private ChunkMonitorDisplay setRenderY(int value) {
+    public ChunkMonitorDisplay setRenderY(int value) {
         int clampedValue = value;
         if (value < minRenderY) {
             clampedValue = minRenderY;
@@ -186,25 +197,24 @@ public class ChunkMonitorDisplay extends JPanel {
         return this;
     }
 
-    private ChunkMonitorDisplay setRenderYDelta(int delta) {
+    public ChunkMonitorDisplay setRenderYDelta(int delta) {
         return setRenderY(renderY + delta);
     }
 
-    private int getOffsetX() {
+    public int getOffsetX() {
         return offsetX;
     }
 
-    private int getOffsetY() {
+    public int getOffsetY() {
         return offsetY;
     }
 
-    private ChunkMonitorDisplay setOffset(int x, int y) {
+    public ChunkMonitorDisplay setOffset(int x, int y) {
         if (offsetX != x || offsetY != y) {
             this.offsetX = x;
             this.offsetY = y;
             updateDisplay(true);
         }
-
         return this;
     }
 
@@ -326,6 +336,10 @@ public class ChunkMonitorDisplay extends JPanel {
             this.fastResume = fastResume;
         }
 
+        RenderRequest() {
+            this.fastResume = false;
+        }
+
         @Override
         public void execute() {
         }
@@ -417,6 +431,7 @@ public class ChunkMonitorDisplay extends JPanel {
             return "Chunk Request";
         }
 
+        @Override
         public boolean isChunkEvent() {
             return true;
         }
@@ -555,7 +570,10 @@ public class ChunkMonitorDisplay extends JPanel {
         }
     }
 
-    private final class UpdateRunner extends SwingWorker<Void, Void> {
+    private final class RenderTask implements Runnable {
+
+        private RenderTask() {
+        }
 
         private Rectangle calcBox(List<ChunkMonitorEntry> chunkEntries) {
             if (chunkEntries.isEmpty()) {
@@ -613,12 +631,12 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         private void renderBox(Graphics2D g, int offsetx, int offsety, Rectangle box) {
-            g.setColor(Color.white);
+            g.setColor(Color.WHITE);
             g.drawRect(box.x * chunkSize + offsetx, box.y * chunkSize + offsety, box.width * chunkSize - 1, box.height * chunkSize - 1);
         }
 
         private void renderBackground(Graphics2D g, int width, int height) {
-            g.setColor(Color.black);
+            g.setColor(Color.BLACK);
             g.fillRect(0, 0, width, height);
         }
 
@@ -673,23 +691,28 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         @Override
-        protected Void doInBackground() throws Exception {
+        public void run() {
+
+            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+
             final List<Request> requests = new LinkedList<>();
 
             try {
-                while (true) {
+                while (!stopThread) {
+
                     final long slept = poll(requests);
                     boolean needsRendering = false;
                     boolean fastResume = false;
 
-                    for (Request request : requests) {
-                        try {
-                            request.execute();
+                    for (Request r : requests) {
+                        try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(r.getName())) {
+                            r.execute();
                         } catch (Exception e) {
-                            LOGGER.error("Thread error", e);
+                            ThreadMonitor.addError(e);
+                            LOGGER.error("Error executing chunk monitor update", e);
                         } finally {
-                            needsRendering |= request.needsRendering();
-                            fastResume |= request.fastResume();
+                            needsRendering |= r.needsRendering();
+                            fastResume |= r.fastResume();
                         }
                     }
 
@@ -708,10 +731,11 @@ public class ChunkMonitorDisplay extends JPanel {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.error("Error executing thread monitor update", e);
+                ThreadMonitor.addError(e);
+                LOGGER.error("Error executing chunk monitor update", e);
             }
 
-            return null;
+            executor.shutdownNow();
         }
     }
 }
