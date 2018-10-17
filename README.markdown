@@ -2,7 +2,7 @@
 
 [![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
 [![Release](https://img.shields.io/github/release/MovingBlocks/Terasology.svg)](../../releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/latest/total.svg "Downloads")](../../releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/total.svg "Downloads")](../../releases/latest)
 [![Bounties](https://img.shields.io/bountysource/team/MovingBlocks/activity.svg)](https://www.bountysource.com/teams/MovingBlocks)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MovingBlocks/Terasology/alerts/)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MovingBlocks/Terasology/context:java)
