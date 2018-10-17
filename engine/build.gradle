@@ -1,10 +1,5 @@
 // The engine build is the primary Java project and has the primary list of dependencies
 
-// Get the gradle versioneye plugin from the plugins.gradle.org repo
-plugins {
-    id "org.standardout.versioneye" version "1.1.0"
-}
-
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
