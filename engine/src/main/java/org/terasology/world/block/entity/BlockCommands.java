@@ -113,7 +113,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the" +
-            "commands, e.g.: \"listBlocks engine: core:\" will list all blocks from the engine and core module",
+            " commands, e.g.: \"listBlocks engine: core:\" will list all blocks from the engine and core module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -148,7 +148,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Lists all available shapes\nYou can filter by adding the beginning of words after the" +
-            "commands, e.g.: \"listShapes engine: core:\" will list all shapes from the engine and core module",
+            " commands, e.g.: \"listShapes engine: core:\" will list all shapes from the engine and core module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listShapes(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
