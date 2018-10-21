@@ -475,7 +475,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                     moduleDetails.bindEnabled(new ReadOnlyBinding<Boolean>() {
                         @Override
                         public Boolean get() {
-                            return !sortedModules.isEmpty() && sortedModules.stream().anyMatch(ModuleSelectionInfo::isPresent);
+                            return moduleInfoBinding.get() != null;
                         }
                     });
                     moduleDetails.subscribe(b -> {
