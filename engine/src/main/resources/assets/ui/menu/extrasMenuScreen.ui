@@ -20,7 +20,7 @@
             },
             {
                 "type": "UILabel",
-                "text": "${engine:menu#extras-title}",
+                "text": "${engine:menu#extras-label}",
                 "family": "title",
                 "id": "subtitle",
                 "layoutInfo": {

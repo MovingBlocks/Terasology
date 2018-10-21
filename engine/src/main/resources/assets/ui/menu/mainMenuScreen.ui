@@ -101,7 +101,7 @@
                     {
                         "type": "UIButton",
                         "id": "extras",
-                        "text": "${engine:menu#extras}"
+                        "text": "${engine:menu#extras-label}"
                     },
                     {
                         "type" : "UISpace",
