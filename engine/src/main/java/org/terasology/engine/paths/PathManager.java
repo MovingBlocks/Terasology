@@ -272,7 +272,7 @@ public final class PathManager {
      *
      * @return Path in which the modules are allowed to save files.
      */
-    public Path getSandboxesPath() {
+    public Path getSandboxPath() {
         return sandboxPath;
     }
 
@@ -323,6 +323,6 @@ public final class PathManager {
     }
 
     public Path getSandboxPath(String title) {
-        return getSandboxesPath().resolve(title.replaceAll(REGEX, ""));
+        return getSandboxPath().resolve(title.replaceAll(REGEX, ""));
     }
 }

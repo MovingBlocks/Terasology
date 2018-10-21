@@ -24,17 +24,29 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * This class wrap common file operations so they're only allowed to happen
+ * within Terasology/sandbox directory.
+ *
+ * It gives modules the ability to read and write to the file system in a safe way.
+ */
 @API
-public class SandboxManager {
+public class SandboxFileManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(SandboxManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(SandboxFileManager.class);
 
     private PathManager pathManager;
 
-    public SandboxManager() {
+    public SandboxFileManager() {
         this.pathManager = PathManager.getInstance();
     }
 
+    /**
+     * Read the file that matches the passed filename.
+     *
+     * @param filename
+     * @return An array of bytes.
+     */
     public byte[] readFile(String filename) {
         Path sandboxPath = pathManager.getSandboxPath(filename);
         try {
@@ -46,6 +58,12 @@ public class SandboxManager {
         return null;
     }
 
+    /**
+     * Write a new file using the filename and data passed as parameter.
+     *
+     * @param filename
+     * @param data The file's content.
+     */
     public void writeFile(String filename, byte[] data) {
         Path sandboxPath = pathManager.getSandboxPath(filename);
         try {
@@ -55,6 +73,11 @@ public class SandboxManager {
         }
     }
 
+    /**
+     * Delete the file that matches the passed filename.
+     *
+     * @param filename
+     */
     public void deleteFile(String filename) {
         Path sandboxPath = pathManager.getSandboxPath(filename);
         try {
