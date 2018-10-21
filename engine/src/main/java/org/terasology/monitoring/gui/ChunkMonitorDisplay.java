@@ -528,13 +528,6 @@ public class ChunkMonitorDisplay extends JPanel {
                     }
                     chunks.add(entry);
                     map.put(pos, entry);
-                } else {
-                    entry = map.get(pos);
-                }
-                if (entry != null) {
-                    entry.addEvent(bEvent);
-                } else {
-                    logger.error("No chunk monitor entry found for position {}", pos);
                 }
             }
         }
