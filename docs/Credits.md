@@ -240,7 +240,8 @@ Contributors
  [llvieira](https://github.com/llvieira),
  [pardovot](https://github.com/pardovot),
  [brylie](https://github.com/brylie),
- [Joseph5610](https://github.com/Joseph5610)
+ [Joseph5610](https://github.com/Joseph5610),
+ [fallazc](https://github.com/fallazc)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
