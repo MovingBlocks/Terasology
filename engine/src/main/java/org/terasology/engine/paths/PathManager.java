@@ -48,6 +48,7 @@ public final class PathManager {
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
     private static final String CONFIGS_DIR = "configs";
+    private static final String SANDBOX_DIR = "sandbox";
     private static final String REGEX = "[^A-Za-z0-9-_ ]";
 
     private static PathManager instance;
@@ -58,6 +59,7 @@ public final class PathManager {
     private Path logPath;
     private Path shaderLogPath;
     private Path currentWorldPath;
+    private Path sandboxPath;
 
     private ImmutableList<Path> modPaths = ImmutableList.of();
     private Path screenshotPath;
@@ -267,6 +269,14 @@ public final class PathManager {
     }
 
     /**
+     *
+     * @return Path in which the modules are allowed to save files.
+     */
+    public Path getSandboxesPath() {
+        return sandboxPath;
+    }
+
+    /**
      * Updates all of the path manager's file/directory references to match the path settings. Creates directories if they don't already exist.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
@@ -296,6 +306,8 @@ public final class PathManager {
         if (currentWorldPath == null) {
             currentWorldPath = homePath;
         }
+        sandboxPath = homePath.resolve(SANDBOX_DIR);
+        Files.createDirectories(sandboxPath);
     }
 
     public Path getHomeModPath() {
@@ -308,5 +320,9 @@ public final class PathManager {
 
     public Path getRecordingPath(String title) {
         return getRecordingsPath().resolve(title.replaceAll(REGEX, ""));
+    }
+
+    public Path getSandboxPath(String title) {
+        return getSandboxesPath().resolve(title.replaceAll(REGEX, ""));
     }
 }
