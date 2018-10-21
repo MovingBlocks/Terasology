@@ -23,6 +23,8 @@ import org.terasology.module.sandbox.API;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * This class wrap common file operations so they're only allowed to happen
@@ -49,13 +51,16 @@ public class SandboxFileManager {
      */
     public byte[] readFile(String filename) {
         Path sandboxPath = pathManager.getSandboxPath(filename);
-        try {
-            return Files.readAllBytes(sandboxPath);
-        } catch (IOException e) {
-            logger.error("Could not read the file: " + filename, e);
-        }
 
-        return null;
+        return AccessController.doPrivileged((PrivilegedAction<byte[]>) () -> {
+            try {
+                return Files.readAllBytes(sandboxPath);
+            } catch (IOException e) {
+                logger.error("Could not read the file: " + filename, e);
+            }
+
+            return null;
+        });
     }
 
     /**
@@ -66,11 +71,16 @@ public class SandboxFileManager {
      */
     public void writeFile(String filename, byte[] data) {
         Path sandboxPath = pathManager.getSandboxPath(filename);
-        try {
-            Files.write(sandboxPath, data);
-        } catch (IOException e) {
-            logger.error("Could not write the file: " + filename, e);
-        }
+        
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            try {
+                Files.write(sandboxPath, data);
+            } catch (IOException e) {
+                logger.error("Could not write the file: " + filename, e);
+            }
+
+            return null;
+        });
     }
 
     /**
@@ -80,10 +90,15 @@ public class SandboxFileManager {
      */
     public void deleteFile(String filename) {
         Path sandboxPath = pathManager.getSandboxPath(filename);
-        try {
-            Files.delete(sandboxPath);
-        } catch (IOException e) {
-            logger.error("Could not delete the file: " + filename, e);
-        }
+
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            try {
+                Files.delete(sandboxPath);
+            } catch (IOException e) {
+                logger.error("Could not delete the file: " + filename, e);
+            }
+
+            return null;
+        });
     }
 }
