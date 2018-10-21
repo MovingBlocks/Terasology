@@ -49,9 +49,7 @@ import java.util.concurrent.Executors;
 public class PerformanceMonitorPanel extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceMonitorPanel.class);
 
-    /**
-     * If true, the active monitoring thread in executor service should stop.
-     */
+    // If true, the active monitoring thread in executor service should stop.
     private boolean stopThread;
 
     public PerformanceMonitorPanel() {

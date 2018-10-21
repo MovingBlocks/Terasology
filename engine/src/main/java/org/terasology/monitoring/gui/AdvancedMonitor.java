@@ -54,6 +54,8 @@ public class AdvancedMonitor extends JFrame {
     }
 
     /**
+     * Closes advanced monitor panel.
+     *
      * This method goes through three steps:
      *  1. Hides this windows.
      *  2. Releases all of the native screen resources used by this windows.

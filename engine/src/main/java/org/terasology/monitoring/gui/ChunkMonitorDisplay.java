@@ -68,7 +68,7 @@ public class ChunkMonitorDisplay extends JPanel {
     private static final Color COLOR_SELECTED_CHUNK = new Color(255, 102, 0);
     private static final Color COLOR_DEAD = Color.LIGHT_GRAY;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
+    private static final Logger logger = LoggerFactory.getLogger(ChunkMonitorDisplay.class);
 
     private final EventBus eventbus = new EventBus("ChunkMonitorDisplay");
     private final List<ChunkMonitorEntry> chunks = Lists.newArrayList();
@@ -91,9 +91,7 @@ public class ChunkMonitorDisplay extends JPanel {
     private final BlockingQueue<Request> queue;
     private final transient ExecutorService executor;
 
-    /**
-     * If true, the active monitoring thread in executor service should stop.
-     */
+    // If true, the active monitoring thread in executor service should stop.
     private boolean stopThread;
 
     public ChunkMonitorDisplay(int refreshInterval, int chunkSize) {
@@ -127,6 +125,10 @@ public class ChunkMonitorDisplay extends JPanel {
         int x = (p.x - centerOffsetX - offsetX) / chunkSize;
         int z = (p.y - centerOffsetY - offsetY) / chunkSize;
         return new Vector3i(x - 1, renderY, z);
+    }
+
+    private void updateDisplay() {
+        queue.offer(new RenderRequest());
     }
 
     private void updateDisplay(boolean fastResume) {
@@ -201,6 +203,19 @@ public class ChunkMonitorDisplay extends JPanel {
         return setRenderY(renderY + delta);
     }
 
+    public boolean getFollowPlayer() {
+        return followPlayer;
+    }
+
+    // TODO: Add a checkbox to toggle whether the chunk display will follow where the player goes or not.
+    public ChunkMonitorDisplay setFollowPlayer(boolean value) {
+        if (followPlayer != value) {
+            followPlayer = value;
+            updateDisplay();
+        }
+        return this;
+    }
+
     public int getOffsetX() {
         return offsetX;
     }
@@ -215,6 +230,7 @@ public class ChunkMonitorDisplay extends JPanel {
             this.offsetY = y;
             updateDisplay(true);
         }
+
         return this;
     }
 
@@ -275,7 +291,7 @@ public class ChunkMonitorDisplay extends JPanel {
                 }
             } catch (Exception e) {
                 imageB = null;
-                LOGGER.error("Error allocating background buffer for chunk monitor display", e);
+                logger.error("Error allocating background buffer for chunk monitor display", e);
             } finally {
                 lock.writeLock().unlock();
             }
@@ -471,7 +487,7 @@ public class ChunkMonitorDisplay extends JPanel {
                 if (entry != null) {
                     entry.addEvent(bEvent);
                 } else {
-                    LOGGER.error("No chunk monitor entry found for position {}", pos);
+                    logger.error("No chunk monitor entry found for position {}", pos);
                 }
             }
         }
@@ -709,7 +725,7 @@ public class ChunkMonitorDisplay extends JPanel {
                             r.execute();
                         } catch (Exception e) {
                             ThreadMonitor.addError(e);
-                            LOGGER.error("Error executing chunk monitor update", e);
+                            logger.error("Error executing chunk monitor update", e);
                         } finally {
                             needsRendering |= r.needsRendering();
                             fastResume |= r.fastResume();
@@ -732,7 +748,7 @@ public class ChunkMonitorDisplay extends JPanel {
                 }
             } catch (Exception e) {
                 ThreadMonitor.addError(e);
-                LOGGER.error("Error executing chunk monitor update", e);
+                logger.error("Error executing chunk monitor update", e);
             }
 
             executor.shutdownNow();
