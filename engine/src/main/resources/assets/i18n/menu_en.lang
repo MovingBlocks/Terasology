@@ -128,6 +128,8 @@
     "exit-game": "Exit Terasology",
     "extra-lighting": "Extra Lighting",
     "experimental": "Experimental",
+    "extras": "Extras",
+    "extras-title": "Extras",
     "eye-adaption": "Eye-Adaption",
     "failed-to-join": "Failed to Join",
     "file-picker-access-denied-to": "Access denied to ",

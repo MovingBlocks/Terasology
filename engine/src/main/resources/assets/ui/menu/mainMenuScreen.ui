@@ -85,16 +85,6 @@
                     },
                     {
                         "type": "UIButton",
-                        "id": "record",
-                        "text": "${engine:menu#start-record}"
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "replay",
-                        "text": "${engine:menu#start-replay}"
-                    },
-                    {
-                        "type": "UIButton",
                         "id": "multiplayer",
                         "text": "${engine:menu#host-multiplayer-game}"
                     },
@@ -110,8 +100,8 @@
                     },
                     {
                         "type": "UIButton",
-                        "id": "credits",
-                        "text": "${engine:menu#credits}"
+                        "id": "extras",
+                        "text": "${engine:menu#extras}"
                     },
                     {
                         "type" : "UISpace",
@@ -123,34 +113,6 @@
                         "text": "${engine:menu#exit-game}"
                     }
                 ]
-            },
-            {
-                 "type": "RowLayout",
-                 "horizontalSpacing": 4,
-                 "contents": [
-                     {
-                         "type": "UIButton",
-                         "text": "${engine:menu#telemetry-button}",
-                         "id": "telemetry"
-                     },
-                     {
-                         "type": "UIButton",
-                         "text": "${engine:menu#crash-reporter}",
-                         "id": "crashReporter"
-                     }
-                 ],
-                 "layoutInfo": {
-                     "width":400,
-                     "height": 32,
-                     "use-content-width": true,
-                     "use-content-height": true,
-                     "position-bottom": {
-                         "offset": 8
-                     },
-                     "position-right": {
-                         "offset": 8
-                     }
-                 }
             },
             {
                 "type": "UILabel",
