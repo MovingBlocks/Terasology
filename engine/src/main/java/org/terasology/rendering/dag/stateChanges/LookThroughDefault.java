@@ -34,6 +34,11 @@ class LookThroughDefault implements StateChange {
     }
 
     @Override
+    public int hashCode() {
+        return LookThroughDefault.class.hashCode();
+    }
+
+    @Override
     public StateChange getDefaultInstance() {
         return this;
     }
