@@ -5,30 +5,16 @@
     "type": "relativeLayout",
     "contents": [
       {
-        "type": "UIImage",
-        "image": "engine:terasology",
-        "id": "title",
-        "layoutInfo": {
-          "width": 512,
-          "height": 128,
-          "position-horizontal-center": {},
-          "position-top": {
-            "target": "TOP",
-            "offset": 48
-          }
-        }
-      },
-      {
         "type": "UILabel",
-        "id": "subtitle",
+        "id": "title",
         "family": "title",
         "text": "${engine:menu#universe-setup}",
         "layoutInfo": {
           "height": 48,
           "position-horizontal-center": {},
           "position-top": {
-            "target": "BOTTOM",
-            "widget": "title"
+            "target": "TOP",
+            "offset": 48
           }
         }
       },
@@ -140,8 +126,10 @@
           "position-horizontal-center": {},
           "position-top": {
             "target": "BOTTOM",
-            "offset": 64,
             "widget": "title"
+          },
+          "position-bottom": {
+            "target": "BOTTOM"
           }
         }
       },
