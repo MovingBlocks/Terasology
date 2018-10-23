@@ -93,7 +93,7 @@ public class DecoratorNode extends ActionNode {
         try {
             modifiedState = action.modify(actor, lastState);
         } catch (Exception e) {
-            logger.info("Exception while running action {} from entity {}: ", action, actor.getEntity(), e.getStackTrace());
+            logger.info("Exception while running action {} from entity {}: {}", action, actor.getEntity(), e.getStackTrace());
             // TODO maybe returning UNDEFINED would be more canonical?
             return BehaviorState.FAILURE;
         }

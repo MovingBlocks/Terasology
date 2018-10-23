@@ -92,9 +92,8 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
                     delayedEntity.send(new DelayedActionTriggeredEvent(actionId));
                 }
             } else {
-                logger.error("ERROR: This entity is missing a DelayedActionComponent. " +
-                        "So skipping delayed actions for this entity",
-                        delayedEntity);
+                logger.error("ERROR: This entity is missing a DelayedActionComponent: {}. " +
+                        "So skipping delayed actions for this entity.", delayedEntity);
             }
         });
     }
@@ -128,7 +127,7 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
                     periodicEntity.send(new PeriodicActionTriggeredEvent(actionId));
                 }
             } else {
-                logger.error("ERROR: This entity is missing a DelayedActionComponent. " +
+                logger.error("ERROR: This entity is missing a DelayedActionComponent: {}. " +
                         "So skipping delayed actions for this entity", periodicEntity);
             }
         });
