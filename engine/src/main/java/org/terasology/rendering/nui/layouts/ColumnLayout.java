@@ -224,10 +224,10 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         Vector2i availableSize = new Vector2i(areaHint);
         int numRows = TeraMath.ceilToInt((float) widgetList.size() / columns);
         if (numRows > 0) {
-            availableSize.y -= verticalSpacing * (numRows - 1);
+            availableSize.y = Math.max(1, availableSize.y - verticalSpacing * (numRows - 1));
         }
         if (columns > 0) {
-            availableSize.x -= horizontalSpacing * (columns - 1);
+            availableSize.x = Math.max(1, availableSize.x - horizontalSpacing * (columns - 1));
         }
 
         Iterator<List<UIWidget>> rows = getRowIterator();
