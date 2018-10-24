@@ -86,11 +86,11 @@ public class UIButtonWebBrowser extends UIButton {
             Runtime runtime = Runtime.getRuntime();
             try {
                 if (os.contains("win")) {
-                    runtime.exec("rundll32 url.dll,FileProtocolHandler " + this.url);
+                    runtime.exec(createCommand("rundll32", "url.dll,FileProtocolHandler", this.url));
                 } else if (os.contains("mac")) {
-                    runtime.exec("open " + this.url);
+                    runtime.exec(createCommand("open", this.url));
                 } else {
-                    runtime.exec("xdg-open " + this.url);
+                    runtime.exec(createCommand("xdg-open", this.url));
                 }
             } catch (IOException e) {
                 LOGGER.warn("Can't recognize your OS and open the url {}.", this.url);
@@ -140,6 +140,10 @@ public class UIButtonWebBrowser extends UIButton {
 
     private boolean hasConfirmation() {
         return confirmed.get() != null && confirmed.get();
+    }
+
+    private String[] createCommand(String... arguments) {
+        return arguments;
     }
 
     /**

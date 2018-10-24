@@ -23,13 +23,11 @@ import java.lang.ref.WeakReference;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 public class ChunkMonitorEntry {
 
     private final Vector3i pos;
     private Deque<WeakReference<Chunk>> chunks = new LinkedList<>();
-    private List<ChunkMonitorEvent.BasicChunkEvent> events = new LinkedList<>();
 
     public ChunkMonitorEntry(Vector3i pos) {
         this.pos = Preconditions.checkNotNull(pos, "The parameter 'pos' must not be null");
@@ -65,11 +63,5 @@ public class ChunkMonitorEntry {
         Preconditions.checkArgument(pos.equals(value.getPosition()), "Expected chunk for position {} but got position {} instead", pos, value.getPosition());
         purge();
         chunks.add(new WeakReference<>(value));
-    }
-
-    public void addEvent(ChunkMonitorEvent.BasicChunkEvent event) {
-        Preconditions.checkNotNull(event, "The parameter 'event' must not be null");
-        Preconditions.checkArgument(pos.equals(event.position), "Expected event for position {} but got position {} instead", pos, event.position);
-        events.add(event);
     }
 }
