@@ -22,6 +22,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.Resolution;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.logic.players.LocalPlayer;
@@ -242,6 +243,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             displaySetting.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
             displaySetting.setOptions(Arrays.asList(DisplayModeSetting.values()));
             displaySetting.bindSelection(BindHelper.bindBeanProperty("displayModeSetting", displayDevice, DisplayModeSetting.class));
+        }
+
+        UIDropdown<Resolution> resolution = find("resolution", UIDropdown.class);
+        if (resolution != null) {
+            resolution.setOptions(displayDevice.getResolutions());
+            resolution.bindSelection(BindHelper.bindBeanProperty("resolution", displayDevice, Resolution.class));
         }
 
         WidgetUtil.tryBindCheckbox(this, "menu-animations", BindHelper.bindBeanProperty("animatedMenu", config.getRendering(), Boolean.TYPE));
