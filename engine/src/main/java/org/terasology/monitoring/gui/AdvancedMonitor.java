@@ -15,17 +15,16 @@
  */
 package org.terasology.monitoring.gui;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JTabbedPane;
+import javax.swing.JFrame;
+import java.awt.BorderLayout;
 
 @SuppressWarnings("serial")
 public class AdvancedMonitor extends JFrame {
 
-    private final JTabbedPane tabs;
-
     private final ThreadMonitorPanel threadMonitor;
     private final ChunkMonitorPanel chunkMonitor;
-    private final PerformanceMonitorPanel perfMonitor;
+    private final PerformanceMonitorPanel performanceMonitor;
 
     public AdvancedMonitor() {
         this("Advanced Monitoring Tool", 10, 10, 800, 600);
@@ -36,7 +35,7 @@ public class AdvancedMonitor extends JFrame {
         setBounds(x, y, width, height);
         setLayout(new BorderLayout());
 
-        tabs = new JTabbedPane();
+        JTabbedPane tabs = new JTabbedPane();
 
         threadMonitor = new ThreadMonitorPanel();
         threadMonitor.setVisible(true);
@@ -44,13 +43,30 @@ public class AdvancedMonitor extends JFrame {
         chunkMonitor = new ChunkMonitorPanel();
         chunkMonitor.setVisible(true);
 
-        perfMonitor = new PerformanceMonitorPanel();
-        perfMonitor.setVisible(true);
+        performanceMonitor = new PerformanceMonitorPanel();
+        performanceMonitor.setVisible(true);
 
         tabs.add("Threads", threadMonitor);
         tabs.add("Chunks", chunkMonitor);
-        tabs.add("Performance", perfMonitor);
+        tabs.add("Performance", performanceMonitor);
 
         add(tabs, BorderLayout.CENTER);
+    }
+
+    /**
+     * Closes advanced monitor panel.
+     *
+     * This method goes through three steps:
+     *  1. Hides this windows.
+     *  2. Releases all of the native screen resources used by this windows.
+     *  3. Stops monitoring threads gracefully.
+     */
+    public void close() {
+        setVisible(false);
+        dispose();
+
+        threadMonitor.stopThread();
+        chunkMonitor.stopThread();
+        performanceMonitor.stopThread();
     }
 }

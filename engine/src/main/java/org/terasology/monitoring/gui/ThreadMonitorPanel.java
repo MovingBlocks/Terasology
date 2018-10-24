@@ -23,8 +23,18 @@ import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.SingleThreadMonitor;
 import org.terasology.monitoring.impl.ThreadMonitorEvent;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.JList;
+import javax.swing.JLabel;
+import javax.swing.ListCellRenderer;
+import javax.swing.SwingUtilities;
+import javax.swing.AbstractListModel;
+import javax.swing.SwingConstants;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Dimension;
+import java.awt.Component;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.BlockingQueue;
@@ -36,24 +46,31 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("serial")
 public class ThreadMonitorPanel extends JPanel {
 
-    private static final Color BACKGROUND = Color.white;
-    private static final Logger logger = LoggerFactory.getLogger(ThreadMonitorPanel.class);
+    private static final Color BACKGROUND = Color.WHITE;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThreadMonitorPanel.class);
 
-    private final JList list;
+    /**
+     * If true, the active monitoring thread in executor service should stop.
+     */
+    private boolean stopThread;
 
     public ThreadMonitorPanel() {
         setLayout(new BorderLayout());
-        list = new JList(new ThreadListModel());
+        JList list = new JList(new ThreadListModel());
         list.setCellRenderer(new ThreadListRenderer());
         list.setVisible(true);
         add(list, BorderLayout.CENTER);
+    }
+
+    public void stopThread() {
+        this.stopThread = true;
     }
 
     private abstract static class Task {
 
         private String name;
 
-         Task(String name) {
+        Task(String name) {
             this.name = name;
         }
 
@@ -94,7 +111,7 @@ public class ThreadMonitorPanel extends JPanel {
             private Dimension dId = new Dimension(0, 0);
             private Dimension dName = new Dimension(0, 0);
 
-             MyRenderer() {
+            MyRenderer() {
                 setBackground(BACKGROUND);
                 setLayout(new BorderLayout());
 
@@ -105,8 +122,8 @@ public class ThreadMonitorPanel extends JPanel {
                 pHead.add(pError, BorderLayout.PAGE_END);
 
                 lId.setHorizontalAlignment(SwingConstants.RIGHT);
-                lName.setForeground(Color.blue);
-                lCounters.setForeground(Color.gray);
+                lName.setForeground(Color.BLUE);
+                lCounters.setForeground(Color.GRAY);
 
                 pList.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 pList.setBackground(BACKGROUND);
@@ -120,7 +137,7 @@ public class ThreadMonitorPanel extends JPanel {
                 pError.add(lErrorSpacer);
                 pError.add(lError);
 
-                lError.setForeground(Color.red);
+                lError.setForeground(Color.RED);
 
                 add(pHead, BorderLayout.PAGE_START);
             }
@@ -148,14 +165,14 @@ public class ThreadMonitorPanel extends JPanel {
 
                     if (monitor.isAlive()) {
                         if (monitor.isActive()) {
-                            lActive.setForeground(Color.green);
+                            lActive.setForeground(Color.GREEN);
                             lActive.setText("Active");
                         } else {
-                            lActive.setForeground(Color.gray);
+                            lActive.setForeground(Color.GRAY);
                             lActive.setText("Inactive");
                         }
                     } else {
-                        lActive.setForeground(Color.red);
+                        lActive.setForeground(Color.RED);
                         lActive.setText("Disposed");
                     }
 
@@ -175,7 +192,7 @@ public class ThreadMonitorPanel extends JPanel {
         }
     }
 
-    private static final class ThreadListModel extends AbstractListModel {
+    private final class ThreadListModel extends AbstractListModel {
 
         private final java.util.List<SingleThreadMonitor> monitors = new ArrayList<>();
         private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -193,41 +210,35 @@ public class ThreadMonitorPanel extends JPanel {
                     }
                 }
             });
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    try {
-                        while (true) {
-                            final Task task = queue.poll(500, TimeUnit.MILLISECONDS);
-                            if (task != null) {
-                                try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getName())) {
-                                    task.execute();
-                                }
-                            } else {
-                                try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Sort Monitors")) {
-                                    Collections.sort(monitors);
-                                    invokeContentsChanged(0, monitors.size() - 1);
-                                }
+
+            executor.execute(() -> {
+                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                try {
+                    while (!stopThread) {
+                        final Task task = queue.poll(500, TimeUnit.MILLISECONDS);
+                        if (task != null) {
+                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getName())) {
+                                task.execute();
+                            }
+                        } else {
+                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity("Sort Monitors")) {
+                                Collections.sort(monitors);
+                                invokeContentsChanged(0, monitors.size() - 1);
                             }
                         }
-                    } catch (Exception e) {
-                        ThreadMonitor.addError(e);
-                        logger.error("Error executing thread monitor update", e);
                     }
-                    invokeContentsChanged(0, monitors.size() - 1);
+                } catch (Exception e) {
+                    ThreadMonitor.addError(e);
+                    LOGGER.error("Error executing thread monitor update", e);
                 }
+
+                executor.shutdownNow();
             });
         }
 
         private void invokeIntervalAdded(final int a, final int b) {
             final Object source = this;
             SwingUtilities.invokeLater(() -> fireIntervalAdded(source, a, b));
-        }
-
-        private void invokeIntervalRemoved(final int a, final int b) {
-            final Object source = this;
-            SwingUtilities.invokeLater(() -> fireIntervalRemoved(source, a, b));
         }
 
         private void invokeContentsChanged(final int a, final int b) {
