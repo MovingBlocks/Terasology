@@ -241,7 +241,8 @@ Contributors
  [pardovot](https://github.com/pardovot),
  [brylie](https://github.com/brylie),
  [Joseph5610](https://github.com/Joseph5610),
- [fallazc](https://github.com/fallazc)
+ [fallazc](https://github.com/fallazc),
+ [andrasveto](https://github.com/andrasveto)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
