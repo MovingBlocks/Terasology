@@ -59,7 +59,7 @@ public class ReplayScreen extends SelectionScreen {
     public void initialise() {
         initWidgets();
 
-        if(isValidScreen()) {
+        if (isValidScreen()) {
 
             initSaveGamePathWidget(PathManager.getInstance().getRecordingsPath());
 

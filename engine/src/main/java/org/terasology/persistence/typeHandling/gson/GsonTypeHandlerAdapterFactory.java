@@ -20,7 +20,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 import java.util.HashMap;
 import java.util.Map;

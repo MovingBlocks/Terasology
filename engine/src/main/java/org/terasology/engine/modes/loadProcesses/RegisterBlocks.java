@@ -57,7 +57,7 @@ public class RegisterBlocks extends SingleStepLoadProcess {
         context.put(WorldAtlas.class, atlas);
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        context.put(BlockFamilyLibrary.class,new BlockFamilyLibrary(environment,context));
+        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment, context));
 
 
         BlockManagerImpl blockManager;

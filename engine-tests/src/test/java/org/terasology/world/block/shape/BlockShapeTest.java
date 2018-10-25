@@ -54,8 +54,8 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
         BlockShape blockShape =  assetManager.getAsset("engine:halfSlope", BlockShape.class).get();
         CollisionShape shape = blockShape.getCollisionShape(Rotation.rotate(Yaw.CLOCKWISE_90));
 
-        Assert.assertEquals(shape instanceof ConvexHullShape,true);
-        if (shape instanceof ConvexHullShape){
+        Assert.assertEquals(shape instanceof ConvexHullShape, true);
+        if (shape instanceof ConvexHullShape) {
             Vector3f[] test = new Vector3f[]{new Vector3f(0.49999997f, 0.0f, 0.49999997f),
                     new Vector3f(-0.49999997f, -0.49999997f, 0.49999997f),
                     new Vector3f(0.49999997f, -0.49999997f, 0.49999997f),
@@ -78,7 +78,7 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
             BulletConvexHullShape bulletConvexHullShape = (BulletConvexHullShape) shape;
 
             ObjectArrayList<javax.vecmath.Vector3f> points = ((com.bulletphysics.collision.shapes.ConvexHullShape) bulletConvexHullShape.underlyingShape).getPoints();
-            for (int x = 0; x < points.size(); x++){
+            for (int x = 0; x < points.size(); x++) {
                 fuzzVectorTest(test[x], VecMath.from(points.get(x)));
 
             }
@@ -86,10 +86,10 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
 
     }
 
-    private void fuzzVectorTest(Vector3f test,Vector3f actual){
-        Assert.assertEquals(test.x,actual.x,.1f);
-        Assert.assertEquals(test.y,actual.y,.1f);
-        Assert.assertEquals(test.z,actual.z,.1f);
+    private void fuzzVectorTest(Vector3f test, Vector3f actual) {
+        Assert.assertEquals(test.x, actual.x, .1f);
+        Assert.assertEquals(test.y, actual.y, .1f);
+        Assert.assertEquals(test.z, actual.z, .1f);
     }
 
 

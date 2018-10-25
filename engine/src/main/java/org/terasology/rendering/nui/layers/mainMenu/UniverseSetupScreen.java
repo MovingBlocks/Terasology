@@ -310,7 +310,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private void initAssets() {
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        BlockFamilyLibrary library =  new BlockFamilyLibrary(environment,context);
+        BlockFamilyLibrary library =  new BlockFamilyLibrary(environment, context);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.registerCoreAssetType(Prefab.class,
