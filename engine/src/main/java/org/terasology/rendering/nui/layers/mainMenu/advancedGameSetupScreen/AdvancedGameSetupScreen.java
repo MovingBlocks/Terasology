@@ -438,12 +438,12 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 uncategorizedCheckbox.setChecked(selectModulesConfig.isUncategorizedSelected());
 
                 resetAdvancedFilters.subscribe(button -> {
-                    if (selectModulesConfig.isLocalOnlySelected()){
+                    if (selectModulesConfig.isLocalOnlySelected()) {
                         selectModulesConfig.toggleIsLocalOnlySelected();
                         localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
                     }
 
-                    if (selectModulesConfig.isUncategorizedSelected()){
+                    if (selectModulesConfig.isUncategorizedSelected()) {
                         selectModulesConfig.toggleUncategorizedSelected();
                         uncategorizedCheckbox.setChecked(selectModulesConfig.isUncategorizedSelected());
                     }
@@ -460,7 +460,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         checkbox.setChecked(selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
                         resetAdvancedFilters.subscribe(button -> {
                             checkbox.setEnabled(!selectModulesConfig.isUncategorizedSelected());
-                            if (selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension)){
+                            if (selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension)) {
                                 selectModulesConfig.toggleStandardModuleExtensionSelected(standardModuleExtension);
                                 checkbox.setChecked(
                                         selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));

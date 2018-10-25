@@ -37,7 +37,7 @@ import java.util.Map;
  */
 @RegisterBlockFamily("freeform")
 @FreeFormSupported(true)
-public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBlockFamily{
+public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
     private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
 
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
@@ -126,7 +126,7 @@ public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBl
 
     @Override
     public Block getBlockForSide(Side side) {
-        if(archetypeBlock == null) {
+        if (archetypeBlock == null) {
             return blocks.get(side);
         }
         return archetypeBlock;
@@ -134,7 +134,7 @@ public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBl
 
     @Override
     public Side getSide(Block block) {
-        if(archetypeBlock == null) {
+        if (archetypeBlock == null) {
             for (Map.Entry<Side, Block> sideBlockEntry : blocks.entrySet()) {
                 if (block == sideBlockEntry.getValue()) {
                     return sideBlockEntry.getKey();

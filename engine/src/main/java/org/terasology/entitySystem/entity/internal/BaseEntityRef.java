@@ -39,8 +39,8 @@ import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
  */
 public abstract class BaseEntityRef extends EntityRef {
 
-    protected LowLevelEntityManager entityManager;
     private static final Logger logger = LoggerFactory.getLogger(BaseEntityRef.class);
+    protected LowLevelEntityManager entityManager;
 
     public BaseEntityRef(LowLevelEntityManager entityManager) {
         this.entityManager = entityManager;

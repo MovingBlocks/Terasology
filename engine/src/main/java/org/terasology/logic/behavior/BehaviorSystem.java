@@ -62,8 +62,8 @@ import java.util.Optional;
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
-    private static final Logger logger = LoggerFactory.getLogger(BehaviorSystem.class);
     public static final Name BEHAVIORS = new Name("Behaviors");
+    private static final Logger logger = LoggerFactory.getLogger(BehaviorSystem.class);
     @In
     private EntityManager entityManager;
     @In

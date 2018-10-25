@@ -30,7 +30,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.sun.CelestialSystem;
-import org.terasology.world.sun.DefaultCelestialSystem;
 
 /**
  * This class contains basic client commands for debugging eg.

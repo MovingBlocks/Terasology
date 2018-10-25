@@ -135,7 +135,7 @@ class ServerListDownloader {
 
             jsonReader.endArray();
             
-            if(servers.size()==0) {
+            if(servers.size() == 0) {
                 status = String.format("Server Error!");
             }
             else {

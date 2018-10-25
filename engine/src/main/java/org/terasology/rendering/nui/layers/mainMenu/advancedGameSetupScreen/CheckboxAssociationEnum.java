@@ -46,7 +46,7 @@ public enum CheckboxAssociationEnum {
         StringBuilder builder = new StringBuilder(standardModuleExtension.getKey());
         final int prefixIndex = builder.indexOf("is");
 
-        if ( prefixIndex == 0 ) {
+        if (prefixIndex == 0) {
             builder.delete(prefixIndex, prefixIndex + 2);
             builder.setCharAt(0, Character.toLowerCase(builder.charAt(0)));
         }
