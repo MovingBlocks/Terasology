@@ -73,7 +73,8 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
 
     @Override
     public boolean isSunHalted() {
-        return haltSunPosition; }
+        return haltSunPosition;
+    }
 
     @Override
     public void toggleSunHalting (float timeInDays) {

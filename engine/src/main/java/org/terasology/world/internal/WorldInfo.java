@@ -82,7 +82,7 @@ public class WorldInfo {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return title;
     }
 }
