@@ -202,7 +202,7 @@ public final class Config {
                     return Optional.of(userConfig.getAsJsonObject());
                 }
             } catch (IOException e) {
-                logger.error("Failed to load config file {}, falling back on default config");
+                logger.error("Failed to load config file {}, falling back on default config", configPath);
             }
         }
         return Optional.empty();

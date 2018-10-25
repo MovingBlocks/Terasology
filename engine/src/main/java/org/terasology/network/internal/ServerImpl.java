@@ -381,7 +381,7 @@ public class ServerImpl implements Server {
                     }
                     blockManager.receiveFamilyRegistration(family, registrationMap);
                 } catch (BlockUriParseException e) {
-                    logger.error("Received invalid block uri", blockFamily.getBlockUri(0));
+                    logger.error("Received invalid block uri {}", blockFamily.getBlockUri(0));
                 }
             }
         }
