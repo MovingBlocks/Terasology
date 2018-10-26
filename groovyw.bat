@@ -58,7 +58,15 @@ set _SKIP=2
 :win9xME_args_slurp
 if "x%~1" == "x" goto execute
 
-set CMD_LINE_ARGS=%*
+@REM set CMD_LINE_ARGS=%*
+:process_args
+IF "%1"=="" GOTO end
+IF "%1" == "*" (SET CMD_LINE_ARGS=%CMD_LINE_ARGS% "%1") ELSE SET CMD_LINE_ARGS=%CMD_LINE_ARGS% %1
+SHIFT
+GOTO process_args
+
+:end
+SET CMD_LINE_ARGS=%CMD_LINE_ARGS:~1%
 
 :execute
 @rem Setup the command line
