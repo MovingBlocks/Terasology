@@ -246,7 +246,7 @@ public final class CommandParameter<T> implements Parameter {
     }
 
     public boolean hasName() {
-        return name.length() >= 0;
+        return name.length() > 0;
     }
 
     public String getName() {
