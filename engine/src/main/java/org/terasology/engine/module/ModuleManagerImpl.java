@@ -151,8 +151,7 @@ public class ModuleManagerImpl implements ModuleManager {
                     continue;
                 }
 
-                try {
-                    Reader reader = new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET);
+                try (Reader reader = new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET)) {
                     ModuleMetadata metaData = metadataReader.read(reader);
                     String displayName = metaData.getDisplayName().toString();
                     Name id = metaData.getId();
