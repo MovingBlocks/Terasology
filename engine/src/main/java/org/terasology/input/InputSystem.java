@@ -203,7 +203,7 @@ public class InputSystem extends BaseComponentSystem {
      * Processes input actions by the mouse buttons, sends input events and updates bind buttons accordingly.
      *
      * @param delta The length of the current frame.
-     * @param action The input action to be processed
+     * @param action The input action to be processed.
      */
     private void processMouseButtonInput(float delta, MouseAction action) {
         int id = action.getInput().getId();
@@ -264,7 +264,7 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     /**
-     * Processes input actions by controller buttons, and updates bind buttons accordingly
+     * Processes input actions by controller buttons, and updates bind buttons accordingly.
      *
      * @param delta The length of the current frame.
      * @param action The input action to be processed.
@@ -354,7 +354,7 @@ public class InputSystem extends BaseComponentSystem {
     /**
      * Cancels the simulation of key strokes.
      *
-     * @param key The key to cancel simulation of.
+     * @param key The key to cancel the simulation of.
      */
     public void cancelSimulatedKeyStroke(Input key) {
         char keyChar = key.getDisplayName().charAt(0);
@@ -396,7 +396,7 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     /**
-     * Processes/Updates all bind buttons
+     * Processes/Updates all bind buttons.
      *
      * @param delta The length of the current frame.
      */
@@ -522,9 +522,9 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     /**
-     * API-exposed caller to {@link BindsSubsystem#getInputsForBindButton(SimpleUri)}
-     * TODO: Restored for API reasons, may be duplicating code elsewhere. Should be reviewed
-     * @param bindId the ID
+     * API-exposed caller to {@link BindsSubsystem#getInputsForBindButton(SimpleUri)}.
+     * TODO: Restored for API reasons, may be duplicating code elsewhere. Should be reviewed.
+     * @param bindId the ID.
      * @return a list of keyboard/mouse inputs that trigger the binding.
      */
     public List<Input> getInputsForBindButton(SimpleUri bindId) {
