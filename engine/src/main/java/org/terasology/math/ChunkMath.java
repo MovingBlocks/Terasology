@@ -64,13 +64,13 @@ public final class ChunkMath {
     }
 
     public static int calcChunkPosX(int x) {
-        return calcChunkPosX(x, ChunkConstants.CHUNK_POWER.x);
+        return calcChunkPosX(x, ChunkConstants.CHUNK_POWER.x());
     }
     public static int calcChunkPosY(int y) {
-        return calcChunkPosY(y, ChunkConstants.CHUNK_POWER.y);
+        return calcChunkPosY(y, ChunkConstants.CHUNK_POWER.y());
     }
     public static int calcChunkPosZ(int z) {
-        return calcChunkPosZ(z, ChunkConstants.CHUNK_POWER.z);
+        return calcChunkPosZ(z, ChunkConstants.CHUNK_POWER.z());
     }
 
     public static Vector3i calcChunkPos(Vector3ic pos, Vector3ic chunkPower) {
@@ -100,14 +100,14 @@ public final class ChunkMath {
         return new Vector3i(calcChunkPosX(x, chunkPower.x()), calcChunkPosY(y, chunkPower.y()), calcChunkPosZ(z, chunkPower.z()));
     }
 
-    public static Vector3i[] calcChunkPos(Region3i region, Vector3i chunkPower) {
-        int minX = calcChunkPosX(region.minX(), chunkPower.x);
-        int minY = calcChunkPosY(region.minY(), chunkPower.y);
-        int minZ = calcChunkPosZ(region.minZ(), chunkPower.z);
+    public static Vector3i[] calcChunkPos(Region3i region, Vector3ic chunkPower) {
+        int minX = calcChunkPosX(region.minX(), chunkPower.x());
+        int minY = calcChunkPosY(region.minY(), chunkPower.y());
+        int minZ = calcChunkPosZ(region.minZ(), chunkPower.z());
 
-        int maxX = calcChunkPosX(region.maxX(), chunkPower.x);
-        int maxY = calcChunkPosY(region.maxY(), chunkPower.y);
-        int maxZ = calcChunkPosZ(region.maxZ(), chunkPower.z);
+        int maxX = calcChunkPosX(region.maxX(), chunkPower.x());
+        int maxY = calcChunkPosY(region.maxY(), chunkPower.y());
+        int maxZ = calcChunkPosZ(region.maxZ(), chunkPower.z());
 
         int size = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
 
@@ -148,15 +148,15 @@ public final class ChunkMath {
     }
 
     public static int calcBlockPosX(int blockX) {
-        return calcBlockPosX(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x);
+        return calcBlockPosX(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x());
     }
 
     public static int calcBlockPosY(int blockY) {
-        return calcBlockPosY(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y);
+        return calcBlockPosY(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y());
     }
 
     public static int calcBlockPosZ(int blockZ) {
-        return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z);
+        return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z());
     }
 
     public static Vector3i calcBlockPos(Vector3ic worldPos) {
@@ -167,8 +167,8 @@ public final class ChunkMath {
         return calcBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
 
-    public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
-        return new Vector3i(calcBlockPosX(x, chunkFilterSize.x), calcBlockPosY(y, chunkFilterSize.y), calcBlockPosZ(z, chunkFilterSize.z));
+    public static Vector3i calcBlockPos(int x, int y, int z, Vector3ic chunkFilterSize) {
+        return new Vector3i(calcBlockPosX(x, chunkFilterSize.x()), calcBlockPosY(y, chunkFilterSize.y()), calcBlockPosZ(z, chunkFilterSize.z()));
     }
 
     public static Region3i getChunkRegionAroundWorldPos(Vector3ic pos, int extent) {

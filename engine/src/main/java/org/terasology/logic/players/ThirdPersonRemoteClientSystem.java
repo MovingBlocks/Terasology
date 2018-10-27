@@ -93,7 +93,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
         Location.removeChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity);
         Location.attachChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity,
                 remotePersonHeldItemMountPointComponent.translate,
-                new Quaternionf().rotationXYZ(
+                new Quaternionf().rotationYXZ(
                         TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.y,
                         TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.x,
                         TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.z),
@@ -225,7 +225,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
                 Location.attachChild(mountPointComponent.mountPointEntity, currentHeldItem,
                         heldItemTransformComponent.translate,
-                        new Quaternionf().rotationXYZ(
+                        new Quaternionf().rotationYXZ(
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.y,
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.x,
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.z),
@@ -306,7 +306,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
             }
             float addPitch = 15f * animateAmount;
             float addYaw = 10f * animateAmount;
-            locationComponent.setLocalRotation(new Quaternionf().rotationXYZ(
+            locationComponent.setLocalRotation(new Quaternionf().rotationYXZ(
                     TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.y + addYaw),
                     TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.x + addPitch),
                     TeraMath.DEG_TO_RAD * mountPointComponent.rotateDegrees.z));

@@ -48,8 +48,7 @@ enum BenchmarkType {
         }
     };
 
-    private static final int BLOCKS_PER_CHUNK = ChunkConstants.CHUNK_SIZE.x * ChunkConstants.CHUNK_SIZE.y
-            * ChunkConstants.CHUNK_SIZE.z;
+    private static final int BLOCKS_PER_CHUNK = ChunkConstants.CHUNK_SIZE.x() * ChunkConstants.CHUNK_SIZE.y() * ChunkConstants.CHUNK_SIZE.z();
 
     private String title;
     private int maxIterations;

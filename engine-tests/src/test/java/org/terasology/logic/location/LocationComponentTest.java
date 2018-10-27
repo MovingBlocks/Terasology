@@ -48,9 +48,9 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         loc = new LocationComponent();
         entity = createFakeEntityWith(loc);
 
-        yawRotation = new Quaternionf().rotationXYZ(TeraMath.DEG_TO_RAD * 90, 0, 0);
-        pitchRotation = new Quaternionf().rotationXYZ(0, TeraMath.DEG_TO_RAD * 45, 0);
-        yawPitch = new Quaternionf().rotationXYZ(TeraMath.DEG_TO_RAD * 90, TeraMath.DEG_TO_RAD * 45, 0);
+        yawRotation = new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * 90, 0, 0);
+        pitchRotation = new Quaternionf().rotationYXZ(0, TeraMath.DEG_TO_RAD * 45, 0);
+        yawPitch = new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * 90, TeraMath.DEG_TO_RAD * 45, 0);
     }
 
     private EntityRef createFakeEntityWith(LocationComponent locationComponent) {

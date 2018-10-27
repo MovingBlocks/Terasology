@@ -69,7 +69,7 @@ public class ItemIcon extends CoreWidget {
         if (getIcon() != null) {
             canvas.drawTexture(getIcon());
         } else if (getMesh() != null && getMeshTexture() != null) {
-            Quaternionf rot = new Quaternionf().rotationXYZ(TeraMath.PI / 6, -TeraMath.PI / 12, 0);
+            Quaternionf rot = new Quaternionf().rotationYXZ(TeraMath.PI / 6, -TeraMath.PI / 12, 0);
             canvas.drawMesh(getMesh(), getMeshTexture(), canvas.getRegion(), rot, new Vector3f(), 1.0f);
         }
         if (getQuantity() > 1) {

@@ -106,11 +106,11 @@ public class RecursiveTreeGeneratorLSystem {
                     rotation.mul(tempRotation);
                     break;
                 case '*':
-                    tempRotation = new Matrix4f().rotation(new Quaternionf().setAngleAxis(angle + angleOffset,1f, 0f, 0f));
+                    tempRotation = new Matrix4f().rotation(new Quaternionf().setAngleAxis(angle ,1f, 0f, 0f));
                     rotation.mul(tempRotation);
                     break;
                 case '/':
-                    tempRotation = new Matrix4f().rotation(new Quaternionf().setAngleAxis(angle + angleOffset,-1f, 0f, 0f));
+                    tempRotation = new Matrix4f().rotation(new Quaternionf().setAngleAxis(angle,-1f, 0f, 0f));
                     rotation.mul(tempRotation);
                     break;
                 default:

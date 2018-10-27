@@ -64,7 +64,7 @@ public final class CharacterMovementSystemUtility {
         setPhysicsLocation(entity, state.getPosition());
 
         // set the pitch to the character's gaze entity
-        Quaternionf rotation = new Quaternionf().rotationXYZ(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);//new Quaternionf(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);
+        Quaternionf rotation = new Quaternionf().rotationYXZ(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);//new Quaternionf(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);
         EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(entity);
         if (!gazeEntity.equals(entity)) {
             // Only set the gaze entity rotation if it is not the same as the main entity.

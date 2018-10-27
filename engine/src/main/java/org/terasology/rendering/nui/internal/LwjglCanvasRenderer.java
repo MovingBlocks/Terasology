@@ -184,11 +184,11 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         Vector3f centerOffset = meshAABB.getCenter();
         centerOffset.mul(-1.0f);
 
-        Matrix4f centerTransform = new Matrix4f().translate(centerOffset).scale(1.0f);
-        Matrix4f userTransform = new Matrix4f().rotate(rotation).translate(offset).scale(-fitScale * scale);
-        Matrix4f translateTransform = new Matrix4f().translate(
+        Matrix4f centerTransform = new Matrix4f().translationRotateScale(centerOffset,new Quaternionf(),1);//.translate(centerOffset);
+        Matrix4f userTransform = new Matrix4f().translationRotateScale(offset,rotation,-fitScale * scale);
+        Matrix4f translateTransform = new Matrix4f().translationRotateScale(
                 new Vector3f(drawRegion.minX() + drawRegion.width() / 2,
-                        drawRegion.minY() + drawRegion.height() / 2, 0)).scale(1);
+                        drawRegion.minY() + drawRegion.height() / 2, 0),new Quaternionf(),1);
 
         userTransform.mul(centerTransform);
         translateTransform.mul(userTransform);
