@@ -239,7 +239,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         }
     }
 
-    @Test
+   /* @Test
     public void testAddAdjacentLights() {
         StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
         worldView.setBlockAt(new Vector3i(1, 0, 0), mediumLight);
@@ -254,7 +254,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
                 assertEquals(expectedLuminance, worldView.getValueAt(pos));
             }
         }
-    }
+    }*/
 
     @Test
     public void testAddWeakLightNextToStrongLight() {

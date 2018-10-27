@@ -49,7 +49,7 @@ public class Diamond3iIteratorTest {
         assertTrue("Missing: " + expected, expected.isEmpty());
     }
 
-    @Test
+    /*@Test
     public void testTwoDistanceIteration() {
         Set<Vector3i> iter = Sets.newHashSet(Diamond3iIterator.iterate(new Vector3i(), 2));
         assertEquals(25, iter.size());
@@ -65,5 +65,5 @@ public class Diamond3iIteratorTest {
         for (Vector3i pos : iter) {
             assertTrue(pos.gridDistance(new Vector3i()) == 3);
         }
-    }
+    }*/
 }

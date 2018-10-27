@@ -83,7 +83,7 @@ public class DoorSystem extends BaseComponentSystem {
         }
 
         Vector3f offset = new Vector3f(event.getHitPosition());
-        offset.sub(targetBlockComp.position.toVector3f());
+        offset.sub(new Vector3f(targetBlockComp.position));
         Side offsetDir = Side.inDirection(offset);
 
         Vector3i primePos = new Vector3i(targetBlockComp.position);
@@ -134,7 +134,7 @@ public class DoorSystem extends BaseComponentSystem {
             EntityRef newDoor = entityManager.create(door.doorRegionPrefab);
             entity.removeComponent(MeshComponent.class);
             newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
-            Vector3f doorCenter = bottomBlockPos.toVector3f();
+            Vector3f doorCenter = new Vector3f(bottomBlockPos);
             doorCenter.y += 0.5f;
             newDoor.addComponent(new LocationComponent(doorCenter));
             DoorComponent newDoorComp = newDoor.getComponent(DoorComponent.class);

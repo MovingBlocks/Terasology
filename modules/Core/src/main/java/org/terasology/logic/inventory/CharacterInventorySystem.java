@@ -196,7 +196,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
 
             //send DropItemRequest
             Vector3f impulseVector = new Vector3f(direction);
-            impulseVector.scale(dropPower);
+            impulseVector.mul(dropPower);
             entity.send(new DropItemRequest(selectedItemEntity, entity,
                     impulseVector,
                     newPosition));

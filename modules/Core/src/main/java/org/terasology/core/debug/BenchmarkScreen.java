@@ -143,15 +143,15 @@ public class BenchmarkScreen extends BaseInteractionScreen {
     }
 
     static Region3i getChunkRegionAbove(Vector3f location) {
-        Vector3i charecterPos = new Vector3i(location);
+        Vector3i charecterPos = new Vector3i((int)location.x,(int)location.y,(int)location.z);
         Vector3i chunkAboveCharacter = ChunkMath.calcChunkPos(charecterPos);
-        chunkAboveCharacter.addY(1);
+        chunkAboveCharacter.add(0,1,0);
         Vector3i chunkRelativePos = ChunkMath.calcBlockPos(charecterPos);
         Vector3i characterChunkOriginPos = new Vector3i(charecterPos);
         characterChunkOriginPos.sub(chunkRelativePos);
 
         Vector3i chunkAboveOrigin = new Vector3i(characterChunkOriginPos);
-        chunkAboveOrigin.addY(ChunkConstants.CHUNK_SIZE.getY());
+        chunkAboveOrigin.add(0,ChunkConstants.CHUNK_SIZE.y(),0);
         return ChunkConstants.CHUNK_REGION.move(chunkAboveOrigin);
     }
 

@@ -15,6 +15,8 @@
  */
 package org.terasology.core.world.generator.worldGenerators;
 
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
 import org.terasology.core.world.generator.facetProviders.BiomeProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultFloraProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultTreeProvider;
@@ -33,7 +35,6 @@ import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.spawner.FixedSpawner;
-import org.terasology.math.geom.ImmutableVector2i;
 import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
@@ -63,7 +64,7 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
     @Override
     protected WorldBuilder createWorld() {
         int seaLevel = 32;
-        ImmutableVector2i spawnPos = new ImmutableVector2i(0, 0); // as used by the spawner
+        Vector2ic spawnPos = new Vector2i(0, 0); // as used by the spawner
 
         return new WorldBuilder(worldGeneratorPluginLibrary)
                 .setSeaLevel(seaLevel)

@@ -76,7 +76,7 @@ public class AnimationScreen extends CoreScreenLayer {
             Vector3f localPlayerPosition = localPlayer.getPosition();
             Quaternionf localPlayerRotation = localPlayer.getRotation();
             Vector3f offset = localPlayer.getViewDirection();
-            offset.scale(2.0f);
+            offset.mul(2.0f);
             offset.y = 0;
             localPlayerPosition.add(offset);
             Optional<Prefab> prefab = assetManager.getAsset(entityDropdown.getSelection(), Prefab.class);

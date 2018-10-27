@@ -15,8 +15,8 @@
  */
 package org.terasology.core.world.generator.trees;
 
+import org.joml.Matrix4f;
 import org.terasology.math.LSystemRule;
-import org.terasology.math.geom.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.utilities.collection.CharSequenceIterator;
@@ -62,7 +62,7 @@ public class TreeGeneratorLSystem extends AbstractTreeGenerator {
     public void generate(BlockManager blockManager, CoreChunk view, Random rand, int posX, int posY, int posZ) {
         Vector3f position = new Vector3f(0f, 0f, 0f);
 
-        Matrix4f rotation = new Matrix4f(new Quaternionf(new Vector3f(0f, 0f, 1f), (float) Math.PI / 2f), Vector3f.ZERO, 1.0f);
+        Matrix4f rotation = new Matrix4f().rotation(new Quaternionf().setAngleAxis((float) Math.PI / 2f,0f, 0f, 1f));
 
         float angleOffset = rand.nextFloat(-MAX_ANGLE_OFFSET, MAX_ANGLE_OFFSET);
 

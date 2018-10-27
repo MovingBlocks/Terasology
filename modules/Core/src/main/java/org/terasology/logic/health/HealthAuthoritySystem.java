@@ -231,7 +231,7 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     @ReceiveEvent(components = {HealthComponent.class})
     public void onLand(VerticalCollisionEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
-        float speed = Math.abs(event.getVelocity().y);
+        float speed = Math.abs(event.getVelocity().y());
 
         if (speed > health.fallingDamageSpeedThreshold) {
             int damage = (int) ((speed - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
