@@ -15,18 +15,14 @@
  */
 package org.terasology.math;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import org.lwjgl.openal.AL;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Rotation provides easy access to 90 degree increments of rotations - intended for block-related rotations.
@@ -187,10 +183,8 @@ public final class Rotation {
         return roll;
     }
 
-    public Quat4f getQuat4f() {
-        Quat4f rotation = new Quat4f(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
-        rotation.normalize();
-        return rotation;
+    public Quaternionf getQuaternionf() {
+        return TeraMath.toYawPitchRoll(yaw.getRadians(),pitch.getRadians(),roll.getRadians()).normalize();
     }
 
     public Side rotate(Side side) {

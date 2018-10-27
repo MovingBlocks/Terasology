@@ -43,7 +43,7 @@ import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.RetainedOnBlockChangeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.testUtil.WorldProviderCoreStub;
 import org.terasology.world.block.Block;

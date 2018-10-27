@@ -15,8 +15,9 @@
  */
 package org.terasology.logic.characters.events;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3f;
 
 /**
  */
@@ -29,11 +30,11 @@ public class CollisionEvent implements Event {
         this.velocity = new Vector3f(velocity);
     }
 
-    public Vector3f getVelocity() {
+    public Vector3fc getVelocity() {
         return velocity;
     }
 
-    public Vector3f getLocation() {
+    public Vector3fc getLocation() {
         return location;
     }
 }

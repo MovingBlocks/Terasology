@@ -17,7 +17,7 @@ package org.terasology.logic.behavior.nui;
 
 import org.terasology.utilities.Assets;
 import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;

@@ -15,11 +15,10 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
+import org.joml.Vector2ic;
+import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.ImmutableVector2i;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
@@ -43,7 +42,7 @@ import com.google.common.base.Preconditions;
 @Updates(@Facet(SurfaceHeightFacet.class))
 public class PlateauProvider implements FacetProvider {
 
-    private final ImmutableVector2i centerPos;
+    private final Vector2ic centerPos;
     private final float targetHeight;
     private final float innerRadius;
     private final float outerRadius;
@@ -54,11 +53,11 @@ public class PlateauProvider implements FacetProvider {
      * @param innerRadius the radius of the flat plateau
      * @param outerRadius the radius of the affected (smoothened) area
      */
-    public PlateauProvider(BaseVector2i center, float targetHeight, float innerRadius, float outerRadius) {
+    public PlateauProvider(Vector2ic center, float targetHeight, float innerRadius, float outerRadius) {
         Preconditions.checkArgument(innerRadius >= 0, "innerRadius must be >= 0");
         Preconditions.checkArgument(outerRadius > innerRadius, "outerRadius must be larger than innerRadius");
 
-        this.centerPos = ImmutableVector2i.createOrUse(center);
+        this.centerPos = center;
         this.targetHeight = targetHeight;
         this.innerRadius = innerRadius;
         this.outerRadius = outerRadius;
@@ -73,9 +72,9 @@ public class PlateauProvider implements FacetProvider {
             SurfaceHeightFacet facet = region.getRegionFacet(SurfaceHeightFacet.class);
 
             // update the surface height
-            for (BaseVector2i pos : facet.getWorldRegion().contents()) {
+            for (Vector2ic pos : facet.getWorldRegion().contents()) {
                 float originalValue = facet.getWorld(pos);
-                int distSq = pos.distanceSquared(centerPos);
+                int distSq = (int) pos.distanceSquared(centerPos);
 
                 if (distSq <= innerRadius * innerRadius) {
                     facet.setWorld(pos, targetHeight);

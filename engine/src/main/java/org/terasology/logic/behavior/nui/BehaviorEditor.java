@@ -32,7 +32,7 @@ import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.logic.behavior.core.Visitor;
 import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;

@@ -26,7 +26,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -74,7 +74,7 @@ public class AnimationScreen extends CoreScreenLayer {
         }
         spawnEntityIdButton.subscribe(widget -> {
             Vector3f localPlayerPosition = localPlayer.getPosition();
-            Quat4f localPlayerRotation = localPlayer.getRotation();
+            Quaternionf localPlayerRotation = localPlayer.getRotation();
             Vector3f offset = localPlayer.getViewDirection();
             offset.scale(2.0f);
             offset.y = 0;

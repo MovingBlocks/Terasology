@@ -15,7 +15,7 @@
  */
 package org.terasology.world.chunks;
 
-import org.terasology.math.geom.BaseVector3i;
+import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
 
 /**
@@ -34,7 +34,7 @@ public interface LitChunk extends CoreChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Current sunlight
      */
-    byte getSunlight(BaseVector3i pos);
+    byte getSunlight(Vector3ic pos);
 
     /**
      * Returns the current amount of sunlight at given position relative to the chunk.
@@ -53,7 +53,7 @@ public interface LitChunk extends CoreChunk {
      * @param amount Amount of sunlight to set this block to
      * @return False if the amount is same as the old value, true otherwise
      */
-    boolean setSunlight(BaseVector3i pos, byte amount);
+    boolean setSunlight(Vector3ic pos, byte amount);
 
     /**
      * Sets the amount of sunlight at given position relative to the chunk.
@@ -71,7 +71,7 @@ public interface LitChunk extends CoreChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Current sunlight regeneration
      */
-    byte getSunlightRegen(BaseVector3i pos);
+    byte getSunlightRegen(Vector3ic pos);
 
     /**
      * Returns current value of sunlight regeneration for given block relative to the chunk.
@@ -90,7 +90,7 @@ public interface LitChunk extends CoreChunk {
      * @param amount Sunlight regeneration amount
      * @return False if the amount is same as the old value, true otherwise
      */
-    boolean setSunlightRegen(BaseVector3i pos, byte amount);
+    boolean setSunlightRegen(Vector3ic pos, byte amount);
 
     /**
      * Sets sunlight regeneration for given block relative to the chunk.
@@ -109,7 +109,7 @@ public interface LitChunk extends CoreChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Current lightness
      */
-    byte getLight(BaseVector3i pos);
+    byte getLight(Vector3ic pos);
 
     /**
      * Returns current amount of light for given block relative to the chunk.
@@ -128,7 +128,7 @@ public interface LitChunk extends CoreChunk {
      * @param amount Lightness value
      * @return False if the amount is same as the old value, true otherwise
      */
-    boolean setLight(BaseVector3i pos, byte amount);
+    boolean setLight(Vector3ic pos, byte amount);
 
     /**
      * Sets lightness for given block relative to the chunk.

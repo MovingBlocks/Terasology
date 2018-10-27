@@ -15,10 +15,10 @@
  */
 package org.terasology.world.block.shapes;
 
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkVertexFlag;
 
@@ -106,13 +106,13 @@ public class BlockMeshPart {
         }
     }
 
-    public BlockMeshPart rotate(Quat4f rotation) {
+    public BlockMeshPart rotate(Quaternionf rotation) {
         Vector3f[] newVertices = new Vector3f[vertices.length];
         Vector3f[] newNormals = new Vector3f[normals.length];
 
         for (int i = 0; i < newVertices.length; ++i) {
-            newVertices[i] = rotation.rotate(vertices[i], new Vector3f());
-            newNormals[i] = rotation.rotate(normals[i], new Vector3f());
+            newVertices[i] = vertices[i].rotate(rotation,new Vector3f());
+            newNormals[i] = normals[i].rotate(rotation,new Vector3f());
             newNormals[i].normalize();
         }
 

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -22,7 +23,6 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
@@ -188,11 +188,11 @@ public class AmbientOcclusionNode extends ConditionDependentNode {
             vec.z = randomGenerator.nextFloat();
 
             vec.normalize();
-            vec.scale(randomGenerator.nextFloat(0.0f, 1.0f));
+            vec.mul(randomGenerator.nextFloat(0.0f, 1.0f));
             float scale = i / (float) SSAO_KERNEL_ELEMENTS;
             scale = TeraMath.lerp(0.25f, 1.0f, scale * scale);
 
-            vec.scale(scale);
+            vec.mul(scale);
 
             ssaoSamples.put(vec.x);
             ssaoSamples.put(vec.y);

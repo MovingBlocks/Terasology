@@ -15,6 +15,7 @@
  */
 package org.terasology.world.selection;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -22,8 +23,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.selection.event.SetBlockSelectionEndingPointEvent;
 import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
 
@@ -74,7 +74,7 @@ public class BlockSelectionSystem extends BaseComponentSystem {
 
         Vector3f worldPosition = locationComponent.getWorldPosition();
 
-        Vector3i endPosition = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
+        Vector3i endPosition = new Vector3i((int)worldPosition.x,(int) worldPosition.y, (int)worldPosition.z);
         Vector3i startPosition = blockSelectionComponent.startPosition;
         if (null == startPosition) {
             startPosition = endPosition;

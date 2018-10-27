@@ -16,9 +16,9 @@
 
 package org.terasology.utilities.random;
 
+import org.joml.Vector3f;
 import org.terasology.module.sandbox.API;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.List;
 
@@ -204,7 +204,7 @@ public abstract class Random {
             nextVector3f(vector);
         } while (vector.x == 0.0f && vector.y == 0.0f && vector.z == 0.0f);
         float length = vector.length();
-        vector.scale(size / length);
+        vector.mul(size / length);
         return vector;
     }
 

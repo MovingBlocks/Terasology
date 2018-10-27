@@ -15,12 +15,13 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseQuat4f;
+import org.terasology.math.geom.BaseQuaternionf;
 import org.terasology.math.geom.BaseVector3f;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
@@ -66,7 +67,7 @@ public final class CharacterMovementSystemUtility {
         setPhysicsLocation(entity, state.getPosition());
 
         // set the pitch to the character's gaze entity
-        Quat4f rotation = new Quat4f(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);
+        Quaternionf rotation = new Quaternionf(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);
         EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(entity);
         if (!gazeEntity.equals(entity)) {
             // Only set the gaze entity rotation if it is not the same as the main entity.
@@ -80,7 +81,7 @@ public final class CharacterMovementSystemUtility {
     public void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
         float t = (float) (time - a.getTime()) / (b.getTime() - a.getTime());
         Vector3f newPos = BaseVector3f.lerp(a.getPosition(), b.getPosition(), t);
-        Quat4f newRot = BaseQuat4f.interpolate(a.getRotation(), b.getRotation(), t);
+        Quaternionf newRot = BaseQuaternionf.interpolate(a.getRotation(), b.getRotation(), t);
         LocationComponent location = entity.getComponent(LocationComponent.class);
         location.setWorldPosition(newPos);
         location.setWorldRotation(newRot);
@@ -106,7 +107,7 @@ public final class CharacterMovementSystemUtility {
     public void setToExtrapolateState(EntityRef entity, CharacterStateEvent state, long time) {
         float t = (time - state.getTime()) * 0.0001f;
         Vector3f newPos = new Vector3f(state.getVelocity());
-        newPos.scale(t);
+        newPos.mul(t);
         newPos.add(state.getPosition());
         extrapolateLocationComponent(entity, state, newPos);
 

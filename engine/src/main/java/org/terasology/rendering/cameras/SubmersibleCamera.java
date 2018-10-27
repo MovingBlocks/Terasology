@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Vector3f;
 import org.terasology.config.RenderingConfig;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.world.WorldProvider;
 

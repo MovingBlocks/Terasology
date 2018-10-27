@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.nui;
 
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Keyboard;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.animation.MenuAnimationSystem;
 import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.rendering.nui.events.NUIKeyEvent;

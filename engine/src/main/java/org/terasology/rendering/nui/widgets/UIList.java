@@ -19,8 +19,8 @@ import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -94,7 +94,7 @@ public class UIList<T> extends CoreWidget {
             canvas.drawBackground(itemRegion);
             itemRenderer.draw(item, canvas, margin.shrink(itemRegion));
 
-            yOffset += preferredSize.getY();
+            yOffset += preferredSize.y();
         }
     }
 

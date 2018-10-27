@@ -40,7 +40,7 @@ import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.VecMath;
 import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -169,7 +169,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     private void renderEntitiesByMaterial(SetMultimap<Material, EntityRef> meshByMaterial) {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-        Quat4f worldRot = new Quat4f();
+        Quaternionf worldRot = new Quaternionf();
         Vector3f worldPos = new Vector3f();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);

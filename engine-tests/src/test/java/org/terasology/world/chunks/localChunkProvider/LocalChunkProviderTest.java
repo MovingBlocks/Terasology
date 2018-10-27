@@ -28,7 +28,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.Block;

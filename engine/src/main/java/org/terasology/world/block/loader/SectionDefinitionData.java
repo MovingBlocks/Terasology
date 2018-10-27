@@ -16,9 +16,9 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.BaseVector4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.joml.Vector4fc;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.DefaultColorSource;
@@ -287,7 +287,7 @@ public class SectionDefinitionData {
         return colorOffsets;
     }
 
-    public void setAllColorOffsets(BaseVector4f offset) {
+    public void setAllColorOffsets(Vector4fc offset) {
         for (BlockPart part : BlockPart.values()) {
             colorOffsets.put(part, new Vector4f(offset));
         }

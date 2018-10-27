@@ -24,11 +24,15 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
+import com.google.common.math.DoubleMath;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import org.jboss.netty.channel.Channel;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -44,7 +48,6 @@ import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
@@ -96,7 +99,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private BiomeManager biomeManager;
 
     // Relevance
-    private Set<Vector3i> relevantChunks = Sets.newHashSet();
+    private Set<Vector3ic> relevantChunks = Sets.newHashSet();
     private TIntSet netRelevant = new TIntHashSet();
 
     // Entity replication data
@@ -123,8 +126,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private final List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
 
-    private Map<Vector3i, Chunk> readyChunks = Maps.newLinkedHashMap();
-    private Set<Vector3i> invalidatedChunks = Sets.newLinkedHashSet();
+    private Map<Vector3ic, Chunk> readyChunks = Maps.newLinkedHashMap();
+    private Set<Vector3ic> invalidatedChunks = Sets.newLinkedHashSet();
 
 
     // Incoming messages
@@ -259,12 +262,15 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), RoundingMode.HALF_UP)));
+                    Vector3f pos =loc.getWorldPosition();
+                    center.set(ChunkMath.calcChunkPos(new Vector3i(DoubleMath.roundToInt(pos.x, RoundingMode.HALF_UP),
+                            DoubleMath.roundToInt(pos.y, RoundingMode.HALF_UP),
+                            DoubleMath.roundToInt(pos.z, RoundingMode.HALF_UP))));
                 }
-                Vector3i pos = null;
+                Vector3ic pos = null;
                 int distance = Integer.MAX_VALUE;
-                for (Vector3i chunkPos : readyChunks.keySet()) {
-                    int chunkDistance = chunkPos.distanceSquared(center);
+                for (Vector3ic chunkPos : readyChunks.keySet()) {
+                    int chunkDistance = (int) chunkPos.distance(center);
                     if (pos == null || chunkDistance < distance) {
                         pos = chunkPos;
                         distance = chunkDistance;
@@ -280,9 +286,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     private void sendChunkInvalidations(NetData.NetMessage.Builder message) {
-        Iterator<Vector3i> i = invalidatedChunks.iterator();
+        Iterator<Vector3ic> i = invalidatedChunks.iterator();
         while (i.hasNext()) {
-            Vector3i pos = i.next();
+            Vector3ic pos = i.next();
             i.remove();
             relevantChunks.remove(pos);
             message.addInvalidateChunk(NetData.InvalidateChunkMessage.newBuilder().setPos(NetMessageUtil.convert(pos)));
@@ -386,15 +392,15 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     @Override
-    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
+    public void onChunkRelevant(Vector3ic pos, Chunk chunk) {
         invalidatedChunks.remove(pos);
-        readyChunks.put(pos, chunk);
+        readyChunks.put(new Vector3i(pos), chunk);
     }
 
     @Override
-    public void onChunkIrrelevant(Vector3i pos) {
+    public void onChunkIrrelevant(Vector3ic pos) {
         readyChunks.remove(pos);
-        invalidatedChunks.add(pos);
+        invalidatedChunks.add(new Vector3i(pos));
     }
 
     @Override

@@ -18,7 +18,7 @@ package org.terasology.logic.players;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
 
 /**

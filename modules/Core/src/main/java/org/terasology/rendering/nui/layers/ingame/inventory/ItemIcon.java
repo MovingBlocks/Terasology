@@ -17,8 +17,8 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Quaternionf;
+import org.joml.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
@@ -69,7 +69,7 @@ public class ItemIcon extends CoreWidget {
         if (getIcon() != null) {
             canvas.drawTexture(getIcon());
         } else if (getMesh() != null && getMeshTexture() != null) {
-            Quat4f rot = new Quat4f(TeraMath.PI / 6, -TeraMath.PI / 12, 0);
+            Quaternionf rot = new Quaternionf(TeraMath.PI / 6, -TeraMath.PI / 12, 0);
             canvas.drawMesh(getMesh(), getMeshTexture(), canvas.getRegion(), rot, new Vector3f(), 1.0f);
         }
         if (getQuantity() > 1) {

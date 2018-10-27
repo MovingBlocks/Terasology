@@ -17,8 +17,9 @@
 package org.terasology.network.internal;
 
 import com.google.protobuf.ByteString;
+import org.joml.Vector3ic;
 import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.protobuf.NetData;
 
 import java.math.BigInteger;
@@ -35,8 +36,8 @@ public final class NetMessageUtil {
         return new Vector3i(data.getX(), data.getY(), data.getZ());
     }
 
-    public static NetData.Vector3iData convert(Vector3i data) {
-        return NetData.Vector3iData.newBuilder().setX(data.x).setY(data.y).setZ(data.z).build();
+    public static NetData.Vector3iData convert(Vector3ic data) {
+        return NetData.Vector3iData.newBuilder().setX(data.x()).setY(data.y()).setZ(data.z()).build();
     }
 
     public static NetData.Certificate convert(PublicIdentityCertificate data) {

@@ -16,9 +16,10 @@
 
 package org.terasology.physics;
 
+import com.google.common.math.DoubleMath;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.math.RoundingMode;
 
@@ -53,7 +54,7 @@ public class HitResult {
         this.hitPoint = hitPoint;
         this.hitNormal = hitNormal;
         //This is the block were the hitPoint is inside:
-        this.blockPosition = new Vector3i(hitPoint, RoundingMode.HALF_UP);
+        this.blockPosition = new Vector3i(DoubleMath.roundToInt(hitPoint.x, RoundingMode.HALF_UP), DoubleMath.roundToInt(hitPoint.y, RoundingMode.HALF_UP), DoubleMath.roundToInt(hitPoint.y, RoundingMode.HALF_UP));
         this.worldHit = false;
     }
 

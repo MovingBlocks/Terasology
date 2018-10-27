@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem;
 
+import org.joml.Vector3f;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.assets.AssetFactory;
@@ -30,10 +31,9 @@ import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Quaternionf;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -64,7 +64,7 @@ public class PojoPrefabManagerTest {
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         TypeSerializationLibrary lib = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
         lib.add(Vector3f.class, new Vector3fTypeHandler());
-        lib.add(Quat4f.class, new Quat4fTypeHandler());
+        lib.add(Quaternionf.class, new QuaternionfTypeHandler());
         entitySystemLibrary = new EntitySystemLibrary(context, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
 

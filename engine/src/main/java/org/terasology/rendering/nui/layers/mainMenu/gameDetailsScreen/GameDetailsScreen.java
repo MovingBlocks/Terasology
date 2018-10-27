@@ -25,7 +25,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;

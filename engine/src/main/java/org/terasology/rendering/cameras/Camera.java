@@ -15,13 +15,14 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.AxisAngle4f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * Provides global access to fonts.
@@ -204,17 +205,17 @@ public abstract class Camera {
      * Get the orientation of the camera.
      * @return the orientation direction, a quaternion.
      */
-    public Quat4f getOrientation() {
-        return new Quat4f(viewingDirection, viewingAngle);
+    public Quaternionf getOrientation() {
+        return new Quaternionf().set(new AxisAngle4f(viewingAngle,viewingDirection));//viewingDirection, viewingAngle);
     }
 
     /**
      Try to set the viewing direction.
      * @param direction
      */
-    public void setOrientation(Quat4f direction) {
-        viewingDirection = direction.getAxis();
-        viewingAngle = direction.getAngle();
+    public void setOrientation(Quaternionf direction) {
+        viewingDirection =new Vector3f(direction.x,direction.y,direction.z);// direction.getAxis();
+        viewingAngle = direction.angle();
     }
 
     public ViewFrustum getViewFrustum() {

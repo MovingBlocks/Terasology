@@ -20,7 +20,7 @@ import com.bulletphysics.util.ObjectArrayList;
 import org.terasology.math.AABB;
 import org.terasology.math.Transform;
 import org.terasology.math.VecMath;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
 

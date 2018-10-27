@@ -16,9 +16,9 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Set;

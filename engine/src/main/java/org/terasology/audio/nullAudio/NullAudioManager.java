@@ -23,7 +23,7 @@ import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
 
 /**
@@ -88,7 +88,7 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity) {
+    public void updateListener(Vector3f position, Quaternionf orientation, Vector3f velocity) {
     }
 
     @Override

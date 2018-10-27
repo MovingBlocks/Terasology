@@ -15,8 +15,9 @@
  */
 package org.terasology.world.propagation.light;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
 
@@ -25,7 +26,7 @@ import org.terasology.world.chunks.LitChunk;
 public class LightPropagationRules extends CommonLightPropagationRules {
 
     @Override
-    public byte getFixedValue(Block block, Vector3i pos) {
+    public byte getFixedValue(Block block, Vector3ic pos) {
         return block.getLuminance();
     }
 
@@ -40,8 +41,8 @@ public class LightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public byte getValue(LitChunk chunk, Vector3i pos) {
-        return getValue(chunk, pos.x, pos.y, pos.z);
+    public byte getValue(LitChunk chunk, Vector3ic pos) {
+        return getValue(chunk, pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -50,7 +51,7 @@ public class LightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
+    public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
         chunk.setLight(pos, value);
     }
 

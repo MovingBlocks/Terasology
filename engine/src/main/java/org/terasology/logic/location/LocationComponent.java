@@ -16,11 +16,11 @@
 package org.terasology.logic.location;
 
 import com.google.common.collect.Lists;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -50,7 +50,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @TextField
     Vector3f position = new Vector3f();
     @Replicate
-    Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    Quaternionf rotation = new Quaternionf();
     @Replicate
     float scale = 1.0f;
 
@@ -73,16 +73,15 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public Vector3f getLocalDirection() {
-        Vector3f result = Direction.FORWARD.getVector3f();
-        getLocalRotation().rotate(result, result);
+        Vector3f result = Direction.FORWARD.getVector3f().rotate(getLocalRotation());
         return result;
     }
 
-    public Quat4f getLocalRotation() {
+    public Quaternionf getLocalRotation() {
         return rotation;
     }
 
-    public void setLocalRotation(Quat4f newQuat) {
+    public void setLocalRotation(Quaternionf newQuat) {
         rotation.set(newQuat);
     }
 
@@ -105,25 +104,24 @@ public final class LocationComponent implements Component, ReplicationCheck {
         output.set(position);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
-            output.scale(parentLoc.scale);
-            parentLoc.getLocalRotation().rotate(output, output);
-            output.add(parentLoc.position);
+            output.mul(parentLoc.scale)
+                    .rotate(parentLoc.getLocalRotation())
+                    .add(parentLoc.position);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return output;
     }
 
     public Vector3f getWorldDirection() {
-        Vector3f result = Direction.FORWARD.getVector3f();
-        getWorldRotation().rotate(result, result);
-        return result;
+        return Direction.FORWARD.getVector3f()
+                .rotate(getWorldRotation());
     }
 
-    public Quat4f getWorldRotation() {
-        return getWorldRotation(new Quat4f(0, 0, 0, 1));
+    public Quaternionf getWorldRotation() {
+        return getWorldRotation(new Quaternionf());
     }
 
-    public Quat4f getWorldRotation(Quat4f output) {
+    public Quaternionf getWorldRotation(Quaternionf output) {
         output.set(rotation);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
@@ -148,19 +146,16 @@ public final class LocationComponent implements Component, ReplicationCheck {
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             this.position.sub(parentLoc.getWorldPosition());
-            this.position.scale(1f / parentLoc.getWorldScale());
-            Quat4f rot = new Quat4f(0, 0, 0, 1);
-            rot.inverse(parentLoc.getWorldRotation());
-            rot.rotate(this.position, this.position);
+            this.position.mul(1f / parentLoc.getWorldScale());
+            this.position.rotate(new Quaternionf(parentLoc.getWorldRotation()).conjugate());
         }
     }
 
-    public void setWorldRotation(Quat4f value) {
+    public void setWorldRotation(Quaternionf value) {
         this.rotation.set(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
-            Quat4f worldRot = parentLoc.getWorldRotation();
-            worldRot.inverse();
+            Quaternionf worldRot = parentLoc.getWorldRotation().conjugate();
             this.rotation.mul(worldRot, this.rotation);
         }
     }

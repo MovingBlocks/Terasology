@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
+import org.joml.Vector3f;
 import org.terasology.config.Config;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
@@ -125,7 +125,9 @@ public class DebugOverlay extends CoreScreenLayer {
                 @Override
                 public String get() {
                     String biomeId = "unavailable";
-                    Vector3i blockPos = new Vector3i(localPlayer.getPosition());
+                    //TODO: implement Vector3i impl
+                    Vector3f pos = localPlayer.getPosition();
+                    Vector3i blockPos = new Vector3i((int)pos.x,(int)pos.y,(int)pos.z);
                     if (worldProvider.isBlockRelevant(blockPos)) {
                         Biome biome = worldProvider.getBiome(blockPos);
                         biomeId = CoreRegistry.get(BiomeManager.class).getBiomeId(biome);

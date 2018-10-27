@@ -17,7 +17,7 @@ package org.terasology.world.block;
 
 import gnu.trove.list.TIntList;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.internal.BlockPositionIterator;
 

@@ -31,9 +31,9 @@ import org.terasology.input.device.MouseDevice;
 import org.terasology.math.Border;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Quaternionf;
+import org.terasology.math.Rect2i;
+import org.joml.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
@@ -652,7 +652,7 @@ public class CanvasImpl implements CanvasControl {
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
+    public void drawMesh(Mesh mesh, Material material, Rect2i region, Quaternionf rotation, Vector3f offset, float scale) {
         if (material == null) {
             logger.warn("Attempted to draw with nonexistent material");
             return;
@@ -671,7 +671,7 @@ public class CanvasImpl implements CanvasControl {
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
+    public void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quaternionf rotation, Vector3f offset, float scale) {
         meshMat.setTexture("texture", texture);
         drawMesh(mesh, meshMat, region, rotation, offset, scale);
     }

@@ -24,6 +24,8 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -35,7 +37,6 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.persistence.ChunkStore;
@@ -90,7 +91,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
-    private static final Vector3i UNLOAD_LEEWAY = Vector3i.one();
+    private static final Vector3ic UNLOAD_LEEWAY = new Vector3i(1,1,1);
 
     private StorageManager storageManager;
     private final EntityManager entityManager;
@@ -159,22 +160,22 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
+    public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
         Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, Vector3i.one());
+            return createWorldView(region, new Vector3i(1,1,1));
         }
         return null;
     }
 
     @Override
-    public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
+    public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
         Region3i region = ChunkMath.getChunkRegionAroundWorldPos(blockPos, extent);
         return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
     }
 
     @Override
-    public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
+    public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
         Region3i region = Region3i.createFromCenterExtents(chunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
             return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
@@ -202,12 +203,12 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
+    public void addRelevanceEntity(EntityRef entity, Vector3ic distance) {
         addRelevanceEntity(entity, distance, null);
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener) {
+    public void addRelevanceEntity(EntityRef entity, Vector3ic distance, ChunkRegionListener listener) {
         if (!entity.exists()) {
             return;
         }
@@ -242,7 +243,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
-    public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
+    public void updateRelevanceEntity(EntityRef entity, Vector3ic distance) {
         regionLock.readLock().lock();
         try {
             ChunkRelevanceRegion region = regions.get(entity);
@@ -406,9 +407,9 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         PerformanceMonitor.startActivity("Unloading irrelevant chunks");
         int unloaded = 0;
         logger.debug("Compacting cache");
-        Iterator<Vector3i> iterator = chunkCache.iterateChunkPositions();
+        Iterator<Vector3ic> iterator = chunkCache.iterateChunkPositions();
         while (iterator.hasNext()) {
-            Vector3i pos = iterator.next();
+            Vector3ic pos = iterator.next();
             boolean keep = false;
             for (ChunkRelevanceRegion region : regions.values()) {
                 if (region.getCurrentRegion().expand(UNLOAD_LEEWAY).encompasses(pos)) {
@@ -430,7 +431,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         PerformanceMonitor.endActivity();
     }
 
-    private boolean unloadChunkInternal(Vector3i pos) {
+    private boolean unloadChunkInternal(Vector3ic pos) {
         Chunk chunk = chunkCache.get(pos);
         if (!chunk.isReady()) {
             // Chunk hasn't been finished or changed, so just drop it.
@@ -544,8 +545,8 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
-    public Chunk getChunk(Vector3i pos) {
-        Chunk chunk = chunkCache.get(pos);
+    public Chunk getChunk(Vector3ic pos) {
+        Chunk chunk = chunkCache.get(new Vector3i(pos));
         if (isChunkReady(chunk)) {
             return chunk;
         }
@@ -589,7 +590,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
-    public boolean reloadChunk(Vector3i coords) {
+    public boolean reloadChunk(Vector3ic coords) {
         if (!chunkCache.containsChunkAt(coords)) {
             return false;
         }
@@ -637,10 +638,10 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
     }
 
-    private void createOrLoadChunk(Vector3i chunkPos) {
+    private void createOrLoadChunk(Vector3ic chunkPos) {
         Chunk chunk = chunkCache.get(chunkPos);
         if (chunk == null && !preparingChunks.contains(chunkPos)) {
-            preparingChunks.add(chunkPos);
+            preparingChunks.add(new Vector3i(chunkPos));
             pipeline.doTask(new AbstractChunkTask(chunkPos) {
                 @Override
                 public String getName() {
@@ -675,12 +676,12 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
-    public Chunk getChunkUnready(Vector3i pos) {
+    public Chunk getChunkUnready(Vector3ic pos) {
         return chunkCache.get(pos);
     }
 
     @Override
-    public boolean isChunkReady(Vector3i pos) {
+    public boolean isChunkReady(Vector3ic pos) {
         return isChunkReady(chunkCache.get(pos));
     }
 
@@ -720,7 +721,9 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-            return pos.gridDistance(regionCenter);
+            //TODO: manhatten distance missing in joml
+            return Math.abs(regionCenter.x() - pos.x()) + Math.abs(regionCenter.y() - pos.y());
+            //return pos.gridDistance(regionCenter);
         }
     }
 
@@ -749,7 +752,9 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-            return pos.gridDistance(regionCenter);
+            //TODO: manhatten distance missing in joml
+            return Math.abs(regionCenter.x() - pos.x()) + Math.abs(regionCenter.y() - pos.y());
+            //return pos.gridDistance(regionCenter);
         }
     }
 

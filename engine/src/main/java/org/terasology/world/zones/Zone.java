@@ -15,8 +15,8 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.ImmutableVector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
@@ -76,12 +76,12 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
         this(name, (pos, region) -> regionFunction.getAsBoolean());
     }
 
-    public Zone(String name, Predicate<BaseVector3i> regionFunction) {
+    public Zone(String name, Predicate<Vector3ic> regionFunction) {
         this(name, (pos, region) -> regionFunction.test(pos));
     }
 
-    public Zone(String name, BiPredicate<BaseVector3i, Region> regionFunction) {
-        this(name, (x, y, z, region) -> regionFunction.test(new ImmutableVector3i(x, y, z), region));
+    public Zone(String name, BiPredicate<Vector3ic, Region> regionFunction) {
+        this(name, (x, y, z, region) -> regionFunction.test(new Vector3i(x, y, z), region));
     }
 
     /**

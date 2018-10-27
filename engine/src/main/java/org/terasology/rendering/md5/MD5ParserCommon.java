@@ -17,7 +17,7 @@
 package org.terasology.rendering.md5;
 
 import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 

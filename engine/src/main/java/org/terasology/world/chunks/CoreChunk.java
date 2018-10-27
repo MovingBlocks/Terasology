@@ -15,9 +15,9 @@
  */
 package org.terasology.world.chunks;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
@@ -49,7 +49,7 @@ public interface CoreChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Block at given position
      */
-    Block getBlock(BaseVector3i pos);
+    Block getBlock(Vector3ic pos);
 
     /**
      * Returns block at given position relative to the chunk.
@@ -79,7 +79,7 @@ public interface CoreChunk {
      * @param block Block to set block at given position to
      * @return Old Block at given position
      */
-    Block setBlock(BaseVector3i pos, Block block);
+    Block setBlock(Vector3ic pos, Block block);
 
     /**
      * Sets biome at given position relative to the chunk.
@@ -99,7 +99,7 @@ public interface CoreChunk {
      * @param biome Biome to set block at given position to
      * @return Old Biome at given position
      */
-    Biome setBiome(BaseVector3i pos, Biome biome);
+    Biome setBiome(Vector3ic pos, Biome biome);
 
     /**
      * Returns Biome at given position relative to the chunk.
@@ -117,7 +117,7 @@ public interface CoreChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Biome at given position
      */
-    Biome getBiome(BaseVector3i pos);
+    Biome getBiome(Vector3ic pos);
 
     /**
      * Sets liquid state at given position relative to the chunk.
@@ -125,7 +125,7 @@ public interface CoreChunk {
      * @param pos   Position of the block relative to corner of the chunk
      * @param state Liquid state to set the block to
      */
-    void setLiquid(BaseVector3i pos, LiquidData state);
+    void setLiquid(Vector3ic pos, LiquidData state);
 
     /**
      * Sets liquid state at given position relative to the chunk.
@@ -143,7 +143,7 @@ public interface CoreChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Liquid state currently assigned to the block
      */
-    LiquidData getLiquid(BaseVector3i pos);
+    LiquidData getLiquid(Vector3ic pos);
 
     /**
      * Returns liquid state at given position relative to the chunk.
@@ -177,7 +177,7 @@ public interface CoreChunk {
      * @param pos   Position of the block relative to the corner of the chunk
      * @param value New value to set the block to
      */
-    void setExtraData(int index, BaseVector3i pos, int value);
+    void setExtraData(int index, Vector3ic pos, int value);
     
     /**
      * Returns one of the per-block custom data values at a given position relative to the chunk.
@@ -197,7 +197,7 @@ public interface CoreChunk {
      * @param pos   Position of the block relative to the corner of the chunk
      * @return Selected extra data value at the given location
      */
-    int getExtraData(int index, BaseVector3i pos);
+    int getExtraData(int index, Vector3ic pos);
 
     /**
      * Returns offset of this chunk to the world center (0:0:0), with one unit being one chunk.
@@ -233,7 +233,7 @@ public interface CoreChunk {
      * @param blockPos Position in this chunk you want to transform
      * @return Transformed position
      */
-    Vector3i chunkToWorldPosition(BaseVector3i blockPos);
+    Vector3i chunkToWorldPosition(Vector3ic blockPos);
 
     /**
      * Returns position in this chunk transformed to world coordinates.

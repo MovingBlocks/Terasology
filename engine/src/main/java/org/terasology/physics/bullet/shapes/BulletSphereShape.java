@@ -16,7 +16,7 @@
 package org.terasology.physics.bullet.shapes;
 
 import com.bulletphysics.collision.shapes.SphereShape;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.physics.shapes.CollisionShape;
 
 public class BulletSphereShape extends BulletCollisionShape implements org.terasology.physics.shapes.SphereShape {
@@ -28,7 +28,7 @@ public class BulletSphereShape extends BulletCollisionShape implements org.teras
     }
 
     @Override
-    public CollisionShape rotate(Quat4f rot) {
+    public CollisionShape rotate(Quaternionf rot) {
         return this;
     }
 }

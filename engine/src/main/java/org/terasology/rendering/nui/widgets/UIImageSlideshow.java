@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -70,7 +70,7 @@ public class UIImageSlideshow extends CoreWidget {
         if (isImageExists()) {
             return images.get(index).getPreferredContentSize(canvas, sizeHint);
         }
-        return Vector2i.zero();
+        return new Vector2i();
     }
 
     @Override

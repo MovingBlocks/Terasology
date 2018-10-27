@@ -15,8 +15,12 @@
  */
 package org.terasology.world.block;
 
+import com.google.common.math.DoubleMath;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector4f;
 import org.terasology.math.Transform;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
 import com.google.common.collect.Maps;
 
@@ -27,10 +31,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -497,7 +497,8 @@ public final class Block {
      * @param luminance the light level produced by this block
      */
     public void setLuminance(byte luminance) {
-        this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
+        this.luminance = (byte)Math.max(Math.min(luminance,0),ChunkConstants.MAX_LIGHT);
+//        this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
     }
 
     public Vector3f getTint() {
@@ -654,7 +655,7 @@ public final class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        bounds = shape.getAABB(new Transform(offset, new Quat4f(0, 0, 0, 1), 1.0f));
+        bounds = shape.getAABB(new Transform(offset, new Quaternionf(0, 0, 0, 1), 1.0f));
     }
 
     public CollisionShape getCollisionShape() {
@@ -666,11 +667,17 @@ public final class Block {
     }
 
     public AABB getBounds(Vector3i pos) {
-        return bounds.move(pos.toVector3f());
+        return bounds.move(new Vector3f(pos));
     }
 
-    public AABB getBounds(Vector3f floatPos) {
-        return getBounds(new Vector3i(floatPos, RoundingMode.HALF_UP));
+
+    public AABB getBounds(Vector3f pos) {
+
+        return getBounds(new Vector3i(
+                DoubleMath.roundToInt(pos.x, RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(pos.y, RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(pos.z, RoundingMode.HALF_UP)));
+        //return getBounds(new Vector3i(floatPos, RoundingMode.HALF_UP));
     }
 
     public void renderWithLightValue(float sunlight, float blockLight) {

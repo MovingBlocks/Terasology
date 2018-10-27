@@ -17,11 +17,10 @@ package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
+import org.joml.Vector2i;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.LayoutConfig;
@@ -120,7 +119,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     public void onDraw(Canvas canvas) {
         if (!widgetList.isEmpty()) {
             Vector2i availableSize = canvas.size();
-            int numRows = TeraMath.ceilToInt((float) widgetList.size() / columns);
+            int numRows = (int) Math.ceil((float) widgetList.size() / columns);
             if (numRows > 0) {
                 availableSize.y -= verticalSpacing * (numRows - 1);
             }
@@ -138,7 +137,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
             if (autoSizeColumns) {
                 for (RowInfo row : rowInfos) {
                     for (int column = 0; column < row.widgetSizes.size(); column++) {
-                        minWidths[column] = Math.max(minWidths[column], row.widgetSizes.get(column).getX());
+                        minWidths[column] = Math.max(minWidths[column], row.widgetSizes.get(column).x());
                     }
                 }
 
@@ -152,7 +151,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
             } else {
                 minRowWidth = canvas.size().x;
                 for (int i = 0; i < columns; ++i) {
-                    minWidths[i] = TeraMath.floorToInt((minRowWidth - (columns - 1) * horizontalSpacing) * columnWidths[i]);
+                    minWidths[i] = (int) Math.floor((minRowWidth - (columns - 1) * horizontalSpacing) * columnWidths[i]);
                 }
             }
 
@@ -222,7 +221,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Vector2i availableSize = new Vector2i(areaHint);
-        int numRows = TeraMath.ceilToInt((float) widgetList.size() / columns);
+        int numRows = (int) Math.ceil((float) widgetList.size() / columns);
         if (numRows > 0) {
             availableSize.y = Math.max(1, availableSize.y - verticalSpacing * (numRows - 1));
         }
@@ -241,7 +240,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 size.y += verticalSpacing;
             }
             for (int i = 0; i < rowInfo.widgetSizes.size(); ++i) {
-                columnSizes[i] = Math.max(columnSizes[i], rowInfo.widgetSizes.get(i).getX());
+                columnSizes[i] = Math.max(columnSizes[i], rowInfo.widgetSizes.get(i).x);
             }
         }
         for (int columnSize : columnSizes) {
@@ -250,7 +249,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
         if (!autoSizeColumns) {
             for (int i = 0; i < columns; ++i) {
-                size.x = Math.max(size.x, TeraMath.floorToInt(columnSizes[i] / columnWidths[i]));
+                size.x = (int) Math.max(size.x, Math.floor(columnSizes[i] / columnWidths[i]));
             }
         }
 
@@ -272,9 +271,9 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 columnSizes[i] = Math.max(columnSizes[i], maxSize.x);
                 rowHeight = Math.max(rowHeight, maxSize.y);
             }
-            size.y = TeraMath.addClampAtMax(size.y, rowHeight);
+            size.y = Math.min( size.y + rowHeight,Integer.MAX_VALUE);// TeraMath.addClampAtMax(size.y, rowHeight);
             if (rows.hasNext()) {
-                size.y = TeraMath.addClampAtMax(size.y, verticalSpacing);
+                size.y = Math.min( size.y + verticalSpacing,Integer.MAX_VALUE); //TeraMath.addClampAtMax(size.y, verticalSpacing);
             }
         }
 
@@ -285,7 +284,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
         if (!autoSizeColumns) {
             for (int i = 0; i < columns; ++i) {
-                width = Math.min(width, TeraMath.floorToInt(columnSizes[i] / columnWidths[i]));
+                width = Math.min(width, (int)Math.floor(columnSizes[i] / columnWidths[i]));
             }
         }
 

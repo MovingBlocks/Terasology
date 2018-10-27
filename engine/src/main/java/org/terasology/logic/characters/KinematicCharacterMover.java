@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,9 +30,9 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
@@ -328,7 +330,7 @@ public class KinematicCharacterMover implements CharacterMover {
             Vector3f perpendicularDir = Vector3fUtil.getPerpendicularComponent(reflectDir, hitNormal, new Vector3f());
             if (normalMag != 0.0f) {
                 Vector3f perpComponent = new Vector3f(perpendicularDir);
-                perpComponent.scale(normalMag * movementLength);
+                perpComponent.mul(normalMag * movementLength);
                 direction.set(perpComponent);
             }
         }
@@ -395,7 +397,7 @@ public class KinematicCharacterMover implements CharacterMover {
             expectedMove.sub(position);
             if (expectedMove.lengthSquared() > physics.getEpsilon()) {
                 expectedMove.normalize();
-                expectedMove.scale(actualDist);
+                expectedMove.mul(actualDist);
                 position.add(expectedMove);
             }
             remainingDist -= actualDist;
@@ -427,7 +429,7 @@ public class KinematicCharacterMover implements CharacterMover {
                             break;
                         }
                         normalizedDir.set(expectedMove);
-                        expectedMove.scale(-remainingDist / expectedMove.y + HORIZONTAL_PENETRATION_LEEWAY);
+                        expectedMove.mul(-remainingDist / expectedMove.y + HORIZONTAL_PENETRATION_LEEWAY);
                         targetPos.set(position);
                         targetPos.add(expectedMove);
                     } else {
@@ -460,13 +462,13 @@ public class KinematicCharacterMover implements CharacterMover {
 
         if (collider == null) {
             // ignore collision
-            normalizedDir.scale(dist);
+            normalizedDir.mul(dist);
             position.add(normalizedDir);
             return false;
         }
 
         Vector3f targetPos = new Vector3f(normalizedDir);
-        targetPos.scale(dist + HORIZONTAL_PENETRATION_LEEWAY);
+        targetPos.mul(dist + HORIZONTAL_PENETRATION_LEEWAY);
         targetPos.add(position);
         int iteration = 0;
         Vector3f lastHitNormal = new Vector3f(0, 1, 0);
@@ -483,12 +485,12 @@ public class KinematicCharacterMover implements CharacterMover {
             if (callback.hasHit()) {
                 if (actualDist > physics.getEpsilon()) {
                     Vector3f actualMove = new Vector3f(normalizedDir);
-                    actualMove.scale(actualDist);
+                    actualMove.mul(actualDist);
                     position.add(actualMove);
                 }
                 dist -= actualDist;
                 Vector3f newDir = new Vector3f(normalizedDir);
-                newDir.scale(dist);
+                newDir.mul(dist);
                 float slope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
 
                 // We step up if we're hitting a big slope, or if we're grazing
@@ -516,7 +518,7 @@ public class KinematicCharacterMover implements CharacterMover {
                     extractResidualMovement(callback.getHitNormalWorld(), newDir);
                     Vector3f modHorizDir = new Vector3f(newDir);
                     modHorizDir.y = 0;
-                    newDir.scale(newHorizDir.length() / modHorizDir.length());
+                    newDir.mul(newHorizDir.length() / modHorizDir.length());
                 }
                 float sqrDist = newDir.lengthSquared();
                 if (sqrDist > physics.getEpsilon()) {
@@ -530,10 +532,10 @@ public class KinematicCharacterMover implements CharacterMover {
                 dist = (float) Math.sqrt(sqrDist);
                 normalizedDir.set(newDir);
                 targetPos.set(normalizedDir);
-                targetPos.scale(dist + HORIZONTAL_PENETRATION_LEEWAY);
+                targetPos.mul(dist + HORIZONTAL_PENETRATION_LEEWAY);
                 targetPos.add(position);
             } else {
-                normalizedDir.scale(dist);
+                normalizedDir.mul(dist);
                 position.add(normalizedDir);
                 break;
             }
@@ -575,7 +577,7 @@ public class KinematicCharacterMover implements CharacterMover {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
             result.getRotation().set(new Vector3f(0, 1, 0), yaw);
         } else {
-            result.getRotation().set(new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0));
+            result.getRotation().set(new Quaternionf(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0));
         }
     }
 
@@ -603,10 +605,10 @@ public class KinematicCharacterMover implements CharacterMover {
             desiredVelocity.y = 0;
             if (desiredVelocity.x != 0 || desiredVelocity.z != 0) {
                 desiredVelocity.normalize();
-                desiredVelocity.scale(speed);
+                desiredVelocity.mul(speed);
             }
         }
-        desiredVelocity.scale(maxSpeed);
+        desiredVelocity.mul(maxSpeed);
 
         if (movementComp.mode == MovementMode.CLIMBING) {
             climb(state, input, desiredVelocity);
@@ -620,7 +622,7 @@ public class KinematicCharacterMover implements CharacterMover {
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
-        velocityDiff.scale(Math.min(movementComp.mode.scaleInertia * input.getDelta(), 1.0f));
+        velocityDiff.mul(Math.min(movementComp.mode.scaleInertia * input.getDelta(), 1.0f));
         Vector3f endVelocity = new Vector3f(state.getVelocity());
         endVelocity.x += velocityDiff.x;
         endVelocity.z += velocityDiff.z;
@@ -633,7 +635,7 @@ public class KinematicCharacterMover implements CharacterMover {
             endVelocity.y = Math.max(-TERMINAL_VELOCITY, state.getVelocity().y - (GRAVITY * movementComp.mode.scaleGravity) * input.getDelta());
         }
         Vector3f moveDelta = new Vector3f(endVelocity);
-        moveDelta.scale(input.getDelta());
+        moveDelta.mul(input.getDelta());
         CharacterCollider collider = movementComp.mode.useCollision ? physics.getCharacterCollider(entity) : null;
         MoveResult moveResult = move(state.getPosition(), moveDelta,
                 (state.getMode() != MovementMode.CLIMBING && state.isGrounded() && movementComp.mode.canBeGrounded) ? movementComp.stepHeight : 0,
@@ -760,11 +762,10 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3f tmp;
 
         Vector3i climbDir3i = state.getClimbDirection();
-        Vector3f climbDir3f = climbDir3i.toVector3f();
+        Vector3f climbDir3f = new Vector3f(climbDir3i);
 
-        Quat4f rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
-        tmp = new Vector3f(0.0f, 0.0f, -1.0f);
-        rotation.rotate(tmp, tmp);
+        Quaternionf rotation = new Quaternionf(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+        tmp = new Vector3f(0.0f, 0.0f, -1.0f).rotate(rotation);
         float angleToClimbDirection = tmp.angle(climbDir3f);
 
         boolean clearMovementToDirection = !state.isGrounded();
@@ -779,30 +780,33 @@ public class KinematicCharacterMover implements CharacterMover {
             } else {
                 float pitchAmount = state.isGrounded() ? 45f : 90f;
                 float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
-                rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
-                rotation.rotate(desiredVelocity, desiredVelocity);
+                rotation = new Quaternionf(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
+                desiredVelocity.rotate(rotation);
             }
 
             // looking sidewards from ladder
         } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
             float rollAmount = state.isGrounded() ? 45f : 90f;
             tmp = new Vector3f();
-            rotation.rotate(climbDir3f, tmp);
+            climbDir3f.rotate(rotation,tmp);
+//            rotation.rotate(climbDir3f, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             if (jumpOrCrouchActive) {
-                rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+                rotation = new Quaternionf(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             } else {
-                rotation = new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
+                rotation = new Quaternionf(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
                         TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
                 );
             }
-            rotation.rotate(desiredVelocity, desiredVelocity);
+            desiredVelocity.rotate(rotation);
+//            rotation.rotate(desiredVelocity, desiredVelocity);
 
             // facing away from ladder
         } else {
-            rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
-            rotation.rotate(desiredVelocity, desiredVelocity);
+            rotation = new Quaternionf(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+            desiredVelocity.rotate(rotation);
+//            rotation.rotate(desiredVelocity, desiredVelocity);
             clearMovementToDirection = false;
         }
 

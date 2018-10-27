@@ -16,7 +16,7 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import gnu.trove.list.TIntList;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;

@@ -24,6 +24,7 @@ import org.terasology.world.propagation.PropagationRules;
  */
 public abstract class CommonLightPropagationRules implements PropagationRules {
 
+
     @Override
     public PropagationComparison comparePropagation(Block newBlock, Block oldBlock, Side side) {
         if (newBlock.isTranslucent() && oldBlock.isTranslucent()) {

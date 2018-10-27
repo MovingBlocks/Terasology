@@ -22,9 +22,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import java.util.List;
 
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.joml.Vector4f;
 
 import com.google.common.collect.Lists;
 
@@ -73,7 +73,7 @@ public final class TeraAssert {
         }
     }
 
-    public static void assertEquals(Quat4f expected, Quat4f actual, float error) {
+    public static void assertEquals(Quaternionf expected, Quaternionf actual, float error) {
         if (expected == null) {
             assertNull(actual);
         } else {

@@ -16,9 +16,9 @@
 
 package org.terasology.logic.spawner;
 
+import org.joml.Vector2i;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.world.generation.World;
 
 /**
@@ -46,8 +46,7 @@ public class FixedSpawner extends AbstractSpawner {
     @Override
     public Vector3f getSpawnPosition(World world, EntityRef entity) {
         // don't care about the given entity
-        Vector3f realPos = findSpawnPosition(world, desiredPos, searchRadius);
-        return realPos;
+        return findSpawnPosition(world, desiredPos, searchRadius);
     }
 
 }

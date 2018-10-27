@@ -29,7 +29,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;

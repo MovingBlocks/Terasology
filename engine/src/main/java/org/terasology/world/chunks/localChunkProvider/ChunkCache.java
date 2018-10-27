@@ -15,7 +15,8 @@
  */
 package org.terasology.world.chunks.localChunkProvider;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.chunks.Chunk;
 
 import java.util.Collection;
@@ -25,17 +26,17 @@ import java.util.Iterator;
  * Chunk storage which allows to look up for chunks based on their world position.
  */
 interface ChunkCache {
-    Chunk get(Vector3i chunkPosition);
+    Chunk get(Vector3ic chunkPosition);
 
-    void put(Vector3i chunkPosition, Chunk chunk);
+    void put(Vector3ic chunkPosition, Chunk chunk);
 
-    Iterator<Vector3i> iterateChunkPositions();
+    Iterator<Vector3ic> iterateChunkPositions();
 
     Collection<Chunk> getAllChunks();
 
     void clear();
 
-    boolean containsChunkAt(Vector3i chunkPosition);
+    boolean containsChunkAt(Vector3ic chunkPosition);
 
-    void removeChunkAt(Vector3i chunkPosition);
+    void removeChunkAt(Vector3ic chunkPosition);
 }

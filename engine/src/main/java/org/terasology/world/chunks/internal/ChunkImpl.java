@@ -18,13 +18,13 @@ package org.terasology.world.chunks.internal;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -152,7 +152,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public final Block getBlock(BaseVector3i pos) {
+    public final Block getBlock(Vector3ic pos) {
         short id = (short) blockData.get(pos.x(), pos.y(), pos.z());
         return blockManager.getBlock(id);
     }
@@ -181,12 +181,12 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Block setBlock(BaseVector3i pos, Block block) {
+    public Block setBlock(Vector3ic pos, Block block) {
         return setBlock(pos.x(), pos.y(), pos.z(), block);
     }
 
     @Override
-    public byte getSunlight(BaseVector3i pos) {
+    public byte getSunlight(Vector3ic pos) {
         return getSunlight(pos.x(), pos.y(), pos.z());
     }
 
@@ -196,7 +196,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public boolean setSunlight(BaseVector3i pos, byte amount) {
+    public boolean setSunlight(Vector3ic pos, byte amount) {
         return setSunlight(pos.x(), pos.y(), pos.z(), amount);
     }
 
@@ -207,7 +207,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte getSunlightRegen(BaseVector3i pos) {
+    public byte getSunlightRegen(Vector3ic pos) {
         return getSunlightRegen(pos.x(), pos.y(), pos.z());
     }
 
@@ -217,7 +217,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public boolean setSunlightRegen(BaseVector3i pos, byte amount) {
+    public boolean setSunlightRegen(Vector3ic pos, byte amount) {
         return setSunlightRegen(pos.x(), pos.y(), pos.z(), amount);
     }
 
@@ -228,7 +228,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte getLight(BaseVector3i pos) {
+    public byte getLight(Vector3ic pos) {
         return getLight(pos.x(), pos.y(), pos.z());
     }
 
@@ -238,7 +238,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public boolean setLight(BaseVector3i pos, byte amount) {
+    public boolean setLight(Vector3ic pos, byte amount) {
         return setLight(pos.x(), pos.y(), pos.z(), amount);
     }
 
@@ -249,7 +249,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public void setLiquid(BaseVector3i pos, LiquidData state) {
+    public void setLiquid(Vector3ic pos, LiquidData state) {
         setLiquid(pos.x(), pos.y(), pos.z(), state);
     }
 
@@ -263,7 +263,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public LiquidData getLiquid(BaseVector3i pos) {
+    public LiquidData getLiquid(Vector3ic pos) {
         return getLiquid(pos.x(), pos.y(), pos.z());
     }
 
@@ -278,7 +278,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Biome getBiome(BaseVector3i pos) {
+    public Biome getBiome(Vector3ic pos) {
         return getBiome(pos.x(), pos.y(), pos.z());
     }
 
@@ -293,7 +293,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Biome setBiome(BaseVector3i pos, Biome biome) {
+    public Biome setBiome(Vector3ic pos, Biome biome) {
         return setBiome(pos.x(), pos.y(), pos.z(), biome);
     }
     
@@ -303,7 +303,7 @@ public class ChunkImpl implements Chunk {
     }
     
     @Override
-    public int getExtraData(int index, BaseVector3i pos) {
+    public int getExtraData(int index, Vector3ic pos) {
         return getExtraData(index, pos.x(), pos.y(), pos.z());
     }
     
@@ -316,7 +316,7 @@ public class ChunkImpl implements Chunk {
     }
     
     @Override
-    public void setExtraData(int index, BaseVector3i pos, int value) {
+    public void setExtraData(int index, Vector3ic pos, int value) {
         setExtraData(index, pos.x(), pos.y(), pos.z(), value);
     }
 
@@ -341,7 +341,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Vector3i chunkToWorldPosition(BaseVector3i blockPos) {
+    public Vector3i chunkToWorldPosition(Vector3ic blockPos) {
         return chunkToWorldPosition(blockPos.x(), blockPos.y(), blockPos.z());
     }
 
@@ -368,8 +368,8 @@ public class ChunkImpl implements Chunk {
     @Override
     public AABB getAABB() {
         if (aabb == null) {
-            Vector3f min = getChunkWorldOffset().toVector3f();
-            Vector3f max = ChunkConstants.CHUNK_SIZE.toVector3f();
+            Vector3f min = new Vector3f(getChunkWorldOffset());
+            Vector3f max = new Vector3f(ChunkConstants.CHUNK_SIZE);
             max.add(min);
             aabb = AABB.createMinMax(min, max);
         }

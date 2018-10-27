@@ -15,7 +15,7 @@
  */
 package org.terasology.reflection.copy.strategy;
 
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 

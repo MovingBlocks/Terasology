@@ -22,7 +22,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -114,11 +114,11 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
         propagator.process(new BlockChange(Vector3i.zero(), air, fullLight));
 
-        assertEquals(fullLight.getLuminance(), worldView.getValueAt(Vector3i.zero()));
+        assertEquals(fullLight.getLuminance(), worldView.getValueAt(new Vector3i()));
         assertEquals(fullLight.getLuminance() - 1, worldView.getValueAt(new Vector3i(0, 1, 0)));
         assertEquals(fullLight.getLuminance() - 14, worldView.getValueAt(new Vector3i(0, 14, 0)));
         for (int i = 1; i < fullLight.getLuminance(); ++i) {
-            for (Vector3i pos : Diamond3iIterator.iterateAtDistance(Vector3i.zero(), i)) {
+            for (Vector3i pos : Diamond3iIterator.iterateAtDistance(new Vector3i(), i)) {
                 assertEquals(fullLight.getLuminance() - i, worldView.getValueAt(pos));
             }
         }
@@ -127,7 +127,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     @Test
     public void testRemoveLightInVacuum() {
         StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
-        worldView.setBlockAt(Vector3i.zero(), fullLight);
+        worldView.setBlockAt(new Vector3i(), fullLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
         propagator.process(new BlockChange(Vector3i.zero(), air, fullLight));
 
@@ -248,8 +248,8 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         propagator.process(new BlockChange(new Vector3i(1, 0, 0), air, mediumLight), new BlockChange(new Vector3i(0, 0, 0), air, mediumLight));
 
         for (int i = 0; i < fullLight.getLuminance() + 1; ++i) {
-            for (Vector3i pos : Diamond3iIterator.iterateAtDistance(Vector3i.zero(), i)) {
-                int dist = Math.min(Vector3i.zero().gridDistance(pos), new Vector3i(1, 0, 0).gridDistance(pos));
+            for (Vector3i pos : Diamond3iIterator.iterateAtDistance(new Vector3i(), i)) {
+                int dist = Math.min(new Vector3i().gridDistance(pos), new Vector3i(1, 0, 0).gridDistance(pos));
                 byte expectedLuminance = (byte) Math.max(mediumLight.getLuminance() - dist, 0);
                 assertEquals(expectedLuminance, worldView.getValueAt(pos));
             }

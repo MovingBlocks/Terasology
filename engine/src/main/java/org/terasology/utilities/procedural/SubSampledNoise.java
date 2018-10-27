@@ -16,14 +16,13 @@
 package org.terasology.utilities.procedural;
 
 import com.google.common.math.IntMath;
-
-import org.terasology.math.geom.Rect2i;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 /**
  */
@@ -78,7 +77,7 @@ public class SubSampledNoise extends AbstractNoise {
             float[] result = new float[subRegion.sizeX() * subRegion.sizeY()];
             Vector2i offset = new Vector2i(subRegion.minX() - fullRegion.minX(), subRegion.minY() - fullRegion.minY());
             for (int y = 0; y < subRegion.sizeY(); ++y) {
-                System.arraycopy(fullData, offset.getX() + fullRegion.sizeX() * (y + offset.getY()), result, subRegion.sizeX() * y, subRegion.sizeX());
+                System.arraycopy(fullData, offset.x() + fullRegion.sizeX() * (y + offset.y()), result, subRegion.sizeX() * y, subRegion.sizeX());
             }
             return result;
         } else {

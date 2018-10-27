@@ -16,7 +16,7 @@
 
 package org.terasology.physics.engine;
 
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
 
 /**

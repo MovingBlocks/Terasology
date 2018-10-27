@@ -15,8 +15,9 @@
  */
 package org.terasology.audio.openAL;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.audio.Sound;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * Interface for a sound that includes the data required for relative sound positioning.
@@ -80,7 +81,7 @@ public interface SoundSource<T extends Sound<?>> {
      * @param pos
      * @return
      */
-    SoundSource<T> setPosition(Vector3f pos);
+    SoundSource<T> setPosition(Vector3fc pos);
 
     /**
      * Returns sound position in space

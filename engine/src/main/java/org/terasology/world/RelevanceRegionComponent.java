@@ -16,7 +16,7 @@
 package org.terasology.world;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 
 /**
  */

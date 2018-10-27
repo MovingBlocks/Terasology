@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block;
 
-import org.terasology.math.geom.Vector4f;
+import org.joml.Vector4f;
 import org.terasology.world.biomes.Biome;
 
 /**

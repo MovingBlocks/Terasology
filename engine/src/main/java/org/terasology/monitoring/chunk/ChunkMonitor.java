@@ -18,7 +18,7 @@ package org.terasology.monitoring.chunk;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;

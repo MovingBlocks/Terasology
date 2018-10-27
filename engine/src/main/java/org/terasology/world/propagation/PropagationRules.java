@@ -15,8 +15,8 @@
  */
 package org.terasology.world.propagation;
 
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
 
@@ -30,7 +30,7 @@ public interface PropagationRules {
      * @param block
      * @return The value of provided by the given block
      */
-    byte getFixedValue(Block block, Vector3i pos);
+    byte getFixedValue(Block block, Vector3ic pos);
 
     /**
      * @param newBlock
@@ -72,7 +72,7 @@ public interface PropagationRules {
      * @param pos
      * @return The value of the given position of a chunk
      */
-    byte getValue(LitChunk chunk, Vector3i pos);
+    byte getValue(LitChunk chunk, Vector3ic pos);
 
     byte getValue(LitChunk chunk, int x, int y, int z);
 
@@ -83,5 +83,5 @@ public interface PropagationRules {
      * @param pos
      * @param value
      */
-    void setValue(LitChunk chunk, Vector3i pos, byte value);
+    void setValue(LitChunk chunk, Vector3ic pos, byte value);
 }

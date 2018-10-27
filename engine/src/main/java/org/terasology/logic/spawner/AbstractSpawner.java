@@ -16,13 +16,13 @@
 
 package org.terasology.logic.spawner;
 
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.math.Region3i;
+import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.SpiralIterable;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.facets.SeaLevelFacet;
@@ -41,7 +41,7 @@ public abstract class AbstractSpawner implements Spawner {
     protected Vector3f findSpawnPosition(World world, Vector2i pos, int searchRadius) {
 
         Vector3i ext = new Vector3i(searchRadius, 1, searchRadius);
-        Vector3i desiredPos = new Vector3i(pos.getX(), 1, pos.getY());
+        Vector3i desiredPos = new Vector3i(pos.x(), 1, pos.y());
 
         // try and find somewhere in this region a spot to land
         Region3i spawnArea = Region3i.createFromCenterExtents(desiredPos, ext);
@@ -59,16 +59,16 @@ public abstract class AbstractSpawner implements Spawner {
 
         int spiralRad = searchRadius / 2 - 1;
         SpiralIterable spiral = SpiralIterable.clockwise(pos).maxRadius(spiralRad).scale(2).build();
-        for (BaseVector2i test : spiral) {
-            float val = surfaceHeightFacet.getWorld(test.getX(), test.getY());
+        for (Vector2ic test : spiral) {
+            float val = surfaceHeightFacet.getWorld(test.x(), test.y());
             int height = TeraMath.floorToInt(val);
             if (height >= seaLevel) {
-                return new Vector3f(test.getX(), height, test.getY());
+                return new Vector3f(test.x(), height, test.y());
             }
         }
 
         // nothing above sea level found
-        float y = surfaceHeightFacet.getWorld(pos.getX(), pos.getY());
-        return new Vector3f(pos.getX(), y, pos.getY());
+        float y = surfaceHeightFacet.getWorld(pos.x(), pos.y());
+        return new Vector3f(pos.x(), y, pos.y());
     }
 }

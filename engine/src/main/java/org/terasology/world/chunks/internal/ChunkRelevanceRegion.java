@@ -18,11 +18,12 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkRegionListener;
 
@@ -40,9 +41,9 @@ public class ChunkRelevanceRegion {
     private Region3i previousRegion = Region3i.empty();
     private ChunkRegionListener listener;
 
-    private Set<Vector3i> relevantChunks = Sets.newLinkedHashSet();
+    private Set<Vector3ic> relevantChunks = Sets.newLinkedHashSet();
 
-    public ChunkRelevanceRegion(EntityRef entity, Vector3i relevanceDistance) {
+    public ChunkRelevanceRegion(EntityRef entity, Vector3ic relevanceDistance) {
         this.entity = entity;
         this.relevanceDistance.set(relevanceDistance);
 
@@ -60,7 +61,7 @@ public class ChunkRelevanceRegion {
         return new Vector3i(center);
     }
 
-    public void setRelevanceDistance(Vector3i distance) {
+    public void setRelevanceDistance(Vector3ic distance) {
         if (!distance.equals(this.relevanceDistance)) {
             reviewRelevantChunks(distance);
             this.relevanceDistance.set(distance);
@@ -69,12 +70,12 @@ public class ChunkRelevanceRegion {
         }
     }
 
-    private void reviewRelevantChunks(Vector3i distance) {
-        Vector3i extents = new Vector3i(distance.x / 2, distance.y / 2, distance.z / 2);
+    private void reviewRelevantChunks(Vector3ic distance) {
+        Vector3i extents = new Vector3i(distance.x() / 2, distance.y() / 2, distance.z() / 2);
         Region3i retainRegion = Region3i.createFromCenterExtents(center, extents);
-        Iterator<Vector3i> iter = relevantChunks.iterator();
+        Iterator<Vector3ic> iter = relevantChunks.iterator();
         while (iter.hasNext()) {
-            Vector3i pos = iter.next();
+            Vector3ic pos = iter.next();
             if (!retainRegion.encompasses(pos)) {
                 sendChunkIrrelevant(pos);
                 iter.remove();
@@ -144,7 +145,7 @@ public class ChunkRelevanceRegion {
         }
     }
 
-    private void sendChunkIrrelevant(Vector3i pos) {
+    private void sendChunkIrrelevant(Vector3ic pos) {
         if (listener != null) {
             listener.onChunkIrrelevant(pos);
         }
@@ -188,7 +189,7 @@ public class ChunkRelevanceRegion {
         return NeededChunksIterator::new;
     }
 
-    public void chunkUnloaded(Vector3i pos) {
+    public void chunkUnloaded(Vector3ic pos) {
         if (relevantChunks.contains(pos)) {
             relevantChunks.remove(pos);
             sendChunkIrrelevant(pos);

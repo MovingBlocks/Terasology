@@ -20,7 +20,7 @@ import org.terasology.utilities.Assets;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.math.geom.Vector2f;

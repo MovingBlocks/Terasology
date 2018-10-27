@@ -16,7 +16,7 @@
 
 package org.terasology.world.chunks.internal;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 
@@ -34,5 +34,5 @@ public interface GeneratingChunkProvider extends ChunkProvider {
      */
     void onChunkIsReady(Chunk chunk);
 
-    Chunk getChunkUnready(Vector3i pos);
+    Chunk getChunkUnready(Vector3ic pos);
 }

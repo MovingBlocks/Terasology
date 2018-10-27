@@ -31,7 +31,7 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.UsernameSuggester;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.PlayerUtil;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;

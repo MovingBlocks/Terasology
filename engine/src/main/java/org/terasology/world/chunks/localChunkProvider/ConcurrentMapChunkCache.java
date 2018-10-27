@@ -16,7 +16,8 @@
 package org.terasology.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.chunks.Chunk;
 
 import java.util.Collection;
@@ -25,20 +26,20 @@ import java.util.Map;
 
 class ConcurrentMapChunkCache implements ChunkCache {
 
-    private Map<Vector3i, Chunk> cache = Maps.newConcurrentMap();
+    private Map<Vector3ic, Chunk> cache = Maps.newConcurrentMap();
 
     @Override
-    public Chunk get(final Vector3i chunkPosition) {
+    public Chunk get(final Vector3ic chunkPosition) {
         return cache.get(chunkPosition);
     }
 
     @Override
-    public void put(final Vector3i chunkPosition, final Chunk chunk) {
-        cache.put(chunkPosition, chunk);
+    public void put(final Vector3ic chunkPosition, final Chunk chunk) {
+        cache.put(new Vector3i(chunkPosition), chunk);
     }
 
     @Override
-    public Iterator<Vector3i> iterateChunkPositions() {
+    public Iterator<Vector3ic> iterateChunkPositions() {
         return cache.keySet().iterator();
     }
 
@@ -53,12 +54,12 @@ class ConcurrentMapChunkCache implements ChunkCache {
     }
 
     @Override
-    public boolean containsChunkAt(final Vector3i chunkPosition) {
+    public boolean containsChunkAt(final Vector3ic chunkPosition) {
         return cache.containsKey(chunkPosition);
     }
 
     @Override
-    public void removeChunkAt(final Vector3i chunkPosition) {
+    public void removeChunkAt(final Vector3ic chunkPosition) {
         cache.remove(chunkPosition);
     }
 }

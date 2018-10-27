@@ -15,8 +15,9 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * Used within the server to trigger a teleport of a character. Just chaining the position is not possible due to
@@ -29,7 +30,7 @@ public class CharacterTeleportEvent implements Event {
         this.targetPosition = targetPosition;
     }
 
-    public Vector3f getTargetPosition() {
+    public Vector3fc getTargetPosition() {
         return targetPosition;
     }
 }

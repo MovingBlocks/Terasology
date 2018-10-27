@@ -16,12 +16,13 @@
 package org.terasology.rendering.nui.layers.hud;
 
 import com.google.common.collect.Maps;
+import org.joml.Math;
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Rect2f;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.Canvas;

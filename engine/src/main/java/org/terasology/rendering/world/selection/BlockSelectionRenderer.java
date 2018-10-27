@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.world.selection;
 
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
+import org.terasology.math.Rect2f;
 import org.terasology.utilities.Assets;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
+import org.joml.Vector3i;
+import org.joml.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;

@@ -50,7 +50,7 @@ import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
@@ -493,7 +493,7 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             dir.set(Direction.FORWARD.getVector3f());
         }
-        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
+        Quaternionf rotation = Quaternionf.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
         Optional<Prefab> prefab = Assets.getPrefab(prefabName);
         if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {

@@ -17,7 +17,7 @@ package org.terasology.rendering.cameras;
 
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;

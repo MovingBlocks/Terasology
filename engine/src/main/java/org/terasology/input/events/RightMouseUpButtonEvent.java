@@ -16,8 +16,8 @@
 package org.terasology.input.events;
 
 
+import org.joml.Vector2i;
 import org.terasology.input.MouseInput;
-import org.terasology.math.geom.Vector2i;
 
 public final class RightMouseUpButtonEvent extends MouseUpButtonEvent {
 

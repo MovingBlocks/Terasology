@@ -27,7 +27,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;

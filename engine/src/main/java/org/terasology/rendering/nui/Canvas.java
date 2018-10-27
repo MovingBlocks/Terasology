@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.nui;
 
+import org.joml.Quaternionf;
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Border;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -246,7 +246,7 @@ public interface Canvas {
      * @param size the size of the texture.
      * @return A SubRegion, to be closed when no long needed
      */
-    SubRegion subRegionFBO(ResourceUrn uri, BaseVector2i size);
+    SubRegion subRegionFBO(ResourceUrn uri, Vector2ic size);
 
     /**
      * When drawOnTop is set to true, subsequent drawing will be on top of everything else.
@@ -476,9 +476,9 @@ public interface Canvas {
      * @param offset   Offset, in object space, for the mesh
      * @param scale    A relative scale for drawing the mesh
      */
-    void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
+    void drawMesh(Mesh mesh, Material material, Rect2i region, Quaternionf rotation, Vector3f offset, float scale);
 
-    void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
+    void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quaternionf rotation, Vector3f offset, float scale);
 
     /**
      * Adds an interaction region filling the region used to draw the current widget. The widget's margin is used to expand the interaction region to fill the

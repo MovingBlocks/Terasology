@@ -15,10 +15,11 @@
  */
 package org.terasology.audio.openAL;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.openal.AL10;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
-import org.terasology.math.geom.Vector3f;
 
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_GAIN;
@@ -170,13 +171,13 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
     }
 
     @Override
-    public SoundSource<T> setPosition(Vector3f value) {
+    public SoundSource<T> setPosition(Vector3fc value) {
         if (value == null || this.position.equals(value)) {
             return this;
         }
 
         this.position.set(value);
-        alSource3f(getSourceId(), AL10.AL_POSITION, value.x, value.y, value.z);
+        alSource3f(getSourceId(), AL10.AL_POSITION, value.x(), value.y(), value.z());
 
         OpenALException.checkState("Changing sound position");
 

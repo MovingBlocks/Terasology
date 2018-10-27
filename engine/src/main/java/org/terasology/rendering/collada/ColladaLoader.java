@@ -25,17 +25,18 @@ import org.eaxy.Element;
 import org.eaxy.ElementSet;
 import org.eaxy.NonMatchingPathException;
 import org.eaxy.Xml;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -179,7 +180,7 @@ public class ColladaLoader {
 
             String[] jointNameArray = null;
             float[] inverseBindMatrixArray;
-            Quat4f[] rotationArray;
+            Quaternionf[] rotationArray;
             ElementSet jointsInputSet = joints.find("input");
             List<Input> inputList = parseInputs(jointsInputSet);
             for (Input jointsInput : inputList) {
@@ -425,7 +426,7 @@ public class ColladaLoader {
                 matrixDataArray[i] = Float.parseFloat(floatString);
             }
 
-            Quat4f[] jointMatrix = quad4fArrayFromFloat16ArrayData(matrixDataArray);
+            Quaternionf[] jointMatrix = quad4fArrayFromFloat16ArrayData(matrixDataArray);
             Vector3f[] positionVectorArray = positionFromFloat16ArrayData(matrixDataArray);
             md5Joint.position = positionVectorArray[0];
             md5Joint.orientation = jointMatrix[0];
@@ -455,14 +456,14 @@ public class ColladaLoader {
         return md5Joint;
     }
 
-    private Quat4f[] quad4fArrayFromFloat16ArrayData(float[] inverseBindMatrixArray) {
-        Quat4f[] rotationArray = new Quat4f[inverseBindMatrixArray.length / 16];
+    private Quaternionf[] quad4fArrayFromFloat16ArrayData(float[] inverseBindMatrixArray) {
+        Quaternionf[] rotationArray = new Quaternionf[inverseBindMatrixArray.length / 16];
         for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
             int offset = i * 16;
-            Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
-            Quat4f rotation = new Quat4f();
-            rotation.set(matrix4f);
-            rotationArray[i] = rotation;
+//            Quaternionf rotation = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16)).getNormalizedRotation(new Quaternionf());
+//            Quaternionf rotation = new Quaternionf();
+//            rotation.set(matrix4f);
+            rotationArray[i] =  new Matrix4f(FloatBuffer.wrap(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16))).getNormalizedRotation(new Quaternionf());
         }
 
         return rotationArray;
@@ -472,8 +473,8 @@ public class ColladaLoader {
         Vector3f[] translationVectorArray = new Vector3f[inverseBindMatrixArray.length / 16];
         for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
             int offset = i * 16;
-            Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
-            Vector3f translationVector = matrix4f.getTranslation();
+            Matrix4f matrix4f = new Matrix4f(FloatBuffer.wrap(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16)));
+            Vector3f translationVector = matrix4f.getTranslation(new Vector3f());
             translationVectorArray[i] = translationVector;
         }
 
@@ -957,7 +958,7 @@ public class ColladaLoader {
     private static class MD5Joint {
         private String name;
         private Vector3f position;
-        private Quat4f orientation;
+        private Quaternionf orientation;
 
         private Element element;
         private MD5Joint parent;

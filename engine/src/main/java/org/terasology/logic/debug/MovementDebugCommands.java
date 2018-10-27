@@ -26,7 +26,7 @@ import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -268,7 +268,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 float prevHeight = gazeMountPointComponent.translate.y;
                 gazeMountPointComponent.translate.y = amount;
                 Location.removeChild(player, gazeMountPointComponent.gazeEntity);
-                Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quaternionf(Quaternionf.IDENTITY));
                 player.saveComponent(gazeMountPointComponent);
                 return "Eye-height of player set to " + amount + " (was " + prevHeight + ")";
             }

@@ -15,10 +15,10 @@
  */
 package org.terasology.persistence.internal;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.protobuf.EntityData;
 

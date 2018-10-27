@@ -17,8 +17,8 @@ package org.terasology.math;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -31,8 +31,8 @@ import java.util.EnumSet;
  *
  */
 public enum Side {
-    TOP(Vector3i.up(), true, false, true),
-    BOTTOM(Vector3i.down(), true, false, true),
+    TOP(new Vector3i(0,1,0), true, false, true),
+    BOTTOM(new Vector3i(0,-1,0), true, false, true),
     LEFT(new Vector3i(-1, 0, 0), false, true, true),
     RIGHT(new Vector3i(1, 0, 0), false, true, true),
     FRONT(new Vector3i(0, 0, -1), true, true, false),
@@ -141,11 +141,11 @@ public enum Side {
     }
 
     public static Side inDirection(int x, int y, int z) {
-        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(y)) {
-            if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+        if (Math.abs(x) > Math.abs(y)) {
+            if (Math.abs(x) > Math.abs(z)) {
                 return (x > 0) ? RIGHT : LEFT;
             }
-        } else if (TeraMath.fastAbs(y) > TeraMath.fastAbs(z)) {
+        } else if (Math.abs(y) > Math.abs(z)) {
             return (y > 0) ? TOP : BOTTOM;
         }
         return (z > 0) ? BACK : FRONT;
@@ -164,11 +164,11 @@ public enum Side {
      * @return Side enum with the appropriate direction
      */
     public static Side inDirection(double x, double y, double z) {
-        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(y)) {
-            if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+        if (Math.abs(x) > Math.abs(y)) {
+            if (Math.abs(x) > Math.abs(z)) {
                 return (x > 0) ? RIGHT : LEFT;
             }
-        } else if (TeraMath.fastAbs(y) > TeraMath.fastAbs(z)) {
+        } else if (Math.abs(y) > Math.abs(z)) {
             return (y > 0) ? TOP : BOTTOM;
         }
         return (z > 0) ? BACK : FRONT;
@@ -182,7 +182,7 @@ public enum Side {
      * @return Side enum with the appropriate direction
      */
     public static Side inHorizontalDirection(double x, double z) {
-        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+        if (Math.abs(x) > Math.abs(z)) {
             return (x > 0) ? RIGHT : LEFT;
         }
         return (z > 0) ? BACK : FRONT;

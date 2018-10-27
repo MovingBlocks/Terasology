@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;

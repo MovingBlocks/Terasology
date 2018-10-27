@@ -15,8 +15,8 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Rect2i;
+import org.joml.Vector2ic;
+import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
@@ -46,7 +46,7 @@ public class SurfaceToDensityProvider implements FacetProvider {
         Region3i area = region.getRegion();
         Rect2i rect = Rect2i.createFromMinAndMax(facet.getRelativeRegion().minX(), facet.getRelativeRegion().minZ(),
                 facet.getRelativeRegion().maxX(), facet.getRelativeRegion().maxZ());
-        for (BaseVector2i pos : rect.contents()) {
+        for (Vector2ic pos : rect.contents()) {
             float height = surfaceHeight.get(pos);
             for (int y = facet.getRelativeRegion().minY(); y <= facet.getRelativeRegion().maxY(); ++y) {
                 facet.set(pos.x(), y, pos.y(), height - area.minY() - y);

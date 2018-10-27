@@ -17,7 +17,7 @@ package org.terasology.utilities;
 
 
 import org.junit.Test;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Rect2i;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

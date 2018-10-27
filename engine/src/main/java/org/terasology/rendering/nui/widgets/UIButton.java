@@ -16,10 +16,10 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+import org.joml.Vector2i;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -173,7 +173,7 @@ public class UIButton extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Font font = canvas.getCurrentStyle().getFont();
-        List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.getX());
+        List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x());
         return font.getSize(lines);
     }
 
