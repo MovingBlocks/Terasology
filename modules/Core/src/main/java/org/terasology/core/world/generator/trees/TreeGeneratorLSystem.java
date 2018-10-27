@@ -18,7 +18,7 @@ package org.terasology.core.world.generator.trees;
 import org.terasology.math.LSystemRule;
 import org.terasology.math.geom.Matrix4f;
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;

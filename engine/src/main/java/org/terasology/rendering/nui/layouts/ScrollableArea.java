@@ -217,7 +217,7 @@ public class ScrollableArea extends CoreLayout {
     private void drawWithJustVertical(Canvas canvas, Vector2i availableSize, Vector2i contentSize) {
         boolean atBottom = verticalBar.getRange() == verticalBar.getValue();
 
-        Rect2i contentRegion = Rect2i.createFromMinAndSize(Vector2i.zero(), availableSize);
+        Rect2i contentRegion = Rect2i.createFromMinAndSize(new Vector2i(), availableSize);
         verticalBar.setRange(contentSize.y - contentRegion.height());
         if ((stickToBottom && atBottom) || moveToBottomPending) {
             verticalBar.setValue(verticalBar.getRange());
@@ -250,7 +250,7 @@ public class ScrollableArea extends CoreLayout {
      * @param contentSize   The size of the widget to draw
      */
     private void drawWithJustHorizontal(Canvas canvas, Vector2i availableSize, Vector2i contentSize) {
-        Rect2i contentRegion = Rect2i.createFromMinAndSize(Vector2i.zero(), availableSize);
+        Rect2i contentRegion = Rect2i.createFromMinAndSize(new Vector2i(), availableSize);
 
         canvas.addInteractionRegion(scrollListener);
         horizontalBar.setRange(contentSize.x - contentRegion.width());
@@ -277,7 +277,7 @@ public class ScrollableArea extends CoreLayout {
                               Vector2i contentSize) {
         boolean atBottom = verticalBar.getRange() == verticalBar.getValue();
 
-        Rect2i contentRegion = Rect2i.createFromMinAndSize(Vector2i.zero(), availableSize);
+        Rect2i contentRegion = Rect2i.createFromMinAndSize(new Vector2i(), availableSize);
 
         verticalBar.setRange(contentSize.y - contentRegion.height());
         horizontalBar.setRange(contentSize.x - contentRegion.width());
@@ -314,7 +314,7 @@ public class ScrollableArea extends CoreLayout {
      * @param availableSize The available size for the layout
      */
     private void drawWithNeither(Canvas canvas, Vector2i availableSize) {
-        canvas.drawWidget(content, Rect2i.createFromMinAndSize(Vector2i.zero(), availableSize));
+        canvas.drawWidget(content, Rect2i.createFromMinAndSize(new Vector2i(), availableSize));
     }
 
 

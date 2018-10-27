@@ -55,12 +55,12 @@ public class BulletCompoundShape extends BulletCollisionShape implements org.ter
     // TODO: Add removeChildShape if needed
 
     @Override
-    public CollisionShape rotate(Quat4f rot) {
+    public CollisionShape rotate(Quaternionf rot) {
         CompoundShape newShape = new CompoundShape();
         for (BulletCompoundShapeChild child : childList) {
             CollisionShape rotatedChild = child.childShape.rotate(rot);
             javax.vecmath.Vector3f offset = com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), child.transform.origin, new javax.vecmath.Vector3f());
-            newShape.addChildShape(new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), offset, 1.0f)), ((BulletCollisionShape) rotatedChild).underlyingShape);
+            newShape.addChildShape(new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuaternionf()), offset, 1.0f)), ((BulletCollisionShape) rotatedChild).underlyingShape);
         }
         return new BulletCompoundShape(newShape);
     }

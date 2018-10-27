@@ -24,7 +24,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
@@ -433,7 +433,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private static float squaredDistanceToCamera(RenderableChunk chunk, Vector3f cameraPosition) {
         // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
         // comments are in use instead of appropriately named vectors.
-        Vector3f result = chunk.getPosition().toVector3f(); // chunk position in chunk coordinates
+        Vector3f result = new Vector3f(chunk.getPosition()); // chunk position in chunk coordinates
         result.add(CHUNK_CENTER_OFFSET);                    // chunk center in chunk coordinates
 
         result.x *= ChunkConstants.SIZE_X;    // chunk center in world coordinates

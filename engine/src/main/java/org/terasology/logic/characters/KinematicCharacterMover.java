@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.characters;
 
+import com.google.common.math.DoubleMath;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
@@ -30,9 +32,6 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
-import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
-import org.joml.Vector3i;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
@@ -107,8 +106,8 @@ public class KinematicCharacterMover implements CharacterMover {
 
             if (input.isFirstRun()) {
                 checkBlockEntry(entity,
-                        new Vector3i(initial.getPosition(), RoundingMode.HALF_UP),
-                        new Vector3i(result.getPosition(), RoundingMode.HALF_UP),
+                        new Vector3i(DoubleMath.roundToInt(initial.getPosition().x, RoundingMode.HALF_UP),DoubleMath.roundToInt(initial.getPosition().y, RoundingMode.HALF_UP),DoubleMath.roundToInt(initial.getPosition().z, RoundingMode.HALF_UP)),
+                        new Vector3i(DoubleMath.roundToInt(result.getPosition().x, RoundingMode.HALF_UP),DoubleMath.roundToInt(result.getPosition().y, RoundingMode.HALF_UP),DoubleMath.roundToInt(result.getPosition().z, RoundingMode.HALF_UP)),
                         characterMovementComponent.height);
             }
             if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
@@ -258,8 +257,8 @@ public class KinematicCharacterMover implements CharacterMover {
             Block block = worldProvider.getBlock(side);
             if (block.isClimbable()) {
                 //If any of our sides are near a climbable block, check if we are near to the side
-                Vector3i myPos = new Vector3i(worldPos, RoundingMode.HALF_UP);
-                Vector3i climbBlockPos = new Vector3i(side, RoundingMode.HALF_UP);
+                Vector3i myPos = new Vector3i(DoubleMath.roundToInt(worldPos.x, RoundingMode.HALF_UP),DoubleMath.roundToInt(worldPos.y, RoundingMode.HALF_UP),DoubleMath.roundToInt(worldPos.z, RoundingMode.HALF_UP));
+                Vector3i climbBlockPos = new Vector3i(DoubleMath.roundToInt(side.x, RoundingMode.HALF_UP),DoubleMath.roundToInt(side.y, RoundingMode.HALF_UP),DoubleMath.roundToInt(side.z, RoundingMode.HALF_UP));
                 Vector3i dir = new Vector3i(block.getDirection().getVector3i());
                 float currentDistance = 10f;
 
@@ -575,9 +574,9 @@ public class KinematicCharacterMover implements CharacterMover {
                                 CharacterMoveInputEvent input) {
         if (movementComp.faceMovementDirection && result.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
-            result.getRotation().set(new Vector3f(0, 1, 0), yaw);
+            result.getRotation().setAngleAxis(yaw,0,1,0);
         } else {
-            result.getRotation().set(new Quaternionf(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0));
+            result.getRotation().set(new Quaternionf().rotationXYZ(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0));
         }
     }
 
@@ -592,7 +591,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (lengthSquared > 1) {
             desiredVelocity.normalize();
         }
-        desiredVelocity.scale(movementComp.speedMultiplier);
+        desiredVelocity.mul(movementComp.speedMultiplier);
 
         float maxSpeed = getMaxSpeed(entity, movementComp);
         if (input.isRunning()) {
@@ -764,7 +763,7 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3i climbDir3i = state.getClimbDirection();
         Vector3f climbDir3f = new Vector3f(climbDir3i);
 
-        Quaternionf rotation = new Quaternionf(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+        Quaternionf rotation = new Quaternionf().rotationXYZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
         tmp = new Vector3f(0.0f, 0.0f, -1.0f).rotate(rotation);
         float angleToClimbDirection = tmp.angle(climbDir3f);
 
@@ -780,7 +779,7 @@ public class KinematicCharacterMover implements CharacterMover {
             } else {
                 float pitchAmount = state.isGrounded() ? 45f : 90f;
                 float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
-                rotation = new Quaternionf(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
+                rotation = new Quaternionf().rotationXYZ(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
                 desiredVelocity.rotate(rotation);
             }
 
@@ -793,9 +792,9 @@ public class KinematicCharacterMover implements CharacterMover {
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             if (jumpOrCrouchActive) {
-                rotation = new Quaternionf(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+                rotation = new Quaternionf().rotationXYZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             } else {
-                rotation = new Quaternionf(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
+                rotation = new Quaternionf().rotationXYZ(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
                         TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
                 );
             }
@@ -804,7 +803,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
             // facing away from ladder
         } else {
-            rotation = new Quaternionf(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+            rotation = new Quaternionf().rotationXYZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             desiredVelocity.rotate(rotation);
 //            rotation.rotate(desiredVelocity, desiredVelocity);
             clearMovementToDirection = false;

@@ -59,7 +59,6 @@ import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Rect2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Rect2iTypeHandler;

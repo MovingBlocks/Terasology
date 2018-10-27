@@ -38,7 +38,7 @@ public final class ShutdownChunkTask implements ChunkTask {
 
     @Override
     public Vector3i getPosition() {
-        return Vector3i.zero();
+        return new Vector3i();
     }
 
 }

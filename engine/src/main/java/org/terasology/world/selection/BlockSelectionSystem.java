@@ -51,7 +51,7 @@ public class BlockSelectionSystem extends BaseComponentSystem {
 
         Vector3f worldPosition = locationComponent.getWorldPosition();
 
-        Vector3i startPosition = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
+        Vector3i startPosition = new Vector3i((int) worldPosition.x,(int) worldPosition.y,(int) worldPosition.z);
         blockSelectionComponent.startPosition = startPosition;
         Vector3i endPosition = startPosition;
         blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);

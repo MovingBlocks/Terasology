@@ -24,7 +24,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.players.FirstPersonHeldItemMountPointComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.PlayerTargetChangedEvent;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;

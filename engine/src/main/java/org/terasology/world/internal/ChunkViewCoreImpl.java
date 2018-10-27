@@ -17,6 +17,7 @@
 package org.terasology.world.internal;
 
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
@@ -69,8 +70,8 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public Block getBlock(Vector3i pos) {
-        return getBlock(pos.x, pos.y, pos.z);
+    public Block getBlock(Vector3ic pos) {
+        return getBlock(pos.x(), pos.y(), pos.z());
     }
 
     // TODO: Review

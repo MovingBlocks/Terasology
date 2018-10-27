@@ -30,7 +30,7 @@ import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;

@@ -16,12 +16,12 @@
 
 package org.terasology.world.viewer.picker;
 
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
+
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
-
-import org.terasology.math.geom.BaseVector2f;
-import org.terasology.math.geom.ImmutableVector2f;
 
 /**
  * Retrieves the closest (circular) object from a collection of tested elements.
@@ -29,7 +29,7 @@ import org.terasology.math.geom.ImmutableVector2f;
  */
 public class CirclePickerClosest<T> implements CirclePicker<T> {
 
-    private final BaseVector2f cursor;
+    private final Vector2f cursor;
     private final Function<? super T, ? extends Number> radiusFunc;
 
     private double minDistSq = Double.POSITIVE_INFINITY;
@@ -39,7 +39,7 @@ public class CirclePickerClosest<T> implements CirclePicker<T> {
      * No minimum distance to the target is required
      * @param target the target location
      */
-    public CirclePickerClosest(BaseVector2f target) {
+    public CirclePickerClosest(Vector2fc target) {
         this(target, ignored -> Double.POSITIVE_INFINITY);
     }
 
@@ -48,15 +48,15 @@ public class CirclePickerClosest<T> implements CirclePicker<T> {
      * @param target the target location
      * @param radiusFunc the radius function for each of the tested elements
      */
-    public CirclePickerClosest(BaseVector2f target, Function<? super T, ? extends Number> radiusFunc) {
-        this.cursor = ImmutableVector2f.createOrUse(target);
+    public CirclePickerClosest(Vector2fc target, Function<? super T, ? extends Number> radiusFunc) {
+        this.cursor = new Vector2f(target);
         this.radiusFunc = radiusFunc;
     }
 
     @Override
     public void offer(float locX, float locY, T object) {
-        float dx = cursor.getX() - locX;
-        float dy = cursor.getY() - locY;
+        float dx = cursor.x() - locX;
+        float dy = cursor.y() - locY;
         float distSq = dx * dx + dy * dy;
         float rad = radiusFunc.apply(object).floatValue();
 

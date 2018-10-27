@@ -35,7 +35,7 @@ public class BulletSweepCallback extends CollisionWorld.ClosestConvexResultCallb
     protected final Vector3f up;
     protected float minSlopeDot;
 
-    public BulletSweepCallback(CollisionObject me, org.terasology.math.geom.Vector3f up, float minSlopeDot) {
+    public BulletSweepCallback(CollisionObject me,org.joml.Vector3f up, float minSlopeDot) {
         super(new Vector3f(), new Vector3f());
         this.me = me;
         this.up = new Vector3f(up.x, up.y, up.z);
@@ -90,13 +90,13 @@ public class BulletSweepCallback extends CollisionWorld.ClosestConvexResultCallb
     }
 
     @Override
-    public org.terasology.math.geom.Vector3f getHitNormalWorld() {
-        return new org.terasology.math.geom.Vector3f(hitNormalWorld.x, hitNormalWorld.y, hitNormalWorld.z);
+    public org.joml.Vector3f getHitNormalWorld() {
+        return new org.joml.Vector3f(hitNormalWorld.x, hitNormalWorld.y, hitNormalWorld.z);
     }
 
     @Override
-    public org.terasology.math.geom.Vector3f getHitPointWorld() {
-        return new org.terasology.math.geom.Vector3f(hitPointWorld.x, hitPointWorld.y, hitPointWorld.z);
+    public org.joml.Vector3f getHitPointWorld() {
+        return new org.joml.Vector3f(hitPointWorld.x, hitPointWorld.y, hitPointWorld.z);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class BulletSweepCallback extends CollisionWorld.ClosestConvexResultCallb
     }
 
     @Override
-    public boolean checkForStep(org.terasology.math.geom.Vector3f direction, float stepHeight, float slopeFactor, float checkForwardDistance) {
+    public boolean checkForStep(org.joml.Vector3f direction, float stepHeight, float slopeFactor, float checkForwardDistance) {
         boolean moveUpStep;
         boolean hitStep = false;
         float stepSlope = 1f;

@@ -26,7 +26,7 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.AABB;
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 
@@ -118,10 +118,10 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
             }
 
             List<Quaternionf> rotations = rawRotations.stream().map(rot ->
-                    MD5ParserCommon.completeQuaternionf(rot.x, rot.y, rot.z)).collect(Collectors.toCollection(ArrayList::new));
+                    MD5ParserCommon.completeQuat4f(rot.x, rot.y, rot.z)).collect(Collectors.toCollection(ArrayList::new));
 
             // Rotate just the root bone to correct for coordinate system differences
-            rotations.set(0, MD5ParserCommon.correctQuaternionf(rotations.get(0)));
+            rotations.set(0, MD5ParserCommon.correctQuat4f(rotations.get(0)));
             positions.set(0, MD5ParserCommon.correctOffset(positions.get(0)));
 
 

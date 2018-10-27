@@ -22,12 +22,12 @@ import org.terasology.reflection.copy.RegisterCopyStrategy;
 /**
  */
 @RegisterCopyStrategy
-public class Quat4fCopyStrategy implements CopyStrategy<Quat4f> {
+public class Quat4fCopyStrategy implements CopyStrategy<Quaternionf> {
 
     @Override
-    public Quat4f copy(Quat4f value) {
+    public Quaternionf copy(Quaternionf value) {
         if (value != null) {
-            return new Quat4f(value);
+            return new Quaternionf(value);
         }
         return null;
     }

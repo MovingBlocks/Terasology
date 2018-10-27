@@ -27,8 +27,8 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
@@ -204,7 +204,7 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
             joint.name = matcher.group(1);
             joint.parent = Integer.parseInt(matcher.group(2));
             joint.position = MD5ParserCommon.readVector3fAndCorrect(matcher.group(3), matcher.group(4), matcher.group(5));
-            joint.orientation = MD5ParserCommon.readQuaternionf(matcher.group(6), matcher.group(7), matcher.group(8));
+            joint.orientation = MD5ParserCommon.readQuat4f(matcher.group(6), matcher.group(7), matcher.group(8));
             md5.joints[i] = joint;
             logger.trace("Read joint: {}", joint.name);
         }

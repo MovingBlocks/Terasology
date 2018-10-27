@@ -16,8 +16,9 @@
 
 package org.terasology.world.internal;
 
+import com.google.common.math.DoubleMath;
+import org.joml.Vector3f;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
@@ -47,7 +48,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public boolean isBlockRelevant(Vector3f pos) {
-        return isBlockRelevant(new Vector3i(pos, RoundingMode.HALF_UP));
+        return isBlockRelevant(new Vector3i(DoubleMath.roundToInt(pos.x, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.y, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.z, RoundingMode.HALF_UP)));
     }
 
     @Override
@@ -67,7 +68,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public Block getBlock(Vector3f pos) {
-        return getBlock(new Vector3i(pos, RoundingMode.HALF_UP));
+        return getBlock(new Vector3i(DoubleMath.roundToInt(pos.x, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.y, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.z, RoundingMode.HALF_UP)));
     }
 
     @Override
@@ -82,17 +83,17 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public byte getLight(Vector3f pos) {
-        return getLight(new Vector3i(pos, RoundingMode.HALF_UP));
+        return getLight(new Vector3i(DoubleMath.roundToInt(pos.x, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.y, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.z, RoundingMode.HALF_UP)));
     }
 
     @Override
     public byte getSunlight(Vector3f pos) {
-        return getSunlight(new Vector3i(pos, RoundingMode.HALF_UP));
+        return getSunlight(new Vector3i(DoubleMath.roundToInt(pos.x, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.y, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.z, RoundingMode.HALF_UP)));
     }
 
     @Override
     public byte getTotalLight(Vector3f pos) {
-        return getTotalLight(new Vector3i(pos, RoundingMode.HALF_UP));
+        return getTotalLight(new Vector3i(DoubleMath.roundToInt(pos.x, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.y, RoundingMode.HALF_UP),DoubleMath.roundToInt(pos.z, RoundingMode.HALF_UP)));
     }
 
 

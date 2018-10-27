@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.ControllerConfig.ControllerInfo;

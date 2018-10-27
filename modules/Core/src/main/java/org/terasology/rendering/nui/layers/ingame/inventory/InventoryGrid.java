@@ -118,12 +118,12 @@ public class InventoryGrid extends CoreWidget {
             return;
         }
         Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
-        if (cellSize.getX() == 0 || cellSize.getY() == 0) {
+        if (cellSize.x() == 0 || cellSize.y() == 0) {
             return;
         }
         canvas.addInteractionRegion(interactionListener);
 
-        int horizontalCells = Math.max(1, Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX()));
+        int horizontalCells = Math.max(1, Math.min(maxHorizontalCells, canvas.size().x() / cellSize.x()));
         for (int i = 0; i < numSlots && i < cells.size(); ++i) {
             int horizPos = i % horizontalCells;
             int vertPos = i / horizontalCells;
@@ -135,13 +135,13 @@ public class InventoryGrid extends CoreWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         int numSlots = getNumSlots();
         if (numSlots == 0 || cells.isEmpty()) {
-            return Vector2i.zero();
+            return new Vector2i();
         }
         Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
-        if (cellSize.getX() == 0 || cellSize.getY() == 0) {
-            return Vector2i.zero();
+        if (cellSize.x() == 0 || cellSize.y() == 0) {
+            return new Vector2i();
         }
-        int horizontalCells = Math.min(Math.min(maxHorizontalCells, numSlots), sizeHint.getX() / cellSize.getX());
+        int horizontalCells = Math.min(Math.min(maxHorizontalCells, numSlots), sizeHint.x() / cellSize.x());
         int verticalCells = ((numSlots - 1) / horizontalCells) + 1;
         return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
     }

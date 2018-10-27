@@ -19,10 +19,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -35,7 +37,6 @@ import org.terasology.math.MatrixUtils;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseQuaternionf;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
 import org.terasology.rendering.assets.material.Material;
@@ -172,7 +173,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quaternionf rotation, Vector3f offset, float scale, float alpha) {
+    public void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quaternionfc rotation, Vector3fc offset, float scale, float alpha) {
         if (!material.isRenderable()) {
             return;
         }
@@ -183,11 +184,11 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         Vector3f centerOffset = meshAABB.getCenter();
         centerOffset.mul(-1.0f);
 
-        Matrix4f centerTransform = new Matrix4f(BaseQuaternionf.IDENTITY, centerOffset, 1.0f);
-        Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
-        Matrix4f translateTransform = new Matrix4f(BaseQuaternionf.IDENTITY,
+        Matrix4f centerTransform = new Matrix4f().translate(centerOffset).scale(1.0f);
+        Matrix4f userTransform = new Matrix4f().rotate(rotation).translate(offset).scale(-fitScale * scale);
+        Matrix4f translateTransform = new Matrix4f().translate(
                 new Vector3f(drawRegion.minX() + drawRegion.width() / 2,
-                        drawRegion.minY() + drawRegion.height() / 2, 0), 1);
+                        drawRegion.minY() + drawRegion.height() / 2, 0)).scale(1);
 
         userTransform.mul(centerTransform);
         translateTransform.mul(userTransform);

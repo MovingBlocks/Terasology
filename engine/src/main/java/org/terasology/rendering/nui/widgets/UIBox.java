@@ -47,7 +47,7 @@ public class UIBox extends CoreWidget {
         if (content != null) {
             return canvas.calculateRestrictedSize(content, sizeHint);
         }
-        return Vector2i.zero();
+        return new Vector2i();
     }
 
     @Override

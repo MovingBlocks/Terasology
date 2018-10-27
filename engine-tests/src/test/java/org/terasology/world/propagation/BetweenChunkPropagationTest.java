@@ -16,6 +16,7 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -213,22 +214,22 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
+        public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
             return null;
         }
 
         @Override
-        public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
+        public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
             return null;
         }
 
         @Override
-        public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
+        public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
             return null;
         }
 
         @Override
-        public boolean reloadChunk(Vector3i pos) {
+        public boolean reloadChunk(Vector3ic pos) {
             return false;
         }
 
@@ -243,17 +244,17 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
+        public void addRelevanceEntity(EntityRef entity, Vector3ic distance) {
             // do nothing
         }
 
         @Override
-        public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener) {
+        public void addRelevanceEntity(EntityRef entity, Vector3ic distance, ChunkRegionListener listener) {
             // do nothing
         }
 
         @Override
-        public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
+        public void updateRelevanceEntity(EntityRef entity, Vector3ic distance) {
             // do nothing
         }
 
@@ -273,7 +274,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public boolean isChunkReady(Vector3i pos) {
+        public boolean isChunkReady(Vector3ic pos) {
             return false;
         }
 
@@ -283,7 +284,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public Chunk getChunk(Vector3i chunkPos) {
+        public Chunk getChunk(Vector3ic chunkPos) {
             return chunks.get(chunkPos);
         }
 

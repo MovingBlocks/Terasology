@@ -28,7 +28,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;

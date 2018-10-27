@@ -15,7 +15,7 @@
  */
 package org.terasology.physics.shapes;
 
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 /**
  * Represents a box collision shape in the physics engine.

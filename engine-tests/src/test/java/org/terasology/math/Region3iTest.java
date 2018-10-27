@@ -34,7 +34,7 @@ public class Region3iTest {
 
     @Test
     public void testEmptyRegion() {
-        assertEquals(Region3i.empty().size(), Vector3i.zero());
+        assertEquals(Region3i.empty().size(), new Vector3i());
         assertTrue(Region3i.empty().isEmpty());
     }
 

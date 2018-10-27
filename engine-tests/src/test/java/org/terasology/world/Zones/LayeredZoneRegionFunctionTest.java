@@ -17,10 +17,10 @@ package org.terasology.world.Zones;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import org.joml.Vector2ic;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector2i;
 import org.joml.Vector3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
@@ -67,7 +67,7 @@ public class LayeredZoneRegionFunctionTest {
                     SurfaceHeightFacet facet = new SurfaceHeightFacet(generatingRegion.getRegion(),
                             generatingRegion.getBorderForFacet(SurfaceHeightFacet.class));
 
-                    for (BaseVector2i pos : facet.getRelativeRegion().contents()) {
+                    for (Vector2ic pos : facet.getRelativeRegion().contents()) {
                         facet.set(pos, 100);
                     }
 

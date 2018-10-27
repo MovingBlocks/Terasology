@@ -15,7 +15,7 @@
  */
 package org.terasology.reflection.copy.strategy;
 
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 

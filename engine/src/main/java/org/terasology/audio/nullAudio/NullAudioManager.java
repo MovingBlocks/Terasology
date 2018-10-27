@@ -16,6 +16,8 @@
 
 package org.terasology.audio.nullAudio;
 
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.terasology.assets.AssetFactory;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
@@ -24,7 +26,7 @@ import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 /**
  * Null implementation of the AudioManager
@@ -52,19 +54,19 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position) {
+    public void playSound(StaticSound sound, Vector3fc position) {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume) {
+    public void playSound(StaticSound sound, Vector3fc position, float volume) {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume, int priority) {
+    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority) {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
+    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority, AudioEndListener endListener) {
     }
 
     @Override
@@ -88,7 +90,7 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void updateListener(Vector3f position, Quaternionf orientation, Vector3f velocity) {
+    public void updateListener(Vector3fc position, Quaternionfc orientation, Vector3fc velocity) {
     }
 
     @Override

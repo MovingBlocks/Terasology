@@ -21,7 +21,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;

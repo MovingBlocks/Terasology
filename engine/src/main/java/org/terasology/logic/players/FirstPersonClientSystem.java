@@ -35,7 +35,7 @@ import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.VisualComponent;
@@ -85,7 +85,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         Location.removeChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity);
         Location.attachChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity,
                 firstPersonHeldItemMountPointComponent.translate,
-                new Quaternionf(
+                new Quaternionf().rotationXYZ(
                         TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.y,
                         TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.x,
                         TeraMath.DEG_TO_RAD * firstPersonHeldItemMountPointComponent.rotateDegrees.z),
@@ -183,7 +183,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
                 Location.attachChild(mountPointComponent.mountPointEntity, currentHeldItem,
                         heldItemTransformComponent.translate,
-                        new Quaternionf(
+                        new Quaternionf().rotationXYZ(
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.y,
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.x,
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.z),
@@ -231,7 +231,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         }
         float addPitch = 15f * animateAmount;
         float addYaw = 10f * animateAmount;
-        locationComponent.setLocalRotation(new Quaternionf(
+        locationComponent.setLocalRotation(new Quaternionf().rotationXYZ(
                 TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.y + addYaw),
                 TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.x + addPitch),
                 TeraMath.DEG_TO_RAD * mountPointComponent.rotateDegrees.z));

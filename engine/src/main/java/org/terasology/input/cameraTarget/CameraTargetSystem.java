@@ -17,12 +17,14 @@
 package org.terasology.input.cameraTarget;
 
 import com.google.common.base.Objects;
+import com.google.common.math.DoubleMath;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.TeraMath;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -144,6 +146,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
             //calculate the distance from the player to the hit point
             playerToTargetRay.sub(hitInfo.getHitPoint(), localPlayer.getViewPosition());
             //gradually adjust focalDistance from it's current value to the hit point distance
+
             focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.length(), delta * focusRate);
             //if nothing was hit, gradually adjust the focusDistance to the maximum length of the update function trace
         } else {
@@ -176,7 +179,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
         if (targetBlockPos != null) {
             return new Vector3i(targetBlockPos);
         }
-        return new Vector3i(hitPosition, RoundingMode.HALF_UP);
+        return new Vector3i(DoubleMath.roundToInt(hitPosition.x, RoundingMode.HALF_UP),DoubleMath.roundToInt(hitPosition.y, RoundingMode.HALF_UP),DoubleMath.roundToInt(hitPosition.z, RoundingMode.HALF_UP));
     }
 
     /**

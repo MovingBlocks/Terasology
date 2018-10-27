@@ -21,7 +21,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import java.util.HashSet;
@@ -155,12 +155,12 @@ public class Vector3iTest {
 
     @Test
     public void testManhattanDistance() {
-        assertEquals(0, Vector3i.zero().gridDistance(Vector3i.zero()));
-        assertEquals(1, Vector3i.zero().gridDistance(Vector3i.west()));
-        assertEquals(1, Vector3i.zero().gridDistance(Vector3i.up()));
-        assertEquals(1, Vector3i.zero().gridDistance(Vector3i.north()));
-        assertEquals(3, Vector3i.zero().gridDistance(Vector3i.one()));
-        assertEquals(3, Vector3i.zero().gridDistance(new Vector3i(1, -1, 1)));
+        assertEquals(0, new Vector3i().gridDistance(new Vector3i()));
+        assertEquals(1, new Vector3i().gridDistance(Vector3i.west()));
+        assertEquals(1, new Vector3i().gridDistance(Vector3i.up()));
+        assertEquals(1, new Vector3i().gridDistance(Vector3i.north()));
+        assertEquals(3, new Vector3i().gridDistance(Vector3i.one()));
+        assertEquals(3, new Vector3i().gridDistance(new Vector3i(1, -1, 1)));
     }
 
     @Test

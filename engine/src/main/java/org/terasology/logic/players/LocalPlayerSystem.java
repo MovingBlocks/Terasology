@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
@@ -62,8 +64,6 @@ import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
-import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -160,15 +160,16 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quat4f viewRotation;
+        Quaternionf viewRotation;
         switch (characterMovementComponent.mode) {
             case CROUCHING:
             case WALKING:
                 if (!config.getRendering().isVrSupport()) {
-                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
+                    viewRotation = new Quaternionf().rotateXYZ(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
                     playerCamera.setOrientation(viewRotation);
                 }
-                playerCamera.getOrientation().rotate(relMove, relMove);
+                relMove.rotate(playerCamera.getOrientation());
+//                playerCamera.getOrientation().rotate(relMove, relMove);
                 break;
             case CLIMBING:
                 // Rotation is applied in KinematicCharacterMover
@@ -176,15 +177,16 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 break;
             default:
                 if (!config.getRendering().isVrSupport()) {
-                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
+                    viewRotation = new Quaternionf().rotateXYZ(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
                     playerCamera.setOrientation(viewRotation);
                 }
-                playerCamera.getOrientation().rotate(relMove, relMove);
+                relMove.rotate(playerCamera.getOrientation());
+//                playerCamera.getOrientation().rotate(relMove, relMove);
                 relMove.y += relativeMovement.y;
                 break;
         }
         // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing trouble down the line.
-        if (!Float.isNaN(relMove.getX()) && !Float.isNaN(relMove.getY()) && !Float.isNaN(relMove.getZ())) {
+        if (!Float.isNaN(relMove.x()) && !Float.isNaN(relMove.y()) && !Float.isNaN(relMove.z())) {
             entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch, jump, time.getGameDeltaInMs()));
         }
         jump = false;
@@ -412,10 +414,11 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         aabbRenderer = newAABBRender;
     }
 
-    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
+    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quaternionf rotation) {
         playerCamera.getPosition().set(position);
         Vector3f viewDir = Direction.FORWARD.getVector3f();
-        rotation.rotate(viewDir, playerCamera.getViewingDirection());
+        viewDir.rotate(rotation,playerCamera.getViewingDirection());
+//        rotation.rotate(viewDir, playerCamera.getViewingDirection());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {

@@ -21,7 +21,7 @@ import org.mockito.Mockito;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.biomes.BiomeManager;

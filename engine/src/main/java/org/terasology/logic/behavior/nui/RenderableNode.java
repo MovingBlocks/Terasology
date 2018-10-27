@@ -23,7 +23,7 @@ import org.terasology.input.device.KeyboardDevice;
 import org.joml.Vector2i;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;

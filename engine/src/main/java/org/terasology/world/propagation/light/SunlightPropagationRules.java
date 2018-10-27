@@ -15,6 +15,7 @@
  */
 package org.terasology.world.propagation.light;
 
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
 import org.joml.Vector3i;
 import org.terasology.world.block.Block;
@@ -38,7 +39,7 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public byte getFixedValue(Block block, Vector3i pos) {
+    public byte getFixedValue(Block block, Vector3ic pos) {
         byte lightVal = (byte) (regenWorldView.getValueAt(pos) - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
         return (lightVal > 0) ? lightVal : 0;
     }
@@ -54,8 +55,8 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public byte getValue(LitChunk chunk, Vector3i pos) {
-        return getValue(chunk, pos.x, pos.y, pos.z);
+    public byte getValue(LitChunk chunk, Vector3ic pos) {
+        return getValue(chunk, pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -64,7 +65,7 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
+    public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
         chunk.setSunlight(pos, value);
     }
 

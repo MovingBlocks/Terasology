@@ -46,7 +46,7 @@ public class UICrosshair extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return Vector2i.zero();
+        return new Vector2i();
     }
 
     public void bindChargeAmount(Binding<Float> binding) {

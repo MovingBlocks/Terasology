@@ -44,7 +44,7 @@ import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;

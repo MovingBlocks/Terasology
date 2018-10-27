@@ -19,7 +19,7 @@ package org.terasology.rendering.assets.animation;
 import com.google.common.collect.Lists;
 
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;

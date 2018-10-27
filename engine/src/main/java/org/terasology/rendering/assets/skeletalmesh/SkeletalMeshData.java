@@ -25,8 +25,6 @@ import org.joml.Vector3f;
 import org.terasology.assets.AssetData;
 import org.terasology.math.AABB;
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
@@ -181,8 +179,7 @@ public class SkeletalMeshData implements AssetData {
             Vector3f normal = normals.get(vertIndex);
             for (int weightIndex = 0; weightIndex < vertexWeightCounts.get(vertIndex); ++weightIndex) {
                 BoneWeight weight = weights.get(weightIndex + vertexStartWeights.get(vertIndex));
-                inverseRot.inverse(bones.get(weight.getBoneIndex()).getObjectRotation());
-                inverseRot.rotate(normal, norm);
+                normal.rotate(inverseRot.invert(bones.get(weight.getBoneIndex()).getObjectRotation()),norm);
                 weight.setNormal(norm);
             }
         }

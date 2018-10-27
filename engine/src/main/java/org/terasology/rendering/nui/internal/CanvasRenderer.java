@@ -16,9 +16,11 @@
 package org.terasology.rendering.nui.internal;
 
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
@@ -46,7 +48,7 @@ public interface CanvasRenderer {
 
     FrameBufferObject getFBO(ResourceUrn urn, Vector2ic size);
 
-    void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quaternionf rotation, Vector3f offset, float scale, float alpha);
+    void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quaternionfc rotation, Vector3fc offset, float scale, float alpha);
 
     void drawMaterialAt(Material material, Rect2i drawRegion);
 

@@ -79,7 +79,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
                 if (currentPosition == null) {
                     currentPosition = new Vector2i(position);
                 } else {
-                    currentPosition.addX(currentWidth);
+                    currentPosition.add(currentWidth,0);
                 }
                 Rect2i region = Rect2i.createFromMinAndSize(currentPosition,
                     canvas.calculatePreferredSize(level));
@@ -93,7 +93,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
                         region.maxX(),
                         canvas.getRegion().height());
                 }
-                currentWidth = canvas.calculatePreferredSize(level).getX() - 8;
+                currentWidth = canvas.calculatePreferredSize(level).x() - 8;
                 canvas.drawWidget(level, region);
             }
         }

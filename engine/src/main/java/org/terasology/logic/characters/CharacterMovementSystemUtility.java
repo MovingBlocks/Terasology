@@ -15,14 +15,11 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseQuaternionf;
-import org.terasology.math.geom.BaseVector3f;
-import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 
@@ -67,7 +64,7 @@ public final class CharacterMovementSystemUtility {
         setPhysicsLocation(entity, state.getPosition());
 
         // set the pitch to the character's gaze entity
-        Quaternionf rotation = new Quaternionf(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);
+        Quaternionf rotation = new Quaternionf().rotationXYZ(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);//new Quaternionf(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);
         EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(entity);
         if (!gazeEntity.equals(entity)) {
             // Only set the gaze entity rotation if it is not the same as the main entity.
@@ -80,8 +77,8 @@ public final class CharacterMovementSystemUtility {
 
     public void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
         float t = (float) (time - a.getTime()) / (b.getTime() - a.getTime());
-        Vector3f newPos = BaseVector3f.lerp(a.getPosition(), b.getPosition(), t);
-        Quaternionf newRot = BaseQuaternionf.interpolate(a.getRotation(), b.getRotation(), t);
+        Vector3f newPos = new Vector3f(a.getPosition()).lerp(b.getPosition(),t);//BaseVector3f.lerp(a.getPosition(), b.getPosition(), t);
+        Quaternionf newRot = new Quaternionf(a.getRotation()).nlerp(b.getRotation(),t);//BaseQuaternionf.interpolate(a.getRotation(), b.getRotation(), t);
         LocationComponent location = entity.getComponent(LocationComponent.class);
         location.setWorldPosition(newPos);
         location.setWorldRotation(newRot);

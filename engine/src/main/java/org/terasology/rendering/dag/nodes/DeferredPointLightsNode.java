@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
@@ -24,8 +25,7 @@ import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -207,12 +207,12 @@ public class DeferredPointLightsNode extends AbstractNode {
 
                     // setting shader parameters for the light position in camera space
                     Vector3f lightPositionInViewSpace = new Vector3f(lightPositionRelativeToCamera);
-                    activeCamera.getViewMatrix().transformPoint(lightPositionInViewSpace);
+                    activeCamera.getViewMatrix().transformPosition(lightPositionInViewSpace);
                     lightGeometryMaterial.setFloat3("lightViewPos", lightPositionInViewSpace.x, lightPositionInViewSpace.y, lightPositionInViewSpace.z, true);
 
                     // set the size and location of the sphere to be rendered via shader parameters
                     Matrix4f modelMatrix = new Matrix4f();
-                    modelMatrix.set(lightComponent.lightAttenuationRange); // scales the modelview matrix, effectively scales the light sphere
+                    modelMatrix.scale(lightComponent.lightAttenuationRange); // scales the modelview matrix, effectively scales the light sphere
                     modelMatrix.setTranslation(lightPositionRelativeToCamera); // effectively moves the light sphere in the right position relative to camera
                     lightGeometryMaterial.setMatrix4("modelMatrix", modelMatrix, true);
 

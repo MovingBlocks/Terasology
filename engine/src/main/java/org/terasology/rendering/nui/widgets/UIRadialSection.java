@@ -75,7 +75,7 @@ public class UIRadialSection extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return sectionRegion == null ? Vector2i.zero() : sectionRegion.size();
+        return sectionRegion == null ? new Vector2i() : sectionRegion.size();
     }
 
     /**

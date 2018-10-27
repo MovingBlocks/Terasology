@@ -18,6 +18,7 @@ package org.terasology.rendering.logic;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.assets.management.AssetManager;
@@ -32,9 +33,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Matrix4f;
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
@@ -110,7 +110,10 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         Vector3f worldPositionCameraSpace = new Vector3f();
         worldPositionCameraSpace.sub(worldPos, cameraPosition);
 
-        Matrix4f matrixCameraSpace = new Matrix4f(new Quaternionf(0, 0, 0, 1), worldPositionCameraSpace, 1.0f);
+        Matrix4f matrixCameraSpace = new Matrix4f()
+                .rotate(new Quaternionf(0, 0, 0, 1))
+                .translate( worldPositionCameraSpace)
+                .scale(1.0f);
 
         Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);

@@ -239,7 +239,7 @@ public class StandardBatchPropagator implements BatchPropagator {
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         IndexProvider indexProvider = createIndexProvider(side);
 
-        Region3i edgeRegion = ChunkMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
+        Region3i edgeRegion = ChunkMath.getEdgeRegion(Region3i.createFromMinAndSize(new Vector3i(), ChunkConstants.CHUNK_SIZE), side);
 
         int edgeSize = edgeRegion.size().x * edgeRegion.size().y * edgeRegion.size().z;
         int[] depth = new int[edgeSize];

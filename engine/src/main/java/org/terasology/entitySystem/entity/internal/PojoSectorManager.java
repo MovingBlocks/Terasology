@@ -16,7 +16,9 @@
 package org.terasology.entitySystem.entity.internal;
 
 import com.google.common.collect.Iterables;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityPool;
@@ -99,17 +101,17 @@ public class PojoSectorManager implements EngineSectorManager {
     }
 
     @Override
-    public EntityRef create(String prefab, Vector3f position) {
+    public EntityRef create(String prefab, Vector3fc position) {
         return getPool().create(prefab, position);
     }
 
     @Override
-    public EntityRef create(Prefab prefab, Vector3f position) {
+    public EntityRef create(Prefab prefab, Vector3fc position) {
         return getPool().create(prefab, position);
     }
 
     @Override
-    public EntityRef create(Prefab prefab, Vector3f position, Quaternionf rotation) {
+    public EntityRef create(Prefab prefab, Vector3fc position, Quaternionfc rotation) {
         return getPool().create(prefab, position, rotation);
     }
 

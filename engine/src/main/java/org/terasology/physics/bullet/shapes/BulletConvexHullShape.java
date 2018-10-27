@@ -17,11 +17,9 @@ package org.terasology.physics.bullet.shapes;
 
 import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.util.ObjectArrayList;
-import org.terasology.math.AABB;
-import org.terasology.math.Transform;
-import org.terasology.math.VecMath;
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
+import org.terasology.math.VecMath;
 import org.terasology.physics.shapes.CollisionShape;
 
 import java.util.List;
@@ -45,7 +43,7 @@ public class BulletConvexHullShape extends BulletCollisionShape implements org.t
     }
 
     @Override
-    public CollisionShape rotate(Quat4f rot) {
+    public CollisionShape rotate(Quaternionf rot) {
         ObjectArrayList<javax.vecmath.Vector3f> transformedVerts = new ObjectArrayList<>();
         for (javax.vecmath.Vector3f vert : convexHullShape.getPoints()) {
             transformedVerts.add(com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), vert, new javax.vecmath.Vector3f()));

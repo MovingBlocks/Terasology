@@ -34,7 +34,7 @@ import java.util.Set;
 public class GsonTypeSerializationLibraryAdapterFactoryTest {
     private static final TestClass OBJECT = new TestClass(
             new Color(0xDEADBEEF),
-            ImmutableSet.of(Vector4f.zero(), Vector4f.one()),
+            ImmutableSet.of(new Vector4f(0,0,0,0), new Vector4f(1,1,1,1)),
             ImmutableMap.of(
                     "someRect",
                     Rect2i.createFromMinAndSize(-3, -3, 10, 10)

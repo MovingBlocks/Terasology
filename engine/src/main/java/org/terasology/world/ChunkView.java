@@ -16,6 +16,7 @@
 package org.terasology.world;
 
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.Region3i;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
@@ -42,7 +43,7 @@ public interface ChunkView {
      * @param pos
      * @return The block at the given position. If this is outside of the view then the air block is returned
      */
-    Block getBlock(Vector3i pos);
+    Block getBlock(Vector3ic pos);
 
     /**
      * @param x

@@ -28,7 +28,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.FloatingTextComponent;
 
@@ -85,7 +85,7 @@ public class NameTagClientSystem extends BaseComponentSystem {
             nameTag = nameTagBuilder.build();
             nameTagEntityToFloatingTextMap.put(entity, nameTag);
 
-            Location.attachChild(entity, nameTag, offset, new Quat4f(1, 0, 0, 0));
+            Location.attachChild(entity, nameTag, offset, new Quaternionf(1, 0, 0, 0));
         }
     }
 

@@ -19,7 +19,7 @@ import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
 import org.joml.Quaternionf;
 import org.joml.Vector2i;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;

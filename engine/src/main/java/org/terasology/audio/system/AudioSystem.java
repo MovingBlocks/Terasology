@@ -16,7 +16,7 @@
 
 package org.terasology.audio.system;
 
-import org.terasology.utilities.Assets;
+import org.joml.Vector3f;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
@@ -31,10 +31,10 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
+import org.terasology.utilities.Assets;
 
 /**
  * This system handles receiving the PlaySound events and activating the AudioManager to play them

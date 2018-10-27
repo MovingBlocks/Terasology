@@ -17,6 +17,7 @@ package org.terasology.rendering.world;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import org.joml.Math;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,7 +200,7 @@ public final class ChunkMeshUpdateManager {
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-            return pos.gridDistance(regionCenter);
+            return (int) (Math.abs(pos.x - regionCenter.x) + Math.abs(pos.y - regionCenter.y) + Math.abs(pos.z - regionCenter.z));
         }
     }
 }

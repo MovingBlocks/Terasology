@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.math.DoubleMath;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,7 +193,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getBlockEntityAt(Vector3f position) {
-        Vector3i pos = new Vector3i(position, RoundingMode.HALF_UP);
+        Vector3i pos = new Vector3i(DoubleMath.roundToInt(position.x,RoundingMode.HALF_UP),DoubleMath.roundToInt(position.y,RoundingMode.HALF_UP),DoubleMath.roundToInt(position.z,RoundingMode.HALF_UP));//, RoundingMode.HALF_UP);
         return getBlockEntityAt(pos);
     }
 
@@ -304,7 +305,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
         EntityBuilder builder = entityManager.newBuilder(block.getPrefab().orElse(null));
-        builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
+        builder.addComponent(new LocationComponent(new Vector3f(blockPosition)));
         builder.addComponent(new BlockComponent(block, blockPosition));
         boolean isTemporary = isTemporaryBlock(builder, block);
         if (!isTemporary && !builder.hasComponent(NetworkComponent.class)) {

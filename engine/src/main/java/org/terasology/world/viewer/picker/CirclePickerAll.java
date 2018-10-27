@@ -16,8 +16,8 @@
 
 package org.terasology.world.viewer.picker;
 
-import org.terasology.math.geom.BaseVector2f;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2fc;
+import org.joml.Vector2f;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,18 +27,18 @@ import java.util.function.Function;
 public class CirclePickerAll<T> implements CirclePicker<T> {
     private final Set<T> hits = new HashSet<>();
 
-    private final BaseVector2f cursor;
+    private final Vector2fc cursor;
     private final Function<? super T, ? extends Number> radiusFunc;
 
-    public CirclePickerAll(Vector2f cursor, Function<? super T, ? extends Number> radiusFunc) {
-        this.cursor = cursor;
+    public CirclePickerAll(Vector2fc cursor, Function<? super T, ? extends Number> radiusFunc) {
+        this.cursor = new Vector2f(cursor);
         this.radiusFunc = radiusFunc;
     }
 
     @Override
     public void offer(float locX, float locY, T object) {
-        float dx = cursor.getX() - locX;
-        float dy = cursor.getY() - locY;
+        float dx = cursor.x() - locX;
+        float dy = cursor.y() - locY;
         float distSq = dx * dx + dy * dy;
 
         float rad = radiusFunc.apply(object).floatValue();

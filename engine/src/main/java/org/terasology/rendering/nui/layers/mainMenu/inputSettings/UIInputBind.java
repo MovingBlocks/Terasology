@@ -94,7 +94,7 @@ public class UIInputBind extends CoreWidget {
         } else if (newInput != null) {
             text = newInput.getDisplayName();
         }
-        List<String> lines = TextLineBuilder.getLines(font, text, areaHint.getX());
+        List<String> lines = TextLineBuilder.getLines(font, text, areaHint.x());
         return font.getSize(lines);
     }
 

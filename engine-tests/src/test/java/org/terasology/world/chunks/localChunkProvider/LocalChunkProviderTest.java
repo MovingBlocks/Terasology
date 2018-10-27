@@ -204,10 +204,10 @@ public class LocalChunkProviderTest {
     }
 
     private static void generateMockChunkCubeWithSideWidthAround(final Vector3i position, final int sideWidth, final ChunkCache chunkCache) {
-        for (int x = position.getX() - sideWidth; x <= position.getX() + sideWidth; x++) {
-            for (int y = position.getY() - sideWidth; y <= position.getY() + sideWidth; y++) {
-                for (int z = position.getZ() - sideWidth; z <= position.getZ() + sideWidth; z++) {
-                    if (x == position.getX() && y == position.getY() && z == position.getZ()) {
+        for (int x = position.x() - sideWidth; x <= position.x() + sideWidth; x++) {
+            for (int y = position.y() - sideWidth; y <= position.y() + sideWidth; y++) {
+                for (int z = position.z() - sideWidth; z <= position.z() + sideWidth; z++) {
+                    if (x == position.x() && y == position.y() && z == position.z()) {
                         //dont override the inner chunk
                         continue;
                     }

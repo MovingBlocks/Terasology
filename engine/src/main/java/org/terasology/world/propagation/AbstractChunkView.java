@@ -15,7 +15,7 @@
  */
 package org.terasology.world.propagation;
 
-import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.ChunkViewCore;
 
@@ -30,31 +30,31 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
     }
 
     @Override
-    public byte getValueAt(Vector3i pos) {
+    public byte getValueAt(Vector3ic pos) {
         if (isInBounds(pos)) {
             return getValueAt(chunkView, pos);
         }
         return UNAVAILABLE;
     }
 
-    protected abstract byte getValueAt(ChunkViewCore view, Vector3i pos);
+    protected abstract byte getValueAt(ChunkViewCore view, Vector3ic pos);
 
     @Override
-    public void setValueAt(Vector3i pos, byte value) {
+    public void setValueAt(Vector3ic pos, byte value) {
         setValueAt(chunkView, pos, value);
     }
 
-    protected abstract void setValueAt(ChunkViewCore view, Vector3i pos, byte value);
+    protected abstract void setValueAt(ChunkViewCore view, Vector3ic pos, byte value);
 
     @Override
-    public Block getBlockAt(Vector3i pos) {
+    public Block getBlockAt(Vector3ic pos) {
         if (isInBounds(pos)) {
             return chunkView.getBlock(pos);
         }
         return null;
     }
 
-    public boolean isInBounds(Vector3i pos) {
+    public boolean isInBounds(Vector3ic pos) {
         return chunkView.getWorldRegion().encompasses(pos);
     }
 }

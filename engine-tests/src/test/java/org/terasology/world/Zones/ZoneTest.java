@@ -17,8 +17,6 @@ package org.terasology.world.Zones;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.world.generation.Region;
 import org.terasology.world.zones.Zone;
 
 import static org.junit.Assert.assertEquals;

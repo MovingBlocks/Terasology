@@ -17,7 +17,9 @@ package org.terasology.logic.location;
 
 import com.google.common.collect.Lists;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
@@ -141,7 +143,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
         return result;
     }
 
-    public void setWorldPosition(Vector3f value) {
+    public void setWorldPosition(Vector3fc value) {
         this.position.set(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
@@ -151,7 +153,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
         }
     }
 
-    public void setWorldRotation(Quaternionf value) {
+    public void setWorldRotation(Quaternionfc value) {
         this.rotation.set(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {

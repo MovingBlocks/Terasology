@@ -15,14 +15,15 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.world.WorldProvider;
 
@@ -143,7 +144,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         }
 
         tempRightVector.cross(viewingDirection, up);
-        tempRightVector.scale(bobbingRotationOffsetFactor);
+        tempRightVector.mul(bobbingRotationOffsetFactor);
 
         projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar());
 
@@ -153,13 +154,13 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
                 up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight()));
-        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
-        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
+        reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+        reflectionMatrix.setRow(1,  new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
+        reflectionMatrix.setRow(2,  new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
+        reflectionMatrix.setRow(3,  new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
         viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
 
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
+        reflectionMatrix.setRow(1,  new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
         normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
 
         viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
