@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,18 +186,18 @@ public class Rect2i extends BaseRect {
     @Override
     public boolean contains(float x, float y) {
         return !isEmpty()
-            && (x >= posX)
-            && (y >= posY)
-            && (x < posX + w)
-            && (y < posY + h);
+                && (x >= posX)
+                && (y >= posY)
+                && (x < posX + w)
+                && (y < posY + h);
     }
 
     public boolean contains(Rect2i other) {
         return !isEmpty()
-            && other.posX >= posX
-            && other.posY >= posY
-            && other.posX + other.w <= posX + w
-            && other.posY + other.h <= posY + h;
+                && other.posX >= posX
+                && other.posY >= posY
+                && other.posX + other.w <= posX + w
+                && other.posY + other.h <= posY + h;
     }
 
     public boolean overlaps(Rect2i other) {
@@ -334,7 +334,7 @@ public class Rect2i extends BaseRect {
 
                     @Override
                     public boolean hasNext() {
-                        return pos.x() < maxY() || pos.x() < maxX();
+                        return pos.y() < maxY() || pos.x() < maxX();
                     }
 
                     @Override
