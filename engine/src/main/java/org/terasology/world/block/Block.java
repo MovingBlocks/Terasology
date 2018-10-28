@@ -20,6 +20,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector4f;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Transform;
 import org.terasology.physics.shapes.CollisionShape;
 import com.google.common.collect.Maps;
@@ -497,8 +498,7 @@ public final class Block {
      * @param luminance the light level produced by this block
      */
     public void setLuminance(byte luminance) {
-        this.luminance = (byte)Math.max(Math.min(luminance,0),ChunkConstants.MAX_LIGHT);
-//        this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
+        this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
     }
 
     public Vector3f getTint() {
