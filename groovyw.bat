@@ -61,10 +61,15 @@ if "x%~1" == "x" goto execute
 @REM set CMD_LINE_ARGS=%*
 :process_args
 IF "%1"=="" GOTO end
-echo "%1" | findstr /C:"\*" 1>nul && (
-    SET CMD_LINE_ARGS=%CMD_LINE_ARGS% "%1"
+SET ARG=%~1
+echo "%ARG%" | findstr /C:"\*" 1>nul && (
+    SET CMD_LINE_ARGS=%CMD_LINE_ARGS% "%ARG%"
 ) || (
-    SET CMD_LINE_ARGS=%CMD_LINE_ARGS% %1
+    echo "%ARG%" | findstr /C:"\?" 1>nul && (
+        SET CMD_LINE_ARGS=%CMD_LINE_ARGS% "%ARG%"
+    ) || (
+        SET CMD_LINE_ARGS=%CMD_LINE_ARGS% %ARG%
+    )
 )
 SHIFT
 GOTO process_args
