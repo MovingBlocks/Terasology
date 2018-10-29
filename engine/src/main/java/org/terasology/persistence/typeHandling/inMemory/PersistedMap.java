@@ -32,6 +32,16 @@ public class PersistedMap extends AbstractPersistedData implements PersistedData
     }
 
     @Override
+    public PersistedDataMap getAsValueMap() {
+        return this;
+    }
+
+    @Override
+    public boolean isValueMap() {
+        return true;
+    }
+
+    @Override
     public boolean has(String name) {
         return map.containsKey(name);
     }
