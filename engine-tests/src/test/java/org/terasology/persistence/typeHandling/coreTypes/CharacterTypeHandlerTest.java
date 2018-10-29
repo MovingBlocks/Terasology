@@ -16,13 +16,14 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import org.junit.Test;
-import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
+import org.terasology.persistence.typeHandling.inMemory.PersistedInteger;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -44,11 +45,13 @@ public class CharacterTypeHandlerTest {
 
     @Test
     public void testDeserialize() {
-        PersistedData persistedLinefeed = new PersistedString("\n");
-
-        Optional<Character> deserializedLinefeed = typeHandler.deserialize(persistedLinefeed);
+        Optional<Character> deserializedLinefeed = typeHandler.deserialize(new PersistedString("\n"));
 
         assertTrue(deserializedLinefeed.isPresent());
         assertEquals('\n', (char) deserializedLinefeed.get());
+
+        Optional<Character> deserializedInteger = typeHandler.deserialize(new PersistedInteger((int) '\n'));
+
+        assertFalse(deserializedInteger.isPresent());
     }
 }
