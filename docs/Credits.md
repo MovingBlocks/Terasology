@@ -236,8 +236,16 @@ Contributors
  [AdamAboudi](https://github.com/AdamAboudi),
  [lgzy](https://github.com/lgzy),
  [dave2s](https://github.com/dave2s),
- [asiekierka](https://github.com/asiekierka)
- [llvieira](https://github.com/llvieira)
+ [asiekierka](https://github.com/asiekierka),
+ [llvieira](https://github.com/llvieira),
+ [pardovot](https://github.com/pardovot),
+ [brylie](https://github.com/brylie),
+ [Joseph5610](https://github.com/Joseph5610),
+ [fallazc](https://github.com/fallazc),
+ [andrasveto](https://github.com/andrasveto),
+ [JustPRV](https://github.com/JustPRV),
+ [Edvinas01](https://github.com/Edvinas01),
+ [mwvdev](https://github.com/mwvdev)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

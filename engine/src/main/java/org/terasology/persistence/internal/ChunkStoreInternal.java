@@ -22,6 +22,7 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkSerializer;
 
 /**
@@ -35,11 +36,11 @@ final class ChunkStoreInternal implements ChunkStore {
     private EntityData.EntityStore entityStore;
 
     ChunkStoreInternal(EntityData.ChunkStore chunkData, EngineEntityManager entityManager,
-            BlockManager blockManager, BiomeManager biomeManager) {
+            BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
         this.chunkPosition = new Vector3i(chunkData.getX(), chunkData.getY(), chunkData.getZ());
         this.entityManager = entityManager;
 
-        this.chunk = ChunkSerializer.decode(chunkData, blockManager, biomeManager);
+        this.chunk = ChunkSerializer.decode(chunkData, blockManager, biomeManager, extraDataManager);
         this.entityStore = chunkData.getStore();
     }
 

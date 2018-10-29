@@ -36,8 +36,8 @@ public class ChunkRelevanceRegion {
     private Vector3i relevanceDistance = new Vector3i();
     private boolean dirty;
     private Vector3i center = new Vector3i();
-    private Region3i currentRegion = Region3i.EMPTY;
-    private Region3i previousRegion = Region3i.EMPTY;
+    private Region3i currentRegion = Region3i.empty();
+    private Region3i previousRegion = Region3i.empty();
     private ChunkRegionListener listener;
 
     private Set<Vector3i> relevantChunks = Sets.newLinkedHashSet();
@@ -123,7 +123,7 @@ public class ChunkRelevanceRegion {
             Vector3i extents = new Vector3i(relevanceDistance.x / 2, relevanceDistance.y / 2, relevanceDistance.z / 2);
             return Region3i.createFromCenterExtents(ChunkMath.calcChunkPos(loc.getWorldPosition()), extents);
         }
-        return Region3i.EMPTY;
+        return Region3i.empty();
     }
 
     private Vector3i calculateCenter() {

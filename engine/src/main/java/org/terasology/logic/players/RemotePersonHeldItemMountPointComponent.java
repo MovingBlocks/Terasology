@@ -15,16 +15,11 @@
  */
 package org.terasology.logic.players;
 
-import jopenvr.VRControllerState_t;
-import org.joml.Matrix4f;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.openvrprovider.ControllerListener;
-import org.terasology.rendering.openvrprovider.OpenVRProvider;
 
 /**
  * Only used by the client side so that held items of other players can be positioned in line with them.

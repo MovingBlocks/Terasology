@@ -125,6 +125,7 @@
     "exit-game": "exit-game",
     "extra-lighting": "extra-lighting",
     "experimental": "experimental",
+    "extras-label": "extras-label",
     "eye-adaption": "eye-adaption",
     "failed-to-join": "failed-to-join",
     "file-picker-access-denied-to": "file-picker-access-denied-to",

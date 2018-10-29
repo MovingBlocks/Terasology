@@ -29,10 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
-import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 
@@ -141,7 +139,6 @@ public class ColladaLoader {
     protected void parseSkeletalMeshData(Element rootElement) throws ColladaParseException {
 
         List<MD5Joint> md5JointList = new ArrayList<>();
-        List<MD5Mesh> md5MeshList = new ArrayList<>();
 
         skeletonBuilder = new SkeletalMeshDataBuilder();
 
@@ -348,37 +345,6 @@ public class ColladaLoader {
 
         for (MD5Joint joint : md5JointList) {
             skeletonBuilder.addBone(joint.bone);
-        }
-
-        if (md5MeshList.size() > 0) {
-            // TODO: Support multiple mesh somehow?
-            MD5Mesh mesh = md5MeshList.get(0);
-            for (MD5Weight weight : mesh.weightList) {
-                skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
-            }
-
-            List<Vector2f> uvs = Lists.newArrayList();
-
-            TIntList vertexStartWeight = new TIntArrayList(vertices.size() / 3);
-            TIntList vertexWeightCount = new TIntArrayList(vertices.size() / 3);
-            //            for (MD5Vertex vert : mesh.vertexList) {
-            //                uvs.add(vert.uv);
-            //                vertexStartWeight.add(vert.startWeight);
-            //                vertexWeightCount.add(vert.countWeight);
-            //            }
-
-            for (int i = 0; i < vertices.size() / 3; i++) {
-                vertexStartWeight.add(i);
-                vertexWeightCount.add(1);
-            }
-
-            skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
-
-            for (int i = 0; i < normals.size() / 2; i++) {
-                uvs.add(new Vector2f(normals.get(i * 2 + 0), normals.get(i * 2 + 1)));
-            }
-            skeletonBuilder.setUvs(uvs);
-            skeletonBuilder.setIndices(indices);
         }
 
         // Now if you have come this far, you should be able to read the geometry data,

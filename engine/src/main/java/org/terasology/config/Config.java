@@ -146,6 +146,10 @@ public final class Config {
         return config.getUniverseConfig();
     }
 
+    public WebBrowserConfig getWebBrowserConfig() {
+        return config.getWebBrowserConfig();
+    }
+
     /**
      * Saves this config to the default configuration file
      */
@@ -198,7 +202,7 @@ public final class Config {
                     return Optional.of(userConfig.getAsJsonObject());
                 }
             } catch (IOException e) {
-                logger.error("Failed to load config file {}, falling back on default config");
+                logger.error("Failed to load config file {}, falling back on default config", configPath);
             }
         }
         return Optional.empty();

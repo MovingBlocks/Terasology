@@ -36,6 +36,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.internal.ReadyChunkInfo;
@@ -62,6 +63,7 @@ public class LocalChunkProviderTest {
     private ChunkFinalizer chunkFinalizer;
     private EntityManager entityManager;
     private BlockManager blockManager;
+    private ExtraBlockDataManager extraDataManager;
     private BlockEntityRegistry blockEntityRegistry;
     private EntityRef worldEntity;
     private ChunkCache chunkCache;
@@ -71,11 +73,12 @@ public class LocalChunkProviderTest {
         entityManager = mock(EntityManager.class);
         chunkFinalizer = mock(ChunkFinalizer.class);
         blockManager = mock(BlockManager.class);
+        extraDataManager = new ExtraBlockDataManager();
         blockEntityRegistry = mock(BlockEntityRegistry.class);
         worldEntity = mock(EntityRef.class);
         chunkCache = new ConcurrentMapChunkCache();
         chunkProvider = new LocalChunkProvider(null,
-                entityManager, null, blockManager, null, chunkFinalizer, null, chunkCache);
+                entityManager, null, blockManager, null, extraDataManager, chunkFinalizer, null, chunkCache);
         chunkProvider.setBlockEntityRegistry(blockEntityRegistry);
         chunkProvider.setWorldEntity(worldEntity);
     }

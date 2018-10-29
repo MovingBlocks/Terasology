@@ -35,11 +35,11 @@ public class ReadyChunkInfo {
     private boolean newChunk;
     private List<EntityStore> entities;
 
-    public static ReadyChunkInfo createForNewChunk(Chunk chunk, TShortObjectMap<TIntList> blockPositionMapppings, List<EntityStore> entities){
-        return new ReadyChunkInfo(chunk,blockPositionMapppings,entities);
+    public static ReadyChunkInfo createForNewChunk(Chunk chunk, TShortObjectMap<TIntList> blockPositionMapppings, List<EntityStore> entities) {
+        return new ReadyChunkInfo(chunk, blockPositionMapppings, entities);
     }
 
-    public static ReadyChunkInfo createForRestoredChunk(Chunk chunk, TShortObjectMap<TIntList> blockPositionMapppings, ChunkStore chunkStore, List<EntityStore> entities){
+    public static ReadyChunkInfo createForRestoredChunk(Chunk chunk, TShortObjectMap<TIntList> blockPositionMapppings, ChunkStore chunkStore, List<EntityStore> entities) {
         return new ReadyChunkInfo(chunk, blockPositionMapppings, chunkStore, entities);
     }
 

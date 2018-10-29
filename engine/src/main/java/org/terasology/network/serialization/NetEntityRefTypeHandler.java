@@ -48,8 +48,7 @@ public class NetEntityRefTypeHandler extends TypeHandler<EntityRef> {
     public PersistedData serializeNonNull(EntityRef value, PersistedDataSerializer serializer) {
         BlockComponent blockComponent = value.getComponent(BlockComponent.class);
         if (blockComponent != null) {
-            Vector3i pos = blockComponent.getPosition();
-            return serializer.serialize(pos.x, pos.y, pos.z);
+            return serializer.serialize(blockComponent.position.x, blockComponent.position.y, blockComponent.position.z);
         }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {

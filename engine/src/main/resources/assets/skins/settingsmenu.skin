@@ -1,0 +1,13 @@
+{
+	"inherit": "mainmenu",
+	"elements": {
+		"ScrollableArea": {
+			"background": "engine:area"
+		}
+	},
+	"families": {
+		"subheading": {
+			"text-align-horizontal": "center"
+		}
+	}
+}

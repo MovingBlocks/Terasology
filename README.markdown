@@ -2,11 +2,12 @@
 
 [![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
 [![Release](https://img.shields.io/github/release/MovingBlocks/Terasology.svg)](../../releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/latest/total.svg "Downloads")](../../releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/total.svg "Downloads")](../../releases/latest)
 [![Bounties](https://img.shields.io/bountysource/team/MovingBlocks/activity.svg)](https://www.bountysource.com/teams/MovingBlocks)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MovingBlocks/Terasology/alerts/)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/MovingBlocks/Terasology.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MovingBlocks/Terasology/context:java)
 [![License(code)](https://img.shields.io/badge/license(code)-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![License(art)](https://img.shields.io/badge/license(art)-CC%20BY%204.0-blue.svg)](http://creativecommons.org/licenses/by/4.0/)
-[![Dependency Status](https://www.versioneye.com/user/projects/537612b214c1584e82000022/badge.svg)](https://www.versioneye.com/user/projects/537612b214c1584e82000022)
 [![IRC Channel](https://img.shields.io/badge/irc-%23terasology-blue.svg "IRC Channel")](https://webchat.freenode.net/?channels=terasology)
 
 Welcome!

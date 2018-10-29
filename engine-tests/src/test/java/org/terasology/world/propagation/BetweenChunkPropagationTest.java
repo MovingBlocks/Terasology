@@ -41,6 +41,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.propagation.light.InternalLightProcessor;
@@ -58,6 +59,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     private BlockManagerImpl blockManager;
     private BiomeManager biomeManager;
+    private ExtraBlockDataManager extraDataManager;
     private Block solid;
     private SunlightPropagationRules lightRules;
     private SunlightRegenPropagationRules regenRules;
@@ -80,6 +82,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
         biomeManager = Mockito.mock(BiomeManager.class);
         CoreRegistry.put(BlockManager.class, blockManager);
+        extraDataManager = new ExtraBlockDataManager();
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");
@@ -99,8 +102,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testBetweenChunksSimple() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager);
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -121,8 +124,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testBetweenChunksSimpleSunlightRegenOnly() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager);
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -141,8 +144,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testBetweenChunksWithOverhang() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager);
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -169,8 +172,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testPropagateSunlightAppearingMidChunk() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager);
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);

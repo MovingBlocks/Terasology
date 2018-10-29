@@ -72,6 +72,8 @@ public class Environment {
         AssetManager assetManager = setupAssetManager();
 
         setupBlockManager(assetManager);
+        
+        setupExtraDataManager(context);
 
         setupCollisionManager();
 
@@ -129,6 +131,10 @@ public class Environment {
     }
 
     protected void setupBlockManager(AssetManager assetManager) {
+        // empty
+    }
+    
+    protected void setupExtraDataManager(Context context) {
         // empty
     }
 

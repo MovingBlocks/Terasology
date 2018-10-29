@@ -36,6 +36,7 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import static org.junit.Assert.assertEquals;
@@ -54,8 +55,10 @@ public class ChunkTest extends TerasologyTestingEnvironment {
         CoreRegistry.put(BlockManager.class, blockManager);
 
         BiomeManager biomeManager = Mockito.mock(BiomeManager.class);
+        
+        ExtraBlockDataManager extraDataManager = new ExtraBlockDataManager();
 
-        chunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager);
+        chunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");

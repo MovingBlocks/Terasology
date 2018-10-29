@@ -44,6 +44,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [ChrisVolume2OST](https://github.com/Terasology/ChrisVolume2OST) - official game soundtrack by Chris Köbke - volume 2
 * [Cities](https://github.com/Terasology/Cities) - procedural city placer and plot organizer, also places roads to connect cities. Later split into Static and Dynamic variants
 * [ClimateConditions](https://github.com/Terasology/ClimateConditions) - A library module for managing temperature, humidity, and other climate factors
+* [Climbables](https://github.com/Terasology/Climbables) - contains some utility blocks (and associated systems) for easier climbing of things
 * [CombatSystem](https://github.com/Terasology/CombatSystem) - an advanced physics-based combat system
 * [CommonWorld](https://github.com/Terasology/CommonWorld) - general world generation utility module
 * [Compass](https://github.com/Terasology/Compass) - a simple compass
@@ -63,6 +64,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system
 * [Fences](https://github.com/Terasology/Fences) - fences!
 * [FlexiblePathfinding](https://github.com/Terasology/FlexiblePathfinding) - a more flexible variant pathfinding framework
+* [FlowingLiquids](https://github.com/Terasology/FlowingLiquids) - a more advanced flowing liquid system than SimpleLiquids - treats liquids as finite, makes them propagate, and current will even drag you around!
 * [Fluid](https://github.com/Terasology/Fluid) - adds support for fluid in non-world situations (such as for storage in workstations)
 * [FluidComputerIntegration](https://github.com/Terasology/FluidComputerIntegration) - allows for interactions with fluids via computers
 * [FunnyBlocks](https://github.com/Terasology/FunnyBlocks) - cheese wheels and bowling pins - why not

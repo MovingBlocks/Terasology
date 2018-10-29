@@ -80,8 +80,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
             return;
         }
 
-        Vector3i targetBlock = blockComponent.getPosition();
-        processUpdateForBlockLocation(targetBlock);
+        processUpdateForBlockLocation(blockComponent.position);
     }
 
     private void notifyNeighboursOfChangedBlocks() {

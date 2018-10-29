@@ -106,4 +106,5 @@ New_API_file.txt
 whitelist.json
 blacklist.json
 
-# Ignore weird stuff that might be obsolete
+# Profiling related
+terasology.jfr

@@ -44,6 +44,7 @@ public final class RootConfig {
     private IdentityStorageServiceConfig identityStorageService = new IdentityStorageServiceConfig();
     private TelemetryConfig telemetryConfig = new TelemetryConfig();
     private UniverseConfig universeConfig = new UniverseConfig();
+    private WebBrowserConfig webBrowserConfig = new WebBrowserConfig();
 
     /**
      * Create a new, empty config
@@ -117,5 +118,9 @@ public final class RootConfig {
 
     public UniverseConfig getUniverseConfig() {
         return universeConfig;
+    }
+
+    public WebBrowserConfig getWebBrowserConfig() {
+        return webBrowserConfig;
     }
 }

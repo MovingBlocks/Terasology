@@ -32,8 +32,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.AABB;
-import org.terasology.math.Transform;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;

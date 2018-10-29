@@ -137,7 +137,7 @@ public class UIRadialRing extends CoreWidget {
     public int addSection(UIRadialSection section) {
         sections.add(section);
         hasInitialised = false;
-        return sections.size()-1;
+        return sections.size() - 1;
     }
 
     public UIRadialSection getSection(int index) {

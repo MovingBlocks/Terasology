@@ -26,7 +26,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -65,7 +64,7 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
             if (Files.exists(configPath)) {
                 try (Reader reader = Files.newBufferedReader(configPath, TerasologyConstants.CHARSET)) {
                     flexibleConfig.load(reader);
-                } catch(IOException e){
+                } catch (IOException e) {
                     throw new RuntimeException("Exception loading config file for configId " + entry.getKey());
                 }
             } // else: The config does not exist, so the default values will be used.
