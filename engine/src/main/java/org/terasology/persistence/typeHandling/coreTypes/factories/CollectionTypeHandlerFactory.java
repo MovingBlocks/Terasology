@@ -58,9 +58,14 @@ public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
+        TypeInfo<?> elementTypeInfo = TypeInfo.of(elementType);
+
+        Optional<TypeHandler<?>> declaredElementTypeHandler = typeSerializationLibrary.getTypeHandler(elementType);
+
+        @SuppressWarnings({"unchecked"})
         TypeHandler<?> elementTypeHandler = new RuntimeDelegatingTypeHandler(
-                typeSerializationLibrary.getTypeHandler(elementType),
-                TypeInfo.of(elementType),
+                declaredElementTypeHandler.orElse(null),
+                elementTypeInfo,
                 typeSerializationLibrary
         );
 

@@ -59,8 +59,7 @@ public class TypeHandlingIntegrationTest {
     @Test
     public void testJsonSerialize() {
 
-        TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {
-        });
+        TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
 
         GsonPersistedData persistedData = (GsonPersistedData) typeHandler.serialize(INSTANCE, new GsonPersistedDataSerializer());
 
@@ -71,8 +70,7 @@ public class TypeHandlingIntegrationTest {
 
     @Test
     public void testJsonDeserialize() {
-        TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {
-        });
+        TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
 
         Gson gson = new Gson();
         JsonElement jsonElement = gson.fromJson(INSTANCE_JSON, JsonElement.class);
@@ -86,8 +84,7 @@ public class TypeHandlingIntegrationTest {
 
     @Test
     public void testProtobufSerializeDeserialize() throws IOException {
-        TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {
-        });
+        TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
 
         ProtobufPersistedData persistedData = (ProtobufPersistedData) typeHandler.serialize(INSTANCE, new ProtobufPersistedDataSerializer());
 
