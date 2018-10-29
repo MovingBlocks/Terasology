@@ -18,16 +18,20 @@ package org.terasology.persistence.typeHandling.coreTypes;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
+import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -50,7 +54,9 @@ public class RuntimeDelegatingTypeHandlerTest {
 
     @Test
     public void testSerialize() {
-        PersistedDataSerializer context = mock(PersistedDataSerializer.class);
+        PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
+        when(serializer.serialize(any(String.class)))
+                .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
 
         Class<Sub> subType = Sub.class;
         Type baseType = TypeInfo.of(Base.class).getType();
@@ -67,13 +73,19 @@ public class RuntimeDelegatingTypeHandlerTest {
         }, typeSerializationLibrary).get();
 
         ArrayList<Base> bases = Lists.newArrayList(new Sub(), new Base(), new Sub(), new Base(), new Sub());
-        listTypeHandler.serialize(bases, context);
+        listTypeHandler.serialize(bases, serializer);
 
         verify(typeSerializationLibrary).getTypeHandler(baseType);
         verify(typeSerializationLibrary, times(3)).getTypeHandler(subType);
 
         verify(baseTypeHandler, times(2)).serialize(any(), any());
         verify(subTypeHandler, times(3)).serialize(any(), any());
+
+        verify(serializer, times(3)).serialize(
+                argThat((ArgumentMatcher<Map<String, PersistedData>>) argument ->
+                        argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD).getAsString().equals(subType.getName()) &&
+                                argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD))
+        );
     }
 
     @Test
