@@ -143,7 +143,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
             return;
         }
 
-        tempRightVector.cross(viewingDirection, up);
+        viewingDirection.cross(up,tempRightVector);
         tempRightVector.mul(bobbingRotationOffsetFactor);
 
         projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar());
@@ -158,15 +158,15 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         reflectionMatrix.setRow(1,  new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
         reflectionMatrix.setRow(2,  new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
         reflectionMatrix.setRow(3,  new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+        viewMatrixReflected.set(viewMatrix).mul(reflectionMatrix);
 
         reflectionMatrix.setRow(1,  new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+        normViewMatrixReflected.set(normViewMatrix).mul(reflectionMatrix);
 
         viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
 
-        inverseProjectionMatrix.invert(projectionMatrix);
-        inverseViewProjectionMatrix.invert(viewProjectionMatrix);
+        projectionMatrix.set(inverseProjectionMatrix).invert();
+        viewProjectionMatrix.set(inverseViewProjectionMatrix).invert();
 
         // Used for dirty checks
         cachedPosition.set(getPosition());

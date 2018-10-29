@@ -93,7 +93,7 @@ public class OrthographicCamera extends Camera {
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
         viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
-        inverseViewProjectionMatrix.invert(viewProjectionMatrix);
+        inverseViewProjectionMatrix.set(viewProjectionMatrix).invert();
 
         // Used for dirty checks
         cachedPosition.set(getPosition());

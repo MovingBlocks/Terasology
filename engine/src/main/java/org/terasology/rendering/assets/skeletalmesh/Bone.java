@@ -62,7 +62,7 @@ public class Bone {
         Vector3f pos = new Vector3f(objectSpacePos);
         if (parent != null) {
             pos.sub(parent.getObjectPosition())
-                    .rotate(new Quaternionf(parent.getObjectRotation()).invert());
+                    .rotate(new Quaternionf(parent.getObjectRotation()).conjugate());
         }
         return pos;
     }
@@ -78,9 +78,8 @@ public class Bone {
     public Quaternionf getLocalRotation() {
         Quaternionf rot = new Quaternionf(rotation);
         if (parent != null) {
-            Quaternionf inverseParentRot = new Quaternionf();
-            inverseParentRot.invert(parent.getObjectRotation());
-            rot.mul(inverseParentRot, rot);
+            rot.mul(new Quaternionf(parent.getObjectRotation()).conjugate());
+
         }
         return rot;
     }

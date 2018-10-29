@@ -296,15 +296,11 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         viewProjectionMatrixLeftEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
 
-        inverseViewProjectionMatrixLeftEye = new Matrix4f(viewProjectionMatrixLeftEye);
-        inverseViewProjectionMatrixRightEye = new Matrix4f(viewProjectionMatrixRightEye);
-        inverseViewProjectionMatrixLeftEye.invert(viewProjectionMatrixLeftEye);
-        inverseViewProjectionMatrixRightEye.invert(viewProjectionMatrixRightEye);
+        inverseViewProjectionMatrixLeftEye = new Matrix4f(viewProjectionMatrixLeftEye).invert();
+        inverseViewProjectionMatrixRightEye = new Matrix4f(viewProjectionMatrixRightEye).invert();
 
-        inverseProjectionMatrixLeftEye = new Matrix4f(projectionMatrixLeftEye);
-        inverseProjectionMatrixRightEye = new Matrix4f(projectionMatrixRightEye);
-        inverseProjectionMatrixLeftEye.invert(projectionMatrixLeftEye);
-        inverseProjectionMatrixRightEye.invert(projectionMatrixRightEye);
+        inverseProjectionMatrixLeftEye = new Matrix4f(projectionMatrixLeftEye).invert();
+        inverseProjectionMatrixRightEye = new Matrix4f(projectionMatrixRightEye).invert();
 
         updateFrustum();
     }

@@ -179,7 +179,7 @@ public class SkeletalMeshData implements AssetData {
             Vector3f normal = normals.get(vertIndex);
             for (int weightIndex = 0; weightIndex < vertexWeightCounts.get(vertIndex); ++weightIndex) {
                 BoneWeight weight = weights.get(weightIndex + vertexStartWeights.get(vertIndex));
-                normal.rotate(inverseRot.invert(bones.get(weight.getBoneIndex()).getObjectRotation()),norm);
+                normal.rotate(inverseRot.set(bones.get(weight.getBoneIndex()).getObjectRotation()).conjugate(),norm);
                 weight.setNormal(norm);
             }
         }
