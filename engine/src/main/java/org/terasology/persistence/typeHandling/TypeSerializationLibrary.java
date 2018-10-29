@@ -29,15 +29,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
-import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.ByteArrayTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.FloatTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.LongTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
-import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.*;
 import org.terasology.persistence.typeHandling.coreTypes.factories.ArrayTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.EnumTypeHandlerFactory;
@@ -118,6 +110,8 @@ public class TypeSerializationLibrary {
         addTypeHandler(Long.TYPE, new LongTypeHandler());
         addTypeHandler(String.class, new StringTypeHandler());
         addTypeHandler(Number.class, new NumberTypeHandler());
+        addTypeHandler(Character.class, new CharTypeHandler());
+        addTypeHandler(Character.TYPE, new CharTypeHandler());
 
         addTypeHandlerFactory(new ArrayTypeHandlerFactory());
         addTypeHandler(byte[].class, new ByteArrayTypeHandler());
