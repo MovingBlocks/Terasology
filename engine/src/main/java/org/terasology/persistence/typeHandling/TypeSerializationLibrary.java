@@ -32,6 +32,7 @@ import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteArrayTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.CharacterTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.FloatTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
@@ -108,6 +109,8 @@ public class TypeSerializationLibrary {
         addTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
         addTypeHandler(Byte.class, new ByteTypeHandler());
         addTypeHandler(Byte.TYPE, new ByteTypeHandler());
+        addTypeHandler(Character.class, new CharacterTypeHandler());
+        addTypeHandler(Character.TYPE, new CharacterTypeHandler());
         addTypeHandler(Double.class, new DoubleTypeHandler());
         addTypeHandler(Double.TYPE, new DoubleTypeHandler());
         addTypeHandler(Float.class, new FloatTypeHandler());
