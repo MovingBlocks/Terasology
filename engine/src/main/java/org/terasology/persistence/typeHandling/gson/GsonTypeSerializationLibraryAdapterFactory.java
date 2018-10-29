@@ -42,7 +42,7 @@ public class GsonTypeSerializationLibraryAdapterFactory implements TypeAdapterFa
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
         Type rawType = type.getType();
 
-        TypeHandler<T> typeHandler = (TypeHandler<T>) typeSerializationLibrary.getTypeHandler(rawType);
+        TypeHandler<T> typeHandler = (TypeHandler<T>) typeSerializationLibrary.getTypeHandler(rawType).orElse(null);
 
         if (typeHandler == null || typeHandler instanceof ObjectFieldMapTypeHandler) {
             return null;

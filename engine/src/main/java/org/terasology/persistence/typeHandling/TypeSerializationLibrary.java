@@ -210,18 +210,21 @@ public class TypeSerializationLibrary {
         instanceCreators.put(typeInfo.getType(), instanceCreator);
     }
 
-    public TypeHandler<?> getTypeHandler(Type type) {
-        return getTypeHandler(TypeInfo.of(type));
+    @SuppressWarnings({"unchecked"})
+    public Optional<TypeHandler<?>> getTypeHandler(Type type) {
+        TypeInfo typeInfo = TypeInfo.of(type);
+        return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo);
     }
 
-    public <T> TypeHandler<T> getTypeHandler(Class<T> typeClass) {
+
+    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass) {
         return getTypeHandler(TypeInfo.of(typeClass));
     }
 
     @SuppressWarnings("unchecked")
-    public <T> TypeHandler<T> getTypeHandler(TypeInfo<T> type) {
+    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type) {
         if (typeHandlerCache.containsKey(type)) {
-            return (TypeHandler<T>) typeHandlerCache.get(type);
+            return Optional.of((TypeHandler<T>) typeHandlerCache.get(type));
         }
 
         // TODO: Explore reversing typeHandlerFactories itself before building object
@@ -232,22 +235,22 @@ public class TypeSerializationLibrary {
             if (typeHandler.isPresent()) {
                 TypeHandler<T> handler = typeHandler.get();
                 typeHandlerCache.put(type, handler);
-                return handler;
+                return Optional.of(handler);
             }
         }
 
-        // TODO: Log error and/or return Optional.empty()
-        return null;
+        return Optional.empty();
     }
 
     private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
         Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
         for (FieldMetadata<?, ?> field : type.getFields()) {
-            TypeHandler<?> handler = getTypeHandler(field.getField().getGenericType());
-            if (handler != null) {
-                handlerMap.put(field, handler);
+            Optional<TypeHandler<?>> handler = getTypeHandler(field.getField().getGenericType());
+
+            if (handler.isPresent()) {
+                handlerMap.put(field, handler.get());
             } else {
-                logger.info("Unsupported field: '{}.{}'", type.getUri(), field.getName());
+                logger.error("Unsupported field: '{}.{}'", type.getUri(), field.getName());
             }
         }
         return handlerMap;

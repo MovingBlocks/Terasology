@@ -35,6 +35,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
@@ -69,8 +70,11 @@ public class RuntimeDelegatingTypeHandlerTest {
         TypeHandler baseTypeHandler = mock(TypeHandler.class);
         TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);
 
-        when(typeSerializationLibrary.getTypeHandler(eq(baseType))).thenReturn(baseTypeHandler);
-        when(typeSerializationLibrary.getTypeHandler(eq(subType))).thenReturn(subTypeHandler);
+        when(typeSerializationLibrary.getTypeHandler(eq(baseType)))
+                .thenReturn(Optional.of(baseTypeHandler));
+
+        when(typeSerializationLibrary.getTypeHandler(eq((Type) subType)))
+                .thenReturn(Optional.of(subTypeHandler));
 
         TypeHandler<List<Base>> listTypeHandler = collectionHandlerFactory.create(new TypeInfo<List<Base>>() {
         }, typeSerializationLibrary).get();
@@ -79,7 +83,7 @@ public class RuntimeDelegatingTypeHandlerTest {
         listTypeHandler.serialize(bases, serializer);
 
         verify(typeSerializationLibrary).getTypeHandler(baseType);
-        verify(typeSerializationLibrary, times(3)).getTypeHandler(subType);
+        verify(typeSerializationLibrary, times(3)).getTypeHandler((Type) subType);
 
         verify(baseTypeHandler, times(2)).serialize(any(), any());
         verify(subTypeHandler, times(3)).serialize(any(), any());
@@ -101,8 +105,11 @@ public class RuntimeDelegatingTypeHandlerTest {
         TypeHandler baseTypeHandler = mock(TypeHandler.class);
         TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);
 
-        when(typeSerializationLibrary.getTypeHandler(eq(baseType))).thenReturn(baseTypeHandler);
-        when(typeSerializationLibrary.getTypeHandler(eq(subType))).thenReturn(subTypeHandler);
+        when(typeSerializationLibrary.getTypeHandler(eq(baseType)))
+                .thenReturn(Optional.of(baseTypeHandler));
+
+        when(typeSerializationLibrary.getTypeHandler(eq(subType)))
+                .thenReturn(Optional.of(subTypeHandler));
 
         TypeHandler<List<Base>> listTypeHandler = collectionHandlerFactory.create(
                 new TypeInfo<List<Base>>() {}, typeSerializationLibrary
