@@ -36,7 +36,7 @@ public class Rect2fTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        Optional<TypeHandler<Vector2f>> vector2fTypeHandler = context.getTypeSerializationLibrary().getTypeHandler(Vector2f.class, context.getContextClassLoader());
+        Optional<TypeHandler<Vector2f>> vector2fTypeHandler = context.getTypeSerializationLibrary().getTypeHandler(Vector2f.class, context.getClassLoaders());
 
         if (!vector2fTypeHandler.isPresent()) {
             LOGGER.error("No Vector2f type handler found");

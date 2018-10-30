@@ -32,6 +32,7 @@ import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -460,5 +461,16 @@ public final class ReflectionUtil {
         }
         throw new IllegalArgumentException(
                 "Cannot find field " + cls.getName() + "." + fieldName);
+    }
+
+    public static Optional<Class<?>> findClassInClassLoaders(String className, ClassLoader... classLoaders) {
+        for (ClassLoader classLoader : classLoaders) {
+            try {
+                return Optional.of(Class.forName(className, true, classLoader));
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+
+        return Optional.empty();
     }
 }

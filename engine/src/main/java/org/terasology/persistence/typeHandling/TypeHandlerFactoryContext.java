@@ -25,11 +25,11 @@ import org.terasology.reflection.TypeInfo;
  */
 public class TypeHandlerFactoryContext {
     private TypeSerializationLibrary typeSerializationLibrary;
-    private ClassLoader contextClassLoader;
+    private ClassLoader[] classLoaders;
 
-    public TypeHandlerFactoryContext(TypeSerializationLibrary typeSerializationLibrary, ClassLoader contextClassLoader) {
+    public TypeHandlerFactoryContext(TypeSerializationLibrary typeSerializationLibrary, ClassLoader... classLoaders) {
         this.typeSerializationLibrary = typeSerializationLibrary;
-        this.contextClassLoader = contextClassLoader;
+        this.classLoaders = classLoaders;
     }
 
     /**
@@ -40,13 +40,13 @@ public class TypeHandlerFactoryContext {
     }
 
     /**
-     * Returns the {@link ClassLoader} to use to load classes in the
+     * Returns the {@link ClassLoader}s to use to load classes in the
      * {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerFactoryContext)} method.
      * <p>
-     * If classes are loaded manually using a method like {@link Class#forName(String)}, this
-     * {@link ClassLoader} must be used so that modules remain sandboxed.
+     * If classes are loaded manually using a method like {@link Class#forName(String)}, these
+     * {@link ClassLoader}s must be used so that modules remain sandboxed.
      */
-    public ClassLoader getContextClassLoader() {
-        return contextClassLoader;
+    public ClassLoader[] getClassLoaders() {
+        return classLoaders;
     }
 }
