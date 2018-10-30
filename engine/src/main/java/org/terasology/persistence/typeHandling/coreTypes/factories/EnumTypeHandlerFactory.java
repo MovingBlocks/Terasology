@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
@@ -29,7 +29,7 @@ import java.util.Optional;
 public class EnumTypeHandlerFactory implements TypeHandlerFactory {
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
+    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
         Class<? super T> enumClass = typeInfo.getRawType();
         if (!Enum.class.isAssignableFrom(enumClass) || Enum.class.equals(enumClass)) {
             return Optional.empty();

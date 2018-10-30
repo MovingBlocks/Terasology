@@ -33,7 +33,7 @@ public class TypeHandlerFactoryContext {
     }
 
     /**
-     * Returns the {@link TypeSerializationLibrary} that called the {@link TypeHandlerFactory#create(TypeInfo, TypeSerializationLibrary)} method.
+     * Returns the {@link TypeSerializationLibrary} that called the {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerFactoryContext)} method.
      */
     public TypeSerializationLibrary getTypeSerializationLibrary() {
         return typeSerializationLibrary;
@@ -41,7 +41,7 @@ public class TypeHandlerFactoryContext {
 
     /**
      * Returns the {@link ClassLoader} to use to load classes in the
-     * {@link TypeHandlerFactory#create(TypeInfo, TypeSerializationLibrary)} method.
+     * {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerFactoryContext)} method.
      * <p>
      * If classes are loaded manually using a method like {@link Class#forName(String)}, this
      * {@link ClassLoader} must be used so that modules remain sandboxed.

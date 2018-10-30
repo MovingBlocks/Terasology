@@ -21,7 +21,7 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
 import org.terasology.persistence.typeHandling.mathTypes.Rect2iTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
@@ -31,12 +31,12 @@ public class Rect2iTypeHandlerFactory implements TypeHandlerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(Rect2iTypeHandlerFactory.class);
 
     @Override
-    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
+    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
         if (!typeInfo.equals(TypeInfo.of(Rect2i.class))) {
             return Optional.empty();
         }
 
-        Optional<TypeHandler<Vector2i>> vector2iTypeHandler = typeSerializationLibrary.getTypeHandler(Vector2i.class);
+        Optional<TypeHandler<Vector2i>> vector2iTypeHandler = context.getTypeSerializationLibrary().getTypeHandler(Vector2i.class, context.getContextClassLoader());
 
         if (!vector2iTypeHandler.isPresent()) {
             LOGGER.error("No Vector2i type handler found");

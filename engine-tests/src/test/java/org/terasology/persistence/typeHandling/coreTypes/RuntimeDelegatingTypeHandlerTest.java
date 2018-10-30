@@ -24,6 +24,7 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
@@ -48,6 +49,9 @@ public class RuntimeDelegatingTypeHandlerTest {
 
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
 
+    private final TypeHandlerFactoryContext context =
+            new TypeHandlerFactoryContext(typeSerializationLibrary, getClass().getClassLoader());
+
     private static class Base {
         int x;
     }
@@ -70,20 +74,20 @@ public class RuntimeDelegatingTypeHandlerTest {
         TypeHandler baseTypeHandler = mock(TypeHandler.class);
         TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);
 
-        when(typeSerializationLibrary.getTypeHandler(eq(baseType)))
+        when(typeSerializationLibrary.getTypeHandler(eq(baseType), any()))
                 .thenReturn(Optional.of(baseTypeHandler));
 
-        when(typeSerializationLibrary.getTypeHandler(eq((Type) subType)))
+        when(typeSerializationLibrary.getTypeHandler(eq((Type) subType), any()))
                 .thenReturn(Optional.of(subTypeHandler));
 
-        TypeHandler<List<Base>> listTypeHandler = collectionHandlerFactory.create(new TypeInfo<List<Base>>() {
-        }, typeSerializationLibrary).get();
+        TypeHandler<List<Base>> listTypeHandler =
+                collectionHandlerFactory.create(new TypeInfo<List<Base>>() {}, context).get();
 
         ArrayList<Base> bases = Lists.newArrayList(new Sub(), new Base(), new Sub(), new Base(), new Sub());
         listTypeHandler.serialize(bases, serializer);
 
-        verify(typeSerializationLibrary).getTypeHandler(baseType);
-        verify(typeSerializationLibrary, times(3)).getTypeHandler((Type) subType);
+        verify(typeSerializationLibrary).getTypeHandler(eq(baseType), any());
+        verify(typeSerializationLibrary, times(3)).getTypeHandler(eq((Type) subType), any());
 
         verify(baseTypeHandler, times(2)).serialize(any(), any());
         verify(subTypeHandler, times(3)).serialize(any(), any());
@@ -105,14 +109,14 @@ public class RuntimeDelegatingTypeHandlerTest {
         TypeHandler baseTypeHandler = mock(TypeHandler.class);
         TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);
 
-        when(typeSerializationLibrary.getTypeHandler(eq(baseType)))
+        when(typeSerializationLibrary.getTypeHandler(eq(baseType), any()))
                 .thenReturn(Optional.of(baseTypeHandler));
 
-        when(typeSerializationLibrary.getTypeHandler(eq(subType)))
+        when(typeSerializationLibrary.getTypeHandler(eq(subType), any()))
                 .thenReturn(Optional.of(subTypeHandler));
 
         TypeHandler<List<Base>> listTypeHandler = collectionHandlerFactory.create(
-                new TypeInfo<List<Base>>() {}, typeSerializationLibrary
+                new TypeInfo<List<Base>>() {}, context
         ).get();
 
         PersistedData persistedBase = new PersistedMap(ImmutableMap.of());
@@ -135,8 +139,8 @@ public class RuntimeDelegatingTypeHandlerTest {
 
         listTypeHandler.deserialize(persistedBases);
 
-        verify(typeSerializationLibrary).getTypeHandler(baseType);
-        verify(typeSerializationLibrary, times(3)).getTypeHandler(subType);
+        verify(typeSerializationLibrary).getTypeHandler(eq(baseType), any());
+        verify(typeSerializationLibrary, times(3)).getTypeHandler(eq(subType), any());
 
         verify(baseTypeHandler, times(2)).deserialize(any());
         verify(subTypeHandler, times(3)).deserialize(any());

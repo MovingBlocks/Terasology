@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling.extensionTypes.factories;
 import org.terasology.assets.Asset;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
@@ -30,7 +30,7 @@ import java.util.Optional;
  */
 public class AssetTypeHandlerFactory implements TypeHandlerFactory {
     @Override
-    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
+    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
         Class<? super T> rawType = typeInfo.getRawType();
 
         if (!Asset.class.isAssignableFrom(rawType)) {

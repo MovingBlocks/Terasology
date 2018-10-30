@@ -197,7 +197,7 @@ public class TypeSerializationLibrary {
         TypeHandlerFactory factory = new TypeHandlerFactory() {
             @SuppressWarnings("unchecked")
             @Override
-            public <R> Optional<TypeHandler<R>> create(TypeInfo<R> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
+            public <R> Optional<TypeHandler<R>> create(TypeInfo<R> typeInfo, TypeHandlerFactoryContext context) {
                 return typeInfo.equals(type) ? Optional.of((TypeHandler<R>) typeHandler) : Optional.empty();
             }
         };
@@ -214,18 +214,20 @@ public class TypeSerializationLibrary {
     }
 
     @SuppressWarnings({"unchecked"})
-    public Optional<TypeHandler<?>> getTypeHandler(Type type) {
+    public Optional<TypeHandler<?>> getTypeHandler(Type type, ClassLoader contextClassLoader) {
         TypeInfo typeInfo = TypeInfo.of(type);
-        return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo);
+        return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo, contextClassLoader);
     }
 
 
-    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass) {
-        return getTypeHandler(TypeInfo.of(typeClass));
+    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass, ClassLoader contextClassLoader) {
+        return getTypeHandler(TypeInfo.of(typeClass), contextClassLoader);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type) {
+    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type, ClassLoader contextClassLoader) {
+        TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(this, contextClassLoader);
+
         if (typeHandlerCache.containsKey(type)) {
             return Optional.of((TypeHandler<T>) typeHandlerCache.get(type));
         }
@@ -233,7 +235,7 @@ public class TypeSerializationLibrary {
         // TODO: Explore reversing typeHandlerFactories itself before building object
         for (int i = typeHandlerFactories.size() - 1; i >= 0; i--) {
             TypeHandlerFactory typeHandlerFactory = typeHandlerFactories.get(i);
-            Optional<TypeHandler<T>> typeHandler = typeHandlerFactory.create(type, this);
+            Optional<TypeHandler<T>> typeHandler = typeHandlerFactory.create(type, context);
 
             if (typeHandler.isPresent()) {
                 TypeHandler<T> handler = typeHandler.get();
@@ -248,7 +250,7 @@ public class TypeSerializationLibrary {
     private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
         Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
         for (FieldMetadata<?, ?> field : type.getFields()) {
-            Optional<TypeHandler<?>> handler = getTypeHandler(field.getField().getGenericType());
+            Optional<TypeHandler<?>> handler = getTypeHandler(field.getField().getGenericType(), getClass().getClassLoader());
 
             if (handler.isPresent()) {
                 handlerMap.put(field, handler.get());
