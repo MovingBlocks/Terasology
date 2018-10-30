@@ -19,6 +19,7 @@ package org.terasology.utilities;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.rendering.nui.UIWidget;
 
 import java.lang.reflect.Array;
@@ -472,5 +473,19 @@ public final class ReflectionUtil {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Returns a list of {@link ClassLoader}s which have access to <i>all</i> engine and loaded module
+     * classes. This function must NOT be accessible to modules.
+     *
+     * @param moduleEnvironment The {@link ModuleEnvironment} managing all loaded modules.
+     */
+    public static ClassLoader[] getComprehensiveEngineClassLoaders(ModuleEnvironment moduleEnvironment) {
+        return new ClassLoader[]{
+                ReflectionUtil.class.getClassLoader(),
+                // TODO: Reflection - can break with updates to gestalt
+                (ClassLoader) readField(moduleEnvironment, "finalClassLoader")
+        };
     }
 }
