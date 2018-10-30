@@ -214,19 +214,19 @@ public class TypeSerializationLibrary {
     }
 
     @SuppressWarnings({"unchecked"})
-    public Optional<TypeHandler<?>> getTypeHandler(Type type, ClassLoader contextClassLoader) {
+    public Optional<TypeHandler<?>> getTypeHandler(Type type, ClassLoader... contextClassLoaders) {
         TypeInfo typeInfo = TypeInfo.of(type);
-        return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo, contextClassLoader);
+        return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo, contextClassLoaders);
     }
 
 
-    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass, ClassLoader contextClassLoader) {
-        return getTypeHandler(TypeInfo.of(typeClass), contextClassLoader);
+    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass, ClassLoader... contextClassLoaders) {
+        return getTypeHandler(TypeInfo.of(typeClass), contextClassLoaders);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type, ClassLoader contextClassLoader) {
-        TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(this, contextClassLoader);
+    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type, ClassLoader... contextClassLoaders) {
+        TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(this, contextClassLoaders);
 
         if (typeHandlerCache.containsKey(type)) {
             return Optional.of((TypeHandler<T>) typeHandlerCache.get(type));

@@ -51,7 +51,7 @@ public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        Optional<TypeHandler<?>> declaredValueTypeHandler = context.getTypeSerializationLibrary().getTypeHandler(valueType, context.getContextClassLoader());
+        Optional<TypeHandler<?>> declaredValueTypeHandler = context.getTypeSerializationLibrary().getTypeHandler(valueType, context.getClassLoaders());
 
         TypeInfo<?> valueTypeInfo = TypeInfo.of(valueType);
 
