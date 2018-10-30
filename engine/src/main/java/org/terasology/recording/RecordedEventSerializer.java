@@ -39,6 +39,7 @@ import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.utilities.ReflectionUtil;
 
 import java.io.Reader;
 import java.io.FileReader;
@@ -70,7 +71,10 @@ class RecordedEventSerializer {
         typeSerializationLibrary.addTypeHandler(MouseInput.class, new EnumTypeHandler<>(MouseInput.class));
         typeSerializationLibrary.addTypeHandler(MovementMode.class, new EnumTypeHandler<>(MovementMode.class));
 
-        this.recordedEventListTypeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<List<RecordedEvent>>() {}).get();
+        ClassLoader[] classLoaders = ReflectionUtil.getComprehensiveEngineClassLoaders(moduleEnvironment);
+
+        this.recordedEventListTypeHandler = typeSerializationLibrary.getTypeHandler(
+                new TypeInfo<List<RecordedEvent>>() {}, classLoaders).get();
     }
 
     /**
