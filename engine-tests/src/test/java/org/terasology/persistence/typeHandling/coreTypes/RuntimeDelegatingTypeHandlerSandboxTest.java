@@ -45,10 +45,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Policy;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -68,7 +70,11 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
     @Before
     public void setup() {
         ModuleRegistry registry = new TableModuleRegistry();
-        Path modulesPath = Paths.get("engine-tests", "test-modules").toAbsolutePath();
+        Path modulesPath = Paths.get("").toAbsolutePath();
+        if (!modulesPath.endsWith("engine-tests")){
+            modulesPath = modulesPath.resolve("engine-tests");
+        }
+        modulesPath = modulesPath.resolve("test-modules");
         new ModulePathScanner().scan(registry, modulesPath);
 
         StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
@@ -89,7 +95,12 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
         DependencyResolver resolver = new DependencyResolver(registry);
         moduleEnvironment = new ModuleEnvironment(resolver.resolve(new Name("EmptyClassModule")).getModules(), permissionProviderFactory, Collections.emptyList());
 
-        moduleClass = moduleEnvironment.getSubtypesOf(AutoCloseable.class).iterator().next();
+        Iterator<Class<? extends AutoCloseable>> moduleClasses =
+                moduleEnvironment.getSubtypesOf(AutoCloseable.class).iterator();
+
+        assumeTrue(moduleClasses.hasNext());
+
+        moduleClass = moduleClasses.next();
 
         baseTypeHandlerMock = mock(TypeHandler.class);
         moduleClassHandlerMock = mock(TypeHandler.class);
