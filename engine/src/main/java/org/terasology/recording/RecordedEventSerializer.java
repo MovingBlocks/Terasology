@@ -17,6 +17,7 @@ package org.terasology.recording;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -80,11 +81,11 @@ class RecordedEventSerializer {
      */
     public void serializeRecordedEvents(List<RecordedEvent> events, String filePath) {
         GsonPersistedDataSerializer serializationContext = new GsonPersistedDataSerializer();
-        PersistedData data = recordedEventListTypeHandler.serialize(events, serializationContext);
+        GsonPersistedData data = (GsonPersistedData) recordedEventListTypeHandler.serialize(events, serializationContext);
 
         try (Writer writer = new FileWriter(filePath)) {
             Gson gson = new GsonBuilder().create();
-            gson.toJson(data, writer);
+            gson.toJson(data.getElement(), writer);
         } catch (IOException e) {
             logger.error("Error while serializing recorded events", e);
         }
@@ -100,8 +101,10 @@ class RecordedEventSerializer {
 
         try (Reader reader = new FileReader(filePath)) {
             Gson gson = new GsonBuilder().create();
-            PersistedData record = gson.fromJson(reader, GsonPersistedData.class);
-            Optional<List<RecordedEvent>> recordedEvents = recordedEventListTypeHandler.deserialize(record);
+            JsonElement jsonElement = gson.fromJson(reader, JsonElement.class);
+            PersistedData persistedData = new GsonPersistedData(jsonElement);
+
+            Optional<List<RecordedEvent>> recordedEvents = recordedEventListTypeHandler.deserialize(persistedData);
             recordedEvents.ifPresent(events::addAll);
         } catch (IOException e) {
             logger.error("Error while serializing recorded events", e);
