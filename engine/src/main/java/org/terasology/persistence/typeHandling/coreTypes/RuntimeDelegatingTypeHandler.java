@@ -22,6 +22,7 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.TypeInfo;
 
@@ -46,11 +47,13 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     private TypeHandler<T> delegateHandler;
     private TypeInfo<T> typeInfo;
     private TypeSerializationLibrary typeSerializationLibrary;
+    private ClassLoader classLoader;
 
-    public RuntimeDelegatingTypeHandler(TypeHandler<T> delegateHandler, TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
+    public RuntimeDelegatingTypeHandler(TypeHandler<T> delegateHandler, TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
         this.delegateHandler = delegateHandler;
         this.typeInfo = typeInfo;
-        this.typeSerializationLibrary = typeSerializationLibrary;
+        this.typeSerializationLibrary = context.getTypeSerializationLibrary();
+        this.classLoader = context.getContextClassLoader();
     }
 
     @Override
@@ -69,7 +72,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         Class<?> runtimeClass = getRuntimeTypeIfMoreSpecific(typeInfo, value);
 
         if (!typeInfo.getRawType().equals(runtimeClass)) {
-            Optional<TypeHandler<?>> runtimeTypeHandler = typeSerializationLibrary.getTypeHandler((Type) runtimeClass);
+            Optional<TypeHandler<?>> runtimeTypeHandler = typeSerializationLibrary.getTypeHandler((Type) runtimeClass, classLoader);
 
             chosenHandler = (TypeHandler<T>) runtimeTypeHandler
                     .map(typeHandler -> {
@@ -143,17 +146,16 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         String runtimeTypeName = valueMap.getAsString(TYPE_FIELD);
 
-        // TODO: Use context class loaders
         Class<?> typeToDeserializeAs;
 
         try {
-            typeToDeserializeAs = Class.forName(runtimeTypeName);
+            typeToDeserializeAs = Class.forName(runtimeTypeName, true, classLoader);
         } catch (ClassNotFoundException e) {
             LOGGER.error("Cannot find class to deserialize {}", runtimeTypeName);
             return Optional.empty();
         }
 
-        TypeHandler<T> runtimeTypeHandler = (TypeHandler<T>) typeSerializationLibrary.getTypeHandler(typeToDeserializeAs)
+        TypeHandler<T> runtimeTypeHandler = (TypeHandler<T>) typeSerializationLibrary.getTypeHandler(typeToDeserializeAs, classLoader)
                 // To avoid compile errors in the orElseGet
                 .map(typeHandler -> (TypeHandler) typeHandler)
                 .orElseGet(() -> {

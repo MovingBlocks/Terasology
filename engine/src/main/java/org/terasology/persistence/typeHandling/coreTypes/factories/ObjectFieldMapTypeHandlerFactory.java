@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.reflection.TypeInfo;
@@ -43,7 +43,7 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
     }
 
     @Override
-    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
+    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
         Class<? super T> typeClass = typeInfo.getRawType();
 
         if (!Modifier.isAbstract(typeClass.getModifiers())
@@ -54,7 +54,7 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
             getResolvedFields(typeInfo).forEach(
                     (field, fieldType) ->
                     {
-                        Optional<TypeHandler<?>> declaredFieldTypeHandler = typeSerializationLibrary.getTypeHandler(fieldType);
+                        Optional<TypeHandler<?>> declaredFieldTypeHandler = context.getTypeSerializationLibrary().getTypeHandler(fieldType, context.getContextClassLoader());
 
                         TypeInfo<?> fieldTypeInfo = TypeInfo.of(fieldType);
 
@@ -63,7 +63,7 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
                                 new RuntimeDelegatingTypeHandler(
                                         declaredFieldTypeHandler.orElse(null),
                                         fieldTypeInfo,
-                                        typeSerializationLibrary
+                                        context
                                 )
                         );
                     }

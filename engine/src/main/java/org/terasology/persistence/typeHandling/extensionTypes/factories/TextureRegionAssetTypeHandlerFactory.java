@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.extensionTypes.factories;
 
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionAssetTypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
@@ -26,7 +26,7 @@ import java.util.Optional;
 
 public class TextureRegionAssetTypeHandlerFactory implements TypeHandlerFactory {
     @Override
-    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary) {
+    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
         if (!TextureRegionAsset.class.equals(typeInfo.getRawType())) {
             return Optional.empty();
         }

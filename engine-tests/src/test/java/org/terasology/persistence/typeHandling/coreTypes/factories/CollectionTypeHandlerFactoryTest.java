@@ -17,13 +17,12 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import com.google.common.collect.Maps;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +31,8 @@ import java.util.Queue;
 import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -39,18 +40,21 @@ public class CollectionTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
     private final CollectionTypeHandlerFactory typeHandlerFactory = new CollectionTypeHandlerFactory(new ConstructorLibrary(Maps.newHashMap()));
 
+    private final TypeHandlerFactoryContext context =
+            new TypeHandlerFactoryContext(typeSerializationLibrary, getClass().getClassLoader());
+
     @Test
     public void testList() {
         TypeInfo<List<Integer>> listTypeInfo = new TypeInfo<List<Integer>>() {};
 
         Optional<TypeHandler<List<Integer>>> typeHandler =
-                typeHandlerFactory.create(listTypeInfo, typeSerializationLibrary);
+                typeHandlerFactory.create(listTypeInfo, context);
 
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof CollectionTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()), any());
     }
 
     @Test
@@ -58,13 +62,13 @@ public class CollectionTypeHandlerFactoryTest {
         TypeInfo<Set<Integer>> listTypeInfo = new TypeInfo<Set<Integer>>() {};
 
         Optional<TypeHandler<Set<Integer>>> typeHandler =
-                typeHandlerFactory.create(listTypeInfo, typeSerializationLibrary);
+                typeHandlerFactory.create(listTypeInfo, context);
 
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof CollectionTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()), any());
     }
 
     @Test
@@ -72,13 +76,13 @@ public class CollectionTypeHandlerFactoryTest {
         TypeInfo<Queue<Integer>> listTypeInfo = new TypeInfo<Queue<Integer>>() {};
 
         Optional<TypeHandler<Queue<Integer>>> typeHandler =
-                typeHandlerFactory.create(listTypeInfo, typeSerializationLibrary);
+                typeHandlerFactory.create(listTypeInfo, context);
 
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof CollectionTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()), any());
     }
 
     @Test
@@ -86,12 +90,12 @@ public class CollectionTypeHandlerFactoryTest {
         class IntList extends ArrayList<Integer> {}
 
         Optional<TypeHandler<IntList>> typeHandler =
-                typeHandlerFactory.create(TypeInfo.of(IntList.class), typeSerializationLibrary);
+                typeHandlerFactory.create(TypeInfo.of(IntList.class), context);
 
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof CollectionTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()), any());
     }
 }

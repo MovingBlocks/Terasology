@@ -33,12 +33,12 @@ public interface TypeHandlerFactory {
      * {@link TypeHandler#serialize(Object, PersistedDataSerializer)} and
      * {@link TypeHandler#deserialize(PersistedData)} implementations are fast.
      *
-     * @param typeInfo The {@link TypeInfo} of the type for which a {@link TypeHandler} must be generated.
-     * @param typeSerializationLibrary The {@link TypeSerializationLibrary} for which the {@link TypeHandler}
-     *                                 is being created.
      * @param <T> The type for which a {@link TypeHandler} must be generated.
+     * @param typeInfo The {@link TypeInfo} of the type for which a {@link TypeHandler} must be generated.
+     * @param context The {@link TypeSerializationLibrary} for which the {@link TypeHandler}
+     *                                 is being created.
      * @return An {@link Optional} wrapping the created {@link TypeHandler}, or {@link Optional#empty()}
      * if the type is not supported by this {@link TypeHandlerFactory}.
      */
-    <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeSerializationLibrary typeSerializationLibrary);
+    <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context);
 }

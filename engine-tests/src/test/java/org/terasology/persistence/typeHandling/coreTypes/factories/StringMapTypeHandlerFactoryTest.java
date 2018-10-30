@@ -18,6 +18,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -35,18 +37,21 @@ public class StringMapTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
     private final StringMapTypeHandlerFactory typeHandlerFactory = new StringMapTypeHandlerFactory();
 
+    private final TypeHandlerFactoryContext context =
+            new TypeHandlerFactoryContext(typeSerializationLibrary, getClass().getClassLoader());
+
     @Test
     public void testStringMap() {
         TypeInfo<Map<String, Integer>> listTypeInfo = new TypeInfo<Map<String, Integer>>() {};
 
         Optional<TypeHandler<Map<String, Integer>>> typeHandler =
-                typeHandlerFactory.create(listTypeInfo, typeSerializationLibrary);
+                typeHandlerFactory.create(listTypeInfo, context);
 
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof StringMapTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), any());
     }
 
     @Test
@@ -54,7 +59,7 @@ public class StringMapTypeHandlerFactoryTest {
         TypeInfo<Set<Integer>> listTypeInfo = new TypeInfo<Set<Integer>>() {};
 
         Optional<TypeHandler<Set<Integer>>> typeHandler =
-                typeHandlerFactory.create(listTypeInfo, typeSerializationLibrary);
+                typeHandlerFactory.create(listTypeInfo, context);
 
         assertFalse(typeHandler.isPresent());
     }
@@ -64,12 +69,12 @@ public class StringMapTypeHandlerFactoryTest {
         class IntMap extends HashMap<String, Integer> {}
 
         Optional<TypeHandler<IntMap>> typeHandler =
-                typeHandlerFactory.create(TypeInfo.of(IntMap.class), typeSerializationLibrary);
+                typeHandlerFactory.create(TypeInfo.of(IntMap.class), context);
 
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof StringMapTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), any());
     }
 }
