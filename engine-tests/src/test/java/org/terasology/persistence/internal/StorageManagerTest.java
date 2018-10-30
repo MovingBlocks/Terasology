@@ -108,7 +108,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         assert !Files.isRegularFile(vfs.getPath("global.dat"));
 
         entityManager = context.get(EngineEntityManager.class);
-        moduleEnvironment = context.get(ModuleEnvironment.class);
+        moduleEnvironment = mock(ModuleEnvironment.class);
         blockManager = context.get(BlockManager.class);
         extraDataManager = context.get(ExtraBlockDataManager.class);
 
