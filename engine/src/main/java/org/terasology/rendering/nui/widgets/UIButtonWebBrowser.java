@@ -163,19 +163,25 @@ public class UIButtonWebBrowser extends UIButton {
 		boolean trustedUrl = false;
 		boolean trustedHostName = false;
 		if (webBrowserConfig != null) {
-			trustedUrl = webBrowserConfig.isUrlTrusted(url);
+			// trustedUrl = webBrowserConfig.isUrlTrusted(url);
 			String hostname;
 			try {
 				hostname = (new URL(url)).getHost();
 				trustedHostName = webBrowserConfig.isHostNameTrusted(hostname);
+				if (trustedHostName) {
+					confirmed.set(true);
+				} else if (webBrowserConfig.isUrlTrusted(url)) {
+					confirmed.set(true);
+					;
+				} else {
+					confirmed.set(false);
+				}
 			} catch (MalformedURLException e) {
 			}
 		}
-
 		if (trustedHostName || trustedUrl) {
 			confirmed.set(true);
-		}
-		else {
+		} else {
 			confirmed.set(false);
 		}
 		this.url = url;

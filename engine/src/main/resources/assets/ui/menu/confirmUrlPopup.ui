@@ -69,7 +69,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "Always accept this urls with this hostname",
+                                    "text": "Always accept URLs to this website",
                                     "id": "alwaysAccept"
                                 },
                             ]
