@@ -15,9 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.WebBrowserConfig;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -76,23 +73,7 @@ public class ConfirmUrlPopup extends CoreScreenLayer {
         }
     }
 
-    public void setCheckbox(WebBrowserConfig webBrowserConfig, String url) throws MalformedURLException {
-    	UICheckbox saveHostName = find("saveHostName", UICheckbox.class);
-
-        if (saveHostName != null && webBrowserConfig != null) {
-            saveHostName.setChecked(false);
-            String hostName = new URL(url).getHost();
-
-            saveHostName.subscribe(checkbox -> {
-                boolean isTrustedHostName = saveHostName.isChecked();
-
-                if (isTrustedHostName) {
-                    webBrowserConfig.addTrustedHostName(hostName);
-                } else {
-                    webBrowserConfig.removeTrustedHostName(hostName);
-                }
-            });
-            
+    public void setCheckbox(WebBrowserConfig webBrowserConfig, String url) {
         UICheckbox saveUrl = find("saveUrl", UICheckbox.class);
 
         if (saveUrl != null && webBrowserConfig != null) {
@@ -107,7 +88,6 @@ public class ConfirmUrlPopup extends CoreScreenLayer {
                     webBrowserConfig.removeTrustedUrl(url);
                 }
             });
-            }
         }
     }
 }

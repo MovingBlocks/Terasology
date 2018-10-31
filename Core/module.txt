@@ -1,7 +1,0 @@
-{
-    "id" : "Core",
-    "version" : "2.1.1-SNAPSHOT",
-    "displayName" : "Core Content",
-    "description" : "This module adds a set of base content for Terasology",
-    "dependencies" : []
-}

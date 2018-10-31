@@ -20,12 +20,11 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 /**
- * Holds all the trusted URLs and HostNames.
+ * Holds all the trusted URLs.
  */
 public class WebBrowserConfig {
 
     private List<String> trustedUrls = Lists.newArrayList();
-    private List<String> trustedHostNames = Lists.newArrayList();
 
     public void addTrustedUrls(String url) {
         trustedUrls.add(url);
@@ -41,22 +40,5 @@ public class WebBrowserConfig {
 
     public List<String> getTrustedUrls() {
         return trustedUrls;
-    }
-    
-    public void addTrustedHostName(String hostname) {
-    	trustedHostNames.add(hostname);
-    }
-    
-    public void removeTrustedHostName(String hostname) {
-    	trustedHostNames.remove(hostname);
-    }
-    
-    public boolean isHostNameTrusted(String hostname) {
-    	return trustedHostNames.contains(hostname);
-    }
-    
-    public List<String> getTrustedHostNames()
-    {
-    	return trustedHostNames;
     }
 }

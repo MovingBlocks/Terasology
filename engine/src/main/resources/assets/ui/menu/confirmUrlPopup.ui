@@ -58,23 +58,6 @@
                             ]
                         },
                         {
-                            "type":"ColumnLayout",
-                            "columns":2,
-                            "column-widths":[0.1,0.90],
-                            "contents": [
-                                {
-                                    "type": "UICheckbox",
-                                    "id": "saveHostName",
-                                    "family": "option-grid"
-                                },
-                                {
-                                    "type": "UILabel",
-                                    "text": "Always accept this urls with this hostname",
-                                    "id": "alwaysAccept"
-                                },
-                            ]
-                        },
-                        {
                             "type": "UISpace",
                             "size": [
                                 1,
@@ -105,6 +88,3 @@
         ]
     }
 }
-
-
-
