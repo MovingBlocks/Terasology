@@ -124,9 +124,9 @@ public final class RecordAndReplaySerializer {
     }
 
     private void deserializeFileAmount(Gson gson, String recordingPath) {
-        try {
+        try (FileReader fileReader = new FileReader(recordingPath + FILE_AMOUNT)){
             JsonParser parser = new JsonParser();
-            JsonElement jsonElement = parser.parse(new FileReader(recordingPath + FILE_AMOUNT));
+            JsonElement jsonElement = parser.parse(fileReader);
             Type typeOfCount = new TypeToken<Integer>() { }.getType();
             recordAndReplayUtils.setFileAmount(gson.fromJson(jsonElement, typeOfCount));
             logger.info("File Amount Deserialization completed!");
@@ -148,9 +148,9 @@ public final class RecordAndReplaySerializer {
     }
 
     private void deserializeCharacterStateEventPositonMap(Gson gson, String recordingPath) {
-        try {
+        try (FileReader fileReader = new FileReader(recordingPath + STATE_EVENT_POSITION)) {
             JsonParser parser = new JsonParser();
-            JsonElement jsonElement = parser.parse(new FileReader(recordingPath + STATE_EVENT_POSITION));
+            JsonElement jsonElement = parser.parse(fileReader);
             Type typeOfHashMap = new TypeToken<HashMap<Integer, Vector3f[]>>() { }.getType();
             Map<Integer, Vector3f[]> previousMap = gson.fromJson(jsonElement, typeOfHashMap);
             characterStateEventPositionMap.setIdToData(previousMap);
@@ -173,9 +173,9 @@ public final class RecordAndReplaySerializer {
     }
     
     private void deserializeAttackEventExtraRecorder(Gson gson, String recordingPath) {
-        try {
+        try (FileReader fileReader = new FileReader(recordingPath + DIRECTION_ORIGIN_LIST)) {
             JsonParser parser = new JsonParser();
-            JsonElement jsonElement = parser.parse(new FileReader(recordingPath + DIRECTION_ORIGIN_LIST));
+            JsonElement jsonElement = parser.parse(fileReader);
             Type type = new TypeToken<ArrayList<DirectionAndOriginPosRecorder>>() {}.getType();
             ArrayList<DirectionAndOriginPosRecorder> list = gson.fromJson(jsonElement, type);
             directionAndOriginPosRecorderList.setList(list);

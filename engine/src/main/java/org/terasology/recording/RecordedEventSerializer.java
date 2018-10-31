@@ -332,9 +332,9 @@ class RecordedEventSerializer {
         List<RecordedEvent> events = new ArrayList<>();
         createInputEventClassMap();
         JsonObject jsonObject;
-        try {
+        try (FileReader fileReader = new FileReader(path)) {
             JsonParser parser = new JsonParser();
-            JsonElement jsonElement = parser.parse(new FileReader(path));
+            JsonElement jsonElement = parser.parse(fileReader);
             jsonObject = jsonElement.getAsJsonObject();
             JsonArray jsonEvents = jsonObject.getAsJsonArray("events");
             for (JsonElement element : jsonEvents) {

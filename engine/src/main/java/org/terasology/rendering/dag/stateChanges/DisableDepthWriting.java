@@ -40,6 +40,11 @@ public final class DisableDepthWriting implements StateChange {
     }
 
     @Override
+    public int hashCode() {
+        return DisableDepthWriting.class.hashCode();
+    }
+
+    @Override
     public String toString() {
         return String.format("%30s", this.getClass().getSimpleName());
     }
@@ -58,6 +63,11 @@ public final class DisableDepthWriting implements StateChange {
         @Override
         public boolean equals(Object obj) {
             return (obj instanceof EnableDepthWriting);
+        }
+
+        @Override
+        public int hashCode() {
+            return EnableDepthWriting.class.hashCode();
         }
 
         @Override
