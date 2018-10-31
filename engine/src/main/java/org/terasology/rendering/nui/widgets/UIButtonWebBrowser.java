@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -44,8 +43,8 @@ public class UIButtonWebBrowser extends UIButton {
 	private static final String NEW_LINE = System.lineSeparator();
 
 	/**
-	 * If false, a confirmation popup should appear asking
-	 * for permission before opening the web browser, otherwise don't.
+	 * If false, a confirmation popup should appear asking for permission before
+	 * opening the web browser, otherwise don't.
 	 */
 	private Binding<Boolean> confirmed = new DefaultBinding<>(false);
 
@@ -128,9 +127,11 @@ public class UIButtonWebBrowser extends UIButton {
 
 		ConfirmUrlPopup confirmUrlPopup = nuiManager.pushScreen(ConfirmUrlPopup.ASSET_URI, ConfirmUrlPopup.class);
 		confirmUrlPopup.setMessage(translationSystem.translate("${engine:menu#button-web-browser-confirmation-title}"),
-				translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}") + NEW_LINE + this.url);
+				translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}") + NEW_LINE
+						+ this.url);
 		confirmUrlPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::openBrowser);
-		confirmUrlPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
+		confirmUrlPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {
+		});
 		try {
 			confirmUrlPopup.setCheckbox(webBrowserConfig, this.url);
 		} catch (MalformedURLException e) {
@@ -152,9 +153,11 @@ public class UIButtonWebBrowser extends UIButton {
 	}
 
 	/**
-	 * Sets the {@link UIButtonWebBrowser#url} value and sets {@link UIButtonWebBrowser#confirmed}
-	 * to true if the given URL or Hostname is already trusted, otherwise confirmed is false.
-	 * @throws MalformedURLException 
+	 * Sets the {@link UIButtonWebBrowser#url} value and sets
+	 * {@link UIButtonWebBrowser#confirmed} to true if the given URL or Hostname is
+	 * already trusted, otherwise confirmed is false.
+	 * 
+	 * @throws MalformedURLException
 	 */
 	public UIButtonWebBrowser setUrl(String url) {
 		boolean trustedUrl = false;
