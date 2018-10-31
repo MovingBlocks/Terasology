@@ -1,0 +1,10 @@
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Pick Axe"
+    },
+    "Item": {
+        "icon": "engine:items#pick",
+        "damageType": "pickaxeDamage"
+    }
+}

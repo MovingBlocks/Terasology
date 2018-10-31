@@ -1,0 +1,10 @@
+/**
+ * A flower that can emit a glow (bloomed version)
+ * @author (art) eleazzaar
+ */
+{
+    "author": "eleazzaar",
+    "basedOn": "core:plant",
+    "luminance": 6,
+    "waving": true
+}

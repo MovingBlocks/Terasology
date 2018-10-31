@@ -1,0 +1,8 @@
+/**
+ * Tall grass variety 1 (higher number = taller)
+ */
+{
+    "basedOn": "core:plant",
+    "colorSource": "foliage_lut",
+    "waving": true
+}

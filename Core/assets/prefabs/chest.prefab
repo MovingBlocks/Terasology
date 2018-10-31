@@ -1,0 +1,65 @@
+{
+    "InventoryAccess": {
+        "input": {
+            "top": "0..29",
+            "bottom": "0..29",
+            "left": "0..29",
+            "right": "0..29",
+            "front": "0..29",
+            "back": "0..29"
+        },
+        "output": {
+            "top": "0..29",
+            "bottom": "0..29",
+            "left": "0..29",
+            "right": "0..29",
+            "front": "0..29",
+            "back": "0..29"
+        }
+    },
+    "Inventory": {
+        "privateToOwner": false,
+        "itemSlots": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ]
+    },
+    "RetainBlockInventory": {},
+    "PlaySoundAction": {
+        "sounds": "engine:click"
+    },
+    "InteractionTarget": {},
+    "InteractionScreen": {
+        "screen": "core:containerScreen"
+    },
+    "Network": {
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Inspection Tool"
+    },
+    "Item": {
+        "icon": "engine:items#whiteRecipe"
+    },
+    "InspectionTool": {},
+    "InteractionTarget": {},
+    "InteractionScreen": {
+        "screen": "engine:inspectionScreen"
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "type": "DropItemRegion",
+    "skin": "dropItemRegionDefault",
+    "contents": {
+        "type": "relativeLayout",
+        "id": "mainOverlay",
+        "contents": [
+        ]
+    }
+}

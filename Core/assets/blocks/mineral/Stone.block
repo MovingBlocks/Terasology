@@ -1,0 +1,6 @@
+/**
+ * Stone is just raw stone in the world
+ */
+{
+    "basedOn": "core:rock"
+}

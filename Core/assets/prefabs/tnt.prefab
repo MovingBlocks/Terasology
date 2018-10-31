@@ -1,0 +1,9 @@
+{
+    "PlaySoundAction": {
+        "sounds": ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
+    },
+    "ExplosionAction": {
+        "relativeTo": "Self",
+        "maxRange": 120
+    }
+}

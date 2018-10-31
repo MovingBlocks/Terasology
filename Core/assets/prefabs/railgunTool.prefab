@@ -1,0 +1,14 @@
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Railgun"
+    },
+    "Item": {
+        "icon": "engine:items#dynamite",
+        "usage": "IN_DIRECTION"
+    },
+    "TunnelAction": {},
+    "PlaySoundAction": {
+        "sounds": ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
+    }
+}

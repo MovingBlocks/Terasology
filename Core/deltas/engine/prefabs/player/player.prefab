@@ -1,0 +1,58 @@
+{
+  "Inventory": {
+    "itemSlots": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "SelectedInventorySlot": {
+  },
+  "Health": {
+    "currentHealth": 100,
+    "maxHealth": 100,
+    "regenRate": 3,
+    "waitBeforeRegen": 10,
+    "excessSpeedDamageMultiplier": 5,
+    "fallingDamageSpeedThreshold": 18,
+    "horizontalDamageSpeedThreshold": 50,
+    "destroyEntityOnNoHealth": true
+  }
+}

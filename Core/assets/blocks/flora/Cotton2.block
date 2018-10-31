@@ -1,0 +1,8 @@
+/**
+ * Cotton in various stages of its life-cycle
+ * @author (art) eleazzaar
+ */
+{
+    "author": "eleazzaar",
+    "basedOn": "core:plant"
+}

@@ -1,0 +1,77 @@
+{
+    "type": "AnimationScreen",
+    "contents": {
+        "type": "RelativeLayout",
+        "contents": [
+            {
+                "type": "ScrollableArea",
+                "id": "scrollArea",
+                "contents": [
+                {
+                     "type": "engine:RowLayout",
+                      "id": "rowWidget",
+                      "layoutInfo": {
+                            "use-content-height": true,
+                            "width": 500,
+                            "position-vertical-top": {}
+                      },
+                      "contents": [
+                      {
+                            "type": "engine:UILabel",
+                            "id": "spawnEntityLabel",
+                            "layoutInfo": {
+                                "relativeWidth": 0.2
+                            },
+                            "text": "Speed"
+                      },
+                      {
+                            "type": "engine:UISlider",
+                            "id": "entityAnimationSpeedSlider",
+                            "layoutInfo": {
+                            "use-content-height": true
+                            },
+                            "value": 0.7
+                      }
+                   ]
+                 },
+
+                ],
+                "layoutInfo": {
+                    "height": 300,
+                    "width": 500,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                }
+            },
+            {
+                "type": "RowLayout",
+                "contents": [
+                    {
+                        "type": "engine:UIDropdownScrollable",
+                        "id": "entityDropdown",
+                        "layoutInfo": {}
+                    },
+
+                    {
+                        "type": "UIButton",
+                        "text": "Spawn",
+                        "id": "spawnEntityIdButton",
+                        "layoutInfo": {
+                            "relativeWidth": 0.18
+                        }
+                    }
+                ],
+                "layoutInfo": {
+                    "use-content-height": true,
+                    "width": 500,
+                    "position-horizontal-center": {},
+                    "position-vertical-top": {},
+                    "position-bottom": {
+                        "widget": "scrollArea",
+                        "target": "TOP"
+                    }
+                }
+            }
+        ]
+    }
+}

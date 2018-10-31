@@ -1,0 +1,9 @@
+{
+    "DisplayName": {
+        "name": "Coal"
+    },
+    "Item": {
+        "icon": "engine:items#coal",
+        "stackId": "coal"
+    }
+}

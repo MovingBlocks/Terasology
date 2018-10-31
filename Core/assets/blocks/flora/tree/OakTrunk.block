@@ -1,0 +1,15 @@
+/*
+ * This is a tree. Treat it well and it will grow tall and strong.
+ * Idea is that all trees (as defined in the block/plant/tree package anyway  will have leaves
+ * L-system generation stat sets could also go here (or in their own separate thing?)
+ * Entirely separate trees would have their own tree + leaf block definitions (rename the plain "Tree" then)
+ */
+{
+    "basedOn": "core:wood",
+    "displayName": "Oak Log",
+    // Graphics
+    "tiles": {
+        "sides": "Core:OakBark",
+        "topBottom": "Core:OakTrunk"
+    }
+}

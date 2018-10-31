@@ -1,0 +1,11 @@
+{
+  "parent": "engine:iconItem",
+  "DisplayName": {
+    "name": "CrossBow"
+  },
+  "Item": {
+    "icon": "engine:items#crossbow",
+    "usage": "IN_DIRECTION"
+  },
+  "ArrowAction": {}
+}

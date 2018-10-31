@@ -1,0 +1,7 @@
+/**
+ * A totally beautiful yellow flower that might get some actual plant stats later
+ */
+{
+    "basedOn": "core:plant",
+    "waving": true
+}
