@@ -110,6 +110,10 @@ class RecordedEventSerializer {
 
             Optional<List<RecordedEvent>> recordedEvents = recordedEventListTypeHandler.deserialize(persistedData);
             recordedEvents.ifPresent(events::addAll);
+
+            if (!recordedEvents.isPresent()) {
+                logger.error("Some problem occurred during deserialization, no recorded events was found");
+            }
         } catch (IOException e) {
             logger.error("Error while serializing recorded events", e);
         }
