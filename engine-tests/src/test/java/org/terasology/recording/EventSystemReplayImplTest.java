@@ -31,6 +31,7 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.events.InputEvent;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -73,7 +74,9 @@ public class EventSystemReplayImplTest {
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, null);
+        ModuleEnvironment moduleEnvironment = mock(ModuleEnvironment.class);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore,
+                recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleEnvironment);
         recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAYING);
         entity = entityManager.create();
         Long id = entity.getId();
