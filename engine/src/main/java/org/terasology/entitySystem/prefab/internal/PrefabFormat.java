@@ -43,10 +43,10 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
     private TypeSerializationLibrary typeSerializationLibrary;
     private ModuleEnvironment environment;
 
-    public PrefabFormat(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary, ModuleEnvironment envrionment) {
+    public PrefabFormat(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary, ModuleEnvironment environment) {
         super("prefab");
         this.componentLibrary = componentLibrary;
-        this.environment = envrionment;
+        this.environment = environment;
         this.typeSerializationLibrary = typeSerializationLibrary;
     }
 
