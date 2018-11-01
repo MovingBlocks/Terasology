@@ -18,6 +18,7 @@ package org.terasology.world.block.loader;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -38,6 +39,8 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.utilities.gson.Vector4fTypeAdapter;
@@ -65,6 +68,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
+ * Defines how block family data should be loaded form asset data
  */
 public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFamilyDefinitionData> {
 
@@ -74,11 +78,13 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
     private final BlockFamilyFactory horizontalFamily = new HorizontalBlockFamilyFactory();
     private final BlockFamilyFactory freeformFamily = new FreeformBlockFamilyFactory();
     private final AssetManager assetManager;
+    private final ModuleEnvironment environment;
     private final Gson gson;
 
-    public BlockFamilyDefinitionFormat(AssetManager assetManager, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
+    public BlockFamilyDefinitionFormat(AssetManager assetManager, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry, ModuleEnvironment environment) {
         super("block");
         this.assetManager = assetManager;
+        this.environment = environment;
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new AssetTypeAdapterFactory(assetManager))
@@ -94,6 +100,12 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input.get(0).openStream(), Charsets.UTF_8))) {
             BlockFamilyDefinitionData data = gson.fromJson(reader, BlockFamilyDefinitionData.class);
 
+            /* We check to see if the block's dependencies are present */
+            if (missingModuleDependency(data)) {
+                return null;
+            }
+
+            /* Finish loading the block */
             applyDefaults(resourceUrn, data.getBaseSection());
             data.getSections().values().stream().forEach(section -> applyDefaults(resourceUrn, section));
             if (!data.isTemplate()) {
@@ -112,6 +124,18 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         }
     }
 
+    private boolean missingModuleDependency(BlockFamilyDefinitionData data) {
+        if (environment != null && data.getModuleDepencencies().size() != 0) {
+            for (String name : data.getModuleDepencencies()) {
+                // TODO: Add add an `isPresent` method to `ModuleEnvironment` in  gestalt.
+                if (environment.get(new Name(name)) == null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void applyDefaults(ResourceUrn resourceUrn, SectionDefinitionData section) {
         Optional<BlockTile> defaultTile = assetManager.getAsset(resourceUrn, BlockTile.class);
         if (defaultTile.isPresent()) {
@@ -125,6 +149,64 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             section.setSounds(assetManager.getAsset(DEFAULT_SOUNDS, BlockSounds.class).get());
         }
 
+    }
+
+    private static class BlockFamilyFactoryHandler implements JsonDeserializer<BlockFamilyFactory> {
+
+        private final BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
+
+        private BlockFamilyFactoryHandler(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
+            this.blockFamilyFactoryRegistry = blockFamilyFactoryRegistry;
+        }
+
+        @Override
+        public BlockFamilyFactory deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return blockFamilyFactoryRegistry.getBlockFamilyFactory(json.getAsString());
+        }
+    }
+
+    private static class AssetTypeAdapterFactory implements TypeAdapterFactory {
+
+        private final AssetManager assetManager;
+
+        private AssetTypeAdapterFactory(AssetManager assetManager) {
+            this.assetManager = assetManager;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            Class<T> rawType = (Class<T>) type.getRawType();
+            if (Asset.class.isAssignableFrom(rawType)) {
+                final Class<? extends Asset> assetClass = (Class<? extends Asset>) rawType;
+                return (TypeAdapter) new TypeAdapter<Asset>() {
+                    @Override
+                    public void write(JsonWriter out, Asset value) throws IOException {
+                        if (value == null) {
+                            out.nullValue();
+                        } else {
+                            out.value(value.getUrn().toString());
+                        }
+                    }
+
+                    @Override
+                    public Asset read(JsonReader in) throws IOException {
+                        if (in.peek() == JsonToken.NULL) {
+                            in.nextNull();
+                            return null;
+                        } else {
+                            String value = in.nextString();
+                            Optional<? extends Asset> asset = assetManager.getAsset(value, assetClass);
+                            if (asset.isPresent()) {
+                                return asset.get();
+                            }
+                        }
+                        return null;
+                    }
+                };
+            }
+            return null;
+        }
     }
 
     private class BlockFamilyDefinitionDataHandler implements JsonDeserializer<BlockFamilyDefinitionData> {
@@ -143,6 +225,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             setBoolean(result::setTemplate, jsonObject, "template");
             setObject(result::setFamilyFactory, jsonObject, "rotation", BlockFamilyFactory.class, context);
             setObject(result::setCategories, jsonObject, "categories", listOfStringType, context);
+            setObject(result::setModuleDepencencies, jsonObject, "moduleDependencies", listOfStringType, context);
 
             deserializeSectionDefinitionData(result.getBaseSection(), jsonObject, context);
 
@@ -260,6 +343,17 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             }
         }
 
+        private void setStringArray(Consumer<String[]> setter, JsonObject jsonObject, String name) {
+            JsonArray jsonArray = jsonObject.getAsJsonArray(name);
+            if (jsonArray != null && jsonArray.isJsonArray()) {
+                String[] array = new String[jsonArray.size()];
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    array[i] = jsonArray.get(i).getAsString();
+                }
+                setter.accept(array);
+            }
+        }
+
         private void setString(Consumer<String> setter, JsonObject jsonObject, String name) {
             JsonPrimitive primitive = jsonObject.getAsJsonPrimitive(name);
             if (primitive != null) {
@@ -320,64 +414,6 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
             data.getBaseSection().setSounds(assetManager.getAsset("engine:default", BlockSounds.class).get());
             return data;
-        }
-    }
-
-    private static class BlockFamilyFactoryHandler implements JsonDeserializer<BlockFamilyFactory> {
-
-        private final BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
-
-        BlockFamilyFactoryHandler(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
-            this.blockFamilyFactoryRegistry = blockFamilyFactoryRegistry;
-        }
-
-        @Override
-        public BlockFamilyFactory deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return blockFamilyFactoryRegistry.getBlockFamilyFactory(json.getAsString());
-        }
-    }
-
-    private static class AssetTypeAdapterFactory implements TypeAdapterFactory {
-
-        private final AssetManager assetManager;
-
-        AssetTypeAdapterFactory(AssetManager assetManager) {
-            this.assetManager = assetManager;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-            Class<T> rawType = (Class<T>) type.getRawType();
-            if (Asset.class.isAssignableFrom(rawType)) {
-                final Class<? extends Asset> assetClass = (Class<? extends Asset>) rawType;
-                return (TypeAdapter) new TypeAdapter<Asset>() {
-                    @Override
-                    public void write(JsonWriter out, Asset value) throws IOException {
-                        if (value == null) {
-                            out.nullValue();
-                        } else {
-                            out.value(value.getUrn().toString());
-                        }
-                    }
-
-                    @Override
-                    public Asset read(JsonReader in) throws IOException {
-                        if (in.peek() == JsonToken.NULL) {
-                            in.nextNull();
-                            return null;
-                        } else {
-                            String value = in.nextString();
-                            Optional<? extends Asset> asset = assetManager.getAsset(value, assetClass);
-                            if (asset.isPresent()) {
-                                return asset.get();
-                            }
-                        }
-                        return null;
-                    }
-                };
-            }
-            return null;
         }
     }
 
