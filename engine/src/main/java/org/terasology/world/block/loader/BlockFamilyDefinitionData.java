@@ -34,6 +34,8 @@ public class BlockFamilyDefinitionData implements AssetData {
 
     private List<String> categories = Lists.newArrayList();
 
+    private List<String> moduleDepencencies = Lists.newArrayList();
+
     public BlockFamilyDefinitionData() {
 
     }
@@ -45,6 +47,7 @@ public class BlockFamilyDefinitionData implements AssetData {
         }
         this.familyFactory = other.familyFactory;
         this.categories = Lists.newArrayList(other.categories);
+        this.moduleDepencencies = Lists.newArrayList(other.moduleDepencencies);
     }
 
     public boolean isValid() {
@@ -72,7 +75,7 @@ public class BlockFamilyDefinitionData implements AssetData {
     }
 
     /**
-     * @param section
+     * @param section The name of the section to get
      * @return Retrieves the data for the given section. If the section is not defined, retrieves the base section instead
      */
     public SectionDefinitionData getSection(String section) {
@@ -98,4 +101,13 @@ public class BlockFamilyDefinitionData implements AssetData {
     public void setCategories(List<String> categories) {
         this.categories = categories;
     }
+
+    public List<String> getModuleDepencencies() {
+        return moduleDepencencies;
+    }
+
+    public void setModuleDepencencies(List<String> moduleDepencencies) {
+        this.moduleDepencencies = moduleDepencencies;
+    }
+
 }
