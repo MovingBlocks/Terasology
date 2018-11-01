@@ -197,6 +197,7 @@ public class HeadlessEnvironment extends Environment {
         return assetTypeManager.getAssetManager();
     }
 
+    @SuppressWarnings("RedundantCast")
     @Override
     protected AssetManager setupAssetManager() {
         ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
@@ -219,8 +220,6 @@ public class HeadlessEnvironment extends Environment {
         DefaultBlockFamilyFactoryRegistry blockFamilyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
         blockFamilyFactoryRegistry.setBlockFamilyFactory("horizontal", new HorizontalBlockFamilyFactory());
         blockFamilyFactoryRegistry.setBlockFamilyFactory("alignToSurface", new AttachedToSurfaceFamilyFactory());
-        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
-                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), blockFamilyFactoryRegistry));
 
         assetTypeManager.registerCoreAssetType(UISkin.class,
                 (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");

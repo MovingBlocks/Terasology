@@ -15,9 +15,6 @@
  */
 package org.terasology.engine.bootstrap;
 
-import java.lang.reflect.Type;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -51,6 +48,11 @@ import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.RegisterBlockFamilyFactory;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
+
+import java.lang.reflect.Type;
+import java.util.Optional;
 
 /**
  * Handles an environment switch by updating the asset manager, component library, and other context objects.
@@ -60,6 +62,7 @@ public final class EnvironmentSwitchHandler {
 
     private PrefabFormat registeredPrefabFormat;
     private PrefabDeltaFormat registeredPrefabDeltaFormat;
+    private BlockFamilyDefinitionFormat registeredBlockFormat;
 
     public EnvironmentSwitchHandler() {
     }
@@ -110,11 +113,17 @@ public final class EnvironmentSwitchHandler {
          * It can't be done before this method gets called because the ComponentLibrary isn't
          * existing then yet.
          */
-        unregisterPrefabFormats(assetTypeManager);
+        unregisterAssetFormats(assetTypeManager);
         registeredPrefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary, moduleManager.getEnvironment());
         assetTypeManager.registerCoreFormat(Prefab.class, registeredPrefabFormat);
         registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeSerializationLibrary);
         assetTypeManager.registerCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
+        registeredBlockFormat = new BlockFamilyDefinitionFormat(
+                assetTypeManager.getAssetManager(),
+                blockFamilyFactoryRegistry,
+                moduleManager.getEnvironment());
+        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
+                registeredBlockFormat);
 
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
 
@@ -131,17 +140,15 @@ public final class EnvironmentSwitchHandler {
     /**
      * Switches the environment of the asset manager to the specified one. It does not register the prefab formats
      * as they require a proper ComponentLibrary.
-     *
+     * <p>
      * The existence of this method call is questionable. It has only be introduced to make sure that
      * the asset type manager has never prefab formats that reference an old ComponentLibrary.
-     *
      */
     private void cheapAssetManagerUpdate(Context context, ModuleEnvironment environment) {
         ModuleAwareAssetTypeManager moduleAwareAssetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
-        unregisterPrefabFormats(moduleAwareAssetTypeManager);
+        unregisterAssetFormats(moduleAwareAssetTypeManager);
         moduleAwareAssetTypeManager.switchEnvironment(environment);
     }
-
 
     public void handleSwitchToPreviewEnvironment(Context context, ModuleEnvironment environment) {
         cheapAssetManagerUpdate(context, environment);
@@ -157,13 +164,12 @@ public final class EnvironmentSwitchHandler {
         cheapAssetManagerUpdate(context, environment);
     }
 
-
     public void handleSwitchToEmptyEnvironment(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         cheapAssetManagerUpdate(context, environment);
     }
 
-    private void unregisterPrefabFormats(ModuleAwareAssetTypeManager assetTypeManager) {
+    private void unregisterAssetFormats(ModuleAwareAssetTypeManager assetTypeManager) {
         if (registeredPrefabFormat != null) {
             assetTypeManager.removeCoreFormat(Prefab.class, registeredPrefabFormat);
             registeredPrefabFormat = null;
@@ -171,6 +177,10 @@ public final class EnvironmentSwitchHandler {
         if (registeredPrefabDeltaFormat != null) {
             assetTypeManager.removeCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
             registeredPrefabDeltaFormat = null;
+        }
+        if (registeredBlockFormat != null) {
+            assetTypeManager.removeCoreFormat(BlockFamilyDefinition.class, registeredBlockFormat);
+            registeredBlockFormat = null;
         }
     }
 

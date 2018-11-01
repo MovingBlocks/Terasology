@@ -42,10 +42,10 @@ import org.terasology.engine.subsystem.common.GameSubsystem;
 import org.terasology.engine.subsystem.common.MonitoringSubsystem;
 import org.terasology.engine.subsystem.common.NetworkSubsystem;
 import org.terasology.engine.subsystem.common.PhysicsSubsystem;
+import org.terasology.engine.subsystem.common.TelemetrySubSystem;
 import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
-import org.terasology.engine.subsystem.common.TelemetrySubSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -302,6 +302,7 @@ public class TerasologyEngine implements GameEngine {
         rootContext.put(AssetManager.class, assetTypeManager.getAssetManager());
     }
 
+    @SuppressWarnings("RedundantCast")
     private void initAssets() {
         DefaultBlockFamilyFactoryRegistry familyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
         rootContext.put(BlockFamilyFactoryRegistry.class, familyFactoryRegistry);
@@ -317,8 +318,6 @@ public class TerasologyEngine implements GameEngine {
                 (AssetFactory<BlockTile, TileData>) BlockTile::new, "blockTiles");
         assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
                 (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
-        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
-                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), familyFactoryRegistry));
         assetTypeManager.registerCoreAssetType(UISkin.class,
                 (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");
         assetTypeManager.registerCoreAssetType(BehaviorTree.class,
@@ -405,6 +404,7 @@ public class TerasologyEngine implements GameEngine {
 
     /**
      * Runs a single "tick" of the engine
+     *
      * @return true if the loop requesting a tick should continue running
      */
     public boolean tick() {
