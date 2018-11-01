@@ -36,6 +36,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+/**
+ * Defines how prefab data should be loaded from asset data
+ */
 public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
     private static final Logger logger = LoggerFactory.getLogger(PrefabFormat.class);
 
@@ -50,6 +53,9 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
         this.typeSerializationLibrary = typeSerializationLibrary;
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public PrefabData load(ResourceUrn resourceUrn, List<AssetDataFile> inputs) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
@@ -58,16 +64,24 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
                 logger.info("Attempting to deserialize prefab {} with inputs {}", resourceUrn, inputs);
                 PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeSerializationLibrary);
                 return checkOptionalDependencies(serializer.deserialize(prefabData));
-
             } else {
                 throw new IOException("Failed to read prefab for '" + resourceUrn + "'");
             }
         }
     }
+
+    /**
+     * Checks if the prefab has any optional dependencies.
+     * These should be specified in a {@link ModuleDependenciesComponent} on the prefab
+     *
+     * @param data The deserialised prefab data
+     * @return The data if it should be loaded, null otherwise.
+     */
     private PrefabData checkOptionalDependencies(PrefabData data) {
         if (environment != null && data.hasComponent(ModuleDependenciesComponent.class)) {
             ModuleDependenciesComponent component = data.getComponent(ModuleDependenciesComponent.class);
             for (String name : component.modules) {
+                // TODO: Add add an `isPresent` method to `ModuleEnvironment` in  gestalt.
                 if (environment.get(new Name(name)) == null) {
                     return null;
                 }
