@@ -28,84 +28,84 @@ import org.terasology.rendering.nui.widgets.UILabel;
 
 public class ConfirmUrlPopup extends CoreScreenLayer {
 
-	public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:confirmUrlPopup!instance");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:confirmUrlPopup!instance");
 
-	private Runnable leftActon;
-	private Runnable rightAction;
+    private Runnable leftActon;
+    private Runnable rightAction;
 
-	@Override
-	public void initialise() {
-		WidgetUtil.trySubscribe(this, "leftButton", button -> buttonCallback(leftActon));
-		WidgetUtil.trySubscribe(this, "rightButton", button -> buttonCallback(rightAction));
-	}
+    @Override
+    public void initialise() {
+        WidgetUtil.trySubscribe(this, "leftButton", button -> buttonCallback(leftActon));
+        WidgetUtil.trySubscribe(this, "rightButton", button -> buttonCallback(rightAction));
+    }
 
-	private void buttonCallback(Runnable action) {
-		getManager().popScreen();
-		action.run();
-	}
+    private void buttonCallback(Runnable action) {
+        getManager().popScreen();
+        action.run();
+    }
 
-	public void setLeftButton(String text, Runnable action) {
-		UIButton leftButton = find("leftButton", UIButton.class);
-		if (leftButton != null) {
-			leftButton.setText(text);
-		}
+    public void setLeftButton(String text, Runnable action) {
+        UIButton leftButton = find("leftButton", UIButton.class);
+        if (leftButton != null) {
+            leftButton.setText(text);
+        }
 
-		leftActon = action;
-	}
+        leftActon = action;
+    }
 
-	public void setRightButton(String text, Runnable action) {
-		UIButton rightButton = find("rightButton", UIButton.class);
-		if (rightButton != null) {
-			rightButton.setText(text);
-		}
+    public void setRightButton(String text, Runnable action) {
+        UIButton rightButton = find("rightButton", UIButton.class);
+        if (rightButton != null) {
+            rightButton.setText(text);
+        }
 
-		rightAction = action;
-	}
+        rightAction = action;
+    }
 
-	public void setMessage(String title, String message) {
-		UILabel titleLabel = find("title", UILabel.class);
-		if (titleLabel != null) {
-			titleLabel.setText(title);
-		}
+    public void setMessage(String title, String message) {
+        UILabel titleLabel = find("title", UILabel.class);
+        if (titleLabel != null) {
+            titleLabel.setText(title);
+        }
 
-		UILabel messageLabel = find("message", UILabel.class);
-		if (messageLabel != null) {
-			messageLabel.setText(message);
-		}
-	}
+        UILabel messageLabel = find("message", UILabel.class);
+        if (messageLabel != null) {
+            messageLabel.setText(message);
+        }
+    }
 
-	public void setCheckbox(WebBrowserConfig webBrowserConfig, String url) throws MalformedURLException {
-		UICheckbox saveHostName = find("saveHostName", UICheckbox.class);
+    public void setCheckbox(WebBrowserConfig webBrowserConfig, String url) throws MalformedURLException {
+        UICheckbox saveHostName = find("saveHostName", UICheckbox.class);
 
-		if (saveHostName != null && webBrowserConfig != null) {
-			saveHostName.setChecked(false);
-			String hostName = new URL(url).getHost();
+        if (saveHostName != null) {
+            saveHostName.setChecked(false);
+            String hostName = new URL(url).getHost();
 
-			saveHostName.subscribe(checkbox -> {
-				boolean isTrustedHostName = saveHostName.isChecked();
+            saveHostName.subscribe(checkbox -> {
+                boolean isTrustedHostName = saveHostName.isChecked();
 
-				if (isTrustedHostName) {
-					webBrowserConfig.addTrustedHostName(hostName);
-				} else {
-					webBrowserConfig.removeTrustedHostName(hostName);
-				}
-			});
+                if (isTrustedHostName) {
+                    webBrowserConfig.addTrustedHostName(hostName);
+                } else {
+                    webBrowserConfig.removeTrustedHostName(hostName);
+                }
+            });
 
-			UICheckbox saveUrl = find("saveUrl", UICheckbox.class);
+            UICheckbox saveUrl = find("saveUrl", UICheckbox.class);
 
-			if (saveUrl != null && webBrowserConfig != null) {
-				saveUrl.setChecked(false);
+            if (saveUrl != null) {
+                saveUrl.setChecked(false);
 
-				saveUrl.subscribe(checkbox -> {
-					boolean isTrustedUrl = saveUrl.isChecked();
+                saveUrl.subscribe(checkbox -> {
+                    boolean isTrustedUrl = saveUrl.isChecked();
 
-					if (isTrustedUrl) {
-						webBrowserConfig.addTrustedUrls(url);
-					} else {
-						webBrowserConfig.removeTrustedUrl(url);
-					}
-				});
-			}
-		}
-	}
+                    if (isTrustedUrl) {
+                        webBrowserConfig.addTrustedUrls(url);
+                    } else {
+                        webBrowserConfig.removeTrustedUrl(url);
+                    }
+                });
+            }
+        }
+    }
 }
