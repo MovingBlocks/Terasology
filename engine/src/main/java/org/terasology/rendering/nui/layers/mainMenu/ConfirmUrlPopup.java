@@ -90,22 +90,22 @@ public class ConfirmUrlPopup extends CoreScreenLayer {
                     webBrowserConfig.removeTrustedHostName(hostName);
                 }
             });
+        }
 
-            UICheckbox saveUrl = find("saveUrl", UICheckbox.class);
+        UICheckbox saveUrl = find("saveUrl", UICheckbox.class);
 
-            if (saveUrl != null) {
-                saveUrl.setChecked(false);
+        if (saveUrl != null) {
+            saveUrl.setChecked(false);
 
-                saveUrl.subscribe(checkbox -> {
-                    boolean isTrustedUrl = saveUrl.isChecked();
+            saveUrl.subscribe(checkbox -> {
+                boolean isTrustedUrl = saveUrl.isChecked();
 
-                    if (isTrustedUrl) {
-                        webBrowserConfig.addTrustedUrls(url);
-                    } else {
-                        webBrowserConfig.removeTrustedUrl(url);
-                    }
-                });
-            }
+                if (isTrustedUrl) {
+                    webBrowserConfig.addTrustedUrls(url);
+                } else {
+                    webBrowserConfig.removeTrustedUrl(url);
+                }
+            });
         }
     }
 }

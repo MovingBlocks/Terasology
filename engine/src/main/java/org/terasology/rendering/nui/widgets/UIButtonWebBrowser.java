@@ -39,7 +39,7 @@ import java.net.URL;
  */
 public class UIButtonWebBrowser extends UIButton {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UIButtonWebBrowser.class);
+    private static final Logger logger = LoggerFactory.getLogger(UIButtonWebBrowser.class);
     private static final String NEW_LINE = System.lineSeparator();
 
     /**
@@ -70,7 +70,7 @@ public class UIButtonWebBrowser extends UIButton {
 
     private final ActivateEventListener openUrlInDefaultBrowser = button -> {
         if (!hasConfirmation()) {
-            LOGGER.debug("Don't have confirmation for opening web browser.");
+            logger.debug("Don't have confirmation for opening web browser.");
             showConfirmationPopup();
             return;
         }
@@ -79,7 +79,7 @@ public class UIButtonWebBrowser extends UIButton {
             try {
                 desktop.browse(new URI(this.url));
             } catch (IOException | URISyntaxException e) {
-                LOGGER.warn("Can't open {} in default browser of your system.", this.url);
+                logger.warn("Can't open {} in default browser of your system.", this.url);
                 showErrorPopup("Can't open " + this.url + " in default browser of your system.");
             }
         } else {
@@ -94,7 +94,7 @@ public class UIButtonWebBrowser extends UIButton {
                     runtime.exec(createCommand("xdg-open", this.url));
                 }
             } catch (IOException e) {
-                LOGGER.warn("Can't recognize your OS and open the url {}.", this.url);
+                logger.warn("Can't recognize your OS and open the url {}.", this.url);
                 showErrorPopup("Can't recognize your OS and open the url " + this.url);
             }
         }
@@ -121,22 +121,23 @@ public class UIButtonWebBrowser extends UIButton {
 
     private void showConfirmationPopup() {
         if (nuiManager == null || translationSystem == null) {
-            LOGGER.error("Can't show confirmation popup!");
+            logger.error("Can't show confirmation popup!");
             return;
         }
 
         ConfirmUrlPopup confirmUrlPopup = nuiManager.pushScreen(ConfirmUrlPopup.ASSET_URI, ConfirmUrlPopup.class);
         confirmUrlPopup.setMessage(translationSystem.translate("${engine:menu#button-web-browser-confirmation-title}"),
-                translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}") + NEW_LINE
-                        + this.url);
+                translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}")
+                        + NEW_LINE + this.url);
         confirmUrlPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::openBrowser);
-        confirmUrlPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {
-        });
+        confirmUrlPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {});
         try {
             if (webBrowserConfig != null) {
                 confirmUrlPopup.setCheckbox(webBrowserConfig, this.url);
             }
-        } catch (MalformedURLException e) {}
+        } catch (MalformedURLException e) {
+            logger.error(this.url + " is malformed", e);
+        }
     }
 
     private void showErrorPopup(final String message) {
@@ -168,7 +169,9 @@ public class UIButtonWebBrowser extends UIButton {
             try {
                 String hostname = new URL(url).getHost();
                 trustedHostName = webBrowserConfig.isHostNameTrusted(hostname);
-            } catch (MalformedURLException e) {}
+            } catch (MalformedURLException e) {
+                logger.error(url + " is malformed", e);
+            }
 
             if (!trustedHostName) {
                 trustedUrl = webBrowserConfig.isUrlTrusted(url);

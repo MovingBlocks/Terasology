@@ -63,6 +63,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
 /**
  * Shows detailed information about modules.
  */
@@ -74,8 +75,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String DEFAULT_GITHUB_MODULE_URL = "https://github.com/Terasology/";
-    private static final List INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay",
-            "BuilderSampleGameplay");
+    private static final List INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay", "BuilderSampleGameplay");
     @In
     private ModuleManager moduleManager;
     @In
@@ -163,8 +163,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
         if (!isScreenValid()) {
             final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
-                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
             popup.subscribeButton(e -> triggerBackAnimation());
             getManager().pushScreen(popup);
             // disable child widgets
@@ -193,7 +192,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     }
 
     private List<DependencyInfo> getSortedDependencies(final Module module) {
-        return module.getMetadata().getDependencies().stream().sorted(Comparator.comparing(DependencyInfo::getId))
+        return module.getMetadata()
+                .getDependencies().stream()
+                .sorted(Comparator.comparing(DependencyInfo::getId))
                 .collect(Collectors.toList());
     }
 
@@ -203,11 +204,12 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         if (module == null) {
             return;
         }
-        final String moduleOrigin = getOriginModuleUrl(
-                moduleManager.getRegistry().getLatestModuleVersion(module.getMetadata().getId()));
+        final String moduleOrigin = getOriginModuleUrl(moduleManager.getRegistry().getLatestModuleVersion(module.getMetadata().getId()));
         if (StringUtils.isNotBlank(moduleOrigin)) {
             openInBrowser.setEnabled(true);
-            openInBrowser.setUrl(moduleOrigin).setNuiManager(getManager()).setTranslationSystem(translationSystem);
+            openInBrowser.setUrl(moduleOrigin)
+                    .setNuiManager(getManager())
+                    .setTranslationSystem(translationSystem);
         }
     }
 
@@ -227,8 +229,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             @Override
             public String get() {
                 if (dependencyInfoBinding.get() != null) {
-                    return String.valueOf(moduleManager.getRegistry()
-                            .getLatestModuleVersion(dependencyInfoBinding.get().getId()).getVersion());
+                    return String.valueOf(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()).getVersion());
                 }
                 return "";
             }
@@ -293,13 +294,16 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             @Override
             public Vector2i getPreferredSize(DependencyInfo value, Canvas canvas) {
                 String text = getString(value);
-                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                return new Vector2i(
+                        canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });
         dependencies.subscribe(((widget, item) -> {
             if (item != null) {
-                modules.getList().stream().filter(m -> item.getId().equals(m.getId())).findFirst()
+                modules.getList().stream()
+                        .filter(m -> item.getId().equals(m.getId()))
+                        .findFirst()
                         .ifPresent(m -> modules.setSelection(m));
             }
         }));
@@ -348,9 +352,14 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     }
 
     private Set<Module> getAllModuleDependencies(final Collection<Module> modules) {
-        return modules.stream().filter(Objects::nonNull).map(Module::getMetadata).map(ModuleMetadata::getDependencies)
-                .flatMap(Collection::stream).filter(dep -> Objects.nonNull(dep.getId()))
-                .map(dep -> moduleManager.getRegistry().getLatestModuleVersion(dep.getId())).filter(Objects::nonNull)
+        return modules.stream()
+                .filter(Objects::nonNull)
+                .map(Module::getMetadata)
+                .map(ModuleMetadata::getDependencies)
+                .flatMap(Collection::stream)
+                .filter(dep -> Objects.nonNull(dep.getId()))
+                .map(dep -> moduleManager.getRegistry().getLatestModuleVersion(dep.getId()))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 
@@ -358,8 +367,11 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         if (modules != null) {
             final Set<Module> mods = new HashSet<>(modules);
             mods.addAll(getAllModuleDependencies(modules));
-            this.modules
-                    .setList(mods.stream().sorted(Comparator.comparing(Module::getId)).collect(Collectors.toList()));
+            this.modules.setList(
+                    mods.stream()
+                            .sorted(Comparator.comparing(Module::getId))
+                            .collect(Collectors.toList())
+            );
         }
     }
 
@@ -377,24 +389,35 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         }
         final ModuleMetadata metadata = module.getMetadata();
 
-        return translationSystem.translate("${engine:menu#game-details-module-id}") + ": " + metadata.getId() + '\n'
-                + translationSystem.translate("${engine:menu#game-details-module-display-name}") + ": "
-                + metadata.getDisplayName() + '\n'
-                + translationSystem.translate("${engine:menu#game-details-module-version}") + ": "
-                + metadata.getVersion() + '\n'
-                + translationSystem.translate("${engine:menu#game-details-module-description}") + ": "
-                + metadata.getDescription() + '\n'
-                + translationSystem.translate("${engine:menu#game-details-module-permissions}") + ": "
-                + String.join(", ", metadata.getRequiredPermissions()) + '\n'
-                + translationSystem.translate("${engine:menu#game-details-module-github}") + ": "
-                + getOriginModuleUrl(module) + '\n'
-                + translationSystem.translate("${engine:menu#game-details-module-author}") + ": "
-                + ExtraDataModuleExtension.getAuthor(module) + '\n'
-                + translationSystem.translate("${engine:menu#game-details-module-size}") + ": " + getRemoteSize(module)
-                + '\n' + translationSystem.translate("${engine:menu#game-details-module-last-update-date}") + ": "
-                + getLastUpdateDate(module) + '\n'
-                + translationSystem.translate("${engine:menu#game-details-module-categories}") + ": "
-                + getModuleTags(module);
+        return translationSystem.translate("${engine:menu#game-details-module-id}") + ": " +
+                metadata.getId() +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-display-name}") + ": " +
+                metadata.getDisplayName() +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-version}") + ": " +
+                metadata.getVersion() +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-description}") + ": " +
+                metadata.getDescription() +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-permissions}") + ": " +
+                String.join(", ", metadata.getRequiredPermissions()) +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-github}") + ": " +
+                getOriginModuleUrl(module) +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-author}") + ": " +
+                ExtraDataModuleExtension.getAuthor(module) +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-size}") + ": " +
+                getRemoteSize(module) +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-last-update-date}") + ": " +
+                getLastUpdateDate(module) +
+                '\n' +
+                translationSystem.translate("${engine:menu#game-details-module-categories}") + ": " +
+                getModuleTags(module);
     }
 
     private String getOriginModuleUrl(Module module) {
@@ -407,31 +430,43 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     private String getOnlineVersion(final DependencyInfo dependencyInfo) {
         return moduleManager.getInstallManager().getRemoteRegistry().stream()
-                .filter(module -> module.getId().equals(dependencyInfo.getId())).findFirst().map(Module::getVersion)
-                .map(String::valueOf).orElse("");
+                .filter(module -> module.getId().equals(dependencyInfo.getId()))
+                .findFirst()
+                .map(Module::getVersion)
+                .map(String::valueOf)
+                .orElse("");
     }
 
     private String getRemoteSize(final Module module) {
         return moduleManager.getInstallManager().getRemoteRegistry().stream()
-                .filter(m -> m.getId().equals(module.getId())).findFirst().map(Module::getMetadata)
-                .map(RemoteModuleExtension::getArtifactSize).map(m -> m + " bytes").orElse("");
+                .filter(m -> m.getId().equals(module.getId()))
+                .findFirst()
+                .map(Module::getMetadata)
+                .map(RemoteModuleExtension::getArtifactSize)
+                .map(m -> m + " bytes")
+                .orElse("");
     }
 
     private String getLastUpdateDate(final Module module) {
         return moduleManager.getInstallManager().getRemoteRegistry().stream()
-                .filter(m -> m.getId().equals(module.getId())).findFirst().map(Module::getMetadata)
-                .map(RemoteModuleExtension::getLastUpdated).map(dateFormat::format).orElse("");
+                .filter(m -> m.getId().equals(module.getId()))
+                .findFirst()
+                .map(Module::getMetadata)
+                .map(RemoteModuleExtension::getLastUpdated)
+                .map(dateFormat::format)
+                .orElse("");
     }
 
     private String getModuleTags(final Module module) {
-        return StandardModuleExtension.booleanPropertySet().stream().filter(ext -> ext.isProvidedBy(module))
-                .map(StandardModuleExtension::getKey).collect(Collectors.joining(", "));
+        return StandardModuleExtension.booleanPropertySet().stream()
+                .filter(ext -> ext.isProvidedBy(module))
+                .map(StandardModuleExtension::getKey)
+                .collect(Collectors.joining(", "));
     }
 
     private boolean isScreenValid() {
-        if (Stream
-                .of(moduleName, installedVersion, minSupportedVersion, maxSupportedVersion, close, onlineVersion,
-                        required, dependencies, modules, openInBrowser, updateModuleButton, description)
+        if (Stream.of(moduleName, installedVersion, minSupportedVersion, maxSupportedVersion, close,
+                onlineVersion, required, dependencies, modules, openInBrowser, updateModuleButton, description)
                 .anyMatch(Objects::isNull)) {
             logger.error("Can't initialize screen correctly. At least one widget was missed!");
             return false;

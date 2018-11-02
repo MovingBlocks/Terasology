@@ -52,7 +52,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "Always accept this url",
+                                    "text": "Always accept this URL",
                                     "id": "alwaysAccept"
                                 },
                             ]
