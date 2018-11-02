@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.stream.Stream;
 
 /**
  * This class wrap common file operations so they're only allowed to happen
@@ -47,14 +48,14 @@ public class SandboxFileManager {
      * Read the file that matches the passed filename.
      *
      * @param filename
-     * @return An array of bytes.
+     * @return String stream.
      */
-    public byte[] readFile(String filename) {
+    public Stream<String> readFile(String filename) {
         Path sandboxPath = pathManager.getSandboxPath(filename);
 
-        return AccessController.doPrivileged((PrivilegedAction<byte[]>) () -> {
+        return AccessController.doPrivileged((PrivilegedAction<Stream<String>>) () -> {
             try {
-                return Files.readAllBytes(sandboxPath);
+                return Files.lines(sandboxPath);
             } catch (IOException e) {
                 logger.error("Could not read the file: " + filename, e);
             }
