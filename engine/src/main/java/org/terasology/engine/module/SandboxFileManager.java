@@ -20,12 +20,14 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.sandbox.API;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 /**
  * This class wrap common file operations so they're only allowed to happen
@@ -45,17 +47,23 @@ public class SandboxFileManager {
     }
 
     /**
-     * Read the file that matches the passed filename.
+     * Reads the file that matches the passed filename.
      *
      * @param filename
-     * @return String stream.
+     * @param consumer Consumer to read the file.
      */
-    public Stream<String> readFile(String filename) {
-        Path sandboxPath = pathManager.getSandboxPath(filename);
+    public void readFile(String filename, Consumer<ModuleInputStream> consumer) {
+        String sandboxPath = pathManager.getSandboxPath(filename).toString();
 
-        return AccessController.doPrivileged((PrivilegedAction<Stream<String>>) () -> {
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
             try {
-                return Files.lines(sandboxPath);
+                InputStream inputStream = new FileInputStream(sandboxPath);
+                ModuleInputStream moduleInputStream = new ModuleInputStream(inputStream);
+
+                // consumer to read the file, if it exists
+                consumer.accept(moduleInputStream);
+
+                inputStream.close();
             } catch (IOException e) {
                 logger.error("Could not read the file: " + filename, e);
             }
