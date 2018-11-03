@@ -124,6 +124,11 @@ public class InputSystem extends BaseComponentSystem {
         bindsManager.registerBinds();
     }
 
+    /**
+     * Updates/processes user input across all of the players input devices.
+     *
+     * @param delta The length of the current frame.
+     */
     public void update(float delta) {
         updateInputEntities();
         processMouseInput(delta);
@@ -133,14 +138,31 @@ public class InputSystem extends BaseComponentSystem {
         processBindAxis(delta);
     }
 
+    /**
+     * Returns true if the game window currently has display focus, therefore mouse input is being captured.
+     *
+     * @return true if display currently has focus, else false.
+     */
     public boolean isCapturingMouse() {
         return display.hasFocus();
     }
 
+    /**
+     * Updates the client and input entities of the local player, to be used in input events against the local player.
+     */
     private void updateInputEntities() {
         inputEntities = new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
     }
 
+    /**
+     * Processes the current input state of the mouse, sends input events and updates bind buttons.
+     *
+     * Mouse position actions are handled here, while mouse button and mouse wheel actions are handled at
+     * {@link #processMouseButtonInput(float, MouseAction)} and {@link #processMouseWheelInput(float, MouseAction)}
+     * accordingly.
+     *
+     * @param delta The length of the current frame.
+     */
     private void processMouseInput(float delta) {
         if (!isCapturingMouse()) {
             return;
@@ -177,6 +199,12 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Processes input actions by the mouse buttons, sends input events and updates bind buttons accordingly.
+     *
+     * @param delta The length of the current frame.
+     * @param action The input action to be processed.
+     */
     private void processMouseButtonInput(float delta, MouseAction action) {
         int id = action.getInput().getId();
         if (id != MouseInput.NONE.getId()) {
@@ -189,6 +217,12 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Processes input actions by the mouse wheel, sends input events and updates bind buttons accordingly.
+     *
+     * @param delta The length of the current frame.
+     * @param action The input action to be processed.
+     */
     private void processMouseWheelInput(float delta, MouseAction action) {
         int dir = action.getInput().getId();
         if (dir != 0 && action.getTurns() != 0) {
@@ -203,6 +237,15 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Processes the current input state of any connected controllers, and updates bind buttons.
+     *
+     * Controller button and axis events are both handled in
+     * {@link #processControllerButtonInput(float, ControllerAction, boolean, Input)} and
+     * {@link #processControllerAxisInput(ControllerAction, Input)} accordingly.
+     *
+     * @param delta The length of the current frame.
+     */
     private void processControllerInput(float delta) {
         if (!isCapturingMouse()) {
             return;
@@ -220,6 +263,14 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Processes input actions by controller buttons, and updates bind buttons accordingly.
+     *
+     * @param delta The length of the current frame.
+     * @param action The input action to be processed.
+     * @param consumed True if sent input event has been processed/consumed by an event receiver.
+     * @param input The specific input of the controller button.
+     */
     private void processControllerButtonInput(float delta, ControllerAction action, boolean consumed, Input input) {
         BindableButton bind = bindsManager.getControllerBinds().get(input);
         if (bind != null) {
@@ -228,6 +279,12 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Processes input actions by controller axis, and updates bind axis accordingly.
+     *
+     * @param action The input action to be processed.
+     * @param input The specific input of the controller axis.
+     */
     private void processControllerAxisInput(ControllerAction action, Input input) {
         BindableRealAxis axis = bindsManager.getControllerAxisBinds().get(input);
         if (axis != null) {
@@ -240,6 +297,15 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Updates the bind state of a button bind based on provided input information.
+     *
+     * @param bind The button bind to be updated.
+     * @param input The specific input to be binded.
+     * @param pressed True if the button in the input is pressed, false if not.
+     * @param delta The length of the current frame.
+     * @param consumed True if the input event has been processed/consumed by an event receiver.
+     */
     private void updateBindState(BindableButton bind, Input input, boolean pressed, float delta, boolean consumed) {
         bind.updateBindState(
                 input,
@@ -254,8 +320,11 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     /**
-     * Simulated key strokes: To simulate input from a keyboard, we simply have to extract the Input associated to the action
-     * and this function adds it to the keyboard's input queue.
+     * Simulates a single key stroke from the keyboard.
+     *
+     * Simulated key strokes: To simulate input from a keyboard, we simply have to extract the Input associated to the
+     * action and this function adds it to the keyboard's input queue.
+     *
      * @param key The key to be simulated.
      */
     public void simulateSingleKeyStroke(Input key) {
@@ -268,18 +337,36 @@ public class InputSystem extends BaseComponentSystem {
         simulatedKeys.add(action);
     }
 
+    /**
+     * Simulates a repeated key stroke from the keyboard.
+     *
+     * Simulated key strokes: To simulate input from a keyboard, we simply have to extract the Input associated to the
+     * action and this function adds it to the keyboard's input queue.
+     *
+     * @param key The key to be simulated.
+     */
     public void simulateRepeatedKeyStroke(Input key) {
         char keyChar = key.getDisplayName().charAt(0);
         KeyboardAction action = new KeyboardAction(key, ButtonState.REPEAT, keyChar);
         simulatedKeys.add(action);
     }
 
+    /**
+     * Cancels the simulation of key strokes.
+     *
+     * @param key The key to cancel the simulation of.
+     */
     public void cancelSimulatedKeyStroke(Input key) {
         char keyChar = key.getDisplayName().charAt(0);
         KeyboardAction action = new KeyboardAction(key, ButtonState.UP, keyChar);
         simulatedKeys.add(action);
     }
 
+    /**
+     * Processes input actions by keyboard buttons, sends key events and updates bind buttons accordingly.
+     *
+     * @param delta The length of the current frame.
+     */
     private void processKeyboardInput(float delta) {
         Queue<KeyboardAction> keyQueue = keyboard.getInputQueue();
         keyQueue.addAll(simulatedKeys);
@@ -296,6 +383,11 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Processes/Updates all bind axis.
+     *
+     * @param delta The length of the current frame.
+     */
     private void processBindAxis(float delta) {
         for (AbstractBindableAxis axis : bindsManager.getAxisBinds()) {
             axis.update(inputEntities, delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
@@ -303,6 +395,11 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Processes/Updates all bind buttons.
+     *
+     * @param delta The length of the current frame.
+     */
     private void processBindRepeats(float delta) {
         for (BindableButton button : bindsManager.getButtonBinds()) {
             button.update(inputEntities,
@@ -315,6 +412,15 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Creates and sends an input event based on a provided keyboard input.
+     *
+     * @param key The specific input to be sent.
+     * @param keyChar The character of the input key.
+     * @param state The state of the input key.
+     * @param delta The length of the current frame.
+     * @return true if the event has been consumed by an event listener, false otherwise.
+     */
     private boolean sendKeyEvent(Input key, char keyChar, ButtonState state, float delta) {
         KeyEvent event;
         switch (state) {
@@ -336,6 +442,15 @@ public class InputSystem extends BaseComponentSystem {
         return consumed;
     }
 
+    /**
+     * Creates and sends an input event based on a provided mouse action.
+     *
+     * @param button The specific input to be sent.
+     * @param buttonDown True if the button is pressed, false if not.
+     * @param position The position of the mouse.
+     * @param delta The length of the current frame.
+     * @return True if the event has been consumed by an event listener, false otherwise.
+     */
     private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i position, float delta) {
         MouseButtonEvent event;
         switch (button) {
@@ -356,11 +471,25 @@ public class InputSystem extends BaseComponentSystem {
         return consumed;
     }
 
+    /**
+     * Creates and sends an input event based on a provided mouse wheel action.
+     *
+     * @param pos The position of the mouse.
+     * @param wheelTurns The number of times the scroll wheel has turned.
+     * @param delta The length of the current frame.
+     * @return True if the event has been consumed by an event listener, false otherwise.
+     */
     private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
         MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(pos, wheelTurns, delta);
         return send(mouseWheelEvent);
     }
 
+    /**
+     * Sends a provided input event to the local player's input entities.
+     *
+     * @param event The input event to be sent.
+     * @return True if the event has been consumed by an event listener, false otherwise.
+     */
     private boolean send(InputEvent event) {
         setupTarget(event);
         for (EntityRef entity : inputEntities) {
@@ -372,6 +501,11 @@ public class InputSystem extends BaseComponentSystem {
         return event.isConsumed();
     }
 
+    /**
+     * Sets up the target info for a specified input event.
+     *
+     * @param event The specified input event.
+     */
     private void setupTarget(InputEvent event) {
         if (targetSystem.isTargetAvailable()) {
             event.setTargetInfo(targetSystem.getTarget(), targetSystem.getTargetBlockPosition(), targetSystem.getHitPosition(), targetSystem.getHitNormal());
@@ -388,9 +522,9 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     /**
-     * API-exposed caller to {@link BindsSubsystem#getInputsForBindButton(SimpleUri)}
-     * TODO: Restored for API reasons, may be duplicating code elsewhere. Should be reviewed
-     * @param bindId the ID
+     * API-exposed caller to {@link BindsSubsystem#getInputsForBindButton(SimpleUri)}.
+     * TODO: Restored for API reasons, may be duplicating code elsewhere. Should be reviewed.
+     * @param bindId the ID.
      * @return a list of keyboard/mouse inputs that trigger the binding.
      */
     public List<Input> getInputsForBindButton(SimpleUri bindId) {
