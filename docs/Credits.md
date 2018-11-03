@@ -245,7 +245,9 @@ Contributors
  [andrasveto](https://github.com/andrasveto),
  [JustPRV](https://github.com/JustPRV),
  [Edvinas01](https://github.com/Edvinas01),
- [mwvdev](https://github.com/mwvdev)
+ [mwvdev](https://github.com/mwvdev),
+ [nschnitzer](https://github.com/nschnitzer),
+ [AndyTechGuy](https://github.com/AndyTechGuy)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
