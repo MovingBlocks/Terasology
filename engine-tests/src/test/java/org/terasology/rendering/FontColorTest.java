@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class FontColorTest {
-	public static class IsValid {
+	public static class isValid {
 		
 		@Test
 		public void testResetColor() {
@@ -36,6 +36,6 @@ public class FontColorTest {
 		public void testInvalidColor() {
 			char invalidColor = 0xA10F;
 			assertFalse(FontColor.isValid(invalidColor));
-		}
+		}		
 	}
 }
