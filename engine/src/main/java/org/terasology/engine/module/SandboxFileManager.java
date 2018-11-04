@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 /**
  * This class wrap common file operations so they're only allowed to happen
  * within Terasology/sandbox directory.
- *
+ * <p>
  * It gives modules the ability to read and write to the file system in a safe way.
  */
 @API
@@ -48,22 +48,40 @@ public class SandboxFileManager {
 
     /**
      * Reads the file that matches the passed filename.
+     * <p>
+     * How to use:
+     * <ul>
+     * <li>First of all, we need to create a file read consumer, for example:
+     * <pre>{@code
+     * Consumer<ModuleInputStream> consumer = inputStream -> {
+     *      try {
+     *          int value = inputStream.read();
      *
-     * @param filename
+     *          while (value != -1) {
+     *              doSomething(value);
+     *              value = inputStream.read();
+     *          }
+     *      } catch (IOException e) {
+     *          logger.error("Cannot read file.")
+     *      }
+     * };
+     * }</pre></li>
+     * <li>Call {@code readFile} passing in the filename and the consumer as parameter.</li>
+     * <li>When the execution is completed the {@code InputStream} is automatically closed.</li>
+     * </ul>
+     *
+     * @param filename Filename.
      * @param consumer Consumer to read the file.
      */
     public void readFile(String filename, Consumer<ModuleInputStream> consumer) {
         String sandboxPath = pathManager.getSandboxPath(filename).toString();
 
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-            try {
-                InputStream inputStream = new FileInputStream(sandboxPath);
+            try (InputStream inputStream = new FileInputStream(sandboxPath)) {
                 ModuleInputStream moduleInputStream = new ModuleInputStream(inputStream);
 
                 // consumer to read the file, if it exists
                 consumer.accept(moduleInputStream);
-
-                inputStream.close();
             } catch (IOException e) {
                 logger.error("Could not read the file: " + filename, e);
             }
@@ -75,12 +93,12 @@ public class SandboxFileManager {
     /**
      * Write a new file using the filename and data passed as parameter.
      *
-     * @param filename
+     * @param filename Filename.
      * @param data The file's content.
      */
     public void writeFile(String filename, byte[] data) {
         Path sandboxPath = pathManager.getSandboxPath(filename);
-        
+
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
             try {
                 Files.write(sandboxPath, data);
@@ -95,7 +113,7 @@ public class SandboxFileManager {
     /**
      * Delete the file that matches the passed filename.
      *
-     * @param filename
+     * @param filename Filename.
      */
     public void deleteFile(String filename) {
         Path sandboxPath = pathManager.getSandboxPath(filename);
