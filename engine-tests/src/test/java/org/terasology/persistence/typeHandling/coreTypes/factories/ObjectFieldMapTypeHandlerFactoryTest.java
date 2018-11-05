@@ -59,10 +59,10 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
         // Verify that the Integer and List<Integer> TypeHandlers were loaded from the TypeSerializationLibrary
         verify(typeSerializationLibrary).getTypeHandler(
                 eq(TypeInfo.of(Integer.class).getType()),
-                any());
+                (ClassLoader) any());
 
         verify(typeSerializationLibrary).getTypeHandler(
                 eq(new TypeInfo<List<Integer>>() {}.getType()),
-                any());
+                (ClassLoader) any());
     }
 }

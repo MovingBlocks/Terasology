@@ -69,6 +69,7 @@ import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -214,11 +215,24 @@ public class TypeSerializationLibrary {
     }
 
     @SuppressWarnings({"unchecked"})
+    public Optional<TypeHandler<?>> getTypeHandler(Type type, Class<?>...  classes) {
+        return getTypeHandler(type, Arrays.stream(classes)
+                .map(Class::getClassLoader)
+                .toArray(ClassLoader[]::new));
+    }
+
+    @SuppressWarnings({"unchecked"})
     public Optional<TypeHandler<?>> getTypeHandler(Type type, ClassLoader... contextClassLoaders) {
         TypeInfo typeInfo = TypeInfo.of(type);
         return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo, contextClassLoaders);
     }
 
+
+    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass, Class<?>... classes) {
+        return getTypeHandler(typeClass, Arrays.stream(classes)
+                .map(Class::getClassLoader)
+                .toArray(ClassLoader[]::new));
+    }
 
     public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass, ClassLoader... contextClassLoaders) {
         return getTypeHandler(TypeInfo.of(typeClass), contextClassLoaders);
@@ -250,7 +264,7 @@ public class TypeSerializationLibrary {
     private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
         Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
         for (FieldMetadata<?, ?> field : type.getFields()) {
-            Optional<TypeHandler<?>> handler = getTypeHandler(field.getField().getGenericType(), getClass().getClassLoader());
+            Optional<TypeHandler<?>> handler = getTypeHandler(field.getField().getGenericType(), getClass());
 
             if (handler.isPresent()) {
                 handlerMap.put(field, handler.get());

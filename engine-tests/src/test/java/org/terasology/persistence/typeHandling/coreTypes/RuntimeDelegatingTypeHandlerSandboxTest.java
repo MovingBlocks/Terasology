@@ -115,13 +115,13 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
         when(apiClassHandlerMock.deserialize(any()))
                 .thenReturn(Optional.of(new PersistedInteger(0)));
 
-        when(typeSerializationLibrary.getTypeHandler(eq(Object.class), any()))
+        when(typeSerializationLibrary.getTypeHandler(eq(Object.class), (ClassLoader) any()))
                 .thenReturn(Optional.of(baseTypeHandlerMock));
 
-        when(typeSerializationLibrary.getTypeHandler(eq(moduleClass), any()))
+        when(typeSerializationLibrary.getTypeHandler(eq(moduleClass), (ClassLoader) any()))
                 .thenReturn(Optional.of(moduleClassHandlerMock));
 
-        when(typeSerializationLibrary.getTypeHandler(eq(apiClass), any()))
+        when(typeSerializationLibrary.getTypeHandler(eq(apiClass), (ClassLoader) any()))
                 .thenReturn(Optional.of(apiClassHandlerMock));
     }
 
@@ -172,7 +172,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
     @Test
     public void testAccessApiClassFromModule() {
         TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(typeSerializationLibrary,
-                moduleClass.getClassLoader());
+                moduleClass);
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(Object.class), context);
 
@@ -194,7 +194,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
     @Test
     public void testCannotAccessNonApiClassFromModule() {
         TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(typeSerializationLibrary,
-                moduleClass.getClassLoader());
+                moduleClass);
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(Object.class), context);
 
