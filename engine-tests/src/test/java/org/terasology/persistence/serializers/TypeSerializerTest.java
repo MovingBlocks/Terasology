@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeHandling;
+package org.terasology.persistence.serializers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedData;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
-import org.terasology.protobuf.EntityData;
+import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.rendering.nui.Color;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -40,9 +36,8 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class TypeHandlingIntegrationTest {
-    private static final String INSTANCE_JSON = "{\"data\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"@type\":\"org.terasology.persistence.typeHandling.TypeHandlingIntegrationTest$Dog\",\"@value\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"@type\":\"org.terasology.persistence.typeHandling.TypeHandlingIntegrationTest$Cheetah\",\"@value\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
-
+@RunWith(Enclosed.class)
+public class TypeSerializerTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
 
     static {
@@ -53,58 +48,52 @@ public class TypeHandlingIntegrationTest {
         INSTANCE.animals.add(new Cheetah(Color.MAGENTA));
     }
 
-    private ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-    private final TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, new CopyStrategyLibrary(reflectFactory));
+    public static class Json {
+        private static final String INSTANCE_JSON = "{\"data\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"@type\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"@value\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"@type\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"@value\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
 
-    @Test
-    public void testJsonSerialize() {
+        private ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
+        private final TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, new CopyStrategyLibrary(reflectFactory));
 
-        TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, getClass().getClassLoader()).get();
+        @Test
+        public void testJsonSerialize() {
+            GsonSerializer gsonSerializer = new GsonSerializer();
 
-        GsonPersistedData persistedData = (GsonPersistedData) typeHandler.serialize(INSTANCE, new GsonPersistedDataSerializer());
+            TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, TypeSerializerTest.class).get();
 
-        Gson gson = new Gson();
-
-        assertEquals(INSTANCE_JSON, gson.toJson(persistedData.getElement()));
-    }
-
-    @Test
-    public void testJsonDeserialize() {
-        TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, getClass().getClassLoader()).get();
-
-        Gson gson = new Gson();
-        JsonElement jsonElement = gson.fromJson(INSTANCE_JSON, JsonElement.class);
-
-        PersistedData persistedData = new GsonPersistedData(jsonElement);
-
-        SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData).get();
-
-        assertEquals(INSTANCE, deserializedInstance);
-    }
-
-    @Test
-    public void testProtobufSerializeDeserialize() throws IOException {
-        TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, getClass().getClassLoader()).get();
-
-        ProtobufPersistedData persistedData = (ProtobufPersistedData) typeHandler.serialize(INSTANCE, new ProtobufPersistedDataSerializer());
-
-        byte[] bytes;
-
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            persistedData.getValue().writeDelimitedTo(out);
-            bytes = out.toByteArray();
+            assertEquals(INSTANCE_JSON, gsonSerializer.toJson(INSTANCE, typeHandler));
         }
 
-        EntityData.Value value;
+        @Test
+        public void testDeserialize() {
+            GsonSerializer gsonSerializer = new GsonSerializer();
+            PersistedData persistedData = gsonSerializer.persistedDatafromJson(INSTANCE_JSON);
 
-        try (ByteArrayInputStream in = new ByteArrayInputStream(bytes)) {
-            value = EntityData.Value.parseDelimitedFrom(in);
+            TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, getClass().getClassLoader()).get();
+
+            SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData).get();
+
+            assertEquals(INSTANCE, deserializedInstance);
         }
+    }
 
-        persistedData = new ProtobufPersistedData(value);
-        SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData).get();
+    public static class Protobuf {
+        private ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
+        private final TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, new CopyStrategyLibrary(reflectFactory));
 
-        assertEquals(INSTANCE, deserializedInstance);
+        @Test
+        public void testSerializeDeserialize() throws IOException {
+            TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, getClass().getClassLoader()).get();
+
+            ProtobufSerializer protobufSerializer = new ProtobufSerializer();
+
+            byte[] bytes = protobufSerializer.toBytes(INSTANCE, typeHandler);
+
+            PersistedData persistedData = protobufSerializer.persistedDatafromBytes(bytes);
+
+            SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData).get();
+
+            assertEquals(INSTANCE, deserializedInstance);
+        }
     }
 
     private static class SomeClass<T> {

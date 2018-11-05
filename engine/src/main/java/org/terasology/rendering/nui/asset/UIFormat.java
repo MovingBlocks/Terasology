@@ -97,6 +97,8 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         TypeSerializationLibrary library = new TypeSerializationLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
         library.addTypeHandler(UISkin.class, new AssetTypeHandler<>(UISkin.class));
 
+        // TODO: Rewrite to use TypeSerializationLibrary
+
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new GsonTypeSerializationLibraryAdapterFactory(library))
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
