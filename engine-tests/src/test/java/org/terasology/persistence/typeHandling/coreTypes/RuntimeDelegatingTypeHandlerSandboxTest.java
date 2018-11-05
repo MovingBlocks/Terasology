@@ -171,6 +171,15 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
 
     @Test
     public void testAccessApiClassFromModule() {
+        testCanAccessClassFromModule(apiClass, apiClassHandlerMock);
+    }
+
+    @Test
+    public void testAccessModuleClassFromModule() {
+        testCanAccessClassFromModule(moduleClass, moduleClassHandlerMock);
+    }
+
+    private void testCanAccessClassFromModule(Class<?> testClass, TypeHandler testClassHandlerMock) {
         TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(typeSerializationLibrary,
                 moduleClass);
 
@@ -179,7 +188,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
         PersistedData persistedModuleClassInstance = new PersistedMap(
                 ImmutableMap.of(
                         RuntimeDelegatingTypeHandler.TYPE_FIELD,
-                        new PersistedString(apiClass.getName()),
+                        new PersistedString(testClass.getName()),
                         RuntimeDelegatingTypeHandler.VALUE_FIELD,
                         new PersistedMap(ImmutableMap.of())
                 )
@@ -188,7 +197,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
         assertTrue(typeHandler.deserialize(persistedModuleClassInstance).isPresent());
 
         verify(baseTypeHandlerMock, times(0)).deserialize(any());
-        verify(apiClassHandlerMock, times(1)).deserialize(any());
+        verify(testClassHandlerMock, times(1)).deserialize(any());
     }
 
     @Test
