@@ -214,7 +214,7 @@ public abstract class Camera {
      * @param direction
      */
     public void setOrientation(Quaternionf direction) {
-        viewingDirection =new Vector3f(direction.x,direction.y,direction.z);// direction.getAxis();
+        viewingDirection = new Vector3f(direction.x,direction.y,direction.z);// direction.getAxis();
         viewingAngle = direction.angle();
     }
 

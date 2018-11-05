@@ -118,17 +118,17 @@ public final class MatrixUtils {
         Matrix4f m = new Matrix4f();
 
         Vector3f f = new Vector3f();
-        f.sub(center, eye);
+        f.set(center).sub( eye);
 
         f.normalize();
         up.normalize();
 
         Vector3f s = new Vector3f();
-        s.cross(f, up);
+        s.set(up).cross(f);
         s.normalize();
 
         Vector3f u = new Vector3f();
-        u.cross(s, f);
+        u.set(f).cross(s);
         u.normalize();
 
         m.m00(s.x);
@@ -218,13 +218,13 @@ public final class MatrixUtils {
 
     public static Matrix4f calcViewProjectionMatrix(Matrix4f vm, Matrix4f p) {
         Matrix4f result = new Matrix4f();
-        result.mul(p, vm);
+        result.set(p).mul(vm);
         return result;
     }
 
     public static Matrix4f calcModelViewMatrix(Matrix4f m, Matrix4f vm) {
         Matrix4f result = new Matrix4f();
-        result.mul(m, vm);
+        result.set(m).mul(vm);
         return result;
     }
 

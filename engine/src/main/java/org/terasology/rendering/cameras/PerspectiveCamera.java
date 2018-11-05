@@ -143,12 +143,13 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
             return;
         }
 
-        viewingDirection.cross(up,tempRightVector);
+        tempRightVector.set(viewingDirection).cross(up);
         tempRightVector.mul(bobbingRotationOffsetFactor);
 
         projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar());
 
-        viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+
+        viewMatrix =  MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
                 viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
@@ -165,8 +166,8 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
         viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
 
-        projectionMatrix.set(inverseProjectionMatrix).invert();
-        viewProjectionMatrix.set(inverseViewProjectionMatrix).invert();
+        inverseProjectionMatrix.set(projectionMatrix).invert();
+        inverseViewProjectionMatrix.set(viewProjectionMatrix).invert();
 
         // Used for dirty checks
         cachedPosition.set(getPosition());
@@ -194,7 +195,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         float aspectRatio = (float) Display.getWidth() / Display.getHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
-        return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
+        return new Matrix4f().perspective(fovY, aspectRatio, zNear, zFar).transpose();//MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {

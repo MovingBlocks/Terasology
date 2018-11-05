@@ -204,7 +204,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     Transform toWorldSpace = new Transform(worldPos, worldRot, worldScale);
 
                     Vector3f offsetFromCamera = new Vector3f();
-                    offsetFromCamera.sub(worldPos, cameraPosition);
+                    offsetFromCamera.set(worldPos).sub(cameraPosition);
                     Matrix4f matrixCameraSpace = new Matrix4f()
                             .rotate(worldRot)
                             .translate(offsetFromCamera)

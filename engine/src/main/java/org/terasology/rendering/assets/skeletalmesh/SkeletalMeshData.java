@@ -166,7 +166,7 @@ public class SkeletalMeshData implements AssetData {
             v2.sub(vertices.get(indices.get(i * 3 + 2)), baseVert);
             v1.normalize();
             v2.normalize();
-            norm.cross(v1, v2);
+            norm.set(v2).cross(v1);
             normals.get(indices.get(i * 3)).add(norm);
             normals.get(indices.get(i * 3 + 1)).add(norm);
             normals.get(indices.get(i * 3 + 2)).add(norm);

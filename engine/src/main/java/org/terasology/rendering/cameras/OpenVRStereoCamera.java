@@ -278,10 +278,10 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
 
-        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+        viewMatrixReflected.set(viewMatrix).mul(reflectionMatrix);
 
         reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+        normViewMatrixReflected.set(normViewMatrix).mul(reflectionMatrix);
 
         viewTranslationLeftEye.identity();
         viewTranslationLeftEye.setTranslation(new Vector3f(halfIPD, 0.0f, 0.0f));
@@ -290,8 +290,8 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         viewTranslationRightEye.setTranslation(new Vector3f(-halfIPD, 0.0f, 0.0f));
 
 
-        viewMatrixReflectedLeftEye.mul(viewMatrixReflected, viewTranslationLeftEye);
-        viewMatrixReflectedRightEye.mul(viewMatrixReflected, viewTranslationRightEye);
+        viewMatrixReflectedLeftEye.set(viewMatrixReflected).mul(viewTranslationLeftEye);
+        viewMatrixReflectedRightEye.set(viewMatrixReflected).mul(viewTranslationRightEye);
 
         viewProjectionMatrixLeftEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);

@@ -252,7 +252,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
 
             Vector3f worldPositionCameraSpace = new Vector3f();
-            worldPositionCameraSpace.sub(worldPos, cameraPosition);
+            worldPositionCameraSpace.set(worldPos).sub(cameraPosition);
 
             worldPos.y -= skeletalMesh.heightOffset;
 
@@ -324,7 +324,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 location.getWorldPosition(worldPos);
 
                 Vector3f worldPositionCameraSpace = new Vector3f();
-                worldPositionCameraSpace.sub(worldPos, cameraPosition);
+                worldPositionCameraSpace.set(worldPos).sub(cameraPosition);
 
                 float worldScale = location.getWorldScale();
                 Matrix4f matrixCameraSpace = new Matrix4f()

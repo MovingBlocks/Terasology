@@ -108,7 +108,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         Vector3f worldPos = new Vector3f();
 
         Vector3f worldPositionCameraSpace = new Vector3f();
-        worldPositionCameraSpace.sub(worldPos, cameraPosition);
+        worldPositionCameraSpace.set(worldPos).sub(cameraPosition);
 
         Matrix4f matrixCameraSpace = new Matrix4f()
                 .rotate(new Quaternionf(0, 0, 0, 1))

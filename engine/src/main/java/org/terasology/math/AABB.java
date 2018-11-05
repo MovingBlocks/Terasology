@@ -198,7 +198,7 @@ public final class AABB {
     public AABB transform(Transform transform, float margin) {
         // Adaptation of method AabbUtil2.transformAabb from the TeraBullet library.
         Vector3f localHalfExtents = new Vector3f();
-        localHalfExtents.sub(max, min);
+        localHalfExtents.set(max).sub(min);
         localHalfExtents.mul(HALVING_FACTOR);
 
         localHalfExtents.x += margin;
@@ -232,7 +232,7 @@ public final class AABB {
         extent.z = absBasis.getRow(2,new Vector3f()).dot(localHalfExtents);
 
         Vector3f worldMin = new Vector3f();
-        worldMin.sub(center, extent);
+        worldMin.set(center).sub(extent);
 
         Vector3f worldMax = new Vector3f(center).add(extent);
 
