@@ -239,6 +239,13 @@ public class TypeSerializationLibrary {
     }
 
     @SuppressWarnings("unchecked")
+    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type, Class<?>... contextClasses) {
+        return getTypeHandler(type, Arrays.stream(contextClasses)
+                .map(Class::getClassLoader)
+                .toArray(ClassLoader[]::new));
+    }
+
+    @SuppressWarnings("unchecked")
     public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type, ClassLoader... contextClassLoaders) {
         TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(this, contextClassLoaders);
 
