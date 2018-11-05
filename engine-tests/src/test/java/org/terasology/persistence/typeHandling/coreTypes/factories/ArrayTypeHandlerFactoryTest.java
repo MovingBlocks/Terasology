@@ -49,7 +49,7 @@ public class ArrayTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof ArrayTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(eq(TypeInfo.of(int.class).getType()), any());
+        verify(typeSerializationLibrary).getTypeHandler(eq(TypeInfo.of(int.class).getType()), (ClassLoader) any());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ArrayTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof ArrayTypeHandler);
 
         // Verify that the List<Integer> TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(eq(new TypeInfo<List<Integer>>() {}.getType()), any());
+        verify(typeSerializationLibrary).getTypeHandler(eq(new TypeInfo<List<Integer>>() {}.getType()), (ClassLoader) any());
     }
 
     @Test

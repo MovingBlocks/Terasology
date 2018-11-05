@@ -17,6 +17,8 @@ package org.terasology.persistence.typeHandling;
 
 import org.terasology.reflection.TypeInfo;
 
+import java.util.Arrays;
+
 /**
  * Represents the context in which a {@link TypeHandlerFactory} creates {@link TypeHandler} instances.
  * <p>
@@ -26,6 +28,15 @@ import org.terasology.reflection.TypeInfo;
 public class TypeHandlerFactoryContext {
     private TypeSerializationLibrary typeSerializationLibrary;
     private ClassLoader[] classLoaders;
+
+    public TypeHandlerFactoryContext(TypeSerializationLibrary typeSerializationLibrary, Class<?>... classes) {
+        this(
+                typeSerializationLibrary,
+                Arrays.stream(classes)
+                        .map(Class::getClassLoader)
+                        .toArray(ClassLoader[]::new)
+        );
+    }
 
     public TypeHandlerFactoryContext(TypeSerializationLibrary typeSerializationLibrary, ClassLoader... classLoaders) {
         this.typeSerializationLibrary = typeSerializationLibrary;

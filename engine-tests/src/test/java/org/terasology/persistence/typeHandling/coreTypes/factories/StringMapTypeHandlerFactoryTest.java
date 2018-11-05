@@ -51,7 +51,7 @@ public class StringMapTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof StringMapTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), any());
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
     }
 
     @Test
@@ -75,6 +75,6 @@ public class StringMapTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof StringMapTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), any());
+        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
     }
 }
