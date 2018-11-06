@@ -43,6 +43,10 @@ public class ProtobufSerializer {
         writeBytes(object, typeHandler, new FileOutputStream(file));
     }
 
+    public <T> void writeBytes(T object, TypeHandler<T> typeHandler, String path) throws IOException {
+        writeBytes(object, typeHandler, new File(path));
+    }
+
     public <T> void writeBytes(T object, TypeHandler<T> typeHandler, OutputStream stream) throws IOException {
         ProtobufPersistedData persistedData =
             (ProtobufPersistedData) typeHandler.serialize(object, new ProtobufPersistedDataSerializer());

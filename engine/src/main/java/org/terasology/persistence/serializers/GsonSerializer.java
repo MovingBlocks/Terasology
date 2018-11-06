@@ -68,6 +68,10 @@ public class GsonSerializer {
         writeJson(object, typeHandler, new BufferedWriter(new FileWriter(file)));
     }
 
+    public <T> void writeJson(T object, TypeHandler<T> typeHandler, String path) throws IOException {
+        writeJson(object, typeHandler, new File(path));
+    }
+
     public PersistedData persistedDatafromJson(Reader reader) {
         JsonElement jsonElement = gson.fromJson(reader, JsonElement.class);
 
