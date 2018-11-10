@@ -482,7 +482,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
     private void scheduleNextAutoSave() {
-        long msBetweenAutoSave = config.getSystem().getMaxSecondsBetweenSaves() * 1000;
+        long msBetweenAutoSave = (long) config.getSystem().getMaxSecondsBetweenSaves() * 1000;
         nextAutoSave = System.currentTimeMillis() + msBetweenAutoSave;
     }
 

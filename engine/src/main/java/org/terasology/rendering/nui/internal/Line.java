@@ -177,7 +177,7 @@ public final class Line {
             } else { //calculate to exact
                 dx = y1 - y2;
                 dy = x2 - x1;
-                float len = (float) Math.sqrt(dx * dx + dy * dy);
+                float len = (float) Math.sqrt((double) dx * dx + (double) dy * dy);
                 dx /= len;
                 dy /= len;
                 cx = -0.6f * dy;

@@ -83,7 +83,7 @@ public abstract class TimeBase implements EngineTime {
 
         // Reduce desynch between server time
         if (desynch != 0) {
-            long diff = (long) Math.ceil(desynch * RESYNC_TIME_RATE);
+            long diff = (long) Math.ceil(desynch * (double) RESYNC_TIME_RATE);
             if (diff == 0) {
                 diff = (long) Math.signum(desynch);
             }
