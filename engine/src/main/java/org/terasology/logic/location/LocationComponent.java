@@ -158,7 +158,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             Quaternionf worldRot = parentLoc.getWorldRotation().conjugate();
-            worldRot.mul(this.rotation,this.rotation);
+            this.rotation.mul(worldRot,rotation);
         }
     }
 

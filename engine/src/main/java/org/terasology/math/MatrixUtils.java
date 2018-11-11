@@ -19,6 +19,7 @@ package org.terasology.math;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import java.nio.FloatBuffer;
 
@@ -131,26 +132,10 @@ public final class MatrixUtils {
         u.set(f).cross(s);
         u.normalize();
 
-        m.m00(s.x);
-        m.m10(s.y);
-        m.m20(s.z);
-        m.m30(0);
-        m.m01(u.x);
-        m.m11(u.y);
-        m.m21(u.z);
-        m.m31(0);
-        m.m02(-f.x);
-        m.m12(-f.y);
-        m.m22(-f.z);
-        m.m32(0);
-        m.m03(0);
-        m.m13(0);
-        m.m23(0);
-        m.m33(1);
-
-        m.m30(-eye.x);
-        m.m31(-eye.y);
-        m.m32(-eye.z);
+        m.setColumn(0,new Vector4f(s.x,s.y,s.z,0.0f));
+        m.setColumn(1,new Vector4f(u.x,u.y,u.z,0.0f));
+        m.setColumn(2,new Vector4f(-f.x,-f.y,-f.z,0.0f));
+        m.setColumn(3,new Vector4f(-eye.x,-eye.y,-eye.z,1.0f));
 
         m.transpose();
 
@@ -217,14 +202,14 @@ public final class MatrixUtils {
     }
 
     public static Matrix4f calcViewProjectionMatrix(Matrix4f vm, Matrix4f p) {
-        Matrix4f result = new Matrix4f();
-        result.set(p).mul(vm);
+        Matrix4f result = new Matrix4f(p);
+        result.mul(vm);
         return result;
     }
 
     public static Matrix4f calcModelViewMatrix(Matrix4f m, Matrix4f vm) {
-        Matrix4f result = new Matrix4f();
-        result.set(m).mul(vm);
+        Matrix4f result = new Matrix4f(m);
+        result.mul(vm);
         return result;
     }
 
