@@ -16,10 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.*;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,7 +24,7 @@ import java.util.Iterator;
 /**
  * A simple element that just renders a box-style background.
  */
-public class UIBox extends CoreWidget {
+public class UIBox extends WidgetWithOrder {
 
     @LayoutConfig
     private UIWidget content;
@@ -37,6 +34,7 @@ public class UIBox extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
+
         if (content != null) {
             canvas.drawWidget(content);
         }
