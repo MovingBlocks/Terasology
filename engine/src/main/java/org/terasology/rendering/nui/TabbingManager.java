@@ -1,6 +1,4 @@
 package org.terasology.rendering.nui;
-//TODO: make other ordered widgets inherit from WidgetWithOrder
-//TODO: ensure this is getting called. currently isn't
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
