@@ -50,12 +50,12 @@ public class OggReader extends FilterInputStream {
     /**
      * The mono 16 bit format
      */
-    private static final int FORMAT_MONO16 = 1;
+    //private static final int FORMAT_MONO16 = 1;
 
     /**
      * The stereo 16 bit format
      */
-    private static final int FORMAT_STEREO16 = 2;
+    //private static final int FORMAT_STEREO16 = 2;
 
     /// Conversion buffer size
     private static int convsize = 4096 * 2;

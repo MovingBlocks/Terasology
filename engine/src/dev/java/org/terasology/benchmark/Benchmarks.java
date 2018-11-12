@@ -213,9 +213,9 @@ public final class Benchmarks {
     public static StringBuilder printResult(BenchmarkResult result, StringBuilder b) {
         Preconditions.checkNotNull(b);
         BenchmarkResult.Column<?>[] columns = getColumns(result);
-        printFieldTitles(result, columns, b);
+        printFieldTitles(columns, b);
         for (int repIndex = 0; repIndex < result.getRepetitions(); repIndex++) {
-            printFieldValues(result, repIndex, columns, b);
+            printFieldValues(repIndex, columns, b);
         }
         return b;
     }
@@ -230,7 +230,7 @@ public final class Benchmarks {
         return columns;
     }
 
-    private static void printFieldTitles(BenchmarkResult result, BenchmarkResult.Column<?>[] columns, StringBuilder b) {
+    private static void printFieldTitles(BenchmarkResult.Column<?>[] columns, StringBuilder b) {
         boolean first = true;
         for (BenchmarkResult.Column<?> col : columns) {
             if (first) {
@@ -243,7 +243,7 @@ public final class Benchmarks {
         b.append("\n");
     }
 
-    private static void printFieldValues(BenchmarkResult result, int repIndex, BenchmarkResult.Column<?>[] columns, StringBuilder b) {
+    private static void printFieldValues(int repIndex, BenchmarkResult.Column<?>[] columns, StringBuilder b) {
         boolean first = true;
         for (BenchmarkResult.Column<?> col : columns) {
             if (first) {

@@ -143,7 +143,8 @@ public class StateMainMenu implements GameState {
         // pushLaunchPopup();
     }
 
-    private void pushLaunchPopup() {
+    // PMD Warning if used for it never being called; commented out for now
+    /*private void pushLaunchPopup() {
         Config config = context.get(Config.class);
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         TranslationSystem translationSystem = context.get(TranslationSystem.class);
@@ -170,7 +171,7 @@ public class StateMainMenu implements GameState {
                 nuiManager.pushScreen(TelemetryScreen.ASSET_URI, TelemetryScreen.class);
             });
         }
-    }
+    }*/
 
     @Override
     public void dispose(boolean shuttingDown) {

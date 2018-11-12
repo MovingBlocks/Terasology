@@ -48,9 +48,9 @@ public class BenchmarkTeraArraySerializeToByteString extends BenchmarkTeraArrayS
     @Override
     public void run() {
         handler.serialize(array, buffer);
-        int length = buffer.position();
+        //int length = buffer.position();
         buffer.rewind();
-        final ByteString b = ByteString.copyFrom(buffer, length);
+        //final ByteString b = ByteString.copyFrom(buffer, length);
         buffer.rewind();
     }
 

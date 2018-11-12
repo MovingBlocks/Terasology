@@ -21,6 +21,8 @@ import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 
 import org.lwjgl.LWJGLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +39,9 @@ import javax.swing.JFileChooser;
  * Manager class that keeps track of the game's various paths and save directories.
  */
 public final class PathManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(PathManager.class);
+
     private static final String TERASOLOGY_FOLDER_NAME = "Terasology";
     private static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
 
@@ -71,11 +76,10 @@ public final class PathManager {
 
             // TODO: Probably remove this after a while, confirming via logs that this is no longer needed
             Path codeLocation = Paths.get(urlToSource.toURI());
-            System.out.println("PathManager being initialized. Initial code location is " + codeLocation.toAbsolutePath());
-
+            logger.info("PathManager being initialized. Initial code location is " + codeLocation.toAbsolutePath());
             // Theory that whatever reason we needed to get the path that way isn't needed anymore - try just current dir ...
             codeLocation = Paths.get("").toAbsolutePath();
-            System.out.println("Switched it to expected working dir: " + codeLocation.toAbsolutePath());
+            logger.info("Switched it to expected working dir: " + codeLocation.toAbsolutePath());
 
             // If that fails in some situations a different approach could test for the following in the path:
             // if (codeLocation.toString().contains(".gradle") || codeLocation.toString().contains(".m2")) {
@@ -83,21 +87,21 @@ public final class PathManager {
             if (Files.isRegularFile(codeLocation)) {
                 installPath = findNativesHome(codeLocation.getParent(), 5);
                 if (installPath == null) {
-                    System.out.println("Failed to find the natives dir - unable to launch!");
+                    logger.info("Failed to find the natives dir - unable to launch!");
                     throw new RuntimeException("Failed to find natives from .jar launch");
                 }
             }
         } catch (URISyntaxException e) {
             // Can't use logger, because logger not set up when PathManager is used.
-            System.out.println("Failed to convert code location to uri");
+            logger.info("Failed to convert code location to uri");
         }
         // We might be running from an IDE which can cause the installPath to be null. Try current working directory.
         if (installPath == null) {
             installPath = Paths.get("").toAbsolutePath();
-            System.out.println("installPath was null, running from IDE or headless server? Setting to: " + installPath);
+            logger.info("installPath was null, running from IDE or headless server? Setting to: " + installPath);
             installPath = findNativesHome(installPath, 5);
             if (installPath == null) {
-                System.out.println("Failed to find the natives dir - unable to launch!");
+                logger.info("Failed to find the natives dir - unable to launch!");
                 throw new RuntimeException("Failed to find natives from likely IDE launch");
             }
         }
@@ -117,19 +121,19 @@ public final class PathManager {
         while (levelsToSearch > 0) {
             File dirToTest = new File(checkedPath.toFile(), NATIVES_DIR);
             if (dirToTest.exists()) {
-                System.out.println("Found the natives dir: " + dirToTest);
+                logger.info("Found the natives dir: " + dirToTest);
                 return checkedPath;
             }
 
             checkedPath = checkedPath.getParent();
             if (checkedPath.equals(startPath.getRoot())) {
-                System.out.println("Uh oh, reached the root path, giving up");
+                logger.info("Uh oh, reached the root path, giving up");
                 return null;
             }
             levelsToSearch--;
         }
 
-        System.out.println("Failed to find the natives dir within " + maxDepth + " levels of " + startPath);
+        logger.info("Failed to find the natives dir within " + maxDepth + " levels of " + startPath);
         return null;
     }
 

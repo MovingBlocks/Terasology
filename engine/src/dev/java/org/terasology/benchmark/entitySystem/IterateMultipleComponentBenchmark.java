@@ -68,7 +68,7 @@ public class IterateMultipleComponentBenchmark extends AbstractBenchmark {
     public void run() {
         for (EntityRef entity : entityManager.getEntitiesWith(MeshComponent.class, LocationComponent.class)) {
             LocationComponent loc = entity.getComponent(LocationComponent.class);
-            MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+            //MeshComponent meshComp = entity.getComponent(MeshComponent.class);
             loc.getLocalPosition();
         }
     }

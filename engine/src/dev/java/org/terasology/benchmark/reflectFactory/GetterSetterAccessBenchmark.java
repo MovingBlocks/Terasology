@@ -51,7 +51,7 @@ public class GetterSetterAccessBenchmark extends AbstractBenchmark {
     @Override
     public void run() {
         accessor.setValue(comp, i++);
-        int val = (int) accessor.getValue(comp);
-        val++;
+        //int val = (int) accessor.getValue(comp);
+        //val++;
     }
 }

@@ -16,6 +16,8 @@
 
 package org.terasology.engine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.terasology.engine.modes.GameState;
 import org.terasology.version.TerasologyVersion;
@@ -40,6 +42,7 @@ import java.util.Date;
  */
 public final class LoggingContext {
 
+    private static final Logger logger = LoggerFactory.getLogger(LoggingContext.class);
     /**
      * The identifier for the initialization phase
      */
@@ -87,7 +90,8 @@ public final class LoggingContext {
         try {
             deleteLogFiles(logFileFolder, Duration.ofDays(5).getSeconds());
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         // Unfortunately, setting context-based variables works only after initialization
@@ -145,7 +149,9 @@ public final class LoggingContext {
                     } catch (IOException e) {
                         // we explicitly catch the exception so that other files
                         // will be removed even if this one fails
-                        System.err.println("Could not delete log file: " + file);
+
+                        //System.err.println("Could not delete log file: " + file);
+                        logger.error("Could not delete log file: " + file);
                     }
                 }
 
@@ -161,7 +167,9 @@ public final class LoggingContext {
                     } catch (IOException e) {
                         // we explicitly catch the exception so that other folders
                         // will be removed even if this one fails
-                        System.err.println("Could not delete empty folder: " + path);
+
+                        //System.err.println("Could not delete empty folder: " + path);
+                        logger.error(("Could not delete empty folder: " + path));
                     }
                 }
 
