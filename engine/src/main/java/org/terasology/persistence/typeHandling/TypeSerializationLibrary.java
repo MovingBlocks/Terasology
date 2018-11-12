@@ -70,6 +70,7 @@ import org.terasology.rendering.nui.Color;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -85,6 +86,15 @@ public class TypeSerializationLibrary {
     private List<TypeHandlerFactory> typeHandlerFactories = Lists.newArrayList();
 
     private Map<TypeInfo<?>, TypeHandler<?>> typeHandlerCache = Maps.newHashMap();
+
+    /**
+     * In certain object graphs, creating a {@link TypeHandler} for a type may recursively
+     * require an {@link TypeHandler} for the same type. Without intervention, the recursive
+     * lookup would stack overflow. Thus, for type handlers in the process of being created,
+     * we return a delegate to the {@link TypeHandler} via {@link FutureTypeHandler} which is
+     * wired after the {@link TypeHandler} has been created.
+     */
+    private final ThreadLocal<Map<TypeInfo<?>, FutureTypeHandler<?>>> futureTypeHandlers = new ThreadLocal<>();
 
     private Map<Type, InstanceCreator<?>> instanceCreators = Maps.newHashMap();
     private ConstructorLibrary constructorLibrary;
@@ -253,19 +263,48 @@ public class TypeSerializationLibrary {
             return Optional.of((TypeHandler<T>) typeHandlerCache.get(type));
         }
 
-        // TODO: Explore reversing typeHandlerFactories itself before building object
-        for (int i = typeHandlerFactories.size() - 1; i >= 0; i--) {
-            TypeHandlerFactory typeHandlerFactory = typeHandlerFactories.get(i);
-            Optional<TypeHandler<T>> typeHandler = typeHandlerFactory.create(type, context);
+        Map<TypeInfo<?>, FutureTypeHandler<?>> futures = futureTypeHandlers.get();
+        boolean cleanupFutureTypeHandlers = false;
 
-            if (typeHandler.isPresent()) {
-                TypeHandler<T> handler = typeHandler.get();
-                typeHandlerCache.put(type, handler);
-                return Optional.of(handler);
-            }
+        if (futures == null) {
+            cleanupFutureTypeHandlers = true;
+            futures = new HashMap<>();
+            futureTypeHandlers.set(futures);
         }
 
-        return Optional.empty();
+        FutureTypeHandler<T> future = (FutureTypeHandler<T>) futures.get(type);
+
+        if (future != null) {
+            return Optional.of(future);
+        }
+
+        try {
+            future = new FutureTypeHandler<>();
+            futures.put(type, future);
+
+            // TODO: Explore reversing typeHandlerFactories itself before building object
+            for (int i = typeHandlerFactories.size() - 1; i >= 0; i--) {
+                TypeHandlerFactory typeHandlerFactory = typeHandlerFactories.get(i);
+                Optional<TypeHandler<T>> typeHandler = typeHandlerFactory.create(type, context);
+
+                if (typeHandler.isPresent()) {
+                    TypeHandler<T> handler = typeHandler.get();
+
+                    typeHandlerCache.put(type, handler);
+                    future.typeHandler = handler;
+
+                    return Optional.of(handler);
+                }
+            }
+
+            return Optional.empty();
+        } finally {
+            futures.remove(type);
+
+            if (cleanupFutureTypeHandlers) {
+                futureTypeHandlers.remove();
+            }
+        }
     }
 
     private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
