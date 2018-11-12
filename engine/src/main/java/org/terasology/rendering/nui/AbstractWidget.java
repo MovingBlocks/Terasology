@@ -45,8 +45,6 @@ public abstract class AbstractWidget implements UIWidget {
     @LayoutConfig
     private Binding<UIWidget> tooltip = new DefaultBinding<>();
 
-    protected TabbingManager tabbingManager = new TabbingManager();
-
     @LayoutConfig
     private float tooltipDelay = 0.5f;
 

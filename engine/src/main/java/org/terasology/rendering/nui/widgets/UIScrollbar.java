@@ -19,11 +19,7 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -33,7 +29,7 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 /**
  * A simple scrollbar
  */
-public class UIScrollbar extends CoreWidget {
+public class UIScrollbar extends WidgetWithOrder {
 
     @LayoutConfig
     private Binding<Integer> minimum = new DefaultBinding<>(0);

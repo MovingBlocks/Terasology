@@ -16,18 +16,13 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+import org.terasology.rendering.nui.*;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -38,7 +33,7 @@ import java.util.List;
 /**
  * A widget displaying a clickable button, containing text and an optional image
  */
-public class UIButton extends CoreWidget {
+public class UIButton extends WidgetWithOrder {
     public static final String DOWN_MODE = "down";
 
     /**

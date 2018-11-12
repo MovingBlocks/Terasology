@@ -1,10 +1,9 @@
 package org.terasology.rendering.nui;
 //TODO: make other ordered widgets inherit from WidgetWithOrder
-//TODO: figure out why bindsManager is null, then test
+//TODO: ensure this is getting called. currently isn't
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.config.BindsManager;
@@ -18,7 +17,6 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.Keyboard;
 import org.terasology.input.internal.BindableButtonImpl;
-import org.terasology.registry.In;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -26,40 +24,32 @@ import java.util.Map;
 @RegisterSystem(RegisterMode.ALWAYS)
 public class TabbingManager extends BaseComponentSystem {
 
-    @In
-    private BindsManager bindsManager;
+    private static BindsManager bindsManager;
 
     public static final Logger logger = LoggerFactory.getLogger(TabbingManager.class);
 
-    public int currentNum;
-    public int maxNum;
-    public int nextNum;
-    public ArrayList<Integer> usedNums;
-    public ArrayList<WidgetWithOrder> widgetsList;
-
-    public Context context;
+    private static int currentNum;
+    private static int maxNum;
+    private static int nextNum;
+    private static ArrayList<Integer> usedNums;
+    private static ArrayList<WidgetWithOrder> widgetsList;
+    private static boolean initialized = false;
 
     public TabbingManager() {
-        context = new ContextImpl();
         currentNum = 0;
         maxNum = 0;
         nextNum = 0;
-
+        logger.info("constructing");
         usedNums = new ArrayList<>();
-        usedNums.add(nextNum);
-    }
-    public TabbingManager(ArrayList<Integer> alreadyUsed) {
-        context = new ContextImpl();
-        currentNum = 0;
-        maxNum = 0;
-        nextNum = 0;
-        usedNums = alreadyUsed;
-    }
+        widgetsList = new ArrayList<>();
 
-    @Override
-    public void initialise() {
-        //BindsManager bindsManager = context.get(BindsManager.class);
-        logger.info("bindsManager: " + bindsManager);
+        bindsManager = new ContextImpl().get(BindsManager.class);
+        init();
+    }
+    public void init() {
+        //if (!initialized) {
+            //BindsManager bindsManager = context.get(BindsManager.class);
+            logger.info("bindsManager: " + bindsManager);
             Map<Integer, BindableButton> keys = bindsManager.getKeyBinds();
             BindButtonSubscriber subscriber = new BindButtonSubscriber() {
                 @Override
@@ -87,7 +77,9 @@ public class TabbingManager extends BaseComponentSystem {
                 keys.put(Keyboard.Key.BACKSLASH.getId(), new BindableButtonImpl(new SimpleUri("changeActive"), "Change Focused Widget", new BindButtonEvent()));
                 keys.get(Keyboard.Key.BACKSLASH.getId()).subscribe(subscriber);
             }
-        }
+            initialized = true;
+        //}
+    }
     @ReceiveEvent
     public void changeFocus(ChangeActiveWidgetEvent event, EntityRef ref) {
         logger.info("changing focus of widget");
@@ -112,7 +104,7 @@ public class TabbingManager extends BaseComponentSystem {
             }
         }
     }
-    public int getNewNextNum() {
+    public static int getNewNextNum() {
         nextNum++;
         maxNum++;
         while (usedNums.contains(nextNum)) {
@@ -122,7 +114,7 @@ public class TabbingManager extends BaseComponentSystem {
         usedNums.add(nextNum);
         return nextNum;
     }
-    public void addToUsedNums(int toAdd, WidgetWithOrder widget) {
+    public static void addToUsedNums(int toAdd, WidgetWithOrder widget) {
         if (!usedNums.contains(toAdd)) {
             usedNums.add(toAdd);
             if (toAdd>maxNum) {

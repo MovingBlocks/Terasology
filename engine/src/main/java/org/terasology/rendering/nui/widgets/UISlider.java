@@ -17,15 +17,10 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.base.Function;
 import org.terasology.input.MouseInput;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -35,7 +30,7 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 /**
  * A simple value slider bar with one handle
  */
-public class UISlider extends CoreWidget {
+public class UISlider extends WidgetWithOrder {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
 

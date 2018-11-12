@@ -19,9 +19,9 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.utilities.Assets;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * One radial section of the Radial Ring
  */
-public class UIRadialSection extends CoreWidget {
+public class UIRadialSection extends WidgetWithOrder {
 
     private Rect2i infoRegion;
     private Rect2i innerRegion;
