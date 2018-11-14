@@ -34,6 +34,7 @@ import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -110,10 +111,14 @@ public class RecordScreen extends SelectionScreen {
     private void loadGame(GameInfo item) {
         try {
             final GameManifest manifest = item.getManifest();
-            copySaveDirectoryToRecordingLibrary(manifest.getTitle());
-            recordAndReplayUtils.setGameTitle(manifest.getTitle());
+
+            String oldTitle = manifest.getTitle();
+            String newTitle = oldTitle;
+
+            copySaveDirectoryToRecordingLibrary(oldTitle, newTitle);
+            recordAndReplayUtils.setGameTitle(newTitle);
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
-            config.getWorldGeneration().setWorldTitle(manifest.getTitle());
+            config.getWorldGeneration().setWorldTitle(newTitle);
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
@@ -121,16 +126,26 @@ public class RecordScreen extends SelectionScreen {
         }
     }
 
-    private void copySaveDirectoryToRecordingLibrary(String gameTitle) {
-        File saveDirectory = new File(PathManager.getInstance().getSavePath(gameTitle).toString());
-        Path destinationPath = PathManager.getInstance().getRecordingPath(gameTitle);
+    private void copySaveDirectoryToRecordingLibrary(String oldTitle, String newTitle) {
+        File saveDirectory = new File(PathManager.getInstance().getSavePath(oldTitle).toString());
+        Path destinationPath = PathManager.getInstance().getRecordingPath(newTitle);
         File destDirectory = new File(destinationPath.toString());
         try {
             FileUtils.copyDirectoryStructure(saveDirectory, destDirectory);
+            if(oldTitle != newTitle) {
+                rewriteGameTitle(destinationPath, newTitle);
+            }
         } catch (Exception e) {
             logger.error("Error trying to copy the save directory:", e);
         }
     }
+
+    private void rewriteGameTitle(Path destinationPath, String newTitle) throws IOException {
+        GameManifest manifest = GameManifest.load(destinationPath.resolve(GameManifest.DEFAULT_FILE_NAME));
+        manifest.setTitle(newTitle);
+        GameManifest.save(destinationPath.resolve(GameManifest.DEFAULT_FILE_NAME), manifest);
+    }
+
 
     void setRecordAndReplayUtils(RecordAndReplayUtils recordAndReplayUtils) {
         this.recordAndReplayUtils = recordAndReplayUtils;
