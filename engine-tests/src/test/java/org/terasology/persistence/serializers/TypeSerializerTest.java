@@ -55,7 +55,7 @@ public class TypeSerializerTest {
         private final TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, new CopyStrategyLibrary(reflectFactory));
 
         @Test
-        public void testJsonSerialize() {
+        public void testJsonSerialize() throws IOException {
             GsonSerializer gsonSerializer = new GsonSerializer();
 
             TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, TypeSerializerTest.class).get();
