@@ -44,7 +44,7 @@ public class GsonSerializer {
         this.gson = new Gson();
     }
 
-    public <T> String toJson(T object, TypeHandler<T> typeHandler) throws IOException {
+    public <T> String toJson(T object, TypeHandler<T> typeHandler) {
         StringWriter writer = new StringWriter();
 
         writeJson(object, typeHandler, writer);
@@ -52,21 +52,23 @@ public class GsonSerializer {
         return writer.toString();
     }
 
-    public <T> void writeJson(T object, TypeHandler<T> typeHandler, Writer writer) throws IOException {
+    public <T> void writeJson(T object, TypeHandler<T> typeHandler, Writer writer) {
         GsonPersistedData persistedData =
                 (GsonPersistedData) typeHandler.serialize(object, new GsonPersistedDataSerializer());
 
         gson.toJson(persistedData.getElement(), writer);
-
-        writer.close();
     }
 
     public <T> void writeJson(T object, TypeHandler<T> typeHandler, OutputStream stream) throws IOException {
-        writeJson(object, typeHandler, new BufferedWriter(new OutputStreamWriter(stream)));
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(stream))) {
+            writeJson(object, typeHandler, writer);
+        }
     }
 
     public <T> void writeJson(T object, TypeHandler<T> typeHandler, File file) throws IOException {
-        writeJson(object, typeHandler, new BufferedWriter(new FileWriter(file)));
+        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+            writeJson(object, typeHandler, writer);
+        }
     }
 
     public <T> void writeJson(T object, TypeHandler<T> typeHandler, String path) throws IOException {
