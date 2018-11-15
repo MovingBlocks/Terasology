@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -29,6 +30,7 @@ import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
@@ -76,7 +78,9 @@ public class RecordScreen extends SelectionScreen {
             load.subscribe(button -> {
                 final GameInfo gameInfo = getGameInfos().getSelection();
                 if (gameInfo != null) {
-                    loadGame(gameInfo);
+                    if (!rewriteCheck(gameInfo)) {
+                        loadGame(gameInfo);
+                    }
                 }
             });
 
@@ -109,13 +113,14 @@ public class RecordScreen extends SelectionScreen {
     }
 
     private void loadGame(GameInfo item) {
+        loadGame(item, item.getManifest().getTitle());
+    }
+
+    private void loadGame(GameInfo item, String newTitle) {
         try {
             final GameManifest manifest = item.getManifest();
 
-            String oldTitle = manifest.getTitle();
-            String newTitle = oldTitle;
-
-            copySaveDirectoryToRecordingLibrary(oldTitle, newTitle);
+            copySaveDirectoryToRecordingLibrary(manifest.getTitle(), newTitle);
             recordAndReplayUtils.setGameTitle(newTitle);
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(newTitle);
@@ -132,12 +137,41 @@ public class RecordScreen extends SelectionScreen {
         File destDirectory = new File(destinationPath.toString());
         try {
             FileUtils.copyDirectoryStructure(saveDirectory, destDirectory);
-            if(oldTitle != newTitle) {
+            if (oldTitle != newTitle) {
                 rewriteGameTitle(destinationPath, newTitle);
             }
         } catch (Exception e) {
             logger.error("Error trying to copy the save directory:", e);
         }
+    }
+
+    // TODO: Translation strings for rename prompt
+    private boolean rewriteCheck(GameInfo item) {
+        if (doesRecordingExist(item.getManifest().getTitle())) {
+            final ShortEntryPopup popup = getManager().createScreen(ShortEntryPopup.ASSET_URI, ShortEntryPopup.class);
+            popup.setTitle("Rename Recording");
+            popup.setMessage("A recording with this name has already been saved! Please set a new name for this recording.");
+            popup.bindInput(new Binding<String>() {
+                @Override
+                public String get() {
+                    return null;
+                }
+
+                @Override
+                public void set(String value) {
+                    if (!isNameValid(value)) {
+                        popup.setMessage("Invalid File Name! Please set a different name for this recording.");
+                        getManager().pushScreen(popup);
+                        return;
+                    }
+                    loadGame(item, value);
+                }
+            });
+            getManager().pushScreen(popup);
+
+            return true;
+        }
+        return false;
     }
 
     private void rewriteGameTitle(Path destinationPath, String newTitle) throws IOException {
@@ -146,6 +180,20 @@ public class RecordScreen extends SelectionScreen {
         GameManifest.save(destinationPath.resolve(GameManifest.DEFAULT_FILE_NAME), manifest);
     }
 
+    private boolean doesRecordingExist(String name) {
+        Path destinationPath = PathManager.getInstance().getRecordingPath(name);
+        return FileUtils.fileExists(destinationPath.toString());
+    }
+
+    private boolean isNameValid(String name) {
+        if (StringUtils.isBlank(name)) {
+            return false;
+        }
+        if (doesRecordingExist(name)) {
+            return false;
+        }
+        return true;
+    }
 
     void setRecordAndReplayUtils(RecordAndReplayUtils recordAndReplayUtils) {
         this.recordAndReplayUtils = recordAndReplayUtils;
