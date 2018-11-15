@@ -66,7 +66,7 @@ public class TypeSerializerTest {
         @Test
         public void testDeserialize() {
             GsonSerializer gsonSerializer = new GsonSerializer();
-            PersistedData persistedData = gsonSerializer.persistedDatafromJson(INSTANCE_JSON);
+            PersistedData persistedData = gsonSerializer.persistedDataFromJson(INSTANCE_JSON);
 
             TypeHandler<SomeClass<Integer>> typeHandler = typeSerializationLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, getClass().getClassLoader()).get();
 
