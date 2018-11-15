@@ -45,7 +45,7 @@ public class GsonSerializer {
         this.gson = new Gson();
     }
 
-    public <T> String toJson(T object, TypeHandler<T> typeHandler) {
+    public <T> String toJson(T object, TypeHandler<T> typeHandler) throws IOException {
         StringWriter writer = new StringWriter();
 
         writeJson(object, typeHandler, writer);
@@ -53,14 +53,16 @@ public class GsonSerializer {
         return writer.toString();
     }
 
-    public <T> void writeJson(T object, TypeHandler<T> typeHandler, Writer writer) {
+    public <T> void writeJson(T object, TypeHandler<T> typeHandler, Writer writer) throws IOException {
         GsonPersistedData persistedData =
                 (GsonPersistedData) typeHandler.serialize(object, new GsonPersistedDataSerializer());
 
         gson.toJson(persistedData.getElement(), writer);
+
+        writer.close();
     }
 
-    public <T> void writeJson(T object, TypeHandler<T> typeHandler, OutputStream stream) {
+    public <T> void writeJson(T object, TypeHandler<T> typeHandler, OutputStream stream) throws IOException {
         writeJson(object, typeHandler, new BufferedWriter(new OutputStreamWriter(stream)));
     }
 
