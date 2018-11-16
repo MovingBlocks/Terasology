@@ -1,11 +1,26 @@
 {
-  "type": "shortEntryPopup",
-  "skin": "messageBox",
+  "type": "nameRecordingScreen",
+  "skin": "engine:mainMenu",
   "contents": {
     "type": "relativeLayout",
     "contents": [
       {
+        "type": "UILabel",
+        "id": "title",
+        "family": "title",
+        "layoutInfo": {
+          "height": 48,
+          "position-horizontal-center": {},
+          "position-bottom": {
+            "target": "TOP",
+            "widget": "box",
+            "offset": 48
+          }
+        }
+      },
+      {
         "type": "UIBox",
+        "id": "box",
         "layoutInfo": {
           "width": 500,
           "use-content-height": true,
@@ -18,11 +33,6 @@
           "verticalSpacing": 8,
           "contents": [
             {
-              "type": "UILabel",
-              "id": "title",
-              "family": "title"
-            },
-            {
               "type": "UISpace",
               "size": [
                 1,
@@ -31,7 +41,7 @@
             },
             {
               "type": "UILabel",
-              "id": "message"
+              "id": "description"
             },
             {
               "type": "UISpace",
@@ -55,7 +65,7 @@
                 },
                 {
                   "type": "UIButton",
-                  "id": "returnButton",
+                  "id": "cancelButton",
                   "text": "${engine:menu#dialog-cancel}"
                 }
               ],
