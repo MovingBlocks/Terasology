@@ -32,7 +32,6 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -42,6 +41,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
+/**
+ * Screen for setting the name of and ultimately loading a recording.
+ */
 public class NameRecordingScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nameRecordingScreen!instance");
 
@@ -75,6 +77,9 @@ public class NameRecordingScreen extends CoreScreenLayer {
         cancel.subscribe(button -> cancelPressed());
     }
 
+    /**
+     * Sets the values of all widget references.
+     */
     private void initWidgets() {
         title = find("title", UILabel.class);
         description = find("description", UILabel.class);
@@ -83,12 +88,15 @@ public class NameRecordingScreen extends CoreScreenLayer {
         cancel = find("cancelButton", UIButton.class);
     }
 
-    private void enterPressed() { // TODO: More translation strings
-        if(!isNameValid(nameInput.getText())) {
+    /**
+     * Activates upon pressing the enter key.
+     */
+    private void enterPressed() {
+        if (!isNameValid(nameInput.getText())) {
             description.setText(translationSystem.translate("${engine:menu#name-recording-error-invalid}"));
             return;
         }
-        if(doesRecordingExist(nameInput.getText())) {
+        if (doesRecordingExist(nameInput.getText())) {
             description.setText(translationSystem.translate("${engine:menu#name-recording-error-duplicate}"));
             return;
         }
@@ -96,10 +104,19 @@ public class NameRecordingScreen extends CoreScreenLayer {
         loadGame(nameInput.getText());
     }
 
+    /**
+     * Activates upon pressing the cancel key.
+     */
     private void cancelPressed() {
         triggerBackAnimation();
     }
 
+    /**
+     * Last step of the recording setup process. Copies the save files from the selected game, transplants them into the 'recordings' folder, and renames the map files
+     * to match the provided recording name. Then launches the game loading state.
+     *
+     * @param newTitle The title of the new recording.
+     */
     private void loadGame(String newTitle) {
         try {
             final GameManifest manifest = gameInfo.getManifest();
@@ -115,35 +132,61 @@ public class NameRecordingScreen extends CoreScreenLayer {
         }
     }
 
+    /**
+     * Copies the selected save files to a new recording directory.
+     *
+     * @param oldTitle The name of the original save directory.
+     * @param newTitle The name of the new recording directory.
+     */
     private void copySaveDirectoryToRecordingLibrary(String oldTitle, String newTitle) {
         File saveDirectory = new File(PathManager.getInstance().getSavePath(oldTitle).toString());
         Path destinationPath = PathManager.getInstance().getRecordingPath(newTitle);
         File destDirectory = new File(destinationPath.toString());
         try {
             FileUtils.copyDirectoryStructure(saveDirectory, destDirectory);
-            rewriteRecordingTitle(destinationPath, newTitle);
+            rewriteManifestTitle(destinationPath, newTitle);
         } catch (Exception e) {
             logger.error("Error trying to copy the save directory:", e);
         }
     }
 
-    private void rewriteRecordingTitle(Path destinationPath, String newTitle) throws IOException {
+    /**
+     * Rewrites the title of the save game manifest to match the new directory title.
+     *
+     * @param destinationPath The path of the new recording files.
+     * @param newTitle The new name for the recording manifest.
+     * @throws IOException
+     */
+    private void rewriteManifestTitle(Path destinationPath, String newTitle) throws IOException {
+        // simply grabs the manifest, changes it, and saves again.
         GameManifest manifest = GameManifest.load(destinationPath.resolve(GameManifest.DEFAULT_FILE_NAME));
         manifest.setTitle(newTitle);
         GameManifest.save(destinationPath.resolve(GameManifest.DEFAULT_FILE_NAME), manifest);
     }
 
+    /**
+     * Tests if the provided string is valid for a game name.
+     *
+     * @param name The provided name string.
+     * @return true if name is valid, false otherwise.
+     */
     private boolean isNameValid(String name) {
         Path destinationPath = PathManager.getInstance().getRecordingPath(name);
 
         // invalid characters are filtered, so if the file name is made up of entirely invalid characters, the path will have a blank name.
-        if(destinationPath == PathManager.getInstance().getRecordingPath("")) {
+        if (destinationPath == PathManager.getInstance().getRecordingPath("")) {
             return false;
         }
 
         return !StringUtils.isBlank(name);
     }
 
+    /**
+     * Tests if there is an existing recording with the provided name string.
+     *
+     * @param name The provided name string.
+     * @return true if recording exists, false otherwise.
+     */
     private boolean doesRecordingExist(String name) {
         Path destinationPath = PathManager.getInstance().getRecordingPath(name);
         return FileUtils.fileExists(destinationPath.toString());

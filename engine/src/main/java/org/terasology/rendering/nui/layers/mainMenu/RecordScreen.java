@@ -88,7 +88,8 @@ public class RecordScreen extends SelectionScreen {
             refreshGameInfoList(GameProvider.getSavedGames());
         } else {
             final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
+                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
             popup.subscribeButton(e -> triggerBackAnimation());
             getManager().pushScreen(popup);
             // disable child widgets
@@ -103,6 +104,12 @@ public class RecordScreen extends SelectionScreen {
         close = find("close", UIButton.class);
     }
 
+    /**
+     * Launches {@link NameRecordingScreen} with the info of the game selected in this screen.
+     *
+     * @param nameRecordingScreen The instance of the screen to launch
+     * @param info The info of the selected game.
+     */
     private void launchRename(NameRecordingScreen nameRecordingScreen, GameInfo info) {
         nameRecordingScreen.setGameInfo(info);
         nameRecordingScreen.setRecordAndReplayUtils(recordAndReplayUtils);
@@ -116,8 +123,8 @@ public class RecordScreen extends SelectionScreen {
     @Override
     protected boolean isValidScreen() {
         if (Stream.of(load, close)
-                .anyMatch(Objects::isNull) ||
-                !super.isValidScreen()) {
+                .anyMatch(Objects::isNull)
+                || !super.isValidScreen()) {
             logger.error("Can't initialize screen correctly. At least one widget was missed!");
             return false;
         }
