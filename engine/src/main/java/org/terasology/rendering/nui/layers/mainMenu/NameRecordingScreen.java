@@ -25,6 +25,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
@@ -49,6 +50,9 @@ public class NameRecordingScreen extends CoreScreenLayer {
     @In
     protected Config config;
 
+    @In
+    private TranslationSystem translationSystem;
+
     private GameInfo gameInfo;
 
     private RecordAndReplayUtils recordAndReplayUtils;
@@ -66,10 +70,6 @@ public class NameRecordingScreen extends CoreScreenLayer {
 
         initWidgets();
 
-        // TODO: Translation strings for rename prompt
-        title.setText("Name Recording");
-        description.setText("Set a unique name for this recording.");
-
         enter.subscribe(button -> enterPressed());
 
         cancel.subscribe(button -> cancelPressed());
@@ -85,11 +85,11 @@ public class NameRecordingScreen extends CoreScreenLayer {
 
     private void enterPressed() { // TODO: More translation strings
         if(!isNameValid(nameInput.getText())) {
-            description.setText("This name is blank, or has disallowed characters in it! Please set a different name.");
+            description.setText(translationSystem.translate("${engine:menu#name-recording-error-invalid}"));
             return;
         }
         if(doesRecordingExist(nameInput.getText())) {
-            description.setText("This name is already taken! Please set a different name.");
+            description.setText(translationSystem.translate("${engine:menu#name-recording-error-duplicate}"));
             return;
         }
 
@@ -133,8 +133,15 @@ public class NameRecordingScreen extends CoreScreenLayer {
         GameManifest.save(destinationPath.resolve(GameManifest.DEFAULT_FILE_NAME), manifest);
     }
 
-    private boolean isNameValid(String name) { // In the future, this probably also check for invalid file characters (?, ", .) etc.
-        return !StringUtils.isBlank(name); // newGameScreen does it this way, so it should be fine..?
+    private boolean isNameValid(String name) {
+        Path destinationPath = PathManager.getInstance().getRecordingPath(name);
+
+        // invalid characters are filtered, so if the file name is made up of entirely invalid characters, the path will have a blank name.
+        if(destinationPath == PathManager.getInstance().getRecordingPath("")) {
+            return false;
+        }
+
+        return !StringUtils.isBlank(name);
     }
 
     private boolean doesRecordingExist(String name) {
