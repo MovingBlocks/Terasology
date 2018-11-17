@@ -68,10 +68,8 @@ public class FieldMetadata<T, U> {
 
     private static Class<?> determineType(Field field, Class<?> ownerType) {
         Method getter = ReflectionUtil.findGetter(field.getName(), ownerType);
-        if (getter != null && getter.getReturnType() != null) {
-            if (ReflectionUtil.findSetter(field.getName(), ownerType, getter.getReturnType()) != null) {
-                return getter.getReturnType();
-            }
+        if (getter != null && getter.getReturnType() != null && ReflectionUtil.findSetter(field.getName(), ownerType, getter.getReturnType()) != null ) {
+            return getter.getReturnType();
         }
         return field.getType();
     }

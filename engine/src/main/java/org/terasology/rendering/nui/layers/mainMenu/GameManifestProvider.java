@@ -37,9 +37,6 @@ import org.terasology.world.time.WorldTime;
  */
 public class GameManifestProvider {
 
-    @In
-    private Config config;
-
     private static final Logger logger = LoggerFactory.getLogger(GameManifestProvider.class);
 
     private GameManifestProvider() {
@@ -91,7 +88,6 @@ public class GameManifestProvider {
         gameManifest.addWorld(worldInfo);
         config.getUniverseConfig().addWorldManager(worldInfo);
         config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
-        config.getUniverseConfig().setUniverseSeed(universeWrapper.getSeed());
         return gameManifest;
     }
 }

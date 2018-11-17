@@ -24,10 +24,8 @@ import java.util.Iterator;
  * Runs all children until one finishes with FAILURE
  */
 public class SequenceNode extends CompositeNode {
-    private static final Logger logger = LoggerFactory.getLogger(SequenceNode.class);
     private Iterator<BehaviorNode> iterator;
     private BehaviorNode current;
-    private String reentry;
 
     @Override
     public String getName() {

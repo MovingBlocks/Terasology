@@ -30,7 +30,8 @@ public class LocalChunkView implements PropagatorWorldView {
     private Vector3i topLeft = new Vector3i();
 
     public LocalChunkView(Chunk[] chunks, PropagationRules rules) {
-        this.chunks = chunks;
+        Chunk[] temp = chunks.clone();
+        this.chunks = temp;
         this.rules = rules;
         topLeft.set(chunks[13].getPosition().x - 1, chunks[13].getPosition().y - 1, chunks[13].getPosition().z - 1);
 

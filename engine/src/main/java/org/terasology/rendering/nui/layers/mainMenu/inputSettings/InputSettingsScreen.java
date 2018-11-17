@@ -83,9 +83,6 @@ public class InputSettingsScreen extends CoreScreenLayer {
     @In
     private TranslationSystem translationSystem;
 
-    @In
-    private Context context;
-
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());

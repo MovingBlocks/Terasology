@@ -63,9 +63,6 @@ public class BlockItemSystem extends BaseComponentSystem {
     private BlockEntityRegistry blockEntityRegistry;
 
     @In
-    private AudioManager audioManager;
-
-    @In
     private NetworkSystem networkSystem;
 
     @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
@@ -171,7 +168,6 @@ public class BlockItemSystem extends BaseComponentSystem {
             /*
              * Calculations aren't exact and in the corner cases it is better to let the user place the block.
              */
-            float additionalAllowedPenetration = 0.04f; // ignore small rounding mistakes
             min.add(ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION);
             max.sub(ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION);
 

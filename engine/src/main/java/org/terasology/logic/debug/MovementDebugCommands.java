@@ -253,7 +253,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             }
             return "";
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return "";
         }
     }
@@ -274,7 +274,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             }
             return "";
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return "";
         }
     }

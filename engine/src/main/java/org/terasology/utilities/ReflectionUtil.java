@@ -242,10 +242,8 @@ public final class ReflectionUtil {
         Class targetClass = getClassOfType(target);
         if (superClass.equals(getClassOfType(targetClass.getGenericSuperclass()))) {
             Type superType = targetClass.getGenericSuperclass();
-            if (superType instanceof ParameterizedType) {
-                if (((ParameterizedType) superType).getRawType().equals(superClass)) {
-                    return ((ParameterizedType) superType).getActualTypeArguments()[index];
-                }
+            if (superType instanceof ParameterizedType && ((ParameterizedType) superType).getRawType().equals(superClass) ) {
+                return ((ParameterizedType) superType).getActualTypeArguments()[index];
             }
         }
         return getTypeParameterForSuperClass(targetClass.getGenericSuperclass(), superClass, index);
@@ -254,10 +252,8 @@ public final class ReflectionUtil {
     private static <T> Type getTypeParameterForSuperInterface(Type target, Class<T> superClass, int index) {
         Class targetClass = getClassOfType(target);
         for (Type superType : targetClass.getGenericInterfaces()) {
-            if (superType instanceof ParameterizedType) {
-                if (((ParameterizedType) superType).getRawType().equals(superClass)) {
-                    return ((ParameterizedType) superType).getActualTypeArguments()[index];
-                }
+            if (superType instanceof ParameterizedType && ((ParameterizedType) superType).getRawType().equals(superClass) ) {
+                return ((ParameterizedType) superType).getActualTypeArguments()[index];
             }
         }
         return getTypeParameterForSuperInterface(targetClass.getGenericSuperclass(), superClass, index);

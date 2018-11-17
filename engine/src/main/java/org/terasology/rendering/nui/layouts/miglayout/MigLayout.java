@@ -51,13 +51,6 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     private Map<UIWidget, ComponentWrapper> wrappers = Maps.newHashMap();
     private List<ComponentWrapper> children = Lists.newArrayList();
 
-    @LayoutConfig
-    private String layoutConstraints;
-    @LayoutConfig
-    private String rowConstraints;
-    @LayoutConfig
-    private String colConstraints;
-
     private LC lc;
     private AC rc;
     private AC cc;
@@ -88,7 +81,6 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     }
 
     public void setLayoutConstraints(String constraint) {
-        layoutConstraints = constraint;
         setLc(ConstraintParser.parseLayoutConstraint(ConstraintParser.prepare(constraint)));
     }
 
@@ -98,7 +90,6 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     }
 
     public void setColConstraints(String constraint) {
-        colConstraints = constraint;
         setCC(ConstraintParser.parseColumnConstraints(ConstraintParser.prepare(constraint)));
     }
 
@@ -112,7 +103,6 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     }
 
     public void setRowConstraints(String constraint) {
-        rowConstraints = constraint;
         setRc(ConstraintParser.parseColumnConstraints(ConstraintParser.prepare(constraint)));
     }
 

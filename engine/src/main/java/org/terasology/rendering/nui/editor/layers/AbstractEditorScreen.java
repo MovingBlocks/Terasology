@@ -64,7 +64,7 @@ import java.util.List;
  * A base screen for the NUI screen/skin editors.
  */
 public abstract class AbstractEditorScreen extends CoreScreenLayer {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger logger = LoggerFactory.getLogger(AbstractEditorScreen.class);
 
     /**
      * Used to get the {@link Path} of an asset.

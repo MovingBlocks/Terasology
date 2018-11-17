@@ -39,7 +39,6 @@ import java.util.Map;
  */
 @API
 public class Actor {
-    private static Logger logger = LoggerFactory.getLogger(Actor.class);
     // Stores system-wide information (allows inter-node communication)
     public final Map<String, Object> blackboard;
     private final EntityRef entity;

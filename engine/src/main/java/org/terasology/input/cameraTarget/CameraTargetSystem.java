@@ -50,9 +50,6 @@ public class CameraTargetSystem extends BaseComponentSystem {
     private Config config;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private Physics physics;
 
     private float targetDistance;

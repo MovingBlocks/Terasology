@@ -113,7 +113,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                 min[i] = Float.MIN_VALUE;
                 max[i] = Float.MAX_VALUE;
             }
-            rootNode = createNewNode(position, min, max, value);
+            rootNode = createNewNode(position, max, value);
             return null;
         } else {
             // Add a node to the root
@@ -210,10 +210,8 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
             }
 
             for (Node subNode : node.subNodes) {
-                if (subNode != null) {
-                    if (distanceFunction.getPointRegionDistance(position, subNode.minValues, subNode.maxValues) <= treeSearch.maxDistance) {
-                        executeSearchInNode(position, subNode, treeSearch);
-                    }
+                if (subNode != null && distanceFunction.getPointRegionDistance(position, subNode.minValues, subNode.maxValues) <= treeSearch.maxDistance ) {
+                    executeSearchInNode(position, subNode, treeSearch);
                 }
             }
         } else {
@@ -326,7 +324,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                                 max[i] = processedNode.center[i];
                             }
                         }
-                        processedNode.subNodes[subNodeIndex] = createNewNode(position, min, max, value);
+                        processedNode.subNodes[subNodeIndex] = createNewNode(position, max, value);
                         return null;
                     } else {
                         processedNode = subNode;
@@ -371,10 +369,8 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
             increment *= 2;
         }
 
-        if (index == 0) {
-            if (distanceFunction.getDistance(position, center) == 0) {
-                return -1;
-            }
+        if (index == 0 && distanceFunction.getDistance(position, center) == 0 ) {
+            return -1;
         }
         return index;
     }
@@ -383,14 +379,13 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
      * Creates a new node.
      *
      * @param position   The position of the new node
-     * @param min        The minimal position of the new node
      * @param max        The maximal position of the new node
      * @param value      The value of the new node
      */
-    private Node createNewNode(float[] position, float[] min, float[] max, T value) {
+    private Node createNewNode(float[] position, float[] max, T value) {
         float[] positionCopy = new float[dimensions];
         System.arraycopy(position, 0, positionCopy, 0, dimensions);
-        return new Node(positionCopy, value, min, max);
+        return new Node(positionCopy, value, max);
     }
 
     /**
@@ -465,7 +460,8 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
          * @param value           The value which the NodeEntry will hold
          */
         private NodeEntry(float[] position, T value) {
-            this.position = position;
+            float[] temp = position.clone();
+            this.position = temp;
             this.value = value;
         }
     }
@@ -486,14 +482,16 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
          *
          * @param position      The position of the node
          * @param value         The value which the node holds
-         * @param minValues     The minimum values of the node in terms of position
          * @param maxValues     The maximum values of the node in terms of position
          */
-        private Node(float[] position, T value, float[] minValues, float[] maxValues) {
+        private Node(float[] position, T value, float[] maxValues) {
+            float[] maxTemp = maxValues.clone();
+            float[] minTemp = maxValues.clone();
+
             nodeBucket = new HashSet<>();
             nodeBucket.add(new NodeEntry<>(position, value));
-            this.minValues = minValues;
-            this.maxValues = maxValues;
+            this.minValues = minTemp;
+            this.maxValues = maxTemp;
         }
 
         /**
@@ -523,7 +521,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                         }
                     }
 
-                    subNodes[subNodeIndex] = new Node(nodeEntry.position, nodeEntry.value, min, max);
+                    subNodes[subNodeIndex] = new Node(nodeEntry.position, nodeEntry.value, max);
                 } else {
                     subNodes[subNodeIndex].nodeBucket.add(nodeEntry);
                 }

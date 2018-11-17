@@ -57,7 +57,8 @@ public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements Object
     }
 
     public T[] getInternal() {
-        return data;
+        T[] temp = data.clone();
+        return temp;
     }
 
     @Override

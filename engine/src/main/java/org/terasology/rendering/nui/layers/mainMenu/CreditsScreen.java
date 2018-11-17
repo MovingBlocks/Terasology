@@ -37,9 +37,6 @@ public class CreditsScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:creditsScreen");
 
     @In
-    private Config config;
-
-    @In
     private TranslationSystem translationSystem;
 
     private UIScrollingText creditsScroll;

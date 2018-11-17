@@ -27,8 +27,6 @@ import org.terasology.engine.paths.PathManager;
  */
 public final class LWJGLHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(LWJGLHelper.class);
-
     private LWJGLHelper() {
     }
 

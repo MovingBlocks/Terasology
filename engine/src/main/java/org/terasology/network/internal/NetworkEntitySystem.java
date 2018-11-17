@@ -43,9 +43,6 @@ public class NetworkEntitySystem extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
-    @In
-    private WorldRenderer worldRenderer;
-
     private NetworkSystemImpl networkSystem;
 
     public NetworkEntitySystem(NetworkSystemImpl networkSystem) {

@@ -67,8 +67,6 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     @In
     private EntityManager entityManager;
     @In
-    private PrefabManager prefabManager;
-    @In
     private AssetManager assetManager;
 
     private List<BehaviorTree> trees = Lists.newArrayList();

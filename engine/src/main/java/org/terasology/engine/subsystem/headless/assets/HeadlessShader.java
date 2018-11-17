@@ -25,8 +25,6 @@ import java.util.Collections;
 
 public class HeadlessShader extends Shader {
 
-    private ShaderData shaderProgramBase;
-
     public HeadlessShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
         super(urn, assetType);
         reload(data);
@@ -49,7 +47,6 @@ public class HeadlessShader extends Shader {
 
     @Override
     protected void doReload(ShaderData data) {
-        shaderProgramBase = data;
     }
 
 }

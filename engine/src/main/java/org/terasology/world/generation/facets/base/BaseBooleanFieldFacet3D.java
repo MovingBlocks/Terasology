@@ -53,7 +53,8 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
     }
 
     public boolean[] getInternal() {
-        return data;
+        boolean[] temp = data.clone();
+        return temp;
     }
 
     @Override

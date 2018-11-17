@@ -44,8 +44,6 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
 
     @In
     private WorldProvider worldProvider;
-    @In
-    private BlockEntityRegistry blockEntityRegistry;
 
     private int largeBlockUpdateCount;
     private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();

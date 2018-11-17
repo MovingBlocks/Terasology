@@ -42,7 +42,7 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
 
     public HorizontalFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        super(definition, shape, blockBuilder);
+        super(definition);
         BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
@@ -62,7 +62,7 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
     }
 
     public HorizontalFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        super(definition, blockBuilder);
+        super(definition);
         BlockUri uri = new BlockUri(definition.getUrn());
         for (Rotation rot : Rotation.horizontalRotations()) {
             Side side = rot.rotate(Side.FRONT);

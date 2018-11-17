@@ -88,7 +88,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     private static final String SELECTED_SCREEN_ID = "selectedScreen";
     private static final String CREATE_NEW_SKIN = "New Skin";
 
-    private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
+    private static final Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
     /**
      * Used to retrieve {@link UISkin} assets.

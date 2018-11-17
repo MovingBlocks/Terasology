@@ -96,11 +96,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private MovementDebugCommands movementDebugCommands;
     @In
-    private PhysicsEngine physics;
-    @In
-    private DelayManager delayManager;
-
-    @In
     private Config config;
     @In
     private InputSystem inputSystem;
@@ -396,11 +391,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @Override
     public void renderOverlay() {
         // Display the block the player is aiming at
-        if (config.getRendering().isRenderPlacingBox()) {
-            if (aabb != null) {
-                aabbRenderer.setAABB(aabb);
-                aabbRenderer.render(2f);
-            }
+        if (config.getRendering().isRenderPlacingBox() && aabb != null ) {
+            aabbRenderer.setAABB(aabb);
+            aabbRenderer.render(2f);
+
         }
     }
 

@@ -52,16 +52,10 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
 
     @In
-    private GameEngine engine;
-
-    @In
     private Config config;
 
     @In
     private DisplayDevice displayDevice;
-
-    @In
-    private LocalPlayer localPlayer;
 
     @In
     private TranslationSystem translationSystem;

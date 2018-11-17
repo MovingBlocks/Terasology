@@ -349,27 +349,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     public void renderShadows() {
     }
 
-    private void renderBoneOrientation(EntityRef boneEntity) {
-        LocationComponent loc = boneEntity.getComponent(LocationComponent.class);
-        if (loc == null) {
-            return;
-        }
-        glPushMatrix();
-        Vector3f worldPosA = loc.getWorldPosition();
-        Quat4f worldRot = loc.getWorldRotation();
-        Vector3f offset = new Vector3f(0, 0, 0.1f);
-        worldRot.rotate(offset, offset);
-        offset.add(worldPosA);
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(worldPosA.x, worldPosA.y, worldPosA.z);
-        glVertex3f(offset.x, offset.y, offset.z);
-        glEnd();
-
-        loc.getChildren().forEach(this::renderBoneOrientation);
-        glPopMatrix();
-    }
-
     private void renderBone(EntityRef boneEntity, Vector3f centerPos) {
         LocationComponent loc = boneEntity.getComponent(LocationComponent.class);
         if (loc == null) {

@@ -59,7 +59,8 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     public T[] getInternal() {
-        return data;
+        T[] temp = data.clone();
+        return temp;
     }
 
     @Override

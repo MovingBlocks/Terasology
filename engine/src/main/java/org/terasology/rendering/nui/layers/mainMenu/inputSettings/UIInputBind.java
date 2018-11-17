@@ -119,12 +119,10 @@ public class UIInputBind extends CoreWidget {
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown()) {
-            if (capturingInput) {
-                setNewInput(InputType.KEY.getInput(event.getKey().getId()));
-                capturingInput = false;
-                return true;
-            }
+        if (event.isDown() && capturingInput) {
+            setNewInput(InputType.KEY.getInput(event.getKey().getId()));
+            capturingInput = false;
+            return true;
         }
         return false;
     }

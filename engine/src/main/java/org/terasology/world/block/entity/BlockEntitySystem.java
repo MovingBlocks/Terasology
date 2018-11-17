@@ -61,9 +61,6 @@ public class BlockEntitySystem extends BaseComponentSystem {
     private EntityManager entityManager;
 
     @In
-    private AudioManager audioManager;
-
-    @In
     private BlockManager blockManager;
 
     private BlockItemFactory blockItemFactory;

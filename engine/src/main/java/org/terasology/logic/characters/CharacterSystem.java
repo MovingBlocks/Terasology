@@ -82,12 +82,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private Time time;
 
     @In
-    private PlayerTargetSystem targetSystem;
-
-    @In
-    private BlockEntityRegistry blockRegistry;
-
-    @In
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
 
     @In
@@ -205,22 +199,19 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @ReceiveEvent(components = LocationComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onAttackRequest(AttackRequest event, EntityRef character, CharacterComponent characterComponent) {
         // if an item is used,  make sure this entity is allowed to attack with it
-        if (event.getItem().exists()) {
-            if (!character.equals(event.getItem().getOwner())) {
+        if (event.getItem().exists() && !character.equals(event.getItem().getOwner()) ) {
                 return;
-            }
         }
 
         OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
         character.send(onItemUseEvent);
-        if (!onItemUseEvent.isConsumed()) {
+        if (!onItemUseEvent.isConsumed() && recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
             Vector3f direction = gazeLocation.getWorldDirection();
             Vector3f originPos = gazeLocation.getWorldPosition();
-            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
-                directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction, originPos);
-            } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
+            directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction, originPos);
+            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
                 Vector3f[] data = directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().poll();
                 direction = data[0];
                 originPos = data[1];

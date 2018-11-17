@@ -145,10 +145,8 @@ public class BiomeManager implements BiomeRegistry {
     @Override
     public <T extends Biome> T getBiomeById(String id, Class<T> biomeClass) {
         Biome biome = getBiomeById(id);
-        if (biome != null) {
-            if (biomeClass.isAssignableFrom(biome.getClass())) {
-                return biomeClass.cast(biome);
-            }
+        if (biome != null && biomeClass.isAssignableFrom(biome.getClass())) {
+            return biomeClass.cast(biome);
         }
         return null;
     }

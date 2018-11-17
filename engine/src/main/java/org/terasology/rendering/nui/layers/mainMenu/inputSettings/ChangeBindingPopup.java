@@ -38,19 +38,10 @@ public class ChangeBindingPopup extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:changeBindingPopup");
 
     @In
-    private Config config;
-
-    @In
     private BindsManager bindsManager;
 
     @In
-    private ModuleManager moduleManager;
-
-    @In
     private TranslationSystem translationSystem;
-
-    @In
-    private Context context;
 
     private UIInputBind bindButton;
 

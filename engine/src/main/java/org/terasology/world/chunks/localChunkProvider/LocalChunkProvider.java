@@ -411,14 +411,12 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                     break;
                 }
             }
-            if (!keep) {
+            if (!keep && unloadChunkInternal(pos)) {
                 // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
                 // Note: Above won't matter if all changes are on the main thread
-                if (unloadChunkInternal(pos)) {
-                    iterator.remove();
-                    if (++unloaded >= UNLOAD_PER_FRAME) {
-                        break;
-                    }
+                iterator.remove();
+                if (++unloaded >= UNLOAD_PER_FRAME) {
+                    break;
                 }
             }
         }
@@ -453,28 +451,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
 
         return true;
-    }
-
-    private boolean areAdjacentChunksReady(Chunk chunk) {
-        for (Chunk adjacentChunk : listAdjacentChunks(chunk)) {
-            if (!adjacentChunk.isReady()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private List<Chunk> listAdjacentChunks(Chunk chunk) {
-        final Vector3i centerChunkPosition = chunk.getPosition();
-        List<Chunk> adjacentChunks = new ArrayList<>(6);
-        for (Side side : Side.getAllSides()) {
-            final Vector3i adjacentChunkPosition = side.getAdjacentPos(centerChunkPosition);
-            final Chunk adjacentChunk = chunkCache.get(adjacentChunkPosition);
-            if (adjacentChunk != null) {
-                adjacentChunks.add(adjacentChunk);
-            }
-        }
-        return adjacentChunks;
     }
 
     private void updateRelevance() {

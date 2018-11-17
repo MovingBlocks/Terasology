@@ -58,7 +58,7 @@ public class NUIEditorMenuTreeBuilder {
     public static final String OPTION_EDIT = "Edit";
     public static final String OPTION_PASTE = "Paste";
 
-    private Logger logger = LoggerFactory.getLogger(NUIEditorMenuTreeBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(NUIEditorMenuTreeBuilder.class);
 
     /**
      * A {@link NUIManager} instance retrieved from the editor screen.

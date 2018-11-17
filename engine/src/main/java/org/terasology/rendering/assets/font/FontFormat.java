@@ -41,7 +41,6 @@ public class FontFormat extends AbstractAssetFileFormat<FontData> {
 
     private static final String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
 
-    private static final Name FONT_RESOURCE_NAME = new Name("font");
 
     // Common patterns
     private Pattern lineHeightPattern = Pattern.compile("lineHeight=" + INTEGER_PATTERN);

@@ -110,7 +110,7 @@ public class KinematicCharacterMover implements CharacterMover {
                         characterMovementComponent.height);
             }
             if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
-                checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun(), input.isCrouching());
+                checkMode(characterMovementComponent, result, input.isCrouching());
             }
         }
         result.setTime(initial.getTime() + input.getDeltaMs());
@@ -171,8 +171,7 @@ public class KinematicCharacterMover implements CharacterMover {
      * @param movementComp The movement component of the character.
      * @param state        The current state of the character.
      */
-    private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
-                           final CharacterStateEvent oldState, EntityRef entity, boolean firstRun, boolean isCrouching) {
+    private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state, boolean isCrouching) {
         //If we are ghosting or we can't move, the mode cannot be changed.
         if (!state.getMode().respondToEnvironment) {
             return;
@@ -192,7 +191,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
         if (isClimbingAllowed(newSwimming, newDiving)) {
             Vector3i finalDir;
-            finalDir = findClimbable(movementComp, worldPos, newSwimming, newDiving);
+            finalDir = findClimbable(movementComp, worldPos);
             if (finalDir != null) {
                 newClimbing = true;
                 state.setClimbDirection(finalDir);
@@ -239,7 +238,7 @@ public class KinematicCharacterMover implements CharacterMover {
         }
     }
 
-    private Vector3i findClimbable(CharacterMovementComponent movementComp, Vector3f worldPos, boolean swimming, boolean diving) {
+    private Vector3i findClimbable(CharacterMovementComponent movementComp, Vector3f worldPos) {
         Vector3i finalDir = null;
         Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(
                 worldPos), new Vector3f(worldPos)};

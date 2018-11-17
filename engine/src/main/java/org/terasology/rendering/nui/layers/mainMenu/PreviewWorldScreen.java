@@ -77,16 +77,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:previewWorldScreen");
 
-    private static final Logger logger = LoggerFactory.getLogger(PreviewWorldScreen.class);
-
     @In
     private ModuleManager moduleManager;
-
-    @In
-    private ModuleAwareAssetTypeManager assetTypeManager;
-
-    @In
-    private WorldGeneratorManager worldGeneratorManager;
 
     @In
     private Config config;
@@ -112,7 +104,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private Texture texture;
 
     private boolean triggerUpdate;
-    private String targetZone = "Surface";
 
     public PreviewWorldScreen() {
     }

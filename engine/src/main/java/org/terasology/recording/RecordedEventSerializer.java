@@ -384,7 +384,6 @@ class RecordedEventSerializer {
             boolean crouching = jsonObject.get("crouching").getAsBoolean();
             boolean jumpRequested = jsonObject.get("jumpRequested").getAsBoolean();
             int sequenceNumber = jsonObject.get("sequeceNumber").getAsInt();
-            boolean firstRun = jsonObject.get("firstRun").getAsBoolean();
             JsonObject objMoveDirection = jsonObject.get("movementDirection").getAsJsonObject();
             Vector3f movementDirection = new Vector3f(objMoveDirection.get("x").getAsFloat(),
                     objMoveDirection.get("y").getAsFloat(),
@@ -426,7 +425,6 @@ class RecordedEventSerializer {
                 Keyboard.Key input = (Keyboard.Key) typeHandler.deserialize(data, deserializationContext);
                 data = new GsonPersistedData(jsonObject.get("state"));
                 typeHandler = typeSerializationLibrary.getTypeHandler(ButtonState.class);
-                ButtonState state = (ButtonState) typeHandler.deserialize(data, deserializationContext);
                 char keychar = jsonObject.get("keychar").getAsCharacter();
                 float delta = jsonObject.get("delta").getAsFloat();
                 KeyEvent aux;
@@ -509,8 +507,6 @@ class RecordedEventSerializer {
     }
 
     private void inputEventSetup(InputEvent event, JsonObject jsonObject) {
-        float delta = jsonObject.get("delta").getAsFloat();
-        boolean consumed = jsonObject.get("consumed").getAsBoolean();
         EntityRef target =  new RecordedEntityRef(jsonObject.get("target").getAsLong(), (LowLevelEntityManager) this.entityManager);
         JsonObject aux = jsonObject.get("hitNormal").getAsJsonObject();
         Vector3f hitNormal = new Vector3f(aux.get("x").getAsFloat(), aux.get("y").getAsFloat(), aux.get("z").getAsFloat());

@@ -50,11 +50,8 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
     @In
     private BlockEntityRegistry blockEntityRegistry;
     @In
-    private EntityManager entityManager;
-    @In
     private PrefabManager prefabManager;
 
-    private boolean midDestruction;
     private EntityRef gatheringEntity;
 
     private Set<BlockStructuralSupport> supports = Sets.newTreeSet(

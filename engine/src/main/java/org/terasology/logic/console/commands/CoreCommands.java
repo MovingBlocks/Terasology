@@ -138,8 +138,6 @@ public class CoreCommands extends BaseComponentSystem {
     @In
     private Config config;
 
-    @In
-    private ModuleManager moduleManager;
 
     /**
      * Determine if command is matching one of criteria

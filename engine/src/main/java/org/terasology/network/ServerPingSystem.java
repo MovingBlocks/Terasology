@@ -99,7 +99,7 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
                     pingStockComponent = client.getComponent(PingStockComponent.class);
                 }
                 if (localPlayer != null && localPlayer.getClientEntity() != null) {
-                    pingMap.put(localPlayer.getClientEntity(), new Long(5));
+                    pingMap.put(localPlayer.getClientEntity(), Long.valueOf(5));
                 }
                 pingStockComponent.setValues(pingMap);
                 client.addOrSaveComponent(pingStockComponent);

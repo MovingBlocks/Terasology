@@ -57,8 +57,6 @@ import java.util.List;
 
 public class NewGameScreen extends CoreScreenLayer {
 
-    private static final Logger logger = LoggerFactory.getLogger(NewGameScreen.class);
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:newGameScreen");
     private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
 
@@ -190,10 +188,8 @@ public class NewGameScreen extends CoreScreenLayer {
         List<Module> gameplayModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!latestVersion.isOnClasspath()) {
-                if (StandardModuleExtension.isGameplayModule(latestVersion)) {
-                    gameplayModules.add(latestVersion);
-                }
+            if (!latestVersion.isOnClasspath() && StandardModuleExtension.isGameplayModule(latestVersion)) {
+                gameplayModules.add(latestVersion);
             }
         }
         gameplayModules.sort(Comparator.comparing(o -> o.getMetadata().getDisplayName().value()));
@@ -288,12 +284,10 @@ public class NewGameScreen extends CoreScreenLayer {
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
-            if (GameProvider.isSavesFolderEmpty()) {
-                // skip selectGameScreen and get back directly to main screen
-                getManager().pushScreen("engine:mainMenuScreen");
-                return true;
-            }
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE && GameProvider.isSavesFolderEmpty() ) {
+            // skip selectGameScreen and get back directly to main screen
+            getManager().pushScreen("engine:mainMenuScreen");
+            return true;
         }
         return super.onKeyEvent(event);
     }

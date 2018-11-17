@@ -69,7 +69,8 @@ public enum BlockPart {
      * @return The block parts corresponding to sides (so not the center)
      */
     public static BlockPart[] sideValues() {
-        return SIDES;
+        BlockPart[] temp = SIDES;
+        return temp;
     }
 
     /**

@@ -68,7 +68,7 @@ import java.util.Set;
 /**
  */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
-    private Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
+    private static final Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private HUDScreenLayer hudScreenLayer;
     private BiMap<ResourceUrn, UIScreenLayer> screenLookup = HashBiMap.create();
@@ -77,7 +77,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private UIWidget focus;
     private KeyboardDevice keyboard;
     private MouseDevice mouse;
-    private DisplayDevice display;
     private boolean forceReleaseMouse;
 
     private Map<ResourceUrn, ControlWidget> overlays = Maps.newLinkedHashMap();
@@ -91,7 +90,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         this.canvas = new CanvasImpl(this, context, renderer);
         this.keyboard = context.get(InputSystem.class).getKeyboard();
         this.mouse = context.get(InputSystem.class).getMouseDevice();
-        this.display = context.get(DisplayDevice.class);
         this.assetManager = context.get(AssetManager.class);
         refreshWidgetsLibrary();
 
@@ -180,10 +178,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
     }
 
-    private void closeScreenWithoutEvent(ResourceUrn screenUri) {
-        boolean sendEvents = false;
-        closeScreen(screenUri, sendEvents);
-    }
 
     @Override
     public void closeScreen(UIScreenLayer screen) {
@@ -397,7 +391,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             if (expectedType.isInstance(root)) {
                 T overlay = expectedType.cast(root);
                 if (!existsAlready) {
-                    initialiseOverlay(overlay, overlayUri);
+                    initialiseOverlay(overlay);
                 }
                 addOverlay(overlay, overlayUri);
                 return overlay;
@@ -408,7 +402,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         return null;
     }
 
-    private <T extends ControlWidget> void initialiseOverlay(T overlay, ResourceUrn screenUri) {
+    private <T extends ControlWidget> void initialiseOverlay(T overlay) {
         InjectionHelper.inject(overlay);
         overlay.initialise();
     }
@@ -607,20 +601,16 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void keyEvent(KeyEvent ev, EntityRef entity) {
         NUIKeyEvent nuiEvent = new NUIKeyEvent(mouse, keyboard, ev.getKey(), ev.getKeyCharacter(), ev.getState());
-        if (focus != null) {
-            if (focus.onKeyEvent(nuiEvent)) {
-                ev.consume();
-            }
+        if (focus != null && focus.onKeyEvent(nuiEvent)) {
+            ev.consume();
         }
 
         // send event to screen stack if not yet consumed
         if (!ev.isConsumed()) {
             for (UIScreenLayer screen : screens) {
-                if (screen != focus) {    // explicit identity check
-                    if (screen.onKeyEvent(nuiEvent)) {
-                        ev.consume();
-                        break;
-                    }
+                if (screen != focus && screen.onKeyEvent(nuiEvent) ) {    // explicit identity check
+                    ev.consume();
+                    break;
                 }
                 if (screen.isModal()) {
                     break;

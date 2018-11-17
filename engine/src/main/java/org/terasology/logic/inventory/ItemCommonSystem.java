@@ -37,7 +37,6 @@ import org.terasology.world.block.items.BlockItemComponent;
  */
 @RegisterSystem
 public class ItemCommonSystem extends BaseComponentSystem {
-    private static Random rand = new FastRandom();
 
     @ReceiveEvent
     public void onRenderItemIconMeshActivated(OnActivatedComponent event, EntityRef item,

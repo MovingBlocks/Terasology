@@ -91,7 +91,7 @@ public class ByteCodeReflectFactory implements ReflectFactory {
     @Override
     public <T, U> FieldAccessor<T, U> createFieldAccessor(Class<T> ownerType, Field field, Class<U> fieldType) throws InaccessibleFieldException {
         try {
-            return new ReflectASMFieldAccessor<>(ownerType, field, fieldType);
+            return new ReflectASMFieldAccessor<>(ownerType, field);
         } catch (IllegalArgumentException | InaccessibleFieldException e) {
             logger.warn("Failed to create accessor for field '{}' of type '{}', falling back on reflection", field.getName(), ownerType.getName());
             return backupFactory.createFieldAccessor(ownerType, field, fieldType);
@@ -112,7 +112,7 @@ public class ByteCodeReflectFactory implements ReflectFactory {
         private FieldAccess fieldAccess;
         private int fieldIndex;
 
-        ReflectASMFieldAccessor(Class<T> ownerType, Field field, Class<U> fieldType) throws InaccessibleFieldException {
+        ReflectASMFieldAccessor(Class<T> ownerType, Field field) throws InaccessibleFieldException {
             methodAccess = MethodAccess.get(ownerType);
             Method getter = ReflectionUtil.findGetter(field);
             if (getter != null) {

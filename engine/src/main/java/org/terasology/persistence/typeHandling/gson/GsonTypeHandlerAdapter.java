@@ -47,7 +47,6 @@ import java.io.IOException;
  */
 public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
 
-    private final TypeHandler<T> typeHandler;
     private final JsonSerializer<T> serializer;
     private final JsonDeserializer<T> deserializer;
     private final Gson gson;
@@ -55,7 +54,6 @@ public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
 
     GsonTypeHandlerAdapter(TypeHandler<T> typeHandler,
                            Gson gson, TypeToken<T> typeToken) {
-        this.typeHandler = typeHandler;
 
         this.serializer = (src, typeOfSrc, context) ->
                 ((GsonPersistedData) typeHandler.serialize(src, new GsonSerializationContext(context)))

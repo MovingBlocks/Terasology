@@ -79,8 +79,6 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     @In
     private NetworkSystem networkSystem;
     @In
-    private EntityManager entityManager;
-    @In
     private PhysicsEngine physics;
     @In
     private WorldProvider worldProvider;

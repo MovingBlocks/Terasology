@@ -128,6 +128,7 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
         for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
             return entity;
         }
+
         return EntityRef.NULL;
     }
 }

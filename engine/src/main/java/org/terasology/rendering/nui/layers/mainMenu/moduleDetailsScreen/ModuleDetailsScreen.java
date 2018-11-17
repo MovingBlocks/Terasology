@@ -80,8 +80,6 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     private ModuleManager moduleManager;
     @In
     private TranslationSystem translationSystem;
-    @In
-    private Context context;
 
     private UIList<DependencyInfo> dependencies;
     private final Binding<DependencyInfo> dependencyInfoBinding = new ReadOnlyBinding<DependencyInfo>() {

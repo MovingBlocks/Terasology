@@ -151,14 +151,6 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
         // used: they are only necessary to ensure that the event is fired up correctly.
    }
 
-    private void disposeAllFbos() {
-        // TODO: This should be public, and should be called while disposing an object of this class, to prevent leaks.
-        for (SimpleUri urn : fboConfigs.keySet()) {
-            fboLookup.get(urn).dispose();
-        }
-        fboLookup.clear();
-    }
-
     /**
      * Returns the GBuffer FBOs as a SwappableFBO instance.
      *

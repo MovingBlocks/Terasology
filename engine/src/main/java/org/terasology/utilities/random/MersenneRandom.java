@@ -57,7 +57,8 @@ public class MersenneRandom extends Random {
      * @param array the seed value
      */
     public MersenneRandom(int[] array) {
-        mersenne = new MersenneTwisterFast(array);
+        int[] temp = array.clone();
+        mersenne = new MersenneTwisterFast(temp);
     }
 
     @Override

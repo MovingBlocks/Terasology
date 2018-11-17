@@ -79,11 +79,9 @@ public class TargetSystem {
         EntityRef newTarget = hitInfo.getEntity();
 
         if (hitInfo.isWorldHit()) {
-            if (targetBlockPos != null) {
-                if (targetBlockPos.equals(hitInfo.getBlockPosition())) {
+                if (targetBlockPos != null && targetBlockPos.equals(hitInfo.getBlockPosition())) {
                     return false;
                 }
-            }
             targetBlockPos = hitInfo.getBlockPosition();
         } else {
             if (target.equals(newTarget)) {

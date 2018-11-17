@@ -24,7 +24,6 @@ import java.util.List;
 public class UniverseConfig {
     private List<WorldInfo> worlds = Lists.newArrayList();
     private String spawnWorldTitle;
-    private String universeSeed;
 
     public UniverseConfig() {
         worlds.clear();
@@ -40,10 +39,6 @@ public class UniverseConfig {
 
     public void setSpawnWorldTitle(String targetWorldTitle) {
         spawnWorldTitle = targetWorldTitle;
-    }
-
-    public void setUniverseSeed(String seed) {
-        universeSeed = seed;
     }
 
     public String getSpawnWorldTitle() {

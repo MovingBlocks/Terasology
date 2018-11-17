@@ -87,7 +87,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
     private static final String SELECTED_SCREEN_ID = "selectedScreen";
     private static final String CREATE_NEW_SCREEN = "New Screen";
 
-    private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
+    private static final Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
     /**
      * Used to retrieve & dispose of {@link UIElement} assets.

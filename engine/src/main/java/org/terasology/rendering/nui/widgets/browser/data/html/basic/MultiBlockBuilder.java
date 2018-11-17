@@ -25,7 +25,6 @@ import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyl
 import org.xml.sax.Attributes;
 
 public class MultiBlockBuilder implements HTMLBlockBuilder {
-    private final HTMLFontResolver htmlFontResolver;
     private MultiBlockParagraphRenderable renderable;
 
     private HTMLDocumentBuilder htmlDocumentBuilder;
@@ -35,9 +34,8 @@ public class MultiBlockBuilder implements HTMLBlockBuilder {
     private int level;
     private final ParagraphRenderStyle paragraphRenderStyle;
 
-    public MultiBlockBuilder(HTMLDocumentBuilder htmlDocumentBuilder, HTMLFontResolver htmlFontResolver, Attributes attributes) {
+    public MultiBlockBuilder(HTMLDocumentBuilder htmlDocumentBuilder, Attributes attributes) {
         this.htmlDocumentBuilder = htmlDocumentBuilder;
-        this.htmlFontResolver = htmlFontResolver;
         paragraphRenderStyle = HTMLUtils.createParagraphRenderStyleFromCommonAttributes(attributes);
         renderable = new MultiBlockParagraphRenderable(paragraphRenderStyle);
     }

@@ -86,7 +86,6 @@ public class ChunkImpl implements Chunk {
     // Rendering
     private ChunkMesh activeMesh;
     private ChunkMesh pendingMesh;
-    private boolean adjacentChunksReady;
 
     public ChunkImpl(int x, int y, int z, BlockManager blockManager, BiomeManager biomeManager) {
         this(new Vector3i(x, y, z), blockManager, biomeManager);
@@ -159,10 +158,8 @@ public class ChunkImpl implements Chunk {
             blockData = blockData.copy();
         }
         int oldValue = blockData.set(x, y, z, block.getId());
-        if (oldValue != block.getId()) {
-            if (!block.isLiquid()) {
-                setLiquid(x, y, z, new LiquidData());
-            }
+        if (oldValue != block.getId() && !block.isLiquid()) {
+            setLiquid(x, y, z, new LiquidData());
         }
         return blockManager.getBlock((short) oldValue);
     }

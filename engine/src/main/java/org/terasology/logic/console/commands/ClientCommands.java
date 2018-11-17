@@ -46,9 +46,6 @@ public class ClientCommands extends BaseComponentSystem {
     private WorldProvider worldProvider;
 
     @In
-    private NetworkSystem networkSystem;
-
-    @In
     private CelestialSystem celestialSystem;
 
     /**

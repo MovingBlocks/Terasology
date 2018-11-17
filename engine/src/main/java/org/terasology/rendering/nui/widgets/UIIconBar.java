@@ -59,11 +59,8 @@ public class UIIconBar extends CoreWidget {
             Vector2i iconSize = getIconSize(canvas);
             float ratio = maxIcons * getValue() / getMaxValue();
             int fullIcons = TeraMath.floorToInt(ratio);
-            boolean halfIcon = false;
             if (ratio - fullIcons >= 0.5f) {
                 fullIcons++;
-            } else if (ratio - fullIcons > 0) {
-                halfIcon = true;
             }
             Vector2i offset = new Vector2i();
             for (int i = 0; i < maxIcons; ++i) {

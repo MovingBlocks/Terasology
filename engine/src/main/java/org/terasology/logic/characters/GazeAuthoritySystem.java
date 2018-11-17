@@ -37,7 +37,6 @@ import org.terasology.registry.In;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class GazeAuthoritySystem extends BaseComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(GazeAuthoritySystem.class);
     @In
     EntityManager entityManager;
     @In

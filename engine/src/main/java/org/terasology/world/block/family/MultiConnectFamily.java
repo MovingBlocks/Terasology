@@ -60,22 +60,16 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * Constructor for a block with a specified shape
      * 
      * @param definition Family definition
-     * @param shape The shape of the block
-     * @param blockBuilder The builder to make the blocks for the family
      */
-    public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        super(definition, shape, blockBuilder);
+    public MultiConnectFamily(BlockFamilyDefinition definition) {
+        super(definition);
     }
 
     /**
      * Constructor for a regular block
      * 
      * @param definition Family definition
-     * @param blockBuilder The builder to make the blocks for the family
      */
-    public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        super(definition, blockBuilder);
-    }
 
     /**
      * A condition to return true if the block should have a connection on the given side

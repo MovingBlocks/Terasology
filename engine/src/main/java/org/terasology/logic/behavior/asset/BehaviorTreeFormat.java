@@ -42,9 +42,6 @@ import java.util.List;
  */
 @RegisterAssetFileFormat
 public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData> {
-    private static final Logger logger = LoggerFactory.getLogger(BehaviorTreeFormat.class);
-
-
 
     public BehaviorTreeFormat() {
         super("behavior");

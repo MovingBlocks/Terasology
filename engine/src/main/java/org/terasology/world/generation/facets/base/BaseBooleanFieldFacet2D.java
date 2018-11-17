@@ -62,7 +62,8 @@ public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements Boo
      * @return the internal data buffer
      */
     public boolean[] getInternal() {
-        return data;
+        boolean[] temp = data.clone();
+        return temp;
     }
 
     @Override

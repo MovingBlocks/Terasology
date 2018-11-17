@@ -55,7 +55,8 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
     }
 
     public float[] getInternal() {
-        return data;
+        float[] temp = data.clone();
+        return temp;
     }
 
     @Override

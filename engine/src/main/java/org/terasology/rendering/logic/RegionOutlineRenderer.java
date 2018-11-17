@@ -62,10 +62,6 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
     @In
     private WorldRenderer worldRenderer;
 
-    @In
-    private EntityManager entityManager;
-
-
     private Material material;
 
     private Map<EntityRef, RegionOutlineComponent> entityToRegionOutlineMap = Maps.newLinkedHashMap();

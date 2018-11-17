@@ -28,18 +28,12 @@ import java.nio.FloatBuffer;
 
 public class HeadlessMaterial extends BaseMaterial {
 
-    // private MaterialData data
 
     public HeadlessMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
         super(urn, assetType);
         reload(data);
     }
 
-    /*
-    @Override
-    protected void doReload(MaterialData newData) {
-        this.data = newData;
-    }*/
 
     @Override
     protected void doReload(MaterialData newData) {

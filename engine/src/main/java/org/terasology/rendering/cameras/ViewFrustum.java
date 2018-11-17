@@ -145,7 +145,10 @@ public class ViewFrustum {
 
         Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition();
 
-        for (int i = 0; i < 6; i++) {
+        double value1, value2, value3, value4, value5, value6, value7, value8;
+
+
+        /*for (int i = 0; i < 6; i++) {
             if (planes[i].getA() * (aabbVertices[0].x - cp.x) + planes[i].getB() * (aabbVertices[0].y - cp.y)
                     + planes[i].getC() * (aabbVertices[0].z - cp.z) + planes[i].getD() > 0) {
                 continue;
@@ -179,7 +182,32 @@ public class ViewFrustum {
                 continue;
             }
             return false;
+        }*/
+
+        for (int i = 0; i < 6; i++) {
+            value1 = planes[i].getA() * (aabbVertices[0].x - cp.x) + planes[i].getB() * (aabbVertices[0].y - cp.y)
+                    + planes[i].getC() * (aabbVertices[0].z - cp.z) + planes[i].getD();
+            value2 = planes[i].getA() * (aabbVertices[1].x - cp.x) + planes[i].getB() * (aabbVertices[1].y - cp.y)
+                    + planes[i].getC() * (aabbVertices[1].z - cp.z) + planes[i].getD();
+            value3 = planes[i].getA() * (aabbVertices[2].x - cp.x) + planes[i].getB() * (aabbVertices[2].y - cp.y)
+                    + planes[i].getC() * (aabbVertices[2].z - cp.z) + planes[i].getD();
+            value4 = planes[i].getA() * (aabbVertices[3].x - cp.x) + planes[i].getB() * (aabbVertices[3].y - cp.y)
+                    + planes[i].getC() * (aabbVertices[3].z - cp.z) + planes[i].getD();
+            value5 = planes[i].getA() * (aabbVertices[4].x - cp.x) + planes[i].getB() * (aabbVertices[4].y - cp.y)
+                    + planes[i].getC() * (aabbVertices[4].z - cp.z) + planes[i].getD();
+            value6 = planes[i].getA() * (aabbVertices[5].x - cp.x) + planes[i].getB() * (aabbVertices[5].y - cp.y)
+                    + planes[i].getC() * (aabbVertices[5].z - cp.z) + planes[i].getD();
+            value7 = planes[i].getA() * (aabbVertices[6].x - cp.x) + planes[i].getB() * (aabbVertices[6].y - cp.y)
+                    + planes[i].getC() * (aabbVertices[6].z - cp.z) + planes[i].getD();
+            value8 = planes[i].getA() * (aabbVertices[7].x - cp.x) + planes[i].getB() * (aabbVertices[7].y - cp.y)
+                    + planes[i].getC() * (aabbVertices[7].z - cp.z) + planes[i].getD();
+
+            if(value1 <= 0 || value2 <= 0 && value3 <= 0 && value4 <= 0 && value5 <= 0 && value6 <= 0 && value7 <= 0 && value8 <= 0) {
+                return false;
+            }
         }
+
+
 
         return true;
     }

@@ -416,6 +416,7 @@ public final class AABB {
      * @return The vertices
      */
     public Vector3f[] getVertices() {
+
         if (vertices == null) {
             vertices = new Vector3f[8];
 
@@ -430,8 +431,9 @@ public final class AABB {
             vertices[6] = new Vector3f(max.x, max.y, min.z);
             vertices[7] = new Vector3f(min.x, max.y, min.z);
         }
+        Vector3f[] temp = vertices;
 
-        return vertices;
+        return temp;
     }
 
     @Override

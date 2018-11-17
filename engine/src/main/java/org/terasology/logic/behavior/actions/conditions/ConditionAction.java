@@ -50,9 +50,6 @@ public class ConditionAction extends BaseAction {
     protected String[] values;
 
     @In
-    private ModuleManager moduleManager;
-
-    @In
     private ComponentLibrary componentLibrary;
 
     @Override

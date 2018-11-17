@@ -98,7 +98,9 @@ public class TypeInfo<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
         return o instanceof TypeInfo<?>
                 && ReflectionUtil.typeEquals(type, ((TypeInfo<?>) o).type);
     }

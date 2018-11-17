@@ -321,11 +321,10 @@ public class ColladaLoader {
         while (!jointsToProcess.isEmpty()) {
             MD5Joint joint = jointsToProcess.pop();
             MD5Joint parentJoint = joint.parent;
-            if (null != parentJoint) {
-                if (!md5JointList.contains(parentJoint)) {
-                    md5JointList.add(parentJoint);
-                    jointsToProcess.push(parentJoint);
-                }
+            if (null != parentJoint && !md5JointList.contains(parentJoint) ) {
+                md5JointList.add(parentJoint);
+                jointsToProcess.push(parentJoint);
+
             }
         }
 
@@ -566,7 +565,7 @@ public class ColladaLoader {
                 ElementSet trianglesSet = mesh.find("triangles");
                 for (Element triangles : trianglesSet) {
                     vertCount = parseTriangles(rootElement, vertices, texCoord0,
-                            normals, indices, colors,
+                            normals, colors,
                             vertCount, geometry, mesh, triangles,
                             yUp, zUp);
                 }
@@ -590,7 +589,7 @@ public class ColladaLoader {
                     }
 
                     vertCount = parseFaces(rootElement, vcountList, vertices, texCoord0,
-                            normals, indices, colors,
+                            normals, colors,
                             vertCount, geometry, mesh, polylist,
                             yUp, zUp);
                 }
@@ -599,17 +598,17 @@ public class ColladaLoader {
     }
 
     private int parseTriangles(Element rootElement, TFloatList verticesParam, TFloatList texCoord0Param,
-                               TFloatList normalsParam, TIntList indicesParam, TFloatList colorsParam,
+                               TFloatList normalsParam, TFloatList colorsParam,
                                int vertCountParam, Element geometry, Element mesh,
                                Element triangles, boolean yUp, boolean zUp) throws ColladaParseException {
         return parseFaces(rootElement, null, verticesParam, texCoord0Param,
-                normalsParam, indicesParam, colorsParam,
+                normalsParam, colorsParam,
                 vertCountParam, geometry, mesh, triangles,
                 yUp, zUp);
     }
 
     private int parseFaces(Element rootElement, TIntList vcountList, TFloatList verticesParam, TFloatList texCoord0Param,
-                           TFloatList normalsParam, TIntList indicesParam, TFloatList colorsParam,
+                           TFloatList normalsParam, TFloatList colorsParam,
                            int vertCountParam, Element geometry, Element mesh, Element faces,
                            boolean yUp, boolean zUp) throws ColladaParseException {
         int vertCount = vertCountParam;

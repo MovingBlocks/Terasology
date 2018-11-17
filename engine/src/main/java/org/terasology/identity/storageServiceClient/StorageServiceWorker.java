@@ -194,8 +194,9 @@ public final class StorageServiceWorker {
         private String messageId;
         private Object[] args;
         private ConsoleNotification(String messageId, Object[] args) {
+            Object[] temp = args.clone();
             this.messageId = messageId;
-            this.args = args;
+            this.args = temp;
         }
     }
 }

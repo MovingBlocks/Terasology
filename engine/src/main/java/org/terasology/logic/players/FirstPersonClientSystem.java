@@ -49,8 +49,6 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     @In
     private LocalPlayer localPlayer;
     @In
-    private WorldRenderer worldRenderer;
-    @In
     private EntityManager entityManager;
     @In
     private Time time;

@@ -53,9 +53,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldSetupScreen");
 
     @In
-    private WorldGeneratorManager worldGeneratorManager;
-
-    @In
     private Config config;
 
     @In
@@ -65,7 +62,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
     private WorldSetupWrapper world;
     private ModuleEnvironment environment;
     private Context context;
-    private WorldConfigurator oldWorldConfig;
 
     @Override
     public void initialise() {
@@ -119,7 +115,6 @@ public class WorldSetupScreen extends CoreScreenLayer {
             worldConfig = worldGenerator.getConfigurator();
             world.setWorldConfigurator(worldConfig);
         }
-        oldWorldConfig = worldConfig;
 
         Map<String, Component> params = worldConfig.getProperties();
 

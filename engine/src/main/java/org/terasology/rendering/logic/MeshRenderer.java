@@ -61,9 +61,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     private NetworkSystem network;
 
     @In
-    private LocalPlayer localPlayer;
-
-    @In
     private Config config;
 
     @In

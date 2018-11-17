@@ -90,20 +90,18 @@ public class ColladaMeshFormat extends AbstractAssetFileFormat<MeshData> {
             throw new IOException("There must be either texture coordinates or vertex colors provided.");
         }
 
-        if ((null != data.getTexCoord0()) && (0 != data.getTexCoord0().size())) {
-            if (data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
-                throw new IOException("The number of tex coords (" + data.getTexCoord0().size() / 2
-                        + ") does not match the number of vertices (" + data.getVertices().size() / 3
-                        + ").");
-            }
+        if ((null != data.getTexCoord0()) && (0 != data.getTexCoord0().size()) && data.getTexCoord0().size() / 2 != data.getVertices().size() / 3 ) {
+            throw new IOException("The number of tex coords (" + data.getTexCoord0().size() / 2
+                    + ") does not match the number of vertices (" + data.getVertices().size() / 3
+                    + ").");
+
         }
 
-        if ((null != data.getColors()) && (0 != data.getColors().size())) {
-            if (data.getColors().size() / 4 != data.getVertices().size() / 3) {
-                throw new IOException("The number of vertex colors (" + data.getColors().size() / 4
-                        + ") does not match the number of vertices (" + data.getVertices().size() / 3
-                        + ").");
-            }
+        if ((null != data.getColors()) && (0 != data.getColors().size()) && data.getColors().size() / 4 != data.getVertices().size() / 3 ) {
+            throw new IOException("The number of vertex colors (" + data.getColors().size() / 4
+                    + ") does not match the number of vertices (" + data.getVertices().size() / 3
+                    + ").");
+
         }
 
         return data;

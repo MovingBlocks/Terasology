@@ -46,8 +46,10 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     private Block defaultBlock;
 
     public ChunkViewCoreImpl(Chunk[] chunks, Region3i chunkRegion, Vector3i offset, Block defaultBlock) {
+        Chunk[] tempchunks = chunks.clone();
+
         this.chunkRegion = chunkRegion;
-        this.chunks = chunks;
+        this.chunks = tempchunks;
         this.offset = offset;
         setChunkSize(new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
         this.defaultBlock = defaultBlock;

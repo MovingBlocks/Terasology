@@ -165,11 +165,9 @@ public class DeferredPointLightsNode extends AbstractNode {
         lightGeometryMaterial.setInt("texSceneOpaqueDepth", 0, true);
         lightGeometryMaterial.setInt("texSceneOpaqueNormals", 1, true);
 
-        if (renderingConfig.isDynamicShadows()) {
-            if (renderingConfig.isCloudShadows()) {
-                lightGeometryMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
-                lightGeometryMaterial.setFloat3("cameraPosition", cameraPosition, true);
-            }
+        if (renderingConfig.isDynamicShadows() && renderingConfig.isCloudShadows() ) {
+            lightGeometryMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+            lightGeometryMaterial.setFloat3("cameraPosition", cameraPosition, true);
         }
 
         if (renderingConfig.isDynamicShadows()) {

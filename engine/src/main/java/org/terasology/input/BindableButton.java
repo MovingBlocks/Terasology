@@ -103,7 +103,7 @@ public interface BindableButton {
      * @param gameTimeInMs The game time in milliseconds.
      * @return Whether the button's event has been consumed
      */
-    public boolean updateBindState(Input input,
+    boolean updateBindState(Input input,
                                    boolean pressed,
                                    float delta,
                                    EntityRef[] inputEntities,
@@ -125,7 +125,7 @@ public interface BindableButton {
      * @param hitNormal The current hit normal
      * @param gameTimeInMs The game time in milliseconds.
      */
-    public void update(EntityRef[] inputEntities,
+    void update(EntityRef[] inputEntities,
                        float delta,
                        EntityRef target,
                        Vector3i targetBlockPos,

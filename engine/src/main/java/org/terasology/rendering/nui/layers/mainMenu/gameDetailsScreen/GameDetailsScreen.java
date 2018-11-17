@@ -89,8 +89,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private ModuleManager moduleManager;
     @In
     private TranslationSystem translationSystem;
-    @In
-    private Context context;
 
     private UIList<ModuleSelectionInfo> gameModules;
     private final Binding<ModuleSelectionInfo> moduleInfoBinding = new ReadOnlyBinding<ModuleSelectionInfo>() {

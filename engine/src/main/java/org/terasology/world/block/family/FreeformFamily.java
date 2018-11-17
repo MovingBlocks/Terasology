@@ -44,7 +44,7 @@ public class FreeformFamily extends AbstractBlockFamily {
     private Block archetypeBlock;
 
     public FreeformFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        super(definition, shape, blockBuilder);
+        super(definition);
         BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
@@ -68,8 +68,8 @@ public class FreeformFamily extends AbstractBlockFamily {
         setBlockUri(uri);
     }
 
-    public FreeformFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {
-        super(blockFamilyDefinition, blockBuilderHelper);
+    public FreeformFamily(BlockFamilyDefinition blockFamilyDefinition) {
+        super(blockFamilyDefinition);
         throw new UnsupportedOperationException("Shape expected");
     }
 

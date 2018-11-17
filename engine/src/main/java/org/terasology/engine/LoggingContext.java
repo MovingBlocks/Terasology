@@ -150,7 +150,6 @@ public final class LoggingContext {
                         // we explicitly catch the exception so that other files
                         // will be removed even if this one fails
 
-                        //System.err.println("Could not delete log file: " + file);
                         logger.error("Could not delete log file: " + file);
                     }
                 }
@@ -168,7 +167,6 @@ public final class LoggingContext {
                         // we explicitly catch the exception so that other folders
                         // will be removed even if this one fails
 
-                        //System.err.println("Could not delete empty folder: " + path);
                         logger.error(("Could not delete empty folder: " + path));
                     }
                 }

@@ -68,7 +68,8 @@ public abstract class AbstractGsonPersistedData implements PersistedData {
         if (!isBytes()) {
             throw new DeserializationException("Data is not a valid bytes array");
         } else {
-            return cachedDecodedBytes;
+            byte[] temp = cachedDecodedBytes;
+            return temp;
         }
     }
 

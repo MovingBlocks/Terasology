@@ -66,8 +66,6 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
     @In
     private Config config;
 
-    @In
-    private EntityManager entityManager;
 
     @In
     private LocalPlayer localPlayer;

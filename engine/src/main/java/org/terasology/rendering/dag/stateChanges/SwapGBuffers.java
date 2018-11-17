@@ -58,6 +58,12 @@ public class SwapGBuffers implements StateChange {
         return false;
     }
 
+    // put this here to get rid of pmd warning
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
     @Override
     public String toString() {
         return String.format("%30s", this.getClass().getSimpleName());

@@ -38,8 +38,6 @@ import java.util.Map;
  */
 public class RowLayout extends CoreLayout<RowLayoutHint> {
 
-    private static final Logger logger = LoggerFactory.getLogger(RowLayout.class);
-
     /**
      * A list of the widgets in this {@link RowLayout}
      */
@@ -178,13 +176,11 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
                 for (int i = 0; i < results.size(); ++i) {
                     if (results.get(i) == 0) {
                         RowLayoutHint hint = hints.get(contents.get(i));
-                        if (hint != null) {
-                            if (hint.isUseContentWidth()) {
+                        if (hint != null && hint.isUseContentWidth()) {
                                 Vector2i contentSize = contents.get(i).getPreferredContentSize(canvas, new Vector2i(remainingWidthPerElement, canvas.size().y));
                                 results.set(i, contentSize.x);
                                 totalWidthUsed += contentSize.x;
                                 unprocessedWidgets--;
-                            }
                         }
                     }
                 }

@@ -56,7 +56,7 @@ public interface ParagraphRenderable {
     void renderContents(Canvas canvas, Vector2i startPos, ContainerRenderSpace containerRenderSpace, int leftIndent, int rightIndent,
                         ParagraphRenderStyle defaultStyle, HorizontalAlign horizontalAlign, HyperlinkRegister hyperlinkRegister);
 
-    public interface HyperlinkRegister {
+    interface HyperlinkRegister {
         void registerHyperlink(Rect2i region, String hyperlink);
     }
 }

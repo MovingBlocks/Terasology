@@ -34,13 +34,11 @@ import java.util.Optional;
 public class BlockTypeEntityGenerator implements BlockRegistrationListener {
 
     private EntityManager entityManager;
-    private PrefabManager prefabManager;
     private BlockManager blockManager;
     private Prefab blockTypePrefab;
 
     public BlockTypeEntityGenerator(EntityManager entityManager, BlockManager blockManager) {
         this.entityManager = entityManager;
-        this.prefabManager = entityManager.getPrefabManager();
         this.blockManager = blockManager;
         blockTypePrefab = entityManager.getPrefabManager().getPrefab("engine:blockType");
 

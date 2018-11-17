@@ -72,8 +72,6 @@ import java.util.concurrent.Future;
 public class JoinGameScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
-    private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
-
     @In
     private Config config;
 

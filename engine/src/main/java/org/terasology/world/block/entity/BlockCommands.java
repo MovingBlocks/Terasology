@@ -69,8 +69,6 @@ import java.util.stream.Collectors;
 public class BlockCommands extends BaseComponentSystem {
     private TargetSystem targetSystem;
     // TODO: Remove once camera is handled better
-    @In
-    private WorldRenderer renderer;
 
     @In
     private AssetManager assetManager;
@@ -82,25 +80,13 @@ public class BlockCommands extends BaseComponentSystem {
     private WorldProvider world;
 
     @In
-    private PrefabManager prefabManager;
-
-    @In
-    private LocalPlayer localPlayer;
-
-    @In
     private EntityManager entityManager;
-
-    @In
-    private LocalPlayer player;
 
     @In
     private Physics physics;
 
     @In
     private BlockEntityRegistry blockRegistry;
-
-    @In
-    private WorldProviderCoreImpl worldImpl;
 
     private BlockItemFactory blockItemFactory;
     private BlockExplorer blockExplorer;

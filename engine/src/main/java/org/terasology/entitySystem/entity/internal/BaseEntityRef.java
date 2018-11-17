@@ -58,10 +58,8 @@ public abstract class BaseEntityRef extends EntityRef {
 
     @Override
     public void setAlwaysRelevant(boolean alwaysRelevant) {
-        if (exists()) {
-            if (alwaysRelevant != isAlwaysRelevant()) {
+        if ( exists() && alwaysRelevant != isAlwaysRelevant()) {
                 setScope(alwaysRelevant ? GLOBAL : CHUNK);
-            }
         }
     }
 
@@ -75,12 +73,10 @@ public abstract class BaseEntityRef extends EntityRef {
 
     @Override
     public void setOwner(EntityRef owner) {
-        if (exists()) {
-            EntityInfoComponent info = getEntityInfo();
-            if (!info.owner.equals(owner)) {
+        EntityInfoComponent info = getEntityInfo();
+        if (exists() && !info.owner.equals(owner)) {
                 info.owner = owner;
                 saveComponent(info);
-            }
         }
     }
 

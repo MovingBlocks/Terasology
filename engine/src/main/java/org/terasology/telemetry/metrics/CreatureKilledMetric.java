@@ -39,9 +39,6 @@ public final class CreatureKilledMetric extends Metric {
 
     private LocalPlayer localPlayer;
 
-    @TelemetryField
-    private Map creatureKilledMap;
-
     @Override
     public Optional<Unstructured> getUnstructuredMetric() {
         createTelemetryFieldToValue();

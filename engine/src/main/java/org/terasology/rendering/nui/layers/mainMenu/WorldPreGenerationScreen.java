@@ -59,14 +59,7 @@ import java.util.stream.Collectors;
 public class WorldPreGenerationScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener {
 
     private static final Logger logger = LoggerFactory.getLogger(WorldPreGenerationScreen.class);
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
-
-    @In
-    private ModuleManager moduleManager;
-
-    @In
-    private Config config;
 
     private ModuleEnvironment environment;
     private WorldGenerator worldGenerator;
@@ -145,7 +138,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
                     previewGen = new FacetLayerPreview(environment, worldGenerator);
                     updatePreview();
                 } catch (UnresolvedWorldGeneratorException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
                 }
             }
         });
@@ -171,7 +164,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
                 }
             } catch (UnresolvedWorldGeneratorException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         });
 
@@ -195,7 +188,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
             previewGen = new FacetLayerPreview(environment, worldGenerator);
             updatePreview();
         } catch (UnresolvedWorldGeneratorException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -272,7 +265,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
                 try {
                     worldSetupWrapper.setWorldGenerator(WorldGeneratorManager.createWorldGenerator(findWorldByName(worldSetupWrapper.getWorldName().toString()).getWorldGeneratorInfo().getUri(), context, environment));
                 } catch (UnresolvedWorldGeneratorException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
                 }
             }
             worldSetupWrapper.getWorldGenerator().setWorldSeed(createSeed(worldSetupWrapper.getWorldName().toString()));

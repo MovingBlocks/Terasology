@@ -53,7 +53,8 @@ public abstract class BaseFieldFacet3D extends BaseFacet3D implements FieldFacet
     }
 
     public float[] getInternal() {
-        return data;
+        float[] temp = data.clone();
+        return temp;
     }
 
     @Override

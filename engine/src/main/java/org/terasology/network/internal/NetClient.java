@@ -316,12 +316,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     public void setComponentRemoved(int networkId, Class<? extends Component> component) {
-        if (netRelevant.contains(networkId) && !netInitial.contains(networkId)) {
-            if (!addedComponents.remove(networkId, component)) {
-                removedComponents.put(networkId, component);
-                if (!dirtyComponents.remove(networkId, component)) {
+        if (netRelevant.contains(networkId) && !netInitial.contains(networkId) && !addedComponents.remove(networkId, component)) {
+            removedComponents.put(networkId, component);
+            if (!dirtyComponents.remove(networkId, component)) {
                     netDirty.add(networkId);
-                }
             }
         }
     }
@@ -354,12 +352,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 }
             } else {
                 NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
-                if (networkComponent != null) {
-                    if (netRelevant.contains(networkComponent.getNetworkId()) || netInitial.contains(networkComponent.getNetworkId())) {
-                        queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                                .setTargetId(networkComponent.getNetworkId())
-                                .setEvent(eventSerializer.serialize(event)).build());
-                    }
+                if (networkComponent != null && netRelevant.contains(networkComponent.getNetworkId()) || netInitial.contains(networkComponent.getNetworkId())) {
+                    queuedOutgoingEvents.add(NetData.EventMessage.newBuilder().setTargetId(networkComponent.getNetworkId()).setEvent(eventSerializer.serialize(event)).build());
                 }
             }
         } catch (SerializationException e) {

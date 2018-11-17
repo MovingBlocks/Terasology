@@ -43,13 +43,13 @@ public class ListBlockBuilder implements HTMLBlockBuilder {
 
         ParagraphRenderStyle paragraphRenderStyle = HTMLUtils.createParagraphRenderStyleFromCommonAttributes(attributes);
 
-        ListDecorator listDecorator = createListDecorator(attributes, ordered);
+        ListDecorator listDecorator = createListDecorator(ordered);
         listParagraphRenderable = new ListParagraphRenderable(paragraphRenderStyle, listDecorator);
 
         paragraphData = new DefaultParagraphData(paragraphRenderStyle, listParagraphRenderable);
     }
 
-    private ListDecorator createListDecorator(Attributes attributes, boolean ordered) {
+    private ListDecorator createListDecorator(boolean ordered) {
         if (ordered) {
             return new OrderedListDecorator();
         } else {

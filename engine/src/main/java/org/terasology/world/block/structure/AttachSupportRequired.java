@@ -48,11 +48,9 @@ public class AttachSupportRequired implements BlockStructuralSupport {
 
     private boolean hasRequiredSupportOnSideForBlock(Vector3i location, Side sideChanged, Block block) {
         final BlockMeshPart part = block.getPrimaryAppearance().getPart(BlockPart.fromSide(sideChanged));
-        if (part != null) {
+        if (part != null && !hasSupportFromBlockOnSide(location, sideChanged, Collections.<Vector3i, Block>emptyMap()) ) {
             // This block has mesh on this side, therefore it requires a support on that side
-            if (!hasSupportFromBlockOnSide(location, sideChanged, Collections.<Vector3i, Block>emptyMap())) {
-                return false;
-            }
+            return false;
         }
         return true;
     }

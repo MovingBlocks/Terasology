@@ -32,7 +32,7 @@ public class DefaultHTMLDocumentBuilderFactory implements HTMLDocumentBuilderFac
 
     @Override
     public HTMLDocumentBuilder create(Attributes attributes) {
-        DefaultHTMLDocumentBuilder htmlDocumentBuilder = new DefaultHTMLDocumentBuilder(htmlFontResolver, createDocumentStyle(attributes));
+        DefaultHTMLDocumentBuilder htmlDocumentBuilder = new DefaultHTMLDocumentBuilder(htmlFontResolver, createDocumentStyle());
         ParagraphBuilderFactory htmlParagraphBuilderFactory = new ParagraphBuilderFactory();
         htmlDocumentBuilder.addKnownTag("p", htmlParagraphBuilderFactory);
         MultiBlockBuilderFactory multiBlockBuilderFactory = new MultiBlockBuilderFactory(htmlDocumentBuilder);
@@ -41,7 +41,7 @@ public class DefaultHTMLDocumentBuilderFactory implements HTMLDocumentBuilderFac
         return htmlDocumentBuilder;
     }
 
-    private DocumentRenderStyle createDocumentStyle(Attributes attributes) {
+    private DocumentRenderStyle createDocumentStyle() {
         return null;
     }
 
@@ -78,7 +78,7 @@ public class DefaultHTMLDocumentBuilderFactory implements HTMLDocumentBuilderFac
 
         @Override
         public HTMLBlockBuilder create(HTMLFontResolver htmlFontResolver, Attributes attributes) {
-            return new MultiBlockBuilder(htmlDocumentBuilder, htmlFontResolver, attributes);
+            return new MultiBlockBuilder(htmlDocumentBuilder, attributes);
         }
     }
 }
