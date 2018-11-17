@@ -24,7 +24,6 @@ import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -60,35 +59,43 @@ public class GsonSerializer {
         gson.toJson(persistedData.getElement(), writer);
     }
 
-    public <T> void writeJson(T object, TypeHandler<T> typeHandler, OutputStream stream) {
-        writeJson(object, typeHandler, new BufferedWriter(new OutputStreamWriter(stream)));
+    public <T> void writeJson(T object, TypeHandler<T> typeHandler, OutputStream stream) throws IOException {
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(stream))) {
+            writeJson(object, typeHandler, writer);
+        }
     }
 
     public <T> void writeJson(T object, TypeHandler<T> typeHandler, File file) throws IOException {
-        writeJson(object, typeHandler, new BufferedWriter(new FileWriter(file)));
+        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+            writeJson(object, typeHandler, writer);
+        }
     }
 
     public <T> void writeJson(T object, TypeHandler<T> typeHandler, String path) throws IOException {
         writeJson(object, typeHandler, new File(path));
     }
 
-    public PersistedData persistedDatafromJson(Reader reader) {
+    public PersistedData persistedDataFromJson(Reader reader) {
         JsonElement jsonElement = gson.fromJson(reader, JsonElement.class);
 
         return new GsonPersistedData(jsonElement);
     }
 
-    public PersistedData persistedDatafromJson(InputStream stream) {
-        return persistedDatafromJson(new InputStreamReader(stream));
+    public PersistedData persistedDataFromJson(InputStream stream) throws IOException {
+        try (Reader reader = new InputStreamReader(stream)) {
+            return persistedDataFromJson(reader);
+        }
     }
 
-    public PersistedData persistedDatafromJson(File file) throws FileNotFoundException {
-        return persistedDatafromJson(new FileReader(file));
+    public PersistedData persistedDataFromJson(File file) throws IOException {
+        try (Reader reader = new FileReader(file)) {
+            return persistedDataFromJson(reader);
+        }
     }
 
-    public PersistedData persistedDatafromJson(String json) {
+    public PersistedData persistedDataFromJson(String json) {
         try (StringReader reader = new StringReader(json)) {
-            return persistedDatafromJson(reader);
+            return persistedDataFromJson(reader);
         }
     }
 }

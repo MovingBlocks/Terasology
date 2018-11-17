@@ -83,7 +83,7 @@ class RecordedEventSerializer {
         List<RecordedEvent> events = new ArrayList<>();
 
         try {
-            PersistedData persistedData = gsonSerializer.persistedDatafromJson(new File(filePath));
+            PersistedData persistedData = gsonSerializer.persistedDataFromJson(new File(filePath));
 
             Optional<List<RecordedEvent>> recordedEvents = recordedEventListTypeHandler.deserialize(persistedData);
             recordedEvents.ifPresent(events::addAll);
