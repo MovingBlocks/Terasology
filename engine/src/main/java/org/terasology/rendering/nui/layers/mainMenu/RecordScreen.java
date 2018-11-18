@@ -66,12 +66,12 @@ public class RecordScreen extends SelectionScreen {
                 updateDescription(item);
             });
 
-            getGameInfos().subscribe((widget, item) -> launchRename(nameRecordingScreen, item));
+            getGameInfos().subscribe((widget, item) -> launchNamingScreen(nameRecordingScreen, item));
 
             load.subscribe(button -> {
                 final GameInfo gameInfo = getGameInfos().getSelection();
                 if (gameInfo != null) {
-                    launchRename(nameRecordingScreen, gameInfo);
+                    launchNamingScreen(nameRecordingScreen, gameInfo);
                 }
             });
 
@@ -110,7 +110,7 @@ public class RecordScreen extends SelectionScreen {
      * @param nameRecordingScreen The instance of the screen to launch
      * @param info The info of the selected game.
      */
-    private void launchRename(NameRecordingScreen nameRecordingScreen, GameInfo info) {
+    private void launchNamingScreen(NameRecordingScreen nameRecordingScreen, GameInfo info) {
         nameRecordingScreen.setGameInfo(info);
         nameRecordingScreen.setRecordAndReplayUtils(recordAndReplayUtils);
         triggerForwardAnimation(nameRecordingScreen);

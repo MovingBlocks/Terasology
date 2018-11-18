@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -60,7 +59,6 @@ public class NameRecordingScreen extends CoreScreenLayer {
     private RecordAndReplayUtils recordAndReplayUtils;
 
     // widgets
-    private UILabel title;
     private UILabel description;
     private UIText nameInput;
     private UIButton enter;
@@ -73,15 +71,19 @@ public class NameRecordingScreen extends CoreScreenLayer {
         initWidgets();
 
         enter.subscribe(button -> enterPressed());
-
         cancel.subscribe(button -> cancelPressed());
+    }
+
+    @Override
+    public void onScreenOpened() {
+        // resets the description from any earlier error messages, in case the user re-opens the screen.
+        description.setText(translationSystem.translate("${engine:menu#name-recording-description}"));
     }
 
     /**
      * Sets the values of all widget references.
      */
     private void initWidgets() {
-        title = find("title", UILabel.class);
         description = find("description", UILabel.class);
         nameInput = find("nameInput", UIText.class);
         enter = find("enterButton", UIButton.class);
@@ -173,12 +175,9 @@ public class NameRecordingScreen extends CoreScreenLayer {
     private boolean isNameValid(String name) {
         Path destinationPath = PathManager.getInstance().getRecordingPath(name);
 
-        // invalid characters are filtered, so if the file name is made up of entirely invalid characters, the path will have a blank name.
-        if (destinationPath == PathManager.getInstance().getRecordingPath("")) {
-            return false;
-        }
-
-        return !StringUtils.isBlank(name);
+        // invalid characters are filtered from paths, so if the file name is made up of entirely invalid characters, the path will have a blank file name.
+        // also acts as a check for blank input.
+        return !destinationPath.equals(PathManager.getInstance().getRecordingPath(""));
     }
 
     /**
