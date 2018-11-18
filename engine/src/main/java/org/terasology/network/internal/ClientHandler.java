@@ -45,6 +45,12 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
         this.networkSystem = networkSystem;
     }
 
+    /**
+     * Displays the "Disconnected from server message."
+     * @param ctx Channel Handler Context
+     * @param e
+     * @throws Exception
+     */
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         GameEngine gameEngine = CoreRegistry.get(GameEngine.class);
@@ -53,6 +59,11 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
+    /**
+     * Gets the message from the message event. Then queues it to the server for processing.
+     * @param ctx Channel Handler Context
+     * @param e
+     */
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
@@ -66,6 +77,10 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     }
 
 
+    /**
+     *  Marks the joining of the server to be complete and sets the server in networkSystem.
+     * @param joinedServer The parameter for the server being joined by the player.
+     */
     public void joinComplete(ServerImpl joinedServer) {
         this.server = joinedServer;
         networkSystem.setServer(server);

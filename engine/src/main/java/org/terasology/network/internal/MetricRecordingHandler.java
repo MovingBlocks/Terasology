@@ -37,6 +37,12 @@ public class MetricRecordingHandler extends SimpleChannelHandler implements NetM
     private AtomicInteger sentMessages = new AtomicInteger();
     private AtomicInteger sentBytes = new AtomicInteger();
 
+    /**
+     * A metric function, increments AtmoicIntegers to keep track of data received.
+     * @param ctx Channel Handler Context
+     * @param e Message Event
+     * @throws Exception
+     */
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         ChannelBuffer buf = (ChannelBuffer) e.getMessage();
@@ -45,6 +51,12 @@ public class MetricRecordingHandler extends SimpleChannelHandler implements NetM
         ctx.sendUpstream(e);
     }
 
+    /**
+     * A metric function, increments AtmoicIntegers to keep track of data received, then pushes them downstream to be written.
+     * @param ctx Channel Handler Context
+     * @param e Message Event
+     * @throws Exception
+     */
     @Override
     public void writeRequested(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         ChannelBuffer buf = (ChannelBuffer) e.getMessage();
