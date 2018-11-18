@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
+
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Provides methods for working with game preview images.
@@ -94,11 +96,9 @@ public final class GamePreviewImageProvider {
         // create folder if not exists yet
         createDirectory(dirPath);
 
-        try {
-            return Files.list(dirPath)
-                    .filter(Files::isRegularFile)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
+        try (Stream<Path> stream = Files.list(dirPath).filter(Files::isRegularFile)) {
+            return stream.collect(Collectors.toList());
+        } catch (Exception e) {
             logger.warn("Can't correctly read files from {}", dirPath);
             return Collections.emptyList();
         }
