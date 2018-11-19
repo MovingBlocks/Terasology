@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class GameProvider {
 
@@ -58,12 +59,12 @@ public final class GameProvider {
     public static boolean isSavesFolderEmpty() {
         Path savePath = PathManager.getInstance().getSavesPath();
         if (savePath != null) {
-            try {
-                return Files.list(savePath)
-                        .filter(savedGameFolderPath -> Files.isDirectory(savedGameFolderPath)
-                                && Files.isRegularFile(savedGameFolderPath.resolve(GameManifest.DEFAULT_FILE_NAME)))
-                        .collect(Collectors.toList())
-                        .isEmpty();
+
+            // Set the stream path in a try with resources construct first in order to close the stream.
+            try (Stream<Path> stream = Files.list(savePath)
+                    .filter(savedGameFolderPath -> Files.isDirectory(savedGameFolderPath)
+                                                   && Files.isRegularFile(savedGameFolderPath.resolve(GameManifest.DEFAULT_FILE_NAME)))) {
+                return stream.collect(Collectors.toList()).isEmpty();
             } catch (IOException e) {
                 logger.warn("Can't read saves path {}", savePath, e);
             }
@@ -73,8 +74,7 @@ public final class GameProvider {
 
     private static List<GameInfo> getSavedGameOrRecording(Path saveOrRecordingPath) {
         SortedMap<FileTime, Path> savedGamePaths = Maps.newTreeMap(Collections.reverseOrder());
-        try (DirectoryStream<Path> stream =
-                     Files.newDirectoryStream(saveOrRecordingPath)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(saveOrRecordingPath)) {
             for (Path entry : stream) {
                 if (Files.isRegularFile(entry.resolve(GameManifest.DEFAULT_FILE_NAME))) {
                     savedGamePaths.put(Files.getLastModifiedTime(entry.resolve(GameManifest.DEFAULT_FILE_NAME)), entry);
@@ -108,7 +108,6 @@ public final class GameProvider {
         }
         return result;
     }
-
 
     /**
      * Generates the game name based on the game number of the last saved game
