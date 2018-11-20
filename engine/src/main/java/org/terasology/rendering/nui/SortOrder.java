@@ -48,7 +48,6 @@ public class SortOrder extends BaseComponentSystem {
     private static ArrayList<CoreScreenLayer> enabledWidgets;
     private static boolean initialized = false;
     private static ArrayList<Integer> used;
-    private static int numAdded;
 
     @In
     private BindsManager bindsManager;
@@ -125,16 +124,15 @@ public class SortOrder extends BaseComponentSystem {
             Collections.sort(layersFilled, (a, b) -> Math.max(a[0], b[0]));
             if (increase) {
                 index++;
-                index += numAdded;
-                numAdded = 0;
             }
             int iterator;
-            if (index < layersFilled.size()) {
-                iterator = layersFilled.get(index)[0];
-            } else {
-                index = 0;
-                iterator = layersFilled.get(index)[0];
+
+            while(index>=layersFilled.size()) {
+                index -= layersFilled.size();
             }
+
+            iterator = layersFilled.get(index)[0];
+
             boolean loopThroughDone = false;
 
 
@@ -206,7 +204,7 @@ public class SortOrder extends BaseComponentSystem {
             toAdd[1] = 1;
             layersFilled.add(toAdd);
         }
-        numAdded++;
+        index = -1;
     }
 
     /**
@@ -217,6 +215,9 @@ public class SortOrder extends BaseComponentSystem {
         for (int i = 0; i < layersFilled.size(); i++) {
             if (layersFilled.get(i)[0] == layer) {
                 layersFilled.get(i)[1]--;
+                if (layersFilled.get(i)[1]==0) {
+                    layersFilled.remove(i);
+                }
                 return;
             }
         }
