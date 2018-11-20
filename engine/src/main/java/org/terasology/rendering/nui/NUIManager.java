@@ -19,7 +19,10 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.internal.CanvasControl;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
+
+import java.util.Deque;
 
 /**
  */
@@ -107,6 +110,14 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     void removeOverlay(ResourceUrn uri);
 
+    Deque<UIScreenLayer> getScreens();
+
+    void setScreens(Deque<UIScreenLayer> screens);
+
+    ResourceUrn getUri(UIScreenLayer screen);
+
+    //void setUpdateFrozen(boolean updateFrozen);
+
     void clear();
 
     void render();
@@ -128,5 +139,7 @@ public interface NUIManager extends ComponentSystem, FocusManager {
     void setForceReleasingMouse(boolean value);
 
     void invalidate();
+
+    CanvasControl getCanvas();
 
 }

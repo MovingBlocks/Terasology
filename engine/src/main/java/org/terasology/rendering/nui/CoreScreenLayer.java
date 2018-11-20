@@ -28,12 +28,11 @@ import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
-/**
- */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 
     private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
@@ -53,6 +52,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     private NUIManager manager;
 
+    private int index;
+
     private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
 
     public CoreScreenLayer() {
@@ -60,6 +61,16 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     public CoreScreenLayer(String id) {
         super(id);
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepthAuto() {
+        if (SortOrder.isInitialized()) {
+            depth = SortOrder.getCurrent();
+        }
     }
 
     @Override
@@ -77,8 +88,43 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onOpened() {
+        if (depth <= 0) {
+            setDepthAuto();
+        }
+        if (SortOrder.isInitialized()) {
+            if (!SortOrder.getUsed().contains(depth)) {
+                SortOrder.getUsed().add(depth);
+            }
+        }
         animationSystem.triggerFromPrev();
         onScreenOpened();
+    }
+
+    /**
+     * adds or removes from enabledWidgets based on if the screen is showing or not
+     * @param showing if the screen is visible or not
+     */
+    protected void addOrRemove(boolean showing) {
+        if (SortOrder.getEnabledWidgets() != null) {
+            if (!SortOrder.getEnabledWidgets().contains(this)) {
+                if (showing) {
+                    ArrayList<CoreScreenLayer> enabledWidgets = SortOrder.getEnabledWidgets();
+
+                    enabledWidgets.add(this);
+                    SortOrder.setEnabledWidgets(enabledWidgets);
+
+                    SortOrder.addAnother(depth);
+                }
+            } else {
+                if (!showing) {
+                    ArrayList<CoreScreenLayer> enabledWidgets = SortOrder.getEnabledWidgets();
+                    enabledWidgets.remove(this);
+                    SortOrder.setEnabledWidgets(enabledWidgets);
+
+                    SortOrder.removeOne(depth);
+                }
+            }
+        }
     }
 
     /**
@@ -89,6 +135,19 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
      * (e.g., a parent menu in the menu system) is returned to (as {@code onShow}).
      */
     public void onScreenOpened() {
+        if (!SortOrder.isInSortOrder()) {
+            addOrRemove(true);
+        }
+    }
+
+    public final int getIndex() {
+        return index;
+    }
+
+    public final void setIndex() {
+        if (SortOrder.isInitialized()) {
+            this.index = SortOrder.makeIndex();
+        }
     }
 
     @Override
@@ -121,6 +180,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         if (contents != null) {
             contents.update(delta);
             animationSystem.update(delta);
+
+            if (depth == -999999) {
+                setDepthAuto();
+            }
         }
     }
 
@@ -135,6 +198,9 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onClosed() {
+        if (!SortOrder.isInSortOrder()) {
+            addOrRemove(false);
+        }
     }
 
     @Override
@@ -145,6 +211,9 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onHide() {
+        if (!SortOrder.isInSortOrder()) {
+            addOrRemove(false);
+        }
     }
 
     @Override
