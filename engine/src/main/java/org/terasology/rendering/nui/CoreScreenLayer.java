@@ -52,8 +52,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     private NUIManager manager;
 
-    private int index;
-
     private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
 
     public CoreScreenLayer() {
@@ -137,16 +135,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     public void onScreenOpened() {
         if (!SortOrder.isInSortOrder()) {
             addOrRemove(true);
-        }
-    }
-
-    public final int getIndex() {
-        return index;
-    }
-
-    public final void setIndex() {
-        if (SortOrder.isInitialized()) {
-            this.index = SortOrder.makeIndex();
         }
     }
 

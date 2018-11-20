@@ -43,7 +43,6 @@ public class SortOrder extends BaseComponentSystem {
     private static int current;
     private static ArrayList<Integer[]> layersFilled; //arg1 of the Integer[] is the layer depth, arg2 is the number of things on that layer
     private static int index;
-    private static int uiIndex;
     private static boolean inSortOrder;
     private static ArrayList<CoreScreenLayer> enabledWidgets;
     private static boolean initialized = false;
@@ -104,7 +103,6 @@ public class SortOrder extends BaseComponentSystem {
         }
         current = 0;
         index = 0;
-        uiIndex = -1;
         layersFilled = new ArrayList<>();
         enabledWidgets = new ArrayList<>();
         used = new ArrayList<>();
@@ -230,10 +228,6 @@ public class SortOrder extends BaseComponentSystem {
     }
     public static ArrayList<CoreScreenLayer> getEnabledWidgets() {
         return enabledWidgets;
-    }
-    public static int makeIndex() {
-        uiIndex++;
-        return uiIndex;
     }
 
     public static boolean isInitialized() {
