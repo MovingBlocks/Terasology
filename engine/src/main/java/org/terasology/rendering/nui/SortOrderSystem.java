@@ -79,12 +79,18 @@ public class SortOrderSystem extends BaseComponentSystem {
             }
         };
 
-        if (keys.containsKey(Keyboard.Key.SEMICOLON.getId())) {
-            keys.get(Keyboard.Key.SEMICOLON.getId()).subscribe(bindsButtonSubscriber);
-        } else {
-            keys.put(Keyboard.Key.SEMICOLON.getId(), new BindableButtonImpl(new SimpleUri("changeFocus"), "Change Focus With Shift", new BindButtonEvent()));
-            keys.get(Keyboard.Key.SEMICOLON.getId()).subscribe(bindsButtonSubscriber);
-        }
+         if (keys.containsKey(Keyboard.Key.LEFT_ALT.getId())) {
+             keys.get(Keyboard.Key.LEFT_ALT.getId()).subscribe(bindsButtonSubscriber);
+         } else {
+             keys.put(Keyboard.Key.LEFT_ALT.getId(), new BindableButtonImpl(new SimpleUri("changeFocus"), "Change Focus With Shift", new BindButtonEvent()));
+             keys.get(Keyboard.Key.LEFT_ALT.getId()).subscribe(bindsButtonSubscriber);
+         }
+         if (keys.containsKey(Keyboard.Key.RIGHT_ALT.getId())) {
+             keys.get(Keyboard.Key.RIGHT_ALT.getId()).subscribe(bindsButtonSubscriber);
+         } else {
+             keys.put(Keyboard.Key.RIGHT_ALT.getId(), new BindableButtonImpl(new SimpleUri("changeFocus"), "Change Focus With Shift", new BindButtonEvent()));
+             keys.get(Keyboard.Key.RIGHT_ALT.getId()).subscribe(bindsButtonSubscriber);
+         }
 
         current = 0;
         index = 0;
@@ -196,7 +202,7 @@ public class SortOrderSystem extends BaseComponentSystem {
      */
     public static void removeOne(int layer) {
         if (layersFilled.contains(layer)) {
-            layersFilled.remove(layer);
+            layersFilled.remove(layersFilled.indexOf(layer));
         }
     }
 
