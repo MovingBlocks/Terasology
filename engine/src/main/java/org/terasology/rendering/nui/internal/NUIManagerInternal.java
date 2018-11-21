@@ -105,14 +105,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         ModuleAwareAssetTypeManager maaTypeManager = context.get(ModuleAwareAssetTypeManager.class);
         maaTypeManager.getAssetType(UIElement.class).ifPresent(type -> type.disposeAll());
     }
+
     @Override
     public Deque<UIScreenLayer> getScreens() {
         return screens;
     }
+
     @Override
     public void setScreens(Deque<UIScreenLayer> toSet) {
         screens = toSet;
     }
+
     public void refreshWidgetsLibrary() {
         widgetsLibrary = new WidgetLibrary(context);
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();

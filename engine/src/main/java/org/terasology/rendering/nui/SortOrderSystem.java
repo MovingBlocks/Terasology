@@ -29,7 +29,6 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.Keyboard;
 import org.terasology.input.internal.BindableButtonImpl;
-import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.registry.In;
 
 import java.util.ArrayList;
@@ -37,11 +36,15 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.Map;
 
-
-@RegisterSystem(RegisterMode.ALWAYS)
-public class SortOrder extends BaseComponentSystem {
+/**
+ * Keeps track of the order of screens, and allows the order of them to change.
+ */
+@RegisterSystem(RegisterMode.CLIENT)
+public class SortOrderSystem extends BaseComponentSystem {
+    public static final int DEFAULT_DEPTH = -99999;
     private static int current;
-    private static ArrayList<Integer[]> layersFilled; //arg1 of the Integer[] is the layer depth, arg2 is the number of things on that layer
+    /* Part 1 of the Integer[] is the layer depth, part 2 is the number of things on that layer. */
+    private static ArrayList<Integer[]> layersFilled;
     private static int index;
     private static boolean inSortOrder;
     private static ArrayList<CoreScreenLayer> enabledWidgets;
@@ -52,55 +55,38 @@ public class SortOrder extends BaseComponentSystem {
     private BindsManager bindsManager;
 
     /**
-     * Initializes sort order
-     * @param event
-     * @param player
+     * Initializes sort order.
      */
-    @ReceiveEvent
-    public void onPlayerSpawnedEvent(OnPlayerSpawnedEvent event, EntityRef player) {
+     public void postBegin() {
         initialized = true;
         Map<Integer, BindableButton> keys = bindsManager.getKeyBinds();
+
+        BindButtonSubscriber bindsButtonSubscriber = new BindButtonSubscriber() {
+            @Override
+            public boolean onPress(float delta, EntityRef target) {
+                target.send(new FocusChangedEvent());
+                return false;
+            }
+
+            @Override
+            public boolean onRepeat(float delta, EntityRef target) {
+                target.send(new FocusChangedEvent());
+                return false;
+            }
+
+            @Override
+            public boolean onRelease(float delta, EntityRef target) {
+                return false;
+            }
+        };
+
         if (keys.containsKey(Keyboard.Key.SEMICOLON.getId())) {
-            keys.get(Keyboard.Key.SEMICOLON.getId()).subscribe(new BindButtonSubscriber() {
-                @Override
-                public boolean onPress(float delta, EntityRef target) {
-                    target.send(new FocusChangedEvent());
-                    return false;
-                }
-
-                @Override
-                public boolean onRepeat(float delta, EntityRef target) {
-                    target.send(new FocusChangedEvent());
-                    return false;
-                }
-
-                @Override
-                public boolean onRelease(float delta, EntityRef target) {
-                    return false;
-                }
-            });
+            keys.get(Keyboard.Key.SEMICOLON.getId()).subscribe(bindsButtonSubscriber);
         } else {
-            BindButtonSubscriber bindButtonSubscriber = new BindButtonSubscriber() {
-                @Override
-                public boolean onPress(float delta, EntityRef target) {
-                    target.send(new FocusChangedEvent());
-                    return false;
-                }
-
-                @Override
-                public boolean onRepeat(float delta, EntityRef target) {
-                    target.send(new FocusChangedEvent());
-                    return false;
-                }
-
-                @Override
-                public boolean onRelease(float delta, EntityRef target) {
-                    return false;
-                }
-            };
-            keys.put(Keyboard.Key.SEMICOLON.getId(), new BindableButtonImpl(new SimpleUri("changeFocus"), "Change Focus", new BindButtonEvent()));
-            keys.get(Keyboard.Key.SEMICOLON.getId()).subscribe(bindButtonSubscriber);
+            keys.put(Keyboard.Key.SEMICOLON.getId(), new BindableButtonImpl(new SimpleUri("changeFocus"), "Change Focus With Shift", new BindButtonEvent()));
+            keys.get(Keyboard.Key.SEMICOLON.getId()).subscribe(bindsButtonSubscriber);
         }
+
         current = 0;
         index = 0;
         layersFilled = new ArrayList<>();
@@ -113,6 +99,7 @@ public class SortOrder extends BaseComponentSystem {
     public void changeFocus(FocusChangedEvent event, EntityRef ref) {
         rotateOrder(true);
     }
+
     /**
      * rotates through the elements
      * @param increase where or not to increment index
@@ -125,7 +112,7 @@ public class SortOrder extends BaseComponentSystem {
             }
             int iterator;
 
-            while(index>=layersFilled.size()) {
+            while(index >= layersFilled.size()) {
                 index -= layersFilled.size();
             }
 
@@ -141,13 +128,15 @@ public class SortOrder extends BaseComponentSystem {
 
             while (!loopThroughDone) {
                 for (CoreScreenLayer widget : widgetsCopy) {
-                    inSortOrder = true;
-                    if (widget.getDepth() == iterator) {
-                        String widgId = widget.getId();
-                        widget.getManager().pushScreen(widgId);
-                        widget.getManager().render();
+                    if (widget.getManager() != null) {
+                        inSortOrder = true;
+                        if (widget.getDepth() == iterator) {
+                            String widgId = widget.getId();
+                            widget.getManager().pushScreen(widgId);
+                            widget.getManager().render();
+                        }
+                        inSortOrder = false;
                     }
-                    inSortOrder = false;
                 }
                 if (tempIndex < layersFilled.size()) {
                     iterator = layersFilled.get(tempIndex)[0];
@@ -163,14 +152,16 @@ public class SortOrder extends BaseComponentSystem {
                 timesLooping++;
             }
             for (CoreScreenLayer layer:enabledWidgets) {
-                Deque<UIScreenLayer> screens = layer.getManager().getScreens();
-                Deque<UIScreenLayer> toCreate = Queues.newArrayDeque();
-                for (UIScreenLayer screen: screens) {
-                    if (!toCreate.contains(screen)) {
-                        toCreate.add(screen);
+                if (layer.getManager() != null) {
+                    Deque<UIScreenLayer> screens = layer.getManager().getScreens();
+                    Deque<UIScreenLayer> toCreate = Queues.newArrayDeque();
+                    for (UIScreenLayer screen : screens) {
+                        if (!toCreate.contains(screen)) {
+                            toCreate.add(screen);
+                        }
                     }
+                    layer.getManager().setScreens(toCreate);
                 }
-                layer.getManager().setScreens(toCreate);
             }
 
             enabledWidgets = widgetsCopy;
@@ -213,7 +204,7 @@ public class SortOrder extends BaseComponentSystem {
         for (int i = 0; i < layersFilled.size(); i++) {
             if (layersFilled.get(i)[0] == layer) {
                 layersFilled.get(i)[1]--;
-                if (layersFilled.get(i)[1]==0) {
+                if (layersFilled.get(i)[1] == 0) {
                     layersFilled.remove(i);
                 }
                 return;
@@ -226,6 +217,7 @@ public class SortOrder extends BaseComponentSystem {
             enabledWidgets = widgetList;
         }
     }
+
     public static ArrayList<CoreScreenLayer> getEnabledWidgets() {
         return enabledWidgets;
     }
@@ -237,9 +229,11 @@ public class SortOrder extends BaseComponentSystem {
     public static boolean isInSortOrder() {
         return inSortOrder;
     }
+
     public static ArrayList<Integer> getUsed() {
         return used;
     }
+
     public static void setUsed(ArrayList<Integer> other) {
         used = other;
     }

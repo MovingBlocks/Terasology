@@ -46,7 +46,7 @@ public abstract class AbstractWidget implements UIWidget {
     @LayoutConfig
     private float tooltipDelay = 0.5f;
 
-    protected int depth = new DefaultBinding<Integer>(-99999).get();
+    protected int depth = new DefaultBinding<Integer>(SortOrderSystem.DEFAULT_DEPTH).get();
 
     private boolean focused;
 

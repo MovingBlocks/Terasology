@@ -65,9 +65,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         return depth;
     }
 
+    /**
+     * Automatically sets the depth of this screen using SortOrderSystem.
+     */
     public void setDepthAuto() {
-        if (SortOrder.isInitialized()) {
-            depth = SortOrder.getCurrent();
+        if (SortOrderSystem.isInitialized()) {
+            depth = SortOrderSystem.getCurrent();
         }
     }
 
@@ -86,12 +89,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onOpened() {
-        if (depth <= 0) {
+        if (depth == SortOrderSystem.DEFAULT_DEPTH) {
             setDepthAuto();
         }
-        if (SortOrder.isInitialized()) {
-            if (!SortOrder.getUsed().contains(depth)) {
-                SortOrder.getUsed().add(depth);
+        if (SortOrderSystem.isInitialized()) {
+            if (!SortOrderSystem.getUsed().contains(depth)) {
+                SortOrderSystem.getUsed().add(depth);
             }
         }
         animationSystem.triggerFromPrev();
@@ -103,23 +106,23 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
      * @param showing if the screen is visible or not
      */
     protected void addOrRemove(boolean showing) {
-        if (SortOrder.getEnabledWidgets() != null) {
-            if (!SortOrder.getEnabledWidgets().contains(this)) {
+        if (SortOrderSystem.getEnabledWidgets() != null) {
+            if (!SortOrderSystem.getEnabledWidgets().contains(this)) {
                 if (showing) {
-                    ArrayList<CoreScreenLayer> enabledWidgets = SortOrder.getEnabledWidgets();
+                    ArrayList<CoreScreenLayer> enabledWidgets = SortOrderSystem.getEnabledWidgets();
 
                     enabledWidgets.add(this);
-                    SortOrder.setEnabledWidgets(enabledWidgets);
+                    SortOrderSystem.setEnabledWidgets(enabledWidgets);
 
-                    SortOrder.addAnother(depth);
+                    SortOrderSystem.addAnother(depth);
                 }
             } else {
                 if (!showing) {
-                    ArrayList<CoreScreenLayer> enabledWidgets = SortOrder.getEnabledWidgets();
+                    ArrayList<CoreScreenLayer> enabledWidgets = SortOrderSystem.getEnabledWidgets();
                     enabledWidgets.remove(this);
-                    SortOrder.setEnabledWidgets(enabledWidgets);
+                    SortOrderSystem.setEnabledWidgets(enabledWidgets);
 
-                    SortOrder.removeOne(depth);
+                    SortOrderSystem.removeOne(depth);
                 }
             }
         }
@@ -133,7 +136,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
      * (e.g., a parent menu in the menu system) is returned to (as {@code onShow}).
      */
     public void onScreenOpened() {
-        if (!SortOrder.isInSortOrder()) {
+        if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(true);
         }
     }
@@ -169,7 +172,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             contents.update(delta);
             animationSystem.update(delta);
 
-            if (depth == -999999) {
+            if (depth == SortOrderSystem.DEFAULT_DEPTH) {
                 setDepthAuto();
             }
         }
@@ -186,7 +189,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onClosed() {
-        if (!SortOrder.isInSortOrder()) {
+        if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(false);
         }
     }
@@ -199,7 +202,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onHide() {
-        if (!SortOrder.isInSortOrder()) {
+        if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(false);
         }
     }
