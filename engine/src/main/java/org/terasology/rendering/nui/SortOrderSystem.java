@@ -43,8 +43,7 @@ import java.util.Map;
 public class SortOrderSystem extends BaseComponentSystem {
     public static final int DEFAULT_DEPTH = -99999;
     private static int current;
-    /* Part 1 of the Integer[] is the layer depth, part 2 is the number of things on that layer. */
-    private static ArrayList<Integer[]> layersFilled;
+    private static ArrayList<Integer> layersFilled;
     private static int index;
     private static boolean inSortOrder;
     private static ArrayList<CoreScreenLayer> enabledWidgets;
@@ -106,7 +105,7 @@ public class SortOrderSystem extends BaseComponentSystem {
      */
     public static void rotateOrder(boolean increase) {
         if (layersFilled.size() > 0) {
-            Collections.sort(layersFilled, (a, b) -> Math.max(a[0], b[0]));
+            Collections.sort(layersFilled, (a, b) -> Math.max(a, b));
             if (increase) {
                 index++;
             }
@@ -116,7 +115,7 @@ public class SortOrderSystem extends BaseComponentSystem {
                 index -= layersFilled.size();
             }
 
-            iterator = layersFilled.get(index)[0];
+            iterator = layersFilled.get(index);
 
             boolean loopThroughDone = false;
 
@@ -139,11 +138,11 @@ public class SortOrderSystem extends BaseComponentSystem {
                     }
                 }
                 if (tempIndex < layersFilled.size()) {
-                    iterator = layersFilled.get(tempIndex)[0];
+                    iterator = layersFilled.get(tempIndex);
                     tempIndex++;
                 } else {
                     tempIndex = 0;
-                    iterator = layersFilled.get(tempIndex)[0];
+                    iterator = layersFilled.get(tempIndex);
                     tempIndex++;
                 }
                 if (timesLooping > layersFilled.size()) {
@@ -181,17 +180,12 @@ public class SortOrderSystem extends BaseComponentSystem {
     }
 
     /**
-     * adds another occurrence of a certain depth to layers filled
+     * Adds a certain depth to layersFilled.
      * @param layer the depth
      */
     public static void addAnother(int layer) {
-        try {
-            layersFilled.get(layer)[1]++;
-        } catch (Exception e) {
-            Integer[] toAdd = new Integer[2];
-            toAdd[0] = layer;
-            toAdd[1] = 1;
-            layersFilled.add(toAdd);
+        if (!layersFilled.contains(layer)) {
+            layersFilled.add(layer);
         }
         index = -1;
     }
@@ -201,14 +195,8 @@ public class SortOrderSystem extends BaseComponentSystem {
      * @param layer the depth
      */
     public static void removeOne(int layer) {
-        for (int i = 0; i < layersFilled.size(); i++) {
-            if (layersFilled.get(i)[0] == layer) {
-                layersFilled.get(i)[1]--;
-                if (layersFilled.get(i)[1] == 0) {
-                    layersFilled.remove(i);
-                }
-                return;
-            }
+        if (layersFilled.contains(layer)) {
+            layersFilled.remove(layer);
         }
     }
 
