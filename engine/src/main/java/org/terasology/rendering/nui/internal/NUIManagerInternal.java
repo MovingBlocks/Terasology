@@ -51,11 +51,13 @@ import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
+import org.terasology.rendering.nui.SortOrderSystem;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
+import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.utilities.Assets;
 
 import java.util.ArrayList;
@@ -440,8 +442,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void addOverlay(ControlWidget overlay, ResourceUrn uri) {
-        overlay.onOpened();
-        overlays.put(uri, overlay);
+        if (!SortOrderSystem.getModifierPressed() || !overlay.getClass().equals(OnlinePlayersOverlay.class)) {
+            overlay.onOpened();
+            overlays.put(uri, overlay);
+        }
     }
 
     @Override

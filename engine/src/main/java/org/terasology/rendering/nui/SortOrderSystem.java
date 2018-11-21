@@ -49,6 +49,7 @@ public class SortOrderSystem extends BaseComponentSystem {
     private static ArrayList<CoreScreenLayer> enabledWidgets;
     private static boolean initialized = false;
     private static ArrayList<Integer> used;
+    private static boolean modifierPressed;
 
     @In
     private BindsManager bindsManager;
@@ -58,38 +59,67 @@ public class SortOrderSystem extends BaseComponentSystem {
      */
      public void postBegin() {
         initialized = true;
+        modifierPressed = false;
         Map<Integer, BindableButton> keys = bindsManager.getKeyBinds();
 
-        BindButtonSubscriber bindsButtonSubscriber = new BindButtonSubscriber() {
-            @Override
-            public boolean onPress(float delta, EntityRef target) {
-                target.send(new FocusChangedEvent());
-                return false;
-            }
+         BindButtonSubscriber shiftSubscriber = new BindButtonSubscriber() {
+             @Override
+             public boolean onPress(float delta, EntityRef target) {
+                 modifierPressed = true;
+                 return false;
+             }
 
-            @Override
-            public boolean onRepeat(float delta, EntityRef target) {
-                target.send(new FocusChangedEvent());
-                return false;
-            }
+             @Override
+             public boolean onRepeat(float delta, EntityRef target) {
+                 return false;
+             }
 
-            @Override
-            public boolean onRelease(float delta, EntityRef target) {
-                return false;
-            }
-        };
+             @Override
+             public boolean onRelease(float delta, EntityRef target) {
+                 modifierPressed = false;
+                 return false;
+             }
+         };
+         BindButtonSubscriber tabSubscriber = new BindButtonSubscriber() {
+             @Override
+             public boolean onPress(float delta, EntityRef target) {
+                 if (modifierPressed) {
+                     target.send(new FocusChangedEvent());
+                 }
+                 return false;
+             }
 
-         if (keys.containsKey(Keyboard.Key.LEFT_ALT.getId())) {
-             keys.get(Keyboard.Key.LEFT_ALT.getId()).subscribe(bindsButtonSubscriber);
+             @Override
+             public boolean onRepeat(float delta, EntityRef target) {
+                 if (modifierPressed) {
+                     target.send(new FocusChangedEvent());
+                 }
+                 return false;
+             }
+
+             @Override
+             public boolean onRelease(float delta, EntityRef target) {
+                 return false;
+             }
+         };
+
+         if (keys.containsKey(Keyboard.Key.LEFT_SHIFT.getId())) {
+             keys.get(Keyboard.Key.LEFT_SHIFT.getId()).subscribe(shiftSubscriber);
          } else {
-             keys.put(Keyboard.Key.LEFT_ALT.getId(), new BindableButtonImpl(new SimpleUri("changeFocus"), "Change Focus With Shift", new BindButtonEvent()));
-             keys.get(Keyboard.Key.LEFT_ALT.getId()).subscribe(bindsButtonSubscriber);
+             keys.put(Keyboard.Key.LEFT_SHIFT.getId(), new BindableButtonImpl(new SimpleUri("changeFocusMod"), "Change Focus Modifier", new BindButtonEvent()));
+             keys.get(Keyboard.Key.LEFT_SHIFT.getId()).subscribe(shiftSubscriber);
          }
-         if (keys.containsKey(Keyboard.Key.RIGHT_ALT.getId())) {
-             keys.get(Keyboard.Key.RIGHT_ALT.getId()).subscribe(bindsButtonSubscriber);
+         if (keys.containsKey(Keyboard.Key.RIGHT_SHIFT.getId())) {
+             keys.get(Keyboard.Key.RIGHT_SHIFT.getId()).subscribe(shiftSubscriber);
          } else {
-             keys.put(Keyboard.Key.RIGHT_ALT.getId(), new BindableButtonImpl(new SimpleUri("changeFocus"), "Change Focus With Shift", new BindButtonEvent()));
-             keys.get(Keyboard.Key.RIGHT_ALT.getId()).subscribe(bindsButtonSubscriber);
+             keys.put(Keyboard.Key.RIGHT_SHIFT.getId(), new BindableButtonImpl(new SimpleUri("changeFocusMod"), "Change Focus Modifier", new BindButtonEvent()));
+             keys.get(Keyboard.Key.RIGHT_SHIFT.getId()).subscribe(shiftSubscriber);
+         }
+         if (keys.containsKey(Keyboard.Key.TAB.getId())) {
+             keys.get(Keyboard.Key.TAB.getId()).subscribe(tabSubscriber);
+         } else {
+             keys.put(Keyboard.Key.TAB.getId(), new BindableButtonImpl(new SimpleUri("changeFocus"), "Change Focus", new BindButtonEvent()));
+             keys.get(Keyboard.Key.TAB.getId()).subscribe(tabSubscriber);
          }
 
         current = 0;
@@ -230,5 +260,9 @@ public class SortOrderSystem extends BaseComponentSystem {
 
     public static void setUsed(ArrayList<Integer> other) {
         used = other;
+    }
+
+    public static boolean getModifierPressed() {
+        return modifierPressed;
     }
 }
