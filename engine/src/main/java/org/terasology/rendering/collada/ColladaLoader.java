@@ -311,7 +311,7 @@ public class ColladaLoader {
 
 				if (jointName == null)
 				{
-					throw new ColladaParseException("a jointName is null in jointNmaeArray")
+					throw new ColladaParseException("a jointName is null in jointNmaeArray");
 				}
 				MD5Joint md5Joint = md5JointBySidMap.get(jointName);
 
