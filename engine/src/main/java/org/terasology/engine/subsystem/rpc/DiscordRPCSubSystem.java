@@ -32,7 +32,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener {
 
     public static void setState(String state) {
         if (instance == null) {
-            throw new IllegalStateException("There's no instance of DiscordRPC to work with");
+            return;
         }
         if (!getInstance().ready) {
             return;
