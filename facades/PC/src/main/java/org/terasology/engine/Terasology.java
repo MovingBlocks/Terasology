@@ -39,6 +39,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.subsystem.openvr.OpenVRInput;
+import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
@@ -382,6 +383,7 @@ public final class Terasology {
                     .add(new OpenVRInput());
         }
         builder.add(new HibernationSubsystem());
+        builder.add(new DiscordRPCSubSystem());
     }
 
     private static void reportException(Throwable throwable) {

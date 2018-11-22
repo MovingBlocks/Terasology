@@ -17,6 +17,7 @@ package org.terasology.entitySystem.systems;
 
 import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 
+@RegisterSystem(RegisterMode.CLIENT)
 public class DiscordRPCSystem extends BaseComponentSystem {
 
     @Override
