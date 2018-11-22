@@ -177,7 +177,7 @@ public class ColladaLoader {
             String vertexWeightsCountString = vertexWeights.attr("count");
             int vertexWeightsCount = Integer.parseInt(vertexWeightsCountString);
 
-            String[] jointNameArray = null;
+            String[] jointNameArray = {};
             float[] inverseBindMatrixArray;
             Quat4f[] rotationArray;
             ElementSet jointsInputSet = joints.find("input");
@@ -199,7 +199,7 @@ public class ColladaLoader {
 
             List<MD5Weight> md5WeightList = Lists.newArrayList();
 
-            float[] weightsArray = null;
+            float[] weightsArray = {};
 
             ElementSet vertexWeightsInputSet = vertexWeights.find("input");
             List<Input> vertexWeightsInputList = parseInputs(vertexWeightsInputSet);
@@ -287,10 +287,12 @@ public class ColladaLoader {
                             vertexWeightsJointNameArray[vertexWeightsIndex] = jointNameArray[index];
                             if (vertexWeightsJointNameArray[vertexWeightsIndex] == null){
                                 logger.debug("No jointNameArray in index: " + index);
+                                throw new ColladaParseException("No jointNameArray in index: " + index);
                             }
                         } else if ("WEIGHT".equals(vertexWeightsInput.semantic)) {
                             if (weightsArray == null) {
                                 logger.debug("No weights in weightsArray");
+                                throw new ColladaParseException("No weights in weightsArray");
                             }
                             md5Weight.bias = weightsArray[index];
                             vertexWeightsArray[vertexWeightsIndex] = weightsArray[index];
@@ -306,13 +308,13 @@ public class ColladaLoader {
             MD5Mesh md5Mesh = new MD5Mesh();
             md5Mesh.weightList = md5WeightList;
 
+            if (jointNameArray == null) {
+                throw new ColladaParseException("a jointName is null in jointNmaeArray");
+            }
+
             // Find a node with sid="joint-name"
             for (String jointName : jointNameArray) {
 
-                if (jointName == null)
-                {
-                    throw new ColladaParseException("a jointName is null in jointNmaeArray");
-                }
                 MD5Joint md5Joint = md5JointBySidMap.get(jointName);
 
                 if (null == md5Joint) {
