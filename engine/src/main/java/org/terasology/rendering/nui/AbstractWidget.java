@@ -26,8 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-/**
- */
 public abstract class AbstractWidget implements UIWidget {
 
     @LayoutConfig
@@ -47,6 +45,8 @@ public abstract class AbstractWidget implements UIWidget {
 
     @LayoutConfig
     private float tooltipDelay = 0.5f;
+
+    protected int depth = new DefaultBinding<Integer>(SortOrderSystem.DEFAULT_DEPTH).get();
 
     private boolean focused;
 
