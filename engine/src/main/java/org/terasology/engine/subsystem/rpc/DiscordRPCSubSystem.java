@@ -18,6 +18,8 @@ package org.terasology.engine.subsystem.rpc;
 import com.jagrosh.discordipc.IPCClient;
 import com.jagrosh.discordipc.IPCListener;
 import com.jagrosh.discordipc.entities.RichPresence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -28,6 +30,13 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener {
 
     public static DiscordRPCSubSystem getInstance() {
         return instance;
+    }
+
+    public static Logger getLogger() {
+        if (getInstance() == null) {
+            return null;
+        }
+        return getInstance().logger;
     }
 
     public static void setState(String state) {
@@ -42,6 +51,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener {
         getInstance().ipcClient.sendRichPresence(builder.build());
     }
 
+    private Logger logger;
     private IPCClient ipcClient;
     private boolean ready;
 
@@ -51,11 +61,13 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener {
         }
         ipcClient = new IPCClient(515274721080639504L);
         ipcClient.setListener(this);
+        logger = LoggerFactory.getLogger(DiscordRPCSubSystem.class);
         instance = this;
     }
 
     @Override
     public void onReady(IPCClient client) {
+        getLogger().info("Discord RPC >> Connected!");
         this.ipcClient = client;
         if (!ready) ready = true;
         RichPresence.Builder builder = new RichPresence.Builder();
@@ -65,12 +77,16 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener {
 
     @Override
     public void onDisconnect(IPCClient client, Throwable t) {
-        if (ready) ready = false;
+        if (ready) {
+            ready = false;
+        }
+        getLogger().info("Discord RPC >> Disconnected!");
     }
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
         try {
+            getLogger().info("Discord RPC >> Connecting...");
             ipcClient.connect();
         } catch (Exception ex) {
             ex.printStackTrace();
