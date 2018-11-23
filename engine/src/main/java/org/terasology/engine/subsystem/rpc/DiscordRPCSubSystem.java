@@ -137,12 +137,11 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     lastPing = 0;
                     reconnecting = true;
                     int timeout = (reconnectTries * 5) * 1000;
-                    getLogger().info("Discord RPC >> Reconnecting... (Timeout: " + timeout / 1000 + ")");
+                    getLogger().info("Discord RPC >> Reconnecting... (Timeout: " + timeout + "ms)");
                     try {
                         ipcClient.connect();
                     } catch (Exception ex) {
-                        getLogger().info(String.format("Discord RPC >> Failed to reconnect! Retrying in %s seconds...", (timeout / 1000)));
-                        if (reconnectTries <= 5) {
+                        if (reconnectTries <= 6) {
                             reconnectTries += 1;
                         }
                         Thread.sleep(timeout);
