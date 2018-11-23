@@ -114,6 +114,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     public void run() {
         while (autoReconnect) {
             try {
+                // Connect if the connect on init didn't connect successfully
                 if (!connectedBefore && !ready) {
                     lastPing = 0;
                     try {
@@ -122,6 +123,9 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     Thread.sleep(5000);
                     continue;
                 }
+
+
+                // Ping to make sure that the RPC is alive
                 if (ready) {
                     Thread.sleep(1);
                     lastPing += 1;
@@ -129,7 +133,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                         sendRichPresence(this.lastRichPresence);
                         this.lastPing = 0;
                     }
-                } else {
+                } else { // Reconnect to RPC with tries ( min: 2 seconds, max: 30 seconds )
                     lastPing = 0;
                     reconnecting = true;
                     int timeout = (reconnectTries * 2) * 1000;
