@@ -29,7 +29,9 @@ Note: Keys between the latest stable and latest develop build may differ.
 * [C] - Show character screen for stats and equipment (requires "Equipment" module active)
 * [H] - Hide user interface
 * [T] - Toggle chat interface (effectively a mini-console that only does chat)
-* [Tab] - Auto-completion in the console
+* [Tab] - Auto-completion if in the console
+* [Tab] - Show online players overlay if not in the console
+* [Shift + Tab] - Cycle between in-game windows
 * [Home] - Increase viewing distance
 * [End] - Decrease viewing distance
 * [Escape] - Show/hide the game menu screen
