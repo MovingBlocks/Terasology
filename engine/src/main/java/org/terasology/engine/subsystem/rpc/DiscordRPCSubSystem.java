@@ -52,7 +52,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         RichPresence.Builder builder = new RichPresence.Builder();
         if (state != null) {
             builder.setState(state);
-            if (!getInstance().lastState.equals(state)) {
+            if (getInstance() == null || (getInstance().lastState != null && !getInstance().lastState.equals(state))) {
                 getInstance().lastState = state;
             }
         }
