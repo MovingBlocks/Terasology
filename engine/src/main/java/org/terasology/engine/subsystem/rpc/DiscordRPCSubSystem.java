@@ -49,10 +49,10 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         }
         RichPresence.Builder builder = new RichPresence.Builder();
         builder.setState(state);
-//        if (getInstance().config != null) {
-//            String playerName = getInstance().config.getPlayer().getName();
-//            builder.setDetails("IGN | " + playerName);
-//        }
+        if (getInstance().config != null) {
+            String playerName = getInstance().config.getPlayer().getName();
+            builder.setDetails("IGN | " + playerName);
+        }
         getInstance().sendRichPresence(builder.build());
     }
 
@@ -66,6 +66,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     private int reconnectTries = 1;
     private boolean connectedBefore;
     private int lastPing = 0;
+    private Config config;
 
     public DiscordRPCSubSystem() throws IllegalStateException {
         if (instance != null) {
@@ -169,20 +170,8 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
 
     @Override
     public void postInitialise(Context context) {
+        config = context.get(Config.class);
         setState("In Lobby");
-    }
-
-    @In
-    private LocalPlayer localPlayer;
-
-    // For Repeating and see if there's any change
-    @Override
-    public void postUpdate(GameState currentState, float delta) {
-        if (localPlayer == null) {
-            logger.info("Not found the local player");
-        } else {
-            logger.info("Found the local player");
-        }
     }
 
     @Override
