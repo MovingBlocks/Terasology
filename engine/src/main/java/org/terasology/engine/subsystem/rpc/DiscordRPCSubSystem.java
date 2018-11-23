@@ -28,6 +28,8 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 
+import java.time.OffsetDateTime;
+
 public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnable {
 
     private static DiscordRPCSubSystem instance;
@@ -50,10 +52,14 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         RichPresence.Builder builder = new RichPresence.Builder();
         if (state != null) {
             builder.setState(state);
+            if (!getInstance().lastState.equals(state)) {
+                getInstance().lastState = state;
+            }
         }
         if (getInstance().config != null) {
             String playerName = getInstance().config.getPlayer().getName();
             builder.setDetails("IGN | " + playerName);
+            builder.setStartTimestamp(OffsetDateTime.now());
         }
         getInstance().sendRichPresence(builder.build());
     }
