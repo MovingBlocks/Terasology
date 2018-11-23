@@ -178,7 +178,7 @@ public class UIRadialRing extends CoreWidget {
         double angle = Math.atan2(mousePos.y(), mousePos.x());
         angle = angle < 0 ? angle + Math.PI * 2 : angle;
 
-        double dist = Math.sqrt(mousePos.x() * mousePos.x() + mousePos.y() * mousePos.y());
+        double dist = Math.sqrt((double) mousePos.x() * mousePos.x() + (double) mousePos.y() * mousePos.y());
         if (dist < radius / 2 || dist > radius) {
             return -1;
         }

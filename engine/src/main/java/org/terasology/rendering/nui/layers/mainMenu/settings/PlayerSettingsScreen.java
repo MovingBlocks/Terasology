@@ -268,7 +268,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     }
 
     private Color findClosestColor(float findex) {
-        int index = DoubleMath.roundToInt(findex * (colors.size() - 1), RoundingMode.HALF_UP);
+        int index = DoubleMath.roundToInt(findex * (double) (colors.size() - 1), RoundingMode.HALF_UP);
         Color color = colors.get(index);
         return color;
     }

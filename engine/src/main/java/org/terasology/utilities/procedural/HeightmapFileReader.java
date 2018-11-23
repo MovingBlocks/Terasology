@@ -40,7 +40,7 @@ public final class HeightmapFileReader {
     public static void convertFileToTexture() throws IOException {
         float[][] heightmap = readFile();
 
-        double scaleFactor = 256 * 256 * 12.8f;
+        double scaleFactor = 256 * 256 * 12.8;
 
 //        Slick's PNGDecoder does not support 16 bit textures
 
