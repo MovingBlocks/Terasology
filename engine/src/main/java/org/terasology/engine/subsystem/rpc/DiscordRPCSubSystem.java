@@ -43,9 +43,6 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         if (instance == null) {
             return;
         }
-        if (!getInstance().ready) {
-            return;
-        }
         RichPresence.Builder builder = new RichPresence.Builder();
         builder.setState(state);
         getInstance().sendRichPresence(builder.build());
@@ -79,7 +76,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
 
     public void sendRichPresence(RichPresence richPresence) {
         this.lastRichPresence = richPresence;
-        if (!ready) {
+        if (!ready || lastRichPresence == null) {
             return;
         }
         ipcClient.sendRichPresence(lastRichPresence);
@@ -100,10 +97,9 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         }
         if (lastRichPresence == null) {
             RichPresence.Builder builder = new RichPresence.Builder();
-            client.sendRichPresence(builder.build());
-        } else {
-            client.sendRichPresence(lastRichPresence);
+            lastRichPresence = builder.build();
         }
+        client.sendRichPresence(lastRichPresence);
     }
 
     @Override
@@ -136,12 +132,12 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                 } else {
                     lastPing = 0;
                     reconnecting = true;
-                    int timeout = (reconnectTries * 5) * 1000;
+                    int timeout = (reconnectTries * 2) * 1000;
                     getLogger().info("Discord RPC >> Reconnecting... (Timeout: " + timeout + "ms)");
                     try {
                         ipcClient.connect();
                     } catch (Exception ex) {
-                        if (reconnectTries <= 6) {
+                        if (reconnectTries <= 15) {
                             reconnectTries += 1;
                         }
                         Thread.sleep(timeout);
