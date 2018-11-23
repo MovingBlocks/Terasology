@@ -21,6 +21,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
 import org.terasology.context.Context;
+import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
@@ -317,6 +318,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText().trim());
             config.getPlayer().setHasEnteredUsername(true);
+            DiscordRPCSubSystem.updateState();
         }
         if (!config.getSystem().getLocale().equals(language.getSelection())) {
             config.getSystem().setLocale(language.getSelection());
