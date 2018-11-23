@@ -48,12 +48,21 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
             return;
         }
         RichPresence.Builder builder = new RichPresence.Builder();
-        builder.setState(state);
+        if (state != null) {
+            builder.setState(state);
+        }
         if (getInstance().config != null) {
             String playerName = getInstance().config.getPlayer().getName();
             builder.setDetails("IGN | " + playerName);
         }
         getInstance().sendRichPresence(builder.build());
+    }
+
+    public static void updateState() {
+        if (getInstance() == null) {
+            return;
+        }
+        setState(getInstance().lastState);
     }
 
     private Logger logger;
@@ -67,6 +76,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     private boolean connectedBefore;
     private int lastPing = 0;
     private Config config;
+    private String lastState;
 
     public DiscordRPCSubSystem() throws IllegalStateException {
         if (instance != null) {
