@@ -46,6 +46,10 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     }
 
     public static void setState(String state) {
+        setState(state, true);
+    }
+
+    public static void setState(String state, boolean timestamp) {
         if (instance == null) {
             return;
         }
@@ -59,6 +63,8 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         if (getInstance().config != null) {
             String playerName = getInstance().config.getPlayer().getName();
             builder.setDetails("IGN | " + playerName);
+        }
+        if (timestamp) {
             builder.setStartTimestamp(OffsetDateTime.now());
         }
         getInstance().sendRichPresence(builder.build());

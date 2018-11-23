@@ -16,13 +16,27 @@
 package org.terasology.entitySystem.systems;
 
 import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
+import org.terasology.game.Game;
+import org.terasology.registry.In;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class DiscordRPCSystem extends BaseComponentSystem {
 
+    @In
+    private Game game;
+
+    public String getGame() {
+        return String.format("In Game | %s", game.getName());
+    }
+
     @Override
     public void initialise() {
-        DiscordRPCSubSystem.setState("In Game");
+        DiscordRPCSubSystem.setState(getGame(), false);
+    }
+
+    @Override
+    public void postBegin() {
+        DiscordRPCSubSystem.setState(getGame(), true);
     }
 
     @Override
