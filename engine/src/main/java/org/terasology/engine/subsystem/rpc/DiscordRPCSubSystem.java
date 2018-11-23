@@ -58,8 +58,9 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     private Thread reconnectThread;
     private RichPresence lastRichPresence;
     private boolean reconnecting;
-    private int reconnectTries;
+    private int reconnectTries = 1;
     private boolean connectedBefore;
+    private int lastPing = 0;
 
     public DiscordRPCSubSystem() throws IllegalStateException {
         if (instance != null) {
@@ -88,7 +89,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     public void onReady(IPCClient client) {
         if (reconnecting) {
             getLogger().info("Discord RPC >> Reconnected!");
-            reconnectTries = 0;
+            reconnectTries = 1;
         } else {
             getLogger().info("Discord RPC >> Connected!");
             connectedBefore = true;
@@ -117,29 +118,37 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     public void run() {
         while (autoReconnect) {
             try {
-                if (!connectedBefore) {
-                    ipcClient.connect();
+                if (!connectedBefore && !ready) {
+                    lastPing = 0;
+                    try {
+                        ipcClient.connect();
+                    } catch (Exception ex) {}
                     Thread.sleep(5000);
+                    continue;
                 }
                 if (ready) {
                     Thread.sleep(1);
+                    lastPing += 1;
+                    if (lastPing >= 5 * 1000) {
+                        sendRichPresence(this.lastRichPresence);
+                        this.lastPing = 0;
+                    }
                 } else {
+                    lastPing = 0;
                     reconnecting = true;
-                    getLogger().info("Discord RPC >> Reconnecting...");
-                    ipcClient.connect();
                     int timeout = (reconnectTries * 5) * 1000;
-                    Thread.sleep(timeout);
-                    if (!ready) {
+                    getLogger().info("Discord RPC >> Reconnecting... (Timeout: " + timeout / 1000 + ")");
+                    try {
+                        ipcClient.connect();
+                    } catch (Exception ex) {
                         getLogger().info(String.format("Discord RPC >> Failed to reconnect! Retrying in %s seconds...", (timeout / 1000)));
-                        if (reconnectTries <= 3) reconnectTries += 1;
+                        if (reconnectTries <= 5) {
+                            reconnectTries += 1;
+                        }
+                        Thread.sleep(timeout);
                     }
                 }
-            } catch (Exception ex) {
-                if (ex instanceof IllegalStateException) {
-                    continue;
-                }
-                ex.printStackTrace();
-            }
+            } catch (Exception ex) { }
         }
     }
 
@@ -148,9 +157,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         try {
             getLogger().info("Discord RPC >> Connecting...");
             ipcClient.connect();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        } catch (Exception ex) { }
     }
 
     @Override
@@ -160,6 +167,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
 
     @Override
     public void preShutdown() {
+        autoReconnect = false;
         reconnectThread.interrupt();
         ipcClient.close();
     }
