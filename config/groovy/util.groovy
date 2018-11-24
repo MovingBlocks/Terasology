@@ -227,10 +227,9 @@ def printUsage() {
     println ""
     println "Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub."
     println "Example: 'groovyw module get *' - would retrieve all the modules in the Terasology organisation on GitHub."
-    println "Example: 'groovyw module get *de*' - would retrieve all the modules in the Terasology organisation on GitHub" +
-            " that have the letter-pair \"de\" next somewhere within them."
-    println "Example: 'groovyw module get ?????Blocks' - would retrieve all the modules in the Terasology organisation on GitHub" +
-            " that start with any five characters and end with 'Blocks'."
+    println "Example: 'groovyw module get Sa??l*' - would retrieve all the modules in the Terasology organisation on GitHub" +
+            " that start with \"Sa\", have any two characters after that, then an \"l\" and then end with anything else." +
+            " This should retrieve the Sample repository from the Terasology organisation on GitHub."
     println ""
     println "*NOTE*: On UNIX platforms (MacOS and Linux), the arguments must be escaped with single quotes e.g. groovyw module get '*'."
     println ""
