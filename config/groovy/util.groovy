@@ -55,7 +55,6 @@ switch(cleanerArgs[0]) {
             // Note: processCustomRemote also drops one of the array elements from cleanerArgs
             cleanerArgs = common.processCustomRemote(cleanerArgs)
             ArrayList<String> selectedModules = new ArrayList<String>()
-            String[] moduleList = common.retrieveAvailableItems()
 
             common.cacheItemList()
             for (String arg : cleanerArgs) {
