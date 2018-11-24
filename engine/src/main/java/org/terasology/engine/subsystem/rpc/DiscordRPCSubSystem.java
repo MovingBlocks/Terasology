@@ -23,59 +23,13 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.registry.In;
 
 import java.time.OffsetDateTime;
 
 public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnable {
 
     private static DiscordRPCSubSystem instance;
-
-    public static DiscordRPCSubSystem getInstance() {
-        return instance;
-    }
-
-    public static Logger getLogger() {
-        if (getInstance() == null) {
-            return null;
-        }
-        return getInstance().logger;
-    }
-
-    public static void setState(String state) {
-        setState(state, true);
-    }
-
-    public static void setState(String state, boolean timestamp) {
-        if (instance == null) {
-            return;
-        }
-        RichPresence.Builder builder = new RichPresence.Builder();
-        if (state != null) {
-            builder.setState(state);
-            if (getInstance() == null || (getInstance().lastState != null && !getInstance().lastState.equals(state))) {
-                getInstance().lastState = state;
-            }
-        }
-        if (getInstance().config != null) {
-            String playerName = getInstance().config.getPlayer().getName();
-            builder.setDetails("IGN | " + playerName);
-        }
-        if (timestamp) {
-            builder.setStartTimestamp(OffsetDateTime.now());
-        }
-        getInstance().sendRichPresence(builder.build());
-    }
-
-    public static void updateState() {
-        if (getInstance() == null) {
-            return;
-        }
-        setState(getInstance().lastState);
-    }
 
     private Logger logger;
     private IPCClient ipcClient;
@@ -86,7 +40,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     private boolean reconnecting;
     private int reconnectTries = 1;
     private boolean connectedBefore;
-    private int lastPing = 0;
+    private int lastPing;
     private Config config;
     private String lastState;
 
@@ -150,7 +104,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     lastPing = 0;
                     try {
                         ipcClient.connect();
-                    } catch (Exception ex) {}
+                    } catch (Exception ex) { }
                     Thread.sleep(5000);
                     continue;
                 }
@@ -207,4 +161,48 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     public String getName() {
         return "DiscordRPC";
     }
+
+    public static DiscordRPCSubSystem getInstance() {
+        return instance;
+    }
+
+    public static Logger getLogger() {
+        if (getInstance() == null) {
+            return null;
+        }
+        return getInstance().logger;
+    }
+
+    public static void setState(String state) {
+        setState(state, true);
+    }
+
+    public static void setState(String state, boolean timestamp) {
+        if (instance == null) {
+            return;
+        }
+        RichPresence.Builder builder = new RichPresence.Builder();
+        if (state != null) {
+            builder.setState(state);
+            if (getInstance() == null || (getInstance().lastState != null && !getInstance().lastState.equals(state))) {
+                getInstance().lastState = state;
+            }
+        }
+        if (getInstance().config != null) {
+            String playerName = getInstance().config.getPlayer().getName();
+            builder.setDetails("IGN | " + playerName);
+        }
+        if (timestamp) {
+            builder.setStartTimestamp(OffsetDateTime.now());
+        }
+        getInstance().sendRichPresence(builder.build());
+    }
+
+    public static void updateState() {
+        if (getInstance() == null) {
+            return;
+        }
+        setState(getInstance().lastState);
+    }
+
 }
