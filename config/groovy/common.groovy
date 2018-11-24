@@ -31,6 +31,10 @@ class common {
     /** The default name of a git remote we might want to work on or keep handy */
     String defaultRemote = "origin"
 
+    boolean itemListCached = false
+
+    String[] cachedItemList;
+
     /**
      * Initialize defaults to match the target item type
      * @param type the type to be initialized
@@ -297,6 +301,9 @@ class common {
      * @return a String[] containing the names of items available for download.
      */
     String[] retrieveAvailableItems() {
+        if (itemListCached) {
+            return cachedItemList
+        }
 
         // TODO: We need better ways to display the result especially when it contains a lot of items
         // However, in some cases heavy filtering could still mean that very few items will actually display ...
@@ -323,7 +330,49 @@ class common {
             }
         }
 
-        return itemTypeScript.filterItemsFromApi(mappedPossibleItems)
+        String[] items = itemTypeScript.filterItemsFromApi(mappedPossibleItems)
+
+        return items;
+    }
+
+    /**
+     * Retrieves all the available items for the target type in the form of a list that match the specified regex.
+     *
+     * Forming the regex:
+     * "\Q" starts an explicit quote (which includes all reserved characters as well)
+     * "\E" ends an explicit quote
+     * "\w*" is equivalent to "*" - it selects anything that has the same characters
+     * (in the range of a-z, A-Z or 1-9) as before and after the asterisk
+     * "." is equivalent to "?" - it selects anything that has the rest of the pattern but any
+     * character in the "?" symbol's position
+     * So, "\Q<INPUT_PART1>\E\w*\Q\<INPUT_PART1>E", selects anything that starts with INPUT_PART1
+     * and ends with INPUT_PART2 - This regex expression is equivalent to the input argument
+     * "INPUT_PART1*INPUT_PART2"
+     *
+     * @return a String[] containing the names of items available for download.
+     * @param regex the regex that the retrieved items should match
+     */
+    String[] retrieveAvailableItemsWithRegexMatch(String regex) {
+        ArrayList<String> selectedModules = new ArrayList<String>()
+        String[] moduleList = retrieveAvailableItems()
+        for (String module : moduleList) {
+            if (module.matches(regex)) {
+                selectedModules.add(module)
+            }
+        }
+
+        return ((String[]) selectedModules.toArray());
+    }
+
+    /**
+     * Retrieves all the available items for the target type in the form of a list that match the specified regex.
+     *
+     * @param wildcardPattern the wildcard pattern that the retrieved items should match
+     * @return a String[] containing the names of items available for download.
+     */
+    String[] retrieveAvalibleItemsWithWildcardMatch(String wildcardPattern) {
+        String regex = ("\\Q" + wildcardPattern.replace("*", "\\E\\w*\\Q").replace("?", "\\E.\\Q") + "\\E")
+        return retrieveAvailableItemsWithRegexMatch(regex);
     }
 
     /**
@@ -352,5 +401,14 @@ class common {
             }
         }
         return localItems
+    }
+
+    void cacheItemList() {
+        cachedItemList = retrieveAvailableItems()
+        itemListCached = true
+    }
+
+    void unCacheItemList() {
+        itemListCached = false
     }
 }

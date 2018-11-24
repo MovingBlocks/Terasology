@@ -57,30 +57,15 @@ switch(cleanerArgs[0]) {
             ArrayList<String> selectedModules = new ArrayList<String>()
             String[] moduleList = common.retrieveAvailableItems()
 
+            common.cacheItemList()
             for (String arg : cleanerArgs) {
                 if (!arg.contains('*') && !arg.contains('?')) {
                     selectedModules.add(arg)
                 } else {
-                    for (String module : moduleList) {
-                        /**
-                         * Forming the regex:
-                         * "\Q" starts an explicit quote (which includes all reserved characters as well)
-                         * "\E" ends an explicit quote
-                         * "\w*" is equivalent to "*" - it selects anything that has the same characters
-                         * (in the range of a-z, A-Z or 1-9) as before and after the asterisk
-                         * "." is equivalent to "?" - it selects anything that has the rest of the pattern but any
-                         * character in the "?" symbol's position
-                         * So, "\Q<INPUT_PART1>\E\w*\Q\<INPUT_PART1>E", selects anything that starts with INPUT_PART1
-                         * and ends with INPUT_PART2 - This regex expression is equivalent to the input argument
-                         * "INPUT_PART1*INPUT_PART2"
-                         */
-                        String regex = ("\\Q" + arg.replace("*", "\\E\\w*\\Q").replace("?", "\\E.\\Q") + "\\E")
-                        if (module.matches(regex)) {
-                            selectedModules.add(module)
-                        }
-                    }
+                    selectedModules.addAll(common.retrieveAvalibleItemsWithWildcardMatch(arg));
                 }
             }
+            common.unCacheItemList()
 
             common.retrieve(((String[])selectedModules.toArray()), recurse)
         }
@@ -245,6 +230,11 @@ def printUsage() {
     println "Example: 'groovyw module get *' - would retrieve all the modules in the Terasology organisation on GitHub."
     println "Example: 'groovyw module get *de*' - would retrieve all the modules in the Terasology organisation on GitHub" +
             " that have the letter-pair \"de\" next somewhere within them."
+    println "Example: 'groovyw module get ?????Blocks' - would retrieve all the modules in the Terasology organisation on GitHub" +
+            " that start with any five characters and end with 'Blocks'."
+    println ""
+    println "*NOTE*: On UNIX platforms (MacOS and Linux), the arguments must be escaped with single quotes e.g. groovyw module get '*'."
+    println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source"
     println "Example: 'groovyw lib list' - would list library projects compatible with being embedded in a Terasology workspace"
     println ""
