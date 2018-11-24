@@ -31,9 +31,11 @@ class common {
     /** The default name of a git remote we might want to work on or keep handy */
     String defaultRemote = "origin"
 
+    /** Should we cache the list of remote items */
     boolean itemListCached = false
 
-    String[] cachedItemList;
+    /** For keeping a list of remote items that can be retrieved */
+    String[] cachedItemList
 
     /**
      * Initialize defaults to match the target item type
