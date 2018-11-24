@@ -82,6 +82,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         }
         if (lastRichPresence == null) {
             RichPresence.Builder builder = new RichPresence.Builder();
+            builder.setLargeImage("ss_6");
             lastRichPresence = builder.build();
         }
         client.sendRichPresence(lastRichPresence);
@@ -195,6 +196,8 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         if (timestamp) {
             builder.setStartTimestamp(OffsetDateTime.now());
         }
+
+        builder.setLargeImage("ss_6");
         getInstance().sendRichPresence(builder.build());
     }
 
