@@ -53,6 +53,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     private Config config;
     private String lastState;
     private boolean dontTryAgain;
+    private boolean enabled;
 
     public DiscordRPCSubSystem() throws IllegalStateException {
         if (instance != null) {
@@ -66,6 +67,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         reconnectThread.setName("DISCORD-RPC-RECONNECT");
         reconnectThread.start();
         instance = this;
+        enabled = false;
     }
 
     public void sendRichPresence(RichPresence richPresence) {
@@ -109,6 +111,12 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     public void run() {
         while (autoReconnect) {
             try {
+                // Ignore if the Discord RPC is not enabled
+                if (!enabled) {
+                    Thread.sleep(1);
+                    continue;
+                }
+
                 // Don't try to retry to discover the RPC until some reasons happen
                 if(dontTryAgain) {
                     Thread.sleep(1);
@@ -163,6 +171,11 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
+        Config c = rootContext.get(Config.class);
+        enabled = c.getPlayer().isDiscordPresence();
+        if (!enabled) {
+            return;
+        }
         try {
             getLogger().info("Discord RPC >> Connecting...");
             ipcClient.connect();
@@ -240,9 +253,32 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         if (getInstance() == null) {
             return;
         }
-        if (getInstance().dontTryAgain) {
+        if (getInstance().dontTryAgain && getInstance().enabled) {
             getInstance().dontTryAgain = false;
             getInstance().reconnectTries = 0;
+        }
+    }
+
+    public static void enable() {
+        setEnabled(true);
+    }
+
+    public static void disable() {
+        setEnabled(false);
+    }
+
+    public static void setEnabled(boolean enable) {
+        if (getInstance() == null) {
+            return;
+        }
+        getInstance().enabled = enable;
+        if (enable == false) {
+            getInstance().reconnectTries = 0;
+            if (getInstance().ready) {
+                try {
+                    getInstance().ipcClient.close();
+                } catch (Exception ex) { }
+            }
         }
     }
 
