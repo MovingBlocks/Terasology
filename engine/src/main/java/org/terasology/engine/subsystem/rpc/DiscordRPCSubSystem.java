@@ -155,7 +155,11 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     public void preShutdown() {
         autoReconnect = false;
         reconnectThread.interrupt();
-        ipcClient.close();
+        if (ready) {
+          try {
+              ipcClient.close();
+          } catch (Exception ex) { }
+        }
     }
 
     @Override
