@@ -19,7 +19,14 @@ import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.game.Game;
 import org.terasology.registry.In;
 
-@RegisterSystem(RegisterMode.CLIENT)
+/**
+ * It's a system that runs when a single player or multi player game has been started to process some stuff
+ * throw the {@link DiscordRPCSubSystem}.
+ *
+ * @see DiscordRPCSubSystem
+ * @author iHDeveloper
+ */
+@RegisterSystem(RegisterMode.ALWAYS)
 public class DiscordRPCSystem extends BaseComponentSystem {
 
     @In
