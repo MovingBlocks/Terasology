@@ -52,6 +52,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     private int lastPing;
     private Config config;
     private String lastState;
+    private boolean dontTryAgain;
 
     public DiscordRPCSubSystem() throws IllegalStateException {
         if (instance != null) {
@@ -108,6 +109,12 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     public void run() {
         while (autoReconnect) {
             try {
+                // Don't try to retry to discover the RPC until some reasons happen
+                if(dontTryAgain) {
+                    Thread.sleep(1);
+                    continue;
+                }
+
                 // Connect if the connect on init didn't connect successfully
                 if (!connectedBefore && !ready) {
                     lastPing = 0;
@@ -135,8 +142,11 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     try {
                         ipcClient.connect();
                     } catch (Exception ex) {
-                        if (reconnectTries <= 15) {
+                        if (reconnectTries <= 5) {
                             reconnectTries += 1;
+                        }
+                        if (reconnectTries >= 5) {
+
                         }
                         Thread.sleep(timeout);
                     }
@@ -218,6 +228,14 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
             return;
         }
         setState(getInstance().lastState);
+    }
+
+    public static void tryToDiscover() {
+        if (getInstance() == null) {
+            return;
+        }
+        getInstance().dontTryAgain = false;
+        getInstance().reconnectTries = 0;
     }
 
 }
