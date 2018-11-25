@@ -234,8 +234,10 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         if (getInstance() == null) {
             return;
         }
-        getInstance().dontTryAgain = false;
-        getInstance().reconnectTries = 0;
+        if (getInstance().dontTryAgain) {
+            getInstance().dontTryAgain = false;
+            getInstance().reconnectTries = 0;
+        }
     }
 
 }

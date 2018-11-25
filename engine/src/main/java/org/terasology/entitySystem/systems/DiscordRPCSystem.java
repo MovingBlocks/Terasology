@@ -38,6 +38,11 @@ public class DiscordRPCSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
+        DiscordRPCSubSystem.tryToDiscover();
+    }
+
+    @Override
+    public void preBegin() {
         DiscordRPCSubSystem.setState(getGame(), false);
     }
 
