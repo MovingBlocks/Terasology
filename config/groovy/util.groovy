@@ -54,19 +54,19 @@ switch(cleanerArgs[0]) {
         } else {
             // Note: processCustomRemote also drops one of the array elements from cleanerArgs
             cleanerArgs = common.processCustomRemote(cleanerArgs)
-            ArrayList<String> selectedModules = new ArrayList<String>()
+            ArrayList<String> selectedItems = new ArrayList<String>()
 
             common.cacheItemList()
             for (String arg : cleanerArgs) {
                 if (!arg.contains('*') && !arg.contains('?')) {
-                    selectedModules.add(arg)
+                    selectedItems.add(arg)
                 } else {
-                    selectedModules.addAll(common.retrieveAvalibleItemsWithWildcardMatch(arg));
+                    selectedItems.addAll(common.retrieveAvalibleItemsWithWildcardMatch(arg));
                 }
             }
             common.unCacheItemList()
 
-            common.retrieve(((String[])selectedModules.toArray()), recurse)
+            common.retrieve(((String[])selectedItems.toArray()), recurse)
         }
         break
 

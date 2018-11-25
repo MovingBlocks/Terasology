@@ -355,15 +355,15 @@ class common {
      * @param regex the regex that the retrieved items should match
      */
     String[] retrieveAvailableItemsWithRegexMatch(String regex) {
-        ArrayList<String> selectedModules = new ArrayList<String>()
-        String[] moduleList = retrieveAvailableItems()
-        for (String module : moduleList) {
-            if (module.matches(regex)) {
-                selectedModules.add(module)
+        ArrayList<String> selectedItems = new ArrayList<String>()
+        String[] itemList = retrieveAvailableItems()
+        for (String item : itemList) {
+            if (item.matches(regex)) {
+                selectedItems.add(item)
             }
         }
 
-        return ((String[]) selectedModules.toArray());
+        return ((String[]) selectedItems.toArray());
     }
 
     /**
