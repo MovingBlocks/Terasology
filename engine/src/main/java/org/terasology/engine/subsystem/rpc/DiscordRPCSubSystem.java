@@ -73,7 +73,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
 
     public void sendRichPresence(RichPresence richPresence) {
         this.lastRichPresence = richPresence;
-        if (!ready || lastRichPresence == null) {
+        if (!ready || lastRichPresence == null || !enabled) {
             return;
         }
         ipcClient.sendRichPresence(lastRichPresence);
@@ -151,7 +151,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     Thread.sleep(1);
                     lastPing += 1;
                     if (lastPing >= 5 * 1000) {
-                        sendRichPresence(this.lastRichPresence);
+                        ipcClient.sendRichPresence(this.lastRichPresence);
                         this.lastPing = 0;
                     }
                 } else { // Reconnect to RPC with tries ( min: 2 seconds, max: 30 seconds )
