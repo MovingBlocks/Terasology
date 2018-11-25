@@ -282,4 +282,11 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         }
     }
 
+    public static boolean isEnabled() {
+        if (getInstance() == null) {
+            return false;
+        }
+        return getInstance().enabled;
+    }
+
 }
