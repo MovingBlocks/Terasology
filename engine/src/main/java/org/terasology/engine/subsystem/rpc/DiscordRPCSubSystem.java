@@ -281,6 +281,8 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         getInstance().enabled = enable;
         if (enable == false) {
             getInstance().reconnectTries = 0;
+        } else {
+            tryToDiscover();
         }
     }
 
