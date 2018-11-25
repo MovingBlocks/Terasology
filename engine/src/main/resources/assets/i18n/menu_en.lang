@@ -432,5 +432,6 @@
     "caching-textures": "Caching Textures...",
     "loading-prefabs": "Loading Prefabs...",
     "post-initialise-systems": "Post-Initialise Systems",
-    "reticulating-splines": "Reticulating Splines"
+    "reticulating-splines": "Reticulating Splines",
+    "discord-presence": "Discord Rich Presence"
 }
