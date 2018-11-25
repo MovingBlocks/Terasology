@@ -36,11 +36,11 @@ import java.time.OffsetDateTime;
  */
 public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnable {
 
+    private static final Logger logger = LoggerFactory.getLogger(DiscordRPCSubSystem.class);
     private static final long CLIENT_ID = 515274721080639504L;
     private static final String LARGE_IMAGE = "ss_6";
     private static DiscordRPCSubSystem instance;
 
-    private Logger logger;
     private IPCClient ipcClient;
     private boolean ready;
     private boolean autoReconnect;
@@ -60,7 +60,6 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         lastRichPresence = null;
         ipcClient = new IPCClient(CLIENT_ID);
         ipcClient.setListener(this);
-        logger = LoggerFactory.getLogger(DiscordRPCSubSystem.class);
         autoReconnect = true;
         reconnectThread = new Thread(this);
         reconnectThread.setName("DISCORD-RPC-RECONNECT");
