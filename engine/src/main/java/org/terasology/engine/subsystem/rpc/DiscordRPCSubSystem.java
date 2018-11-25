@@ -113,6 +113,11 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
             try {
                 // Ignore if the Discord RPC is not enabled
                 if (!enabled) {
+                    if (ready) {
+                        try {
+                            getInstance().ipcClient.close();
+                        } catch (Exception ex) { }
+                    }
                     Thread.sleep(1);
                     continue;
                 }
@@ -274,11 +279,6 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         getInstance().enabled = enable;
         if (enable == false) {
             getInstance().reconnectTries = 0;
-            if (getInstance().ready) {
-                try {
-                    getInstance().ipcClient.close();
-                } catch (Exception ex) { }
-            }
         }
     }
 
