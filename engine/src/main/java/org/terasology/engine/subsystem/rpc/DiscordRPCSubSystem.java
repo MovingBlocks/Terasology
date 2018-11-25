@@ -68,6 +68,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         reconnectThread.start();
         instance = this;
         enabled = false;
+        dontTryAgain = true;
     }
 
     public void sendRichPresence(RichPresence richPresence) {
@@ -184,6 +185,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         try {
             getLogger().info("Discord RPC >> Connecting...");
             ipcClient.connect();
+            dontTryAgain = false;
         } catch (Exception ex) { }
     }
 
