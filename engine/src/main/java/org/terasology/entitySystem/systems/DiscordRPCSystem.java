@@ -24,7 +24,6 @@ import org.terasology.registry.In;
  * throw the {@link DiscordRPCSubSystem}.
  *
  * @see DiscordRPCSubSystem
- * @author iHDeveloper
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class DiscordRPCSystem extends BaseComponentSystem {

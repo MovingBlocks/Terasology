@@ -32,7 +32,6 @@ import java.time.OffsetDateTime;
  * You can use this subsystem for future features to make the game looks better.
  *
  * @see EngineSubsystem
- * @author  iHDeveloper
  */
 public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnable {
 
@@ -124,7 +123,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                 }
 
                 // Don't try to retry to discover the RPC until some reasons happen
-                if(dontTryAgain) {
+                if (dontTryAgain) {
                     Thread.sleep(1);
                     continue;
                 }
@@ -279,7 +278,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
             return;
         }
         getInstance().enabled = enable;
-        if (enable == false) {
+        if (!enable) {
             getInstance().reconnectTries = 0;
         } else {
             tryToDiscover();
