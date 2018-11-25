@@ -516,6 +516,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             if (focus != null) {
                 focus.onGainFocus();
             }
+            logger.info("focus: "+focus);
         }
     }
 

@@ -1,38 +1,51 @@
 package org.terasology.rendering.nui;
 
-import org.terasology.context.internal.ContextImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 public abstract class WidgetWithOrder extends CoreWidget {
 
     //TODO: call init of tabbingManager
 
     @LayoutConfig
-    private int order = -9999;
+    private int order = TabbingManager.UNINITIALIZED_DEPTH;
 
-    protected TabbingManager tabbingManager;
+    private boolean added = false;
 
     public WidgetWithOrder() {
         this.setId("");
-        tabbingManager = new ContextImpl().get(TabbingManager.class);
-        if (tabbingManager == null) {
-            tabbingManager = new TabbingManager();
-        }
     }
+
     public WidgetWithOrder(String id) {
         this.setId(id);
-        tabbingManager = new ContextImpl().get(TabbingManager.class);
-        if (tabbingManager == null) {
-            tabbingManager = new TabbingManager();
-        }
     }
 
-    public int getOrder() {
-        if (order != -9999) {
-            order = TabbingManager.getNewNextNum();
-        } else {
-            TabbingManager.addToUsedNums(order, this);
-        }
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
 
+        Logger logger = LoggerFactory.getLogger("widget w/ order");
+        logger.info("adding");
+        TabbingManager.addToWidgetsList(this);
+    }
+    public int getOrder() {
+        if (order == TabbingManager.UNINITIALIZED_DEPTH) {
+            order = TabbingManager.getNewNextNum();
+        } else if (!added) {
+            TabbingManager.addToUsedNums(order, this);
+            added = true;
+        }
         return order;
     }
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        return true;
+    }
+
+    /*
+    @Override
+    public void onBindEvent(BindButtonEvent event) {
+        if (event.getId().equals())
+    }*/
 }

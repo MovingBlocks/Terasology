@@ -2,28 +2,16 @@ package org.terasology.rendering.nui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.subsystem.config.BindsManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.BindButtonSubscriber;
-import org.terasology.input.BindableButton;
-import org.terasology.input.Keyboard;
-import org.terasology.input.internal.BindableButtonImpl;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
-@RegisterSystem(RegisterMode.ALWAYS)
+@RegisterSystem
 public class TabbingManager extends BaseComponentSystem {
 
-    private static BindsManager bindsManager;
-
+    public static final int UNINITIALIZED_DEPTH = -9999;
     public static final Logger logger = LoggerFactory.getLogger(TabbingManager.class);
 
     private static int currentNum;
@@ -40,71 +28,31 @@ public class TabbingManager extends BaseComponentSystem {
         logger.info("constructing");
         usedNums = new ArrayList<>();
         widgetsList = new ArrayList<>();
-
-        bindsManager = new ContextImpl().get(BindsManager.class);
-        init();
     }
-    public void init() {
-        //if (!initialized) {
-            //BindsManager bindsManager = context.get(BindsManager.class);
-            logger.info("bindsManager: " + bindsManager);
-            Map<Integer, BindableButton> keys = bindsManager.getKeyBinds();
-            BindButtonSubscriber subscriber = new BindButtonSubscriber() {
-                @Override
-                public boolean onPress(float delta, EntityRef target) {
-                    logger.info("pressed");
-                    target.send(new ChangeActiveWidgetEvent());
-                    return false;
-                }
 
-                @Override
-                public boolean onRepeat(float delta, EntityRef target) {
-                    logger.info("held");
-                    target.send(new ChangeActiveWidgetEvent());
-                    return false;
-                }
-
-                @Override
-                public boolean onRelease(float delta, EntityRef target) {
-                    return false;
-                }
-            };
-            if (keys.containsKey(Keyboard.Key.BACKSLASH)) {
-                keys.get(Keyboard.Key.BACKSLASH.getId()).subscribe(subscriber);
-            } else {
-                keys.put(Keyboard.Key.BACKSLASH.getId(), new BindableButtonImpl(new SimpleUri("changeActive"), "Change Focused Widget", new BindButtonEvent()));
-                keys.get(Keyboard.Key.BACKSLASH.getId()).subscribe(subscriber);
-            }
-            initialized = true;
-        //}
-    }
-    @ReceiveEvent
-    public void changeFocus(ChangeActiveWidgetEvent event, EntityRef ref) {
-        logger.info("changing focus of widget");
-        increaseCurrentNum();
-        for(WidgetWithOrder widget:widgetsList) {
-            logger.info("widget order: "+widget.getOrder());
-            logger.info("currentNum: "+currentNum);
-            if (widget.getOrder() == currentNum) {
-                widget.onGainFocus();
-            } else {
-                widget.onLoseFocus();
-            }
-        }
-
-    }
-    public void increaseCurrentNum() {
+    public static void increaseCurrentNum() {
+        boolean loopedOnce = false;
         currentNum++;
+
+        logger.info("usedNums size: "+usedNums.size());
         while (!usedNums.contains(currentNum)) {
             currentNum++;
             if (currentNum > maxNum) {
-                currentNum = 0;
+                if (!loopedOnce) {
+                    logger.info("looped once");
+                    currentNum = 0;
+                    loopedOnce = true;
+                } else {
+                    logger.debug("usedNums doesn't contain enough numbers.");
+                    break;
+                }
             }
         }
     }
     public static int getNewNextNum() {
         nextNum++;
         maxNum++;
+        logger.info("nextNum: "+nextNum);
         while (usedNums.contains(nextNum)) {
             nextNum++;
             maxNum++;
@@ -122,5 +70,14 @@ public class TabbingManager extends BaseComponentSystem {
         } else {
             logger.info("one of depth already exists. ignoring.");
         }
+    }
+    public static void addToWidgetsList(WidgetWithOrder widget) {
+        widgetsList.add(widget);
+    }
+    public static int getCurrentNum() {
+        return currentNum;
+    }
+    public static List<WidgetWithOrder> getWidgetsList() {
+        return widgetsList;
     }
 }

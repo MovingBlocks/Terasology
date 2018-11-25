@@ -15,9 +15,13 @@
  */
 package org.terasology.rendering.nui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Keyboard;
+import org.terasology.input.binds.general.TabbingUIButton;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Rect2i;
@@ -36,6 +40,8 @@ import java.util.Iterator;
  */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 
+    protected TabbingManager tabbingManager;
+
     private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
@@ -52,6 +58,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private UIWidget contents;
 
     private NUIManager manager;
+
+    private boolean modifyingList;
+
+    private boolean activateBindEvent;
 
     private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
 
@@ -77,8 +87,33 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onOpened() {
+        modifyingList = false;
+        activateBindEvent = false;
+
+        tabbingManager = new TabbingManager();
+        Iterator<UIWidget> widgets = contents.iterator();
+        iterateThrough(widgets);
+
         animationSystem.triggerFromPrev();
         onScreenOpened();
+    }
+
+    private void iterateThrough(Iterator<UIWidget> widgets) {
+        modifyingList = true;
+        Logger logger = LoggerFactory.getLogger(CoreScreenLayer.class);
+        while(widgets.hasNext()) {
+            UIWidget next = widgets.next();
+            logger.info("id: "+next);
+            if (next instanceof  WidgetWithOrder) {
+                logger.info("instance");
+                TabbingManager.addToWidgetsList((WidgetWithOrder) next);
+            }
+            if (next.iterator().hasNext()) {
+                logger.info("hasNext");
+                iterateThrough(next.iterator());
+            }
+        }
+        modifyingList=false;
     }
 
     /**
@@ -121,6 +156,9 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         if (contents != null) {
             contents.update(delta);
             animationSystem.update(delta);
+            if (activateBindEvent) {
+                onBindEvent(new TabbingUIButton());
+            }
         }
     }
 
@@ -182,6 +220,28 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onBindEvent(BindButtonEvent event) {
+        if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
+            if (!modifyingList) {
+                modifyingList = true;
+                Logger logger = LoggerFactory.getLogger("testLogger");
+                logger.info("event id: " + event.getId());
+                logger.info("changing focus of widget");
+                logger.info("widgetsList length: " + TabbingManager.getWidgetsList().size());
+                TabbingManager.increaseCurrentNum();
+                logger.info("currentNum: " + TabbingManager.getCurrentNum());
+                for (WidgetWithOrder widget : TabbingManager.getWidgetsList()) {
+                    logger.info("widget order: " + widget.getOrder());
+                    if (widget.getOrder() == TabbingManager.getCurrentNum()) {
+                        logger.info("gaining focus");
+                        this.getManager().setFocus(widget);
+                    }
+                }
+                modifyingList = false;
+            } else {
+                activateBindEvent = true;
+            }
+            event.consume();
+        }
     }
 
     @Override
