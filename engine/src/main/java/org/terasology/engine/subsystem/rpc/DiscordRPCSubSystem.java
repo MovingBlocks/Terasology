@@ -134,7 +134,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     try {
                         ipcClient.connect();
                     } catch (Exception ex) { }
-                    Thread.sleep(5000);
+                    Thread.sleep(15 * 1000);
                     if (!ready) {
                         reconnectTries += 1;
                         if (reconnectTries >= 5) {
