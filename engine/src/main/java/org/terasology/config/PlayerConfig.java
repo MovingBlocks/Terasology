@@ -18,6 +18,7 @@ package org.terasology.config;
 
 import java.util.List;
 
+import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
 import org.terasology.utilities.random.FastRandom;
@@ -87,6 +88,13 @@ public class PlayerConfig {
 
     public void setDiscordPresence(boolean discordPresence) {
         this.discordPresence = discordPresence;
+        if (DiscordRPCSubSystem.isEnabled() != discordPresence) {
+            if (discordPresence) {
+                DiscordRPCSubSystem.enable();
+            } else {
+                DiscordRPCSubSystem.disable();
+            }
+        }
     }
 
     public boolean isDiscordPresence() {
