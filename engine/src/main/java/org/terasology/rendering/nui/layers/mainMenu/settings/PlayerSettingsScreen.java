@@ -26,7 +26,7 @@ import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
 import org.terasology.rendering.nui.layers.mainMenu.ThreeButtonPopup;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.*;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -42,11 +42,6 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.nui.widgets.UIText;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -89,6 +84,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private UISlider heightSlider;
     private UISlider eyeHeightSlider;
     private UIImage img;
+    private UICheckbox discordpresence;
     private UIDropdownScrollable<Locale> language;
 
     private StorageServiceWorkerStatus storageServiceWorkerStatus;
@@ -108,6 +104,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         }
         if (eyeHeightSlider != null) {
             eyeHeightSlider.bindValue(new NotifyingBinding(config.getPlayer().getEyeHeight()));
+        }
+        if (discordpresence != null) {
+            discordpresence.setChecked(config.getPlayer().isDiscordPresence());
         }
         if (language != null) {
             language.setSelection(config.getSystem().getLocale());
@@ -162,6 +161,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             eyeHeightSlider.setRange(1f);
             eyeHeightSlider.setPrecision(1);
         }
+
+        discordpresence = find("discord-presence", UICheckbox.class);
 
         language = find("language", UIDropdownScrollable.class);
         if (language != null) {
@@ -315,6 +316,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         config.getPlayer().setHeight(height);
         Float eyeHeight = getEyeHeight();
         config.getPlayer().setEyeHeight(eyeHeight);
+        config.getPlayer().setDiscordPresence(discordpresence.isChecked());
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText().trim());
             config.getPlayer().setHasEnteredUsername(true);
