@@ -15,9 +15,13 @@
  */
 package org.terasology.engine.subsystem.rpc;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import com.jagrosh.discordipc.IPCClient;
 import com.jagrosh.discordipc.IPCListener;
 import com.jagrosh.discordipc.entities.RichPresence;
+import com.jagrosh.discordipc.entities.pipe.Pipe;
+import com.jagrosh.discordipc.entities.pipe.WindowsPipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -176,6 +180,9 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
+        disableLogger(IPCClient.class);
+        disableLogger(WindowsPipe.class);
+        disableLogger(Pipe.class);
         Config c = rootContext.get(Config.class);
         enabled = c.getPlayer().isDiscordPresence();
         if (!enabled) {
@@ -203,6 +210,12 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
               ipcClient.close();
           } catch (Exception ex) { }
         }
+    }
+
+    private void disableLogger(Class<?> clazz) {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        Logger l = loggerContext.getLogger(clazz);
+        ((ch.qos.logback.classic.Logger) l).setLevel(Level.OFF);
     }
 
     @Override
