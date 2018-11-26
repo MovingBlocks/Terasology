@@ -17,6 +17,8 @@ package org.terasology.entitySystem.systems;
 
 import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.game.Game;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 
 /**
@@ -25,14 +27,17 @@ import org.terasology.registry.In;
  *
  * @see DiscordRPCSubSystem
  */
-@RegisterSystem(RegisterMode.ALWAYS)
+@RegisterSystem(RegisterMode.CLIENT)
 public class DiscordRPCSystem extends BaseComponentSystem {
 
     @In
     private Game game;
 
+    @In
+    private NetworkSystem networkSystem;
+
     public String getGame() {
-        return String.format("In Game | %s", game.getName());
+        return String.format("In Game | %s", networkSystem.getMode() == NetworkMode.CLIENT ? "Multiplayer" : game.getName());
     }
 
     @Override
