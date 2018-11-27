@@ -40,8 +40,8 @@ import java.time.OffsetDateTime;
 public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscordRPCSubSystem.class);
-    private static final long CLIENT_ID = 515274721080639504L;
-    private static final String LARGE_IMAGE = "ss_6";
+    private static final long DISCORD_APP_CLIENT_ID = 515274721080639504L;
+    private static final String DISCORD_APP_LARGE_IMAGE = "ss_6";
     private static final int RECONNECT_TRIES = 5;
     private static DiscordRPCSubSystem instance;
 
@@ -64,7 +64,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
             throw new IllegalStateException("More then one instance in the DiscordRPC");
         }
         lastRichPresence = null;
-        ipcClient = new IPCClient(CLIENT_ID);
+        ipcClient = new IPCClient(DISCORD_APP_CLIENT_ID);
         ipcClient.setListener(this);
         autoReconnect = true;
         reconnectThread = new Thread(this);
@@ -98,7 +98,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         }
         if (lastRichPresence == null) {
             RichPresence.Builder builder = new RichPresence.Builder();
-            builder.setLargeImage(LARGE_IMAGE);
+            builder.setLargeImage(DISCORD_APP_LARGE_IMAGE);
             lastRichPresence = builder.build();
         }
         client.sendRichPresence(lastRichPresence);
@@ -254,7 +254,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
             builder.setStartTimestamp(OffsetDateTime.now());
         }
 
-        builder.setLargeImage(LARGE_IMAGE);
+        builder.setLargeImage(DISCORD_APP_LARGE_IMAGE);
         getInstance().sendRichPresence(builder.build());
     }
 
