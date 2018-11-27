@@ -125,7 +125,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     continue;
                 }
 
-                // Don't try to retry to discover the RPC until some reasons happen
+                // Don't retry to do any connect to the RPC till something happen to do it
                 if (dontTryAgain) {
                     Thread.sleep(1);
                     continue;
