@@ -212,6 +212,10 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         }
     }
 
+    /**
+     * To disable the logger from some classes that throw errors and some other spam stuff into our console.
+     *
+     */
     private void disableLogger(Class<?> clazz) {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger l = loggerContext.getLogger(clazz);
