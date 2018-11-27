@@ -42,6 +42,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     private static final Logger logger = LoggerFactory.getLogger(DiscordRPCSubSystem.class);
     private static final long CLIENT_ID = 515274721080639504L;
     private static final String LARGE_IMAGE = "ss_6";
+    private static final int RECONNECT_TRIES = 5;
     private static DiscordRPCSubSystem instance;
 
     private IPCClient ipcClient;
@@ -141,7 +142,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     Thread.sleep(15 * 1000);
                     if (!ready) {
                         reconnectTries += 1;
-                        if (reconnectTries >= 5) {
+                        if (reconnectTries >= RECONNECT_TRIES) {
                             dontTryAgain = true;
                         }
                     }
@@ -153,7 +154,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                 if (ready) {
                     Thread.sleep(1);
                     lastPing += 1;
-                    if (lastPing >= 5 * 1000) {
+                    if (lastPing >= RECONNECT_TRIES * 1000) {
                         ipcClient.sendRichPresence(this.lastRichPresence);
                         this.lastPing = 0;
                     }
@@ -165,10 +166,10 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     try {
                         ipcClient.connect();
                     } catch (Exception ex) {
-                        if (reconnectTries <= 5) {
+                        if (reconnectTries <= RECONNECT_TRIES) {
                             reconnectTries += 1;
                         }
-                        if (reconnectTries >= 5) {
+                        if (reconnectTries >= RECONNECT_TRIES) {
                             dontTryAgain = true;
                         }
                         Thread.sleep(timeout);
