@@ -24,7 +24,7 @@ import java.util.Iterator;
 /**
  * A simple element that just renders a box-style background.
  */
-public class UIBox extends WidgetWithOrder {
+public class UIBox extends CoreWidget {
 
     @LayoutConfig
     private UIWidget content;

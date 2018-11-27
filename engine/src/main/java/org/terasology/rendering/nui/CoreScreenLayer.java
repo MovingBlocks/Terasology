@@ -38,9 +38,10 @@ import java.util.Iterator;
  */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 
+    //TODO: on enter trigger tooltip
     protected TabbingManagerSystem tabbingManagerSystem;
 
-    private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
+    public static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             return true;

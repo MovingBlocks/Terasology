@@ -128,11 +128,16 @@ public abstract class AbstractWidget implements UIWidget {
                     logger.info("gaining focus");
                     //TabbingManagerSystem.focusedWidget = widget;
                     widget.onGainFocus();
+                    TabbingManagerSystem.openScreen.setTooltip(widget);
                     TabbingManagerSystem.focusedWidget = widget;
                 } else if (widget.isFocused()) {
                     widget.onLoseFocus();
+                    TabbingManagerSystem.openScreen.setTooltip((UIWidget) null);
                 }
+                TabbingManagerSystem.tooltipLocked = true;
             }
+
+            //event.consume();
         }
     }
 

@@ -35,9 +35,7 @@ public class BaseInteractionListener implements InteractionListener {
     }
 
     @Override
-    public void onMouseOver(NUIMouseOverEvent event) {
-        this.mouseOver = event.isTopMostElement();
-    }
+    public void onMouseOver(NUIMouseOverEvent event) { this.mouseOver = event.isTopMostElement(); }
 
     @Override
     public void onMouseLeave() {

@@ -15,31 +15,23 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 
-import java.util.List;
-
 /**
  * A check-box. Hovering is supported.
  */
-public class UICheckbox extends CoreWidget {
+public class UICheckbox extends WidgetWithOrder {
     public static final String HOVER_ACTIVE_MODE = "hover-active";
 
     private Binding<Boolean> active = new DefaultBinding<>(false);
-
-    /**
-     * A {@link List} of listeners subscribed to this checkbox
-     */
-    private List<ActivateEventListener> listeners = Lists.newArrayList();
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
@@ -106,15 +98,6 @@ public class UICheckbox extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         return Vector2i.zero();
-    }
-
-    /**
-     * Called when this {@code UICheckbox} is pressed to activate all subscribed listeners.
-     */
-    private void activate() {
-        for (ActivateEventListener listener : listeners) {
-            listener.onActivated(this);
-        }
     }
 
     /**

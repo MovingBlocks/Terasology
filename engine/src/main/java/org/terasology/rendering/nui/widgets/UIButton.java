@@ -66,11 +66,6 @@ public class UIButton extends WidgetWithOrder {
     private boolean down;
 
     /**
-     * A {@link List} of listeners subscribed to this button
-     */
-    private List<ActivateEventListener> listeners = Lists.newArrayList();
-
-    /**
      * An {@link InteractionListener} that listens for mouse interaction with this button
      */
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -193,15 +188,6 @@ public class UIButton extends WidgetWithOrder {
             return HOVER_MODE;
         }
         return DEFAULT_MODE;
-    }
-
-    /**
-     * Called when this {@code UIButton} is pressed to activate all subscribed listeners.
-     */
-    private void activate() {
-        for (ActivateEventListener listener : listeners) {
-            listener.onActivated(this);
-        }
     }
 
     /**

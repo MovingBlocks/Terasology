@@ -16,6 +16,8 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     public static CoreScreenLayer openScreen;
     public static boolean buttonLocked;
 
+    public static boolean tooltipLocked = false;
+
     public static UIWidget focusedWidget;
 
     private static int currentNum;

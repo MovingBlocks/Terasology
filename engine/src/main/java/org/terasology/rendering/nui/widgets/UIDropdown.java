@@ -22,9 +22,9 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -38,7 +38,7 @@ import java.util.List;
  * A dropdown widget.
  * @param <T> the list element type
  */
-public class UIDropdown<T> extends CoreWidget {
+public class UIDropdown<T> extends WidgetWithOrder {
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
 
