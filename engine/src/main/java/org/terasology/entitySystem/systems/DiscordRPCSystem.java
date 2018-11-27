@@ -37,7 +37,14 @@ public class DiscordRPCSystem extends BaseComponentSystem {
     private NetworkSystem networkSystem;
 
     public String getGame() {
-        return String.format("In Game | %s", networkSystem.getMode() == NetworkMode.CLIENT ? "Multiplayer" : game.getName());
+        NetworkMode networkMode = networkSystem.getMode();
+        String mode = "Playing Online";
+        if (networkMode == NetworkMode.DEDICATED_SERVER) {
+            mode = "Hosting | " + game.getName();
+        } else if (networkMode == NetworkMode.NONE) {
+            mode = "Solo | " + game.getName();
+        }
+        return mode;
     }
 
     @Override
