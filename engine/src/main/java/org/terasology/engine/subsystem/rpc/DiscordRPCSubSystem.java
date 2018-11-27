@@ -32,8 +32,8 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import java.time.OffsetDateTime;
 
 /**
- * It's a subsystem that manages the discord rpc in the game client. It manages the status, connection and other stuff.
- * You can use this subsystem for future features to make the game looks better.
+ * Subsystem that manages Discord RPC in the game client, such as status or connection.
+ * This subsystem can be enhanced further to improve game presentation in rich presence.
  *
  * @see EngineSubsystem
  */
