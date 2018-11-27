@@ -381,9 +381,9 @@ public final class Terasology {
                     .add(new LwjglInput())
                     .add(new BindsSubsystem())
                     .add(new OpenVRInput());
+            builder.add(new DiscordRPCSubSystem());
         }
         builder.add(new HibernationSubsystem());
-        builder.add(new DiscordRPCSubSystem());
     }
 
     private static void reportException(Throwable throwable) {
