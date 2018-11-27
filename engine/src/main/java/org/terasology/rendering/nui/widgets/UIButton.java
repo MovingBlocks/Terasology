@@ -16,17 +16,23 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
-import org.terasology.rendering.nui.*;
-import org.terasology.utilities.Assets;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.TabbingManagerSystem;
+import org.terasology.rendering.nui.TextLineBuilder;
+import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
+import org.terasology.utilities.Assets;
 
 import java.util.List;
 
@@ -35,6 +41,11 @@ import java.util.List;
  */
 public class UIButton extends WidgetWithOrder {
     public static final String DOWN_MODE = "down";
+
+    /**
+     * A {@link List} of listeners subscribed to this button
+     */
+    private List<ActivateEventListener> listeners = Lists.newArrayList();
 
     /**
      * The {@link Binding} containing the {@link TextureRegion} corresponding to the image shown on this button
@@ -182,7 +193,7 @@ public class UIButton extends WidgetWithOrder {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (down || isActive()) {
+        } else if (down || isActive() || (isFocused()& TabbingManagerSystem.focusSetThrough)) {
             return DOWN_MODE;
         } else if (interactionListener.isMouseOver()) {
             return HOVER_MODE;
@@ -328,5 +339,14 @@ public class UIButton extends WidgetWithOrder {
      */
     public boolean isActive() {
         return active.get();
+    }
+
+    /**
+     * Called when this is pressed to activate all subscribed listeners.
+     */
+    private void activate() {
+        for (ActivateEventListener listener : listeners) {
+            listener.onActivated(this);
+        }
     }
 }

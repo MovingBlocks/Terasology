@@ -113,35 +113,6 @@ public abstract class AbstractWidget implements UIWidget {
     }
 
     @Override
-    public void onBindEvent(BindButtonEvent event) {
-        if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
-            event.consume();
-            TabbingManagerSystem.buttonLocked = true;
-            logger.info("event id: " + event.getId());
-            logger.info("changing focus of widget");
-            logger.info("widgetsList length: " + TabbingManagerSystem.getWidgetsList().size());
-            TabbingManagerSystem.increaseCurrentNum();
-            logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
-            for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
-                logger.info("widget order: " + widget.getOrder());
-                if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
-                    logger.info("gaining focus");
-                    //TabbingManagerSystem.focusedWidget = widget;
-                    widget.onGainFocus();
-                    TabbingManagerSystem.openScreen.setTooltip(widget);
-                    TabbingManagerSystem.focusedWidget = widget;
-                } else if (widget.isFocused()) {
-                    widget.onLoseFocus();
-                    TabbingManagerSystem.openScreen.setTooltip((UIWidget) null);
-                }
-                TabbingManagerSystem.tooltipLocked = true;
-            }
-
-            //event.consume();
-        }
-    }
-
-    @Override
     public final <T extends UIWidget> T find(String targetId, Class<T> type) {
         if (this.id.equals(targetId)) {
             if (type.isInstance(this)) {
@@ -311,6 +282,33 @@ public abstract class AbstractWidget implements UIWidget {
                 return null;
             }
             return tooltipLabel;
+        }
+    }
+
+    @Override
+    public void onBindEvent(BindButtonEvent event) {
+        if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
+            TabbingManagerSystem.focusSetThrough = true;
+            logger.info("event id: " + event.getId());
+            logger.info("changing focus of widget");
+            logger.info("widgetsList length: " + TabbingManagerSystem.getWidgetsList().size());
+            TabbingManagerSystem.increaseCurrentNum();
+            logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
+            for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
+                logger.info("widget order: " + widget.getOrder());
+                if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
+                    logger.info("gaining focus");
+                    widget.onGainFocus();
+                    TabbingManagerSystem.focusedWidget = widget;
+                    TabbingManagerSystem.openScreen.getManager().setFocus(widget);
+                } else if (widget.isFocused()) {
+                    widget.onLoseFocus();
+                    TabbingManagerSystem.openScreen.setTooltip((UIWidget) null);
+                }
+                TabbingManagerSystem.tooltipLocked = true;
+            }
+
+            event.consume();
         }
     }
 }

@@ -161,7 +161,6 @@ public class CanvasImpl implements CanvasControl {
     @Override
     public void processMousePosition(Vector2i position) {
         if (clickedRegion != null) {
-            TabbingManagerSystem.openScreen.setTooltip((UIWidget) null);
             Vector2i relPos = new Vector2i(position);
             relPos.sub(clickedRegion.offset);
             clickedRegion.listener.onMouseDrag(new NUIMouseDragEvent(mouse, keyboard, relPos));
@@ -208,6 +207,8 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public boolean processMouseClick(MouseInput button, Vector2i pos) {
+        TabbingManagerSystem.focusSetThrough = false;
+
         boolean possibleDoubleClick = lastClickPosition.gridDistance(pos) < MAX_DOUBLE_CLICK_DISTANCE && lastClickButton == button
             && time.getGameTimeInMs() - lastClickTime < DOUBLE_CLICK_TIME;
         lastClickPosition.set(pos);

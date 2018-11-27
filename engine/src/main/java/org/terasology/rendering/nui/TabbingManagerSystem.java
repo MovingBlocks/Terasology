@@ -19,6 +19,7 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     public static boolean tooltipLocked = false;
 
     public static UIWidget focusedWidget;
+    public static boolean focusSetThrough = false;
 
     private static int currentNum;
     private static int maxNum;
