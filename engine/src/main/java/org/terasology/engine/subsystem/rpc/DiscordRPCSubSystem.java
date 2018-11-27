@@ -156,7 +156,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                         ipcClient.sendRichPresence(this.lastRichPresence);
                         this.lastPing = 0;
                     }
-                } else { // Reconnect to RPC with tries ( min: 2 seconds, max: 30 seconds )
+                } else {
                     lastPing = 0;
                     reconnecting = true;
                     int timeout = (reconnectTries * 2) * 1000;
