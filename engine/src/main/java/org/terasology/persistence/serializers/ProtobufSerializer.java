@@ -30,14 +30,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-// TODO: Document
 public class ProtobufSerializer {
 	/**
 	 * Converts the object into an array of bytes
 	 * @param object the object to be serialized
 	 * @param typeHandler contains how the object will be serialized
 	 * @return the byte array of the object
-	 * @throws IOException throws if the type handler cannot handle the object 
+	 * @throws IOException throws if there is an error writing to the stream
 	 */
     public <T> byte[] toBytes(T object, TypeHandler<T> typeHandler) throws IOException {
         try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
@@ -50,8 +49,8 @@ public class ProtobufSerializer {
      * Writes an object's bytes to a file
      * @param object the object to be serialized
      * @param typeHandler contains how the object will be serialized
-     * @param file file that the
-     * @throws IOException
+     * @param file file that the bytes will be written to
+     * @throws IOException gets thrown if there is an error writing to the file
      */
     public <T> void writeBytes(T object, TypeHandler<T> typeHandler, File file) throws IOException {
         writeBytes(object, typeHandler, new FileOutputStream(file));
@@ -59,10 +58,10 @@ public class ProtobufSerializer {
 
     /**
      * Writes an object's bytes to a stream 
-     * @param object
-     * @param typeHandler
-     * @param stream
-     * @throws IOException
+     * @param object the object to be serialized
+     * @param typeHandler contains how the object will be serialized
+     * @param stream stream that the bytes will be written to
+     * @throws IOException will be thrown if there is an error writing to the stream
      */
     public <T> void writeBytes(T object, TypeHandler<T> typeHandler, OutputStream stream) throws IOException {
         ProtobufPersistedData persistedData =
@@ -73,9 +72,9 @@ public class ProtobufSerializer {
 
     /**
      * Gets the PersistedData from a byte stream
-     * @param stream
-     * @return
-     * @throws IOException
+     * @param stream InputStream that will be deserialized
+     * @return deserialized ProtobufPersistedData object
+     * @throws IOException if there is an issue parsing the stream
      */
     public PersistedData persistedDatafromBytes(InputStream stream) throws IOException {
         EntityData.Value value = EntityData.Value.parseDelimitedFrom(stream);
@@ -85,9 +84,9 @@ public class ProtobufSerializer {
 
     /**
      * Gets the PersistedData from a file
-     * @param file
-     * @return
-     * @throws IOException
+     * @param file contains the bytes that will be deserialized
+     * @return deserialized ProtobufPersistedData object
+     * @throws IOException gets thrown if there is an issue reading the file
      */
     public PersistedData persistedDatafromBytes(File file) throws IOException {
         try (InputStream stream = new FileInputStream(file)) {
@@ -97,9 +96,9 @@ public class ProtobufSerializer {
 
     /**
      * Gets the PersistedData from an array of bytes
-     * @param bytes
-     * @return
-     * @throws IOException
+     * @param bytes array of bytes to be deserialized
+     * @return deserialized ProtobufData object
+     * @throws IOException gets thrown if there is an issue creating the InputStream
      */
     public PersistedData persistedDatafromBytes(byte[] bytes) throws IOException {
         try (InputStream reader = new ByteArrayInputStream(bytes)) {
