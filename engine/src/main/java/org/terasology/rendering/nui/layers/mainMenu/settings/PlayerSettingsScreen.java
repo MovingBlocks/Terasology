@@ -90,7 +90,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private UISlider heightSlider;
     private UISlider eyeHeightSlider;
     private UIImage img;
-    private UICheckbox discordpresence;
+    private UICheckbox discordPresence;
     private UIDropdownScrollable<Locale> language;
 
     private StorageServiceWorkerStatus storageServiceWorkerStatus;
@@ -111,8 +111,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         if (eyeHeightSlider != null) {
             eyeHeightSlider.bindValue(new NotifyingBinding(config.getPlayer().getEyeHeight()));
         }
-        if (discordpresence != null) {
-            discordpresence.setChecked(config.getPlayer().isDiscordPresence());
+        if (discordPresence != null) {
+            discordPresence.setChecked(config.getPlayer().isDiscordPresence());
         }
         if (language != null) {
             language.setSelection(config.getSystem().getLocale());
@@ -168,7 +168,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             eyeHeightSlider.setPrecision(1);
         }
 
-        discordpresence = find("discord-presence", UICheckbox.class);
+        discordPresence = find("discord-presence", UICheckbox.class);
 
         language = find("language", UIDropdownScrollable.class);
         if (language != null) {
@@ -322,7 +322,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         config.getPlayer().setHeight(height);
         Float eyeHeight = getEyeHeight();
         config.getPlayer().setEyeHeight(eyeHeight);
-        config.getPlayer().setDiscordPresence(discordpresence.isChecked());
+        config.getPlayer().setDiscordPresence(discordPresence.isChecked());
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText().trim());
             config.getPlayer().setHasEnteredUsername(true);
