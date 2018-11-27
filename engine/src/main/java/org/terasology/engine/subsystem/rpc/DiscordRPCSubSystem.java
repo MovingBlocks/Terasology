@@ -174,7 +174,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     }
                 }
             } catch (InterruptedException ex) { // Ignore the interrupted exceptions
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 logger.trace(ex.getMessage(), ex.getCause());
             }
         }
