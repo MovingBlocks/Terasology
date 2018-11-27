@@ -86,10 +86,10 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     @Override
     public void onReady(IPCClient client) {
         if (reconnecting) {
-            getLogger().info("Discord RPC >> Reconnected!");
+            logger.info("Discord RPC >> Reconnected!");
             reconnectTries = 1;
         } else {
-            getLogger().info("Discord RPC >> Connected!");
+            logger.info("Discord RPC >> Connected!");
             connectedBefore = true;
         }
         this.ipcClient = client;
@@ -109,7 +109,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         if (ready) {
             ready = false;
         }
-        getLogger().info("Discord RPC >> Disconnected!");
+        logger.info("Discord RPC >> Disconnected!");
     }
 
     @Override
@@ -160,7 +160,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     lastPing = 0;
                     reconnecting = true;
                     int timeout = (reconnectTries * 2) * 1000;
-                    getLogger().info("Discord RPC >> Reconnecting... (Timeout: " + timeout + "ms)");
+                    logger.info("Discord RPC >> Reconnecting... (Timeout: " + timeout + "ms)");
                     try {
                         ipcClient.connect();
                     } catch (Exception ex) {
@@ -175,7 +175,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                 }
             } catch (InterruptedException ex) { // Ignore the interrupted exceptions
             } catch (Exception ex){
-                getLogger().trace(ex.getMessage(), ex.getCause());
+                logger.trace(ex.getMessage(), ex.getCause());
             }
         }
     }
@@ -191,7 +191,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
             return;
         }
         try {
-            getLogger().info("Discord RPC >> Connecting...");
+            logger.info("Discord RPC >> Connecting...");
             ipcClient.connect();
             dontTryAgain = false;
         } catch (Exception ex) { } // Ignore due to reconnect thread
@@ -229,13 +229,6 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
 
     public static DiscordRPCSubSystem getInstance() {
         return instance;
-    }
-
-    public static Logger getLogger() {
-        if (getInstance() == null) {
-            return null;
-        }
-        return getInstance().logger;
     }
 
     public static void setState(String state) {
