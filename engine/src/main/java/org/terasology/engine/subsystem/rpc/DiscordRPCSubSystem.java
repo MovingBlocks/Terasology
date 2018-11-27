@@ -119,9 +119,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                 // Ignore if the Discord RPC is not enabled
                 if (!enabled) {
                     if (ready) {
-                        try {
-                            getInstance().ipcClient.close();
-                        } catch (Exception ex) { }
+                        getInstance().ipcClient.close();
                     }
                     Thread.sleep(1);
                     continue;
@@ -138,7 +136,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     lastPing = 0;
                     try {
                         ipcClient.connect();
-                    } catch (Exception ex) { }
+                    } catch (Exception ex) { } // Ignore the not able to connect to continue our process
                     Thread.sleep(15 * 1000);
                     if (!ready) {
                         reconnectTries += 1;
@@ -175,7 +173,10 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                         Thread.sleep(timeout);
                     }
                 }
-            } catch (Exception ex) { }
+            } catch (InterruptedException ex) { // Ignore the interrupted exceptions
+            } catch (Exception ex){
+                getLogger().trace(ex.getMessage(), ex.getCause());
+            }
         }
     }
 
@@ -193,7 +194,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
             getLogger().info("Discord RPC >> Connecting...");
             ipcClient.connect();
             dontTryAgain = false;
-        } catch (Exception ex) { }
+        } catch (Exception ex) { } // Ignore due to reconnect thread
     }
 
     @Override
@@ -207,9 +208,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         autoReconnect = false;
         reconnectThread.interrupt();
         if (ready) {
-          try {
-              ipcClient.close();
-          } catch (Exception ex) { }
+          ipcClient.close();
         }
     }
 
