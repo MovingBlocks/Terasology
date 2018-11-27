@@ -248,7 +248,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         }
         if (getInstance().config != null) {
             String playerName = getInstance().config.getPlayer().getName();
-            builder.setDetails("IGN | " + playerName);
+            builder.setDetails("Name: " + playerName);
         }
         if (timestamp) {
             builder.setStartTimestamp(OffsetDateTime.now());
