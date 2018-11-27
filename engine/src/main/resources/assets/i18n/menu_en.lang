@@ -110,6 +110,7 @@
     "dialog-yes": "Yes",
     "disable-all-modules": "Disable All",
     "disable-launch-popup": "Remember and don't show again",
+    "discord-presence": "Discord Rich Presence",
     "download-module": "Download",
     "downloading-server-list": "Downloading server list ..",
     "drop-item": "Drop Item",
@@ -432,6 +433,5 @@
     "caching-textures": "Caching Textures...",
     "loading-prefabs": "Loading Prefabs...",
     "post-initialise-systems": "Post-Initialise Systems",
-    "reticulating-splines": "Reticulating Splines",
-    "discord-presence": "Discord Rich Presence"
+    "reticulating-splines": "Reticulating Splines"
 }
