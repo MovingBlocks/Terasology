@@ -16,6 +16,13 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.SimpleUri;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.ButtonState;
+import org.terasology.input.MouseInput;
+import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -47,6 +54,8 @@ public abstract class AbstractWidget implements UIWidget {
 
     @LayoutConfig
     private float tooltipDelay = 0.5f;
+
+    Logger logger = LoggerFactory.getLogger("testLogger");
 
     private boolean focused;
 
@@ -101,6 +110,30 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public void bindFamily(Binding<String> binding) {
         this.family = binding;
+    }
+
+    @Override
+    public void onBindEvent(BindButtonEvent event) {
+        if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
+            event.consume();
+            TabbingManagerSystem.buttonLocked = true;
+            logger.info("event id: " + event.getId());
+            logger.info("changing focus of widget");
+            logger.info("widgetsList length: " + TabbingManagerSystem.getWidgetsList().size());
+            TabbingManagerSystem.increaseCurrentNum();
+            logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
+            for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
+                logger.info("widget order: " + widget.getOrder());
+                if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
+                    logger.info("gaining focus");
+                    //TabbingManagerSystem.focusedWidget = widget;
+                    widget.onGainFocus();
+                    TabbingManagerSystem.focusedWidget = widget;
+                } else if (widget.isFocused()) {
+                    widget.onLoseFocus();
+                }
+            }
+        }
     }
 
     @Override
@@ -190,10 +223,13 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public void onGainFocus() {
         focused = true;
+        this.onMouseButtonEvent(new MouseButtonEvent(MouseInput.MOUSE_LEFT, ButtonState.UP, 0));
+        logger.info("this: "+this+" is focused");
     }
 
     @Override
     public void onLoseFocus() {
+        logger.info("this: "+this+" is no longer focused");
         focused = false;
     }
 

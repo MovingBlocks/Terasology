@@ -18,8 +18,6 @@ package org.terasology.rendering.nui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
-import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.TabbingUIButton;
 import org.terasology.input.events.MouseButtonEvent;
@@ -40,7 +38,7 @@ import java.util.Iterator;
  */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 
-    protected TabbingManager tabbingManager;
+    protected TabbingManagerSystem tabbingManagerSystem;
 
     private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
         @Override
@@ -90,7 +88,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         modifyingList = false;
         activateBindEvent = false;
 
-        tabbingManager = new TabbingManager();
+        tabbingManagerSystem = new TabbingManagerSystem();
         Iterator<UIWidget> widgets = contents.iterator();
         iterateThrough(widgets);
 
@@ -106,7 +104,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             logger.info("id: "+next);
             if (next instanceof  WidgetWithOrder) {
                 logger.info("instance");
-                TabbingManager.addToWidgetsList((WidgetWithOrder) next);
+                TabbingManagerSystem.addToWidgetsList((WidgetWithOrder) next);
             }
             if (next.iterator().hasNext()) {
                 logger.info("hasNext");
@@ -124,6 +122,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
      * (e.g., a parent menu in the menu system) is returned to (as {@code onShow}).
      */
     public void onScreenOpened() {
+        TabbingManagerSystem.openScreen = this;
     }
 
     @Override
@@ -216,32 +215,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     protected boolean isEscapeToCloseAllowed() {
         return true;
-    }
-
-    @Override
-    public void onBindEvent(BindButtonEvent event) {
-        if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
-            if (!modifyingList) {
-                modifyingList = true;
-                Logger logger = LoggerFactory.getLogger("testLogger");
-                logger.info("event id: " + event.getId());
-                logger.info("changing focus of widget");
-                logger.info("widgetsList length: " + TabbingManager.getWidgetsList().size());
-                TabbingManager.increaseCurrentNum();
-                logger.info("currentNum: " + TabbingManager.getCurrentNum());
-                for (WidgetWithOrder widget : TabbingManager.getWidgetsList()) {
-                    logger.info("widget order: " + widget.getOrder());
-                    if (widget.getOrder() == TabbingManager.getCurrentNum()) {
-                        logger.info("gaining focus");
-                        this.getManager().setFocus(widget);
-                    }
-                }
-                modifyingList = false;
-            } else {
-                activateBindEvent = true;
-            }
-            event.consume();
-        }
     }
 
     @Override

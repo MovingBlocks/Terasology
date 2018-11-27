@@ -9,10 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RegisterSystem
-public class TabbingManager extends BaseComponentSystem {
+public class TabbingManagerSystem extends BaseComponentSystem {
 
     public static final int UNINITIALIZED_DEPTH = -9999;
-    public static final Logger logger = LoggerFactory.getLogger(TabbingManager.class);
+    public static final Logger logger = LoggerFactory.getLogger(TabbingManagerSystem.class);
+    public static CoreScreenLayer openScreen;
+    public static boolean buttonLocked;
+
+    public static UIWidget focusedWidget;
 
     private static int currentNum;
     private static int maxNum;
@@ -21,7 +25,7 @@ public class TabbingManager extends BaseComponentSystem {
     private static ArrayList<WidgetWithOrder> widgetsList;
     private static boolean initialized = false;
 
-    public TabbingManager() {
+    public TabbingManagerSystem() {
         currentNum = 0;
         maxNum = 0;
         nextNum = 0;

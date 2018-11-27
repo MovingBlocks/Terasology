@@ -6,10 +6,10 @@ import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 public abstract class WidgetWithOrder extends CoreWidget {
 
-    //TODO: call init of tabbingManager
+    //TODO: call init of tabbingManagerSystem
 
     @LayoutConfig
-    private int order = TabbingManager.UNINITIALIZED_DEPTH;
+    private int order = TabbingManagerSystem.UNINITIALIZED_DEPTH;
 
     private boolean added = false;
 
@@ -27,13 +27,13 @@ public abstract class WidgetWithOrder extends CoreWidget {
 
         Logger logger = LoggerFactory.getLogger("widget w/ order");
         logger.info("adding");
-        TabbingManager.addToWidgetsList(this);
+        TabbingManagerSystem.addToWidgetsList(this);
     }
     public int getOrder() {
-        if (order == TabbingManager.UNINITIALIZED_DEPTH) {
-            order = TabbingManager.getNewNextNum();
+        if (order == TabbingManagerSystem.UNINITIALIZED_DEPTH) {
+            order = TabbingManagerSystem.getNewNextNum();
         } else if (!added) {
-            TabbingManager.addToUsedNums(order, this);
+            TabbingManagerSystem.addToUsedNums(order, this);
             added = true;
         }
         return order;
@@ -42,10 +42,4 @@ public abstract class WidgetWithOrder extends CoreWidget {
     public boolean onKeyEvent(NUIKeyEvent event) {
         return true;
     }
-
-    /*
-    @Override
-    public void onBindEvent(BindButtonEvent event) {
-        if (event.getId().equals())
-    }*/
 }
