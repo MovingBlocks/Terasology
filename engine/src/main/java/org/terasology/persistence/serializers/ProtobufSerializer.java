@@ -32,7 +32,9 @@ import java.io.OutputStream;
 
 public class ProtobufSerializer {
 	/**
-	 * Converts the object into an array of bytes
+	 * Converts the object into an array of bytes.
+	 * @see writeBytes(T, TypeHandler<T>, OutputStream) writes the serialized bytes into an OutputStream instead of a byte array
+	 * @see writeBytes(T, TypeHandler<T>, File) writes the serialized bytes into a File instead of a byte array
 	 * @param object the object to be serialized
 	 * @param typeHandler contains how the object will be serialized
 	 * @return the byte array of the object
@@ -46,7 +48,9 @@ public class ProtobufSerializer {
     }
 
     /**
-     * Writes an object's bytes to a file
+     * Writes an object's bytes to a file.
+     * @see toBytes(T, TypeHandler<T>) writes the serialized bytes into a byte array instead of a File
+     * @see writeBytes(T, TypeHandler<T>, OutputStream) writes the serialized bytes into an OutputStream instead of a File
      * @param object the object to be serialized
      * @param typeHandler contains how the object will be serialized
      * @param file file that the bytes will be written to
@@ -57,7 +61,9 @@ public class ProtobufSerializer {
     }
 
     /**
-     * Writes an object's bytes to a stream 
+     * Writes an object's bytes to a stream.
+     * @see toBytes(T, TypeHandler<T>) writes the serialized bytes into a byte array instead of an OutputStream
+     * @see writeBytes(T, TypeHandler<T>, File) writes serialized bytes to a File instead of an OutputStream
      * @param object the object to be serialized
      * @param typeHandler contains how the object will be serialized
      * @param stream stream that the bytes will be written to
@@ -71,7 +77,9 @@ public class ProtobufSerializer {
     }
 
     /**
-     * Gets the PersistedData from a byte stream
+     * Gets the PersistedData from a byte stream (InputStream).
+     * @see persistedDatafromBytes(File) gets serialized bytes from a File instead of an InputStream
+     * @see persistedDatafromBytes(byte[]) gets serialized bytes from a byte array instead of an InputStream
      * @param stream InputStream that will be deserialized
      * @return deserialized ProtobufPersistedData object
      * @throws IOException if there is an issue parsing the stream
@@ -83,7 +91,9 @@ public class ProtobufSerializer {
     }
 
     /**
-     * Gets the PersistedData from a file
+     * Gets the PersistedData from a File.
+     * @see persistedDatafromBytes(InputStream) gets serialized bytes from an InputStream instead of File
+     * @see persistedDatafromBytes(byte[]) gets serialized bytes from a byte array instead of File
      * @param file contains the bytes that will be deserialized
      * @return deserialized ProtobufPersistedData object
      * @throws IOException gets thrown if there is an issue reading the file
@@ -95,7 +105,9 @@ public class ProtobufSerializer {
     }
 
     /**
-     * Gets the PersistedData from an array of bytes
+     * Gets the PersistedData from an array of bytes.
+     * @see persistedDatafromBytes(InputStream) gets serialized bytes from an InputStream instead of a byte array 
+     * @see persistedDatafromBytes(File) gets serialized bytes from a File instead of a byte array
      * @param bytes array of bytes to be deserialized
      * @return deserialized ProtobufData object
      * @throws IOException gets thrown if there is an issue creating the InputStream
