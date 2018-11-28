@@ -15,20 +15,10 @@
  */
 package org.terasology.logic.title;
 
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
-@RegisterSystem(RegisterMode.ALWAYS)
-public class TitleSystem extends BaseComponentSystem {
-
-    @In
-    private Console console;
-
-    @Command(shortDescription = "To test the title")
-    public void title() {
+public class TitleScreen extends CoreScreenLayer {
+    @Override
+    public void initialise() {
     }
 }

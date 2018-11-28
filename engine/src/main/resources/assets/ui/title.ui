@@ -1,0 +1,35 @@
+{
+  "type": "confirmChangePopup",
+  "skin": "messageBox",
+  "contents": {
+    "type": "ColumnLayout",
+    "columns": 1,
+    "verticalSpacing": 8,
+    "contents": [
+      {
+        "type": "UILabel",
+        "text": "This is the title",
+        "family": "title"
+      },
+      {
+        "type": "UISpace",
+        "size": [
+          1,
+          16
+        ]
+      },
+      {
+        "type": "UILabel",
+        "text": "This is the subtitle",
+        "id": "message"
+      },
+      {
+        "type": "UISpace",
+        "size": [
+          1,
+          16
+        ]
+      }
+    ]
+  }
+}
