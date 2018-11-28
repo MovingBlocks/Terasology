@@ -208,6 +208,7 @@ public class CanvasImpl implements CanvasControl {
     @Override
     public boolean processMouseClick(MouseInput button, Vector2i pos) {
         TabbingManagerSystem.focusSetThrough = false;
+        TabbingManagerSystem.resetCurrentNum();
 
         boolean possibleDoubleClick = lastClickPosition.gridDistance(pos) < MAX_DOUBLE_CLICK_DISTANCE && lastClickButton == button
             && time.getGameTimeInMs() - lastClickTime < DOUBLE_CLICK_TIME;

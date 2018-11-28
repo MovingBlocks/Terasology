@@ -287,27 +287,30 @@ public abstract class AbstractWidget implements UIWidget {
 
     @Override
     public void onBindEvent(BindButtonEvent event) {
-        if (event.getId().equals(new SimpleUri("engine:tabbingUI")) && event.getState().equals(ButtonState.DOWN)) {
-            TabbingManagerSystem.focusSetThrough = true;
-            logger.info("event id: " + event.getId());
-            logger.info("changing focus of widget");
-            logger.info("widgetsList length: " + TabbingManagerSystem.getWidgetsList().size());
-            TabbingManagerSystem.increaseCurrentNum();
-            logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
-            for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
-                logger.info("widget order: " + widget.getOrder());
-                if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
-                    logger.info("gaining focus");
-                    widget.onGainFocus();
-                    TabbingManagerSystem.focusedWidget = widget;
-                    TabbingManagerSystem.openScreen.getManager().setFocus(widget);
-                } else if (widget.isFocused()) {
-                    widget.onLoseFocus();
-                    TabbingManagerSystem.openScreen.setTooltip((UIWidget) null);
+        if (event.getState().equals(ButtonState.DOWN)) {
+            if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
+                TabbingManagerSystem.focusSetThrough = true;
+                logger.info("event id: " + event.getId());
+                logger.info("changing focus of widget");
+                logger.info("widgetsList length: " + TabbingManagerSystem.getWidgetsList().size());
+                TabbingManagerSystem.increaseCurrentNum();
+                logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
+                for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
+                    logger.info("widget order: " + widget.getOrder()+" widget name:"+widget.getId());
+                    if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
+                        logger.info("gaining focus");
+                        widget.onGainFocus();
+                        TabbingManagerSystem.focusedWidget = widget;
+                        TabbingManagerSystem.openScreen.getManager().setFocus(widget);
+                    } else if (widget.isFocused()) {
+                        widget.onLoseFocus();
+                    }
+                    TabbingManagerSystem.tooltipLocked = true;
                 }
-                TabbingManagerSystem.tooltipLocked = true;
+                event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.DOWN, 0);
+            } else if (event.getId().equals(new SimpleUri("engine:activate"))) {
+                TabbingManagerSystem.focusedWidget.activate();
             }
-            event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.DOWN, 0);
         }
     }
 }

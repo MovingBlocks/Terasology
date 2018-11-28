@@ -18,7 +18,7 @@ public class TabbingManagerSystem extends BaseComponentSystem {
 
     public static boolean tooltipLocked = false;
 
-    public static UIWidget focusedWidget;
+    public static WidgetWithOrder focusedWidget;
     public static boolean focusSetThrough = false;
 
     private static int currentNum;
@@ -28,13 +28,14 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     private static ArrayList<WidgetWithOrder> widgetsList;
     private static boolean initialized = false;
 
-    public TabbingManagerSystem() {
+    public static void init() {
         currentNum = 0;
         maxNum = 0;
         nextNum = 0;
         logger.info("constructing");
         usedNums = new ArrayList<>();
         widgetsList = new ArrayList<>();
+        initialized = true;
     }
 
     public static void increaseCurrentNum() {
@@ -80,11 +81,15 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     }
     public static void addToWidgetsList(WidgetWithOrder widget) {
         widgetsList.add(widget);
+        usedNums.add(widget.getOrder());
     }
+    public static void resetCurrentNum() { currentNum = 0; }
     public static int getCurrentNum() {
         return currentNum;
     }
     public static List<WidgetWithOrder> getWidgetsList() {
         return widgetsList;
     }
+    public static boolean isInitialized() { return initialized; }
+    public static void setInitialized(boolean setInit) { initialized = setInit; }
 }

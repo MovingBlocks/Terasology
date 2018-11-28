@@ -38,9 +38,6 @@ import java.util.Iterator;
  */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 
-    //TODO: on enter trigger tooltip
-    protected TabbingManagerSystem tabbingManagerSystem;
-
     public static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
@@ -89,7 +86,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         modifyingList = false;
         activateBindEvent = false;
 
-        tabbingManagerSystem = new TabbingManagerSystem();
+        TabbingManagerSystem.init();
+
         Iterator<UIWidget> widgets = contents.iterator();
         iterateThrough(widgets);
 
@@ -106,6 +104,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             if (next instanceof  WidgetWithOrder) {
                 logger.info("instance");
                 TabbingManagerSystem.addToWidgetsList((WidgetWithOrder) next);
+                logger.info(next.toString());
             }
             if (next.iterator().hasNext()) {
                 logger.info("hasNext");
@@ -159,6 +158,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             if (activateBindEvent) {
                 onBindEvent(new TabbingUIButton());
             }
+            if (!TabbingManagerSystem.isInitialized()) {
+                TabbingManagerSystem.init();
+
+                Iterator<UIWidget> widgets = contents.iterator();
+                iterateThrough(widgets);
+            }
         }
     }
 
@@ -173,6 +178,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onClosed() {
+        logger.info("CLOSING");
+        TabbingManagerSystem.setInitialized(false);
     }
 
     @Override
@@ -183,6 +190,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onHide() {
+        logger.info("HIDING");
+        TabbingManagerSystem.setInitialized(false);
     }
 
     @Override
@@ -191,6 +200,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onLoseFocus() {
+        logger.info("LOST FOCUS");
+        TabbingManagerSystem.setInitialized(false);
     }
 
     @Override

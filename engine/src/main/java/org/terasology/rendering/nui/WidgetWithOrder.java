@@ -1,7 +1,11 @@
 package org.terasology.rendering.nui;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+
+import java.util.List;
 
 public abstract class WidgetWithOrder extends CoreWidget {
 
@@ -9,6 +13,11 @@ public abstract class WidgetWithOrder extends CoreWidget {
 
     @LayoutConfig
     private int order = TabbingManagerSystem.UNINITIALIZED_DEPTH;
+
+    /**
+     * A {@link List} of listeners subscribed to this button
+     */
+    protected List<ActivateEventListener> listeners = Lists.newArrayList();
 
     private boolean added = false;
 
@@ -36,5 +45,14 @@ public abstract class WidgetWithOrder extends CoreWidget {
             added = true;
         }
         return order;
+    }
+
+    /**
+     * Called when this is pressed to activate all subscribed listeners.
+     */
+    protected void activate() {
+        for (ActivateEventListener listener : listeners) {
+            listener.onActivated(this);
+        }
     }
 }

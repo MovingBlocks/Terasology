@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import com.google.common.collect.Lists;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
@@ -41,11 +40,6 @@ import java.util.List;
  */
 public class UIButton extends WidgetWithOrder {
     public static final String DOWN_MODE = "down";
-
-    /**
-     * A {@link List} of listeners subscribed to this button
-     */
-    private List<ActivateEventListener> listeners = Lists.newArrayList();
 
     /**
      * The {@link Binding} containing the {@link TextureRegion} corresponding to the image shown on this button
@@ -339,14 +333,5 @@ public class UIButton extends WidgetWithOrder {
      */
     public boolean isActive() {
         return active.get();
-    }
-
-    /**
-     * Called when this is pressed to activate all subscribed listeners.
-     */
-    private void activate() {
-        for (ActivateEventListener listener : listeners) {
-            listener.onActivated(this);
-        }
     }
 }
