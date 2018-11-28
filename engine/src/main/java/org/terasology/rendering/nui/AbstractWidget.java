@@ -287,7 +287,7 @@ public abstract class AbstractWidget implements UIWidget {
 
     @Override
     public void onBindEvent(BindButtonEvent event) {
-        if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
+        if (event.getId().equals(new SimpleUri("engine:tabbingUI")) && event.getState().equals(ButtonState.DOWN)) {
             TabbingManagerSystem.focusSetThrough = true;
             logger.info("event id: " + event.getId());
             logger.info("changing focus of widget");
@@ -307,8 +307,7 @@ public abstract class AbstractWidget implements UIWidget {
                 }
                 TabbingManagerSystem.tooltipLocked = true;
             }
-
-            event.consume();
+            event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.DOWN, 0);
         }
     }
 }
