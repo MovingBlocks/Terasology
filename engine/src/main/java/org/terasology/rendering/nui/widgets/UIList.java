@@ -21,9 +21,9 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.rendering.ListableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -42,9 +42,8 @@ import java.util.Objects;
  *
  * @param <T> the list element type
  */
-public class UIList<T> extends CoreWidget {
+public class UIList<T> extends ListableWidget {
 
-    private final List<ItemInteractionListener> itemListeners = Lists.newArrayList();
     private final List<ItemActivateEventListener<T>> activateListeners = Lists.newArrayList();
     private final List<ItemSelectEventListener<T>> selectionListeners = Lists.newArrayList();
     private Binding<Boolean> interactive = new DefaultBinding<>(true);
@@ -75,7 +74,7 @@ public class UIList<T> extends CoreWidget {
             T item = list.get().get(i);
             Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
             Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
-            ItemInteractionListener listener = itemListeners.get(i);
+            ItemInteractionListener listener = (ItemInteractionListener)optionListeners.get(i);
             if (enabled) {
                 if (Objects.equals(item, selection.get())) {
                     canvas.setMode(ACTIVE_MODE);
@@ -99,11 +98,11 @@ public class UIList<T> extends CoreWidget {
     }
 
     private void updateItemListeners() {
-        while (itemListeners.size() > list.get().size()) {
-            itemListeners.remove(itemListeners.size() - 1);
+        while (optionListeners.size() > list.get().size()) {
+            optionListeners.remove(optionListeners.size() - 1);
         }
-        while (itemListeners.size() < list.get().size()) {
-            itemListeners.add(new ItemInteractionListener(itemListeners.size()));
+        while (optionListeners.size() < list.get().size()) {
+            optionListeners.add(new ItemInteractionListener(optionListeners.size()));
         }
     }
 

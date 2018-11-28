@@ -23,11 +23,14 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.rendering.ListableWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIRadialRing;
 
 import java.util.Collection;
 import java.util.List;
@@ -288,15 +291,12 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public void onBindEvent(BindButtonEvent event) {
         if (event.getState().equals(ButtonState.DOWN)) {
+            logger.info("event id: "+event.getId());
             if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
                 TabbingManagerSystem.focusSetThrough = true;
-                logger.info("event id: " + event.getId());
-                logger.info("changing focus of widget");
-                logger.info("widgetsList length: " + TabbingManagerSystem.getWidgetsList().size());
                 TabbingManagerSystem.increaseCurrentNum();
                 logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
                 for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
-                    logger.info("widget order: " + widget.getOrder()+" widget name:"+widget.getId());
                     if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
                         logger.info("gaining focus");
                         widget.onGainFocus();
@@ -309,7 +309,23 @@ public abstract class AbstractWidget implements UIWidget {
                 }
                 event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.DOWN, 0);
             } else if (event.getId().equals(new SimpleUri("engine:activate"))) {
-                TabbingManagerSystem.focusedWidget.activate();
+                if  (TabbingManagerSystem.focusedWidget instanceof ActivateableWidget) {
+                    ((ActivateableWidget) TabbingManagerSystem.focusedWidget).activate();
+                } else if (TabbingManagerSystem.focusedWidget instanceof ListableWidget) {
+                    ((UIDropdown) TabbingManagerSystem.focusedWidget).setOpenedReverse();
+                }
+                //TODO: finish implementing for all widgets
+                //TODO: test for list widget, radial ring, drop down,
+            } else if (event.getId().equals(new SimpleUri("engine:forwards"))) {
+                if (TabbingManagerSystem.focusedWidget instanceof ListableWidget) {
+                    ((UIDropdown) TabbingManagerSystem.focusedWidget).changeHighlighted(true);
+                } else if (TabbingManagerSystem.focusedWidget instanceof UIRadialRing) {
+
+                }
+            } else if (event.getId().equals(new SimpleUri("engine:backwards"))) {
+                if (TabbingManagerSystem.focusedWidget instanceof ListableWidget) {
+                    ((UIDropdown) TabbingManagerSystem.focusedWidget).changeHighlighted(false);
+                }
             }
         }
     }

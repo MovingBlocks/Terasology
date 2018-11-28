@@ -41,6 +41,20 @@ public class UIRadialRing extends WidgetWithOrder {
         return selectedTab;
     }
 
+    public void changeSelectedTab(boolean increase) {
+        if (increase) {
+            selectedTab++;
+            if (selectedTab >= sections.size()) {
+                selectedTab=0;
+            }
+        } else {
+            selectedTab--;
+            if (selectedTab < 0) {
+                selectedTab = sections.size()-1;
+            }
+        }
+    }
+
     private int selectedTab = -1;
     private boolean hasInitialised;
     private int radius;

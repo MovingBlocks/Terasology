@@ -47,6 +47,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private int visibleOptionsNum = 5;
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
+
     private Binding<T> selection = new DefaultBinding<>();
     private List<InteractionListener> optionListeners = Lists.newArrayList();
     private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
@@ -187,7 +188,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
      * @param i      Item index.
      */
     private void readItemMouseOver(Canvas canvas, int i) {
-        if (optionListeners.get(i).isMouseOver()) {
+        if (optionListeners.get(i).isMouseOver() || i==highlightedIndex) {
             canvas.setMode(HOVER_MODE);
         } else {
             canvas.setMode(DEFAULT_MODE);
