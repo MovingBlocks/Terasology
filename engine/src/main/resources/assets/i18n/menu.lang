@@ -107,6 +107,7 @@
     "dialog-ok": "dialog-ok",
     "dialog-yes": "dialog-yes",
     "disable-all-modules": "disable-all-modules",
+    "discord-presence": "discord-presence",
     "drop-item": "drop-item",
     "download-module": "download-module",
     "downloading-server-list": "downloading-server-list",

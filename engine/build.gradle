@@ -129,6 +129,9 @@ dependencies {
     }
     compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
 
+    // Discord RPC
+    compile 'com.jagrosh:DiscordIPC:0.4'
+
     // Our developed libs
     compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.3'
     compile group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.3'

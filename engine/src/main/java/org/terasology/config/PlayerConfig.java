@@ -18,6 +18,7 @@ package org.terasology.config;
 
 import java.util.List;
 
+import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
 import org.terasology.utilities.random.FastRandom;
@@ -29,6 +30,8 @@ public class PlayerConfig {
 
     private static final float DEFAULT_PLAYER_EYE_HEIGHT = 0.7f;
 
+    private static final boolean DEFAULT_DISCORD_PRESENCE = true;
+
     private String name = defaultPlayerName();
 
     private Color color = defaultPlayerColor();
@@ -38,6 +41,8 @@ public class PlayerConfig {
     private Float eyeHeight = DEFAULT_PLAYER_EYE_HEIGHT;
 
     private boolean hasEnteredUsername;
+
+    private boolean discordPresence = DEFAULT_DISCORD_PRESENCE;
 
     public String getName() {
         return name;
@@ -79,6 +84,21 @@ public class PlayerConfig {
 
     public void setHasEnteredUsername(boolean entered) {
         this.hasEnteredUsername = entered;
+    }
+
+    public void setDiscordPresence(boolean discordPresence) {
+        this.discordPresence = discordPresence;
+        if (DiscordRPCSubSystem.isEnabled() != discordPresence) {
+            if (discordPresence) {
+                DiscordRPCSubSystem.enable();
+            } else {
+                DiscordRPCSubSystem.disable();
+            }
+        }
+    }
+
+    public boolean isDiscordPresence() {
+        return discordPresence;
     }
 
     /**
