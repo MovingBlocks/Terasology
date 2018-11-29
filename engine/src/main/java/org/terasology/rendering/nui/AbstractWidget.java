@@ -296,10 +296,14 @@ public abstract class AbstractWidget implements UIWidget {
                 logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
                 for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
                     if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
-                        logger.info("gaining focus --- "+widget.getId()+" --- order: "+widget.getOrder());
-                        widget.onGainFocus();
-                        TabbingManagerSystem.focusedWidget = widget;
-                        TabbingManagerSystem.openScreen.getManager().setFocus(widget);
+                        if (!widget.isEnabled()) {
+                            TabbingManagerSystem.increaseCurrentNum();
+                        } else {
+                            logger.info("gaining focus --- " + widget.getId() + " --- order: " + widget.getOrder());
+                            widget.onGainFocus();
+                            TabbingManagerSystem.focusedWidget = widget;
+                            TabbingManagerSystem.openScreen.getManager().setFocus(widget);
+                        }
                     } else {
                         widget.onLoseFocus();
                     }

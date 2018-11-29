@@ -17,6 +17,8 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     public static final Logger logger = LoggerFactory.getLogger(TabbingManagerSystem.class);
     public static CoreScreenLayer openScreen;
 
+    public static int timesTried;
+
     public static boolean tooltipLocked = false;
 
     public static WidgetWithOrder focusedWidget;
@@ -30,6 +32,7 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     private static boolean initialized = false;
 
     public static void init() {
+        timesTried = 0;
         focusedWidget = null;
         currentNum = 0;
         maxNum = 0;
@@ -78,7 +81,7 @@ public class TabbingManagerSystem extends BaseComponentSystem {
         logger.info("nextNum: "+nextNum);
         return nextNum;
     }
-    public static void addToUsedNums(int toAdd, WidgetWithOrder widget) {
+    public static void addToUsedNums(int toAdd) {
         if (!usedNums.contains(toAdd)) {
             usedNums.add(toAdd);
             if (toAdd>maxNum) {

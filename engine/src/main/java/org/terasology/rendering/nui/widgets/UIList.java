@@ -54,6 +54,7 @@ public class UIList<T> extends ActivateableWidget {
     private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
     private Binding<Boolean> canBeFocus = new DefaultBinding<>(true);
+    private int listMin = -1;
 
     private List<InteractionListener> optionListeners = Lists.newArrayList();
 
@@ -67,6 +68,11 @@ public class UIList<T> extends ActivateableWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
+        if (listMin < 0) {
+            listMin = 0;
+            select(listMin);
+            logger.info("listMin: "+listMin);
+        }
         updateItemListeners();
         canvas.setPart("item");
 
@@ -74,9 +80,10 @@ public class UIList<T> extends ActivateableWidget {
         Border margin = canvas.getCurrentStyle().getMargin();
 
         int yOffset = 0;
-        for (int i = 0; i < list.get().size(); ++i) {
+        for (int i = listMin; i < list.get().size(); ++i) {
             T item = list.get().get(i);
             Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
+            //int adjustment = (preferredSize.getY()*optionListeners.indexOf(selection.get()));
             Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
             ItemInteractionListener listener = (ItemInteractionListener)optionListeners.get(i);
             if (enabled) {
@@ -102,6 +109,12 @@ public class UIList<T> extends ActivateableWidget {
     }
 
     private void updateItemListeners() {
+        /*
+        for (int i=0; i<listMin; i++) {
+            if (optionListeners.size() > 1) {
+                optionListeners.remove(0);
+            }
+        }*/
         while (optionListeners.size() > list.get().size()) {
             optionListeners.remove(optionListeners.size() - 1);
         }
@@ -122,7 +135,7 @@ public class UIList<T> extends ActivateableWidget {
         for (T item : list.get()) {
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
             result.x = Math.max(result.x, preferredSize.x);
-            result.y += preferredSize.y;
+            result.y += preferredSize.y+(.5);
         }
         return result;
     }
@@ -333,9 +346,15 @@ public class UIList<T> extends ActivateableWidget {
             int currentIndex = getCurrentIndex();
             if (currentIndex != -1) {
                 if (keyId == Keyboard.KeyId.UP) {
+                    if (listMin > 0) {
+                        listMin--;
+                    }
                     select(currentIndex - 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.DOWN) {
+                    if (listMin < list.get().size()-1) {
+                        listMin++;
+                    }
                     select(currentIndex + 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.ENTER || keyId == Keyboard.KeyId.SPACE) {

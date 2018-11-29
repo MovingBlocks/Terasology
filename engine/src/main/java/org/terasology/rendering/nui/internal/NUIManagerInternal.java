@@ -359,6 +359,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void popScreen() {
+        logger.info("POPPED SCREEN");
         if (!screens.isEmpty()) {
             UIScreenLayer top = screens.peek();
             closeScreen(top);

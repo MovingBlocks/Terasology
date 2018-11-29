@@ -44,10 +44,12 @@ public abstract class WidgetWithOrder extends CoreWidget {
         if (!(this instanceof ScrollerWidget)) {
             if (order == TabbingManagerSystem.UNINITIALIZED_DEPTH) {
                 order = TabbingManagerSystem.getNewNextNum();
-                TabbingManagerSystem.addToUsedNums(order, this);
+                TabbingManagerSystem.addToWidgetsList(this);
+                TabbingManagerSystem.addToUsedNums(order);
                 added = true;
             } else if (!added) {
                 TabbingManagerSystem.addToWidgetsList(this);
+                TabbingManagerSystem.addToUsedNums(order);
                 added = true;
             }
         }

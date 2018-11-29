@@ -306,5 +306,29 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         }
     }
 
+    public void changeHighlighted(boolean increase) {
+        if (increase) {
+            highlighted++;
+            if (highlighted >= getOptions().size()) {
+                highlighted = 0;
+                verticalBar.setValue(verticalBar.getMinimum());
+            } else {
+                int scrollMultiplier = 0 - verticalBar.getRange() / (getOptions().size()-1);
+                verticalBar.setValue(verticalBar.getValue() - scrollMultiplier);
+            }
+        } else {
+            highlighted--;
+            if (highlighted < 0) {
+                highlighted = getOptions().size()-1;
+                verticalBar.setValue(verticalBar.getRange()-verticalBar.getMinimum());
+            } else {
+                int scrollMultiplier = 0 - verticalBar.getRange() / (getOptions().size()-1);
+                verticalBar.setValue(verticalBar.getValue() + scrollMultiplier);
+            }
+        }
+        logger.info("Vectical bar value: "+verticalBar.getValue());
+        setSelection(getOptions().get(highlighted));
+    }
+
     public boolean isOpened() { return opened; }
 }
