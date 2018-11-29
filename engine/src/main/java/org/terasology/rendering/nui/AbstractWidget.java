@@ -317,9 +317,8 @@ public abstract class AbstractWidget implements UIWidget {
                 } else if  (TabbingManagerSystem.focusedWidget instanceof ActivateableWidget) {
                     ((ActivateableWidget) TabbingManagerSystem.focusedWidget).activate();
                 }
-                //TODO: finish implementing for all widgets (UIList)
-                //TODO: test for list widget, radial ring, drop down, scrollbar, slider -- slider doesn't seem to be able to be tabbed to?
-                //TODO: only allow tabbing to widget if depth not set explicitly. add check to see if scrollbar before doing autodepth for this
+                //TODO: test for radial ring, scrollbar (?), slider (?) -- slider doesn't seem to be able to be tabbed to?
+                //TODO: consider preventing changing to scrollbar as it seems to be adjusted for
                 event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
             }
         }

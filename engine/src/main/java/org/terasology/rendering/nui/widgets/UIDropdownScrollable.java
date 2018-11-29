@@ -47,6 +47,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private int visibleOptionsNum = 5;
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
+    private int itemHeight = 1;
 
     private Binding<T> selection = new DefaultBinding<>();
     private List<InteractionListener> optionListeners = Lists.newArrayList();
@@ -106,7 +107,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             float optionsSize = options.get().size() <= visibleOptionsNum ? options.get().size() : (visibleOptionsNum + 0.5f);
 
             // Calculate total options height
-            int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
+            itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
             int height = (int) (itemHeight * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight());
             canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + height));
 
@@ -313,7 +314,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                 highlighted = 0;
                 verticalBar.setValue(verticalBar.getMinimum());
             } else {
-                int scrollMultiplier = 0 - verticalBar.getRange() / (getOptions().size()-1);
+                int scrollMultiplier = 0 - (verticalBar.getRange()*visibleOptionsNum) / (itemHeight*(optionListeners.size()/visibleOptionsNum));
                 verticalBar.setValue(verticalBar.getValue() - scrollMultiplier);
             }
         } else {
@@ -322,11 +323,11 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                 highlighted = getOptions().size()-1;
                 verticalBar.setValue(verticalBar.getRange()-verticalBar.getMinimum());
             } else {
-                int scrollMultiplier = 0 - verticalBar.getRange() / (getOptions().size()-1);
+                int scrollMultiplier = 0 - (verticalBar.getRange()*visibleOptionsNum) / (itemHeight*(optionListeners.size()/visibleOptionsNum));
                 verticalBar.setValue(verticalBar.getValue() + scrollMultiplier);
             }
         }
-        logger.info("Vectical bar value: "+verticalBar.getValue());
+        logger.info("vectical bar value: "+verticalBar.getValue());
         setSelection(getOptions().get(highlighted));
     }
 
