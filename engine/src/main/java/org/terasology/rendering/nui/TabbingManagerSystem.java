@@ -6,7 +6,9 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RegisterSystem
 public class TabbingManagerSystem extends BaseComponentSystem {
@@ -14,7 +16,6 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     public static final int UNINITIALIZED_DEPTH = -9999;
     public static final Logger logger = LoggerFactory.getLogger(TabbingManagerSystem.class);
     public static CoreScreenLayer openScreen;
-    public static boolean buttonLocked;
 
     public static boolean tooltipLocked = false;
 
@@ -29,6 +30,7 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     private static boolean initialized = false;
 
     public static void init() {
+        focusedWidget = null;
         currentNum = 0;
         maxNum = 0;
         nextNum = 0;
@@ -42,8 +44,17 @@ public class TabbingManagerSystem extends BaseComponentSystem {
         boolean loopedOnce = false;
         currentNum++;
 
-        logger.info("usedNums size: "+usedNums.size());
+        //removes duplicates
+        Set<Integer> set = new HashSet<>();
+        set.addAll(usedNums);
+        usedNums.clear();
+        usedNums.addAll(set);
+        logger.info("used nums: "+usedNums);
+        logger.info("widget list: "+widgetsList.size());
+
+        logger.info("currentNum: "+currentNum);
         while (!usedNums.contains(currentNum)) {
+            logger.info("doesn't contain");
             currentNum++;
             if (currentNum > maxNum) {
                 if (!loopedOnce) {
@@ -60,12 +71,11 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     public static int getNewNextNum() {
         nextNum++;
         maxNum++;
-        logger.info("nextNum: "+nextNum);
         while (usedNums.contains(nextNum)) {
             nextNum++;
             maxNum++;
         }
-        usedNums.add(nextNum);
+        logger.info("nextNum: "+nextNum);
         return nextNum;
     }
     public static void addToUsedNums(int toAdd, WidgetWithOrder widget) {
@@ -74,14 +84,14 @@ public class TabbingManagerSystem extends BaseComponentSystem {
             if (toAdd>maxNum) {
                 maxNum = toAdd;
             }
-            widgetsList.add(widget);
         } else {
-            logger.info("one of depth already exists. ignoring.");
+            logger.debug("one of depth already exists. ignoring.");
         }
     }
     public static void addToWidgetsList(WidgetWithOrder widget) {
-        widgetsList.add(widget);
-        usedNums.add(widget.getOrder());
+        if (!widgetsList.contains(widget)) {
+            widgetsList.add(widget);
+        }
     }
     public static void resetCurrentNum() { currentNum = 0; }
     public static int getCurrentNum() {

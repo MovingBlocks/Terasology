@@ -65,7 +65,7 @@ public class UICheckbox extends ActivateableWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (interactionListener.isMouseOver()) {
+        } else if (interactionListener.isMouseOver() || isFocused()) {
             if (active.get()) {
                 return HOVER_ACTIVE_MODE;
             }

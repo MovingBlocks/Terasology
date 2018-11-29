@@ -16,7 +16,10 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.UIWidget;
 
 import java.util.Collections;
 import java.util.Iterator;

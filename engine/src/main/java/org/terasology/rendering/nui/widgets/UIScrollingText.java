@@ -19,9 +19,9 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.TextLineBuilder;
-import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -33,7 +33,7 @@ import java.util.Map.Entry;
 /**
  * A widget that scrolls through long strings of text
  */
-public class UIScrollingText extends WidgetWithOrder {
+public class UIScrollingText extends CoreWidget {
     /**
      * The text to be shown by this widget
      */

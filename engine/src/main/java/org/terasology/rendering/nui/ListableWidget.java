@@ -1,8 +1,6 @@
-package org.terasology.rendering;
+package org.terasology.rendering.nui;
 
 import com.google.common.collect.Lists;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.WidgetWithOrder;
 
 import java.util.List;
 

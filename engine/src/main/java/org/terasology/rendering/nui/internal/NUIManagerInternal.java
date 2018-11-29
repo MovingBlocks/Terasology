@@ -51,6 +51,7 @@ import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
+import org.terasology.rendering.nui.TabbingManagerSystem;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
@@ -339,6 +340,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void pushScreen(UIScreenLayer screen) {
+        TabbingManagerSystem.setInitialized(false);
         if (!screen.isLowerLayerVisible()) {
             UIScreenLayer current = screens.peek();
             if (current != null) {
@@ -346,6 +348,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             }
         }
         screens.push(screen);
+        logger.info("PUSHING: "+screen.getId());
         screen.onOpened();
         String id = screen.getId();
         if (ResourceUrn.isValid(id)) {
@@ -424,6 +427,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void addOverlay(ControlWidget overlay, ResourceUrn uri) {
+        logger.info("OVERLAY OPENED");
         overlay.onOpened();
         overlays.put(uri, overlay);
     }

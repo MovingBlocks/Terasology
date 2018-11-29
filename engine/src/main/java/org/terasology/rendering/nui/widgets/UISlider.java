@@ -30,9 +30,11 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 /**
  * A simple value slider bar with one handle
  */
-public class UISlider extends WidgetWithOrder {
+public class UISlider extends ScrollerWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
+
+    private int nearestSlot;
 
     private UISliderOnChangeTriggeredListener uiSliderOnChangeTriggeredListener;
 
@@ -64,7 +66,7 @@ public class UISlider extends WidgetWithOrder {
                 Vector2i pos = event.getRelativeMousePosition();
                 int maxSlot = TeraMath.floorToInt(getRange() / getIncrement());
                 int slotWidth = sliderWidth / maxSlot;
-                int nearestSlot = maxSlot * (pos.x - offset.x + slotWidth / 2) / sliderWidth;
+                nearestSlot = maxSlot * (pos.x - offset.x + slotWidth / 2) / sliderWidth;
                 nearestSlot = TeraMath.clamp(nearestSlot, 0, maxSlot);
                 float newValue = TeraMath.clamp(getIncrement() * nearestSlot, 0, getRange()) + getMinimum();
                 setValue(newValue);
@@ -269,5 +271,18 @@ public class UISlider extends WidgetWithOrder {
 
     public void setUiSliderOnChangeTriggeredListener(UISliderOnChangeTriggeredListener listener) {
         uiSliderOnChangeTriggeredListener = listener;
+    }
+
+    @Override
+    public void moveDown(boolean increase) {
+        float newValue;
+        if (increase) {
+            nearestSlot++;
+            newValue = TeraMath.clamp(getIncrement() * nearestSlot, 0, getRange()) + getMinimum();
+        } else {
+            nearestSlot--;
+            newValue = TeraMath.clamp(getIncrement() * nearestSlot, 0, getRange()) + getMinimum();
+        }
+        setValue(newValue);
     }
 }

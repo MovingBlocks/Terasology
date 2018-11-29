@@ -188,9 +188,12 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
      * @param i      Item index.
      */
     private void readItemMouseOver(Canvas canvas, int i) {
-        if (optionListeners.get(i).isMouseOver() || i==highlightedIndex) {
+        if (optionListeners.get(i).isMouseOver()) {
             canvas.setMode(HOVER_MODE);
-        } else {
+        } else if (i == highlighted) {
+            canvas.setMode(HOVER_MODE);
+            setSelection(getOptions().get(highlighted));
+        } else{
             canvas.setMode(DEFAULT_MODE);
         }
     }
@@ -292,4 +295,16 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             return true;
         }
     }
+    public void setOpenedReverse() {
+        opened = !opened;
+        logger.info("opened? "+opened);
+        if (opened) {
+            for (int i = 0; i < getOptions().size(); ++i) {
+                optionListeners.add(new UIDropdownScrollable.ItemListener(i));
+            }
+            setSelection(getOptions().get(0));
+        }
+    }
+
+    public boolean isOpened() { return opened; }
 }

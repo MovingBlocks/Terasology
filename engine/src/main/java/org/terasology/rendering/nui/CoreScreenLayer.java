@@ -85,11 +85,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     public void onOpened() {
         modifyingList = false;
         activateBindEvent = false;
-
-        TabbingManagerSystem.init();
-
-        Iterator<UIWidget> widgets = contents.iterator();
-        iterateThrough(widgets);
+        TabbingManagerSystem.setInitialized(false);
 
         animationSystem.triggerFromPrev();
         onScreenOpened();
@@ -122,6 +118,13 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
      * (e.g., a parent menu in the menu system) is returned to (as {@code onShow}).
      */
     public void onScreenOpened() {
+        if (!TabbingManagerSystem.isInitialized()) {
+            TabbingManagerSystem.init();
+
+            Iterator<UIWidget> widgets = contents.iterator();
+            iterateThrough(widgets);
+        }
+
         TabbingManagerSystem.openScreen = this;
     }
 
@@ -159,6 +162,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 onBindEvent(new TabbingUIButton());
             }
             if (!TabbingManagerSystem.isInitialized()) {
+                logger.info("initializing");
                 TabbingManagerSystem.init();
 
                 Iterator<UIWidget> widgets = contents.iterator();

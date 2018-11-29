@@ -29,7 +29,7 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 /**
  * A simple scrollbar
  */
-public class UIScrollbar extends WidgetWithOrder {
+public class UIScrollbar extends ScrollerWidget {
 
     @LayoutConfig
     private Binding<Integer> minimum = new DefaultBinding<>(0);
@@ -246,5 +246,12 @@ public class UIScrollbar extends WidgetWithOrder {
         int newPosition = TeraMath.clamp(pixelPos, 0, sliderSize);
         setValue((sliderSize > 0) ? (newPosition * getRange() / sliderSize) : 0);
     }
-
+    @Override
+    public void moveDown(boolean increase) {
+        if (increase) {
+            updatePosition(getValue()+handleSize);
+        } else {
+            updatePosition(getValue()-handleSize);
+        }
+    }
 }

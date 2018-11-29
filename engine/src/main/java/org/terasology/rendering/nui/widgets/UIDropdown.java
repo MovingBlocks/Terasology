@@ -15,15 +15,17 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import com.google.common.collect.Lists;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.ListableWidget;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.nui.ActivateableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.TabbingManagerSystem;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -37,7 +39,12 @@ import java.util.List;
  * A dropdown widget.
  * @param <T> the list element type
  */
-public class UIDropdown<T> extends ListableWidget {
+public class UIDropdown<T> extends ActivateableWidget {
+
+    private List<InteractionListener> optionListeners = Lists.newArrayList();
+
+    protected int highlighted;
+
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
 
@@ -98,9 +105,11 @@ public class UIDropdown<T> extends ListableWidget {
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
             canvas.setPart(LIST_ITEM);
             for (int i = 0; i < optionListeners.size(); ++i) {
-                if (optionListeners.get(i).isMouseOver() || i==highlightedIndex) {
-                    highlightedIndex = i;
+                if (optionListeners.get(i).isMouseOver()) {
                     canvas.setMode(HOVER_MODE);
+                } else if (i==highlighted) {
+                    canvas.setMode(HOVER_MODE);
+                    setSelection(getOptions().get(highlighted));
                 } else {
                     canvas.setMode(DEFAULT_MODE);
                 }
@@ -126,7 +135,7 @@ public class UIDropdown<T> extends ListableWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (opened) {
+        } else if (opened || (TabbingManagerSystem.focusedWidget != null && TabbingManagerSystem.focusedWidget.equals(this))) {
             return ACTIVE_MODE;
         }
         return DEFAULT_MODE;
@@ -193,7 +202,14 @@ public class UIDropdown<T> extends ListableWidget {
         optionRenderer = itemRenderer;
     }
 
-    public void setOpenedReverse() { opened = !opened; }
+    public void setOpenedReverse() {
+        opened = !opened;
+        if (opened) {
+            for (int i = 0; i < getOptions().size(); ++i) {
+                optionListeners.add(new ItemListener(i));
+            }
+        }
+    }
 
     private class ItemListener extends BaseInteractionListener {
         private int index;
@@ -209,4 +225,21 @@ public class UIDropdown<T> extends ListableWidget {
             return true;
         }
     }
+
+    public void changeHighlighted(boolean increase) {
+        if (increase) {
+            highlighted++;
+            if (highlighted >= getOptions().size()) {
+                highlighted = 0;
+            }
+        } else {
+            highlighted--;
+            if (highlighted < 0) {
+                highlighted = getOptions().size()-1;
+            }
+        }
+        setSelection(getOptions().get(highlighted));
+    }
+
+    public boolean isOpened() { return opened; }
 }

@@ -21,9 +21,11 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.ListableWidget;
+import org.terasology.rendering.nui.ActivateableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.TabbingManagerSystem;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -42,7 +44,7 @@ import java.util.Objects;
  *
  * @param <T> the list element type
  */
-public class UIList<T> extends ListableWidget {
+public class UIList<T> extends ActivateableWidget {
 
     private final List<ItemActivateEventListener<T>> activateListeners = Lists.newArrayList();
     private final List<ItemSelectEventListener<T>> selectionListeners = Lists.newArrayList();
@@ -52,6 +54,8 @@ public class UIList<T> extends ListableWidget {
     private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
     private Binding<Boolean> canBeFocus = new DefaultBinding<>(true);
+
+    private List<InteractionListener> optionListeners = Lists.newArrayList();
 
     public UIList() {
 
@@ -341,5 +345,13 @@ public class UIList<T> extends ListableWidget {
             }
         }
         return super.onKeyEvent(event);
+    }
+
+    @Override
+    public String getMode() {
+        if (TabbingManagerSystem.focusedWidget != null && TabbingManagerSystem.focusedWidget.equals(this)) {
+            return ACTIVE_MODE;
+        }
+        return DEFAULT_MODE;
     }
 }

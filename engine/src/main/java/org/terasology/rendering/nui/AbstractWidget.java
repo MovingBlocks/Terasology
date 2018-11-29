@@ -23,14 +23,12 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.rendering.ListableWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIRadialRing;
 
 import java.util.Collection;
 import java.util.List;
@@ -58,7 +56,7 @@ public abstract class AbstractWidget implements UIWidget {
     @LayoutConfig
     private float tooltipDelay = 0.5f;
 
-    Logger logger = LoggerFactory.getLogger("testLogger");
+    protected Logger logger = LoggerFactory.getLogger("testLogger");
 
     private boolean focused;
 
@@ -203,12 +201,12 @@ public abstract class AbstractWidget implements UIWidget {
     public void onGainFocus() {
         focused = true;
         this.onMouseButtonEvent(new MouseButtonEvent(MouseInput.MOUSE_LEFT, ButtonState.UP, 0));
-        logger.info("this: "+this+" is focused");
+        logger.info("this: "+getId()+" is focused");
     }
 
     @Override
     public void onLoseFocus() {
-        logger.info("this: "+this+" is no longer focused");
+        logger.info("this: "+getId()+" is no longer focused");
         focused = false;
     }
 
@@ -292,40 +290,33 @@ public abstract class AbstractWidget implements UIWidget {
     public void onBindEvent(BindButtonEvent event) {
         if (event.getState().equals(ButtonState.DOWN)) {
             logger.info("event id: "+event.getId());
-            if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
+            if (event.getId().equals(new SimpleUri("engine:tabbingUI")) && event.getState().equals(ButtonState.DOWN)) {
                 TabbingManagerSystem.focusSetThrough = true;
                 TabbingManagerSystem.increaseCurrentNum();
                 logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
                 for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
                     if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
-                        logger.info("gaining focus");
+                        logger.info("gaining focus --- "+widget.getId()+" --- order: "+widget.getOrder());
                         widget.onGainFocus();
                         TabbingManagerSystem.focusedWidget = widget;
                         TabbingManagerSystem.openScreen.getManager().setFocus(widget);
-                    } else if (widget.isFocused()) {
+                    } else {
                         widget.onLoseFocus();
                     }
                     TabbingManagerSystem.tooltipLocked = true;
                 }
-                event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.DOWN, 0);
-            } else if (event.getId().equals(new SimpleUri("engine:activate"))) {
-                if  (TabbingManagerSystem.focusedWidget instanceof ActivateableWidget) {
-                    ((ActivateableWidget) TabbingManagerSystem.focusedWidget).activate();
-                } else if (TabbingManagerSystem.focusedWidget instanceof ListableWidget) {
+                event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
+            } else if (event.getId().equals(new SimpleUri("engine:activate")) && event.getState().equals(ButtonState.DOWN)) {
+                if (TabbingManagerSystem.focusedWidget instanceof UIDropdown) {
+                    logger.info("typeof");
                     ((UIDropdown) TabbingManagerSystem.focusedWidget).setOpenedReverse();
+                } else if  (TabbingManagerSystem.focusedWidget instanceof ActivateableWidget) {
+                    ((ActivateableWidget) TabbingManagerSystem.focusedWidget).activate();
                 }
-                //TODO: finish implementing for all widgets
-                //TODO: test for list widget, radial ring, drop down,
-            } else if (event.getId().equals(new SimpleUri("engine:forwards"))) {
-                if (TabbingManagerSystem.focusedWidget instanceof ListableWidget) {
-                    ((UIDropdown) TabbingManagerSystem.focusedWidget).changeHighlighted(true);
-                } else if (TabbingManagerSystem.focusedWidget instanceof UIRadialRing) {
-
-                }
-            } else if (event.getId().equals(new SimpleUri("engine:backwards"))) {
-                if (TabbingManagerSystem.focusedWidget instanceof ListableWidget) {
-                    ((UIDropdown) TabbingManagerSystem.focusedWidget).changeHighlighted(false);
-                }
+                //TODO: finish implementing for all widgets (UIList)
+                //TODO: test for list widget, radial ring, drop down, scrollbar, slider -- slider doesn't seem to be able to be tabbed to?
+                //TODO: only allow tabbing to widget if depth not set explicitly. add check to see if scrollbar before doing autodepth for this
+                event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
             }
         }
     }
