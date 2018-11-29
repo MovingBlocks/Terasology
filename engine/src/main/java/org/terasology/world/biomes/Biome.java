@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,19 @@ public interface Biome {
      */
     String getName();
 
-    float getFog();
+    @Deprecated
+    default float getFog() {
+        return 0.5f;
+    }
 
-    float getHumidity();
+    @Deprecated
+    default float getHumidity() {
+        return 0.5f;
+    }
 
-    float getTemperature();
+    @Deprecated
+    default float getTemperature() {
+        return 0.5f;
+    }
 
 }
