@@ -348,7 +348,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             }
         }
         screens.push(screen);
-        logger.info("PUSHING: "+screen.getId());
         screen.onOpened();
         String id = screen.getId();
         if (ResourceUrn.isValid(id)) {
@@ -359,7 +358,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void popScreen() {
-        logger.info("POPPED SCREEN");
         if (!screens.isEmpty()) {
             UIScreenLayer top = screens.peek();
             closeScreen(top);
@@ -428,7 +426,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void addOverlay(ControlWidget overlay, ResourceUrn uri) {
-        logger.info("OVERLAY OPENED");
         overlay.onOpened();
         overlays.put(uri, overlay);
     }
@@ -521,7 +518,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             if (focus != null) {
                 focus.onGainFocus();
             }
-            logger.info("focus: "+focus);
         }
     }
 

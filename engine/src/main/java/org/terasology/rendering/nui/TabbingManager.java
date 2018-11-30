@@ -18,9 +18,7 @@ package org.terasology.rendering.nui;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Controls the tabbing for widgets.
@@ -62,17 +60,15 @@ public class TabbingManager {
             currentNum--;
         }
 
-        //removes duplicates
-        Set<Integer> set = new HashSet<>();
-        set.addAll(usedNums);
-        usedNums.clear();
-        usedNums.addAll(set);
-
         if (currentNum < 0 && usedNums.size() > 0) {
             currentNum = Collections.max(usedNums);
         }
         while (!usedNums.contains(currentNum)) {
-            currentNum++;
+            if (increase) {
+                currentNum++;
+            } else {
+                currentNum--;
+            }
             if (currentNum > maxNum) {
                 if (!loopedOnce) {
                     currentNum = 0;
@@ -80,6 +76,9 @@ public class TabbingManager {
                 } else {
                     break;
                 }
+            } else if (currentNum < 0) {
+                currentNum = Collections.max(usedNums);
+                loopedOnce = true;
             }
         }
     }

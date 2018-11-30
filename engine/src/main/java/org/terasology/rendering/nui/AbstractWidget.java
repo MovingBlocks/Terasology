@@ -289,11 +289,13 @@ public abstract class AbstractWidget implements UIWidget {
                 TabbingManager.focusSetThrough = true;
                 TabbingManager.changeCurrentNum(true);
                 currentNumChanged = true;
+
                 event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
             } else if (event.getId().equals(new SimpleUri("engine:tabbingUIBack")) && event.getState().equals(ButtonState.DOWN)) {
                 TabbingManager.focusSetThrough = true;
                 TabbingManager.changeCurrentNum(false);
                 currentNumChanged = true;
+
                 event.prepare(new SimpleUri("engine:tabbingUIBack"), ButtonState.UP, event.getDelta());
             } else if (event.getId().equals(new SimpleUri("engine:activate")) && event.getState().equals(ButtonState.DOWN)) {
                 if (TabbingManager.focusedWidget instanceof UIDropdown) {
@@ -301,6 +303,7 @@ public abstract class AbstractWidget implements UIWidget {
                 } else if  (TabbingManager.focusedWidget instanceof ActivateableWidget) {
                     ((ActivateableWidget) TabbingManager.focusedWidget).activateWidget();
                 }
+
                 event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
             }
 
@@ -316,7 +319,7 @@ public abstract class AbstractWidget implements UIWidget {
                         }
                     } else {
                         widget.onLoseFocus();
-                        
+
                         if (widget instanceof UIRadialSection) {
                             ((UIRadialSection) widget).setSelected(false);
                         }
