@@ -91,7 +91,7 @@ public class UIButton extends ActivateableWidget {
                     if (getClickSound() != null) {
                         getClickSound().play(getClickVolume());
                     }
-                    activate();
+                    activateWidget();
                 }
                 down = false;
             }

@@ -29,6 +29,9 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
+import org.terasology.rendering.nui.layouts.ScrollableArea;
+import org.terasology.rendering.nui.widgets.UIRadialRing;
+import org.terasology.rendering.nui.widgets.UIRadialSection;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,6 +59,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private NUIManager manager;
 
     private boolean modifyingList;
+
+    private ScrollableArea parentToSet;
 
     private boolean activateBindEvent;
 
@@ -96,16 +101,38 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         Logger logger = LoggerFactory.getLogger(CoreScreenLayer.class);
         while(widgets.hasNext()) {
             UIWidget next = widgets.next();
+            boolean setParent = false;
+            if (next instanceof ScrollableArea) {
+                logger.info("TO SET PARENT");
+                parentToSet = (ScrollableArea) next;
+                setParent = true;
+            } else if (next instanceof UILayout || next instanceof WidgetWithOrder) {
+                logger.info("will set PARENT");
+                setParent = true;
+            }
             logger.info("id: "+next);
             if (next instanceof  WidgetWithOrder) {
                 logger.info("instance");
                 TabbingManagerSystem.addToWidgetsList((WidgetWithOrder) next);
                 TabbingManagerSystem.addToUsedNums(((WidgetWithOrder) next).order);
+                if (setParent) {
+                    ((WidgetWithOrder) next).setParent(parentToSet);
+                }
                 logger.info(next.toString());
             }
             if (next.iterator().hasNext()) {
                 logger.info("hasNext");
                 iterateThrough(next.iterator());
+            } else if (next instanceof UIRadialRing) {
+                Iterator<UIRadialSection> iter = ((UIRadialRing) next).getSections().iterator();
+                while(iter.hasNext()) {
+                    next = iter.next();
+                    TabbingManagerSystem.addToWidgetsList((WidgetWithOrder) next);
+                    TabbingManagerSystem.addToUsedNums(((WidgetWithOrder) next).order);
+                    if (setParent) {
+                        ((WidgetWithOrder) next).setParent(parentToSet);
+                    }
+                }
             }
         }
         modifyingList=false;

@@ -20,6 +20,7 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.TabbingManagerSystem;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.utilities.Assets;
@@ -48,6 +49,35 @@ public class UIRadialSection extends WidgetWithOrder {
     private String text;
     @LayoutConfig
     private UIWidget widget;
+
+    public UIRadialSection() {
+        setId("");
+        if (TabbingManagerSystem.isInitialized()) {
+            logger.info("setting up");
+            TabbingManagerSystem.addToUsedNums(this.getOrder());
+            TabbingManagerSystem.addToWidgetsList(this);
+            initialized = true;
+        }
+    }
+    public UIRadialSection(String id) {
+        this.setId(id);
+        if (TabbingManagerSystem.isInitialized()) {
+            TabbingManagerSystem.addToUsedNums(this.getOrder());
+            TabbingManagerSystem.addToWidgetsList(this);
+            initialized = true;
+        }
+    }
+
+    @Override
+    public String getMode() {
+        if  (isSelected) {
+            return ACTIVE_MODE;
+        } else if (TabbingManagerSystem.focusedWidget != null && TabbingManagerSystem.focusedWidget.equals(this)) {
+            isSelected = true;
+            return ACTIVE_MODE;
+        }
+        return DEFAULT_MODE;
+    }
 
     /**
      * Draws the widget

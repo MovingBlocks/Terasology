@@ -100,6 +100,7 @@ public class ScrollableArea extends CoreLayout {
         public boolean onMouseWheel(NUIMouseWheelEvent event) {
             // If there are two scrollbars, we assume vertical has priority
             if (verticalScrollbar) {
+                System.out.println("scrolling");
                 verticalBar.setValue(verticalBar.getValue() + event.getWheelTurns() * SCROLL_MULTIPLIER);
             } else if (horizontalScrollbar) {
                 horizontalBar.setValue(horizontalBar.getValue() + event.getWheelTurns() * SCROLL_MULTIPLIER);
@@ -107,6 +108,19 @@ public class ScrollableArea extends CoreLayout {
             return true;
         }
     };
+
+    public void scroll(boolean up) {
+        System.out.println("SCROLLING");
+        int moveAmount = -1;
+        if (up) {
+            moveAmount = 1;
+        }
+        if (verticalScrollbar) {
+            verticalBar.setValue(verticalBar.getValue() + moveAmount * SCROLL_MULTIPLIER);
+        } else if (horizontalScrollbar) {
+            horizontalBar.setValue(horizontalBar.getValue() + moveAmount * SCROLL_MULTIPLIER);
+        }
+    }
 
     /* Default constructor for internal systems */
     public ScrollableArea() {
@@ -192,6 +206,11 @@ public class ScrollableArea extends CoreLayout {
             if (willNeedScrollbar(axisAvailableSize, axisContentSize, 0)) {
                 return true;
             } else {
+                /*
+                if (axisScrollbarEnabled) {
+                    verticalBar.setOrder(order);
+                    horizontalBar.setOrder(order);
+                }*/
                 /* Is the content definitely small enough in this axis */
                 if (willNeedScrollbar(axisAvailableSize, axisContentSize, oppositeScrollbarSize)) {
                     return true;

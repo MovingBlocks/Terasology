@@ -22,7 +22,7 @@ public abstract class ActivateableWidget extends WidgetWithOrder {
     /**
      * Called when this is pressed to activate all subscribed listeners.
      */
-    protected void activate() {
+    protected void activateWidget() {
         for (ActivateEventListener listener : listeners) {
             listener.onActivated(this);
         }

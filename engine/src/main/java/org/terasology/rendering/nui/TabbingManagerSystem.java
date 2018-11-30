@@ -6,6 +6,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,8 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     public static int timesTried;
 
     public static boolean tooltipLocked = false;
+
+    public static boolean widgetIsOpen = false;
 
     public static WidgetWithOrder focusedWidget;
     public static boolean focusSetThrough = false;
@@ -43,9 +46,13 @@ public class TabbingManagerSystem extends BaseComponentSystem {
         initialized = true;
     }
 
-    public static void increaseCurrentNum() {
+    public static void changeCurrentNum(boolean increase) {
         boolean loopedOnce = false;
-        currentNum++;
+        if (increase) {
+            currentNum++;
+        } else {
+            currentNum--;
+        }
 
         //removes duplicates
         Set<Integer> set = new HashSet<>();
@@ -55,6 +62,9 @@ public class TabbingManagerSystem extends BaseComponentSystem {
         logger.info("used nums: "+usedNums);
         logger.info("widget list: "+widgetsList.size());
 
+        if (currentNum<0 && usedNums.size() > 0) {
+            currentNum = Collections.max(usedNums);
+        }
         logger.info("currentNum: "+currentNum);
         while (!usedNums.contains(currentNum)) {
             logger.info("doesn't contain");

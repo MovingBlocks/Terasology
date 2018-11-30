@@ -29,6 +29,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIRadialSection;
 
 import java.util.Collection;
 import java.util.List;
@@ -289,15 +290,34 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public void onBindEvent(BindButtonEvent event) {
         if (event.getState().equals(ButtonState.DOWN)) {
+            boolean currentNumChanged = false;
             logger.info("event id: "+event.getId());
             if (event.getId().equals(new SimpleUri("engine:tabbingUI")) && event.getState().equals(ButtonState.DOWN)) {
                 TabbingManagerSystem.focusSetThrough = true;
-                TabbingManagerSystem.increaseCurrentNum();
+                TabbingManagerSystem.changeCurrentNum(true);
+                currentNumChanged = true;
+                event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
+            } else if (event.getId().equals(new SimpleUri("engine:tabbingUIBack")) && event.getState().equals(ButtonState.DOWN)) {
+                TabbingManagerSystem.focusSetThrough = true;
+                TabbingManagerSystem.changeCurrentNum(false);
+                currentNumChanged = true;
+                event.prepare(new SimpleUri("engine:tabbingUIBack"), ButtonState.UP, event.getDelta());
+            } else if (event.getId().equals(new SimpleUri("engine:activate")) && event.getState().equals(ButtonState.DOWN)) {
+                if (TabbingManagerSystem.focusedWidget instanceof UIDropdown) {
+                    logger.info("typeof");
+                    ((UIDropdown) TabbingManagerSystem.focusedWidget).setOpenedReverse();
+                } else if  (TabbingManagerSystem.focusedWidget instanceof ActivateableWidget) {
+                    ((ActivateableWidget) TabbingManagerSystem.focusedWidget).activateWidget();
+                }
+                event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
+            }
+
+            if (currentNumChanged) {
                 logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
                 for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
                     if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
                         if (!widget.isEnabled()) {
-                            TabbingManagerSystem.increaseCurrentNum();
+                            TabbingManagerSystem.changeCurrentNum(true);
                         } else {
                             logger.info("gaining focus --- " + widget.getId() + " --- order: " + widget.getOrder());
                             widget.onGainFocus();
@@ -306,20 +326,12 @@ public abstract class AbstractWidget implements UIWidget {
                         }
                     } else {
                         widget.onLoseFocus();
+                        if (widget instanceof UIRadialSection) {
+                            ((UIRadialSection) widget).setSelected(false);
+                        }
                     }
                     TabbingManagerSystem.tooltipLocked = true;
                 }
-                event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
-            } else if (event.getId().equals(new SimpleUri("engine:activate")) && event.getState().equals(ButtonState.DOWN)) {
-                if (TabbingManagerSystem.focusedWidget instanceof UIDropdown) {
-                    logger.info("typeof");
-                    ((UIDropdown) TabbingManagerSystem.focusedWidget).setOpenedReverse();
-                } else if  (TabbingManagerSystem.focusedWidget instanceof ActivateableWidget) {
-                    ((ActivateableWidget) TabbingManagerSystem.focusedWidget).activate();
-                }
-                //TODO: test for radial ring, scrollbar (?), slider (?) -- slider doesn't seem to be able to be tabbed to?
-                //TODO: consider preventing changing to scrollbar as it seems to be adjusted for
-                event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
             }
         }
     }

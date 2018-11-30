@@ -39,7 +39,6 @@ public class UICheckbox extends ActivateableWidget {
         public boolean onMouseClick(NUIMouseClickEvent event) {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 active.set(!active.get());
-                activate();
                 return true;
             }
             return false;
@@ -88,6 +87,11 @@ public class UICheckbox extends ActivateableWidget {
      */
     public void setChecked(boolean checked) {
         active.set(checked);
+    }
+
+    @Override
+    public void activateWidget() {
+        setChecked(!isChecked());
     }
 
 

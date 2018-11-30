@@ -19,8 +19,8 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseOverEvent;
@@ -32,29 +32,34 @@ import java.util.List;
 /**
  * A radial menu widget
  */
-public class UIRadialRing extends WidgetWithOrder {
+public class UIRadialRing extends CoreWidget {//extends WidgetWithOrder {
 
     @LayoutConfig
     private List<UIRadialSection> sections = new ArrayList<>();
 
+    /*
     public int getSelectedTab() {
         return selectedTab;
     }
 
     public void changeSelectedTab(boolean increase) {
         if (increase) {
+            sections.get(selectedTab).setSelected(false);
             selectedTab++;
             if (selectedTab >= sections.size()) {
                 selectedTab=0;
             }
+            sections.get(selectedTab).setSelected(true);
         } else {
+            sections.get(selectedTab).setSelected(false);
             selectedTab--;
             if (selectedTab < 0) {
                 selectedTab = sections.size()-1;
             }
+            sections.get(selectedTab).setSelected(true);
         }
     }
-
+*/
     private int selectedTab = -1;
     private boolean hasInitialised;
     private int radius;

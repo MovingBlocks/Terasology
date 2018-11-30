@@ -30,7 +30,7 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 /**
  * A simple value slider bar with one handle
  */
-public class UISlider extends ScrollerWidget {
+public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
 
@@ -271,18 +271,5 @@ public class UISlider extends ScrollerWidget {
 
     public void setUiSliderOnChangeTriggeredListener(UISliderOnChangeTriggeredListener listener) {
         uiSliderOnChangeTriggeredListener = listener;
-    }
-
-    @Override
-    public void moveDown(boolean increase) {
-        float newValue;
-        if (increase) {
-            nearestSlot++;
-            newValue = TeraMath.clamp(getIncrement() * nearestSlot, 0, getRange()) + getMinimum();
-        } else {
-            nearestSlot--;
-            newValue = TeraMath.clamp(getIncrement() * nearestSlot, 0, getRange()) + getMinimum();
-        }
-        setValue(newValue);
     }
 }
