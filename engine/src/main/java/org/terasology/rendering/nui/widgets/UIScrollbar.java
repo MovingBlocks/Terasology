@@ -192,6 +192,11 @@ public class UIScrollbar extends CoreWidget {
         return DEFAULT_MODE;
     }
 
+    /*
+    public void setOrder(int newOrder) {
+        order = newOrder;
+    }*/
+
     public void bindMinimum(Binding<Integer> binding) {
         minimum = binding;
     }
@@ -251,4 +256,11 @@ public class UIScrollbar extends CoreWidget {
         setValue((sliderSize > 0) ? (newPosition * getRange() / sliderSize) : 0);
     }
 
+    public void moveDown(boolean increase) {
+        if (increase) {
+            updatePosition(getValue() + handleSize);
+        } else {
+            updatePosition(getValue() - handleSize);
+        }
+    }
 }

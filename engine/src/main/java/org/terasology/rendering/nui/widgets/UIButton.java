@@ -15,30 +15,30 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import com.google.common.collect.Lists;
-import org.terasology.utilities.Assets;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.nui.ActivateableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
+import org.terasology.utilities.Assets;
 
 import java.util.List;
 
 /**
  * A widget displaying a clickable button, containing text and an optional image
  */
-public class UIButton extends CoreWidget {
+public class UIButton extends ActivateableWidget {
     public static final String DOWN_MODE = "down";
 
     /**
@@ -71,11 +71,6 @@ public class UIButton extends CoreWidget {
     private boolean down;
 
     /**
-     * A {@link List} of listeners subscribed to this button
-     */
-    private List<ActivateEventListener> listeners = Lists.newArrayList();
-
-    /**
      * An {@link InteractionListener} that listens for mouse interaction with this button
      */
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -96,7 +91,7 @@ public class UIButton extends CoreWidget {
                     if (getClickSound() != null) {
                         getClickSound().play(getClickVolume());
                     }
-                    activate();
+                    activateWidget();
                 }
                 down = false;
             }
@@ -192,21 +187,12 @@ public class UIButton extends CoreWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (down || isActive()) {
+        } else if (down || isActive() || (isFocused()& TabbingManager.focusSetThrough)) {
             return DOWN_MODE;
         } else if (interactionListener.isMouseOver()) {
             return HOVER_MODE;
         }
         return DEFAULT_MODE;
-    }
-
-    /**
-     * Called when this {@code UIButton} is pressed to activate all subscribed listeners.
-     */
-    private void activate() {
-        for (ActivateEventListener listener : listeners) {
-            listener.onActivated(this);
-        }
     }
 
     /**

@@ -17,15 +17,10 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.base.Function;
 import org.terasology.input.MouseInput;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -38,6 +33,8 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
+
+    private int nearestSlot;
 
     private UISliderOnChangeTriggeredListener uiSliderOnChangeTriggeredListener;
 
@@ -69,7 +66,7 @@ public class UISlider extends CoreWidget {
                 Vector2i pos = event.getRelativeMousePosition();
                 int maxSlot = TeraMath.floorToInt(getRange() / getIncrement());
                 int slotWidth = sliderWidth / maxSlot;
-                int nearestSlot = maxSlot * (pos.x - offset.x + slotWidth / 2) / sliderWidth;
+                nearestSlot = maxSlot * (pos.x - offset.x + slotWidth / 2) / sliderWidth;
                 nearestSlot = TeraMath.clamp(nearestSlot, 0, maxSlot);
                 float newValue = TeraMath.clamp(getIncrement() * nearestSlot, 0, getRange()) + getMinimum();
                 setValue(newValue);

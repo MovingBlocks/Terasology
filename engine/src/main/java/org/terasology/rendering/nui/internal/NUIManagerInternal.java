@@ -51,7 +51,11 @@ import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
+<<<<<<< HEAD
 import org.terasology.rendering.nui.SortOrderSystem;
+=======
+import org.terasology.rendering.nui.TabbingManager;
+>>>>>>> uiWidgetTabbing
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
@@ -357,6 +361,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void pushScreen(UIScreenLayer screen) {
+        TabbingManager.setInitialized(false);
         if (!screen.isLowerLayerVisible()) {
             UIScreenLayer current = screens.peek();
             if (current != null) {

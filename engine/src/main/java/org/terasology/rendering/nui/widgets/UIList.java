@@ -21,9 +21,11 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.rendering.nui.ActivateableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -42,9 +44,8 @@ import java.util.Objects;
  *
  * @param <T> the list element type
  */
-public class UIList<T> extends CoreWidget {
+public class UIList<T> extends ActivateableWidget {
 
-    private final List<ItemInteractionListener> itemListeners = Lists.newArrayList();
     private final List<ItemActivateEventListener<T>> activateListeners = Lists.newArrayList();
     private final List<ItemSelectEventListener<T>> selectionListeners = Lists.newArrayList();
     private Binding<Boolean> interactive = new DefaultBinding<>(true);
@@ -53,6 +54,9 @@ public class UIList<T> extends CoreWidget {
     private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
     private Binding<Boolean> canBeFocus = new DefaultBinding<>(true);
+    private int listMin = -1;
+
+    private List<InteractionListener> optionListeners = Lists.newArrayList();
 
     public UIList() {
 
@@ -64,6 +68,10 @@ public class UIList<T> extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
+        if (listMin < 0) {
+            listMin = 0;
+            select(listMin);
+        }
         updateItemListeners();
         canvas.setPart("item");
 
@@ -71,11 +79,12 @@ public class UIList<T> extends CoreWidget {
         Border margin = canvas.getCurrentStyle().getMargin();
 
         int yOffset = 0;
-        for (int i = 0; i < list.get().size(); ++i) {
+        for (int i = listMin; i < list.get().size(); ++i) {
             T item = list.get().get(i);
             Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
+            //int adjustment = (preferredSize.getY()*optionListeners.indexOf(selection.get()));
             Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
-            ItemInteractionListener listener = itemListeners.get(i);
+            ItemInteractionListener listener = (ItemInteractionListener) optionListeners.get(i);
             if (enabled) {
                 if (Objects.equals(item, selection.get())) {
                     canvas.setMode(ACTIVE_MODE);
@@ -99,11 +108,17 @@ public class UIList<T> extends CoreWidget {
     }
 
     private void updateItemListeners() {
-        while (itemListeners.size() > list.get().size()) {
-            itemListeners.remove(itemListeners.size() - 1);
+        /*
+        for (int i=0; i<listMin; i++) {
+            if (optionListeners.size() > 1) {
+                optionListeners.remove(0);
+            }
+        }*/
+        while (optionListeners.size() > list.get().size()) {
+            optionListeners.remove(optionListeners.size() - 1);
         }
-        while (itemListeners.size() < list.get().size()) {
-            itemListeners.add(new ItemInteractionListener(itemListeners.size()));
+        while (optionListeners.size() < list.get().size()) {
+            optionListeners.add(new ItemInteractionListener(optionListeners.size()));
         }
     }
 
@@ -119,7 +134,7 @@ public class UIList<T> extends CoreWidget {
         for (T item : list.get()) {
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
             result.x = Math.max(result.x, preferredSize.x);
-            result.y += preferredSize.y;
+            result.y += preferredSize.y + (.5);
         }
         return result;
     }
@@ -330,9 +345,15 @@ public class UIList<T> extends CoreWidget {
             int currentIndex = getCurrentIndex();
             if (currentIndex != -1) {
                 if (keyId == Keyboard.KeyId.UP) {
+                    if (listMin > 0) {
+                        listMin--;
+                    }
                     select(currentIndex - 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.DOWN) {
+                    if (listMin < list.get().size() - 1) {
+                        listMin++;
+                    }
                     select(currentIndex + 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.ENTER || keyId == Keyboard.KeyId.SPACE) {
@@ -342,5 +363,13 @@ public class UIList<T> extends CoreWidget {
             }
         }
         return super.onKeyEvent(event);
+    }
+
+    @Override
+    public String getMode() {
+        if (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
+            return ACTIVE_MODE;
+        }
+        return DEFAULT_MODE;
     }
 }

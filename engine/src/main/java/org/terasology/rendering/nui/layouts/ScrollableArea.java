@@ -108,6 +108,18 @@ public class ScrollableArea extends CoreLayout {
         }
     };
 
+    public void scroll(boolean up) {
+        int moveAmount = -1;
+        if (up) {
+            moveAmount = 1;
+        }
+        if (verticalScrollbar) {
+            verticalBar.setValue(verticalBar.getValue() + moveAmount * SCROLL_MULTIPLIER);
+        } else if (horizontalScrollbar) {
+            horizontalBar.setValue(horizontalBar.getValue() + moveAmount * SCROLL_MULTIPLIER);
+        }
+    }
+
     /* Default constructor for internal systems */
     public ScrollableArea() {
     }

@@ -16,11 +16,18 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.collect.Lists;
+import org.terasology.engine.SimpleUri;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.ButtonState;
+import org.terasology.input.MouseInput;
+import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIRadialSection;
 
 import java.util.Collection;
 import java.util.List;
@@ -190,6 +197,7 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public void onGainFocus() {
         focused = true;
+        this.onMouseButtonEvent(new MouseButtonEvent(MouseInput.MOUSE_LEFT, ButtonState.UP, 0));
     }
 
     @Override
@@ -270,6 +278,54 @@ public abstract class AbstractWidget implements UIWidget {
                 return null;
             }
             return tooltipLabel;
+        }
+    }
+
+    @Override
+    public void onBindEvent(BindButtonEvent event) {
+        if (event.getState().equals(ButtonState.DOWN)) {
+            boolean currentNumChanged = false;
+            if (event.getId().equals(new SimpleUri("engine:tabbingUI")) && event.getState().equals(ButtonState.DOWN)) {
+                TabbingManager.focusSetThrough = true;
+                TabbingManager.changeCurrentNum(true);
+                currentNumChanged = true;
+
+                event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
+            } else if (event.getId().equals(new SimpleUri("engine:tabbingUIBack")) && event.getState().equals(ButtonState.DOWN)) {
+                TabbingManager.focusSetThrough = true;
+                TabbingManager.changeCurrentNum(false);
+                currentNumChanged = true;
+
+                event.prepare(new SimpleUri("engine:tabbingUIBack"), ButtonState.UP, event.getDelta());
+            } else if (event.getId().equals(new SimpleUri("engine:activate")) && event.getState().equals(ButtonState.DOWN)) {
+                if (TabbingManager.focusedWidget instanceof UIDropdown) {
+                    ((UIDropdown) TabbingManager.focusedWidget).setOpenedReverse();
+                } else if  (TabbingManager.focusedWidget instanceof ActivateableWidget) {
+                    ((ActivateableWidget) TabbingManager.focusedWidget).activateWidget();
+                }
+
+                event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
+            }
+
+            if (currentNumChanged) {
+                for (WidgetWithOrder widget : TabbingManager.getWidgetsList()) {
+                    if (widget.getOrder() == TabbingManager.getCurrentNum()) {
+                        if (!widget.isEnabled()) {
+                            TabbingManager.changeCurrentNum(true);
+                        } else {
+                            widget.onGainFocus();
+                            TabbingManager.focusedWidget = widget;
+                            TabbingManager.getOpenScreen().getManager().setFocus(widget);
+                        }
+                    } else {
+                        widget.onLoseFocus();
+
+                        if (widget instanceof UIRadialSection) {
+                            ((UIRadialSection) widget).setSelected(false);
+                        }
+                    }
+                }
+            }
         }
     }
 }
