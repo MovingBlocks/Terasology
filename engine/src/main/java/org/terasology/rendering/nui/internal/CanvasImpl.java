@@ -47,7 +47,7 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TabbingManagerSystem;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -207,8 +207,8 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public boolean processMouseClick(MouseInput button, Vector2i pos) {
-        TabbingManagerSystem.focusSetThrough = false;
-        TabbingManagerSystem.resetCurrentNum();
+        TabbingManager.focusSetThrough = false;
+        TabbingManager.resetCurrentNum();
 
         boolean possibleDoubleClick = lastClickPosition.gridDistance(pos) < MAX_DOUBLE_CLICK_DISTANCE && lastClickButton == button
             && time.getGameTimeInMs() - lastClickTime < DOUBLE_CLICK_TIME;

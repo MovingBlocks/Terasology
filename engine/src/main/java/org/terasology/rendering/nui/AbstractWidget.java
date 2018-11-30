@@ -16,8 +16,6 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
@@ -56,8 +54,6 @@ public abstract class AbstractWidget implements UIWidget {
 
     @LayoutConfig
     private float tooltipDelay = 0.5f;
-
-    protected Logger logger = LoggerFactory.getLogger("testLogger");
 
     private boolean focused;
 
@@ -202,12 +198,10 @@ public abstract class AbstractWidget implements UIWidget {
     public void onGainFocus() {
         focused = true;
         this.onMouseButtonEvent(new MouseButtonEvent(MouseInput.MOUSE_LEFT, ButtonState.UP, 0));
-        logger.info("this: "+getId()+" is focused");
     }
 
     @Override
     public void onLoseFocus() {
-        logger.info("this: "+getId()+" is no longer focused");
         focused = false;
     }
 
@@ -291,46 +285,42 @@ public abstract class AbstractWidget implements UIWidget {
     public void onBindEvent(BindButtonEvent event) {
         if (event.getState().equals(ButtonState.DOWN)) {
             boolean currentNumChanged = false;
-            logger.info("event id: "+event.getId());
             if (event.getId().equals(new SimpleUri("engine:tabbingUI")) && event.getState().equals(ButtonState.DOWN)) {
-                TabbingManagerSystem.focusSetThrough = true;
-                TabbingManagerSystem.changeCurrentNum(true);
+                TabbingManager.focusSetThrough = true;
+                TabbingManager.changeCurrentNum(true);
                 currentNumChanged = true;
                 event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
             } else if (event.getId().equals(new SimpleUri("engine:tabbingUIBack")) && event.getState().equals(ButtonState.DOWN)) {
-                TabbingManagerSystem.focusSetThrough = true;
-                TabbingManagerSystem.changeCurrentNum(false);
+                TabbingManager.focusSetThrough = true;
+                TabbingManager.changeCurrentNum(false);
                 currentNumChanged = true;
                 event.prepare(new SimpleUri("engine:tabbingUIBack"), ButtonState.UP, event.getDelta());
             } else if (event.getId().equals(new SimpleUri("engine:activate")) && event.getState().equals(ButtonState.DOWN)) {
-                if (TabbingManagerSystem.focusedWidget instanceof UIDropdown) {
-                    logger.info("typeof");
-                    ((UIDropdown) TabbingManagerSystem.focusedWidget).setOpenedReverse();
-                } else if  (TabbingManagerSystem.focusedWidget instanceof ActivateableWidget) {
-                    ((ActivateableWidget) TabbingManagerSystem.focusedWidget).activateWidget();
+                if (TabbingManager.focusedWidget instanceof UIDropdown) {
+                    ((UIDropdown) TabbingManager.focusedWidget).setOpenedReverse();
+                } else if  (TabbingManager.focusedWidget instanceof ActivateableWidget) {
+                    ((ActivateableWidget) TabbingManager.focusedWidget).activateWidget();
                 }
                 event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
             }
 
             if (currentNumChanged) {
-                logger.info("currentNum: " + TabbingManagerSystem.getCurrentNum());
-                for (WidgetWithOrder widget : TabbingManagerSystem.getWidgetsList()) {
-                    if (widget.getOrder() == TabbingManagerSystem.getCurrentNum()) {
+                for (WidgetWithOrder widget : TabbingManager.getWidgetsList()) {
+                    if (widget.getOrder() == TabbingManager.getCurrentNum()) {
                         if (!widget.isEnabled()) {
-                            TabbingManagerSystem.changeCurrentNum(true);
+                            TabbingManager.changeCurrentNum(true);
                         } else {
-                            logger.info("gaining focus --- " + widget.getId() + " --- order: " + widget.getOrder());
                             widget.onGainFocus();
-                            TabbingManagerSystem.focusedWidget = widget;
-                            TabbingManagerSystem.openScreen.getManager().setFocus(widget);
+                            TabbingManager.focusedWidget = widget;
+                            TabbingManager.getOpenScreen().getManager().setFocus(widget);
                         }
                     } else {
                         widget.onLoseFocus();
+                        
                         if (widget instanceof UIRadialSection) {
                             ((UIRadialSection) widget).setSelected(false);
                         }
                     }
-                    TabbingManagerSystem.tooltipLocked = true;
                 }
             }
         }

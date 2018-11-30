@@ -1,20 +1,36 @@
+/*
+ * Copyright 2018 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.terasology.rendering.nui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.input.Keyboard;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 
+/**
+ * Parent for widgets that can be tabbed to.
+ */
 public abstract class WidgetWithOrder extends CoreWidget {
 
     @LayoutConfig
-    protected int order = TabbingManagerSystem.UNINITIALIZED_DEPTH;
+    protected int order = TabbingManager.UNINITIALIZED_DEPTH;
+    protected boolean initialized = false;
 
     private boolean added = false;
-
-    protected boolean initialized = false;
 
     private ScrollableArea parent;
 
@@ -26,16 +42,17 @@ public abstract class WidgetWithOrder extends CoreWidget {
         this.setId(id);
     }
 
-    public ScrollableArea getParent() { return parent; }
+    public ScrollableArea getParent() {
+        return parent;
+    }
 
-    public void setParent(ScrollableArea area) { parent = area; }
+    public void setParent(ScrollableArea area) {
+        parent = area;
+    }
 
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
-
-        Logger logger = LoggerFactory.getLogger("widget w/ order");
-        logger.info("adding");
     }
     @Override
     public String getMode() {
@@ -45,61 +62,47 @@ public abstract class WidgetWithOrder extends CoreWidget {
         return DEFAULT_MODE;
     }
     public int getOrder() {
-       // if (!(this instanceof UIScrollbar)) {
-            if (order == TabbingManagerSystem.UNINITIALIZED_DEPTH) {
-                order = TabbingManagerSystem.getNewNextNum();
-                TabbingManagerSystem.addToWidgetsList(this);
-                TabbingManagerSystem.addToUsedNums(order);
-                added = true;
-            } else if (!added) {
-                TabbingManagerSystem.addToWidgetsList(this);
-                TabbingManagerSystem.addToUsedNums(order);
-                added = true;
-            }
-       // }
+        if (order == TabbingManager.UNINITIALIZED_DEPTH) {
+            order = TabbingManager.getNewNextNum();
+            TabbingManager.addToWidgetsList(this);
+            TabbingManager.addToUsedNums(order);
+            added = true;
+        } else if (!added) {
+            TabbingManager.addToWidgetsList(this);
+            TabbingManager.addToUsedNums(order);
+            added = true;
+        }
         return order;
     }
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown()) {
-            logger.info("parent: "+parent);
             int keyId = event.getKey().getId();
             if (keyId == Keyboard.KeyId.UP) {
-                /*
-                if (TabbingManagerSystem.focusedWidget instanceof UIRadialRing) {
-                    ((UIRadialRing) TabbingManagerSystem.focusedWidget).changeSelectedTab(true);
-                } else */if (TabbingManagerSystem.focusedWidget instanceof UIDropdown) {
-                    if (((UIDropdown)TabbingManagerSystem.focusedWidget).isOpened()) {
-                        TabbingManagerSystem.widgetIsOpen = true;
-                        ((UIDropdown) TabbingManagerSystem.focusedWidget).changeHighlighted(false);
+                if (TabbingManager.focusedWidget instanceof UIDropdown) {
+                    if (((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
+                        TabbingManager.setWidgetIsOpen(true);
+                        ((UIDropdown) TabbingManager.focusedWidget).changeHighlighted(false);
                     } else {
-                        TabbingManagerSystem.widgetIsOpen = false;
+                        TabbingManager.setWidgetIsOpen(false);
                     }
                 }
-                if (parent != null && !TabbingManagerSystem.widgetIsOpen) {
+
+                if (parent != null && !TabbingManager.isWidgetOpen()) {
                     parent.scroll(true);
                 }
-                /*else if ((TabbingManagerSystem.focusedWidget instanceof UIScrollbar) && TabbingManagerSystem.focusedWidget.getOrder() != TabbingManagerSystem.UNINITIALIZED_DEPTH) {
-                    logger.info("instance of scroller");
-                    ((UIScrollbar)TabbingManagerSystem.focusedWidget).moveDown(false);
-                }*/
                 return true;
             } else if (keyId == Keyboard.KeyId.DOWN) {
-                /*
-                if (TabbingManagerSystem.focusedWidget instanceof UIRadialRing) {
-                    ((UIRadialRing) TabbingManagerSystem.focusedWidget).changeSelectedTab(false);
-                } else */if (TabbingManagerSystem.focusedWidget instanceof UIDropdown) {
-                    if (((UIDropdown)TabbingManagerSystem.focusedWidget).isOpened()) {
-                        TabbingManagerSystem.widgetIsOpen = true;
-                        ((UIDropdown) TabbingManagerSystem.focusedWidget).changeHighlighted(true);
+                if (TabbingManager.focusedWidget instanceof UIDropdown) {
+                    if (((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
+                        TabbingManager.setWidgetIsOpen(true);
+                        ((UIDropdown) TabbingManager.focusedWidget).changeHighlighted(true);
                     } else {
-                        TabbingManagerSystem.widgetIsOpen = false;
+                        TabbingManager.setWidgetIsOpen(false);
                     }
-                } /*else if ((TabbingManagerSystem.focusedWidget instanceof UIScrollbar) && TabbingManagerSystem.focusedWidget.getOrder() != TabbingManagerSystem.UNINITIALIZED_DEPTH) {
-                    logger.info("instance of scroller");
-                    ((UIScrollbar)TabbingManagerSystem.focusedWidget).moveDown(true);
-                }*/
-                if (parent != null && !TabbingManagerSystem.widgetIsOpen) {
+                }
+
+                if (parent != null && !TabbingManager.isWidgetOpen()) {
                     parent.scroll(false);
                 }
                 return true;

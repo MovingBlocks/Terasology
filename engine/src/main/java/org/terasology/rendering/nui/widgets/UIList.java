@@ -25,7 +25,7 @@ import org.terasology.rendering.nui.ActivateableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.TabbingManagerSystem;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -71,7 +71,6 @@ public class UIList<T> extends ActivateableWidget {
         if (listMin < 0) {
             listMin = 0;
             select(listMin);
-            logger.info("listMin: "+listMin);
         }
         updateItemListeners();
         canvas.setPart("item");
@@ -85,7 +84,7 @@ public class UIList<T> extends ActivateableWidget {
             Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
             //int adjustment = (preferredSize.getY()*optionListeners.indexOf(selection.get()));
             Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
-            ItemInteractionListener listener = (ItemInteractionListener)optionListeners.get(i);
+            ItemInteractionListener listener = (ItemInteractionListener) optionListeners.get(i);
             if (enabled) {
                 if (Objects.equals(item, selection.get())) {
                     canvas.setMode(ACTIVE_MODE);
@@ -135,7 +134,7 @@ public class UIList<T> extends ActivateableWidget {
         for (T item : list.get()) {
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
             result.x = Math.max(result.x, preferredSize.x);
-            result.y += preferredSize.y+(.5);
+            result.y += preferredSize.y + (.5);
         }
         return result;
     }
@@ -352,7 +351,7 @@ public class UIList<T> extends ActivateableWidget {
                     select(currentIndex - 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.DOWN) {
-                    if (listMin < list.get().size()-1) {
+                    if (listMin < list.get().size() - 1) {
                         listMin++;
                     }
                     select(currentIndex + 1);
@@ -368,7 +367,7 @@ public class UIList<T> extends ActivateableWidget {
 
     @Override
     public String getMode() {
-        if (TabbingManagerSystem.focusedWidget != null && TabbingManagerSystem.focusedWidget.equals(this)) {
+        if (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
             return ACTIVE_MODE;
         }
         return DEFAULT_MODE;

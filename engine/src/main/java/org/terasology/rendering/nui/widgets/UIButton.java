@@ -25,7 +25,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.TabbingManagerSystem;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -187,7 +187,7 @@ public class UIButton extends ActivateableWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (down || isActive() || (isFocused()& TabbingManagerSystem.focusSetThrough)) {
+        } else if (down || isActive() || (isFocused()& TabbingManager.focusSetThrough)) {
             return DOWN_MODE;
         } else if (interactionListener.isMouseOver()) {
             return HOVER_MODE;

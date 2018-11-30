@@ -1,9 +1,20 @@
-package org.terasology.rendering.nui;
+/*
+ * Copyright 2018 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterSystem;
+package org.terasology.rendering.nui;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,21 +22,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@RegisterSystem
-public class TabbingManagerSystem extends BaseComponentSystem {
+/**
+ * Controls the tabbing for widgets.
+ */
+public class TabbingManager {
 
     public static final int UNINITIALIZED_DEPTH = -9999;
-    public static final Logger logger = LoggerFactory.getLogger(TabbingManagerSystem.class);
-    public static CoreScreenLayer openScreen;
+    private static CoreScreenLayer openScreen;
 
-    public static int timesTried;
-
-    public static boolean tooltipLocked = false;
-
-    public static boolean widgetIsOpen = false;
+    private static boolean widgetIsOpen;
 
     public static WidgetWithOrder focusedWidget;
-    public static boolean focusSetThrough = false;
+    public static boolean focusSetThrough;
 
     private static int currentNum;
     private static int maxNum;
@@ -35,12 +43,12 @@ public class TabbingManagerSystem extends BaseComponentSystem {
     private static boolean initialized = false;
 
     public static void init() {
-        timesTried = 0;
+        widgetIsOpen = false;
         focusedWidget = null;
+        focusSetThrough = false;
         currentNum = 0;
         maxNum = 0;
         nextNum = 0;
-        logger.info("constructing");
         usedNums = new ArrayList<>();
         widgetsList = new ArrayList<>();
         initialized = true;
@@ -59,23 +67,17 @@ public class TabbingManagerSystem extends BaseComponentSystem {
         set.addAll(usedNums);
         usedNums.clear();
         usedNums.addAll(set);
-        logger.info("used nums: "+usedNums);
-        logger.info("widget list: "+widgetsList.size());
 
-        if (currentNum<0 && usedNums.size() > 0) {
+        if (currentNum < 0 && usedNums.size() > 0) {
             currentNum = Collections.max(usedNums);
         }
-        logger.info("currentNum: "+currentNum);
         while (!usedNums.contains(currentNum)) {
-            logger.info("doesn't contain");
             currentNum++;
             if (currentNum > maxNum) {
                 if (!loopedOnce) {
-                    logger.info("looped once");
                     currentNum = 0;
                     loopedOnce = true;
                 } else {
-                    logger.debug("usedNums doesn't contain enough numbers.");
                     break;
                 }
             }
@@ -88,17 +90,14 @@ public class TabbingManagerSystem extends BaseComponentSystem {
             nextNum++;
             maxNum++;
         }
-        logger.info("nextNum: "+nextNum);
         return nextNum;
     }
     public static void addToUsedNums(int toAdd) {
         if (!usedNums.contains(toAdd)) {
             usedNums.add(toAdd);
-            if (toAdd>maxNum) {
+            if (toAdd > maxNum) {
                 maxNum = toAdd;
             }
-        } else {
-            logger.debug("one of depth already exists. ignoring.");
         }
     }
     public static void addToWidgetsList(WidgetWithOrder widget) {
@@ -106,13 +105,31 @@ public class TabbingManagerSystem extends BaseComponentSystem {
             widgetsList.add(widget);
         }
     }
-    public static void resetCurrentNum() { currentNum = 0; }
+    public static void resetCurrentNum() {
+        currentNum = 0;
+    }
     public static int getCurrentNum() {
         return currentNum;
     }
     public static List<WidgetWithOrder> getWidgetsList() {
         return widgetsList;
     }
-    public static boolean isInitialized() { return initialized; }
-    public static void setInitialized(boolean setInit) { initialized = setInit; }
+    public static boolean isInitialized() {
+        return initialized;
+    }
+    public static void setInitialized(boolean setInit) {
+        initialized = setInit;
+    }
+    public static boolean isWidgetOpen() {
+        return widgetIsOpen;
+    }
+    public static CoreScreenLayer getOpenScreen() {
+        return openScreen;
+    }
+    public static void setOpenScreen(CoreScreenLayer open) {
+        openScreen = open;
+    }
+    public static void setWidgetIsOpen(boolean open) {
+        widgetIsOpen = open;
+    }
 }

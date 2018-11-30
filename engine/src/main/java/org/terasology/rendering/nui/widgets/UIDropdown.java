@@ -25,7 +25,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TabbingManagerSystem;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -135,7 +135,7 @@ public class UIDropdown<T> extends ActivateableWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (opened || (TabbingManagerSystem.focusedWidget != null && TabbingManagerSystem.focusedWidget.equals(this))) {
+        } else if (opened || (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this))) {
             return ACTIVE_MODE;
         }
         return DEFAULT_MODE;

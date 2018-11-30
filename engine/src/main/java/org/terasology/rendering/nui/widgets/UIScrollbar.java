@@ -19,7 +19,11 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -29,7 +33,7 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 /**
  * A simple scrollbar
  */
-public class UIScrollbar extends CoreWidget {//WidgetWithOrder {
+public class UIScrollbar extends CoreWidget {
 
     @LayoutConfig
     private Binding<Integer> minimum = new DefaultBinding<>(0);
@@ -180,7 +184,7 @@ public class UIScrollbar extends CoreWidget {//WidgetWithOrder {
 
     @Override
     public String getMode() {
-        if (dragging || isFocused()) {
+        if (dragging) {
             return ACTIVE_MODE;
         } else if (handleListener.isMouseOver()) {
             return HOVER_MODE;
@@ -254,9 +258,9 @@ public class UIScrollbar extends CoreWidget {//WidgetWithOrder {
 
     public void moveDown(boolean increase) {
         if (increase) {
-            updatePosition(getValue()+handleSize);
+            updatePosition(getValue() + handleSize);
         } else {
-            updatePosition(getValue()-handleSize);
+            updatePosition(getValue() - handleSize);
         }
     }
 }

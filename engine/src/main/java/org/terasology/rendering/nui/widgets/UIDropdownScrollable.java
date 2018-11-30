@@ -194,7 +194,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         } else if (i == highlighted) {
             canvas.setMode(HOVER_MODE);
             setSelection(getOptions().get(highlighted));
-        } else{
+        } else {
             canvas.setMode(DEFAULT_MODE);
         }
     }
@@ -298,7 +298,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
     public void setOpenedReverse() {
         opened = !opened;
-        logger.info("opened? "+opened);
         if (opened) {
             for (int i = 0; i < getOptions().size(); ++i) {
                 optionListeners.add(new UIDropdownScrollable.ItemListener(i));
@@ -314,7 +313,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                 highlighted = 0;
                 verticalBar.setValue(verticalBar.getMinimum());
             } else {
-                int scrollMultiplier = 0 - (verticalBar.getRange()*visibleOptionsNum) / (itemHeight*(optionListeners.size()/visibleOptionsNum));
+                int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
                 verticalBar.setValue(verticalBar.getValue() - scrollMultiplier);
             }
         } else {
@@ -323,13 +322,14 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                 highlighted = getOptions().size()-1;
                 verticalBar.setValue(verticalBar.getRange()-verticalBar.getMinimum());
             } else {
-                int scrollMultiplier = 0 - (verticalBar.getRange()*visibleOptionsNum) / (itemHeight*(optionListeners.size()/visibleOptionsNum));
+                int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
                 verticalBar.setValue(verticalBar.getValue() + scrollMultiplier);
             }
         }
-        logger.info("vectical bar value: "+verticalBar.getValue());
         setSelection(getOptions().get(highlighted));
     }
 
-    public boolean isOpened() { return opened; }
+    public boolean isOpened() {
+        return opened;
+    }
 }

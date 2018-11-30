@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.nui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.TabbingUIButton;
@@ -90,7 +88,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     public void onOpened() {
         modifyingList = false;
         activateBindEvent = false;
-        TabbingManagerSystem.setInitialized(false);
+        TabbingManager.setInitialized(false);
 
         animationSystem.triggerFromPrev();
         onScreenOpened();
@@ -98,44 +96,37 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     private void iterateThrough(Iterator<UIWidget> widgets) {
         modifyingList = true;
-        Logger logger = LoggerFactory.getLogger(CoreScreenLayer.class);
-        while(widgets.hasNext()) {
+        while (widgets.hasNext()) {
             UIWidget next = widgets.next();
             boolean setParent = false;
             if (next instanceof ScrollableArea) {
-                logger.info("TO SET PARENT");
                 parentToSet = (ScrollableArea) next;
                 setParent = true;
             } else if (next instanceof UILayout || next instanceof WidgetWithOrder) {
-                logger.info("will set PARENT");
                 setParent = true;
             }
-            logger.info("id: "+next);
             if (next instanceof  WidgetWithOrder) {
-                logger.info("instance");
-                TabbingManagerSystem.addToWidgetsList((WidgetWithOrder) next);
-                TabbingManagerSystem.addToUsedNums(((WidgetWithOrder) next).order);
+                TabbingManager.addToWidgetsList((WidgetWithOrder) next);
+                TabbingManager.addToUsedNums(((WidgetWithOrder) next).order);
                 if (setParent) {
                     ((WidgetWithOrder) next).setParent(parentToSet);
                 }
-                logger.info(next.toString());
             }
             if (next.iterator().hasNext()) {
-                logger.info("hasNext");
                 iterateThrough(next.iterator());
             } else if (next instanceof UIRadialRing) {
                 Iterator<UIRadialSection> iter = ((UIRadialRing) next).getSections().iterator();
-                while(iter.hasNext()) {
+                while (iter.hasNext()) {
                     next = iter.next();
-                    TabbingManagerSystem.addToWidgetsList((WidgetWithOrder) next);
-                    TabbingManagerSystem.addToUsedNums(((WidgetWithOrder) next).order);
+                    TabbingManager.addToWidgetsList((WidgetWithOrder) next);
+                    TabbingManager.addToUsedNums(((WidgetWithOrder) next).order);
                     if (setParent) {
                         ((WidgetWithOrder) next).setParent(parentToSet);
                     }
                 }
             }
         }
-        modifyingList=false;
+        modifyingList = false;
     }
 
     /**
@@ -146,7 +137,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
      * (e.g., a parent menu in the menu system) is returned to (as {@code onShow}).
      */
     public void onScreenOpened() {
-        TabbingManagerSystem.openScreen = this;
+        TabbingManager.setOpenScreen(this);
     }
 
     @Override
@@ -183,10 +174,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 onBindEvent(new TabbingUIButton());
             }
 
-            if (!TabbingManagerSystem.isInitialized()) {
-
-                logger.info("initializing");
-                TabbingManagerSystem.init();
+            if (!TabbingManager.isInitialized()) {
+                TabbingManager.init();
 
                 Iterator<UIWidget> widgets = contents.iterator();
                 iterateThrough(widgets);
@@ -205,8 +194,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onClosed() {
-        logger.info("CLOSING");
-        TabbingManagerSystem.setInitialized(false);
+        TabbingManager.setInitialized(false);
     }
 
     @Override
@@ -217,8 +205,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onHide() {
-        logger.info("HIDING");
-        TabbingManagerSystem.setInitialized(false);
+        TabbingManager.setInitialized(false);
     }
 
     @Override
@@ -227,8 +214,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onLoseFocus() {
-        logger.info("LOST FOCUS");
-        TabbingManagerSystem.setInitialized(false);
+        TabbingManager.setInitialized(false);
     }
 
     @Override
