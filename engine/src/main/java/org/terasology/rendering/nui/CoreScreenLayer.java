@@ -98,7 +98,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onOpened() {
-<<<<<<< HEAD
         if (depth == SortOrderSystem.DEFAULT_DEPTH) {
             setDepthAuto();
         }
@@ -107,12 +106,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 SortOrderSystem.getUsed().add(depth);
             }
         }
-=======
         modifyingList = false;
         activateBindEvent = false;
         TabbingManager.setInitialized(false);
 
->>>>>>> uiWidgetTabbing
         animationSystem.triggerFromPrev();
         onScreenOpened();
     }
@@ -187,13 +184,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
      * (e.g., a parent menu in the menu system) is returned to (as {@code onShow}).
      */
     public void onScreenOpened() {
-<<<<<<< HEAD
         if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(true);
         }
-=======
         TabbingManager.setOpenScreen(this);
->>>>>>> uiWidgetTabbing
     }
 
     @Override
@@ -226,11 +220,9 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         if (contents != null) {
             contents.update(delta);
             animationSystem.update(delta);
-<<<<<<< HEAD
-
             if (depth == SortOrderSystem.DEFAULT_DEPTH) {
                 setDepthAuto();
-=======
+            }
             if (activateBindEvent) {
                 onBindEvent(new TabbingUIButton());
             }
@@ -240,7 +232,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
                 Iterator<UIWidget> widgets = contents.iterator();
                 iterateThrough(widgets);
->>>>>>> uiWidgetTabbing
             }
         }
     }
@@ -256,13 +247,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onClosed() {
-<<<<<<< HEAD
         if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(false);
         }
-=======
         TabbingManager.setInitialized(false);
->>>>>>> uiWidgetTabbing
     }
 
     @Override
@@ -273,13 +261,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onHide() {
-<<<<<<< HEAD
         if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(false);
         }
-=======
         TabbingManager.setInitialized(false);
->>>>>>> uiWidgetTabbing
     }
 
     @Override
