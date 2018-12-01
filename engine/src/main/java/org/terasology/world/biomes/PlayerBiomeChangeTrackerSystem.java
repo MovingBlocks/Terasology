@@ -15,8 +15,6 @@
  */
 package org.terasology.world.biomes;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -29,11 +27,13 @@ import org.terasology.physics.events.MovedEvent;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 
+/**
+ * This system is responsible for sending {@link BiomeChangeEvent} whenever applicable.
+ */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlayerBiomeChangeTrackerSystem extends BaseComponentSystem {
     @In
     private WorldProvider world;
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlayerBiomeChangeTrackerSystem.class);
 
     @ReceiveEvent(components = {PlayerCharacterComponent.class})
     public void checkForBiomeChange(MovedEvent event, EntityRef entity) {
@@ -46,7 +46,6 @@ public class PlayerBiomeChangeTrackerSystem extends BaseComponentSystem {
         final Biome newBiome = world.getBiome(newPos);
         if (!oldBiome.equals(newBiome)) {
             entity.send(new BiomeChangeEvent(oldBiome, newBiome));
-            LOGGER.info("Biome changed: " + newBiome.getName());
         }
     }
 }

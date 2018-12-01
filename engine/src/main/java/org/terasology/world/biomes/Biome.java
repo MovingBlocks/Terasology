@@ -17,6 +17,11 @@ package org.terasology.world.biomes;
 
 import org.terasology.module.sandbox.API;
 
+/**
+ * Biomes can be assigned to different blocks during worldgen as well as on runtime, to provide additional metadata
+ * about player's surroundings usable to enhance player experience.
+ * @see BiomeChangeEvent
+ */
 @API
 public interface Biome {
 

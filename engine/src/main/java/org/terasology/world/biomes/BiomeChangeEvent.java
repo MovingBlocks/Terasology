@@ -17,6 +17,10 @@ package org.terasology.world.biomes;
 
 import org.terasology.entitySystem.event.Event;
 
+/**
+ * This event is thrown to entities with {@link org.terasology.logic.players.PlayerCharacterComponent} whenever they
+ * change the biome they are in.
+ */
 public class BiomeChangeEvent implements Event {
     private Biome oldBiome;
     private Biome newBiome;
@@ -26,10 +30,16 @@ public class BiomeChangeEvent implements Event {
         this.newBiome = newBiome;
     }
 
+    /**
+     * @return Biome the entity just left
+     */
     public Biome getOldBiome() {
         return oldBiome;
     }
 
+    /**
+     * @return Biome the entity just entered
+     */
     public Biome getNewBiome() {
         return newBiome;
     }
