@@ -33,9 +33,9 @@ import java.io.OutputStream;
 /**
  * ProtobufSerializer provides the ability to serialize and deserialize between objects and bytes
  * <br><br>
- * Serialized bytes can be forwarded/written to a File object, a File with a specific file name or OutputStream
+ * Serialized bytes can be forwarded/written to various output types
  * <br><br>
- * Bytes from byte arrays, File objects, and InputStreams can be deserialized and returned as PersistedData objects
+ * Various input types of serialized bytes can be deserialized and returned as PersistedData objects
  *
  */
 public class ProtobufSerializer {
