@@ -17,6 +17,7 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.collect.Queues;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -29,6 +30,7 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.Keyboard;
 import org.terasology.input.internal.BindableButtonImpl;
+import org.terasology.logic.console.ui.ConsoleScreen;
 import org.terasology.registry.In;
 
 import java.util.ArrayList;
@@ -49,7 +51,7 @@ public class SortOrderSystem extends BaseComponentSystem {
     private static ArrayList<CoreScreenLayer> enabledWidgets;
     private static boolean initialized = false;
     private static ArrayList<Integer> used;
-    private static boolean modifierPressed;
+    private static boolean controlPressed;
 
     @In
     private BindsManager bindsManager;
@@ -59,13 +61,16 @@ public class SortOrderSystem extends BaseComponentSystem {
      */
      public void postBegin() {
         initialized = true;
-        modifierPressed = false;
+        controlPressed = false;
         Map<Integer, BindableButton> keys = bindsManager.getKeyBinds();
-
-         BindButtonSubscriber shiftSubscriber = new BindButtonSubscriber() {
+         BindButtonSubscriber controlSubscriber = new BindButtonSubscriber() {
              @Override
              public boolean onPress(float delta, EntityRef target) {
-                 modifierPressed = true;
+                 if (!containsConsole()) {
+                     controlPressed = true;
+                 } else {
+                     controlPressed = false;
+                 }
                  return false;
              }
 
@@ -76,14 +81,14 @@ public class SortOrderSystem extends BaseComponentSystem {
 
              @Override
              public boolean onRelease(float delta, EntityRef target) {
-                 modifierPressed = false;
+                 controlPressed = false;
                  return false;
              }
          };
          BindButtonSubscriber tabSubscriber = new BindButtonSubscriber() {
              @Override
              public boolean onPress(float delta, EntityRef target) {
-                 if (modifierPressed) {
+                 if (controlPressed) {
                      target.send(new FocusChangedEvent());
                  }
                  return false;
@@ -91,7 +96,7 @@ public class SortOrderSystem extends BaseComponentSystem {
 
              @Override
              public boolean onRepeat(float delta, EntityRef target) {
-                 if (modifierPressed) {
+                 if (controlPressed) {
                      target.send(new FocusChangedEvent());
                  }
                  return false;
@@ -103,17 +108,17 @@ public class SortOrderSystem extends BaseComponentSystem {
              }
          };
 
-         if (keys.containsKey(Keyboard.Key.LEFT_SHIFT.getId())) {
-             keys.get(Keyboard.Key.LEFT_SHIFT.getId()).subscribe(shiftSubscriber);
+         if (keys.containsKey(Keyboard.Key.RIGHT_CTRL.getId())) {
+             keys.get(Keyboard.Key.RIGHT_CTRL.getId()).subscribe(controlSubscriber);
          } else {
-             keys.put(Keyboard.Key.LEFT_SHIFT.getId(), new BindableButtonImpl(new SimpleUri("changeFocusMod"), "Change Focus Modifier", new BindButtonEvent()));
-             keys.get(Keyboard.Key.LEFT_SHIFT.getId()).subscribe(shiftSubscriber);
+             keys.put(Keyboard.Key.RIGHT_CTRL.getId(), new BindableButtonImpl(new SimpleUri("ctrlMod"), "Control Modifier", new BindButtonEvent()));
+             keys.get(Keyboard.Key.RIGHT_CTRL.getId()).subscribe(controlSubscriber);
          }
-         if (keys.containsKey(Keyboard.Key.RIGHT_SHIFT.getId())) {
-             keys.get(Keyboard.Key.RIGHT_SHIFT.getId()).subscribe(shiftSubscriber);
+         if (keys.containsKey(Keyboard.Key.LEFT_CTRL.getId())) {
+             keys.get(Keyboard.Key.LEFT_CTRL.getId()).subscribe(controlSubscriber);
          } else {
-             keys.put(Keyboard.Key.RIGHT_SHIFT.getId(), new BindableButtonImpl(new SimpleUri("changeFocusMod"), "Change Focus Modifier", new BindButtonEvent()));
-             keys.get(Keyboard.Key.RIGHT_SHIFT.getId()).subscribe(shiftSubscriber);
+             keys.put(Keyboard.Key.LEFT_CTRL.getId(), new BindableButtonImpl(new SimpleUri("ctrlMod"), "Control Modifier", new BindButtonEvent()));
+             keys.get(Keyboard.Key.LEFT_CTRL.getId()).subscribe(controlSubscriber);
          }
          if (keys.containsKey(Keyboard.Key.TAB.getId())) {
              keys.get(Keyboard.Key.TAB.getId()).subscribe(tabSubscriber);
@@ -262,7 +267,20 @@ public class SortOrderSystem extends BaseComponentSystem {
         used = other;
     }
 
-    public static boolean getModifierPressed() {
-        return modifierPressed;
+    public static boolean containsConsole() {
+        if (enabledWidgets != null) {
+            boolean containsConsole = false;
+            for (CoreScreenLayer layer : enabledWidgets) {
+                if (layer instanceof ConsoleScreen) {
+                    LoggerFactory.getLogger("").info("console open");
+                    containsConsole = true;
+                }
+            }
+            return containsConsole;
+        }
+        return false;
+    }
+    public static boolean getControlPressed() {
+        return controlPressed;
     }
 }

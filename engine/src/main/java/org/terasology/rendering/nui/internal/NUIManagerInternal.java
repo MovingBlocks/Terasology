@@ -47,6 +47,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.registry.InjectionHelper;
+import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
@@ -444,7 +445,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void addOverlay(ControlWidget overlay, ResourceUrn uri) {
-        if (!SortOrderSystem.getModifierPressed() || !overlay.getClass().equals(OnlinePlayersOverlay.class)) {
+        if (!AbstractWidget.getShiftPressed() || !SortOrderSystem.getControlPressed() || !overlay.getClass().equals(OnlinePlayersOverlay.class)) {
             overlay.onOpened();
             overlays.put(uri, overlay);
         }

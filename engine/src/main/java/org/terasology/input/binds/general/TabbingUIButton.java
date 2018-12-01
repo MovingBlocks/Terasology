@@ -26,6 +26,6 @@ import org.terasology.input.RegisterBindButton;
  * Enables tabbing between widgets.
  */
 @RegisterBindButton(id = "tabbingUI", description = "${engine:menu#binding-tabbing-ui}", category = "general")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.RIGHT_SHIFT)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.TAB)
 public class TabbingUIButton extends BindButtonEvent {
 }

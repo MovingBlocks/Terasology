@@ -63,7 +63,7 @@ public class TabbingManager {
         if (currentNum < 0 && usedNums.size() > 0) {
             currentNum = Collections.max(usedNums);
         }
-        while (!usedNums.contains(currentNum)) {
+        while (!usedNums.contains(currentNum) && usedNums.size()>0) {
             if (increase) {
                 currentNum++;
             } else {

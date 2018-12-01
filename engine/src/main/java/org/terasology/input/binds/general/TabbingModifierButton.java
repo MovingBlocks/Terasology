@@ -23,9 +23,9 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
- * Enables tabbing between widgets in reverse
+ * Enables tabbing between widgets.
  */
-@RegisterBindButton(id = "tabbingUIBack", description = "${engine:menu#binding-tabbing-ui-back}", category = "general")
+@RegisterBindButton(id = "tabbingModifier", description = "${engine:menu#binding-tabbing-modifier}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.LEFT_SHIFT)
-public class TabbingUIBackButton extends BindButtonEvent {
+public class TabbingModifierButton extends BindButtonEvent {
 }

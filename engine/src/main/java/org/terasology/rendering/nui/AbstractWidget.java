@@ -57,6 +57,8 @@ public abstract class AbstractWidget implements UIWidget {
 
     private boolean focused;
 
+    private static boolean shiftPressed;
+
     @LayoutConfig
     private Binding<Boolean> enabled = new DefaultBinding<>(true);
 
@@ -283,31 +285,19 @@ public abstract class AbstractWidget implements UIWidget {
 
     @Override
     public void onBindEvent(BindButtonEvent event) {
-        if (event.getState().equals(ButtonState.DOWN)) {
-            boolean currentNumChanged = false;
-            if (event.getId().equals(new SimpleUri("engine:tabbingUI")) && event.getState().equals(ButtonState.DOWN)) {
-                TabbingManager.focusSetThrough = true;
-                TabbingManager.changeCurrentNum(true);
-                currentNumChanged = true;
+        if (event.getState().equals(ButtonState.DOWN) && !SortOrderSystem.containsConsole()) {
 
-                event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
-            } else if (event.getId().equals(new SimpleUri("engine:tabbingUIBack")) && event.getState().equals(ButtonState.DOWN)) {
-                TabbingManager.focusSetThrough = true;
-                TabbingManager.changeCurrentNum(false);
-                currentNumChanged = true;
-
-                event.prepare(new SimpleUri("engine:tabbingUIBack"), ButtonState.UP, event.getDelta());
-            } else if (event.getId().equals(new SimpleUri("engine:activate")) && event.getState().equals(ButtonState.DOWN)) {
-                if (TabbingManager.focusedWidget instanceof UIDropdown) {
-                    ((UIDropdown) TabbingManager.focusedWidget).setOpenedReverse();
-                } else if  (TabbingManager.focusedWidget instanceof ActivateableWidget) {
-                    ((ActivateableWidget) TabbingManager.focusedWidget).activateWidget();
-                }
-
-                event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
+            if (event.getId().equals(new SimpleUri("engine:tabbingModifier"))) {
+                shiftPressed = true;
             }
 
-            if (currentNumChanged) {
+            if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
+                TabbingManager.focusSetThrough = true;
+                if (shiftPressed) {
+                    TabbingManager.changeCurrentNum(false);
+                } else {
+                    TabbingManager.changeCurrentNum(true);
+                }
                 for (WidgetWithOrder widget : TabbingManager.getWidgetsList()) {
                     if (widget.getOrder() == TabbingManager.getCurrentNum()) {
                         if (!widget.isEnabled()) {
@@ -325,7 +315,24 @@ public abstract class AbstractWidget implements UIWidget {
                         }
                     }
                 }
+
+                event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
+            } else if (event.getId().equals(new SimpleUri("engine:activate"))) {
+                if (TabbingManager.focusedWidget instanceof UIDropdown) {
+                    ((UIDropdown) TabbingManager.focusedWidget).setOpenedReverse();
+                } else if  (TabbingManager.focusedWidget instanceof ActivateableWidget) {
+                    ((ActivateableWidget) TabbingManager.focusedWidget).activateWidget();
+                }
+
+                event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
+            }
+        }
+        if (event.getState().equals(ButtonState.UP) && !SortOrderSystem.containsConsole()) {
+
+            if (event.getId().equals(new SimpleUri("engine:tabbingModifier"))) {
+                shiftPressed = false;
             }
         }
     }
+    public static boolean getShiftPressed() { return shiftPressed; }
 }
