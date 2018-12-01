@@ -38,7 +38,7 @@ import java.util.Iterator;
 
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 
-    public static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
+    private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             return true;
@@ -121,17 +121,14 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             boolean setParent = false;
             if (next instanceof ScrollableArea) {
                 parentToSet = (ScrollableArea) next;
-                setParent = true;
-            } else if (next instanceof UILayout || next instanceof WidgetWithOrder) {
-                setParent = true;
             }
-            if (next instanceof  WidgetWithOrder) {
+
+            if (next instanceof WidgetWithOrder) {
                 TabbingManager.addToWidgetsList((WidgetWithOrder) next);
                 TabbingManager.addToUsedNums(((WidgetWithOrder) next).order);
-                if (setParent) {
-                    ((WidgetWithOrder) next).setParent(parentToSet);
-                }
+                ((WidgetWithOrder) next).setParent(parentToSet);
             }
+
             if (next.iterator().hasNext()) {
                 iterateThrough(next.iterator());
             } else if (next instanceof UIRadialRing) {

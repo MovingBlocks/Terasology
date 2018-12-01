@@ -303,6 +303,8 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                 optionListeners.add(new UIDropdownScrollable.ItemListener(i));
             }
             setSelection(getOptions().get(0));
+        } else {
+            optionListeners.clear();
         }
     }
 

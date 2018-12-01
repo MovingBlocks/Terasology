@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.widgets;
 
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.ActivateableWidget;
+import org.terasology.rendering.nui.ActivatableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
@@ -28,7 +28,7 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 /**
  * A check-box. Hovering is supported.
  */
-public class UICheckbox extends ActivateableWidget {
+public class UICheckbox extends ActivatableWidget {
     public static final String HOVER_ACTIVE_MODE = "hover-active";
 
     private Binding<Boolean> active = new DefaultBinding<>(false);
@@ -39,6 +39,7 @@ public class UICheckbox extends ActivateableWidget {
         public boolean onMouseClick(NUIMouseClickEvent event) {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 active.set(!active.get());
+                UICheckbox.super.activateWidget();
                 return true;
             }
             return false;

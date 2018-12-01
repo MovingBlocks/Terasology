@@ -23,7 +23,8 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
- * Enables tabbing between widgets.
+ * Modifies the behaviour of tabbing between widgets
+ * Currently this reverses the tab order
  */
 @RegisterBindButton(id = "tabbingModifier", description = "${engine:menu#binding-tabbing-modifier}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.LEFT_SHIFT)

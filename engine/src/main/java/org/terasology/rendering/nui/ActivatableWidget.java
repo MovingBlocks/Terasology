@@ -24,13 +24,13 @@ import java.util.List;
 /**
  * A widget that can be activated when tabbed to.
  */
-public abstract class ActivateableWidget extends WidgetWithOrder {
+public abstract class ActivatableWidget extends WidgetWithOrder {
 
-    public ActivateableWidget() {
+    public ActivatableWidget() {
         this.setId("");
     }
 
-    public ActivateableWidget(String id) {
+    public ActivatableWidget(String id) {
         this.setId(id);
     }
     /**

@@ -21,7 +21,7 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.ActivateableWidget;
+import org.terasology.rendering.nui.ActivatableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
@@ -44,7 +44,7 @@ import java.util.Objects;
  *
  * @param <T> the list element type
  */
-public class UIList<T> extends ActivateableWidget {
+public class UIList<T> extends ActivatableWidget {
 
     private final List<ItemActivateEventListener<T>> activateListeners = Lists.newArrayList();
     private final List<ItemSelectEventListener<T>> selectionListeners = Lists.newArrayList();
@@ -54,7 +54,7 @@ public class UIList<T> extends ActivateableWidget {
     private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
     private Binding<Boolean> canBeFocus = new DefaultBinding<>(true);
-    private int listMin = -1;
+    private int shownOnScreen;
 
     private List<InteractionListener> optionListeners = Lists.newArrayList();
 
@@ -68,10 +68,6 @@ public class UIList<T> extends ActivateableWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (listMin < 0) {
-            listMin = 0;
-            select(listMin);
-        }
         updateItemListeners();
         canvas.setPart("item");
 
@@ -79,10 +75,11 @@ public class UIList<T> extends ActivateableWidget {
         Border margin = canvas.getCurrentStyle().getMargin();
 
         int yOffset = 0;
-        for (int i = listMin; i < list.get().size(); ++i) {
+        for (int i = 0; i < list.get().size(); ++i) {
             T item = list.get().get(i);
             Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
-            //int adjustment = (preferredSize.getY()*optionListeners.indexOf(selection.get()));
+            shownOnScreen = getPreferredContentSize(canvas, preferredSize).y /itemRenderer.getPreferredSize(item, canvas).y;
+
             Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
             ItemInteractionListener listener = (ItemInteractionListener) optionListeners.get(i);
             if (enabled) {
@@ -108,12 +105,6 @@ public class UIList<T> extends ActivateableWidget {
     }
 
     private void updateItemListeners() {
-        /*
-        for (int i=0; i<listMin; i++) {
-            if (optionListeners.size() > 1) {
-                optionListeners.remove(0);
-            }
-        }*/
         while (optionListeners.size() > list.get().size()) {
             optionListeners.remove(optionListeners.size() - 1);
         }
@@ -345,15 +336,18 @@ public class UIList<T> extends ActivateableWidget {
             int currentIndex = getCurrentIndex();
             if (currentIndex != -1) {
                 if (keyId == Keyboard.KeyId.UP) {
-                    if (listMin > 0) {
-                        listMin--;
+                    if (getParent() != null) {
+                        getParent().scroll((double)1 / (optionListeners.size() * shownOnScreen));
                     }
+
                     select(currentIndex - 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.DOWN) {
-                    if (listMin < list.get().size() - 1) {
-                        listMin++;
+
+                    if (getParent() != null) {
+                        getParent().scroll((double)-1 / (optionListeners.size() * shownOnScreen));
                     }
+
                     select(currentIndex + 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.ENTER || keyId == Keyboard.KeyId.SPACE) {

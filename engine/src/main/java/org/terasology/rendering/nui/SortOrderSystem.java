@@ -17,7 +17,6 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.collect.Queues;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -272,11 +271,9 @@ public class SortOrderSystem extends BaseComponentSystem {
             boolean containsConsole = false;
             for (CoreScreenLayer layer : enabledWidgets) {
                 if (layer instanceof ConsoleScreen) {
-                    LoggerFactory.getLogger("").info("console open");
-                    containsConsole = true;
+                    return true;
                 }
             }
-            return containsConsole;
         }
         return false;
     }

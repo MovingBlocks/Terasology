@@ -20,7 +20,7 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.ActivateableWidget;
+import org.terasology.rendering.nui.ActivatableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * A widget displaying a clickable button, containing text and an optional image
  */
-public class UIButton extends ActivateableWidget {
+public class UIButton extends ActivatableWidget {
     public static final String DOWN_MODE = "down";
 
     /**

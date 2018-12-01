@@ -108,6 +108,10 @@ public class ScrollableArea extends CoreLayout {
         }
     };
 
+    /**
+     * Scrolls the equivalent of 1 mouse wheel.
+     * @param up If to scroll up or down.
+     */
     public void scroll(boolean up) {
         int moveAmount = -1;
         if (up) {
@@ -117,6 +121,20 @@ public class ScrollableArea extends CoreLayout {
             verticalBar.setValue(verticalBar.getValue() + moveAmount * SCROLL_MULTIPLIER);
         } else if (horizontalScrollbar) {
             horizontalBar.setValue(horizontalBar.getValue() + moveAmount * SCROLL_MULTIPLIER);
+        }
+    }
+
+    /**
+     * Scrolls the given amount.
+     * @param modifier The amount to scroll as a percent.
+     */
+    public void scroll(double modifier) {
+        if (verticalScrollbar) {
+            int moveAmount = (int)(SCROLL_MULTIPLIER * modifier * verticalBar.getRange());
+            verticalBar.setValue(verticalBar.getValue() + moveAmount);
+        } else if (horizontalScrollbar) {
+            int moveAmount = (int)(SCROLL_MULTIPLIER * modifier * horizontalBar.getRange());
+            horizontalBar.setValue(horizontalBar.getValue() + moveAmount);
         }
     }
 

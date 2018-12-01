@@ -16,11 +16,12 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+import org.terasology.input.Keyboard;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.ActivateableWidget;
+import org.terasology.rendering.nui.ActivatableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
@@ -28,6 +29,7 @@ import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
@@ -39,7 +41,7 @@ import java.util.List;
  * A dropdown widget.
  * @param <T> the list element type
  */
-public class UIDropdown<T> extends ActivateableWidget {
+public class UIDropdown<T> extends ActivatableWidget {
 
     private List<InteractionListener> optionListeners = Lists.newArrayList();
 
@@ -104,6 +106,7 @@ public class UIDropdown<T> extends ActivateableWidget {
 
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
             canvas.setPart(LIST_ITEM);
+
             for (int i = 0; i < optionListeners.size(); ++i) {
                 if (optionListeners.get(i).isMouseOver()) {
                     canvas.setMode(HOVER_MODE);
@@ -208,6 +211,8 @@ public class UIDropdown<T> extends ActivateableWidget {
             for (int i = 0; i < getOptions().size(); ++i) {
                 optionListeners.add(new ItemListener(i));
             }
+        } else {
+            optionListeners.clear();
         }
     }
 
@@ -242,4 +247,37 @@ public class UIDropdown<T> extends ActivateableWidget {
     }
 
     public boolean isOpened() { return opened; }
+
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown()) {
+            int keyId = event.getKey().getId();
+            if (keyId == Keyboard.KeyId.UP) {
+                if (((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
+                    TabbingManager.setWidgetIsOpen(true);
+                    ((UIDropdown) TabbingManager.focusedWidget).changeHighlighted(false);
+                } else {
+                    TabbingManager.setWidgetIsOpen(false);
+                }
+
+                if (parent != null && !TabbingManager.isWidgetOpen()) {
+                    parent.scroll(true);
+                }
+                return true;
+            } else if (keyId == Keyboard.KeyId.DOWN) {
+                if (((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
+                    TabbingManager.setWidgetIsOpen(true);
+                    ((UIDropdown) TabbingManager.focusedWidget).changeHighlighted(true);
+                } else {
+                    TabbingManager.setWidgetIsOpen(false);
+                }
+
+                if (parent != null && !TabbingManager.isWidgetOpen()) {
+                    parent.scroll(false);
+                }
+                return true;
+            }
+        }
+        return super.onKeyEvent(event);
+    }
 }

@@ -293,11 +293,8 @@ public abstract class AbstractWidget implements UIWidget {
 
             if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
                 TabbingManager.focusSetThrough = true;
-                if (shiftPressed) {
-                    TabbingManager.changeCurrentNum(false);
-                } else {
-                    TabbingManager.changeCurrentNum(true);
-                }
+                TabbingManager.changeCurrentNum(!shiftPressed);
+
                 for (WidgetWithOrder widget : TabbingManager.getWidgetsList()) {
                     if (widget.getOrder() == TabbingManager.getCurrentNum()) {
                         if (!widget.isEnabled()) {
@@ -320,8 +317,8 @@ public abstract class AbstractWidget implements UIWidget {
             } else if (event.getId().equals(new SimpleUri("engine:activate"))) {
                 if (TabbingManager.focusedWidget instanceof UIDropdown) {
                     ((UIDropdown) TabbingManager.focusedWidget).setOpenedReverse();
-                } else if  (TabbingManager.focusedWidget instanceof ActivateableWidget) {
-                    ((ActivateableWidget) TabbingManager.focusedWidget).activateWidget();
+                } else if  (TabbingManager.focusedWidget instanceof ActivatableWidget) {
+                    ((ActivatableWidget) TabbingManager.focusedWidget).activateWidget();
                 }
 
                 event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
@@ -334,5 +331,7 @@ public abstract class AbstractWidget implements UIWidget {
             }
         }
     }
-    public static boolean getShiftPressed() { return shiftPressed; }
+    public static boolean getShiftPressed() {
+        return shiftPressed;
+    }
 }

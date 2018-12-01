@@ -22,16 +22,16 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
  * An animated loading bar
  */
-public class UILoadBar extends WidgetWithOrder {
+public class UILoadBar extends CoreWidget {
 
     @LayoutConfig
     private TextureRegion fillTexture;

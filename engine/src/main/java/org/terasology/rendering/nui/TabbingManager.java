@@ -40,6 +40,9 @@ public class TabbingManager {
     private static ArrayList<WidgetWithOrder> widgetsList;
     private static boolean initialized = false;
 
+    /**
+     * Resets TabbingManager values.
+     */
     public static void init() {
         widgetIsOpen = false;
         focusedWidget = null;
@@ -52,18 +55,17 @@ public class TabbingManager {
         initialized = true;
     }
 
+    /**
+     * Changes (increases or decreases) currentNum.
+     * @param increase if currentNumber should be increased.
+     */
     public static void changeCurrentNum(boolean increase) {
         boolean loopedOnce = false;
-        if (increase) {
-            currentNum++;
-        } else {
-            currentNum--;
-        }
+        boolean adjusted = false;
 
-        if (currentNum < 0 && usedNums.size() > 0) {
-            currentNum = Collections.max(usedNums);
-        }
-        while (!usedNums.contains(currentNum) && usedNums.size()>0) {
+        while ((!adjusted || !usedNums.contains(currentNum)) && usedNums.size()>0) {
+            adjusted = true;
+
             if (increase) {
                 currentNum++;
             } else {
@@ -82,6 +84,11 @@ public class TabbingManager {
             }
         }
     }
+
+    /**
+     * Gives an unused number.
+     * @return a new number for order
+     */
     public static int getNewNextNum() {
         nextNum++;
         maxNum++;
@@ -91,6 +98,11 @@ public class TabbingManager {
         }
         return nextNum;
     }
+
+    /**
+     * Adds the order value to usedNums.
+     * @param toAdd the number to add to usedNums.
+     */
     public static void addToUsedNums(int toAdd) {
         if (!usedNums.contains(toAdd)) {
             usedNums.add(toAdd);
@@ -99,11 +111,20 @@ public class TabbingManager {
             }
         }
     }
+
+    /**
+     * Adds a widget to usedNums.
+     * @param widget the widget to add to usedNums.
+     */
     public static void addToWidgetsList(WidgetWithOrder widget) {
         if (!widgetsList.contains(widget)) {
             widgetsList.add(widget);
         }
     }
+
+    /**
+     * Resets currentNum to zero.
+     */
     public static void resetCurrentNum() {
         currentNum = 0;
     }

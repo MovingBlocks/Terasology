@@ -23,7 +23,8 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
- * Enables activation of selected widget.
+ * Activates the selected widget.
+ * Activation is the same as being clicked.
  */
 @RegisterBindButton(id = "activate", description = "${engine:menu#binding-activate}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.ENTER)

@@ -19,7 +19,6 @@ package org.terasology.rendering.nui;
 import org.terasology.input.Keyboard;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
-import org.terasology.rendering.nui.widgets.UIDropdown;
 
 /**
  * Parent for widgets that can be tabbed to.
@@ -32,7 +31,7 @@ public abstract class WidgetWithOrder extends CoreWidget {
 
     private boolean added = false;
 
-    private ScrollableArea parent;
+    protected ScrollableArea parent;
 
     public WidgetWithOrder() {
         this.setId("");
@@ -74,34 +73,17 @@ public abstract class WidgetWithOrder extends CoreWidget {
         }
         return order;
     }
+
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown()) {
             int keyId = event.getKey().getId();
             if (keyId == Keyboard.KeyId.UP) {
-                if (TabbingManager.focusedWidget instanceof UIDropdown) {
-                    if (((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
-                        TabbingManager.setWidgetIsOpen(true);
-                        ((UIDropdown) TabbingManager.focusedWidget).changeHighlighted(false);
-                    } else {
-                        TabbingManager.setWidgetIsOpen(false);
-                    }
-                }
-
                 if (parent != null && !TabbingManager.isWidgetOpen()) {
                     parent.scroll(true);
                 }
                 return true;
             } else if (keyId == Keyboard.KeyId.DOWN) {
-                if (TabbingManager.focusedWidget instanceof UIDropdown) {
-                    if (((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
-                        TabbingManager.setWidgetIsOpen(true);
-                        ((UIDropdown) TabbingManager.focusedWidget).changeHighlighted(true);
-                    } else {
-                        TabbingManager.setWidgetIsOpen(false);
-                    }
-                }
-
                 if (parent != null && !TabbingManager.isWidgetOpen()) {
                     parent.scroll(false);
                 }
