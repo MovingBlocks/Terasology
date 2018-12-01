@@ -207,12 +207,11 @@ public class UIDropdown<T> extends ActivatableWidget {
 
     public void setOpenedReverse() {
         opened = !opened;
+        optionListeners.clear();
         if (opened) {
             for (int i = 0; i < getOptions().size(); ++i) {
                 optionListeners.add(new ItemListener(i));
             }
-        } else {
-            optionListeners.clear();
         }
     }
 

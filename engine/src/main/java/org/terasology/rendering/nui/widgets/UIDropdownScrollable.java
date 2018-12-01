@@ -298,13 +298,12 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
     public void setOpenedReverse() {
         opened = !opened;
+        optionListeners.clear();
         if (opened) {
             for (int i = 0; i < getOptions().size(); ++i) {
                 optionListeners.add(new UIDropdownScrollable.ItemListener(i));
             }
             setSelection(getOptions().get(0));
-        } else {
-            optionListeners.clear();
         }
     }
 
