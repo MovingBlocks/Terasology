@@ -501,7 +501,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             }
         }
 
-        WidgetUtil.trySubscribe(this, "continue", button -> {
+        WidgetUtil.trySubscribe(this, "createWorld", button -> {
             final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             universeWrapper.setSeed(seed.getText());
             saveConfiguration();
@@ -524,7 +524,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             }
         });
 
-        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+        WidgetUtil.trySubscribe(this, "return", button -> triggerBackAnimation());
     }
 
     @Override

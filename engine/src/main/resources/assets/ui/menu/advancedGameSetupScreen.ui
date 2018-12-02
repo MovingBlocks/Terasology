@@ -37,70 +37,37 @@
         "type": "UIBox",
         "id": "container",
         "layoutInfo": {
-          "width": 850,
+          "width": 880,
           "position-horizontal-center": {},
           "position-top": {
-            "target": "BOTTOM",
-            "offset": 32,
-            "widget": "warning"
+            "target": "TOP",
+            "offset": -16,
+            "widget": "moduleContainer"
           },
           "position-bottom": {
-            "target": "TOP",
-            "widget": "actionsRow",
-            "offset": 16
+            "target": "BOTTOM",
+            "widget": "moduleContainer",
+            "offset": -16
           }
         }
       },
       {
         "type": "ColumnLayout",
-        "columns": 1,
-        "verticalSpacing": 8,
-        "horizontalSpacing": 8,
-        "layoutInfo": {
-          "width": 272,
-          "position-horizontal-center": {},
-          "position-top": {
-            "target": "TOP",
-            "widget": "container",
-            "offset": 4
-          },
-          "position-bottom": {
-            "target": "TOP",
-            "widget": "moduleContainer",
-            "offset": 4
-          }
-        },
-        "contents": [
-          {
-            "type": "UILabel",
-            "text": "${engine:menu#world-seed}"
-          },
-          {
-            "type": "UIText",
-            "id": "seed"
-          }
-        ]
-
-      },
-      {
-        "type": "ColumnLayout",
         "columns": 3,
         "verticalSpacing": 16,
-        "horizontalSpacing": 8,
+        "horizontalSpacing": 16,
         "id": "moduleContainer",
         "layoutInfo": {
-          "width": 834,
-          "position-horizontal-center": {},
+          "width": 860,
           "position-top": {
             "target": "TOP",
-            "widget": "container",
-            "offset": 64
+            "offset": 190
           },
           "position-bottom": {
-            "target": "TOP",
-            "widget": "actionsRow",
-            "offset": 24
-          }
+            "target": "BOTTOM",
+            "offset": 190
+          },
+          "position-horizontal-center": {}
         },
         "contents": [
           {
@@ -209,8 +176,10 @@
                 "layoutInfo": {
                   "use-content-height": true,
                   "position-horizontal-center": {},
-                  "position-top": {
-                    "target": "TOP"
+                  "position-bottom": {
+                    "target": "TOP",
+                    "widget": "advancedFilterResetButton",
+                    "offset": 8
                   }
                 }
               },
@@ -242,6 +211,33 @@
             "contents": [
               {
                 "type": "RowLayout",
+                "id": "seedLayout",
+                "layoutInfo": {
+                  "use-content-height": true,
+                  "position-top": {
+                    "target": "TOP"
+                  }
+                },
+                "contents": [
+                  {
+                    "type": "UILabel",
+                    "text": "${engine:menu#world-seed}: ",
+                    "layoutInfo": {
+                      "relativeWidth": 0.25
+                    }
+                  },
+                  {
+                    "type": "UIText",
+                    "id": "seed",
+                    "layoutInfo": {
+                      "relativeWidth": 0.75,
+                      "use-content-height": true
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "RowLayout",
                 "id": "searchLayout",
                 "contents": [
                   {
@@ -263,7 +259,9 @@
                 "layoutInfo": {
                   "use-content-height": true,
                   "position-top": {
-                    "target": "TOP"
+                    "target": "BOTTOM",
+                    "widget": "seedLayout",
+                    "offset": 8
                   }
                 }
               },
@@ -275,31 +273,23 @@
                   "family": "module-list"
                 },
                 "layoutInfo": {
-                  "position-horizontal-center": {},
                   "position-top": {
-                    "target": "TOP",
-                    "offset": 32
+                    "target": "BOTTOM",
+                    "widget": "searchLayout",
+                    "offset": 16
                   },
                   "position-bottom": {
                     "target": "TOP",
-                    "widget": "actionButtons",
+                    "widget": "disableModulesButton",
                     "offset": 8
                   }
                 }
               },
               {
-                "type": "RowLayout",
-                "id": "actionButtons",
-                "horizontalSpacing": 8,
-                "contents": [
-                  {
-                    "type": "UIButton",
-                    "id": "disableAll",
-                    "text": "${engine:menu#disable-all-modules}"
-                  }
-                ],
+                "type": "UIButton",
+                "id": "disableModulesButton",
+                "text": "${engine:menu#disable-all-modules}",
                 "layoutInfo": {
-                  "width": 250,
                   "height": 24,
                   "position-horizontal-center": {},
                   "position-bottom": {
@@ -381,6 +371,21 @@
                   },
                   "position-bottom": {
                     "target": "TOP",
+                    "widget": "moduleDetails",
+                    "offset": 8
+                  }
+                }
+              },
+              {
+                "type": "UIButton",
+                "text": "${engine:menu#game-details-module-details}",
+                "id": "moduleDetails",
+                "layoutInfo": {
+                  "use-content-width": true,
+                  "height": 24,
+                  "position-horizontal-center": {},
+                  "position-bottom": {
+                    "target": "TOP",
                     "widget": "buttonRow",
                     "offset": 8
                   }
@@ -418,12 +423,12 @@
       {
         "type": "RowLayout",
         "id": "actionsRow",
-        "horizontalSpacing": 4,
+        "horizontalSpacing": 32,
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#continue}",
-            "id": "continue"
+            "text": "Return to Basic Setup",
+            "id": "return"
           },
           {
             "type": "UIButton",
@@ -431,14 +436,14 @@
             "id": "play"
           },
           {
-              "type": "UIButton",
-              "text": "${engine:menu#game-details-module-details}",
-              "id": "moduleDetails"
+            "type": "UIButton",
+            "text": "Create Custom World",
+            "id": "createWorld"
           }
         ],
         "layoutInfo": {
-          "width": 400,
-          "height": 32,
+          "width": 600,
+          "height": 64,
           "position-horizontal-center": {},
           "position-bottom": {
             "target": "BOTTOM",
@@ -447,17 +452,21 @@
         }
       },
       {
-        "type": "UIButton",
-        "text": "${engine:menu#back}",
-        "id": "close",
+        "type": "UILabel",
+        "id": "loadWarning",
+        "text": "WARNING: Long Loading Delay",
+        "family": "warning",
         "layoutInfo": {
-          "width": 128,
-          "height": 32,
-          "position-horizontal-center": {},
+          "height": 12,
+          "use-content-width": true,
+          "position-horizontal-center": {
+            "target": "CENTER",
+            "widget": "actionsRow",
+            "offset": 211
+          },
           "position-top": {
             "target": "BOTTOM",
-            "widget": "actionsRow",
-            "offset": 16
+            "widget": "actionsRow"
           }
         }
       }

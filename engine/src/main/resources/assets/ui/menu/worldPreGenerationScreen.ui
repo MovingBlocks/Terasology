@@ -25,35 +25,28 @@
           "width": 720,
           "position-horizontal-center": {},
           "position-top": {
-            "target": "BOTTOM",
-            "offset": 16,
-            "widget": "title"
+            "target": "TOP",
+            "offset": -16,
+            "widget": "coreLayout"
           },
           "position-bottom": {
-            "target": "TOP",
-            "widget": "actionsRow",
-            "offset": 16
+            "target": "BOTTOM",
+            "offset": -16,
+            "widget": "coreLayout"
           }
         }
       },
       {
         "type": "ColumnLayout",
+        "id": "coreLayout",
         "columns": 2,
         "horizontalSpacing": 8,
         "column-widths": [0.53, 0.47],
         "layoutInfo": {
           "width": 704,
+          "use-content-height": true,
           "position-horizontal-center": {},
-          "position-top": {
-            "target": "TOP",
-            "widget": "container",
-            "offset": 8
-          },
-          "position-bottom": {
-            "target": "BOTTOM",
-            "widget": "container",
-            "offset": 8
-          }
+          "position-vertical-center": {}
         },
         "contents": [
           {
@@ -173,43 +166,37 @@
         ]
       },
       {
-        "type": "RowLayout",
-        "id": "actionsRow",
-        "horizontalSpacing": 4,
-        "contents": [
-          {
-            "type": "UIButton",
-            "text": "${engine:menu#continue}",
-            "id": "continue"
-          },
-          {
-            "type": "UIButton",
-            "text": "${engine:menu#start-game}",
-            "id": "play",
-            "enabled": false
-          }
-        ],
+        "type": "UIButton",
+        "text": "Return to Universe Setup",
+        "id": "close",
         "layoutInfo": {
-          "width": 400,
-          "height": 32,
-          "position-horizontal-center": {},
-          "position-bottom": {
-            "target": "BOTTOM",
-            "offset": 80
+          "width": 180,
+          "height": 120,
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "container"
+          },
+          "position-right": {
+            "target": "LEFT",
+            "widget": "container",
+            "offset": 16
           }
         }
       },
       {
         "type": "UIButton",
-        "text": "${engine:menu#back}",
-        "id": "close",
+        "text": "Continue to Spawn Preview",
+        "id": "continue",
         "layoutInfo": {
-          "width": 128,
-          "height": 32,
-          "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "widget": "actionsRow",
+          "width": 180,
+          "height": 120,
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "container"
+          },
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "container",
             "offset": 16
           }
         }

@@ -100,13 +100,18 @@
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#advanced}",
-            "id": "advancedSetup"
+            "text": "${engine:menu#back}",
+            "id": "close"
           },
           {
             "type": "UIButton",
             "text": "${engine:menu#start-game}",
             "id": "play"
+          },
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#advanced}",
+            "id": "advancedSetup"
           }
         ],
         "layoutInfo": {
@@ -117,21 +122,6 @@
             "target": "BOTTOM",
             "offset": 16,
             "widget": "mainBox"
-          }
-        }
-      },
-      {
-        "type": "UIButton",
-        "text": "${engine:menu#back}",
-        "id": "close",
-        "layoutInfo": {
-          "width": 128,
-          "height": 32,
-          "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "offset": 16,
-            "widget": "actionsRow"
           }
         }
       }
