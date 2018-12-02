@@ -170,8 +170,8 @@
         "text": "Return to Universe Setup",
         "id": "close",
         "layoutInfo": {
-          "width": 180,
-          "height": 120,
+          "width": 120,
+          "height": 80,
           "position-vertical-center": {
             "target": "CENTER",
             "widget": "container"
@@ -188,8 +188,8 @@
         "text": "Continue to Spawn Preview",
         "id": "continue",
         "layoutInfo": {
-          "width": 180,
-          "height": 120,
+          "width": 120,
+          "height": 80,
           "position-vertical-center": {
             "target": "CENTER",
             "widget": "container"

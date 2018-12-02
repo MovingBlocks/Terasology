@@ -147,8 +147,8 @@
         "text": "Return to Advanced Setup",
         "id": "close",
         "layoutInfo": {
-          "width": 180,
-          "height": 120,
+          "width": 120,
+          "height": 80,
           "position-vertical-center": {
             "target": "CENTER",
             "widget": "mainBox"
@@ -165,8 +165,8 @@
         "text": "Continue to Pregeneration",
         "id": "continue",
         "layoutInfo": {
-          "width": 180,
-          "height": 120,
+          "width": 120,
+          "height": 80,
           "position-vertical-center": {
             "target": "CENTER",
             "widget": "mainBox"

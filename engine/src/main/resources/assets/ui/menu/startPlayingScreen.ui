@@ -74,8 +74,8 @@
         "text": "Return to Pregeneration",
         "id": "close",
         "layoutInfo": {
-          "width": 180,
-          "height": 120,
+          "width": 120,
+          "height": 80,
           "position-vertical-center": {
             "target": "CENTER",
             "widget": "container"
@@ -92,8 +92,8 @@
         "text": "Start Game",
         "id": "play",
         "layoutInfo": {
-          "width": 180,
-          "height": 120,
+          "width": 120,
+          "height": 80,
           "position-vertical-center": {
             "target": "CENTER",
             "widget": "container"
