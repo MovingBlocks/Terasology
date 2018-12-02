@@ -525,6 +525,10 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "return", button -> triggerBackAnimation());
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
+        });
     }
 
     @Override

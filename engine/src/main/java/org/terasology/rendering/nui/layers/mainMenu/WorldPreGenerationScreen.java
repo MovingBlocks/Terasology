@@ -178,6 +178,10 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
         );
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
+        });
     }
 
     @Override

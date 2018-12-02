@@ -94,9 +94,21 @@
         }
       },
       {
-        "type": "UIButton",
-        "text": "${engine:menu#start-game}",
-        "id": "play",
+        "type": "RowLayout",
+        "id": "actionsRow",
+        "horizontalSpacing": 32,
+        "contents": [
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#start-game}",
+            "id": "play"
+          },
+          {
+            "type": "UIButton",
+            "text": "Back to Main Menu",
+            "id": "mainMenu"
+          }
+        ],
         "layoutInfo": {
           "width": 240,
           "height": 80,

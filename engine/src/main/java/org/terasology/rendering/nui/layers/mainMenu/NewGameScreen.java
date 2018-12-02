@@ -173,6 +173,10 @@ public class NewGameScreen extends CoreScreenLayer {
                 triggerBackAnimation();
             }
         });
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
+        });
     }
 
     /**

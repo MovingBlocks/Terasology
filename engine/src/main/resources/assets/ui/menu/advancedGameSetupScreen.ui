@@ -484,12 +484,17 @@
       {
         "type": "RowLayout",
         "id": "actionsRow",
-        "horizontalSpacing": 4,
+        "horizontalSpacing": 32,
         "contents": [
           {
             "type": "UIButton",
             "text": "${engine:menu#start-game}",
             "id": "play"
+          },
+          {
+            "type": "UIButton",
+            "text": "Back to Main Menu",
+            "id": "mainMenu"
           }
         ],
         "layoutInfo": {

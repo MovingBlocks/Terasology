@@ -95,6 +95,10 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
             gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         });
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
+        });
     }
 
     @Override
