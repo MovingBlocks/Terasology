@@ -18,6 +18,7 @@ package org.terasology.logic.title;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -34,6 +35,9 @@ public class TitleSystem extends BaseComponentSystem implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(TitleSystem.class);
 
     private static final ResourceUrn UI_URL = new ResourceUrn("engine:title");
+
+    @In
+    private Context context;
 
     @In
     private Console console;
@@ -55,6 +59,7 @@ public class TitleSystem extends BaseComponentSystem implements Runnable {
         thread.start();
         alive = true;
         logger.info("Initialised the title system!");
+        context.put(TitleSystem.class, this);
     }
 
     @Override
@@ -62,6 +67,7 @@ public class TitleSystem extends BaseComponentSystem implements Runnable {
         alive = false;
         thread.interrupt();
         logger.info("Successfully! shut down the title system!");
+        context.put(TitleSystem.class, null);
     }
 
     @Override
