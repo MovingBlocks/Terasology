@@ -507,6 +507,24 @@
             "offset": 16
           }
         }
+      },
+      {
+        "type": "UILabel",
+        "id": "loadWarning",
+        "text": "WARNING: Long Loading Delay",
+        "family": "warning",
+        "layoutInfo": {
+          "use-content-height": true,
+          "width": 120,
+          "position-top": {
+            "target": "BOTTOM",
+            "widget": "createWorld"
+          },
+          "position-horizontal-center": {
+            "target": "CENTER",
+            "widget": "createWorld"
+          }
+        }
       }
     ]
   }
