@@ -58,11 +58,13 @@ public class TitleSystem extends BaseComponentSystem {
         titleScreen.setTitle("");
         titleScreen.setSubtitle("");
         titleScreen.update();
+        nuiManager.removeOverlay(UI_URL);
+        titleScreen = null;
     }
 
     private void build() {
         if (titleScreen == null) {
-            titleScreen = nuiManager.pushScreen(UI_URL, TitleScreen.class);
+            titleScreen = nuiManager.addOverlay(UI_URL, TitleScreen.class);
         }
     }
 

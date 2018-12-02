@@ -67,9 +67,4 @@ public class TitleScreen extends CoreScreenLayer {
     public String getSubtitle() {
         return subtitle;
     }
-
-    @Override
-    public boolean canBeFocus() {
-        return false;
-    }
 }
