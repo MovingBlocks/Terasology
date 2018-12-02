@@ -18,6 +18,8 @@ package org.terasology.engine.subsystem;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.utilities.subscribables.Subscribable;
 
+import java.util.List;
+
 public interface DisplayDevice extends Subscribable {
 
     boolean hasFocus();
@@ -31,6 +33,23 @@ public interface DisplayDevice extends Subscribable {
     void setDisplayModeSetting(DisplayModeSetting displayModeSetting);
 
     DisplayModeSetting getDisplayModeSetting();
+
+    /**
+     * @return currently active full-screen resolution.
+     */
+    Resolution getResolution();
+
+    /**
+     * @return list of available full-screen resolutions.
+     */
+    List<Resolution> getResolutions();
+
+    /**
+     * Change currently active full-screen resolution.
+     *
+     * @param resolution resolution to set.
+     */
+    void setResolution(Resolution resolution);
 
     // TODO: this breaks the nice API we have so far.
     // From the lwjgl docs:
