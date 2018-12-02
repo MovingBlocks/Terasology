@@ -93,7 +93,7 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#video-resolution}: "
+                                    "text": "${engine:menu#video-resolution-fullscreen}: "
                                 },
                                 {
                                     "type": "UIDropdownScrollable",

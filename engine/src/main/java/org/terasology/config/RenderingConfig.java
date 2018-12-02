@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import org.terasology.utilities.subscribables.AbstractSubscribable;
 
 import java.beans.PropertyChangeListener;
 
-/**
- */
 public class RenderingConfig extends AbstractSubscribable {
 
     public static final String PIXEL_FORMAT = "PixelFormat";
