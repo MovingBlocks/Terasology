@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
@@ -64,8 +66,14 @@ public class WaitPopup<T> extends CoreScreenLayer {
     }
 
     public void setMessage(String title, String message) {
-        titleLabel.setText(title);
-        messageLabel.setText(message);
+        setTitleText(title);
+        bindMessageText(new ReadOnlyBinding<String>() {
+
+            @Override
+            public String get() {
+                return message;
+            }
+        });
     }
 
     @Override
@@ -129,5 +137,17 @@ public class WaitPopup<T> extends CoreScreenLayer {
 
     public boolean canBeCancelled() {
         return cancelButton.isVisible();
+    }
+
+    public void setTitleText(String text) {
+        titleLabel.setText(text);
+    }
+
+    public void bindMessageText(Binding<String> binding) {
+        messageLabel.bindText(binding);
+    }
+
+    public void setCancelText(String text) {
+        cancelButton.setText(text);
     }
 }

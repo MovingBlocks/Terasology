@@ -18,6 +18,7 @@ package org.terasology.config;
 
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
+import org.terasology.engine.subsystem.Resolution;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
@@ -36,6 +37,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String WINDOW_WIDTH = "WindowWidth";
     public static final String WINDOW_HEIGHT = "WindowHeight";
     public static final String DISPLAY_MODE_SETTING = "DisplayModeSetting";
+    public static final String RESOLUTION = "Resolution";
     public static final String ANIMATED_MENU = "AnimatedMenu";
     public static final String VIEW_DISTANCE = "viewDistance";
     public static final String FLICKERING_LIGHT = "FlickeringLight";
@@ -83,6 +85,7 @@ public class RenderingConfig extends AbstractSubscribable {
     private int windowWidth;
     private int windowHeight;
     private DisplayModeSetting displayModeSetting;
+    private Resolution resolution;
     private boolean animatedMenu;
     private ViewDistance viewDistance;
     private boolean flickeringLight;
@@ -235,6 +238,16 @@ public class RenderingConfig extends AbstractSubscribable {
         } else {
             setFullscreen(true);
         }
+    }
+
+    public Resolution getResolution() {
+        return resolution;
+    }
+
+    public void setResolution(Resolution resolution) {
+        Resolution oldValue = this.resolution;
+        this.resolution = resolution;
+        propertyChangeSupport.firePropertyChange(RESOLUTION, oldValue, resolution);
     }
 
     public boolean isAnimatedMenu() {
