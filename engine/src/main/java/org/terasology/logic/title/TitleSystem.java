@@ -122,6 +122,13 @@ public class TitleSystem extends BaseComponentSystem implements Runnable {
         }
     }
 
+    /**
+     * Show a title screen to the player.
+     *
+     * @param title will be shown in bigger font
+     * @param subtitle will be shown in small font
+     * @param stay how much do you wanna from it to stay for the player ( in milliseconds )
+     */
     public void show(String title, String subtitle, float stay) {
         build();
         currentStay = stay;
@@ -130,6 +137,9 @@ public class TitleSystem extends BaseComponentSystem implements Runnable {
         titleScreen.update();
     }
 
+    /**
+     * Reset the title screen
+     */
     public void hide() {
         build();
         titleScreen.setTitle("");
