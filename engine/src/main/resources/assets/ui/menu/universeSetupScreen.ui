@@ -21,7 +21,7 @@
       {
         "type": "UILabel",
         "id": "warning",
-        "text": "WARNING: Multi-world is not completed, only the final selected world will be available!",
+        "text": "${engine:menu#multi-world-warning}",
         "family": "warning",
         "layoutInfo": {
           "height": 12,
@@ -44,7 +44,7 @@
           "contents": [
             {
               "type": "UILabel",
-              "text": "Pick a world generator and add it. Then select and configure worlds from the freshly filled Worlds dropdown"
+              "text": "${engine:menu#universe-setup-description}"
             },
             {
               "type": "UILabel",
@@ -149,13 +149,13 @@
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#start-game}",
+            "text": "${engine:menu#start-playing}",
             "id": "play",
             "enabled": false
           },
           {
             "type": "UIButton",
-            "text": "Back to Main Menu",
+            "text": "${engine:menu#return-main-menu}",
             "id": "mainMenu"
           }
         ],
@@ -172,7 +172,7 @@
       },
       {
         "type": "UIButton",
-        "text": "Return to Advanced Setup",
+        "text": "${engine:menu#return-advanced-setup}",
         "id": "close",
         "layoutInfo": {
           "width": 120,
@@ -190,7 +190,7 @@
       },
       {
         "type": "UIButton",
-        "text": "Continue to Pregeneration",
+        "text": "${engine:menu#continue-pregeneration}",
         "id": "continue",
         "layoutInfo": {
           "width": 120,

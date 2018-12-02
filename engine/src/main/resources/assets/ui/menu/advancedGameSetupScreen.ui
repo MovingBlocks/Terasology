@@ -447,7 +447,7 @@
       },
       {
         "type": "UIButton",
-        "text": "Return to Basic Setup",
+        "text": "${engine:menu#return-basic-setup}",
         "id": "return",
         "layoutInfo": {
           "width": 120,
@@ -465,7 +465,7 @@
       },
       {
         "type": "UIButton",
-        "text": "Continue to World Generation",
+        "text": "${engine:menu#continue-universe-setup}",
         "id": "createWorld",
         "layoutInfo": {
           "width": 120,
@@ -488,12 +488,12 @@
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#start-game}",
+            "text": "${engine:menu#start-playing}",
             "id": "play"
           },
           {
             "type": "UIButton",
-            "text": "Back to Main Menu",
+            "text": "${engine:menu#return-main-menu}",
             "id": "mainMenu"
           }
         ],
@@ -511,7 +511,7 @@
       {
         "type": "UILabel",
         "id": "loadWarning",
-        "text": "WARNING: Long Loading Delay",
+        "text": "${engine:menu#load-delay-warning}",
         "family": "warning",
         "layoutInfo": {
           "use-content-height": true,

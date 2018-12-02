@@ -61,7 +61,7 @@
             "contents": [
               {
                 "type": "UILabel",
-                "text": "Select a world in the drop-down to see it previewed. Click Re-Roll to randomly pick a new seed or Configure to manually tweak the world further"
+                "text": "${engine:menu#pregeneration-description}"
               },
               {
                 "type": "UILabel",
@@ -172,13 +172,13 @@
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#start-game}",
+            "text": "${engine:menu#start-playing}",
             "id": "play",
             "enabled": false
           },
           {
             "type": "UIButton",
-            "text": "Back to Main Menu",
+            "text": "${engine:menu#return-main-menu}",
             "id": "mainMenu"
           }
         ],
@@ -195,7 +195,7 @@
       },
       {
         "type": "UIButton",
-        "text": "Return to Universe Setup",
+        "text": "${engine:menu#return-universe-setup}",
         "id": "close",
         "layoutInfo": {
           "width": 120,
@@ -213,7 +213,7 @@
       },
       {
         "type": "UIButton",
-        "text": "Continue to Spawn Preview",
+        "text": "${engine:menu#continue-spawn-preview}",
         "id": "continue",
         "layoutInfo": {
           "width": 120,
