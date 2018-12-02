@@ -1,16 +1,11 @@
 {
-  "type": "confirmChangePopup",
+  "type": "titleScreen",
   "skin": "messageBox",
   "contents": {
     "type": "ColumnLayout",
     "columns": 1,
-    "verticalSpacing": 8,
+    "verticalSpacing": 5,
     "contents": [
-      {
-        "type": "UILabel",
-        "text": "This is the title",
-        "family": "title"
-      },
       {
         "type": "UISpace",
         "size": [
@@ -20,8 +15,12 @@
       },
       {
         "type": "UILabel",
-        "text": "This is the subtitle",
-        "id": "message"
+        "id": "title",
+        "family": "title"
+      },
+      {
+        "type": "UILabel",
+        "id": "subtitle"
       },
       {
         "type": "UISpace",

@@ -16,9 +16,60 @@
 package org.terasology.logic.title;
 
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.widgets.UILabel;
 
 public class TitleScreen extends CoreScreenLayer {
+
+    private String title = "";
+    private String subtitle = "";
+    private UILabel uiTitle;
+    private UILabel uiSubtitle;
+
     @Override
     public void initialise() {
+        uiTitle = find("title", UILabel.class);
+        if (uiTitle != null) {
+            uiTitle.setText(title);
+        }
+
+        uiSubtitle = find("subtitle", UILabel.class);
+        if (uiSubtitle != null) {
+            uiSubtitle.setText(subtitle);
+        }
+    }
+
+    public void update() {
+        if (uiTitle != null) {
+            if (!uiTitle.getText().equals(title)) {
+                uiTitle.setText(title);
+            }
+        }
+
+        if (uiSubtitle != null) {
+            if (!uiSubtitle.getText().equals(subtitle)) {
+                uiSubtitle.setText(subtitle);
+            }
+        }
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    @Override
+    public boolean canBeFocus() {
+        return false;
     }
 }
