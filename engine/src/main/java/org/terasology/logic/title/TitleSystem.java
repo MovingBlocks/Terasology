@@ -22,7 +22,9 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
@@ -43,6 +45,8 @@ public class TitleSystem extends BaseComponentSystem implements Runnable {
     private Thread thread;
     private float currentStay;
     private boolean alive;
+    private String lastTitle = "";
+    private String lastSubtitle = "";
 
     @Override
     public void initialise() {
@@ -82,12 +86,39 @@ public class TitleSystem extends BaseComponentSystem implements Runnable {
         currentStay = 0; // Make sure to make it 0 even if the title got hidden
     }
 
-    @Command(shortDescription = "To test the title")
-    public void title() {
-        if (titleScreen != null && !titleScreen.getTitle().equals("")) {
-            hide();
+    @Command(
+            value = "title",
+            shortDescription = "Use the title feature",
+            helpText = "<title:subtitle:stay:reset> <value>"
+    )
+    public void titleCommand(@CommandParam("type") String type, @CommandParam(value = "value", required = false) String value) {
+        if (type.equalsIgnoreCase("reset")) {
+            if (titleScreen != null) {
+                hide();
+                console.addMessage("Done! Reset the title screen.");
+                return;
+            }
+        }
+        if (value != null) {
+            if (type.equalsIgnoreCase("title")) {
+                show(value, lastSubtitle, currentStay);
+                lastTitle = value;
+                console.addMessage("Done! The current title value is " + value);
+            } else if (type.equalsIgnoreCase("subtitle")) {
+                show(lastTitle, value, currentStay);
+                lastSubtitle = value;
+                console.addMessage("Done! The current subtitle value is " + value);
+            } else if (type.equalsIgnoreCase("stay")) {
+                try {
+                    float stay = Float.parseFloat(value);
+                    show(lastTitle, lastSubtitle, stay);
+                    console.addMessage("Done! The current stay value is " + stay);
+                } catch (NumberFormatException ex) {
+                    console.addMessage("I can't understand the stay value", CoreMessageType.ERROR);
+                }
+            }
         } else {
-            show("Welcome to Terasology", "Title System by @iHDeveloper", 5 * 1000f);
+            console.addMessage("Failed! Can't find the value to use it.");
         }
     }
 
