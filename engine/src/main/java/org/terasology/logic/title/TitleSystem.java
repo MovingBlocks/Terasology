@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.title;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -25,11 +27,11 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
 @RegisterSystem(RegisterMode.ALWAYS)
-public class TitleSystem extends BaseComponentSystem {
+public class TitleSystem extends BaseComponentSystem implements Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(TitleSystem.class);
 
     private static final ResourceUrn UI_URL = new ResourceUrn("engine:title");
-
-    private TitleScreen titleScreen;
 
     @In
     private Console console;
@@ -37,17 +39,61 @@ public class TitleSystem extends BaseComponentSystem {
     @In
     private NUIManager nuiManager;
 
+    private TitleScreen titleScreen;
+    private Thread thread;
+    private float currentStay;
+    private boolean alive;
+
+    @Override
+    public void initialise() {
+        thread = new Thread(this);
+        thread.setName("TITLE-STAY");
+        thread.start();
+        alive = true;
+        logger.info("Initialised the title system!");
+    }
+
+    @Override
+    public void shutdown() {
+        alive = false;
+        thread.interrupt();
+        logger.info("Successfully! shut down the title system!");
+    }
+
+    @Override
+    public void run() {
+        while (alive) {
+            if (currentStay <= 0) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException ex) { } // Ignore because this may happen because of #shutdown() which it doesn't matter
+                continue;
+            }
+            currentStay -= 1f;
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException ex) { } // Ignore because this may happen because of #shutdown() which it doesn't matter
+            if (currentStay <= 0 && (titleScreen != null)) {
+                currentStay = 0;
+                hide();
+                continue;
+            }
+        }
+        currentStay = 0; // Make sure to make it 0 even if the title got hidden
+    }
+
     @Command(shortDescription = "To test the title")
     public void title() {
         if (titleScreen != null && !titleScreen.getTitle().equals("")) {
             hide();
         } else {
-            show("Welcome to Terasology", "Title System by @iHDeveloper");
+            show("Welcome to Terasology", "Title System by @iHDeveloper", 5 * 1000f);
         }
     }
 
-    public void show(String title, String subtitle) {
+    public void show(String title, String subtitle, float stay) {
         build();
+        currentStay = stay;
         titleScreen.setTitle(title);
         titleScreen.setSubtitle(subtitle);
         titleScreen.update();
@@ -60,6 +106,7 @@ public class TitleSystem extends BaseComponentSystem {
         titleScreen.update();
         nuiManager.removeOverlay(UI_URL);
         titleScreen = null;
+        currentStay = 0;
     }
 
     private void build() {
