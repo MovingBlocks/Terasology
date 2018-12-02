@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -36,6 +38,10 @@ public class UIRadialRing extends CoreWidget {
 
     @LayoutConfig
     private List<UIRadialSection> sections = new ArrayList<>();
+
+    public int getSelectedTab() {
+        return selectedTab;
+    }
 
     private int selectedTab = -1;
     private boolean hasInitialised;

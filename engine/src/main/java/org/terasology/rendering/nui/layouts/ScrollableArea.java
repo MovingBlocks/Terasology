@@ -26,6 +26,7 @@ import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
+import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UIScrollbar;
 
 import java.util.Collections;
@@ -40,6 +41,7 @@ import java.util.Objects;
  * as if they were moving a window over the widget.
  */
 public class ScrollableArea extends CoreLayout {
+    private static boolean ceil = false;
     private static final int SCROLL_MULTIPLIER = -42;
 
     /**
@@ -126,15 +128,23 @@ public class ScrollableArea extends CoreLayout {
 
     /**
      * Scrolls the given amount.
-     * @param modifier The amount to scroll as a percent.
+     * @param moveAmount The position of the scrollbar as a percent
      */
-    public void scroll(double modifier) {
+    public void setPosition(double moveAmount) {
         if (verticalScrollbar) {
-            int moveAmount = (int)(SCROLL_MULTIPLIER * modifier * verticalBar.getRange());
-            verticalBar.setValue(verticalBar.getValue() + moveAmount);
+            moveAmount *= verticalBar.getRange();
+            verticalBar.setValue((int)Math.round(moveAmount));
         } else if (horizontalScrollbar) {
-            int moveAmount = (int)(SCROLL_MULTIPLIER * modifier * horizontalBar.getRange());
-            horizontalBar.setValue(horizontalBar.getValue() + moveAmount);
+            moveAmount *= horizontalBar.getRange();
+            horizontalBar.setValue((int)Math.round(moveAmount));
+        }
+    }
+
+    public void scrollOne(boolean up) {
+        if (up) {
+
+        } else {
+
         }
     }
 

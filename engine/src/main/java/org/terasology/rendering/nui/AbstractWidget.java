@@ -27,6 +27,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UIRadialSection;
 
 import java.util.Collection;

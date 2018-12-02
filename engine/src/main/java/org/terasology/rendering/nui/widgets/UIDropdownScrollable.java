@@ -312,19 +312,27 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             highlighted++;
             if (highlighted >= getOptions().size()) {
                 highlighted = 0;
-                verticalBar.setValue(verticalBar.getMinimum());
+                if (opened) {
+                    verticalBar.setValue(verticalBar.getMinimum());
+                }
             } else {
-                int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
-                verticalBar.setValue(verticalBar.getValue() - scrollMultiplier);
+                if (opened) {
+                    int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
+                    verticalBar.setValue(verticalBar.getValue() - scrollMultiplier);
+                }
             }
         } else {
             highlighted--;
             if (highlighted < 0) {
                 highlighted = getOptions().size()-1;
-                verticalBar.setValue(verticalBar.getRange()-verticalBar.getMinimum());
+                if (opened) {
+                    verticalBar.setValue(verticalBar.getRange() - verticalBar.getMinimum());
+                }
             } else {
-                int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
-                verticalBar.setValue(verticalBar.getValue() + scrollMultiplier);
+                if (opened) {
+                    int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
+                    verticalBar.setValue(verticalBar.getValue() + scrollMultiplier);
+                }
             }
         }
         setSelection(getOptions().get(highlighted));

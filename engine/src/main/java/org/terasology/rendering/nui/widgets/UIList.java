@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+import org.slf4j.LoggerFactory;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
@@ -54,9 +55,11 @@ public class UIList<T> extends ActivatableWidget {
     private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
     private Binding<Boolean> canBeFocus = new DefaultBinding<>(true);
-    private int shownOnScreen;
+    private int itemSize;
+    private int canvasSize;
 
-    private List<InteractionListener> optionListeners = Lists.newArrayList();
+    private List<ItemInteractionListener> optionListeners = Lists.newArrayList();
+
 
     public UIList() {
 
@@ -78,10 +81,9 @@ public class UIList<T> extends ActivatableWidget {
         for (int i = 0; i < list.get().size(); ++i) {
             T item = list.get().get(i);
             Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
-            shownOnScreen = getPreferredContentSize(canvas, preferredSize).y /itemRenderer.getPreferredSize(item, canvas).y;
 
             Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
-            ItemInteractionListener listener = (ItemInteractionListener) optionListeners.get(i);
+            ItemInteractionListener listener = optionListeners.get(i);
             if (enabled) {
                 if (Objects.equals(item, selection.get())) {
                     canvas.setMode(ACTIVE_MODE);
@@ -101,6 +103,11 @@ public class UIList<T> extends ActivatableWidget {
             itemRenderer.draw(item, canvas, margin.shrink(itemRegion));
 
             yOffset += preferredSize.getY();
+
+            if (i == list.get().size() - 1) {
+                itemSize = preferredSize.getY();
+                canvasSize = canvas.size().y;
+            }
         }
     }
 
@@ -334,18 +341,18 @@ public class UIList<T> extends ActivatableWidget {
         if (event.isDown()) {
             int keyId = event.getKey().getId();
             int currentIndex = getCurrentIndex();
+
             if (currentIndex != -1) {
                 if (keyId == Keyboard.KeyId.UP) {
                     if (getParent() != null) {
-                        getParent().scroll((double)1 / (optionListeners.size() * shownOnScreen));
+                        getParent().setPosition((currentIndex - 1) / (double)optionListeners.size());
                     }
 
                     select(currentIndex - 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.DOWN) {
-
                     if (getParent() != null) {
-                        getParent().scroll((double)-1 / (optionListeners.size() * shownOnScreen));
+                        getParent().setPosition((currentIndex + 1) / (double)optionListeners.size());
                     }
 
                     select(currentIndex + 1);
@@ -354,16 +361,10 @@ public class UIList<T> extends ActivatableWidget {
                     activate(currentIndex);
                     return true;
                 }
+            } else {
+                select(0);
             }
         }
         return super.onKeyEvent(event);
-    }
-
-    @Override
-    public String getMode() {
-        if (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
-            return ACTIVE_MODE;
-        }
-        return DEFAULT_MODE;
     }
 }

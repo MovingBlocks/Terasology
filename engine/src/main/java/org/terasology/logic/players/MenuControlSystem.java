@@ -17,7 +17,6 @@
 package org.terasology.logic.players;
 
 import org.terasology.audio.AudioManager;
-import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -39,6 +38,7 @@ import org.terasology.rendering.nui.layers.ingame.DeathScreen;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.utilities.Assets;
+import org.terasology.engine.Time;
 
 
 /**

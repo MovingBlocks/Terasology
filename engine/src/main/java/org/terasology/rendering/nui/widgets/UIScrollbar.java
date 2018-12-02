@@ -192,11 +192,6 @@ public class UIScrollbar extends CoreWidget {
         return DEFAULT_MODE;
     }
 
-    /*
-    public void setOrder(int newOrder) {
-        order = newOrder;
-    }*/
-
     public void bindMinimum(Binding<Integer> binding) {
         minimum = binding;
     }

@@ -250,30 +250,19 @@ public class UIDropdown<T> extends ActivatableWidget {
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown()) {
+            if (((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
+                TabbingManager.setWidgetIsOpen(true);
+
+            } else {
+                TabbingManager.setWidgetIsOpen(false);
+            }
+
             int keyId = event.getKey().getId();
             if (keyId == Keyboard.KeyId.UP) {
-                if (((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
-                    TabbingManager.setWidgetIsOpen(true);
-                    ((UIDropdown) TabbingManager.focusedWidget).changeHighlighted(false);
-                } else {
-                    TabbingManager.setWidgetIsOpen(false);
-                }
-
-                if (parent != null && !TabbingManager.isWidgetOpen()) {
-                    parent.scroll(true);
-                }
+                this.changeHighlighted(false);
                 return true;
             } else if (keyId == Keyboard.KeyId.DOWN) {
-                if (((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
-                    TabbingManager.setWidgetIsOpen(true);
-                    ((UIDropdown) TabbingManager.focusedWidget).changeHighlighted(true);
-                } else {
-                    TabbingManager.setWidgetIsOpen(false);
-                }
-
-                if (parent != null && !TabbingManager.isWidgetOpen()) {
-                    parent.scroll(false);
-                }
+                this.changeHighlighted(true);
                 return true;
             }
         }
