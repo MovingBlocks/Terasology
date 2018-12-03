@@ -37,8 +37,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 /**
- * GsonSerializer provides the ability to serialize and deserialize between
- * JSONs and Objects <br>
+ * GsonSerializer provides the ability to serialize and deserialize objects to and from JSON
  * <br>
  * Serialized JSONs can be forwarded/written to various output types <br>
  * <br>
