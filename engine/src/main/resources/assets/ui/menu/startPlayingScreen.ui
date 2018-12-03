@@ -70,23 +70,11 @@
         ]
       },
       {
-        "type": "RowLayout",
-        "id": "actionsRow",
-        "horizontalSpacing": 32,
-        "contents": [
-          {
-            "type": "UIButton",
-            "text": "${engine:menu#start-game}",
-            "id": "play"
-          },
-          {
-            "type": "UIButton",
-            "text": "${engine:menu#return-main-menu}",
-            "id": "mainMenu"
-          }
-        ],
+        "type": "UIButton",
+        "text": "${engine:menu#return-main-menu}",
+        "id": "mainMenu",
         "layoutInfo": {
-          "width": 240,
+          "width": 120,
           "height": 80,
           "position-horizontal-center": {},
           "position-top": {

@@ -488,17 +488,17 @@
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#start-playing}",
-            "id": "play"
+            "text": "${engine:menu#return-main-menu}",
+            "id": "mainMenu"
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#return-main-menu}",
-            "id": "mainMenu"
+            "text": "${engine:menu#start-playing}",
+            "id": "play"
           }
         ],
         "layoutInfo": {
-          "width": 240,
+          "width": 272,
           "height": 80,
           "position-horizontal-center": {},
           "position-top": {
