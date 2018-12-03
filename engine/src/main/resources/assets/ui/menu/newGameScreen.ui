@@ -84,13 +84,7 @@
           "width": 500,
           "use-content-height": true,
           "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "widget": "gameTypeTitle"
-          },
-          "position-bottom": {
-            "target": "BOTTOM"
-          }
+          "position-vertical-center": {}
         }
       },
       {
