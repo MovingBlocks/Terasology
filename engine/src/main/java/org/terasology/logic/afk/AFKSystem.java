@@ -92,15 +92,18 @@ public class AFKSystem extends BaseComponentSystem {
                 console.addMessage("[AFK] You are no longer AFK!");
             }
         } else if (networkMode == NetworkMode.CLIENT) {
-            localPlayer.getClientEntity().send(new AFKRequest(afk));
+            EntityRef entity = localPlayer.getClientEntity();
+            AFKRequest afkRequest = new AFKRequest(afk);
+            entity.send(afkRequest);
         }
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void onAFKRequest(AFKRequest event, EntityRef entityRef) {
         afkMap.put(entityRef.getId(), event.isAfk());
+        AFKEvent afkEvent = new AFKEvent(event.isAfk());
         for (Client client : networkSystem.getPlayers()) {
-            client.send(new AFKEvent(event.isAfk()), entityRef);
+            client.send(afkEvent, entityRef);
         }
     }
 
