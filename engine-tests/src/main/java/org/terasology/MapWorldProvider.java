@@ -99,11 +99,6 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
-    public Biome getBiome(Vector3i pos) {
-        return null;
-    }
-
-    @Override
     public Block getBlock(int x, int y, int z) {
         Vector3i pos = new Vector3i(x, y, z);
         Block block = blocks.get(pos);

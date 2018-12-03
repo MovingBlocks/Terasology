@@ -25,15 +25,12 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.persistence.StorageManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
 
 import java.util.Locale;
 
@@ -124,17 +121,10 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine4.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    String biomeId = "Unavailable";
-                    Vector3i blockPos = new Vector3i(localPlayer.getPosition());
-                    if (worldProvider.isBlockRelevant(blockPos)) {
-                        Biome biome = worldProvider.getBiome(blockPos);
-                        biomeId = CoreRegistry.get(BiomeManager.class).getBiomeId(biome);
-                    }
-                    return String.format("Total VUs: %s, World Time: %.3f, Time Dilation: %.1f, Biome: %s",
+                    return String.format("Total VUs: %s, World Time: %.3f, Time Dilation: %.1f",
                             ChunkTessellator.getVertexArrayUpdateCount(),
                             worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
-                            time.getGameTimeDilation(),
-                            biomeId);
+                            time.getGameTimeDilation());
                 }
             });
         }

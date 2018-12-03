@@ -134,14 +134,6 @@ public interface WorldProviderCore {
     Biome setBiome(Vector3i pos, Biome biome);
 
     /**
-     * Returns the biome at a specific world position.
-     *
-     * @param pos The position
-     * @return The biome at the given position.
-     */
-    Biome getBiome(Vector3i pos);
-
-    /**
      * Returns the block at the given position.
      *
      * @param x The X-coordinate

@@ -31,7 +31,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
@@ -298,17 +297,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             return chunk.getBlock(ChunkMath.calcBlockPosX(x), ChunkMath.calcBlockPosY(y), ChunkMath.calcBlockPosZ(z));
         }
         return unloadedBlock;
-    }
-
-    @Override
-    public Biome getBiome(Vector3i pos) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
-        if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(pos);
-            return chunk.getBiome(blockPos.x, blockPos.y, blockPos.z);
-        }
-        return BiomeManager.getUnknownBiome();
     }
 
     @Override

@@ -17,11 +17,6 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
@@ -33,6 +28,12 @@ import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  */
@@ -138,15 +139,6 @@ public class WorldProviderCoreStub implements WorldProviderCore {
             return defaultBiome;
         }
         return oldBiome;
-    }
-
-    @Override
-    public Biome getBiome(Vector3i pos) {
-        Biome result = biomes.get(pos);
-        if (result == null) {
-            return defaultBiome;
-        }
-        return result;
     }
 
     @Override

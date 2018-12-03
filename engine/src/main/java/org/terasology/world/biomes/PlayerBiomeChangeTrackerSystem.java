@@ -42,10 +42,10 @@ public class PlayerBiomeChangeTrackerSystem extends BaseComponentSystem {
         if (newPos.equals(oldPos)) {
             return;
         }
-        final Biome oldBiome = world.getBiome(oldPos);
-        final Biome newBiome = world.getBiome(newPos);
-        if (!oldBiome.equals(newBiome)) {
-            entity.send(new BiomeChangeEvent(oldBiome, newBiome));
-        }
+//        final Biome oldBiome = world.getBiome(oldPos);
+//        final Biome newBiome = world.getBiome(newPos);
+//        if (!oldBiome.equals(newBiome)) {
+//            entity.send(new BiomeChangeEvent(oldBiome, newBiome));
+//        }
     }
 }
