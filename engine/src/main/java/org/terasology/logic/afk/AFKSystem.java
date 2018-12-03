@@ -92,7 +92,7 @@ public class AFKSystem extends BaseComponentSystem {
                 console.addMessage("[AFK] You are no longer AFK!");
             }
         } else if (networkMode == NetworkMode.CLIENT) {
-            networkSystem.getServer().send(new AFKRequest(afk), localPlayer.getClientEntity());
+            localPlayer.getClientEntity().send(new AFKRequest(afk));
         }
     }
 
