@@ -62,7 +62,6 @@ public class ChunkImpl implements Chunk {
     private final Vector3i chunkPos = new Vector3i();
 
     private BlockManager blockManager;
-    private BiomeManager biomeManager;
 
     private TeraArray sunlightData;
     private TeraArray sunlightRegenData;
@@ -86,7 +85,6 @@ public class ChunkImpl implements Chunk {
     // Rendering
     private ChunkMesh activeMesh;
     private ChunkMesh pendingMesh;
-    private boolean adjacentChunksReady;
 
     public ChunkImpl(int x, int y, int z, BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
         this(new Vector3i(x, y, z), blockManager, biomeManager, extraDataManager);
@@ -96,11 +94,10 @@ public class ChunkImpl implements Chunk {
         this(chunkPos, new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-                blockManager, biomeManager);
+                blockManager);
     }
 
-    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray biome, TeraArray[] extra, BlockManager blockManager,
-                     BiomeManager biomeManager) {
+    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray biome, TeraArray[] extra, BlockManager blockManager) {
         this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.biomeData = Preconditions.checkNotNull(biome);
@@ -110,7 +107,6 @@ public class ChunkImpl implements Chunk {
         lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
         this.blockManager = blockManager;
-        this.biomeManager = biomeManager;
         region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
                 ChunkConstants.CHUNK_SIZE);
         ChunkMonitor.fireChunkCreated(this);
@@ -237,31 +233,6 @@ public class ChunkImpl implements Chunk {
         return lightData.set(x, y, z, amount) != amount;
     }
 
-    @Override
-    public Biome getBiome(int x, int y, int z) {
-        return biomeManager.getBiomeByShortId((short) biomeData.get(x, y, z));
-    }
-
-    @Override
-    public Biome getBiome(BaseVector3i pos) {
-        return getBiome(pos.x(), pos.y(), pos.z());
-    }
-
-    @Override
-    public Biome setBiome(int x, int y, int z, Biome biome) {
-        if (biomeData == biomeDataSnapshot) {
-            biomeData = biomeData.copy();
-        }
-        short shortId = biomeManager.getBiomeShortId(biome);
-        short previousShortId = (short) biomeData.set(x, y, z, shortId);
-        return biomeManager.getBiomeByShortId(previousShortId);
-    }
-
-    @Override
-    public Biome setBiome(BaseVector3i pos, Biome biome) {
-        return setBiome(pos.x(), pos.y(), pos.z(), biome);
-    }
-    
     @Override
     public int getExtraData(int index, int x, int y, int z) {
         return extraData[index].get(x, y, z);

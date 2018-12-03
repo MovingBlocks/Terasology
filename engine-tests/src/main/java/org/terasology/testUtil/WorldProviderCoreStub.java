@@ -133,15 +133,6 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public Biome setBiome(Vector3i pos, Biome biome) {
-        Biome oldBiome = biomes.put(pos, biome);
-        if (oldBiome == null) {
-            return defaultBiome;
-        }
-        return oldBiome;
-    }
-
-    @Override
     public byte getLight(int x, int y, int z) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }

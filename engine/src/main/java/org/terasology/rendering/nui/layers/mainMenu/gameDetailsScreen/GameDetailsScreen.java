@@ -27,12 +27,8 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
-import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ResolutionResult;
-import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
@@ -54,14 +50,12 @@ import org.terasology.rendering.nui.widgets.UITabBox;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.time.DateTimeHelper;
 import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.internal.WorldInfo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -129,7 +123,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
             setUpGameModules();
             setUpGameWorlds();
             setUpBlocks();
-            setUpBiomes();
             setUpPreviewSlideshow();
             setUpOpenModuleDetails();
 
@@ -147,7 +140,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
             loadGeneralInfo();
             loadGameModules();
-            loadBiomes();
             loadBlocks();
             loadGameWorlds();
 
@@ -171,7 +163,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private void initWidgets() {
         gameModules = find("modules", UIList.class);
         gameWorlds = find("worlds", UIList.class);
-        biomes = find("biomes", UIList.class);
         blocks = find("blocks", UIList.class);
 
         description = find("description", UIText.class);
@@ -201,44 +192,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
                 "${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
     }
 
-    private void setUpBiomes() {
-        biomes.subscribeSelection(((widget, biome) -> {
-            if (biome == null) {
-                return;
-            }
-
-            descriptionTitle.setText(translationSystem.translate("${engine:menu#game-details-biomes}"));
-            description.setText(getBiomeDescription(biome));
-
-            gameModules.setSelection(null);
-            gameWorlds.setSelection(null);
-            blocks.setSelection(null);
-        }));
-
-        biomes.setItemRenderer(new AbstractItemRenderer<Biome>() {
-            String getString(Biome biome) {
-                return biome.getId();
-            }
-
-            @Override
-            public void draw(Biome value, Canvas canvas) {
-                if (value.getId().contains("Core:")) {
-                    canvas.setMode("internal");
-                } else {
-                    canvas.setMode("external");
-                }
-                canvas.drawText(getString(value), canvas.getRegion());
-            }
-
-            @Override
-            public Vector2i getPreferredSize(Biome biome, Canvas canvas) {
-                String text = getString(biome);
-                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
-                        canvas.getCurrentStyle().getFont().getLineHeight());
-            }
-        });
-    }
-
     private String getBiomeDescription(final Biome biome) {
         return translationSystem.translate("${engine:menu#biome-name}: ") + biome.getId() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#biome-fog}: ") + biome.getFog() + '\n' + '\n' +
@@ -257,7 +210,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
             gameModules.setSelection(null);
             gameWorlds.setSelection(null);
-            biomes.setSelection(null);
         }));
     }
 
@@ -280,7 +232,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
             description.setText(getWorldDescription(worldInfo));
 
             gameModules.setSelection(null);
-            biomes.setSelection(null);
             blocks.setSelection(null);
         });
 
@@ -360,7 +311,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
             description.setText(getModuleDescription(moduleSelectionInfo));
 
             gameWorlds.setSelection(null);
-            biomes.setSelection(null);
             blocks.setSelection(null);
         });
 
@@ -460,34 +410,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
                 + theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator().getObjectName().toString();
     }
 
-    private void loadBiomes() {
-        List<Biome> biomesList = Collections.emptyList();
-        final List<Name> moduleIds = gameInfo.getManifest().getModules().stream()
-                .map(NameVersion::getName)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        final DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        final ResolutionResult result = resolver.resolve(moduleIds);
-        if (result.isSuccess()) {
-            ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
-            BiomeManager biomeManager = null;
-            try {
-                biomeManager = new BiomeManager(env, gameInfo.getManifest().getBiomeIdMap());
-            } catch (Exception ex) {
-                errors.add(translationSystem.translate("${engine:menu#game-details-biomes-error}") + " - " + ex.getMessage());
-                logger.error("Couldn't load biomes: {}", ex.getMessage());
-            }
-            if (biomeManager != null) {
-                biomesList = biomeManager.getBiomes().stream()
-                        .sorted(Comparator.comparing(Biome::getName))
-                        .collect(Collectors.toList());
-            }
-        } else {
-            errors.add(translationSystem.translate("${engine:menu#game-details-biomes-error}"));
-        }
-        biomes.setList(biomesList);
-    }
-
     private void loadGameWorlds() {
         gameWorlds.setList(Lists.newArrayList(gameInfo.getManifest().getWorlds().iterator()));
     }
@@ -585,7 +507,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private boolean isScreenValid() {
-        if (Stream.of(gameModules, gameWorlds, biomes, blocks, description, descriptionTitle, openModuleDetails,
+        if (Stream.of(gameModules, gameWorlds, blocks, description, descriptionTitle, openModuleDetails,
                 previewSlideshow, tabs, showErrors, close, slideLeft, slideRight, slideStop, title)
                 .anyMatch(Objects::isNull)) {
             logger.error("Can't initialize screen correctly. At least one widget was missed!");

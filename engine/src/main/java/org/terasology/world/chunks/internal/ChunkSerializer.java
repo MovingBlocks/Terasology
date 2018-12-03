@@ -65,7 +65,7 @@ public final class ChunkSerializer {
         for (int i = 0; i < extraData.length; i++) {
             runLengthDecode(message.getExtraData(i), extraData[i]);
         }
-        return new ChunkImpl(pos, blockData, biomeData, extraData, blockManager, biomeManager);
+        return new ChunkImpl(pos, blockData, biomeData, extraData, blockManager);
     }
 
     private static EntityData.RunLengthEncoding16 runLengthEncode16(TeraArray array) {

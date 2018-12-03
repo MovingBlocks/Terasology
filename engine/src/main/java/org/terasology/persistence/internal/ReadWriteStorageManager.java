@@ -56,8 +56,6 @@ import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.ShutdownTask;
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.utilities.concurrency.TaskMaster;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -72,7 +70,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -363,8 +360,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private void addGameManifestToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder) {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         UniverseConfig universeConfig = config.getUniverseConfig();
         Time time = CoreRegistry.get(Time.class);
         Game game = CoreRegistry.get(Game.class);
@@ -380,18 +375,10 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         }
         gameManifest.setRegisteredBlockFamilies(registeredBlockFamilies);
         gameManifest.setBlockIdMap(blockManager.getBlockIdMap());
-        List<Biome> biomes = biomeManager.getBiomes();
-        Map<String, Short> biomeIdMap = new HashMap<>(biomes.size());
-        for (Biome biome : biomes) {
-            short shortId = biomeManager.getBiomeShortId(biome);
-            String id = biomeManager.getBiomeId(biome);
-            biomeIdMap.put(id, shortId);
-        }
         List<WorldInfo> worlds = universeConfig.getWorlds();
         for (WorldInfo worldInfo: worlds) {
             gameManifest.addWorld(worldInfo);
         }
-        gameManifest.setBiomeIdMap(biomeIdMap);
         saveTransactionBuilder.setGameManifest(gameManifest);
     }
 

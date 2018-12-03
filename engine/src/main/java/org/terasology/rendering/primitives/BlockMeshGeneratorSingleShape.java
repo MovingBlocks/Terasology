@@ -21,10 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.ChunkView;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
@@ -45,7 +43,6 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
-        Biome selfBiome = view.getBiome(x, y, z);
         Block selfBlock = view.getBlock(x, y, z);
 
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
@@ -91,8 +88,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         }
 
         if (blockAppearance.getPart(BlockPart.CENTER) != null) {
-            Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.CENTER, selfBiome);
-            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
+            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, renderType, vertexFlag);
         }
 
         BlockMeshPart[] drawParts = new BlockMeshPart[6];
@@ -128,13 +124,13 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
         for (Side dir : Side.getAllSides()) {
             if (drawParts[dir.ordinal()] != null) {
-                Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(dir), selfBiome);
+                BlockPart.fromSide(dir);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
                 ChunkVertexFlag sideVertexFlag = vertexFlag;
                 if (selfBlock.isGrass() && dir != Side.TOP && dir != Side.BOTTOM) {
                     sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                 }
-                drawParts[dir.ordinal()].appendTo(chunkMesh, x, y, z, colorOffset, renderType, sideVertexFlag);
+                drawParts[dir.ordinal()].appendTo(chunkMesh, x, y, z, renderType, sideVertexFlag);
             }
         }
     }
