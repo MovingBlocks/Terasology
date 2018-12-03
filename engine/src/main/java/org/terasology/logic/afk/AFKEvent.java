@@ -16,14 +16,21 @@
 package org.terasology.logic.afk;
 
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 
 public class AFKEvent implements Event {
 
+    private EntityRef target;
     private boolean afk;
 
-    public AFKEvent(boolean afk) {
+    public AFKEvent(EntityRef target, boolean afk) {
+        this.target = target;
         this.afk = afk;
+    }
+
+    public EntityRef getTarget() {
+        return target;
     }
 
     public boolean isAfk() {

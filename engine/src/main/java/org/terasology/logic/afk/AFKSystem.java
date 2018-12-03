@@ -101,19 +101,23 @@ public class AFKSystem extends BaseComponentSystem {
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void onAFKRequest(AFKRequest event, EntityRef entityRef) {
         afkMap.put(entityRef.getId(), event.isAfk());
-        AFKEvent afkEvent = new AFKEvent(event.isAfk());
+        AFKEvent afkEvent = new AFKEvent(entityRef, event.isAfk());
         for (Client client : networkSystem.getPlayers()) {
-            client.send(afkEvent, entityRef);
+            EntityRef entity = client.getEntity();
+            entity.send(afkEvent);
         }
     }
 
     @ReceiveEvent
     public void onAFKEvent(AFKEvent event, EntityRef entityRef) {
         afkMap.put(entityRef.getId(), event.isAfk());
-        if (event.isAfk()) {
-            console.addMessage("[AFK] You are AFK!");
-        } else {
-            console.addMessage("[AFK] You are no longer AFK!");
+        EntityRef target = event.getTarget();
+        if (target.getId() == entityRef.getId()) {
+            if (event.isAfk()) {
+                console.addMessage("[AFK] You are AFK!");
+            } else {
+                console.addMessage("[AFK] You are no longer AFK!");
+            }
         }
     }
 
