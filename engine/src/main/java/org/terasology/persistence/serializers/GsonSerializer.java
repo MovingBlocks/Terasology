@@ -56,8 +56,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Converts the object into an array of bytes and forwards it to
-     * {@link #writeJson(Object, TypeHandler, Writer)}
+     * writes the serialized persisted data as a JSON to {@link Writer} and returns the JSON as a string.
      * 
      * @param object      the object to be serialized
      * @param typeHandler contains how the object will be serialized
@@ -72,7 +71,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Writes an object's serialized persisted data to a Writer
+     * Writes an object's serialized persisted data to the {@link Writer} as a JSON.
      * 
      * @see #writeJson(Object, TypeHandler, OutputStream)
      * @param object the object to be serialized
@@ -87,7 +86,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Writes an object's serialized persisted data to an OutputStream
+     * Writes an object's serialized persisted data to the {@link OutputStream} as a JSON.
      * 
      * @see #writeJson(Object, TypeHandler, Writer)
      * @param object the object to be serialized
@@ -102,7 +101,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Writes the object's persisted data to a File object
+     * Writes the object's persisted data to the {@link File} as a JSON.
      * 
      * @see #writeJson(Object, TypeHandler, String)
      * @param object the file to be serialized
@@ -117,7 +116,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Writes the a the object's persisted data to a File located at a specified file name
+     * Writes the a the object's persisted data to {@link File} of a specified file name as a JSON
      * 
      * @see #writeJson(Object, TypeHandler, String)
      * @param object the object to be serialized
@@ -130,10 +129,10 @@ public class GsonSerializer {
     }
 
     /**
-     * Gets the PersistedData from a Reader object
+     * Gets the PersistedData from the {@link Reader}'s contents.
      * 
      * @see #persistedDataFromJson(InputStream)
-     * @param reader Reader object that will be deserialized
+     * @param reader Reader object that contains the contents that will be deserialized
      * @return deserialized GsonPersistedData object
      */
     public PersistedData persistedDataFromJson(Reader reader) {
@@ -143,10 +142,10 @@ public class GsonSerializer {
     }
 
     /**
-     * Gets the PersistedData from an InputStream
+     * Gets the PersistedData from an {@link InputStream}'s contents.
      * 
      * @see #persistedDataFromJson(Reader)
-     * @param stream the InputStream that will be serialized
+     * @param stream Contents of the InputStream will be serialized
      * @return deserialized GsonPersistedData object
      * @throws IOException if there is an issue parsing the stream
      */
@@ -157,7 +156,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Gets the PersistedData from a File object
+     * Gets the PersistedData from a {@link File} object's contents.
      * 
      * @see #persistedDataFromJson(String)
      * @param file File object containing the JSON that will be deserialized
@@ -171,7 +170,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Gets the PersistedData by forwarding a Reader which contains a String to {@link #persistedDataFromJson(Reader)}
+     * Gets the PersistedData from a {@link String}'s contents.
      * 
      * @see #persistedDataFromJson(Reader)
      * @param json the String that will be deserialized
