@@ -300,29 +300,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public Biome setBiome(Vector3i worldPos, Biome biome) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
-        if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
-            Biome oldBiomeType = chunk.setBiome(blockPos.x, blockPos.y, blockPos.z, biome);
-            if (oldBiomeType != biome) {
-                BiomeChange oldChange = biomeChanges.get(worldPos);
-                if (oldChange == null) {
-                    biomeChanges.put(worldPos, new BiomeChange(worldPos, oldBiomeType, biome));
-                } else {
-                    oldChange.setTo(biome);
-                }
-                setDirtyChunksNear(worldPos);
-                notifyBiomeChanged(worldPos, biome, oldBiomeType);
-            }
-            return oldBiomeType;
-
-        }
-        return null;
-    }
-
-    @Override
     public byte getLight(int x, int y, int z) {
         Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);

@@ -21,8 +21,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.players.PlayerCharacterComponent;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
@@ -37,11 +35,11 @@ public class PlayerBiomeChangeTrackerSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {PlayerCharacterComponent.class})
     public void checkForBiomeChange(MovedEvent event, EntityRef entity) {
-        final Vector3i newPos = new Vector3i(event.getPosition());
-        final Vector3i oldPos = new Vector3i(new Vector3f(event.getPosition()).sub(event.getDelta()));
-        if (newPos.equals(oldPos)) {
-            return;
-        }
+//        final Vector3i newPos = new Vector3i(event.getPosition());
+//        final Vector3i oldPos = new Vector3i(new Vector3f(event.getPosition()).sub(event.getDelta()));
+//        if (newPos.equals(oldPos)) {
+//            return;
+//        }
 //        final Biome oldBiome = world.getBiome(oldPos);
 //        final Biome newBiome = world.getBiome(newPos);
 //        if (!oldBiome.equals(newBiome)) {

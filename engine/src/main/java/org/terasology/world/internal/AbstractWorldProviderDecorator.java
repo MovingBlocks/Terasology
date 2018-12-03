@@ -108,11 +108,6 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public Biome setBiome(Vector3i pos, Biome biome) {
-        return base.setBiome(pos, biome);
-    }
-
-    @Override
     public byte getLight(int x, int y, int z) {
         return base.getLight(x, y, z);
     }
