@@ -27,6 +27,7 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.network.Client;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -67,7 +68,6 @@ public class AFKSystem extends BaseComponentSystem {
 
     @Override
     public void shutdown() {
-        context.put(AFKSystem.class, null);
         logger.info("Success! Shut down the afk system.");
     }
 
@@ -75,14 +75,18 @@ public class AFKSystem extends BaseComponentSystem {
             value = "afk",
             shortDescription = "Tell the players that you are away from the keyboard",
             helpText = "[on:off]",
-            runOnServer = true,
             requiredPermission = PermissionManager.NO_PERMISSION
     )
     public void command() {
         afk = !afk;
+        if (networkSystem.getServer() == null && !networkSystem.getMode().isServer()) {
+            console.addMessage("[AFK] Make sure you are connected to an online server ( singleplayer doesn't count )");
+            return;
+        }
         NetworkMode networkMode = networkSystem.getMode();
         if (networkMode == NetworkMode.DEDICATED_SERVER) {
             afkMap.put(localPlayer.getClientEntity().getId(), afk);
+            onAFKRequest(new AFKRequest(afk), localPlayer.getClientEntity());
             if (afk) {
                 console.addMessage("[AFK] You are AFK!");
             } else {
@@ -96,15 +100,12 @@ public class AFKSystem extends BaseComponentSystem {
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void onAFKRequest(AFKRequest event, EntityRef entityRef) {
         afkMap.put(entityRef.getId(), event.isAfk());
-        Server server = networkSystem.getServer();
-        if (server != null) {
-            networkSystem.getPlayers().forEach(client -> {
-                client.send(new AFKEvent(event.isAfk()), entityRef);
-            });
+        for (Client client : networkSystem.getPlayers()) {
+            client.send(new AFKEvent(event.isAfk()), entityRef);
         }
     }
 
-    @ReceiveEvent(netFilter =  RegisterMode.CLIENT)
+    @ReceiveEvent
     public void onAFKEvent(AFKEvent event, EntityRef entityRef) {
         afkMap.put(entityRef.getId(), event.isAfk());
         if (event.isAfk()) {
