@@ -32,7 +32,6 @@ import org.terasology.network.FieldReplicateType;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.Replicate;
-import org.terasology.network.Server;
 import org.terasology.registry.In;
 
 import java.util.HashMap;
