@@ -18,8 +18,10 @@ package org.terasology.logic.afk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -54,6 +56,9 @@ public class AFKSystem extends BaseComponentSystem {
     @In
     private Console console;
 
+    @In
+    private EventSystem eventSystem;
+
     @Replicate(FieldReplicateType.SERVER_TO_CLIENT)
     private Map<Long, Boolean> afkMap = new HashMap<Long, Boolean>();
 
@@ -61,6 +66,8 @@ public class AFKSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
+        eventSystem.registerEvent(new SimpleUri("engine:AFKRequest"), AFKRequest.class);
+        eventSystem.registerEvent(new SimpleUri("engine:AFKEvent"), AFKEvent.class);
         context.put(AFKSystem.class, this);
         logger.info("Initialised the AFK system");
     }
