@@ -28,6 +28,7 @@ import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.physics.events.MovedEvent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 
@@ -74,6 +75,15 @@ public class AFKSystem extends BaseComponentSystem implements AFK {
             console.addMessage("[AFK] You are no longer AFK!");
         }
         localPlayer.getClientEntity().addOrSaveComponent(component);
+    }
+
+    @ReceiveEvent( netFilter = RegisterMode.CLIENT)
+    public void onMove(MovedEvent movedEvent, EntityRef entity) {
+        if (component.afk) {
+            component.afk = false;
+            console.addMessage("[AFK] Welcome back, You are no longer AFK!");
+            localPlayer.getClientEntity().addOrSaveComponent(component);
+        }
     }
 
 }
