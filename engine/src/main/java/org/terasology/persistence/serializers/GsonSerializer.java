@@ -55,7 +55,7 @@ public class GsonSerializer {
     }
 
     /**
-     * writes the serialized persisted data as a JSON to {@link Writer} and returns the JSON as a string.
+     * Writes the serialized persisted data as a JSON to {@link Writer} and returns the JSON as a string.
      * 
      * @param object      the object to be serialized
      * @param typeHandler contains how the object will be serialized
@@ -70,7 +70,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Writes an object's serialized persisted data to the {@link Writer} as a JSON.
+     * Writes an object's serialized persisted data to the {@link Writer} as JSON. 
      * 
      * @see #writeJson(Object, TypeHandler, OutputStream)
      * @param object the object to be serialized
@@ -85,7 +85,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Writes an object's serialized persisted data to the {@link OutputStream} as a JSON.
+     * Writes an object's serialized persisted data to the {@link OutputStream} as JSON.
      * 
      * @see #writeJson(Object, TypeHandler, Writer)
      * @param object the object to be serialized
@@ -100,7 +100,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Writes the object's persisted data to the {@link File} as a JSON.
+     * Writes the object's persisted data to the {@link File} as JSON.
      * 
      * @see #writeJson(Object, TypeHandler, String)
      * @param object the file to be serialized
@@ -115,7 +115,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Writes the a the object's persisted data to {@link File} of a specified file name as a JSON
+     * Writes the a the object's persisted data to {@link File} of a specified file name as JSON
      * 
      * @see #writeJson(Object, TypeHandler, String)
      * @param object the object to be serialized
