@@ -77,7 +77,7 @@ public class AFKSystem extends BaseComponentSystem implements AFK {
         localPlayer.getClientEntity().addOrSaveComponent(component);
     }
 
-    @ReceiveEvent( netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent(netFilter = RegisterMode.CLIENT)
     public void onMove(MovedEvent movedEvent, EntityRef entity) {
         if (component.afk) {
             component.afk = false;

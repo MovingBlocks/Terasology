@@ -21,6 +21,6 @@ import org.terasology.network.Replicate;
 public class AFKComponent implements Component {
 
     @Replicate
-    public boolean afk = false;
+    public boolean afk;
 
 }
