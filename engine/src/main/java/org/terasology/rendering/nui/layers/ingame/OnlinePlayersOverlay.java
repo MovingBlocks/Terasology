@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.afk.AFKSystem;
+import org.terasology.logic.afk.AFKComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.PlayerUtil;
 import org.terasology.network.ClientComponent;
@@ -49,9 +49,6 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
 
     @In
     private LocalPlayer localPlayer;
-
-    @In
-    private AFKSystem afkSystem;
 
     @Override
     public void initialise() {
@@ -103,8 +100,9 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
             }
 
             ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
-            if (afkSystem != null) {
-                if (afkSystem.isAFK(clientEntity.getId())) {
+            AFKComponent afkComponent = clientEntity.getComponent(AFKComponent.class);
+            if (afkComponent != null) {
+                if (afkComponent.afk) {
                     sb.append(FontColor.getColored("[AFK]", Color.RED));
                     sb.append(" ");
                 }

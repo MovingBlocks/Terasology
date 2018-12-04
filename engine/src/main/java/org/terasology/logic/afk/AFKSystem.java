@@ -15,49 +15,65 @@
  */
 package org.terasology.logic.afk;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.permission.PermissionManager;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
+import org.terasology.registry.In;
 import org.terasology.registry.Share;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Share(AFK.class)
 @RegisterSystem(RegisterMode.ALWAYS)
 public class AFKSystem extends BaseComponentSystem implements AFK {
 
-    private Map<Long, Boolean> afkMap;
+    private static final Logger logger = LoggerFactory.getLogger(AFKSystem.class);
+
+    @In
+    private Console console;
+
+    @In
+    private LocalPlayer localPlayer;
+
+    @In
+    private NetworkSystem networkSystem;
+
+    private AFKComponent component;
 
     @Override
     public void initialise() {
-        afkMap = new HashMap<>();
+        component = new AFKComponent();
+        localPlayer.getClientEntity().addComponent(component);
+        logger.info("Successfully! Initialised the AFK system");
     }
 
     @Override
+    @Command(
+            value = "afk",
+            shortDescription = "Say that you are AFK",
+            requiredPermission = PermissionManager.NO_PERMISSION
+    )
     public void onCommand() {
-
-    }
-
-    @Override
-    public void onEvent(AFKEvent event, EntityRef entity) {
-
-    }
-
-    @Override
-    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
-    public void onRequest(AFKRequest request, EntityRef entity) {
-
-    }
-
-    @Override
-    public boolean isAFK(long id) {
-        if (afkMap.containsKey(id)) {
-            return afkMap.get(id);
+        NetworkMode networkMode = networkSystem.getMode();
+        if (networkMode != NetworkMode.CLIENT && networkMode != NetworkMode.DEDICATED_SERVER) {
+            console.addMessage("Failed! You need to be connected to use this command.");
+            return;
         }
-        return false;
+        component.afk = !component.afk;
+        if (component.afk) {
+            console.addMessage("[AFK} You are AFK now!");
+        } else {
+            console.addMessage("[AFK] You are no longer AFK!");
+        }
+        localPlayer.getClientEntity().addOrSaveComponent(component);
     }
 
 }

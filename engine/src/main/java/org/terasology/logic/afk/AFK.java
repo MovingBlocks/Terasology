@@ -15,12 +15,8 @@
  */
 package org.terasology.logic.afk;
 
-import org.terasology.entitySystem.entity.EntityRef;
 
 public interface AFK {
     void initialise();
     void onCommand();
-    void onEvent(AFKEvent event, EntityRef entity);
-    void onRequest(AFKRequest request, EntityRef entity);
-    boolean isAFK(long id);
 }
