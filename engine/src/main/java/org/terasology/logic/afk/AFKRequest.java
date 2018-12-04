@@ -15,21 +15,17 @@
  */
 package org.terasology.logic.afk;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 
 @ServerEvent
-public class AFKRequest implements Event {
-    boolean afk;
+public class AFKRequest extends NetworkEvent {
+    private boolean afk;
 
     public AFKRequest() {
     }
 
     public AFKRequest(boolean afk) {
-        this.afk = afk;
-    }
-
-    public void setAfk(boolean afk) {
         this.afk = afk;
     }
 

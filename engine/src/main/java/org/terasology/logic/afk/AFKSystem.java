@@ -15,119 +15,44 @@
  */
 package org.terasology.logic.afk;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.permission.PermissionManager;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.Client;
-import org.terasology.network.FieldReplicateType;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.Replicate;
-import org.terasology.registry.In;
+import org.terasology.registry.Share;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Share(AFK.class)
 @RegisterSystem(RegisterMode.ALWAYS)
-public class AFKSystem extends BaseComponentSystem {
+public class AFKSystem extends BaseComponentSystem implements AFK {
 
-    private final Logger logger = LoggerFactory.getLogger(AFKSystem.class);
-
-    @In
-    private Context context;
-
-    @In
-    private NetworkSystem networkSystem;
-
-    @In
-    private LocalPlayer localPlayer;
-
-    @In
-    private Console console;
-
-    @In
-    private EventSystem eventSystem;
-
-    @Replicate(FieldReplicateType.SERVER_TO_CLIENT)
-    private Map<Long, Boolean> afkMap = new HashMap<Long, Boolean>();
-
-    private boolean afk;
+    private Map<Long, Boolean> afkMap;
 
     @Override
     public void initialise() {
-        eventSystem.registerEvent(new SimpleUri("engine:AFKRequest"), AFKRequest.class);
-        eventSystem.registerEvent(new SimpleUri("engine:AFKEvent"), AFKEvent.class);
-        context.put(AFKSystem.class, this);
-        logger.info("Initialised the AFK system");
+        afkMap = new HashMap<>();
     }
 
     @Override
-    public void shutdown() {
-        logger.info("Success! Shut down the afk system.");
+    public void onCommand() {
+
     }
 
-    @Command(
-            value = "afk",
-            shortDescription = "Tell the players that you are away from the keyboard",
-            helpText = "[on:off]",
-            requiredPermission = PermissionManager.NO_PERMISSION
-    )
-    public void command() {
-        afk = !afk;
-        if (networkSystem.getServer() == null && !networkSystem.getMode().isServer()) {
-            console.addMessage("[AFK] Make sure you are connected to an online server ( singleplayer doesn't count )");
-            return;
-        }
-        NetworkMode networkMode = networkSystem.getMode();
-        if (networkMode == NetworkMode.DEDICATED_SERVER) {
-            afkMap.put(localPlayer.getClientEntity().getId(), afk);
-            onAFKRequest(new AFKRequest(afk), localPlayer.getClientEntity());
-            if (afk) {
-                console.addMessage("[AFK] You are AFK!");
-            } else {
-                console.addMessage("[AFK] You are no longer AFK!");
-            }
-        } else if (networkMode == NetworkMode.CLIENT) {
-            EntityRef entity = localPlayer.getClientEntity();
-            AFKRequest afkRequest = new AFKRequest(afk);
-            entity.send(afkRequest);
-        }
+    @Override
+    public void onEvent(AFKEvent event, EntityRef entity) {
+
     }
 
+    @Override
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
-    public void onAFKRequest(AFKRequest event, EntityRef entityRef) {
-        afkMap.put(entityRef.getId(), event.isAfk());
-        AFKEvent afkEvent = new AFKEvent(entityRef, event.isAfk());
-        for (Client client : networkSystem.getPlayers()) {
-            EntityRef entity = client.getEntity();
-            entity.send(afkEvent);
-        }
+    public void onRequest(AFKRequest request, EntityRef entity) {
+
     }
 
-    @ReceiveEvent
-    public void onAFKEvent(AFKEvent event, EntityRef entityRef) {
-        afkMap.put(entityRef.getId(), event.isAfk());
-        EntityRef target = event.getTarget();
-        if (target.getId() == entityRef.getId()) {
-            if (event.isAfk()) {
-                console.addMessage("[AFK] You are AFK!");
-            } else {
-                console.addMessage("[AFK] You are no longer AFK!");
-            }
-        }
-    }
-
+    @Override
     public boolean isAFK(long id) {
         if (afkMap.containsKey(id)) {
             return afkMap.get(id);

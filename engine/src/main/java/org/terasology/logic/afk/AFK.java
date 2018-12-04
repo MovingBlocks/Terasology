@@ -15,27 +15,12 @@
  */
 package org.terasology.logic.afk;
 
-
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.network.BroadcastEvent;
-import org.terasology.network.NetworkEvent;
 
-@BroadcastEvent
-public class AFKEvent extends NetworkEvent {
-
-    private EntityRef target;
-    private boolean afk;
-
-    public AFKEvent(EntityRef target, boolean afk) {
-        this.target = target;
-        this.afk = afk;
-    }
-
-    public EntityRef getTarget() {
-        return target;
-    }
-
-    public boolean isAfk() {
-        return afk;
-    }
+public interface AFK {
+    void initialise();
+    void onCommand();
+    void onEvent(AFKEvent event, EntityRef entity);
+    void onRequest(AFKRequest request, EntityRef entity);
+    boolean isAFK(long id);
 }
