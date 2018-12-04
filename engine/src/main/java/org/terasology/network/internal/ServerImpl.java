@@ -51,7 +51,6 @@ import org.terasology.protobuf.NetData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
@@ -91,7 +90,6 @@ public class ServerImpl implements Server {
     private NetworkEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
     private BlockManagerImpl blockManager;
-    private BiomeManager biomeManager;
     private ExtraBlockDataManager extraDataManager;
 
     private BlockEntityRegistry blockEntityRegistry;
@@ -119,7 +117,6 @@ public class ServerImpl implements Server {
         this.entitySerializer = newEntitySerializer;
         this.blockEntityRegistry = newBlockEntityRegistry;
         blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
-        biomeManager = CoreRegistry.get(BiomeManager.class);
         extraDataManager = CoreRegistry.get(ExtraBlockDataManager.class);
     }
 
@@ -339,7 +336,7 @@ public class ServerImpl implements Server {
 
     private void processReceivedChunks(NetData.NetMessage message) {
         for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
-            Chunk chunk = ChunkSerializer.decode(chunkInfo, blockManager, biomeManager, extraDataManager);
+            Chunk chunk = ChunkSerializer.decode(chunkInfo, blockManager, extraDataManager);
             chunkQueue.offer(chunk);
         }
     }

@@ -119,7 +119,7 @@ public class TreeTests {
 
         Rect2i chunks = Rect2i.createFromMinAndMax(-1, -1, 1, 1);
         for (BaseVector2i chunkPos : chunks.contents()) {
-            Chunk chunk = new ChunkImpl(chunkPos.getX(), 0, chunkPos.getY(), blockManager, biomeManager, extraDataManager) {
+            Chunk chunk = new ChunkImpl(chunkPos.getX(), 0, chunkPos.getY(), blockManager, extraDataManager) {
                 @Override
                 public Block setBlock(int x, int y, int z, Block block) {
                     Vector3i world = chunkToWorldPosition(x, y, z);

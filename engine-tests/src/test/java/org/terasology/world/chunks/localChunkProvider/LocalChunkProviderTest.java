@@ -78,7 +78,7 @@ public class LocalChunkProviderTest {
         worldEntity = mock(EntityRef.class);
         chunkCache = new ConcurrentMapChunkCache();
         chunkProvider = new LocalChunkProvider(null,
-                entityManager, null, blockManager, null, extraDataManager, chunkFinalizer, null, chunkCache);
+                entityManager, null, blockManager, extraDataManager, chunkFinalizer, null, chunkCache);
         chunkProvider.setBlockEntityRegistry(blockEntityRegistry);
         chunkProvider.setWorldEntity(worldEntity);
     }

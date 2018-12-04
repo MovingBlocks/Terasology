@@ -30,7 +30,6 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
@@ -40,7 +39,6 @@ import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.propagation.BatchPropagator;
-import org.terasology.world.propagation.BiomeChange;
 import org.terasology.world.propagation.BlockChange;
 import org.terasology.world.propagation.PropagationRules;
 import org.terasology.world.propagation.PropagatorWorldView;
@@ -79,7 +77,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
     private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
-    private Map<Vector3i, BiomeChange> biomeChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
     private Block unloadedBlock;
@@ -270,19 +267,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
         }
     }
-
-    private void notifyBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome) {
-        // TODO: Could use a read/write writeLock.
-        // TODO: Review, should only happen on main thread (as should changes to listeners)
-        synchronized (listeners) {
-            for (WorldChangeListener listener : listeners) {
-                listener.onBiomeChanged(pos, newBiome, originalBiome);
-            }
-        }
-    }
     
     private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
-        // TODO: Change to match block and biome, if those changes are made.
+        // TODO: Change to match block , if those changes are made.
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
                 listener.onExtraDataChanged(index, pos, newData, oldData);

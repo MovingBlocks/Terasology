@@ -49,7 +49,6 @@ import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UITabBox;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.time.DateTimeHelper;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.internal.WorldInfo;
 
 import java.text.DateFormat;
@@ -97,7 +96,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
         }
     };
     private UIList<WorldInfo> gameWorlds;
-    private UIList<Biome> biomes;
     private UIList<String> blocks;
     private UIText description;
     private UIText generalInfo;
@@ -190,13 +188,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
                 .append('\n'));
         getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate(
                 "${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
-    }
-
-    private String getBiomeDescription(final Biome biome) {
-        return translationSystem.translate("${engine:menu#biome-name}: ") + biome.getId() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#biome-fog}: ") + biome.getFog() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#biome-humidity}: ") + biome.getHumidity() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#biome-temperature}: ") + biome.getTemperature();
     }
 
     private void setUpBlocks() {

@@ -42,7 +42,6 @@ import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -112,7 +111,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     private ReadWriteLock regionLock = new ReentrantReadWriteLock();
 
     private BlockManager blockManager;
-    private BiomeManager biomeManager;
     private ExtraBlockDataManager extraDataManager;
     private final ChunkCache chunkCache;
     private final Supplier<ChunkFinalizer> chunkFinalizerSupplier;
@@ -122,12 +120,11 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     //TODO Remove this old constructor at the end of the chunk overhaul
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                              BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
+                              BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this(storageManager,
                 entityManager,
                 generator,
                 blockManager,
-                biomeManager,
                 extraDataManager,
                 new LightMergingChunkFinalizer(),
                 LightMergingChunkFinalizer::new,
@@ -135,14 +132,13 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                       BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager,
+                       BlockManager blockManager, ExtraBlockDataManager extraDataManager,
                        ChunkFinalizer chunkFinalizer, Supplier<ChunkFinalizer> chunkFinalizerSupplier,
                        ChunkCache chunkCache) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
         this.blockManager = blockManager;
-        this.biomeManager = biomeManager;
         this.extraDataManager = extraDataManager;
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
@@ -653,7 +649,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                     Chunk chunk;
                     EntityBufferImpl buffer = new EntityBufferImpl();
                     if (chunkStore == null) {
-                        chunk = new ChunkImpl(getPosition(), blockManager, biomeManager, extraDataManager);
+                        chunk = new ChunkImpl(getPosition(), blockManager, extraDataManager);
                         generator.createChunk(chunk, buffer);
                     } else {
                         chunk = chunkStore.getChunk();

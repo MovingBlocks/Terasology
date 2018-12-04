@@ -80,7 +80,6 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -134,7 +133,6 @@ public class HeadlessEnvironment extends Environment {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         EngineEntityManager engineEntityManager = context.get(EngineEntityManager.class);
         BlockManager blockManager = context.get(BlockManager.class);
-        BiomeManager biomeManager = context.get(BiomeManager.class);
         RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
         Path savePath = PathManager.getInstance().getSavePath("world1");
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
@@ -146,7 +144,7 @@ public class HeadlessEnvironment extends Environment {
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, blockManager, biomeManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+                engineEntityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
     }
 
     @Override

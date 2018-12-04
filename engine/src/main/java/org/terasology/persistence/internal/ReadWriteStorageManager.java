@@ -56,7 +56,6 @@ import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.ShutdownTask;
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.utilities.concurrency.TaskMaster;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
@@ -121,18 +120,18 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      */
     private ComponentLibrary entityRefReplacingComponentLibrary;
 
-    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager,
-                                   BiomeManager biomeManager, ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
+    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager
+            , ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
                                    RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
-        this(savePath, environment, entityManager, blockManager, biomeManager, extraDataManager,
+        this(savePath, environment, entityManager, blockManager, extraDataManager,
             true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
     }
 
     ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                   BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips,
+                                   BlockManager blockManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips,
                                    RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils,
                             RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
-        super(savePath, environment, entityManager, blockManager, biomeManager, extraDataManager, storeChunksInZips);
+        super(savePath, environment, entityManager, blockManager, extraDataManager, storeChunksInZips);
 
         entityManager.subscribeForDestruction(this);
         entityManager.subscribeForChanges(this);

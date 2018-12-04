@@ -100,11 +100,11 @@ public class MapWorldProvider implements WorldProviderCore {
             return block;
         }
 
-        // TODO block & biome manager
+        // TODO block manager
         Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
         Chunk chunk = chunks.get(chunkPos);
         if (chunk == null && worldGenerator != null) {
-            chunk = new ChunkImpl(chunkPos, blockManager, biomeManager, extraDataManager);
+            chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
             worldGenerator.createChunk(chunk, entityBuffer);
             chunks.put(chunkPos, chunk);
         }
