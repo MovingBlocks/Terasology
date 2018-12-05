@@ -41,7 +41,6 @@ import java.util.Objects;
  * as if they were moving a window over the widget.
  */
 public class ScrollableArea extends CoreLayout {
-    private static boolean ceil = false;
     private static final int SCROLL_MULTIPLIER = -42;
 
     /**
@@ -133,10 +132,10 @@ public class ScrollableArea extends CoreLayout {
     public void setPosition(double moveAmount) {
         if (verticalScrollbar) {
             moveAmount *= verticalBar.getRange();
-            verticalBar.setValue((int)Math.round(moveAmount));
+            verticalBar.setValue((int) Math.round(moveAmount));
         } else if (horizontalScrollbar) {
             moveAmount *= horizontalBar.getRange();
-            horizontalBar.setValue((int)Math.round(moveAmount));
+            horizontalBar.setValue((int) Math.round(moveAmount));
         }
     }
 

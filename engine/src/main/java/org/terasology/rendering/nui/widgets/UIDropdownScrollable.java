@@ -324,7 +324,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         } else {
             highlighted--;
             if (highlighted < 0) {
-                highlighted = getOptions().size()-1;
+                highlighted = getOptions().size() - 1;
                 if (opened) {
                     verticalBar.setValue(verticalBar.getRange() - verticalBar.getMinimum());
                 }

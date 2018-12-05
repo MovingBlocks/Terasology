@@ -24,8 +24,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.ActivatableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -76,12 +74,12 @@ public class UIList<T> extends ActivatableWidget {
         boolean enabled = isEnabled();
         Border margin = canvas.getCurrentStyle().getMargin();
 
-        double yOffset =1 / (double)optionListeners.size();
+        double yOffset = 1 / (double) optionListeners.size();
         for (int i = 0; i < list.get().size(); ++i) {
             T item = list.get().get(i);
             Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
 
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, (int)yOffset, canvas.size().x, preferredSize.y);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, (int) yOffset, canvas.size().x, preferredSize.y);
             ItemInteractionListener listener = optionListeners.get(i);
             if (enabled) {
                 if (Objects.equals(item, selection.get())) {
@@ -100,7 +98,7 @@ public class UIList<T> extends ActivatableWidget {
             canvas.drawBackground(itemRegion);
             itemRenderer.draw(item, canvas, margin.shrink(itemRegion));
 
-            yOffset += preferredSize.y - 1/(double) optionListeners.size();
+            yOffset += preferredSize.y - 1 / (double) optionListeners.size();
 
             if (i == list.get().size() - 1) {
                 itemSize = preferredSize.getY();
@@ -131,7 +129,7 @@ public class UIList<T> extends ActivatableWidget {
         for (T item : list.get()) {
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
             result.x = Math.max(result.x, preferredSize.x);
-            result.y += preferredSize.y + 1/(double)optionListeners.size();
+            result.y += preferredSize.y + 1 / (double) optionListeners.size();
         }
         return result;
     }
@@ -344,14 +342,14 @@ public class UIList<T> extends ActivatableWidget {
             if (currentIndex != -1) {
                 if (keyId == Keyboard.KeyId.UP) {
                     if (getParent() != null) {
-                        getParent().setPosition((currentIndex - 1) / ((double)optionListeners.size()-1));
+                        getParent().setPosition((currentIndex - 1) / ((double) optionListeners.size() - 1));
                     }
 
                     select(currentIndex - 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.DOWN) {
                     if (getParent() != null) {
-                        getParent().setPosition((currentIndex + 1) / ((double)optionListeners.size()-1));
+                        getParent().setPosition((currentIndex + 1) / ((double) optionListeners.size() - 1));
                     }
 
                     select(currentIndex + 1);

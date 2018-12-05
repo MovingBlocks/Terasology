@@ -25,6 +25,10 @@ import java.util.List;
  * A widget that can be activated when tabbed to.
  */
 public abstract class ActivatableWidget extends WidgetWithOrder {
+    /**
+     * A {@link List} of listeners subscribed to this button
+     */
+    protected List<ActivateEventListener> listeners = Lists.newArrayList();
 
     public ActivatableWidget() {
         this.setId("");
@@ -33,10 +37,6 @@ public abstract class ActivatableWidget extends WidgetWithOrder {
     public ActivatableWidget(String id) {
         this.setId(id);
     }
-    /**
-     * A {@link List} of listeners subscribed to this button
-     */
-    protected List<ActivateEventListener> listeners = Lists.newArrayList();
 
     /**
      * Called when this is pressed to activate all subscribed listeners.
