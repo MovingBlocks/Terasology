@@ -16,6 +16,7 @@
 package org.terasology.logic.title;
 
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 public class TitleScreen extends CoreScreenLayer {
@@ -29,26 +30,22 @@ public class TitleScreen extends CoreScreenLayer {
     public void initialise() {
         uiTitle = find("title", UILabel.class);
         if (uiTitle != null) {
-            uiTitle.setText(title);
+            uiTitle.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return title;
+                }
+            });
         }
 
         uiSubtitle = find("subtitle", UILabel.class);
         if (uiSubtitle != null) {
-            uiSubtitle.setText(subtitle);
-        }
-    }
-
-    public void update() {
-        if (uiTitle != null) {
-            if (!uiTitle.getText().equals(title)) {
-                uiTitle.setText(title);
-            }
-        }
-
-        if (uiSubtitle != null) {
-            if (!uiSubtitle.getText().equals(subtitle)) {
-                uiSubtitle.setText(subtitle);
-            }
+            uiSubtitle.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return subtitle;
+                }
+            });
         }
     }
 

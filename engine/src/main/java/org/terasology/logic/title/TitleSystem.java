@@ -61,16 +61,6 @@ public class TitleSystem extends BaseComponentSystem implements Title {
     private String lastSubtitle = "";
     private long lastStay;
 
-    @Override
-    public void initialise() {
-        logger.info("Initialised the title system!");
-    }
-
-    @Override
-    public void shutdown() {
-        logger.info("Successfully! shut down the title system!");
-    }
-
     @Command(
             value = "title",
             shortDescription = "Use the title feature",
@@ -126,7 +116,6 @@ public class TitleSystem extends BaseComponentSystem implements Title {
         build();
         titleScreen.setTitle(title);
         titleScreen.setSubtitle(subtitle);
-        titleScreen.update();
         clear();
         delayManager.addDelayedAction(localPlayer.getClientEntity(), DELAY_ACTION_ID, stay);
     }
@@ -139,7 +128,6 @@ public class TitleSystem extends BaseComponentSystem implements Title {
         build();
         titleScreen.setTitle("");
         titleScreen.setSubtitle("");
-        titleScreen.update();
         nuiManager.removeOverlay(UI_URL);
         titleScreen = null;
     }
