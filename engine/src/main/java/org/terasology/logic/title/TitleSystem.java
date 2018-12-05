@@ -38,8 +38,6 @@ import org.terasology.rendering.nui.NUIManager;
 @RegisterSystem(RegisterMode.ALWAYS)
 public class TitleSystem extends BaseComponentSystem implements Title {
 
-    private static final Logger logger = LoggerFactory.getLogger(TitleSystem.class);
-
     private static final ResourceUrn UI_URL = new ResourceUrn("engine:title");
 
     private static final String DELAY_ACTION_ID = "TITLE";
@@ -67,12 +65,13 @@ public class TitleSystem extends BaseComponentSystem implements Title {
             helpText = "<title:subtitle:stay:reset> <value>"
     )
     public void titleCommand(@CommandParam("type") String type, @CommandParam(value = "value", required = false) String value) {
-        if (type.equalsIgnoreCase("reset")) {
-            if (titleScreen != null) {
-                hide();
-                console.addMessage("Done! Reset the title screen.");
-                return;
-            }
+        if (type.equalsIgnoreCase("reset") && titleScreen != null) {
+            hide();
+            console.addMessage("Done! Reset the title screen.");
+            return;
+        } else if (type.equalsIgnoreCase("reset")) {
+            console.addMessage("Done! Reset the title screen.");
+            return;
         }
         if (value != null) {
             if (type.equalsIgnoreCase("title")) {
