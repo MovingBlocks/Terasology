@@ -129,7 +129,7 @@ public class UIList<T> extends ActivatableWidget {
         for (T item : list.get()) {
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
             result.x = Math.max(result.x, preferredSize.x);
-            result.y += preferredSize.y + 1 / (double) optionListeners.size();
+            result.y += preferredSize.y;
         }
         return result;
     }
