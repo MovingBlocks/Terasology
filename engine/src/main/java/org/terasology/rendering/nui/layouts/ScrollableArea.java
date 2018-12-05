@@ -127,8 +127,8 @@ public class ScrollableArea extends CoreLayout {
     }
 
     /**
-     * Scrolls the given amount.
-     * @param moveAmount The position of the scrollbar as a percent
+     * Sets the amount of the scrollbar.
+     * @param moveAmount The position of the scrollbar as a percent.
      */
     public void setPosition(double moveAmount) {
         if (verticalScrollbar) {
@@ -137,14 +137,6 @@ public class ScrollableArea extends CoreLayout {
         } else if (horizontalScrollbar) {
             moveAmount *= horizontalBar.getRange();
             horizontalBar.setValue((int)Math.round(moveAmount));
-        }
-    }
-
-    public void scrollOne(boolean up) {
-        if (up) {
-
-        } else {
-
         }
     }
 

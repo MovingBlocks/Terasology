@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
-import org.slf4j.LoggerFactory;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
@@ -77,12 +76,12 @@ public class UIList<T> extends ActivatableWidget {
         boolean enabled = isEnabled();
         Border margin = canvas.getCurrentStyle().getMargin();
 
-        int yOffset = 0;
+        double yOffset =1 / (double)optionListeners.size();
         for (int i = 0; i < list.get().size(); ++i) {
             T item = list.get().get(i);
             Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
 
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, (int)yOffset, canvas.size().x, preferredSize.y);
             ItemInteractionListener listener = optionListeners.get(i);
             if (enabled) {
                 if (Objects.equals(item, selection.get())) {
@@ -98,11 +97,10 @@ public class UIList<T> extends ActivatableWidget {
             } else {
                 canvas.setMode(DISABLED_MODE);
             }
-
             canvas.drawBackground(itemRegion);
             itemRenderer.draw(item, canvas, margin.shrink(itemRegion));
 
-            yOffset += preferredSize.getY();
+            yOffset += preferredSize.y - 1/(double) optionListeners.size();
 
             if (i == list.get().size() - 1) {
                 itemSize = preferredSize.getY();
@@ -120,6 +118,7 @@ public class UIList<T> extends ActivatableWidget {
         }
     }
 
+
     @Override
     public boolean canBeFocus() {
         return canBeFocus.get();
@@ -132,7 +131,7 @@ public class UIList<T> extends ActivatableWidget {
         for (T item : list.get()) {
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
             result.x = Math.max(result.x, preferredSize.x);
-            result.y += preferredSize.y + (.5);
+            result.y += preferredSize.y + 1/(double)optionListeners.size();
         }
         return result;
     }
@@ -345,14 +344,14 @@ public class UIList<T> extends ActivatableWidget {
             if (currentIndex != -1) {
                 if (keyId == Keyboard.KeyId.UP) {
                     if (getParent() != null) {
-                        getParent().setPosition((currentIndex - 1) / (double)optionListeners.size());
+                        getParent().setPosition((currentIndex - 1) / ((double)optionListeners.size()-1));
                     }
 
                     select(currentIndex - 1);
                     return true;
                 } else if (keyId == Keyboard.KeyId.DOWN) {
                     if (getParent() != null) {
-                        getParent().setPosition((currentIndex + 1) / (double)optionListeners.size());
+                        getParent().setPosition((currentIndex + 1) / ((double)optionListeners.size()-1));
                     }
 
                     select(currentIndex + 1);
