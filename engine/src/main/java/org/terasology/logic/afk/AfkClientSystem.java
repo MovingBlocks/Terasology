@@ -65,11 +65,19 @@ public class AfkClientSystem extends BaseComponentSystem {
         entity.send(request);
     }
 
-    @ReceiveEvent(netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent
+    public void onAfk(AfkEvent event, EntityRef entity) {
+        AfkComponent component = entity.getComponent(AfkComponent.class);
+        if (component != null) {
+            component.afk = event.isAfk();
+        }
+    }
+
+    @ReceiveEvent
     public void onMove(MovedEvent movedEvent, EntityRef entity) {
         EntityRef clientEntity = localPlayer.getClientEntity();
-        AfkComponent component = entity.getComponent(AfkComponent.class);
-        if (component.afk) {
+        AfkComponent component = clientEntity.getComponent(AfkComponent.class);
+        if (component != null && component.afk) {
             component.afk = false;
             clientEntity.addOrSaveComponent(component);
             AfkRequest request = new AfkRequest(clientEntity, false);
