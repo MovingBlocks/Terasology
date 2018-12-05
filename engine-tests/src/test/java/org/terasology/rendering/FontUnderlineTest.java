@@ -27,24 +27,24 @@ public class FontUnderlineTest {
     private static final char END_UNDERLINE = 0xF002;
 			
     @Test
-	public void testStartUnderline() {
-		assertTrue(FontUnderline.isValid(START_UNDERLINE));
-	}
+    public void testStartUnderline() {
+        assertTrue(FontUnderline.isValid(START_UNDERLINE));
+    }
 		
-	@Test
-	public void testEndUnderline() {
-		assertTrue(FontUnderline.isValid(END_UNDERLINE));
-	}
+    @Test
+    public void testEndUnderline() {
+        assertTrue(FontUnderline.isValid(END_UNDERLINE));
+    }
 	
-	@Test
-	public void testInvalidUnderline() {
-		char invalidUnderline = 0xF003;
-		assertFalse(FontUnderline.isValid(invalidUnderline));
-	}
+    @Test
+    public void testInvalidUnderline() {
+        char invalidUnderline = 0xF003;
+        assertFalse(FontUnderline.isValid(invalidUnderline));
+    }
 
-	@Test
-	public void testMarkUnderlined() {
-		String testString = "string";
-		assertTrue(FontUnderline.markUnderlined(testString).equals(START_UNDERLINE + testString + END_UNDERLINE));
-	}	
+    @Test
+    public void testMarkUnderlined() {
+        String testString = "string";
+        assertTrue(FontUnderline.markUnderlined(testString).equals(START_UNDERLINE + testString + END_UNDERLINE));
+    }	
 }
