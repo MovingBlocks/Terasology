@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.title;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
