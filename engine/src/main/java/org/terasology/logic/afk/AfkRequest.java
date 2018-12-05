@@ -15,12 +15,24 @@
  */
 package org.terasology.logic.afk;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.network.Replicate;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.network.NetworkEvent;
+import org.terasology.network.ServerEvent;
 
-public class AFKComponent implements Component {
+@ServerEvent
+public class AfkRequest extends NetworkEvent {
 
-    @Replicate
-    public boolean afk;
+    private boolean afk;
 
+    public AfkRequest() {
+    }
+
+    public AfkRequest(EntityRef instigator, boolean afk) {
+        super(instigator);
+        this.afk = afk;
+    }
+
+    public boolean isAfk() {
+        return afk;
+    }
 }

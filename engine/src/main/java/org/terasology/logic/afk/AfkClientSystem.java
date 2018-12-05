@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.afk;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -30,13 +28,9 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.registry.In;
-import org.terasology.registry.Share;
 
-@Share(AFK.class)
-@RegisterSystem(RegisterMode.ALWAYS)
-public class AFKSystem extends BaseComponentSystem implements AFK {
-
-    private static final Logger logger = LoggerFactory.getLogger(AFKSystem.class);
+@RegisterSystem(RegisterMode.CLIENT)
+public class AfkClientSystem extends BaseComponentSystem {
 
     @In
     private Console console;
@@ -47,16 +41,6 @@ public class AFKSystem extends BaseComponentSystem implements AFK {
     @In
     private NetworkSystem networkSystem;
 
-    private AFKComponent component;
-
-    @Override
-    public void initialise() {
-        component = new AFKComponent();
-        localPlayer.getClientEntity().addComponent(component);
-        logger.info("Successfully! Initialised the AFK system");
-    }
-
-    @Override
     @Command(
             value = "afk",
             shortDescription = "Say that you are AFK",
@@ -68,21 +52,28 @@ public class AFKSystem extends BaseComponentSystem implements AFK {
             console.addMessage("Failed! You need to be connected to use this command.");
             return;
         }
+        EntityRef entity = localPlayer.getClientEntity();
+        AfkComponent component = entity.getComponent(AfkComponent.class);
         component.afk = !component.afk;
         if (component.afk) {
-            console.addMessage("[AFK} You are AFK now!");
+            console.addMessage("[AFK] You are AFK now!");
         } else {
             console.addMessage("[AFK] You are no longer AFK!");
         }
-        localPlayer.getClientEntity().addOrSaveComponent(component);
+        entity.addOrSaveComponent(component);
+        AfkRequest request = new AfkRequest(entity, component.afk);
+        entity.send(request);
     }
 
     @ReceiveEvent(netFilter = RegisterMode.CLIENT)
     public void onMove(MovedEvent movedEvent, EntityRef entity) {
+        EntityRef clientEntity = localPlayer.getClientEntity();
+        AfkComponent component = entity.getComponent(AfkComponent.class);
         if (component.afk) {
             component.afk = false;
-            console.addMessage("[AFK] Welcome back, You are no longer AFK!");
-            localPlayer.getClientEntity().addOrSaveComponent(component);
+            clientEntity.addOrSaveComponent(component);
+            AfkRequest request = new AfkRequest(clientEntity, false);
+            clientEntity.send(request);
         }
     }
 

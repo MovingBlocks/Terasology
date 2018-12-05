@@ -15,8 +15,19 @@
  */
 package org.terasology.logic.afk;
 
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
+import org.terasology.entitySystem.systems.RegisterSystem;
 
-public interface AFK {
-    void initialise();
-    void onCommand();
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class AfkAuthoritySystem extends BaseComponentSystem {
+
+    @ReceiveEvent
+    public void onAfkRequest(AfkRequest request, EntityRef entity) {
+        AfkEvent event = new AfkEvent(request.getInstigator(), request.isAfk());
+        entity.send(event);
+    }
+
 }
