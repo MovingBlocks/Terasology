@@ -21,7 +21,6 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -48,14 +47,12 @@ public class MapWorldProvider implements WorldProviderCore {
     private Map<Vector3i, Chunk> chunks = Maps.newHashMap();
     private WorldGenerator worldGenerator;
     private BlockManager blockManager;
-    private BiomeManager biomeManager;
     private ExtraBlockDataManager extraDataManager;
     private EntityBufferImpl entityBuffer;
 
-    public MapWorldProvider(WorldGenerator worldGenerator, BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
+    public MapWorldProvider(WorldGenerator worldGenerator, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this.worldGenerator = worldGenerator;
         this.blockManager = blockManager;
-        this.biomeManager = biomeManager;
         this.extraDataManager = extraDataManager;
         entityBuffer = new EntityBufferImpl();
     }

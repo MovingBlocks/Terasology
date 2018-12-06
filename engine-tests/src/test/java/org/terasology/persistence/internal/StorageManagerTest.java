@@ -52,8 +52,6 @@ import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.SymmetricFamily;
@@ -69,7 +67,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -143,9 +140,6 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         testBlock2 = context.get(BlockManager.class).getBlock("test:testblock2");
 
         context.put(ChunkProvider.class, mock(ChunkProvider.class));
-        BiomeManager mockBiomeManager = mock(BiomeManager.class);
-        when(mockBiomeManager.getBiomes()).thenReturn(Collections.<Biome>emptyList());
-        context.put(BiomeManager.class, mockBiomeManager);
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
         context.put(WorldProvider.class, worldProvider);

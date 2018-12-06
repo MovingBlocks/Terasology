@@ -15,7 +15,7 @@
  */
 package org.terasology.core.world;
 
-import org.terasology.world.biomes.Biome;
+import org.terasology.biomesAPI.Biome;
 
 public enum CoreBiome implements Biome {
     MOUNTAINS("Mountains",  0.95f, 0.4f, 0.25f),
@@ -50,17 +50,14 @@ public enum CoreBiome implements Biome {
         return this.name;
     }
 
-    @Override
     public float getFog() {
         return fog;
     }
 
-    @Override
     public float getHumidity() {
         return humidity;
     }
 
-    @Override
     public float getTemperature() {
         return temperature;
     }

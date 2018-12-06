@@ -93,7 +93,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
 
-        worldStub = new WorldProviderCoreStub(airBlock, null);
+        worldStub = new WorldProviderCoreStub(airBlock);
         worldProvider = new EntityAwareWorldProvider(worldStub, context);
 
         plainBlock = createBlock("test:plainblock", assetManager, blockManager);

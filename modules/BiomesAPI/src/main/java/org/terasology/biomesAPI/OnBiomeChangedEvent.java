@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.biomes;
+package org.terasology.biomesAPI;
 
 import org.terasology.entitySystem.event.Event;
 
@@ -21,11 +21,11 @@ import org.terasology.entitySystem.event.Event;
  * This event is thrown to entities with {@link org.terasology.logic.players.PlayerCharacterComponent} whenever they
  * change the biome they are in.
  */
-public class BiomeChangeEvent implements Event {
+public class OnBiomeChangedEvent implements Event {
     private Biome oldBiome;
     private Biome newBiome;
 
-    public BiomeChangeEvent(Biome oldBiome, Biome newBiome) {
+    public OnBiomeChangedEvent(Biome oldBiome, Biome newBiome) {
         this.oldBiome = oldBiome;
         this.newBiome = newBiome;
     }

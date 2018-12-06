@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.WorldInfo;
@@ -40,14 +39,11 @@ import java.util.Map;
 public class WorldProviderCoreStub implements WorldProviderCore {
 
     private Map<Vector3i, Block> blocks = Maps.newHashMap();
-    private Map<Vector3i, Biome> biomes = Maps.newHashMap();
     private ArrayList<Map<Vector3i, Integer>> extraData = new ArrayList<>();
     private Block air;
-    private Biome defaultBiome;
 
-    public WorldProviderCoreStub(Block air, Biome defaultBiome) {
+    public WorldProviderCoreStub(Block air) {
         this.air = air;
-        this.defaultBiome = defaultBiome;
     }
 
     @Override

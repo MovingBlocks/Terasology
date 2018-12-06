@@ -17,7 +17,6 @@ package org.terasology.world.generator;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -25,7 +24,6 @@ import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -50,7 +48,6 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     Block fullLight;
 
     private BlockManager blockManager;
-    private BiomeManager biomeManager;
     private ExtraBlockDataManager extraDataManager;
 
 
@@ -62,7 +59,6 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         CoreRegistry.put(BlockManager.class, blockManager);
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
 
-        biomeManager = Mockito.mock(BiomeManager.class);
         
         extraDataManager = new ExtraBlockDataManager();
 
