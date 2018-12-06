@@ -29,6 +29,8 @@ public class AfkScreen extends CoreScreenLayer {
 
     private UIBox uiBox;
 
+    private AfkClientSystem afkClientSystem;
+
     @Override
     public void initialise() {
         uiBox = find("box", UIBox.class);
@@ -49,13 +51,16 @@ public class AfkScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        EntityRef entity = localPlayer.getClientEntity();
-        AfkComponent component = entity.getComponent(AfkComponent.class);
-        if (component != null && component.afk) {
-            component.afk = false;
-            entity.addOrSaveComponent(component);
-            AfkRequest request = new AfkRequest(entity, false);
-            entity.send(request);
+        if (getAfkClientSystem() != null) {
+            afkClientSystem.onAfkScreenClosed();
         }
+    }
+
+    public void setAfkClientSystem(AfkClientSystem afkClientSystem) {
+        this.afkClientSystem = afkClientSystem;
+    }
+
+    public AfkClientSystem getAfkClientSystem() {
+        return afkClientSystem;
     }
 }
