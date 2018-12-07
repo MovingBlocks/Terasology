@@ -21,14 +21,13 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class AfkAuthoritySystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+public class AfkAuthoritySystem extends BaseComponentSystem {
 
     private static final String PERIODIC_ID = "AFK_PERIODIC";
 
@@ -43,18 +42,16 @@ public class AfkAuthoritySystem extends BaseComponentSystem implements UpdateSub
     @In
     private LocalPlayer localPlayer;
 
-    private boolean firstFrame = true;
-
     @Override
-    public void update(float delta) {
-        if (firstFrame) {
-            delayManager.addPeriodicAction(localPlayer.getClientEntity(), PERIODIC_ID, 0, AFK_PERIOD);
-            firstFrame = false;
-        }
+    public void postBegin() {
+        delayManager.addPeriodicAction(localPlayer.getClientEntity(), PERIODIC_ID, 0, AFK_PERIOD);
     }
 
     @ReceiveEvent
     public void onAfkRequest(AfkRequest request, EntityRef entity) {
+        if (!delayManager.hasPeriodicAction(localPlayer.getClientEntity(), PERIODIC_ID)) {
+            delayManager.addPeriodicAction(localPlayer.getClientEntity(), PERIODIC_ID, 0, AFK_PERIOD);
+        }
         AfkEvent event = new AfkEvent(request.getInstigator(), request.isAfk());
         entity.send(event);
     }
