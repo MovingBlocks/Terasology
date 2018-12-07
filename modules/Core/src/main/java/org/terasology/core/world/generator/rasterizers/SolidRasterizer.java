@@ -15,6 +15,10 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
+import org.terasology.biomesAPI.Biome;
+import org.terasology.biomesAPI.BiomeRegistry;
+import org.terasology.core.world.CoreBiome;
+import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3i;
@@ -39,10 +43,12 @@ public class SolidRasterizer implements WorldRasterizer {
     private Block grass;
     private Block snow;
     private Block dirt;
+    private BiomeRegistry biomeRegistry;
 
     @Override
     public void initialize() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        biomeRegistry = CoreRegistry.get(BiomeRegistry.class);
         stone = blockManager.getBlock("core:stone");
         water = blockManager.getBlock("core:water");
         ice = blockManager.getBlock("core:Ice");
@@ -57,7 +63,7 @@ public class SolidRasterizer implements WorldRasterizer {
         DensityFacet solidityFacet = chunkRegion.getFacet(DensityFacet.class);
         SurfaceHeightFacet surfaceFacet = chunkRegion.getFacet(SurfaceHeightFacet.class);
         SurfaceDepthFacet surfaceDepthFacet = chunkRegion.getFacet(SurfaceDepthFacet.class);
-//        BiomeFacet biomeFacet = chunkRegion.getFacet(BiomeFacet.class);
+        BiomeFacet biomeFacet = chunkRegion.getFacet(BiomeFacet.class);
         SeaLevelFacet seaLevelFacet = chunkRegion.getFacet(SeaLevelFacet.class);
         int seaLevel = seaLevelFacet.getSeaLevel();
 
@@ -71,8 +77,8 @@ public class SolidRasterizer implements WorldRasterizer {
                 continue;
             }
 
-//            Biome biome = biomeFacet.get(pos2d);
-//            chunk.setBiome(pos.x, pos.y, pos.z, biome);
+            Biome biome = biomeFacet.get(pos2d);
+            biomeRegistry.setBiome(biome, chunk, pos.x, pos.y, pos.z);
 
             float density = solidityFacet.get(pos);
 
@@ -81,27 +87,28 @@ public class SolidRasterizer implements WorldRasterizer {
             } else if (density >= 0) {
                 int depth = TeraMath.floorToInt(surfaceFacet.get(pos2d)) - posY;
                 Block block = getSurfaceBlock(depth, posY,
-//                        biome,
+                        biome,
                         seaLevel);
                 chunk.setBlock(pos, block);
             } else {
                 // fill up terrain up to sealevel height with water or ice
-//                if (posY == seaLevel && CoreBiome.SNOW == biome) {
-//                    chunk.setBlock(pos, ice);
-//                } else if (posY <= seaLevel) {         // either OCEAN or SNOW
+                if (posY == seaLevel && CoreBiome.SNOW == biome) {
+                    chunk.setBlock(pos, ice);
+                } else if (posY <= seaLevel) {         // either OCEAN or SNOW
                     chunk.setBlock(pos, water);
+//                }
             }
         }
     }
 
     private Block getSurfaceBlock(int depth, int height,
-//                                  Biome type,
+                                  Biome type,
                                   int seaLevel) {
-//        if (type instanceof CoreBiome) {
-//            switch ((CoreBiome) type) {
-//                case FOREST:
-//                case PLAINS:
-//                case MOUNTAINS:
+        if (type instanceof CoreBiome) {
+            switch ((CoreBiome) type) {
+                case FOREST:
+                case PLAINS:
+                case MOUNTAINS:
                     // Beach
                     if (depth == 0 && height > seaLevel && height < seaLevel + 96) {
                         return grass;
@@ -112,38 +119,38 @@ public class SolidRasterizer implements WorldRasterizer {
                     } else {
                         return dirt;
                     }
-//                case SNOW:
-//                    if (depth == 0 && height > seaLevel) {
-//                        // Snow on top
-//                        return snow;
-//                    } else if (depth > 32) {
-//                        // Stone
-//                        return stone;
-//                    } else {
-//                        // Dirt
-//                        return dirt;
-//                    }
-//                case DESERT:
-//                    if (depth > 8) {
-//                        // Stone
-//                        return stone;
-//                    } else {
-//                        return sand;
-//                    }
-//                case OCEAN:
-//                    if (depth == 0) {
-//                        return sand;
-//                    } else {
-//                        return stone;
-//                    }
-//                case BEACH:
-//                    if (depth < 3) {
-//                        return sand;
-//                    } else {
-//                        return stone;
-//                    }
-//            }
-//        }
-//        return dirt;
+                case SNOW:
+                    if (depth == 0 && height > seaLevel) {
+                        // Snow on top
+                        return snow;
+                    } else if (depth > 32) {
+                        // Stone
+                        return stone;
+                    } else {
+                        // Dirt
+                        return dirt;
+                    }
+                case DESERT:
+                    if (depth > 8) {
+                        // Stone
+                        return stone;
+                    } else {
+                        return sand;
+                    }
+                case OCEAN:
+                    if (depth == 0) {
+                        return sand;
+                    } else {
+                        return stone;
+                    }
+                case BEACH:
+                    if (depth < 3) {
+                        return sand;
+                    } else {
+                        return stone;
+                    }
+            }
+        }
+        return dirt;
     }
 }

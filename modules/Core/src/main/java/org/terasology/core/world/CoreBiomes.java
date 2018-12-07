@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//package org.terasology.core.world;
-//
-//import org.terasology.biomesAPI.BiomeRegistry;
-//import org.terasology.biomesAPI.BiomeRegistrator;
-//
-///**
-// * Registers all core biomes with the engine.
-// */
-//public class CoreBiomes implements BiomeRegistrator {
-//
-//    @Override
-//    public void registerBiomes(BiomeRegistry registry) {
-//        for (CoreBiome coreBiome : CoreBiome.values()) {
-//            registry.registerBiome(coreBiome);
-//        }
-//    }
-//
-//}
+package org.terasology.core.world;
+
+import org.terasology.biomesAPI.BiomeRegistry;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.registry.In;
+
+import java.util.stream.Stream;
+
+/**
+ * Registers all core biomes with the engine.
+ */
+@RegisterSystem
+public class CoreBiomes extends BaseComponentSystem {
+    @In
+    private BiomeRegistry biomeRegistry;
+
+    @Override
+    public void preBegin() {
+        Stream.of(CoreBiome.values()).forEach(biomeRegistry::registerBiome);
+    }
+}

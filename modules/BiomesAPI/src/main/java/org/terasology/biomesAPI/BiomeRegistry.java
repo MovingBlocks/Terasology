@@ -17,6 +17,7 @@ package org.terasology.biomesAPI;
 
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.world.chunks.CoreChunk;
 
 import java.util.Optional;
 
@@ -42,12 +43,32 @@ public interface BiomeRegistry {
     void setBiome(Biome biome, int x, int y, int z);
 
     /**
+     * Sets specified biome at position in chunk.
+     *
+     * @param biome Biome to set
+     * @param chunk Chunk where to set the biome
+     * @param relX  x position of the block to set, relative to the chunk
+     * @param relY  y position of the block to set, relative to the chunk
+     * @param relZ  z position of the block to set, relative to the chunk
+     */
+    void setBiome(Biome biome, CoreChunk chunk, int relX, int relY, int relZ);
+
+    /**
      * Sets specified biome at position in world.
      *
      * @param biome Biome to set
      * @param pos   Position of the block to set
      */
     void setBiome(Biome biome, Vector3i pos);
+
+    /**
+     * Sets specified biome at position in chunk.
+     *
+     * @param biome Biome to set
+     * @param chunk Chunk where to set the biome
+     * @param pos   Position of the block to set
+     */
+    void setBiome(Biome biome, CoreChunk chunk, Vector3i pos);
 
     /**
      * Gets biome at position in world.

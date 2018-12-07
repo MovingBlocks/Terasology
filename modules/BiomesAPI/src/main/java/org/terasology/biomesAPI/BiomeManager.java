@@ -30,6 +30,7 @@ import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.blockdata.ExtraDataSystem;
 import org.terasology.world.chunks.blockdata.RegisterExtraData;
 
@@ -73,8 +74,18 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
     }
 
     @Override
+    public void setBiome(Biome biome, CoreChunk chunk, int relX, int relY, int relZ) {
+        setBiome(biome, chunk.chunkToWorldPosition(relX, relY, relZ));
+    }
+
+    @Override
     public void setBiome(Biome biome, Vector3i pos) {
         setBiome(biome, pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public void setBiome(Biome biome, CoreChunk chunk, Vector3i pos) {
+        setBiome(biome, chunk.chunkToWorldPosition(pos));
     }
 
     /**
