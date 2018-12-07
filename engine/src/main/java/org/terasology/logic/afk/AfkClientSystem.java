@@ -24,13 +24,10 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.game.Game;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.delay.PeriodicActionComponent;
-import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkMode;
@@ -39,16 +36,13 @@ import org.terasology.physics.events.MovedEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
-import java.util.Set;
-
 @RegisterSystem(RegisterMode.CLIENT)
-public class AfkClientSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+public class AfkClientSystem extends BaseComponentSystem {
 
     private static final ResourceUrn SCREEN_URL = new ResourceUrn("engine:afk");
     private static final ResourceUrn CONSOLE_SCREEN_URL = new ResourceUrn("engine:console");
 
-    private static final String PERIODIC_ID = "AUTO-AFK-TIMEOUT";
-    private static final long PERIODIC_PERIOD = 1000L;
+    private static final long AFK_TIMEOUT = (60 * 1000) * 1L;
 
     @In
     private Console console;
@@ -68,37 +62,11 @@ public class AfkClientSystem extends BaseComponentSystem implements UpdateSubscr
     @In
     private Time time;
 
-    private int seconds;
-    private boolean firstFrame;
+    private long lastActive;
 
     @Override
-    public void update(float delta) {
-        if (!firstFrame) {
-            if (requireConnection()) {
-                return;
-            }
-            addPeriodicAction();
-            firstFrame = true;
-        }
-        final long currentWorldTime = time.getGameTimeInMs();
-        if (!hasPeriodicAction()) {
-            return;
-        }
-        PeriodicActionComponent component = getPeriodicActionComponent();
-        final long processedTime = component.getLowestWakeUp();
-        if (processedTime > currentWorldTime) {
-            return;
-        }
-        EntityRef entity = localPlayer.getClientEntity();
-        Set<String> actionIds = component.getTriggeredActionsAndReschedule(currentWorldTime);
-        if (component.isEmpty()) {
-            entity.removeComponent(PeriodicActionComponent.class);
-        } else {
-            entity.saveComponent(component);
-        }
-        for (String actionId : actionIds) {
-            entity.send(new PeriodicActionTriggeredEvent(actionId));
-        }
+    public void postBegin() {
+        updateActive();
     }
 
     @Command(
@@ -111,18 +79,16 @@ public class AfkClientSystem extends BaseComponentSystem implements UpdateSubscr
             console.addMessage("Failed! You need to be connected to use this command.");
             return;
         }
+        updateActive();
         EntityRef entity = localPlayer.getClientEntity();
         AfkComponent component = entity.getComponent(AfkComponent.class);
         component.afk = !component.afk;
         if (component.afk) {
-            cancelPeriodicAction();
-            seconds = 0;
             nuiManager.pushScreen(SCREEN_URL, AfkScreen.class).setAfkClientSystem(this);
             nuiManager.closeScreen(CONSOLE_SCREEN_URL);
             enableDiscord();
             console.addMessage("[AFK] You are AFK now!");
         } else {
-            addPeriodicAction();
             nuiManager.closeScreen(SCREEN_URL);
             disableDiscord();
             console.addMessage("[AFK] You are no longer AFK!");
@@ -133,10 +99,25 @@ public class AfkClientSystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     @ReceiveEvent
-    public void onAfk(AfkEvent event, EntityRef entity) {
+    public void onDetectAfk(AfkDetectEvent event, EntityRef entityRef) {
+        EntityRef entity = localPlayer.getClientEntity();
+        long afkTime = time.getGameTimeInMs() - lastActive;
+        if (afkTime >= AFK_TIMEOUT) {
+            AfkComponent component = entity.getComponent(AfkComponent.class);
+            component.afk = true;
+            nuiManager.pushScreen(SCREEN_URL, AfkScreen.class).setAfkClientSystem(this);
+            enableDiscord();
+            AfkRequest request = new AfkRequest(entity, true);
+            entity.send(request);
+        }
+    }
+
+    @ReceiveEvent
+    public void onAfk(AfkEvent event, EntityRef entityRef) {
         if (requireConnection()) {
             return;
         }
+        EntityRef entity = event.getTarget();
         AfkComponent component = entity.getComponent(AfkComponent.class);
         if (component != null) {
             component.afk = event.isAfk();
@@ -149,9 +130,9 @@ public class AfkClientSystem extends BaseComponentSystem implements UpdateSubscr
         if (requireConnection()) {
             return;
         }
-        addPeriodicAction();
-        disable();
-        seconds = 0;
+        if (!disable()) {
+            updateActive();
+        }
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_HIGH)
@@ -160,36 +141,15 @@ public class AfkClientSystem extends BaseComponentSystem implements UpdateSubscr
             return;
         }
         if (disable()) {
-            addPeriodicAction();
             event.consume();
         } else {
-            seconds = 0;
-        }
-    }
-
-    @ReceiveEvent
-    public void onPeriodic(PeriodicActionTriggeredEvent event, EntityRef entity) {
-        if (event.getActionId().equals(PERIODIC_ID)) {
-            seconds += 1;
-            if (seconds >= 5 * 60) {
-                AfkComponent component = entity.getComponent(AfkComponent.class);
-                if (!component.afk) {
-                    component.afk = true;
-                    entity.addOrSaveComponent(component);
-                    nuiManager.pushScreen(SCREEN_URL, AfkScreen.class).setAfkClientSystem(this);
-                    AfkRequest request = new AfkRequest(entity, true);
-                    entity.send(request);
-                    enableDiscord();
-                }
-                cancelPeriodicAction();
-                seconds = 0;
-            }
+            updateActive();
         }
     }
 
     public void onAfkScreenClosed() {
         disable();
-        addPeriodicAction();
+        updateActive();
     }
 
     private String getGame() {
@@ -199,6 +159,10 @@ public class AfkClientSystem extends BaseComponentSystem implements UpdateSubscr
             mode = "Hosting | " + game.getName();
         }
         return mode;
+    }
+
+    private void updateActive() {
+        lastActive = time.getGameTimeInMs();
     }
 
     private void enableDiscord() {
@@ -224,48 +188,6 @@ public class AfkClientSystem extends BaseComponentSystem implements UpdateSubscr
             return true;
         }
         return false;
-    }
-
-    private void addPeriodicAction() {
-        if (hasPeriodicAction()) {
-            return;
-        }
-        EntityRef entity = localPlayer.getClientEntity();
-        PeriodicActionComponent component = getPeriodicActionComponent();
-        component.addScheduledActionId(PERIODIC_ID, time.getGameTimeInMs(), PERIODIC_PERIOD);
-        entity.addOrSaveComponent(component);
-    }
-
-    private void cancelPeriodicAction() {
-        if (hasPeriodicAction()) {
-            return;
-        }
-        EntityRef entity = localPlayer.getClientEntity();
-        PeriodicActionComponent component = getPeriodicActionComponent();
-        component.removeScheduledActionId(PERIODIC_ID);
-        if (component.isEmpty()) {
-            entity.removeComponent(PeriodicActionComponent.class);
-        } else {
-            entity.saveComponent(component);
-        }
-    }
-
-    private boolean hasPeriodicAction() {
-        PeriodicActionComponent component = getPeriodicActionComponent();
-        boolean isNotEmpty = !component.isEmpty();
-        boolean containsTheAction = component.containsActionId(PERIODIC_ID);
-        if (isNotEmpty && containsTheAction) {
-            return true;
-        }
-        return false;
-    }
-
-    private PeriodicActionComponent getPeriodicActionComponent() {
-        PeriodicActionComponent component = localPlayer.getClientEntity().getComponent(PeriodicActionComponent.class);
-        if (component == null) {
-            component = new PeriodicActionComponent();
-        }
-        return component;
     }
 
     private boolean requireConnection() {
