@@ -25,6 +25,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.game.Game;
+import org.terasology.input.Keyboard;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -39,10 +40,12 @@ import org.terasology.rendering.nui.NUIManager;
 @RegisterSystem(RegisterMode.CLIENT)
 public class AfkClientSystem extends BaseComponentSystem {
 
-    private static final ResourceUrn SCREEN_URL = new ResourceUrn("engine:afk");
-    private static final ResourceUrn CONSOLE_SCREEN_URL = new ResourceUrn("engine:console");
+    public static final long AFK_FREEDOM = (5 * 1000) * 1L;
 
     private static final long AFK_TIMEOUT = (60 * 1000) * 1L;
+
+    private static final ResourceUrn SCREEN_URL = new ResourceUrn("engine:afk");
+    private static final ResourceUrn CONSOLE_SCREEN_URL = new ResourceUrn("engine:console");
 
     @In
     private Console console;
@@ -83,6 +86,7 @@ public class AfkClientSystem extends BaseComponentSystem {
         EntityRef entity = localPlayer.getClientEntity();
         AfkComponent component = entity.getComponent(AfkComponent.class);
         component.afk = !component.afk;
+        entity.addOrSaveComponent(component);
         if (component.afk) {
             nuiManager.pushScreen(SCREEN_URL, AfkScreen.class).setAfkClientSystem(this);
             nuiManager.closeScreen(CONSOLE_SCREEN_URL);
@@ -93,7 +97,6 @@ public class AfkClientSystem extends BaseComponentSystem {
             disableDiscord();
             console.addMessage("[AFK] You are no longer AFK!");
         }
-        entity.addOrSaveComponent(component);
         AfkRequest request = new AfkRequest(entity, component.afk);
         entity.send(request);
     }
@@ -104,11 +107,13 @@ public class AfkClientSystem extends BaseComponentSystem {
         long afkTime = time.getGameTimeInMs() - lastActive;
         if (afkTime >= AFK_TIMEOUT) {
             AfkComponent component = entity.getComponent(AfkComponent.class);
-            component.afk = true;
-            nuiManager.pushScreen(SCREEN_URL, AfkScreen.class).setAfkClientSystem(this);
-            enableDiscord();
-            AfkRequest request = new AfkRequest(entity, true);
-            entity.send(request);
+            if (!component.afk) {
+                component.afk = true;
+                nuiManager.pushScreen(SCREEN_URL, AfkScreen.class).setAfkClientSystem(this);
+                enableDiscord();
+                AfkRequest request = new AfkRequest(entity, true);
+                entity.send(request);
+            }
         }
     }
 
@@ -140,16 +145,24 @@ public class AfkClientSystem extends BaseComponentSystem {
         if (requireConnection()) {
             return;
         }
-        if (disable()) {
-            event.consume();
-        } else {
+        AfkComponent component = entity.getComponent(AfkComponent.class);
+        if (component != null && component.afk) {
+            long afkTime = time.getGameTimeInMs() - lastActive;
+            if (afkTime <= AFK_FREEDOM || event.getKey() == Keyboard.Key.ESCAPE) {
+                return;
+            }
             updateActive();
+            disable();
         }
     }
 
     public void onAfkScreenClosed() {
         disable();
         updateActive();
+    }
+
+    public long getLastActive() {
+        return lastActive;
     }
 
     private String getGame() {

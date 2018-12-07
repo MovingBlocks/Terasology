@@ -24,6 +24,10 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.network.Client;
+import org.terasology.network.NetworkSystem;
+import org.terasology.network.events.ConnectedEvent;
+import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.registry.In;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
@@ -42,16 +46,34 @@ public class AfkAuthoritySystem extends BaseComponentSystem {
     @In
     private LocalPlayer localPlayer;
 
-    @Override
-    public void postBegin() {
-        delayManager.addPeriodicAction(localPlayer.getClientEntity(), PERIODIC_ID, 0, AFK_PERIOD);
+    @In
+    private NetworkSystem networkSystem;
+
+    private int count;
+
+    @ReceiveEvent
+    public void onConnected(ConnectedEvent event, EntityRef entity) {
+        count++;
+        if (!delayManager.hasPeriodicAction(entity, PERIODIC_ID)) {
+            delayManager.addPeriodicAction(entity, PERIODIC_ID, 0, AFK_PERIOD);
+        }
+    }
+
+    @ReceiveEvent
+    public void onDisconnected(DisconnectedEvent event, EntityRef entity) {
+        count--;
+        if (delayManager.hasPeriodicAction(entity, PERIODIC_ID)) {
+            delayManager.cancelPeriodicAction(entity, PERIODIC_ID);
+            if (count >= 1) {
+                for (Client player : networkSystem.getPlayers()) {
+                    delayManager.addPeriodicAction(player.getEntity(), PERIODIC_ID, 0, AFK_PERIOD);
+                }
+            }
+        }
     }
 
     @ReceiveEvent
     public void onAfkRequest(AfkRequest request, EntityRef entity) {
-        if (!delayManager.hasPeriodicAction(localPlayer.getClientEntity(), PERIODIC_ID)) {
-            delayManager.addPeriodicAction(localPlayer.getClientEntity(), PERIODIC_ID, 0, AFK_PERIOD);
-        }
         AfkEvent event = new AfkEvent(request.getInstigator(), request.isAfk());
         entity.send(event);
     }
