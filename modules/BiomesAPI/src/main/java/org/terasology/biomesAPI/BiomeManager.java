@@ -24,6 +24,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.players.PlayerCharacterComponent;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.registry.In;
@@ -109,7 +110,7 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
     @ReceiveEvent(components = PlayerCharacterComponent.class)
     public void checkBiomeChangeEvent(MovedEvent event, EntityRef entity) {
         final Vector3i newPosition = new Vector3i(event.getPosition());
-        final Vector3i oldPosition = new Vector3i(event.getPosition().sub(event.getDelta()));
+        final Vector3i oldPosition = new Vector3i(new Vector3f(event.getPosition()).sub(event.getDelta()));
         if (!newPosition.equals(oldPosition)) {
             final Optional<Biome> newBiomeOptional = getBiome(newPosition);
             final Optional<Biome> oldBiomeOptional = getBiome(oldPosition);

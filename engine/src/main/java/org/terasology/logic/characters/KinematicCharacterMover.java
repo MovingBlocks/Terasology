@@ -27,6 +27,7 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
+import org.terasology.math.geom.ImmutableVector3f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -635,7 +636,7 @@ public class KinematicCharacterMover implements CharacterMover {
         distanceMoved.sub(state.getPosition());
         state.getPosition().set(moveResult.getFinalPosition());
         if (input.isFirstRun() && distanceMoved.length() > 0) {
-            entity.send(new MovedEvent(distanceMoved, state.getPosition()));
+            entity.send(new MovedEvent(new ImmutableVector3f(distanceMoved), new ImmutableVector3f(state.getPosition())));
         }
 
         // Upon hitting solid ground, reset the number of jumps back to the maximum value.
