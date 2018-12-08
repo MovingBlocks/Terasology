@@ -39,8 +39,6 @@ public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
 
-    private int nearestSlot;
-
     private UISliderOnChangeTriggeredListener uiSliderOnChangeTriggeredListener;
 
     private InteractionListener tickerListener = new BaseInteractionListener() {

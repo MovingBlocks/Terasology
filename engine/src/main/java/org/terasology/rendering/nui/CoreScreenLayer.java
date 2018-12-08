@@ -270,7 +270,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onLoseFocus() {
-        TabbingManager.setInitialized(false);
     }
 
     @Override

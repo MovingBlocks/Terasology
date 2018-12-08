@@ -250,9 +250,13 @@ public class UIDropdown<T> extends ActivatableWidget {
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown()) {
-            if (TabbingManager.focusedWidget != null && ((UIDropdown) TabbingManager.focusedWidget).isOpened()) {
-                TabbingManager.setWidgetIsOpen(true);
+            boolean dropdownOpen = false;
 
+            if (TabbingManager.focusedWidget instanceof UIDropdown) {
+                dropdownOpen = ((UIDropdown) TabbingManager.focusedWidget).isOpened();
+            }
+            if (TabbingManager.focusedWidget != null && dropdownOpen) {
+                TabbingManager.setWidgetIsOpen(true);
             } else {
                 TabbingManager.setWidgetIsOpen(false);
             }

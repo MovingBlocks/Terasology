@@ -187,7 +187,7 @@ public class UIButton extends ActivatableWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (down || isActive() || (isFocused()& TabbingManager.focusSetThrough)) {
+        } else if (down || isActive() || (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this))) {
             return DOWN_MODE;
         } else if (interactionListener.isMouseOver()) {
             return HOVER_MODE;

@@ -250,4 +250,5 @@ public class UIScrollbar extends CoreWidget {
         int newPosition = TeraMath.clamp(pixelPos, 0, sliderSize);
         setValue((sliderSize > 0) ? (newPosition * getRange() / sliderSize) : 0);
     }
+
 }

@@ -21,6 +21,7 @@ import org.terasology.rendering.nui.ActivatableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -65,7 +66,7 @@ public class UICheckbox extends ActivatableWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (interactionListener.isMouseOver() || isFocused()) {
+        } else if (interactionListener.isMouseOver() || (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this))) {
             if (active.get()) {
                 return HOVER_ACTIVE_MODE;
             }

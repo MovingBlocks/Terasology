@@ -86,6 +86,17 @@ public class TabbingManager {
     }
 
     /**
+     * Unfocuses the currently focused widget.
+     */
+    public static void unfocusWidget() {
+        if (focusedWidget != null) {
+            focusSetThrough = true;
+            focusedWidget = null;
+            openScreen.getManager().setFocus(null);
+        }
+    }
+
+    /**
      * Gives an unused number.
      * @return a new number for order
      */

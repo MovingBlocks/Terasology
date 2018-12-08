@@ -206,6 +206,10 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public void onLoseFocus() {
         focused = false;
+
+        if (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
+            TabbingManager.unfocusWidget();
+        }
     }
 
     public final boolean isFocused() {
@@ -293,6 +297,9 @@ public abstract class AbstractWidget implements UIWidget {
             }
 
             if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
+                if (!TabbingManager.isInitialized()) {
+                    TabbingManager.init();
+                }
                 TabbingManager.focusSetThrough = true;
                 TabbingManager.changeCurrentNum(!shiftPressed);
 
@@ -332,6 +339,7 @@ public abstract class AbstractWidget implements UIWidget {
             }
         }
     }
+
     public static boolean getShiftPressed() {
         return shiftPressed;
     }
