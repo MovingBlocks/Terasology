@@ -37,7 +37,6 @@ public class UIBox extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-
         if (content != null) {
             canvas.drawWidget(content);
         }
