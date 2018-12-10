@@ -280,22 +280,22 @@ public class InputSettingsScreen extends CoreScreenLayer {
     private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {
         BindsConfig bindConfig = bindsManager.getBindsConfig();
         List<Input> binds = bindConfig.getBinds(uri);
-        UIButton primaryInputBind = new UIButton();
-        primaryInputBind.bindText(new BindingText(binds, PRIMARY_BIND_INDEX));
-        primaryInputBind.subscribe(event -> {
-            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
-            popup.setBindingData(uri, bind, PRIMARY_BIND_INDEX);
-        });
+        UIButton primaryInputBind = makeInputBindButton(uri, bind, binds, PRIMARY_BIND_INDEX);
+        UIButton secondaryInputBind = makeInputBindButton(uri, bind, binds, SECONDARY_BIND_INDEX);
 
-        UIButton secondaryInputBind = new UIButton();
-        secondaryInputBind.bindText(new BindingText(binds, SECONDARY_BIND_INDEX));
-        secondaryInputBind.subscribe(event -> {
-            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
-            popup.setBindingData(uri, bind, SECONDARY_BIND_INDEX);
-        });
         layout.addWidget(new RowLayout(new UILabel(translationSystem.translate(bind.description())), primaryInputBind, secondaryInputBind)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
+    }
+
+    private UIButton makeInputBindButton(SimpleUri uri, RegisterBindButton bind, List<Input> binds, int index) {
+        UIButton inputBind = new UIButton();
+        inputBind.bindText(new BindingText(binds, index));
+        inputBind.subscribe(event -> {
+            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
+            popup.setBindingData(uri, bind, index);
+        });
+        return inputBind;
     }
 
     @Override
