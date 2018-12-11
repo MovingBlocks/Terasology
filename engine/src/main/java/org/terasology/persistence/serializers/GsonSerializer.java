@@ -39,7 +39,7 @@ import java.io.Writer;
 /**
  * GsonSerializer provides the ability to serialize and deserialize objects to and from JSON
  * <br>
- * Serialized JSONs can be forwarded/written to various output types <br>
+ * Serialized JSON can be forwarded/written to various output types <br>
  * <br>
  * Various input types can be deserialized and returned as PersistedData types
  *
@@ -115,7 +115,7 @@ public class GsonSerializer {
     }
 
     /**
-     * Writes the a the object's persisted data to {@link File} of a specified file name as JSON
+     * Writes an object's persisted data to {@link File} of a specified file name as JSON
      * 
      * @see #writeJson(Object, TypeHandler, String)
      * @param object the object to be serialized
