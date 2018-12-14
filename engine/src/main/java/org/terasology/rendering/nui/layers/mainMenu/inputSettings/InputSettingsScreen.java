@@ -126,13 +126,15 @@ public class InputSettingsScreen extends CoreScreenLayer {
         UICheckbox mouseInverted = new UICheckbox("mouseYAxisInverted");
         mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", inputDeviceConfiguration, Boolean.TYPE));
 
-        mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:menu#category-mouse}")));
-        mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#mouse-sensitivity}") + ":"), mouseSensitivity)
-                .setColumnRatios(0.4f)
-                .setHorizontalSpacing(horizontalSpacing));
-        mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#invert-mouse}") + ":"), mouseInverted)
-                .setColumnRatios(0.4f)
-                .setHorizontalSpacing(horizontalSpacing));
+        if (mainLayout != null) {
+            mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:menu#category-mouse}")));
+            mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#mouse-sensitivity}") + ":"), mouseSensitivity)
+                    .setColumnRatios(0.4f)
+                    .setHorizontalSpacing(horizontalSpacing));
+            mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#invert-mouse}") + ":"), mouseInverted)
+                    .setColumnRatios(0.4f)
+                    .setHorizontalSpacing(horizontalSpacing));
+        }
 
         Map<String, InputCategory> inputCategories = Maps.newHashMap();
         Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
@@ -159,19 +161,21 @@ public class InputSettingsScreen extends CoreScreenLayer {
             }
         }
 
-        addInputSection(inputCategories.remove("engine:movement"), mainLayout, inputsById);
-        addInputSection(inputCategories.remove("engine:interaction"), mainLayout, inputsById);
-        addInputSection(inputCategories.remove("engine:inventory"), mainLayout, inputsById);
-        addInputSection(inputCategories.remove("engine:general"), mainLayout, inputsById);
-        for (InputCategory category : inputCategories.values()) {
-            addInputSection(category, mainLayout, inputsById);
-        }
-        mainLayout.addWidget(new UISpace(new Vector2i(1, 16)));
+        if (mainLayout != null) {
+            addInputSection(inputCategories.remove("engine:movement"), mainLayout, inputsById);
+            addInputSection(inputCategories.remove("engine:interaction"), mainLayout, inputsById);
+            addInputSection(inputCategories.remove("engine:inventory"), mainLayout, inputsById);
+            addInputSection(inputCategories.remove("engine:general"), mainLayout, inputsById);
+            for (InputCategory category : inputCategories.values()) {
+                addInputSection(category, mainLayout, inputsById);
+            }
+            mainLayout.addWidget(new UISpace(new Vector2i(1, 16)));
 
-        List<String> controllers = inputSystem.getControllerDevice().getControllers();
-        for (String name : controllers) {
-            ControllerInfo cfg = inputDeviceConfiguration.getController(name);
-            addInputSection(mainLayout, name, cfg);
+            List<String> controllers = inputSystem.getControllerDevice().getControllers();
+            for (String name : controllers) {
+                ControllerInfo cfg = inputDeviceConfiguration.getController(name);
+                addInputSection(mainLayout, name, cfg);
+            }
         }
 
         WidgetUtil.trySubscribe(this, "reset", button -> {
@@ -188,11 +192,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
      * @param bindId the uri for the binding, e.g. <code>engine:forwards</code>.
      */
     private void setPrimaryBind(int key, SimpleUri bindId) {
-        UIInputBind inputBind = new UIInputBind();
-        BindsConfig bindConfig = bindsManager.getBindsConfig();
-        inputBind.bindInput(new InputConfigBinding(bindConfig, bindId, PRIMARY_BIND_INDEX));
-        inputBind.setNewInput(InputType.KEY.getInput(key));
-        inputBind.saveInput();
+        final BindsConfig bindConfig = bindsManager.getBindsConfig();
+        new InputConfigBinding(bindConfig, bindId, PRIMARY_BIND_INDEX).set(InputType.KEY.getInput(key));
     }
 
     private void addInputSection(InputCategory category, ColumnLayout layout, Map<SimpleUri, RegisterBindButton> inputsById) {
