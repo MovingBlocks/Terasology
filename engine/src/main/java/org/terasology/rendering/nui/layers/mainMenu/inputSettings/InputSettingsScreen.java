@@ -27,7 +27,13 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.input.*;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.Input;
+import org.terasology.input.InputCategory;
+import org.terasology.input.InputSystem;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard.KeyId;
+import org.terasology.input.RegisterBindButton;
 import org.terasology.input.internal.BindCommands;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyResolver;
@@ -45,12 +51,20 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
-import org.terasology.rendering.nui.widgets.*;
-import org.terasology.input.Keyboard.KeyId;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UICheckbox;
+import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.rendering.nui.widgets.UISpace;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
+ *
  */
 public class InputSettingsScreen extends CoreScreenLayer {
 
@@ -183,7 +197,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
     /**
      * Binds button to key while ensuring visual feedback on the user interface
-     * @param key one constant from the {@link KeyId}s.
+     *
+     * @param key    one constant from the {@link KeyId}s.
      * @param bindId the uri for the binding, e.g. <code>engine:forwards</code>.
      */
     private void setPrimaryBind(int key, SimpleUri bindId) {
