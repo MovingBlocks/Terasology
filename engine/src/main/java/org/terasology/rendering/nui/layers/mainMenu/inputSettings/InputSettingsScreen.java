@@ -50,7 +50,6 @@ import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
-import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -95,39 +94,29 @@ public class InputSettingsScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
-        ColumnLayout mainLayout = new ColumnLayout();
-        mainLayout.setHorizontalSpacing(8);
-        mainLayout.setVerticalSpacing(8);
-        mainLayout.setFamily("option-grid");
+        ColumnLayout mainLayout = find("main", ColumnLayout.class);
 
-        UIButton azerty = new UIButton();
-        azerty.setText(translationSystem.translate("${engine:menu#input-settings-apply}"));
-        azerty.subscribe(event -> {
-            BindCommands.AZERTY.forEach(this::setPrimaryBind);
-            bindsManager.registerBinds();
-        });
-        UIButton dvorak = new UIButton();
-        dvorak.setText(translationSystem.translate("${engine:menu#input-settings-apply}"));
-        dvorak.subscribe(event -> {
-            BindCommands.DVORAK.forEach(this::setPrimaryBind);
-            bindsManager.registerBinds();
-        });
-        UIButton neo = new UIButton();
-        neo.setText(translationSystem.translate("${engine:menu#input-settings-apply}"));
-        neo.subscribe(event -> {
-            BindCommands.NEO.forEach(this::setPrimaryBind);
-            bindsManager.registerBinds();
-        });
-        mainLayout.addWidget(new UILabel("specialKeyboards", "subheading", translationSystem.translate("${engine:menu#special-keyboards}")));
-        mainLayout.addWidget(new RowLayout(new UILabel("AZERTY"), azerty)
-                .setColumnRatios(0.4f)
-                .setHorizontalSpacing(horizontalSpacing));
-        mainLayout.addWidget(new RowLayout(new UILabel("DVORAK"), dvorak)
-                .setColumnRatios(0.4f)
-                .setHorizontalSpacing(horizontalSpacing));
-        mainLayout.addWidget(new RowLayout(new UILabel("NEO"), neo)
-                .setColumnRatios(0.4f)
-                .setHorizontalSpacing(horizontalSpacing));
+        UIButton azerty = find("azerty", UIButton.class);
+        if (azerty != null) {
+            azerty.subscribe(event -> {
+                BindCommands.AZERTY.forEach(this::setPrimaryBind);
+                bindsManager.registerBinds();
+            });
+        }
+        UIButton dvorak = find("dvorak", UIButton.class);
+        if (dvorak != null) {
+            dvorak.subscribe(event -> {
+                BindCommands.DVORAK.forEach(this::setPrimaryBind);
+                bindsManager.registerBinds();
+            });
+        }
+        UIButton neo = find("neo", UIButton.class);
+        if (neo != null) {
+            neo.subscribe(event -> {
+                BindCommands.NEO.forEach(this::setPrimaryBind);
+                bindsManager.registerBinds();
+            });
+        }
 
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
         mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", inputDeviceConfiguration, Float.TYPE));
@@ -184,9 +173,6 @@ public class InputSettingsScreen extends CoreScreenLayer {
             ControllerInfo cfg = inputDeviceConfiguration.getController(name);
             addInputSection(mainLayout, name, cfg);
         }
-
-        ScrollableArea area = find("area", ScrollableArea.class);
-        area.setContent(mainLayout);
 
         WidgetUtil.trySubscribe(this, "reset", button -> {
             inputDeviceConfiguration.reset();
