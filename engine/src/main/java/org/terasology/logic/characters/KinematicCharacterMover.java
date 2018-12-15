@@ -218,7 +218,7 @@ public class KinematicCharacterMover implements CharacterMover {
             if (state.getMode() != MovementMode.SWIMMING) {
                 state.setMode(MovementMode.SWIMMING);
             }
-            state.getVelocity().y += 0.02;
+            state.getVelocity().y += 0.02f;
         } else if (state.getMode() == MovementMode.SWIMMING || state.getMode() == MovementMode.DIVING) {
             if (newClimbing) {
                 state.setMode(MovementMode.CLIMBING);
