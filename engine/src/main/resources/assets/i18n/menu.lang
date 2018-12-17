@@ -287,6 +287,7 @@
     "reset-default": "reset-default",
     "reset-fov-amount": "reset-fov-amount",
     "resolution-scale": "resolution-scale",
+    "ui-scale": "ui-scale",
     "respawn": "respawn",
     "restore-defaults": "restore-defaults",
     "return-main-menu": "return-main-menu",

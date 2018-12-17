@@ -238,6 +238,26 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             });
         }
 
+        final UISlider uiScaleSlider = find("uiScale", UISlider.class);
+        if (uiScaleSlider != null) {
+            uiScaleSlider.setIncrement(5.0f);
+            uiScaleSlider.setPrecision(0);
+            uiScaleSlider.setMinimum(25);
+            uiScaleSlider.setRange(200);
+            uiScaleSlider.setLabelFunction(input -> String.valueOf(input.intValue()) + "%");
+            uiScaleSlider.bindValue(new Binding<Float>() {
+                @Override
+                public Float get() {
+                    return (float) config.getRendering().getUiScale();
+                }
+
+                @Override
+                public void set(Float value) {
+                    config.getRendering().setUiScale(value.intValue());
+                }
+            });
+        }
+
         UIDropdown<CameraSetting> cameraSetting = find("camera", UIDropdown.class);
         if (cameraSetting != null) {
             cameraSetting.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));

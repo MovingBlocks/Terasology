@@ -240,6 +240,14 @@
                                 },
                                 {
                                     "type": "UILabel",
+                                    "text": "${engine:menu#ui-scale}: "
+                                },
+                                {
+                                    "type": "UISlider",
+                                    "id": "uiScale"
+                                },
+                                {
+                                    "type": "UILabel",
                                     "text": "${engine:menu#animate-grass}: "
                                 },
                                 {

@@ -22,6 +22,8 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
@@ -52,6 +54,8 @@ import org.terasology.rendering.opengl.FrameBufferObject;
 import org.terasology.rendering.opengl.LwjglFrameBufferObject;
 import org.terasology.utilities.Assets;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.nio.FloatBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -80,7 +84,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  */
-public class LwjglCanvasRenderer implements CanvasRenderer {
+public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListener {
 
     private static final String CROPPING_BOUNDARIES_PARAM = "croppingBoundaries";
     private static final Rect2f FULL_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
@@ -104,7 +108,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Rect2i currentTextureCropRegion;
 
     private Map<ResourceUrn, LwjglFrameBufferObject> fboMap = Maps.newHashMap();
-
+    private RenderingConfig renderingConfig;
+    private float uiScale = 1f;
 
     public LwjglCanvasRenderer(Context context) {
         // TODO use context to get assets instead of static methods
@@ -112,6 +117,11 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         this.billboard = Assets.getMesh("engine:UIBillboard").get();
         this.fontMeshBuilder = new FontMeshBuilder(context.get(AssetManager.class).getAsset("engine:UIUnderline", Material.class).get());
         // failure to load these can be due to failing shaders or missing resources
+
+        this.renderingConfig = context.get(Config.class).getRendering();
+        this.uiScale = this.renderingConfig.getUiScale() / 100f;
+
+        this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
     }
 
     @Override
@@ -134,6 +144,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         MatrixUtils.matrixToFloatBuffer(modelView, matrixBuffer);
         glLoadMatrix(matrixBuffer);
         matrixBuffer.rewind();
+
+        glScalef(uiScale, uiScale, uiScale);
 
         requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight());
         currentTextureCropRegion = requestedCropRegion;
@@ -506,6 +518,13 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
                 addRectPoly(builder, vertLeft, vertTop, vertRight, vertBottom, texCoordLeft, texCoordTop, texCoordRight, texCoordBottom);
             }
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(RenderingConfig.UI_SCALE)) {
+            this.uiScale = this.renderingConfig.getUiScale() / 100f;
         }
     }
 
