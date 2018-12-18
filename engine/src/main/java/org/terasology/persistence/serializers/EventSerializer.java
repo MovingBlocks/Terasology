@@ -38,6 +38,11 @@ import org.terasology.protobuf.EntityData;
 import java.util.Map;
 
 /**
+ * EventSerializer provides the ability to serialize and deserialize between Events and the protobuf EntityData.Event
+ * <br><br>
+ * If provided with a idTable, then the event will be serialized and deserialized using those ids rather
+ * than the names of each event, saving some space.
+ * 
  */
 public class EventSerializer {
     private static final Logger logger = LoggerFactory.getLogger(ComponentSerializer.class);
@@ -51,6 +56,7 @@ public class EventSerializer {
      * Creates the event serializer.
      *
      * @param eventLibrary The event library used to provide information on each event and its fields.
+     * @param typeSerializationLibrary contains a library of TypeHandlers to be used for serialization
      */
     public EventSerializer(EventLibrary eventLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.eventLibrary = eventLibrary;
@@ -61,7 +67,7 @@ public class EventSerializer {
     /**
      * Sets the mapping between event classes and the ids that are used for serialization
      *
-     * @param table
+     * @param table the table of ids to be used for serialization
      */
     public void setIdMapping(Map<Class<? extends Event>, Integer> table) {
         idTable = ImmutableBiMap.copyOf(table);
@@ -76,7 +82,9 @@ public class EventSerializer {
     }
 
     /**
-     * @param eventData
+     * Deserializes the eventData
+     * 
+     * @param eventData the eventData to be deserialized
      * @return The event described by the eventData
      * @throws org.terasology.persistence.typeHandling.DeserializationException if an error occurs when deserializing
      */
@@ -96,6 +104,14 @@ public class EventSerializer {
     }
 
 
+    /**
+     * Deserializes the eventData on top of the target component. Any fields that are not present in the eventData,
+     * or which cannot be deserialized, are left unaltered.
+     *
+     * @param target
+     * @param eventData
+     * @return The target event.
+     */
     private Event deserializeOnto(Event targetEvent, EntityData.Event eventData, EventMetadata<? extends Event> eventMetadata) {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(eventMetadata);
         for (int i = 0; i < eventData.getFieldIds().size(); ++i) {
@@ -115,7 +131,7 @@ public class EventSerializer {
     /**
      * Serializes an event.
      *
-     * @param event
+     * @param event the event to be serialized
      * @return The serialized event
      * @throws org.terasology.persistence.typeHandling.SerializationException if an error occurs during serialization
      */
@@ -145,6 +161,12 @@ public class EventSerializer {
         return eventData.build();
     }
 
+    /**
+     * Serializes the EventType
+     * 
+     * @param event the event that is being serialized
+     * @param eventData the Builder object 
+     */
     private void serializeEventType(Event event, EntityData.Event.Builder eventData) {
         Integer compId = idTable.get(event.getClass());
         eventData.setType(compId);
@@ -153,7 +175,7 @@ public class EventSerializer {
     /**
      * Determines the event class that the serialized event is for.
      *
-     * @param eventData
+     * @param eventData the eventData to be serialized
      * @return The event class the given eventData describes, or null if it is unknown.
      */
     public Class<? extends Event> getEventClass(EntityData.Event eventData) {
@@ -176,6 +198,11 @@ public class EventSerializer {
         return null;
     }
 
+    /**
+     * Returns the Id Map of the Event
+     * 
+     * @return id Map of the event
+     */
     public Map<Class<? extends Event>, Integer> getIdMapping() {
         return ImmutableMap.copyOf(idTable);
     }
