@@ -47,6 +47,7 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -201,17 +202,20 @@ public class CanvasImpl implements CanvasControl {
                     lastTooltipPosition.set(position);
                 }
             }
-
         }
     }
 
     @Override
     public boolean processMouseClick(MouseInput button, Vector2i pos) {
+        TabbingManager.focusSetThrough = false;
+        TabbingManager.resetCurrentNum();
+
         boolean possibleDoubleClick = lastClickPosition.gridDistance(pos) < MAX_DOUBLE_CLICK_DISTANCE && lastClickButton == button
             && time.getGameTimeInMs() - lastClickTime < DOUBLE_CLICK_TIME;
         lastClickPosition.set(pos);
         lastClickButton = button;
         lastClickTime = time.getGameTimeInMs();
+
         for (InteractionRegion next : mouseOverRegions) {
             if (next.region.contains(pos)) {
                 Vector2i relPos = new Vector2i(pos);

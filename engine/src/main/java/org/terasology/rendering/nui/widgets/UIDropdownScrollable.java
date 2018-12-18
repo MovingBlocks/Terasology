@@ -47,6 +47,8 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private int visibleOptionsNum = 5;
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
+    private int itemHeight = 1;
+
     private Binding<T> selection = new DefaultBinding<>();
     private List<InteractionListener> optionListeners = Lists.newArrayList();
     private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
@@ -105,7 +107,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             float optionsSize = options.get().size() <= visibleOptionsNum ? options.get().size() : (visibleOptionsNum + 0.5f);
 
             // Calculate total options height
-            int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
+            itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
             int height = (int) (itemHeight * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight());
             canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + height));
 
@@ -189,6 +191,9 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private void readItemMouseOver(Canvas canvas, int i) {
         if (optionListeners.get(i).isMouseOver()) {
             canvas.setMode(HOVER_MODE);
+        } else if (i == highlighted) {
+            canvas.setMode(HOVER_MODE);
+            setSelection(getOptions().get(highlighted));
         } else {
             canvas.setMode(DEFAULT_MODE);
         }
@@ -290,5 +295,50 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             opened = false;
             return true;
         }
+    }
+    public void setOpenedReverse() {
+        opened = !opened;
+        optionListeners.clear();
+        if (opened) {
+            for (int i = 0; i < getOptions().size(); ++i) {
+                optionListeners.add(new UIDropdownScrollable.ItemListener(i));
+            }
+            setSelection(getOptions().get(0));
+        }
+    }
+
+    public void changeHighlighted(boolean increase) {
+        if (increase) {
+            highlighted++;
+            if (highlighted >= getOptions().size()) {
+                highlighted = 0;
+                if (opened) {
+                    verticalBar.setValue(verticalBar.getMinimum());
+                }
+            } else {
+                if (opened) {
+                    int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
+                    verticalBar.setValue(verticalBar.getValue() - scrollMultiplier);
+                }
+            }
+        } else {
+            highlighted--;
+            if (highlighted < 0) {
+                highlighted = getOptions().size() - 1;
+                if (opened) {
+                    verticalBar.setValue(verticalBar.getRange() - verticalBar.getMinimum());
+                }
+            } else {
+                if (opened) {
+                    int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
+                    verticalBar.setValue(verticalBar.getValue() + scrollMultiplier);
+                }
+            }
+        }
+        setSelection(getOptions().get(highlighted));
+    }
+
+    public boolean isOpened() {
+        return opened;
     }
 }

@@ -131,7 +131,7 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
 
         switch (event.getKey().getId()) {
-            case Keyboard.KeyId.F2:
+            case Keyboard.KeyId.F11:
                 mouseGrabbed = !mouseGrabbed;
                 DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().getHUDElement("engine:DebugProperties");
                 debugProperties.setVisible(!mouseGrabbed);
