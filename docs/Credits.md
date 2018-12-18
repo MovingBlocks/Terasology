@@ -249,7 +249,8 @@ Contributors
  [nschnitzer](https://github.com/nschnitzer),
  [AndyTechGuy](https://github.com/AndyTechGuy),
  [iHDeveloper](https://github.com/iHDeveloper),
- [PutawanDE](https://github.com/PutawanDE)
+ [PutawanDE](https://github.com/PutawanDE),
+ [bpas247](https://github.com/bpas247)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
