@@ -34,15 +34,15 @@ import java.util.Queue;
 /**
  */
 public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
+    private RenderingConfig renderingConfig;
+    private float uiScale;
+    private boolean mouseGrabbed;
+
     public LwjglMouseDevice(Context context) {
         this.renderingConfig = context.get(Config.class).getRendering();
         this.uiScale = this.renderingConfig.getUiScale() / 100f;
         this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
     }
-
-    private RenderingConfig renderingConfig;
-    private float uiScale;
-    private boolean mouseGrabbed;
 
     @Override
     public Vector2i getPosition() {

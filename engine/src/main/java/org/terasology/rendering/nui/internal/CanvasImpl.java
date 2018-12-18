@@ -144,8 +144,8 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     public void preRender() {
         interactionRegions.clear();
         Vector2i size = renderer.getTargetSize();
-        size.x = (int)(size.x / uiScale);
-        size.y = (int)(size.y / uiScale);
+        size.x = (int) (size.x / uiScale);
+        size.y = (int) (size.y / uiScale);
 
         state = new CanvasState(null, Rect2i.createFromMinAndSize(0, 0, size.x, size.y));
         renderer.preRender();

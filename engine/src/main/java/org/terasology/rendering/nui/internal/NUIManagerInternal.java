@@ -45,7 +45,6 @@ import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.reflection.metadata.ClassLibrary;

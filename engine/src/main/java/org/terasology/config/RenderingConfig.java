@@ -611,8 +611,9 @@ public class RenderingConfig extends AbstractSubscribable {
     }
 
     public int getUiScale() {
-        if (uiScale == 0)
+        if (uiScale == 0) {
             return 100;
+        }
         return uiScale;
     }
 
