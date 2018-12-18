@@ -199,8 +199,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         Matrix4f centerTransform = new Matrix4f(BaseQuat4f.IDENTITY, centerOffset, 1.0f);
         Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
         Matrix4f translateTransform = new Matrix4f(BaseQuat4f.IDENTITY,
-                new Vector3f(drawRegion.minX() + drawRegion.width() / 2,
-                        drawRegion.minY() + drawRegion.height() / 2, 0), 1);
+                new Vector3f((drawRegion.minX() + drawRegion.width() / 2) * uiScale,
+                    (drawRegion.minY() + drawRegion.height() / 2) * uiScale, 0), 1);
 
         userTransform.mul(centerTransform);
         translateTransform.mul(userTransform);
@@ -209,13 +209,20 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         finalMat.mul(translateTransform);
         MatrixUtils.matrixToFloatBuffer(finalMat, matrixBuffer);
 
-        material.setFloat4(CROPPING_BOUNDARIES_PARAM, cropRegion.minX(), cropRegion.maxX(), cropRegion.minY(), cropRegion.maxY());
+        material.setFloat4(
+            CROPPING_BOUNDARIES_PARAM,
+            cropRegion.minX() * uiScale,
+            cropRegion.maxX() * uiScale,
+            cropRegion.minY() * uiScale,
+            cropRegion.maxY() * uiScale);
         material.setMatrix4("posMatrix", translateTransform);
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL11.GL_MODELVIEW);
         glPushMatrix();
         glLoadMatrix(matrixBuffer);
+
+        glScalef(this.uiScale, this.uiScale, this.uiScale);
         matrixBuffer.rewind();
 
         boolean matrixStackSupported = material.supportsFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
