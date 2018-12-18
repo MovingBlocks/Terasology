@@ -57,12 +57,19 @@ public class EntitySerializer {
     private boolean ignoringEntityId;
 
     /**
-     * @param entityManager The entityManager that deserialized entities will be placed in.
+     * @param entityManager The entityManager that deserialized entities will be stored
      */
     public EntitySerializer(EngineEntityManager entityManager) {
         this(entityManager, entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
     }
 
+    /**
+     * Creates a new EntitySerializer object
+     * 
+     * @param entityManager the EngineEntityManager that the deserialized entities will be stored
+     * @param componentLibrary object that contains information about the component to be serialized
+     * @param typeSerializationLibrary contains the information about how to serialize the enitity
+     */
     public EntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
@@ -71,20 +78,39 @@ public class EntitySerializer {
     }
 
     /**
+     * Determines if EntityIds are being ignored during serialization/deserialization
+     * 
      * @return Whether entity ids are being ignored during serialization/deserialization
      */
     public boolean isIgnoringEntityId() {
         return ignoringEntityId;
     }
 
+    /**
+     * Determines if FieldIds are being ignored during serialization/deserialization
+     * 
+     * @return
+     */
     public boolean isUsingFieldIds() {
         return componentSerializer.isUsingFieldIds();
     }
 
+    /**
+     * Sets whether FieldIds will be ignored while serialization/deserialization
+     * If ignored, then they will not be stored in the protobuf, and deserialized entities will be given new ids. This
+     * may break entity references, depending on how they are being handled
+     * 
+     * @param usingFieldIds boolean value that represents of FieldIds should be used
+     */
     public void setUsingFieldIds(boolean usingFieldIds) {
         componentSerializer.setUsingFieldIds(usingFieldIds);
     }
 
+    /**
+     * Sets the ComponentSerializeCheck to a new value
+     * 
+     * @param check the new ComponentSerializeCheck
+     */
     public void setComponentSerializeCheck(ComponentSerializeCheck check) {
         this.componentSerializeCheck = check;
     }
@@ -94,7 +120,7 @@ public class EntitySerializer {
      * If ignored, then they will not be stored in the protobuf, and deserialized entities will be given new ids. This
      * may break entity references, depending on how they are being handled (see: EntityRefTypeHandler)
      *
-     * @param ignoringEntityId
+     * @param ignoringEntityId represents if entity ids are ignored or not
      */
     public void setIgnoringEntityId(boolean ignoringEntityId) {
         this.ignoringEntityId = ignoringEntityId;
@@ -103,7 +129,7 @@ public class EntitySerializer {
     /**
      * Sets the mapping between component classes and the ids that are used for serialization
      *
-     * @param table
+     * @param table the table containing the ids
      */
     public void setComponentIdMapping(Map<Class<? extends Component>, Integer> table) {
         componentSerializer.setIdMapping(table);
@@ -125,7 +151,9 @@ public class EntitySerializer {
     }
 
     /**
-     * @param entityRef
+     * Serializes and returns an EntityRef object as an Entity
+     * 
+     * @param entityRef the object to be serialized
      * @return The serialized entity
      */
     public EntityData.Entity serialize(EntityRef entityRef) {
@@ -133,7 +161,9 @@ public class EntitySerializer {
     }
 
     /**
-     * @param entityRef
+     * Serializes and returns an EntityRef object as an Entity
+     * 
+     * @param entityRef the object to be serialized
      * @param deltaAgainstPrefab Whether the serialized entity should be a delta against its prefab (if any)
      * @return The serialized entity
      */
@@ -142,7 +172,9 @@ public class EntitySerializer {
     }
 
     /**
-     * @param entityRef
+     * Serializes and returns an EntityRef object as an Entity
+     * 
+     * @param entityRef the object to be serialized
      * @param fieldCheck Used to check whether each field in each component of the entity should be serialized.
      * @return The serialized entity
      */
@@ -151,7 +183,9 @@ public class EntitySerializer {
     }
 
     /**
-     * @param entityRef
+     * Serializes and returns an EntityRef object as an Entity
+     * 
+     * @param entityRef the object to be serialized
      * @param fieldCheck Used to check whether each field in each component of the entity should be serialized.
      * @return The serialized entity
      */
@@ -165,7 +199,9 @@ public class EntitySerializer {
     }
 
     /**
-     * @param entityData
+     * Deserializes and returns an Entity object as an EntityRef
+     * 
+     * @param entityData the entity to be deserialized
      * @return The deserialized entity
      */
     public EntityRef deserialize(EntityData.Entity entityData) {
@@ -181,7 +217,7 @@ public class EntitySerializer {
     /**
      * Creates the components for the entity being deserialized based on its prefab (if any)
      *
-     * @param entityData
+     * @param entityData the entity being deserialized
      * @return The mapping of components
      */
     private Map<Class<? extends Component>, Component> createInitialComponents(EntityData.Entity entityData) {
@@ -210,8 +246,8 @@ public class EntitySerializer {
     /**
      * Deserializes the components from an EntityData onto a map of components
      *
-     * @param entityData
-     * @param componentMap
+     * @param entityData the EntityData to be serialized
+     * @param componentMap the map that the entity will be deserialized onto
      */
     private void deserializeOntoComponents(EntityData.Entity entityData, Map<Class<? extends Component>, Component> componentMap) {
         EntityInfoComponent entityInfo = (EntityInfoComponent) componentMap.get(EntityInfoComponent.class);
@@ -253,6 +289,13 @@ public class EntitySerializer {
         }
     }
 
+    /**
+     * Serializes and returns an EntityRef as an Entity
+     * 
+     * @param entityRef the object to be serialized
+     * @param fieldCheck Used to check whether each field in each component of the entity should be serialized
+     * @return the serialzied entity object
+     */
     private EntityData.Entity serializeEntityFull(EntityRef entityRef, FieldSerializeCheck<Component> fieldCheck) {
         EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
         if (!ignoringEntityId) {
@@ -292,6 +335,14 @@ public class EntitySerializer {
         return entity.build();
     }
 
+    /**
+     * Serializes and returns a EntityRef object as a Entity
+     * 
+     * @param entityRef the object to be serialized
+     * @param prefab the parent type
+     * @param fieldCheck Used to check whether each field in each component of the entity should be serialized
+     * @return the serialized Entity object
+     */
     private EntityData.Entity serializeEntityDelta(EntityRef entityRef, Prefab prefab, FieldSerializeCheck<Component> fieldCheck) {
         EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
         if (!ignoringEntityId) {
