@@ -31,7 +31,7 @@ import java.util.Set;
 
 /**
  * Batch propagator that works on a set of changed blocks
- *
+ * Works for a single given propagation ruleset
  */
 public class StandardBatchPropagator implements BatchPropagator {
 
@@ -40,6 +40,7 @@ public class StandardBatchPropagator implements BatchPropagator {
     private PropagationRules rules;
     private PropagatorWorldView world;
 
+    /* Queues are stored in reverse order. Ie, strongest light is 0. */
     private Set<Vector3i>[] reduceQueues;
     private Set<Vector3i>[] increaseQueues;
 
@@ -193,45 +194,77 @@ public class StandardBatchPropagator implements BatchPropagator {
                 }
             }
         }
+
     }
 
+    /**
+     * Propagates a value from a position out into all adjacent blocks.
+     * <p>
+     * If the value spreading into a block is larger than the current value there, set it and queue it for propagating again
+     * If the value is smaller than the current value, do nothing
+     *
+     * @param pos   The initial position
+     * @param value The value to propagate
+     */
     private void push(Vector3i pos, byte value) {
         Block block = world.getBlockAt(pos);
         for (Side side : Side.getAllSides()) {
-            byte spreadValue = rules.propagateValue(value, side, block);
+            byte propagatedValue = rules.propagateValue(value, side, block);
+
             if (rules.canSpreadOutOf(block, side)) {
                 Vector3i adjPos = side.getAdjacentPos(pos);
                 byte adjValue = world.getValueAt(adjPos);
-                if (adjValue < spreadValue && adjValue != PropagatorWorldView.UNAVAILABLE) {
+
+                if (adjValue < propagatedValue && adjValue != PropagatorWorldView.UNAVAILABLE) {
                     Block adjBlock = world.getBlockAt(adjPos);
+
                     if (rules.canSpreadInto(adjBlock, side.reverse())) {
-                        increase(adjPos, spreadValue);
+                        increase(adjPos, propagatedValue);
                     }
                 }
             }
         }
     }
 
-    private void cleanUp() {
-        for (Set<Vector3i> queue : increaseQueues) {
-            queue.clear();
-        }
-    }
-
+    /**
+     * Set the value at a position to a new value.
+     * This should be larger than the prior value
+     * <p>
+     * Queues up this new higher value to be propagated out
+     *
+     * @param position The position to set at
+     * @param value    The value to set the position to
+     */
     private void increase(Vector3i position, byte value) {
         world.setValueAt(position, value);
         queueSpreadValue(position, value);
     }
 
+    private void reduce(Vector3i position, byte oldValue) {
+        if (oldValue > 0) {
+            reduceQueues[rules.getMaxValue() - oldValue].add(position);
+        }
+    }
+
+    /**
+     * Queues up a propagation from a given position.
+     * Propagation is placed into a queue for the given level.
+     *
+     * @param position The position to propagate form
+     * @param value    The value to propagate out
+     */
     private void queueSpreadValue(Vector3i position, byte value) {
         if (value > 1) {
             increaseQueues[rules.getMaxValue() - value].add(position);
         }
     }
 
-    private void reduce(Vector3i position, byte oldValue) {
-        if (oldValue > 0) {
-            reduceQueues[rules.getMaxValue() - oldValue].add(position);
+    /**
+     * Clears all the queues and cleans up the object
+     */
+    private void cleanUp() {
+        for (Set<Vector3i> queue : increaseQueues) {
+            queue.clear();
         }
     }
 
