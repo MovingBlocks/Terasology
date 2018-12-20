@@ -16,26 +16,26 @@
 
 package org.terasology.rendering;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
-
 public class FontUnderlineTest {
-	
+
     private static final char START_UNDERLINE = 0xF001;
     private static final char END_UNDERLINE = 0xF002;
-			
+
     @Test
     public void testStartUnderline() {
         assertTrue(FontUnderline.isValid(START_UNDERLINE));
     }
-		
+
     @Test
     public void testEndUnderline() {
         assertTrue(FontUnderline.isValid(END_UNDERLINE));
     }
-	
+
     @Test
     public void testInvalidUnderline() {
         char invalidUnderline = 0xF003;
@@ -46,5 +46,5 @@ public class FontUnderlineTest {
     public void testMarkUnderlined() {
         String testString = "string";
         assertTrue(FontUnderline.markUnderlined(testString).equals(START_UNDERLINE + testString + END_UNDERLINE));
-    }	
+    }
 }
