@@ -294,6 +294,7 @@
     "re-roll": "Re-Roll",
     "reset-fov-amount": "Reset fov amount",
     "resolution-scale": "Resolution Scale",
+    "ui-scale": "UI Scale",
     "respawn": "Respawn",
     "restore-defaults": "Restore Defaults",
     "return-main-menu": "Exit to Main Menu",

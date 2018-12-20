@@ -240,6 +240,31 @@
                                 },
                                 {
                                     "type": "UILabel",
+                                    "text": "${engine:menu#ui-scale}: "
+                                },
+
+                                {
+                                    "type": "RowLayout",
+                                    "contents": [
+                                        {
+                                            "type": "UIButton",
+                                            "text": "-",
+                                            "id": "uiScaleSmaller"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "id": "uiScaleLabel",
+                                            "text": " 100%"
+                                        },
+                                        {
+                                            "type": "UIButton",
+                                            "text": "+",
+                                            "id": "uiScaleLarger"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "UILabel",
                                     "text": "${engine:menu#animate-grass}: "
                                 },
                                 {

@@ -41,6 +41,7 @@ import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
@@ -237,6 +238,21 @@ public class VideoSettingsScreen extends CoreScreenLayer {
                 }
             });
         }
+
+        final UILabel uiScaleLabel = find("uiScaleLabel", UILabel.class);
+        uiScaleLabel.setText(" " + config.getRendering().getUiScale() + "% ");
+
+        WidgetUtil.trySubscribe(this, "uiScaleSmaller", button -> {
+            int newScale = Math.max(50, config.getRendering().getUiScale() - 25);
+            config.getRendering().setUiScale(newScale);
+            uiScaleLabel.setText(" " + config.getRendering().getUiScale() + "% ");
+        });
+
+        WidgetUtil.trySubscribe(this, "uiScaleLarger", button -> {
+            int newScale = Math.min(250, config.getRendering().getUiScale() + 25);
+            config.getRendering().setUiScale(newScale);
+            uiScaleLabel.setText(" " + config.getRendering().getUiScale() + "% ");
+        });
 
         UIDropdown<CameraSetting> cameraSetting = find("camera", UIDropdown.class);
         if (cameraSetting != null) {

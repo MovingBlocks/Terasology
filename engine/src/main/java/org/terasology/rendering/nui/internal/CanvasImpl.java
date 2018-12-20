@@ -22,6 +22,8 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.Time;
 import org.terasology.input.InputSystem;
@@ -63,6 +65,8 @@ import org.terasology.rendering.nui.widgets.UITooltip;
 import org.terasology.rendering.opengl.FrameBufferObject;
 import org.terasology.utilities.Assets;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -71,7 +75,7 @@ import java.util.Set;
 
 /**
  */
-public class CanvasImpl implements CanvasControl {
+public class CanvasImpl implements CanvasControl, PropertyChangeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(CanvasImpl.class);
 
@@ -119,6 +123,8 @@ public class CanvasImpl implements CanvasControl {
     private Vector2i lastClickPosition = new Vector2i();
 
     private CanvasRenderer renderer;
+    private RenderingConfig renderingConfig;
+    private float uiScale = 1f;
 
     public CanvasImpl(NUIManager nuiManager, Context context, CanvasRenderer renderer) {
         this.renderer = renderer;
@@ -128,16 +134,25 @@ public class CanvasImpl implements CanvasControl {
         this.mouse = context.get(InputSystem.class).getMouseDevice();
         this.meshMat = Assets.getMaterial("engine:UILitMesh").get();
         this.whiteTexture = Assets.getTexture("engine:white").get();
+
+        this.renderingConfig = context.get(Config.class).getRendering();
+        this.uiScale = this.renderingConfig.getUiScale() / 100f;
+
+        this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
     }
 
     @Override
     public void preRender() {
         interactionRegions.clear();
         Vector2i size = renderer.getTargetSize();
+        size.x = (int) (size.x / uiScale);
+        size.y = (int) (size.y / uiScale);
+
         state = new CanvasState(null, Rect2i.createFromMinAndSize(0, 0, size.x, size.y));
         renderer.preRender();
         renderer.crop(state.cropRegion);
         focusDrawn = false;
+
     }
 
     @Override
@@ -741,6 +756,13 @@ public class CanvasImpl implements CanvasControl {
 
     private Rect2i relativeToAbsolute(Rect2i region) {
         return Line.relativeToAbsolute(region, state.drawRegion);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(RenderingConfig.UI_SCALE)) {
+            this.uiScale = this.renderingConfig.getUiScale() / 100f;
+        }
     }
 
     /**
