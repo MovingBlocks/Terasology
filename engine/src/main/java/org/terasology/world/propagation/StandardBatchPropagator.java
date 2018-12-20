@@ -95,31 +95,46 @@ public class StandardBatchPropagator implements BatchPropagator {
         cleanUp();
     }
 
+    /**
+     * Handles a single block being changed to a different type.
+     *
+     * @param blockChange The change that was made
+     */
     private void reviewChange(BlockChange blockChange) {
         byte newValue = rules.getFixedValue(blockChange.getTo(), blockChange.getPosition());
         byte existingValue = world.getValueAt(blockChange.getPosition());
+
+        /* Handle if the block has an higher fixed value */
         if (newValue > existingValue) {
             increase(blockChange.getPosition(), newValue);
         }
 
+        /* Handle if the block has a lower fixed value */
         byte oldValue = rules.getFixedValue(blockChange.getFrom(), blockChange.getPosition());
         if (newValue < oldValue) {
             reduce(blockChange.getPosition(), oldValue);
         }
 
+        /* Process propagation out to other blocks */
         for (Side side : Side.getAllSides()) {
             PropagationComparison comparison = rules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), side);
+
             if (comparison.isRestricting() && existingValue > 0) {
+                /* If the propagation of the new value is going to be lower/reduced */
                 reduce(blockChange.getPosition(), existingValue);
                 Vector3i adjPos = side.getAdjacentPos(blockChange.getPosition());
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue == rules.propagateValue(existingValue, side, blockChange.getFrom())) {
                     reduce(adjPos, adjValue);
                 }
+
             } else if (comparison.isPermitting()) {
+                /* If the propagation of the new value is going to be more allowing */
                 if (existingValue > 0) {
+                    /* Spread this potentially higher value out */
                     queueSpreadValue(blockChange.getPosition(), existingValue);
                 }
+                /* Spread it out to the block on the side */
                 Vector3i adjPos = side.getAdjacentPos(blockChange.getPosition());
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue != PropagatorWorldView.UNAVAILABLE) {
@@ -129,29 +144,18 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void processReduction() {
-        int depth = 0;
-        while (depth < rules.getMaxValue()) {
-            byte oldValue = (byte) (rules.getMaxValue() - depth);
-            Set<Vector3i> toProcess = reduceQueues[depth];
-            if (!toProcess.isEmpty()) {
-                reduceQueues[depth] = Sets.newLinkedHashSetWithExpectedSize(toProcess.size());
 
-                for (Vector3i pos : toProcess) {
-                    purge(pos, oldValue);
-                }
-                if (toProcess.isEmpty()) {
-                    depth++;
-                }
-            } else {
-                depth++;
-            }
-        }
-    }
-
+    /**
+     * Reset a position to only it's fixed values
+     *
+     * @param pos      The position to reset
+     * @param oldValue The value present before reset
+     */
     private void purge(Vector3i pos, byte oldValue) {
-        Block block = world.getBlockAt(pos);
         increaseQueues[rules.getMaxValue() - oldValue].remove(pos);
+
+        /* Clear the value and re-propagate it if it's a positive value */
+        Block block = world.getBlockAt(pos);
         byte fixedValue = rules.getFixedValue(block, pos);
         if (fixedValue > 0) {
             increase(pos, fixedValue);
@@ -159,7 +163,9 @@ public class StandardBatchPropagator implements BatchPropagator {
             world.setValueAt(pos, NO_VALUE);
         }
 
+
         for (Side side : Side.getAllSides()) {
+            /* Handle this value being reset to the default by updating sides as needed */
             byte expectedValue = rules.propagateValue(oldValue, side, block);
             Vector3i adjPos = side.getAdjacentPos(pos);
             if (rules.canSpreadOutOf(block, side)) {
@@ -171,6 +177,26 @@ public class StandardBatchPropagator implements BatchPropagator {
                     }
                 } else if (adjValue > 0) {
                     queueSpreadValue(adjPos, adjValue);
+                }
+            }
+        }
+    }
+
+    /**
+     * Process all reducing propagation requests
+     * This is done from the largest value through the smallest.
+     */
+    private void processReduction() {
+        for (int depth = 0; depth < rules.getMaxValue(); depth++) {
+            byte oldValue = (byte) (rules.getMaxValue() - depth);
+
+            while (!reduceQueues[depth].isEmpty()) {
+                Set<Vector3i> toProcess = reduceQueues[depth];
+                reduceQueues[depth] = Sets.newLinkedHashSetWithExpectedSize(toProcess.size());
+
+                /* This step will add any new reductions to to the `reduceQueues` set */
+                for (Vector3i pos : toProcess) {
+                    purge(pos, oldValue);
                 }
             }
         }
@@ -240,6 +266,12 @@ public class StandardBatchPropagator implements BatchPropagator {
         queueSpreadValue(position, value);
     }
 
+    /**
+     * Set the value at the position as having been lowered to a smaller value
+     *
+     * @param position The position to set at
+     * @param oldValue The original value at the position
+     */
     private void reduce(Vector3i position, byte oldValue) {
         if (oldValue > 0) {
             reduceQueues[rules.getMaxValue() - oldValue].add(position);
@@ -322,14 +354,15 @@ public class StandardBatchPropagator implements BatchPropagator {
             for (int y = edgeRegion.minY(); y <= edgeRegion.maxY(); ++y) {
                 for (int z = edgeRegion.minZ(); z <= edgeRegion.maxZ(); ++z) {
 
-                    int depthIndex = indexProvider.getIndexFor(x, y, z);
-                    adjPos.set(x, y, z);
-                    adjPos.add(chunkEdgeDeltas.get(side));
-
                     byte expectedValue = (byte) (rules.getValue(chunk, x, y, z) - 1);
                     if (expectedValue < 1) {
                         continue;
                     }
+
+                    int depthIndex = indexProvider.getIndexFor(x, y, z);
+                    adjPos.set(x, y, z);
+                    adjPos.add(chunkEdgeDeltas.get(side));
+
 
                     int depth = 0;
                     Block lastBlock = chunk.getBlock(x, y, z);
@@ -352,12 +385,17 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
     }
 
+    /**
+     * Get the index provider appropriate for that side
+     *
+     * @param side The side to get the provider for
+     * @return The provider for that side
+     */
     private IndexProvider createIndexProvider(Side side) {
-        IndexProvider indexProvider;
         switch (side) {
             case TOP:
             case BOTTOM:
-                indexProvider = new IndexProvider() {
+                return new IndexProvider() {
                     @Override
                     public int getIndexFor(Vector3i pos) {
                         return pos.x + ChunkConstants.SIZE_X * pos.z;
@@ -368,10 +406,9 @@ public class StandardBatchPropagator implements BatchPropagator {
                         return x + ChunkConstants.SIZE_X * z;
                     }
                 };
-                break;
             case LEFT:
             case RIGHT:
-                indexProvider = new IndexProvider() {
+                return new IndexProvider() {
                     @Override
                     public int getIndexFor(Vector3i pos) {
                         return pos.y + ChunkConstants.SIZE_Y * pos.z;
@@ -382,10 +419,8 @@ public class StandardBatchPropagator implements BatchPropagator {
                         return y + ChunkConstants.SIZE_Y * z;
                     }
                 };
-                break;
             default:
-                indexProvider = new IndexProvider() {
-
+                return new IndexProvider() {
                     @Override
                     public int getIndexFor(Vector3i pos) {
                         return pos.x + ChunkConstants.SIZE_X * pos.y;
@@ -396,9 +431,7 @@ public class StandardBatchPropagator implements BatchPropagator {
                         return x + ChunkConstants.SIZE_X * y;
                     }
                 };
-                break;
         }
-        return indexProvider;
     }
 
     @Override
