@@ -18,6 +18,7 @@ package org.terasology.world.propagation.light;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
 
 /**
@@ -53,7 +54,7 @@ public class LightPropagationRules extends CommonLightPropagationRules {
      */
     @Override
     public byte getMaxValue() {
-        return 0xF; // 15
+        return ChunkConstants.MAX_LIGHT; // 15
     }
 
     @Override
