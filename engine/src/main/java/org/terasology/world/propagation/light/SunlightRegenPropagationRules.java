@@ -46,7 +46,7 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
     @Override
     public byte propagateValue(byte existingValue, Side side, Block from) {
         if (side == Side.BOTTOM) {
-            return (existingValue == ChunkConstants.MAX_SUNLIGHT_REGEN) ? existingValue : (byte) (existingValue + 1);
+            return (byte) Math.min(existingValue, ChunkConstants.MAX_SUNLIGHT_REGEN);
         }
         return 0;
     }
