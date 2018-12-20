@@ -26,9 +26,10 @@ import org.terasology.world.chunks.LitChunk;
 public interface PropagationRules {
 
     /**
-     * TODO: Document when this method is understood
-     * @param block
-     * @return The value of provided by the given block
+     * Gets the constant values for this block, that are unaffected by the light propagation rules
+     * @param block The block being checked
+     * @param pos The position of the block being checked
+     * @return The constant value of this block
      */
     byte getFixedValue(Block block, Vector3i pos);
 

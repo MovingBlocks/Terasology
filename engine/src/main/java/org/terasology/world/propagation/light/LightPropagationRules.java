@@ -21,22 +21,39 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
 
 /**
+ * Rules for how standard light should propagate.
+ * Also provides implementation for setting and getting values
  */
 public class LightPropagationRules extends CommonLightPropagationRules {
 
+    /**
+     * Any luminance from the block is a constant
+     * <p>
+     * {@inheritDoc}
+     */
     @Override
     public byte getFixedValue(Block block, Vector3i pos) {
         return block.getLuminance();
     }
 
+    /**
+     * When the light propagates it's light level reduces by one
+     * <p>
+     * {@inheritDoc}
+     */
     @Override
     public byte propagateValue(byte existingValue, Side side, Block from) {
         return (byte) (existingValue - 1);
     }
 
+    /**
+     * The maximum light level is a full byte of 15
+     * <p>
+     * {@inheritDoc}
+     */
     @Override
     public byte getMaxValue() {
-        return (byte) 15;
+        return 0xF; // 15
     }
 
     @Override
