@@ -44,7 +44,7 @@ public interface PropagationRules {
     PropagationComparison comparePropagation(Block newBlock, Block oldBlock, Side side);
 
     /**
-     * Get the new value after propgating in a specified manner
+     * Get the new value after propagating in a specified manner
      *
      * @param existingValue The value to propagate
      * @param side          The side the value is leaving by
