@@ -17,18 +17,19 @@
 package org.terasology.world.propagation;
 
 /**
+ * An enum that describes how propagation rules have changes when blocks are replaced with others
  */
 public enum PropagationComparison {
     /**
-     * Lighting is restricted in some way it wasn't before
+     * Propagation is restricted in some way it wasn't before
      */
     MORE_RESTRICTED(true, false),
     /**
-     * Lighting is identical to before
+     * Propagation is identical to before
      */
     IDENTICAL(false, false),
     /**
-     * Lighting is strictly more permissive than before
+     * Propagation is strictly more permissive than before
      */
     MORE_PERMISSIVE(false, true);
 
