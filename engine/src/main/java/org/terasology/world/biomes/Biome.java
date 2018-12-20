@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,11 @@ package org.terasology.world.biomes;
 
 import org.terasology.module.sandbox.API;
 
+/**
+ * Biomes can be assigned to different blocks during worldgen as well as on runtime, to provide additional metadata
+ * about player's surroundings usable to enhance player experience.
+ * @see BiomeChangeEvent
+ */
 @API
 public interface Biome {
 
@@ -31,10 +36,19 @@ public interface Biome {
      */
     String getName();
 
-    float getFog();
+    @Deprecated
+    default float getFog() {
+        return 0.5f;
+    }
 
-    float getHumidity();
+    @Deprecated
+    default float getHumidity() {
+        return 0.5f;
+    }
 
-    float getTemperature();
+    @Deprecated
+    default float getTemperature() {
+        return 0.5f;
+    }
 
 }

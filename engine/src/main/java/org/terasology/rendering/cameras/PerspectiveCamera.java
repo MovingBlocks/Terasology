@@ -115,7 +115,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         float factorMult = 0;
 
         for (Vector3f vector : vectors) {
-            double factor = Math.pow(multiplier, i);
+            float factor = (float) Math.pow(multiplier, i);
             factorMult += factor;
             x += vector.x * factor;
             y += vector.y * factor;

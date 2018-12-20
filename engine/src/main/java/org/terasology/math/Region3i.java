@@ -101,7 +101,7 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * Create a region with center point and extents size
      * @param center the center point of region
-     * @param extents the extents size of region
+     * @param extent the extents size of region
      * @return a new region base on the center point and extents size
      */
     public static Region3i createFromCenterExtents(BaseVector3i center, int extent) {

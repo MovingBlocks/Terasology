@@ -76,7 +76,7 @@ public class OpenVRInput implements EngineSubsystem {
         InputSystem inputSystem = context.get(InputSystem.class);
         if (inputSystem == null) {
             inputSystem = new InputSystem();
-            inputSystem.setMouseDevice(new LwjglMouseDevice());
+            inputSystem.setMouseDevice(new LwjglMouseDevice(context));
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
             context.put(InputSystem.class, inputSystem);
         }

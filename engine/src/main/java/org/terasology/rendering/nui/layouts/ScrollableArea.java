@@ -26,6 +26,7 @@ import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
+import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UIScrollbar;
 
 import java.util.Collections;
@@ -107,6 +108,36 @@ public class ScrollableArea extends CoreLayout {
             return true;
         }
     };
+
+    /**
+     * Scrolls the equivalent of 1 mouse wheel.
+     * @param up If to scroll up or down.
+     */
+    public void scroll(boolean up) {
+        int moveAmount = -1;
+        if (up) {
+            moveAmount = 1;
+        }
+        if (verticalScrollbar) {
+            verticalBar.setValue(verticalBar.getValue() + moveAmount * SCROLL_MULTIPLIER);
+        } else if (horizontalScrollbar) {
+            horizontalBar.setValue(horizontalBar.getValue() + moveAmount * SCROLL_MULTIPLIER);
+        }
+    }
+
+    /**
+     * Sets the amount of the scrollbar.
+     * @param moveAmount The position of the scrollbar as a percent.
+     */
+    public void setPosition(double moveAmount) {
+        if (verticalScrollbar) {
+            moveAmount *= verticalBar.getRange();
+            verticalBar.setValue((int) Math.round(moveAmount));
+        } else if (horizontalScrollbar) {
+            moveAmount *= horizontalBar.getRange();
+            horizontalBar.setValue((int) Math.round(moveAmount));
+        }
+    }
 
     /* Default constructor for internal systems */
     public ScrollableArea() {

@@ -74,8 +74,8 @@ public class BrownianNoise extends AbstractNoise {
         for (int i = 0; i < getOctaves(); i++) {
             result += other.noise(workingX, workingY) * spectralWeights[i];
 
-            workingX *= getLacunarity();
-            workingY *= getLacunarity();
+            workingX *= (float) getLacunarity();
+            workingY *= (float) getLacunarity();
         }
 
         return result * scale;
@@ -99,9 +99,9 @@ public class BrownianNoise extends AbstractNoise {
         for (int i = 0; i < getOctaves(); i++) {
             result += other.noise(workingX, workingY, workingZ) * spectralWeights[i];
 
-            workingX *= getLacunarity();
-            workingY *= getLacunarity();
-            workingZ *= getLacunarity();
+            workingX *= (float) getLacunarity();
+            workingY *= (float) getLacunarity();
+            workingZ *= (float) getLacunarity();
         }
 
         return result * scale;

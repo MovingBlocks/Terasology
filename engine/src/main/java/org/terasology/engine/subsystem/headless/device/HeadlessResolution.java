@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.input.binds.general;
+package org.terasology.engine.subsystem.headless.device;
 
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.Keyboard;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.engine.subsystem.Resolution;
 
-@RegisterBindButton(id = "showOnlinePlayers", description = "${engine:menu#binding-show-online-players}", category = "general")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F2)
-public class OnlinePlayersButton extends BindButtonEvent {
+public final class HeadlessResolution implements Resolution {
+
+    private static final HeadlessResolution INSTANCE = new HeadlessResolution();
+
+    private HeadlessResolution() {
+    }
+
+    public static HeadlessResolution getInstance() {
+        return INSTANCE;
+    }
 }

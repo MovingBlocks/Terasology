@@ -186,7 +186,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
             UIWidget widget = column.get(i);
             Vector2i cellSize = new Vector2i(areaHint.x, availableHeight);
             if (!autoSizeRows) {
-                cellSize.y *= rowHeights[i];
+                cellSize.y *= (int) rowHeights[i];
             }
             if (widget != null) {
                 Vector2i contentSize = canvas.calculateRestrictedSize(widget, cellSize);

@@ -37,6 +37,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.Resolution;
 import org.terasology.entitySystem.Component;
 import org.terasology.input.Input;
 import org.terasology.naming.Name;
@@ -45,6 +46,7 @@ import org.terasology.naming.gson.NameTypeAdapter;
 import org.terasology.naming.gson.VersionTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
+import org.terasology.utilities.gson.ResolutionHandler;
 import org.terasology.utilities.gson.SetMultimapTypeAdapter;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
 
@@ -223,6 +225,7 @@ public final class Config {
                 .registerTypeAdapter(SetMultimap.class, new SetMultimapTypeAdapter<>(Input.class))
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
                 .registerTypeAdapter(Input.class, new InputHandler())
+                .registerTypeAdapter(Resolution.class, new ResolutionHandler())
                 //.registerTypeAdapter(UniverseConfig.class, new UniverseConfig.Handler())
 
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())

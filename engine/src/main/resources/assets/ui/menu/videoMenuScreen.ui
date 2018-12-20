@@ -93,6 +93,14 @@
                                 },
                                 {
                                     "type": "UILabel",
+                                    "text": "${engine:menu#video-resolution-fullscreen}: "
+                                },
+                                {
+                                    "type": "UIDropdownScrollable",
+                                    "id": "resolution"
+                                },
+                                {
+                                    "type": "UILabel",
                                     "text": "${engine:menu#video-vsync}: "
                                 },
                                 {
@@ -229,6 +237,31 @@
                                 {
                                     "type": "UISlider",
                                     "id": "fboScale"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#ui-scale}: "
+                                },
+
+                                {
+                                    "type": "RowLayout",
+                                    "contents": [
+                                        {
+                                            "type": "UIButton",
+                                            "text": "-",
+                                            "id": "uiScaleSmaller"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "id": "uiScaleLabel",
+                                            "text": " 100%"
+                                        },
+                                        {
+                                            "type": "UIButton",
+                                            "text": "+",
+                                            "id": "uiScaleLarger"
+                                        }
+                                    ]
                                 },
                                 {
                                     "type": "UILabel",
@@ -387,7 +420,7 @@
                     ]
                 },
                 "layoutInfo": {
-                    "width": 800,
+                    "width": 1024,
                     "position-horizontal-center": {},
                     "position-top": {
                         "target": "BOTTOM",

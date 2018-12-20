@@ -254,7 +254,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             // Send out this event so other systems can alter the cooldown time.
             AffectItemUseCooldownTimeEvent affectItemUseCooldownTimeEvent = new AffectItemUseCooldownTimeEvent(itemComponent.cooldownTime);
             entity.send(affectItemUseCooldownTimeEvent);
-            characterHeldItemComponent.nextItemUseTime += affectItemUseCooldownTimeEvent.getResultValue();
+            characterHeldItemComponent.nextItemUseTime += (long) affectItemUseCooldownTimeEvent.getResultValue();
         } else {
             characterHeldItemComponent.nextItemUseTime += 200;
         }
