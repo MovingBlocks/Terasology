@@ -175,22 +175,22 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
     }
 
+    /**
+     * Process all increasing propagation requests
+     * This is done from the strongest through to the weakest.
+     */
     private void processIncrease() {
-        int depth = 0;
-        while (depth < rules.getMaxValue() - 1) {
+        for (int depth = 0; depth < rules.getMaxValue() - 1; depth++) {
             byte value = (byte) (rules.getMaxValue() - depth);
-            Set<Vector3i> toProcess = increaseQueues[depth];
-            if (!toProcess.isEmpty()) {
+
+            while (!increaseQueues[depth].isEmpty()) {
+                Set<Vector3i> toProcess = increaseQueues[depth];
                 increaseQueues[depth] = Sets.newLinkedHashSetWithExpectedSize(toProcess.size());
 
+                /* This step will add any new values to `increaseQueues` */
                 for (Vector3i pos : toProcess) {
                     push(pos, value);
                 }
-                if (increaseQueues[depth].isEmpty()) {
-                    depth++;
-                }
-            } else {
-                depth++;
             }
         }
     }
