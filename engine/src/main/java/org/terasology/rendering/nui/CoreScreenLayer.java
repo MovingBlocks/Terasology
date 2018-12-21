@@ -215,6 +215,21 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     @Override
     public void update(float delta) {
         if (contents != null) {
+            if (!TabbingManager.isInitialized()) {
+                TabbingManager.init();
+                TabbingManager.setOpenScreen(this);
+
+                Iterator<UIWidget> widgets = contents.iterator();
+                iterateThrough(widgets);
+            }
+
+            if (TabbingManager.getOpenScreen() == null) {
+                TabbingManager.setOpenScreen(this);
+
+                Iterator<UIWidget> widgets = contents.iterator();
+                iterateThrough(widgets);
+
+            }
             contents.update(delta);
             animationSystem.update(delta);
             if (depth == SortOrderSystem.DEFAULT_DEPTH) {
@@ -222,13 +237,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             }
             if (activateBindEvent) {
                 onBindEvent(new TabbingUIButton());
-            }
-
-            if (!TabbingManager.isInitialized()) {
-                TabbingManager.init();
-
-                Iterator<UIWidget> widgets = contents.iterator();
-                iterateThrough(widgets);
             }
         }
     }

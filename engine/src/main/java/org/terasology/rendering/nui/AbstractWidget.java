@@ -300,6 +300,12 @@ public abstract class AbstractWidget implements UIWidget {
                 if (!TabbingManager.isInitialized()) {
                     TabbingManager.init();
                 }
+                if (TabbingManager.getOpenScreen().getManager().getFocus() == null) {
+                    if (TabbingManager.getWidgetsList().size() > 0) {
+                        TabbingManager.resetCurrentNum();
+                        TabbingManager.focusedWidget = TabbingManager.getWidgetsList().get(0);
+                    }
+                }
                 TabbingManager.focusSetThrough = true;
                 TabbingManager.changeCurrentNum(!shiftPressed);
 
