@@ -206,7 +206,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
             UIWidget widget = row.get(i);
             Vector2i cellSize = new Vector2i(availableWidth, areaHint.y);
             if (!autoSizeColumns) {
-                cellSize.x *= (int) columnWidths[i];
+                cellSize.x = (int) (cellSize.x * columnWidths[i]);
             }
             if (widget != null) {
                 Vector2i contentSize = canvas.calculateRestrictedSize(widget, cellSize);
