@@ -414,14 +414,14 @@
                       },
                       "position-bottom": {
                         "target": "TOP",
-                        "widget": "advancedFilterResetButton",
+                        "widget": "resetFilters",
                         "offset": 8
                       }
                     }
                   },
                   {
                     "type": "UIButton",
-                    "id": "advancedFilterResetButton",
+                    "id": "resetFilters",
                     "text": "${engine:menu#select-modules-filter-reset}",
                     "layoutInfo": {
                       "width": 300,
