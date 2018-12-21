@@ -71,21 +71,6 @@
       },
       {
         "type": "UIButton",
-        "text": "${engine:menu#return-main-menu}",
-        "id": "mainMenu",
-        "layoutInfo": {
-          "width": 120,
-          "height": 80,
-          "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "widget": "container",
-            "offset": 16
-          }
-        }
-      },
-      {
-        "type": "UIButton",
         "text": "${engine:menu#return-pregeneration}",
         "id": "close",
         "layoutInfo": {
@@ -103,20 +88,63 @@
         }
       },
       {
-        "type": "UIButton",
-        "text": "${engine:menu#start-playing}",
-        "id": "play",
-        "layoutInfo": {
-          "width": 120,
-          "height": 80,
-          "position-vertical-center": {
-            "target": "CENTER",
-            "widget": "container"
+        "type": "RowLayout",
+        "id": "actionsRow",
+        "horizontalSpacing": 32,
+        "contents": [
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#return-main-menu}",
+            "id": "mainMenu"
           },
-          "position-left": {
-            "target": "RIGHT",
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#start-playing}",
+            "id": "play"
+          }
+        ],
+        "layoutInfo": {
+          "width": 272,
+          "height": 80,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "BOTTOM",
             "widget": "container",
             "offset": 16
+          }
+        }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:happyGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "actionsRow"
+          }
+        }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:angryGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-right": {
+            "target": "LEFT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "actionsRow"
           }
         }
       }

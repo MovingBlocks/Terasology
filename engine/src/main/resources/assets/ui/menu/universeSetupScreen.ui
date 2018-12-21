@@ -205,6 +205,40 @@
             "offset": 16
           }
         }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:happyGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "actionsRow"
+          }
+        }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:angryGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-right": {
+            "target": "LEFT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "actionsRow"
+          }
+        }
       }
     ]
   }
