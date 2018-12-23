@@ -20,6 +20,8 @@ import org.terasology.world.biomes.Biome;
 
 /**
  * Used for notifying listeners that the biome at a spot in the world has changed.
+ * <p>
+ * A POJO hence no methods are documented.
  *
  */
 public class BiomeChange {

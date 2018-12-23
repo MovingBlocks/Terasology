@@ -21,6 +21,9 @@ import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.AbstractFullWorldView;
 
 /**
+ * Gets the sunlight regen values from the chunk.
+ * <p>
+ * Simply delegates to the provided chunk for values
  */
 public class SunlightRegenWorldView extends AbstractFullWorldView {
 

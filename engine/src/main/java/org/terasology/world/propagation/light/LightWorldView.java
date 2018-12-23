@@ -21,6 +21,8 @@ import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.AbstractFullWorldView;
 
 /**
+ * Basic world view that provides access to the standard lighting in the world.
+ * Simply delegates to getting the value from the provided chunk
  */
 public class LightWorldView extends AbstractFullWorldView {
 
