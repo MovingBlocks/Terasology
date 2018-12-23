@@ -433,7 +433,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             UIButton resetAdvancedFilters = find("resetFilters", UIButton.class);
             if (resetAdvancedFilters != null) {
 
-                //on clicking 'reset filters' button, uncheck all advanced filters
+                //on clicking 'reset category filters' button, uncheck all advanced filters
                 localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
                 uncategorizedCheckbox.setChecked(selectModulesConfig.isUncategorizedSelected());
 
