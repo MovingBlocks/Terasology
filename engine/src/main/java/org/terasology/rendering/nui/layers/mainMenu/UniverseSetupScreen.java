@@ -227,6 +227,10 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
             }
         });
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
+        });
     }
 
     @Override

@@ -84,39 +84,33 @@
           "width": 500,
           "use-content-height": true,
           "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "widget": "gameTypeTitle"
-          },
-          "position-bottom": {
-            "target": "BOTTOM"
-          }
+          "position-vertical-center": {}
         }
       },
       {
         "type": "RowLayout",
         "id": "actionsRow",
-        "horizontalSpacing": 4,
+        "horizontalSpacing": 32,
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#advanced}",
-            "id": "advancedSetup"
+            "text": "${engine:menu#return-main-menu}",
+            "id": "mainMenu"
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#start-game}",
+            "text": "${engine:menu#start-playing}",
             "id": "play"
           }
         ],
         "layoutInfo": {
-          "width": 400,
-          "height": 32,
+          "width": 272,
+          "height": 80,
           "position-horizontal-center": {},
           "position-top": {
             "target": "BOTTOM",
-            "offset": 16,
-            "widget": "mainBox"
+            "widget": "mainBox",
+            "offset": 16
           }
         }
       },
@@ -125,13 +119,34 @@
         "text": "${engine:menu#back}",
         "id": "close",
         "layoutInfo": {
-          "width": 128,
-          "height": 32,
-          "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "offset": 16,
-            "widget": "actionsRow"
+          "width": 120,
+          "height": 80,
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "mainBox"
+          },
+          "position-right": {
+            "target": "LEFT",
+            "widget": "mainBox",
+            "offset": 16
+          }
+        }
+      },
+      {
+        "type": "UIButton",
+        "text": "${engine:menu#advanced}",
+        "id": "advancedSetup",
+        "layoutInfo": {
+          "width": 120,
+          "height": 80,
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "mainBox"
+          },
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "mainBox",
+            "offset": 16
           }
         }
       }
