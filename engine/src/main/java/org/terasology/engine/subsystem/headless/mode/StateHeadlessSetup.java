@@ -106,6 +106,13 @@ public class StateHeadlessSetup implements GameState {
         } else {
             gameManifest = createGameManifest();
         }
+
+        Config config = context.get(Config.class);
+        WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
+        config.getUniverseConfig().addWorldManager(worldInfo);
+        config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
+        config.getUniverseConfig().setUniverseSeed(gameManifest.getSeed());
+
         gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
     }
 
