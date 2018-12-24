@@ -253,7 +253,8 @@ Contributors
  [bpas247](https://github.com/bpas247),
  [Koward](https://github.com/Koward),
  [RatMoleRat](https://github.com/RatMoleRat),
- [rezonant](https://github.com/rezonant)
+ [rezonant](https://github.com/rezonant),
+ [fishfred](https://github.com/fishfred)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
