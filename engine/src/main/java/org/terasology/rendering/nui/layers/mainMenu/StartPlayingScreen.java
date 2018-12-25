@@ -85,7 +85,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
                 if (world != targetWorld) {
                     i++;
                     uri = world.getWorldGeneratorInfo().getUri();
-                    worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD + i, world.getWorldGenerator().getWorldSeed(),
+                    worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD + i, world.getWorldName().toString(), world.getWorldGenerator().getWorldSeed(),
                             (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
                     gameManifest.addWorld(worldInfo);
                     config.getUniverseConfig().addWorldManager(worldInfo);
