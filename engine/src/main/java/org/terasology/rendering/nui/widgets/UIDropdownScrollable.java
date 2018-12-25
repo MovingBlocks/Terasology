@@ -24,6 +24,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -191,7 +192,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private void readItemMouseOver(Canvas canvas, int i) {
         if (optionListeners.get(i).isMouseOver()) {
             canvas.setMode(HOVER_MODE);
-        } else if (i == highlighted) {
+        } else if (i == highlighted && TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
             canvas.setMode(HOVER_MODE);
             setSelection(getOptions().get(highlighted));
         } else {
