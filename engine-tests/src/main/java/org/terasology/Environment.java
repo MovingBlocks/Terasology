@@ -88,12 +88,6 @@ public class Environment {
         setupWorldProvider();
 
         setupCelestialSystem();
-
-        loadPrefabs();
-    }
-
-    protected void loadPrefabs() {
-        // empty
     }
 
     protected void setupComponentManager() {
