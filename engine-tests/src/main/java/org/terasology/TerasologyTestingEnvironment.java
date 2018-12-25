@@ -27,6 +27,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -113,6 +114,13 @@ public abstract class TerasologyTestingEnvironment {
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
+        LoadPrefabs prefabLoadStep = new LoadPrefabs(context);
+
+        boolean complete = false;
+        prefabLoadStep.begin();
+        while (!complete) {
+            complete = prefabLoadStep.step();
+        }
         context.get(ComponentSystemManager.class).initialise();
         context.put(Console.class, new ConsoleImpl(context));
     }

@@ -34,6 +34,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.headless.assets.HeadlessMaterial;
@@ -318,6 +319,18 @@ public class HeadlessEnvironment extends Environment {
     protected void setupCelestialSystem() {
         DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(), context);
         context.put(CelestialSystem.class, celestialSystem);
+    }
+
+    @Override
+    protected void loadPrefabs() {
+
+        LoadPrefabs prefabLoadStep = new LoadPrefabs(context);
+
+        boolean complete = false;
+        prefabLoadStep.begin();
+        while (!complete) {
+            complete = prefabLoadStep.step();
+        }
     }
 
     @Override
