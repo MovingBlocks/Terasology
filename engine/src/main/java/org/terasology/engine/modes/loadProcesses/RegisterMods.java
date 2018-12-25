@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;

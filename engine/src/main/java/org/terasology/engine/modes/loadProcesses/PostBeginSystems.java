@@ -17,6 +17,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.modes.StepBasedLoadProcess;
 import org.terasology.entitySystem.systems.ComponentSystem;
 
 import java.util.Iterator;

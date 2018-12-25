@@ -169,7 +169,7 @@ public interface WorldRenderer {
      * @return Returns True if all necessary chunks have been loaded and their meshes have been generated, False otherwise.
      */
     // TODO: it might be desirable to separate the loading of chunks and mesh generation. The former may concern
-    // TODO: systems dealing with beyond-the-horizon simulations. The latter usually only concerns the renderer.
+    //       systems dealing with beyond-the-horizon simulations. The latter usually only concerns the renderer.
     boolean pregenerateChunks();
 
     /**
