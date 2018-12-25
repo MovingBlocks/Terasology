@@ -20,8 +20,10 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
+ * Responsible for calling {@link ComponentSystem#preBegin()} on all registered systems.
  */
 public class PreBeginSystems extends StepBasedLoadProcess {
 
@@ -42,6 +44,7 @@ public class PreBeginSystems extends StepBasedLoadProcess {
     public boolean step() {
         if (componentSystems.hasNext()) {
             componentSystems.next().preBegin();
+            stepDone();
         }
         return !componentSystems.hasNext();
     }
@@ -49,7 +52,9 @@ public class PreBeginSystems extends StepBasedLoadProcess {
     @Override
     public void begin() {
         ComponentSystemManager csm = context.get(ComponentSystemManager.class);
-        componentSystems = csm.iterateAll().iterator();
+        final List<ComponentSystem> componentSystemList = csm.iterateAll();
+        componentSystems = componentSystemList.iterator();
+        setTotalSteps(componentSystemList.size());
     }
 
     @Override

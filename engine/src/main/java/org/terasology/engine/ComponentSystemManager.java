@@ -128,6 +128,7 @@ public class ComponentSystemManager {
         context.get(EntityManager.class).getEventSystem().registerEventHandler(object);
 
         if (initialised) {
+            logger.warn("System " + object.getClass().getName() + " registered post-init.");
             initialiseSystem(object);
         }
     }
@@ -171,7 +172,7 @@ public class ComponentSystemManager {
         return namedLookup.get(name);
     }
 
-    public Iterable<ComponentSystem> iterateAll() {
+    public List<ComponentSystem> iterateAll() {
         return store;
     }
 

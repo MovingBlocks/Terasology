@@ -18,16 +18,27 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.engine.modes.LoadProcess;
 
 /**
+ * Used for LoadProcesses taking more than one step.
  */
 public abstract class StepBasedLoadProcess implements LoadProcess {
 
     private int stepsComplete;
     private int totalSteps = 1;
 
+    /**
+     * Must be called after every step counted in {@link #setTotalSteps(int)} is finished.
+     *
+     * The prefferable way to do this is from the end of the {@link #step()} method.
+     */
     protected void stepDone() {
         stepsComplete++;
     }
 
+    /**
+     * Set the total amount of steps load process is going to take.
+     *
+     * @param amount The expected amount of steps.
+     */
     protected void setTotalSteps(int amount) {
         this.totalSteps = Math.max(1, amount);
     }
