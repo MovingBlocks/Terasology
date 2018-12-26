@@ -266,6 +266,8 @@ public class UIDropdown<T> extends ActivatableWidget {
             } else if (keyId == Keyboard.KeyId.DOWN) {
                 this.changeHighlighted(true);
                 return true;
+            } else if (keyId == Keyboard.KeyId.ENTER) {
+                setSelection(getOptions().get(highlighted));
             }
         }
         return super.onKeyEvent(event);
