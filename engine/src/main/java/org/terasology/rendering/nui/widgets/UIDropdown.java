@@ -112,7 +112,6 @@ public class UIDropdown<T> extends ActivatableWidget {
                     canvas.setMode(HOVER_MODE);
                 } else if (i==highlighted && TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
                     canvas.setMode(HOVER_MODE);
-                    setSelection(getOptions().get(highlighted));
                 } else {
                     canvas.setMode(DEFAULT_MODE);
                 }
@@ -242,7 +241,6 @@ public class UIDropdown<T> extends ActivatableWidget {
                 highlighted = getOptions().size()-1;
             }
         }
-        setSelection(getOptions().get(highlighted));
     }
 
     public boolean isOpened() { return opened; }
