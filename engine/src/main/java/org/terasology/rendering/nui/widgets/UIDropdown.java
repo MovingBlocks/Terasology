@@ -110,7 +110,7 @@ public class UIDropdown<T> extends ActivatableWidget {
             for (int i = 0; i < optionListeners.size(); ++i) {
                 if (optionListeners.get(i).isMouseOver()) {
                     canvas.setMode(HOVER_MODE);
-                } else if (i==highlighted) {
+                } else if (i==highlighted && TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
                     canvas.setMode(HOVER_MODE);
                     setSelection(getOptions().get(highlighted));
                 } else {
