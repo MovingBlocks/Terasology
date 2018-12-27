@@ -281,10 +281,23 @@ public class GameDetailsScreen extends CoreScreenLayer {
             biomes.setSelection(null);
             blocks.setSelection(null);
         });
+
+        gameWorlds.setItemRenderer(new AbstractItemRenderer<WorldInfo>() {
+            @Override
+            public void draw(WorldInfo value, Canvas canvas) {
+                canvas.drawText(value.getCustomTitle());
+            }
+
+            @Override
+            public Vector2i getPreferredSize(WorldInfo value, Canvas canvas) {
+                String text = value.getCustomTitle();
+                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text), canvas.getCurrentStyle().getFont().getLineHeight());
+            }
+        });
     }
 
     private String getWorldDescription(final WorldInfo worldInfo) {
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + worldInfo.getTitle() + '\n' + '\n' +
+        return translationSystem.translate("${engine:menu#game-details-game-title} ") + worldInfo.getCustomTitle() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldInfo.getWorldGenerator().toString() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
