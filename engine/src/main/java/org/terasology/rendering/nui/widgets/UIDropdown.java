@@ -54,7 +54,7 @@ public class UIDropdown<T> extends ActivatableWidget {
     private Binding<T> selection = new DefaultBinding<>();
 
     private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
-    private boolean opened;
+    protected boolean opened;
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
@@ -205,14 +205,17 @@ public class UIDropdown<T> extends ActivatableWidget {
         optionRenderer = itemRenderer;
     }
 
-    public void setOpenedReverse() {
+    public void setOpenedReverse(boolean selectionSet) {
         opened = !opened;
 
         if (!opened) {
-            setSelection(getOptions().get(highlighted));
-            optionListeners.clear();
+            if (selectionSet) {
+                setSelection(getOptions().get(highlighted));
+            }
         }
-        else {
+        if (getOptions().size() != optionListeners.size()) {
+            optionListeners.clear();
+
             for (int i = 0; i < getOptions().size(); ++i) {
                 optionListeners.add(new ItemListener(i));
             }
@@ -236,6 +239,10 @@ public class UIDropdown<T> extends ActivatableWidget {
     }
 
     public void changeHighlighted(boolean increase) {
+        if (!opened) {
+            highlighted = getOptions().indexOf(getSelection());
+        }
+
         if (increase) {
             highlighted++;
             if (highlighted >= getOptions().size()) {
@@ -247,19 +254,18 @@ public class UIDropdown<T> extends ActivatableWidget {
                 highlighted = getOptions().size()-1;
             }
         }
+
+        if (!opened) {
+            setSelection(getOptions().get(highlighted));
+        }
     }
 
     public boolean isOpened() { return opened; }
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown()) {
-            boolean dropdownOpen = false;
-
-            if (TabbingManager.focusedWidget instanceof UIDropdown) {
-                dropdownOpen = ((UIDropdown) TabbingManager.focusedWidget).isOpened();
-            }
-            if (TabbingManager.focusedWidget != null && dropdownOpen) {
+        if (event.isDown() && TabbingManager.focusedWidget.equals(this)) {
+            if (opened) {
                 TabbingManager.setWidgetIsOpen(true);
             } else {
                 TabbingManager.setWidgetIsOpen(false);
@@ -271,6 +277,17 @@ public class UIDropdown<T> extends ActivatableWidget {
                 return true;
             } else if (keyId == Keyboard.KeyId.DOWN) {
                 this.changeHighlighted(true);
+                return true;
+            }
+            if (keyId == Keyboard.KeyId.LEFT) {
+                if (opened) {
+                    setOpenedReverse(false);
+                }
+                return true;
+            } else if (keyId == Keyboard.KeyId.RIGHT) {
+                if (!opened) {
+                    setOpenedReverse(false);
+                }
                 return true;
             }
         }

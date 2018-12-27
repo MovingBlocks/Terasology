@@ -330,7 +330,10 @@ public abstract class AbstractWidget implements UIWidget {
                 event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
             } else if (event.getId().equals(new SimpleUri("engine:activate"))) {
                 if (TabbingManager.focusedWidget instanceof UIDropdown) {
-                    ((UIDropdown) TabbingManager.focusedWidget).setOpenedReverse();
+                    UIDropdown dropdown = ((UIDropdown) TabbingManager.focusedWidget);
+                    if (dropdown.isOpened()) {
+                        dropdown.setOpenedReverse(true);
+                    }
                 } else if  (TabbingManager.focusedWidget instanceof ActivatableWidget) {
                     ((ActivatableWidget) TabbingManager.focusedWidget).activateWidget();
                 }
