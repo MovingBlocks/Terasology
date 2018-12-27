@@ -147,6 +147,7 @@ public class UIDropdown<T> extends ActivatableWidget {
     public void onLoseFocus() {
         super.onLoseFocus();
         opened = false;
+        optionListeners.clear();
     }
 
     public void bindOptions(Binding<List<T>> binding) {
@@ -206,8 +207,12 @@ public class UIDropdown<T> extends ActivatableWidget {
 
     public void setOpenedReverse() {
         opened = !opened;
-        optionListeners.clear();
-        if (opened) {
+
+        if (!opened) {
+            setSelection(getOptions().get(highlighted));
+            optionListeners.clear();
+        }
+        else {
             for (int i = 0; i < getOptions().size(); ++i) {
                 optionListeners.add(new ItemListener(i));
             }
@@ -224,6 +229,7 @@ public class UIDropdown<T> extends ActivatableWidget {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             setSelection(getOptions().get(index));
+            highlighted = index;
             opened = false;
             return true;
         }
@@ -266,8 +272,6 @@ public class UIDropdown<T> extends ActivatableWidget {
             } else if (keyId == Keyboard.KeyId.DOWN) {
                 this.changeHighlighted(true);
                 return true;
-            } else if (keyId == Keyboard.KeyId.ENTER) {
-                setSelection(getOptions().get(highlighted));
             }
         }
         return super.onKeyEvent(event);

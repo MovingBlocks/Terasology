@@ -291,6 +291,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
+            highlighted = index;
             setSelection(getOptions().get(index));
             opened = false;
             return true;
@@ -303,7 +304,9 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             for (int i = 0; i < getOptions().size(); ++i) {
                 optionListeners.add(new UIDropdownScrollable.ItemListener(i));
             }
-            setSelection(getOptions().get(0));
+        } else {
+            setSelection(getOptions().get(highlighted));
+            optionListeners.clear();
         }
     }
 
