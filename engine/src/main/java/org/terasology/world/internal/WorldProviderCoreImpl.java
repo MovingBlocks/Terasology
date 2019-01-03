@@ -70,6 +70,7 @@ import java.util.Set;
 public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private String title;
+    private String customTitle;
     private String seed = "";
     private SimpleUri worldGenerator;
 
@@ -85,9 +86,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private Block unloadedBlock;
 
-    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator,
+    public WorldProviderCoreImpl(String title, String customTitle, String seed, long time, SimpleUri worldGenerator,
                                  GeneratingChunkProvider chunkProvider, Block unloadedBlock, Context context) {
         this.title = (title == null) ? seed : title;
+        this.customTitle = customTitle;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
@@ -109,7 +111,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider, Block unloadedBlock,
                                  Context context) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider,
+        this(info.getTitle(), info.getCustomTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider,
                 unloadedBlock, context);
     }
 
@@ -134,7 +136,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        return new WorldInfo(title, seed, worldTime.getMilliseconds(), worldGenerator);
+        return new WorldInfo(title, customTitle, seed, worldTime.getMilliseconds(), worldGenerator);
     }
 
     @Override

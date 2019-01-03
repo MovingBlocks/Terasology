@@ -85,7 +85,7 @@ public class GameManifestProvider {
             seed = universeWrapper.getSeed();
         }
         // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
-        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, seed,
+        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, universeWrapper.getTargetWorld().getWorldName().toString(), seed,
                 (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
 
         gameManifest.addWorld(worldInfo);
