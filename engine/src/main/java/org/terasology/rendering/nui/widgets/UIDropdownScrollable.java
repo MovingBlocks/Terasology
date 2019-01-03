@@ -53,13 +53,13 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private Binding<T> selection = new DefaultBinding<>();
     private List<InteractionListener> optionListeners = Lists.newArrayList();
     private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
-    private boolean opened;
+
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             opened = !opened;
-            optionListeners.clear();
             if (opened) {
+                optionListeners.clear();
                 for (int i = 0; i < getOptions().size(); ++i) {
                     optionListeners.add(new ItemListener(i));
                 }
@@ -194,7 +194,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             canvas.setMode(HOVER_MODE);
         } else if (i == highlighted && TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
             canvas.setMode(HOVER_MODE);
-            setSelection(getOptions().get(highlighted));
         } else {
             canvas.setMode(DEFAULT_MODE);
         }
@@ -292,23 +291,32 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
+            highlighted = index;
             setSelection(getOptions().get(index));
             opened = false;
             return true;
         }
     }
-    public void setOpenedReverse() {
+    public void setOpenedReverse(boolean selectionSet) {
         opened = !opened;
-        optionListeners.clear();
         if (opened) {
+
+            optionListeners.clear();
             for (int i = 0; i < getOptions().size(); ++i) {
                 optionListeners.add(new UIDropdownScrollable.ItemListener(i));
             }
-            setSelection(getOptions().get(0));
+        } else {
+            if (selectionSet) {
+                setSelection(getOptions().get(highlighted));
+            }
         }
     }
 
     public void changeHighlighted(boolean increase) {
+        if (!opened) {
+            highlighted = getOptions().indexOf(getSelection());
+        }
+
         if (increase) {
             highlighted++;
             if (highlighted >= getOptions().size()) {
@@ -336,7 +344,10 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                 }
             }
         }
-        setSelection(getOptions().get(highlighted));
+
+        if (!opened) {
+            setSelection(getOptions().get(highlighted));
+        }
     }
 
     public boolean isOpened() {
