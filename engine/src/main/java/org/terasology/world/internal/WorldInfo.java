@@ -33,6 +33,10 @@ public class WorldInfo {
     public WorldInfo() {
     }
 
+    public WorldInfo(String title, String seed, long time, SimpleUri worldGenerator) {
+        this(title, "", seed, time, worldGenerator);
+    }
+
     public WorldInfo(String title, String customTitle, String seed, long time, SimpleUri worldGenerator) {
         if (title != null) {
             this.title = title;
