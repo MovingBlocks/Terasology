@@ -255,7 +255,8 @@ Contributors
  [RatMoleRat](https://github.com/RatMoleRat),
  [rezonant](https://github.com/rezonant),
  [fishfred](https://github.com/fishfred),
- [Snooober](https://github.com/Snooober)
+ [Snooober](https://github.com/Snooober),
+ [costinvisan](https://github.com/costinvisan)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
