@@ -22,11 +22,9 @@ import org.terasology.math.geom.Vector2f;
  * Describes the possible methods drawing to a region of a different size to the image being drawn.
  */
 public enum ScaleMode {
-
     /**
      * Stretches to fill the given space
      */
-
     STRETCH {
         @Override
         public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
@@ -97,7 +95,7 @@ public enum ScaleMode {
                 }
                 System.out.println(actualHeight);
             float scale = Math.max((float) region.width() / actualWidth, (float) region.height() / actualHeight);
-            return new Vector2f(actualWidth * scale, actualHeight * scale-100);
+            return new Vector2f(actualWidth * scale, (actualHeight * scale)-100);
 
 
         }
