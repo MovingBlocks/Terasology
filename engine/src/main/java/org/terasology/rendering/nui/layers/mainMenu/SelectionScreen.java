@@ -30,6 +30,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UIImageSlideshow;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -126,7 +127,10 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         }
 
         previewSlideshow.clean();
-        textures.forEach(previewSlideshow::addImage);
+        textures.forEach(tex -> {
+            UIImage image = new UIImage(null, tex, true);
+            previewSlideshow.addImage(image);
+        });
     }
 
     protected void remove(final UIList<GameInfo> gameList, Path world, String removeString) {
