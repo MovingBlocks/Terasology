@@ -18,11 +18,7 @@ package org.terasology.rendering.nui.widgets;
 
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.ScaleMode;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -68,7 +64,13 @@ public class UIImage extends CoreWidget {
                 canvas.drawTexture(image.get(), tint.get());
             } else {
                 ScaleMode scaleMode = canvas.getCurrentStyle().getTextureScaleMode();
-                canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.SCALE_FILL);
+                if(image.get().getWidth() > 2*(image.get().getHeight())) {
+                    canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.SCALE_FIT);
+                }
+                else
+                {
+                    canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.SCALE_FILL);
+                }
                 canvas.drawTexture(image.get(), tint.get());
                 canvas.getCurrentStyle().setTextureScaleMode(scaleMode);
             }
