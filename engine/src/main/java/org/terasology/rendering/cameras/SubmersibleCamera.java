@@ -43,6 +43,7 @@ public abstract class SubmersibleCamera extends Camera {
         // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
         Vector3f cameraPosition = new Vector3f(this.getPosition());
 
+
         // Compensate for waves
         if (renderingConfig.isAnimateWater()) {
             cameraPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPosition, worldProvider.getTime().getDays());
@@ -51,6 +52,7 @@ public abstract class SubmersibleCamera extends Camera {
         if (worldProvider.isBlockRelevant(cameraPosition)) {
             return worldProvider.getBlock(cameraPosition).isLiquid();
         }
+
         return false;
     }
 }

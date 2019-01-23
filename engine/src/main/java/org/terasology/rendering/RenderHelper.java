@@ -84,7 +84,6 @@ public final class RenderHelper {
         }
 
         height /= OCEAN_OCTAVES;
-
         return height + RefractiveReflectiveBlocksNode.waterOffsetY;
     }
 

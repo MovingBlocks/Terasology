@@ -86,12 +86,8 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkProvider;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glViewport;
+
+import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_16X16_CONFIG;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_1X1_CONFIG;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_2X2_CONFIG;
@@ -254,6 +250,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         addBloomNodes(renderGraph);
 
+
         addExposureNodes(renderGraph);
 
         addInitialPostProcessingNodes(renderGraph);
@@ -274,6 +271,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         BufferClearingNode staleGBufferClearingNode = new BufferClearingNode("staleGBufferClearingNode", context, gBufferPair.getStaleFbo(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(staleGBufferClearingNode);
+
     }
 
     private void addSkyNodes(RenderGraph renderGraph) {
@@ -294,6 +292,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         Node lastUpdatedGBufferClearingNode = renderGraph.findNode("engine:lastUpdatedGBufferClearingNode");
         renderGraph.connect(lastUpdatedGBufferClearingNode, backdropNode, intermediateHazeNode, finalHazeNode);
+        
     }
 
     private void addWorldRenderingNodes(RenderGraph renderGraph) {

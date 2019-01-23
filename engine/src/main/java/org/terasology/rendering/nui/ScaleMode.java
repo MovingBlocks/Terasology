@@ -83,6 +83,29 @@ public enum ScaleMode {
         public String toString() {
             return "tiled";
         }
+    },
+    Automatic_selector {
+        @Override
+        public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
+
+                if(actualHeight < 500)
+                {
+                    System.out.println("Hell of a job");
+                    float scale = Math.max((float) region.width() / actualWidth, (float) region.height() / actualHeight);
+                    return new Vector2f(actualWidth * scale, actualHeight * scale);
+                }
+                System.out.println(actualHeight);
+            float scale = Math.max((float) region.width() / actualWidth, (float) region.height() / actualHeight);
+            return new Vector2f(actualWidth * scale, (actualHeight * scale)-100);
+
+
+        }
+
+        @Override
+        public String toString() {
+            return "atomatic";
+        }
+
     };
 
     /**
