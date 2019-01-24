@@ -66,11 +66,11 @@ public class UIImage extends CoreWidget {
         if (image.get() != null) {
             if (ignoreAspectRatio) {
                 ScaleMode scaleMode = canvas.getCurrentStyle().getTextureScaleMode();
-                if(image.get().getWidth() > (image.get().getHeight()*2))
-                {
-                    canvas.getCurrentStyle().setTextureScaleMode(scaleMode.SCALE_FIT);
-                }
-                else{
+
+                if (image.get().getWidth() > (image.get().getHeight() * 2)) {
+
+                    canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.SCALE_FIT);
+                } else {
                     canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.SCALE_FILL);
                 }
                 canvas.drawTexture(image.get(), tint.get());
