@@ -98,6 +98,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("prePostComposite");
         addShaderProgram("highPass");
         addShaderProgram("blur");
+        addShaderProgram("vignette");
         addShaderProgram("downSampler");
         addShaderProgram("toneMapping");
         addShaderProgram("sky");

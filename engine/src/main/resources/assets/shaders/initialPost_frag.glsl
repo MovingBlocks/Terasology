@@ -29,7 +29,7 @@ uniform vec2 aberrationOffset = vec2(0.0, 0.0);
 
 uniform sampler2D texScene;
 
-#ifdef VIGNETTE
+#ifdef INIT_POST_VIGNETTE
 uniform sampler2D texVignette;
 uniform vec3 inLiquidTint;
 #endif
@@ -60,7 +60,7 @@ void main() {
     color += colorBloom * bloomFactor;
 #endif
 
-#ifdef VIGNETTE
+#ifdef INIT_POST_VIGNETTE
     float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
 
     if (!swimming) {

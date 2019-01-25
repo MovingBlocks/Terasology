@@ -72,6 +72,7 @@ import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.UpdateExposureNode;
+import org.terasology.rendering.dag.nodes.VignetteNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
@@ -536,7 +537,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context);
         renderGraph.addNode(finalPostProcessingNode);
 
-        renderGraph.connect(toneMappingNode, firstLateBlurNode, secondLateBlurNode, finalPostProcessingNode);
+        VignetteNode vignetteNode = new VignetteNode("vignetteNode",context);
+        renderGraph.addNode(vignetteNode);
+
+        renderGraph.connect(toneMappingNode, firstLateBlurNode, secondLateBlurNode, vignetteNode, finalPostProcessingNode);
     }
 
     private void addOutputNodes(RenderGraph renderGraph) {

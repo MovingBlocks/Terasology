@@ -64,6 +64,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
     private boolean bloomIsEnabled;
     private boolean lightShaftsAreEnabled;
+//    private boolean initPostVignetteIsEnabled = false;
 
     private StateChange setBloomInputTexture;
     private StateChange setLightShaftsInputTexture;
@@ -108,7 +109,10 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texScene"));
-        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL_URN, "texVignette"));
+        // TODO::deprecate vignette here
+//        if(initPostVignetteEnabled) {
+//            addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL_URN, "texVignette"));
+//        }
         setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, one8thBloomFbo, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texBloom");
         setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO_URI, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texLightShafts");
 
