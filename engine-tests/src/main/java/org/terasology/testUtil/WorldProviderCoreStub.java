@@ -31,7 +31,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCore;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
 
@@ -121,16 +120,6 @@ public class WorldProviderCoreStub implements WorldProviderCore {
             result.put(entry.getKey(), b);
         }
         return result;
-    }
-
-    @Override
-    public boolean setLiquid(int x, int y, int z, LiquidData newData, LiquidData oldData) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

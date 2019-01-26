@@ -23,7 +23,6 @@ import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.liquid.LiquidData;
 
 import java.math.RoundingMode;
 import java.util.Collection;
@@ -53,16 +52,6 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     @Override
     public Block setBlock(Vector3i pos, Block type) {
         return core.setBlock(pos, type);
-    }
-
-    @Override
-    public boolean setLiquid(Vector3i pos, LiquidData state, LiquidData oldState) {
-        return core.setLiquid(pos.x, pos.y, pos.z, state, oldState);
-    }
-
-    @Override
-    public LiquidData getLiquid(Vector3i blockPos) {
-        return core.getLiquid(blockPos.x, blockPos.y, blockPos.z);
     }
 
     @Override

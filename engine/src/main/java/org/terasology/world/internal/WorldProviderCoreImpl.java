@@ -40,7 +40,6 @@ import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.BiomeChange;
 import org.terasology.world.propagation.BlockChange;
@@ -290,32 +289,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 listener.onExtraDataChanged(index, pos, newData, oldData);
             }
         }
-    }
-
-    @Override
-    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
-        if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
-            LiquidData liquidState = chunk.getLiquid(blockPos);
-            if (liquidState.equals(oldState)) {
-                chunk.setLiquid(blockPos, newState);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
-        if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
-            return chunk.getLiquid(blockPos);
-        }
-        return new LiquidData();
     }
 
     @Override

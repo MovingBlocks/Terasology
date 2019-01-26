@@ -24,7 +24,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 
 /**
@@ -100,16 +99,6 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
         return base.setBlocks(blocks);
-    }
-
-    @Override
-    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
-        return base.setLiquid(x, y, z, newState, oldState);
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        return base.getLiquid(x, y, z);
     }
 
     @Override

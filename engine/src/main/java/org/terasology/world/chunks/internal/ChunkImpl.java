@@ -41,7 +41,6 @@ import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
-import org.terasology.world.liquid.LiquidData;
 
 import java.text.DecimalFormat;
 
@@ -71,8 +70,6 @@ public class ChunkImpl implements Chunk {
 
     private TeraArray blockData;
     private volatile TeraArray blockDataSnapshot;
-    private TeraArray liquidData;
-    private volatile TeraArray liquidDataSnapshot;
     private TeraArray biomeData;
     private volatile TeraArray biomeDataSnapshot;
     private TeraArray[] extraData;
@@ -98,16 +95,14 @@ public class ChunkImpl implements Chunk {
     public ChunkImpl(Vector3i chunkPos, BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
         this(chunkPos, new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 blockManager, biomeManager);
     }
 
-    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray liquid, TeraArray biome, TeraArray[] extra, BlockManager blockManager,
+    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray biome, TeraArray[] extra, BlockManager blockManager,
                      BiomeManager biomeManager) {
         this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
-        this.liquidData = Preconditions.checkNotNull(liquid);
         this.biomeData = Preconditions.checkNotNull(biome);
         this.extraData = Preconditions.checkNotNull(extra);
         sunlightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
@@ -146,7 +141,6 @@ public class ChunkImpl implements Chunk {
                 + sunlightData.getEstimatedMemoryConsumptionInBytes()
                 + sunlightRegenData.getEstimatedMemoryConsumptionInBytes()
                 + lightData.getEstimatedMemoryConsumptionInBytes()
-                + liquidData.getEstimatedMemoryConsumptionInBytes()
                 + biomeData.getEstimatedMemoryConsumptionInBytes()
                 + extraDataSize;
     }
@@ -172,11 +166,6 @@ public class ChunkImpl implements Chunk {
             blockData = blockData.copy();
         }
         int oldValue = blockData.set(x, y, z, block.getId());
-        if (oldValue != block.getId()) {
-            if (!block.isLiquid()) {
-                setLiquid(x, y, z, new LiquidData());
-            }
-        }
         return blockManager.getBlock((short) oldValue);
     }
 
@@ -246,30 +235,6 @@ public class ChunkImpl implements Chunk {
     public boolean setLight(int x, int y, int z, byte amount) {
         Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_LIGHT);
         return lightData.set(x, y, z, amount) != amount;
-    }
-
-    @Override
-    public void setLiquid(BaseVector3i pos, LiquidData state) {
-        setLiquid(pos.x(), pos.y(), pos.z(), state);
-    }
-
-    @Override
-    public void setLiquid(int x, int y, int z, LiquidData newState) {
-        byte newValue = newState.toByte();
-        if (liquidData == liquidDataSnapshot) {
-            liquidData = liquidData.copy();
-        }
-        liquidData.set(x, y, z, newValue);
-    }
-
-    @Override
-    public LiquidData getLiquid(BaseVector3i pos) {
-        return getLiquid(pos.x(), pos.y(), pos.z());
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        return new LiquidData((byte) liquidData.get(x, y, z));
     }
 
     @Override
@@ -385,17 +350,15 @@ public class ChunkImpl implements Chunk {
             int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
             int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
             int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
-            int liquidSize = liquidData.getEstimatedMemoryConsumptionInBytes();
             int biomeSize = biomeData.getEstimatedMemoryConsumptionInBytes();
             int extraSize = 0;
             for (int i = 0; i < extraData.length; i++) {
                 extraSize += extraData[i].getEstimatedMemoryConsumptionInBytes();
             }
-            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + liquidSize + biomeSize + extraSize;
+            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + biomeSize + extraSize;
 
             blockData = def.deflate(blockData);
             lightData = def.deflate(lightData);
-            liquidData = def.deflate(liquidData);
             biomeData = def.deflate(biomeData);
             for (int i = 0; i < extraData.length; i++) {
                 extraData[i] = def.deflate(extraData[i]);
@@ -403,17 +366,15 @@ public class ChunkImpl implements Chunk {
 
             int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
             int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
-            int liquidReduced = liquidData.getEstimatedMemoryConsumptionInBytes();
             int biomeReduced = biomeData.getEstimatedMemoryConsumptionInBytes();
             int extraReduced = 0;
             for (int i = 0; i < extraData.length; i++) {
                 extraReduced += extraData[i].getEstimatedMemoryConsumptionInBytes();
             }
-            int totalReduced = blocksReduced + sunlightRegenSize + sunlightSize + lightReduced + liquidReduced + biomeReduced + extraReduced;
+            int totalReduced = blocksReduced + sunlightRegenSize + sunlightSize + lightReduced + biomeReduced + extraReduced;
 
             double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
             double lightPercent = 100d - (100d / lightSize * lightReduced);
-            double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
             double biomePercent = 100d - (100d / biomeSize * biomeReduced);
             double extraPercent = 100d - (100d / extraSize * extraReduced);
             double totalPercent = 100d - (100d / totalSize * totalReduced);
@@ -424,7 +385,6 @@ public class ChunkImpl implements Chunk {
                             "bytes, total-deflated-by: {}%, " +
                             "blocks-deflated-by={}%, " +
                             "light-deflated-by={}%, " +
-                            "liquid-deflated-by={}%, " +
                             "biome-deflated-by={}%, " +
                             "extra-data-deflated-by={}%",
                     chunkPos,
@@ -433,7 +393,6 @@ public class ChunkImpl implements Chunk {
                     PERCENT_FORMAT.format(totalPercent),
                     PERCENT_FORMAT.format(blocksPercent),
                     PERCENT_FORMAT.format(lightPercent),
-                    PERCENT_FORMAT.format(liquidPercent),
                     PERCENT_FORMAT.format(biomePercent),
                     PERCENT_FORMAT.format(extraPercent));
             ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
@@ -441,7 +400,6 @@ public class ChunkImpl implements Chunk {
             final int oldSize = getEstimatedMemoryConsumptionInBytes();
             blockData = def.deflate(blockData);
             lightData = def.deflate(lightData);
-            liquidData = def.deflate(liquidData);
             biomeData = def.deflate(biomeData);
             for (int i = 0; i < extraData.length; i++) {
                 extraData[i] = def.deflate(extraData[i]);
@@ -458,15 +416,14 @@ public class ChunkImpl implements Chunk {
             int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
             int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
             int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
-            int liquidSize = liquidData.getEstimatedMemoryConsumptionInBytes();
-            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + liquidSize;
+            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize;
 
             sunlightData = def.deflate(sunlightData);
             sunlightRegenData = def.deflate(sunlightRegenData);
 
             int sunlightReduced = sunlightData.getEstimatedMemoryConsumptionInBytes();
             int sunlightRegenReduced = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
-            int totalReduced = blocksSize + sunlightRegenReduced + sunlightReduced + lightSize + liquidSize;
+            int totalReduced = blocksSize + sunlightRegenReduced + sunlightReduced + lightSize;
 
             double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
             double sunlightRegenPercent = 100d - (100d / sunlightRegenSize * sunlightRegenReduced);
@@ -622,7 +579,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public EntityData.ChunkStore.Builder encode() {
-        return ChunkSerializer.encode(chunkPos, blockData, liquidData, biomeData, extraData);
+        return ChunkSerializer.encode(chunkPos, blockData, biomeData, extraData);
     }
 
     /**
@@ -631,7 +588,6 @@ public class ChunkImpl implements Chunk {
      */
     public void createSnapshot() {
         this.blockDataSnapshot = this.blockData;
-        this.liquidDataSnapshot = this.liquidData;
         this.biomeDataSnapshot = this.biomeData;
         this.extraDataSnapshots = new TeraArray[extraData.length];
         System.arraycopy(extraData, 0, extraDataSnapshots, 0, extraData.length);
@@ -646,9 +602,8 @@ public class ChunkImpl implements Chunk {
      * @return an encoded version of the snapshot taken with {@link #createSnapshot()}.
      */
     public EntityData.ChunkStore.Builder encodeAndReleaseSnapshot() {
-        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(chunkPos, blockDataSnapshot, liquidDataSnapshot, biomeDataSnapshot, extraDataSnapshots);
+        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(chunkPos, blockDataSnapshot, biomeDataSnapshot, extraDataSnapshots);
         this.blockDataSnapshot = null;
-        this.liquidDataSnapshot = null;
         this.biomeDataSnapshot = null;
         this.extraDataSnapshots = null;
         return result;
