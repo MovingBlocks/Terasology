@@ -37,6 +37,10 @@ public class BlockTile extends Asset<TileData> {
         reload(data);
     }
 
+    public BufferedImage getImage() {
+        return getImage(0);
+    }
+
     public BufferedImage getImage(int i) {
         return images[i];
     }
