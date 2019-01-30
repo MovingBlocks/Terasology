@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -34,6 +35,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
@@ -48,6 +50,7 @@ import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPING_FB
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 /**
@@ -60,6 +63,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * of the scene.
  */
 public class FinalPostProcessingNode extends AbstractNode implements PropertyChangeListener {
+    public static final SimpleUri POST_FBO_URI = new SimpleUri("engine:fbo.post");
     private static final ResourceUrn POST_MATERIAL_URN = new ResourceUrn("engine:prog.post");
 
     private WorldRenderer worldRenderer;
@@ -100,9 +104,9 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         addDesiredStateChange(new EnableMaterial(POST_MATERIAL_URN));
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO finalBuffer = displayResolutionDependentFBOs.get(FINAL_BUFFER);
-        addDesiredStateChange(new BindFbo(finalBuffer));
-        addDesiredStateChange(new SetViewportToSizeOf(finalBuffer));
+        FBO postFbo = requiresFBO(new FBOConfig(POST_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(postFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(postFbo));
 
         renderingConfig = context.get(Config.class).getRendering();
         isFilmGrainEnabled = renderingConfig.isFilmGrain();
