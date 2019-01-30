@@ -261,6 +261,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         addFinalPostProcessingNodes(renderGraph);
 
+        addVignetteNode(renderGraph);
+
         addOutputNodes(renderGraph);
 
         renderTaskListGenerator = new RenderTaskListGenerator();
@@ -537,22 +539,27 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context);
         renderGraph.addNode(finalPostProcessingNode);
 
+        renderGraph.connect(toneMappingNode, firstLateBlurNode ,secondLateBlurNode, finalPostProcessingNode);
+    }
+
+    private void addVignetteNode(RenderGraph renderGraph){
+        Node finalPostProcessingNode = renderGraph.findNode("engine:finalPostProcessingNode");
+
         VignetteNode vignetteNode = new VignetteNode("vignetteNode",context);
         renderGraph.addNode(vignetteNode);
-
-        renderGraph.connect(toneMappingNode, firstLateBlurNode, secondLateBlurNode, vignetteNode, finalPostProcessingNode);
+        renderGraph.connect(finalPostProcessingNode, vignetteNode);
     }
 
     private void addOutputNodes(RenderGraph renderGraph) {
-        Node finalPostProcessingNode = renderGraph.findNode("engine:finalPostProcessingNode");
+        Node vignetteNode = renderGraph.findNode("engine:finalPostProcessingNode");
 
         Node outputToVRFrameBufferNode = new OutputToHMDNode("outputToVRFrameBufferNode", context);
         renderGraph.addNode(outputToVRFrameBufferNode);
-        renderGraph.connect(finalPostProcessingNode, outputToVRFrameBufferNode);
+        renderGraph.connect(vignetteNode, outputToVRFrameBufferNode);
 
         Node outputToScreenNode = new OutputToScreenNode("outputToScreenNode", context);
         renderGraph.addNode(outputToScreenNode);
-        renderGraph.connect(finalPostProcessingNode, outputToScreenNode);
+        renderGraph.connect(vignetteNode, outputToScreenNode);
     }
 
     @Override
