@@ -69,7 +69,7 @@ public class MenuControlSystem extends BaseComponentSystem {
             event.consume();
         }
         if (networkSystem.getMode() == NetworkMode.NONE) {
-            if (nuiManager.isOpen("engine:pauseMenu")) {
+            if (!nuiManager.isOpen("engine:pauseMenu")) {
                 time.setPaused(true);
             } else {
                 time.setPaused(false);
