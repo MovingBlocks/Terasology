@@ -65,8 +65,8 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
 
     private boolean vignetteIsEnabled;
     // TODO: figure where from to set this variable
-    //private Vector3f tint = new Vector3f(1.0f,1.0f,1.0f);
-    private Vector3f tint = new Vector3f(0.937f,0.126f,0.016f);
+    private Vector3f tint = new Vector3f(.0f,.0f,.0f);
+//    private Vector3f tint = new Vector3f(0.937f,0.126f,0.016f);
 
     private StateChange setVignetteInputTexture;
 
