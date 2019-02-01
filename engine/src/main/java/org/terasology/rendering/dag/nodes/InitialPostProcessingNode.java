@@ -27,7 +27,6 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
@@ -108,13 +107,16 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
         FBO one8thBloomFbo = requiresFBO(one8thScaleBloomConfig, displayResolutionDependentFBOs);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(),
+                ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texScene"));
         // TODO::deprecate vignette here
 //        if(initPostVignetteEnabled) {
 //            addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL_URN, "texVignette"));
 //        }
-        setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, one8thBloomFbo, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texBloom");
-        setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO_URI, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texLightShafts");
+        setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, one8thBloomFbo, ColorTexture, displayResolutionDependentFBOs,
+                INITIAL_POST_MATERIAL_URN, "texBloom");
+        setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO_URI, ColorTexture, displayResolutionDependentFBOs,
+                INITIAL_POST_MATERIAL_URN, "texLightShafts");
 
         if (bloomIsEnabled) {
             addDesiredStateChange(setBloomInputTexture);

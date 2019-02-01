@@ -51,13 +51,12 @@ import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.F
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 /**
  * An instance of this class adds depth of field blur, motion blur and film grain to the rendering
  * of the scene obtained so far. Furthermore, depending if a screenshot has been requested,
  * it instructs the ScreenGrabber to save it to a file.
- *
+ * <p>
  * If RenderingDebugConfig.isEnabled() returns true, this node is instead responsible for displaying
  * the content of a number of technical buffers rather than the final, post-processed rendering
  * of the scene.
@@ -136,7 +135,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
     /**
      * Execute the final post processing on the rendering of the scene obtained so far.
-     *
+     * <p>
      * It uses the data stored in multiple FBOs as input and the FINAL FBO to store its output, rendering everything to a quad.
      */
     @Override
