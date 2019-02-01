@@ -101,12 +101,12 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
         postMaterial = getMaterial(POST_MATERIAL_URN);
 
-        addDesiredStateChange(new EnableMaterial(POST_MATERIAL_URN));
-
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         FBO postFbo = requiresFBO(new FBOConfig(POST_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(postFbo));
         addDesiredStateChange(new SetViewportToSizeOf(postFbo));
+
+        addDesiredStateChange(new EnableMaterial(POST_MATERIAL_URN));
 
         renderingConfig = context.get(Config.class).getRendering();
         isFilmGrainEnabled = renderingConfig.isFilmGrain();
