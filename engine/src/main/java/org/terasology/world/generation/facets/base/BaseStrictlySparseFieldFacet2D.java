@@ -20,32 +20,32 @@ import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.world.generation.Border3D;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 
 /***
  * A strictly-sparse (not necessarily defined at all points) alternative to {@link BaseFieldFacet2D}
  */
-public abstract class BaseStrictlySparseFieldFacet2D extends BaseFacet2D {
-    private ArrayList<Optional<Float>> data;
+public abstract class BaseStrictlySparseFieldFacet2D extends BaseSparseFacet2D {
+    private HashMap<BaseVector2i, Float> data = new HashMap<>();
 
     public BaseStrictlySparseFieldFacet2D(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
-        Vector2i size = getRelativeRegion().size();
-        this.data = new ArrayList<>(Collections.nCopies(size.x * size.y, Optional.empty()));
     }
 
     public Optional<Float> get(int x, int y) {
-        return data.get(getRelativeIndex(x, y));
+        return get(new Vector2i(x, y));
     }
 
     public Optional<Float> get(BaseVector2i pos) {
-        return get(pos.x(), pos.y());
+        validateCoord(pos.x(), pos.y(), getRelativeRegion());
+
+        return Optional.ofNullable(data.getOrDefault(pos, null));
     }
 
     public Optional<Float> getWorld(int x, int y) {
-        return data.get(getWorldIndex(x, y));
+        validateCoord(x, y, getWorldRegion());
+
+        return Optional.ofNullable(data.getOrDefault(worldToRelative(x, y), null));
     }
 
     public Optional<Float> getWorld(BaseVector2i pos) {
@@ -53,15 +53,19 @@ public abstract class BaseStrictlySparseFieldFacet2D extends BaseFacet2D {
     }
 
     public void set(int x, int y, float value) {
-        data.set(getRelativeIndex(x, y), Optional.of(value));
+        set(new Vector2i(x, y), value);
     }
 
     public void set(BaseVector2i pos, float value) {
-        set(pos.x(), pos.y(), value);
+        validateCoord(pos.x(), pos.y(), getRelativeRegion());
+
+        data.put(pos, value);
     }
 
     public void setWorld(int x, int y, float value) {
-        data.set(getWorldIndex(x, y), Optional.of(value));
+        validateCoord(x, y, getWorldRegion());
+
+        data.put(worldToRelative(x, y), value);
     }
 
     public void setWorld(BaseVector2i pos, float value) {
@@ -69,15 +73,19 @@ public abstract class BaseStrictlySparseFieldFacet2D extends BaseFacet2D {
     }
 
     public void unset(int x, int y) {
-        data.set(getRelativeIndex(x, y), Optional.empty());
+        unset(new Vector2i(x, y));
     }
 
     public void unset(BaseVector2i pos) {
-        unset(pos.x(), pos.y());
+        validateCoord(pos.x(), pos.y(), getRelativeRegion());
+
+        data.remove(pos);
     }
 
     public void unsetWorld(int x, int y) {
-        data.set(getWorldIndex(x, y), Optional.empty());
+        validateCoord(x, y, getWorldRegion());
+
+        data.remove(worldToRelative(x, y));
     }
 
     public void unsetWorld(BaseVector2i pos) {
