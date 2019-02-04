@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 
+/***
+ * A strictly-sparse (not necessarily defined at all points) alternative to {@link BaseFieldFacet2D}
+ */
 public abstract class BaseStrictlySparseFieldFacet2D extends BaseFacet2D {
     private ArrayList<Optional<Float>> data;
 
