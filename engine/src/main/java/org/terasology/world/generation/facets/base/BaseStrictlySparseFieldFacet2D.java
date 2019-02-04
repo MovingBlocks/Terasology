@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 
-public class BaseStrictlySparseFieldFacet2D extends BaseFacet2D implements StrictlySparseFieldFacet2D {
+public abstract class BaseStrictlySparseFieldFacet2D extends BaseFacet2D {
     private ArrayList<Optional<Float>> data;
 
     public BaseStrictlySparseFieldFacet2D(Region3i targetRegion, Border3D border) {
@@ -33,62 +33,50 @@ public class BaseStrictlySparseFieldFacet2D extends BaseFacet2D implements Stric
         this.data = new ArrayList<>(Collections.nCopies(size.x * size.y, Optional.empty()));
     }
 
-    @Override
     public Optional<Float> get(int x, int y) {
         return data.get(getRelativeIndex(x, y));
     }
 
-    @Override
     public Optional<Float> get(BaseVector2i pos) {
         return get(pos.x(), pos.y());
     }
 
-    @Override
     public Optional<Float> getWorld(int x, int y) {
         return data.get(getWorldIndex(x, y));
     }
 
-    @Override
     public Optional<Float> getWorld(BaseVector2i pos) {
         return getWorld(pos.x(), pos.y());
     }
 
-    @Override
     public void set(int x, int y, float value) {
         data.set(getRelativeIndex(x, y), Optional.of(value));
     }
 
-    @Override
     public void set(BaseVector2i pos, float value) {
         set(pos.x(), pos.y(), value);
     }
 
-    @Override
     public void setWorld(int x, int y, float value) {
         data.set(getWorldIndex(x, y), Optional.of(value));
     }
 
-    @Override
     public void setWorld(BaseVector2i pos, float value) {
         setWorld(pos.x(), pos.y(), value);
     }
 
-    @Override
     public void unset(int x, int y) {
         data.set(getRelativeIndex(x, y), Optional.empty());
     }
 
-    @Override
     public void unset(BaseVector2i pos) {
         unset(pos.x(), pos.y());
     }
 
-    @Override
     public void unsetWorld(int x, int y) {
         data.set(getWorldIndex(x, y), Optional.empty());
     }
 
-    @Override
     public void unsetWorld(BaseVector2i pos) {
         unsetWorld(pos.x(), pos.y());
     }
