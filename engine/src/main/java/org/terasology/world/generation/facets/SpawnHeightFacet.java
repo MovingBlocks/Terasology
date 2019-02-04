@@ -19,6 +19,9 @@ import org.terasology.math.Region3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseStrictlySparseFieldFacet2D;
 
+/***
+ * Stores the height at which the player may be spawned, if it exists for a given coordinate
+ */
 public class SpawnHeightFacet extends BaseStrictlySparseFieldFacet2D {
     public SpawnHeightFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);

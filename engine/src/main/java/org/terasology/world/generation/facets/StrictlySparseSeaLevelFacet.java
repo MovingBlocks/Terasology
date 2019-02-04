@@ -22,6 +22,9 @@ import org.terasology.world.generation.facets.base.BaseStrictlySparseFieldFacet2
 
 import java.util.Optional;
 
+/***
+ * Stores the sea level, if it varies or is not defined for certain coordinates.
+ */
 public class StrictlySparseSeaLevelFacet extends BaseStrictlySparseFieldFacet2D {
     public StrictlySparseSeaLevelFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
