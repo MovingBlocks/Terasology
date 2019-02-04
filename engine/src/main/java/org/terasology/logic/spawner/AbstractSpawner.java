@@ -57,12 +57,12 @@ public abstract class AbstractSpawner implements Spawner {
         // check if generation uses sea level and surface height facets
         SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
         SpawnHeightFacet spawnHeightFacet = worldRegion.getFacet(SpawnHeightFacet.class);
-
-        if (surfaceHeightFacet != null) {
-            getWorld = v -> Optional.of(surfaceHeightFacet.getWorld(v.getX(), v.getY()));
-        }
-        else if (spawnHeightFacet != null) {
+        
+        if (spawnHeightFacet != null) {
             getWorld = v -> spawnHeightFacet.getWorld(v.getX(), v.getY());
+        }
+        else if (surfaceHeightFacet != null) {
+            getWorld = v -> Optional.of(surfaceHeightFacet.getWorld(v.getX(), v.getY()));
         }
         else {
             throw new IllegalStateException("Surface height facet and spawn height facet not found");
@@ -73,11 +73,11 @@ public abstract class AbstractSpawner implements Spawner {
         SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
         StrictlySparseSeaLevelFacet sparseSeaLevelFacet = worldRegion.getFacet(StrictlySparseSeaLevelFacet.class);
 
-        if (seaLevelFacet != null) {
-            getSeaLevel = v -> Optional.of(seaLevelFacet.getSeaLevel());
-        }
-        else if (sparseSeaLevelFacet != null) {
+        if (sparseSeaLevelFacet != null) {
             getSeaLevel = v -> sparseSeaLevelFacet.getSeaLevel(v.getX(), v.getY());
+        }
+        else if (seaLevelFacet != null) {
+            getSeaLevel = v -> Optional.of(seaLevelFacet.getSeaLevel());
         }
         else {
             getSeaLevel = v -> Optional.of(0);
