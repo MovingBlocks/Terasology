@@ -41,12 +41,11 @@ public class PauseMenu extends CoreScreenLayer {
     @Override
     public void initialise() {
         WidgetUtil.trySubscribe(this, "close", widget -> getManager().closeScreen(PauseMenu.this));
+        WidgetUtil.trySubscribe(this, "extra", widget -> getManager().pushScreen("extraMenuScreen"));
         WidgetUtil.trySubscribe(this, "settings", widget -> getManager().pushScreen("settingsMenuScreen"));
         WidgetUtil.trySubscribe(this, "mainMenu", widget -> CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu()));
         WidgetUtil.trySubscribe(this, "exit", widget -> CoreRegistry.get(GameEngine.class).shutdown());
-        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("There is no error."), LoggingContext.getLoggingPath(), CrashReporter.MODE.ISSUE_REPORTER));
-        WidgetUtil.trySubscribe(this, "devTools", widget -> getManager().pushScreen("devToolsMenuScreen"));
-        WidgetUtil.trySubscribe(this, "telemetry", button -> triggerForwardAnimation(TelemetryScreen.ASSET_URI));
+
     }
 
     @Override

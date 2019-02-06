@@ -1,6 +1,6 @@
 {
-    "type": "pauseMenu",
-    "skin": "pauseMenu",
+    "type": "engine:extraMenuScreen",
+    "skin": "mainMenu",
     "contents": {
         "type": "relativeLayout",
         "contents": [
@@ -10,7 +10,7 @@
                 "contents": [
                     {
                         "type": "UILabel",
-                        "text": "${engine:menu#ingame-menu-title}"
+                        "text": "${engine:menu#extra-menu-title}"
                     },
                     {
                         "type": "UISpace",
@@ -33,23 +33,19 @@
                     },
                     {
                        "type": "UIButton",
-                       "id": "extra",
-                       "text": "${engine:menu#extra}"
+                       "id": "devTools",
+                       "text": "${engine:menu#dev-tools-title}"
+                    },
+
+                    {
+                        "type": "UIButton",
+                        "id": "crashReporter",
+                        "text": "${engine:menu#crash-reporter}"
                     },
                     {
                         "type": "UIButton",
-                        "id": "settings",
-                        "text": "${engine:menu#game-settings}"
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "mainMenu",
-                        "text": "${engine:menu#return-main-menu}"
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "exit",
-                        "text": "${engine:menu#exit-game}"
+                        "id": "telemetry",
+                        "text": "${engine:menu#telemetry-button}"
                     }
                 ],
                 "layoutInfo": {
