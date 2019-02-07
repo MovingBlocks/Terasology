@@ -131,6 +131,7 @@
     "existing-file-warning": "File %s already exists. Do you want to overwrite it?",
     "exit-game": "Exit Terasology",
     "extra-lighting": "Extra Lighting",
+    "extra-menu-title": "Extra Menu"
     "experimental": "Experimental",
     "extras-label": "Extras",
     "eye-adaption": "Eye-Adaption",
@@ -187,6 +188,7 @@
     "game-details-module-author": "Author",
     "game-details-module-size": "Size",
     "game-details-module-last-update-date": "Last update",
+    "game-extra": "Extra",
     "game-name": "Game name",
     "game-settings": "Settings",
     "game-worlds": "Worlds",
