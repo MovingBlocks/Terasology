@@ -271,7 +271,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
      * @return The seed as a string.
      */
     private String createSeed(String world) {
-        return world + seedNumber++;
+        String seed = context.get(UniverseWrapper.class).getSeed();
+        return seed + world + seedNumber++;
     }
 
     private void setWorldGenerators() {

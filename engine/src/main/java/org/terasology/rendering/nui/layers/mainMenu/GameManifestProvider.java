@@ -78,7 +78,7 @@ public class GameManifestProvider {
         String seed;
         if (universeWrapper.getTargetWorld() != null) {
             uri = universeWrapper.getTargetWorld().getWorldGenerator().getUri();
-            seed = universeWrapper.getTargetWorld().getWorldName().toString() + 0;
+            seed = universeWrapper.getTargetWorld().getWorldGenerator().getWorldSeed();
             gameManifest.setSeed(seed);
         } else {
             uri = config.getWorldGeneration().getDefaultGenerator();
