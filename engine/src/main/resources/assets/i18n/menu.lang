@@ -184,6 +184,7 @@
     "game-details-min-supported-version": "game-details-min-supported-version",
     "game-details-max-supported-version": "game-details-max-supported-version",
     "game-details-required": "game-details-required",
+    "game-extra": "game-extra",
     "game-name": "game-name",
     "game-settings": "game-settings",
     "game-worlds": "game-worlds",
