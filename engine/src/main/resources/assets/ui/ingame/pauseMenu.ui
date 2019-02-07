@@ -34,7 +34,7 @@
                     {
                        "type": "UIButton",
                        "id": "extra",
-                       "text": "${engine:menu#extra}"
+                       "text": "${engine:menu#game-extra}"
                     },
                     {
                         "type": "UIButton",
