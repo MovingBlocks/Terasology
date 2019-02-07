@@ -29,6 +29,7 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.telemetry.TelemetryScreen;
 
 /**
+ * handles the extra menu button when game is paused
  */
 public class ExtraMenuScreen extends CoreScreenLayer {
 
@@ -37,6 +38,10 @@ public class ExtraMenuScreen extends CoreScreenLayer {
 
     @In
     private NetworkSystem networkSystem;
+    
+    /**
+     * this function handles the functionality of different buttons in it
+     */
 
     @Override
     public void initialise() {
