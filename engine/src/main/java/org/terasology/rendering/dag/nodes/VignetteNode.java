@@ -19,7 +19,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -53,7 +52,6 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * Requirements: https://github.com/MovingBlocks/Terasology/issues/3040
  */
 public class VignetteNode extends AbstractNode implements PropertyChangeListener {
-    public static final SimpleUri VIGNETTE_FBO_URI = new SimpleUri("engine:fbo.vignette");
     private static final ResourceUrn VIGNETTE_MATERIAL_URN = new ResourceUrn("engine:prog.vignette");
 
     private RenderingConfig renderingConfig;
