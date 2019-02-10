@@ -177,8 +177,12 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
     public void update(float delta) {
         float animDelta = delta;
 
-        if (animDelta > 0.1f || animDelta == 0.0f) {
+        if (animDelta > 0.1f) {
             // avoid skipping over fast animations on heavy load
+            animDelta = 0.1f;
+        }
+        if(animDelta == 0.0f) {
+            // in case time is paused
             animDelta = 0.035f;
         }
 
