@@ -31,6 +31,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -47,8 +48,9 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 /**
  * An instance of this node adds vignette onto the rendering achieved so far, stored in the gbuffer.
  * It should provide ability to use various vignette textures and tinting.
- * 1 Channeled transparency texture is used atm.
- * Stores the result into the VignetteNode.VIGNETTE_FBO_URI, to be used at a later stage.
+ * 1 Channeled transparency texture is used atm. Furthermore, depending if a screenshot has been requested,
+ * it instructs the ScreenGrabber to save it to a file.
+ * Stores the result into the displayResolutionDependentFBOs.FINAL_BUFFER, to be displayed on the screen.
  * Requirements: https://github.com/MovingBlocks/Terasology/issues/3040
  */
 public class VignetteNode extends AbstractNode implements PropertyChangeListener {
@@ -58,6 +60,8 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
     private WorldProvider worldProvider;
     private WorldRenderer worldRenderer;
     private SubmersibleCamera activeCamera;
+
+    private ScreenGrabber screenGrabber;
 
     private Material vignetteMaterial;
 
@@ -75,6 +79,7 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
 
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
+        screenGrabber = context.get(ScreenGrabber.class);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         // TODO: see if we could write this straight into a GBUFFER
@@ -122,6 +127,10 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
         // Actual Node Processing
 
         renderFullscreenQuad();
+
+        if (screenGrabber.isTakingScreenshot()) {
+            screenGrabber.saveScreenshot();
+        }
 
         PerformanceMonitor.endActivity();
     }

@@ -36,7 +36,6 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
@@ -54,12 +53,12 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * An instance of this class adds depth of field blur, motion blur and film grain to the rendering
- * of the scene obtained so far. Furthermore, depending if a screenshot has been requested,
- * it instructs the ScreenGrabber to save it to a file.
+ * of the scene obtained so far.
  * <p>
  * If RenderingDebugConfig.isEnabled() returns true, this node is instead responsible for displaying
  * the content of a number of technical buffers rather than the final, post-processed rendering
  * of the scene.
+ * Stores the result into the FinalPostProcessingnode.POST_FBO_URI, to be used at a later stage.
  */
 public class FinalPostProcessingNode extends AbstractNode implements PropertyChangeListener {
     public static final SimpleUri POST_FBO_URI = new SimpleUri("engine:fbo.post");
@@ -67,7 +66,6 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
     private WorldRenderer worldRenderer;
     private RenderingConfig renderingConfig;
-    private ScreenGrabber screenGrabber;
 
     private Material postMaterial;
 
@@ -95,7 +93,6 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
-        screenGrabber = context.get(ScreenGrabber.class);
         cameraTargetSystem = context.get(CameraTargetSystem.class);
 
         postMaterial = getMaterial(POST_MATERIAL_URN);
@@ -158,10 +155,6 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         }
 
         renderFullscreenQuad();
-
-        if (screenGrabber.isTakingScreenshot()) {
-            screenGrabber.saveScreenshot();
-        }
 
         PerformanceMonitor.endActivity();
     }
