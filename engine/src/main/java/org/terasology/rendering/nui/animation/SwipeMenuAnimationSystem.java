@@ -188,7 +188,7 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
 
         flyIn.update(animDelta);
         flyOut.update(animDelta);
-    }
+    }   
 
     @Override
     public Rect2i animateRegion(Rect2i rc) {
