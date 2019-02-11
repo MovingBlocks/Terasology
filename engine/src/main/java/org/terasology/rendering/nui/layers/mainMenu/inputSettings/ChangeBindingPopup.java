@@ -90,6 +90,7 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
+        super.onClosed();
         bindsManager.registerBinds();
     }
 }

@@ -76,6 +76,7 @@ public class NameRecordingScreen extends CoreScreenLayer {
 
     @Override
     public void onScreenOpened() {
+        super.onScreenOpened();
         // resets the description from any earlier error messages, in case the user re-opens the screen.
         description.setText(translationSystem.translate("${engine:menu#name-recording-description}"));
     }
@@ -197,5 +198,10 @@ public class NameRecordingScreen extends CoreScreenLayer {
 
     public void setGameInfo(GameInfo gameInfo) {
         this.gameInfo = gameInfo;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

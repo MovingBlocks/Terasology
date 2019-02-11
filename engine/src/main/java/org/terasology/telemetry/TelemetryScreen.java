@@ -438,4 +438,9 @@ public class TelemetryScreen extends CoreScreenLayer {
         list.sort(Comparator.comparing(Map.Entry::getKey));
         return list;
     }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
 }

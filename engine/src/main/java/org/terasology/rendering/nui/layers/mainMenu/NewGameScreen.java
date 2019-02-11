@@ -244,6 +244,8 @@ public class NewGameScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         final UIText gameName = find("gameName", UIText.class);
         setGameName(gameName);
 
@@ -299,6 +301,11 @@ public class NewGameScreen extends CoreScreenLayer {
             }
         }
         return super.onKeyEvent(event);
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }
 

@@ -473,4 +473,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         }
         return true;
     }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
 }

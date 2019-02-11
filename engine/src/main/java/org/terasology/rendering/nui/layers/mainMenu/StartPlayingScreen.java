@@ -31,6 +31,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.world.WorldSetupWrapper;
@@ -62,6 +63,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
@@ -103,6 +105,8 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         UIImage previewImage = find("preview", UIImage.class);
         previewImage.setImage(texture);
 
@@ -121,5 +125,10 @@ public class StartPlayingScreen extends CoreScreenLayer {
         worldSetupWrappers = worldSetupWrapperList;
         universeWrapper = context.get(UniverseWrapper.class);
         targetWorld = spawnWorld;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }
