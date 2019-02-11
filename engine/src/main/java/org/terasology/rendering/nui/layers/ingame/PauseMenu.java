@@ -51,6 +51,7 @@ public class PauseMenu extends CoreScreenLayer {
 
     @Override
     public void onScreenOpened() {
+        super.onScreenOpened();
         getManager().removeOverlay("engine:onlinePlayersOverlay");
     }
 
@@ -59,5 +60,10 @@ public class PauseMenu extends CoreScreenLayer {
         if (networkSystem.getMode() == NetworkMode.NONE) {
             time.setPaused(false);
         }
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }
