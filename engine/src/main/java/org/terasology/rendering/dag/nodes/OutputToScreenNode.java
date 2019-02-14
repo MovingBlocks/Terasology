@@ -25,6 +25,7 @@ import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.SwappableFBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
@@ -45,9 +46,11 @@ public class OutputToScreenNode extends ConditionDependentNode {
 
     private StateChange bindFbo;
 
+    private ScreenGrabber screenGrabber;
+
     public OutputToScreenNode(String nodeUri, Context context) {
         super(nodeUri, context);
-
+        screenGrabber = context.get(ScreenGrabber.class);
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
@@ -70,6 +73,9 @@ public class OutputToScreenNode extends ConditionDependentNode {
         // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
         renderFullscreenQuad();
+        if (screenGrabber.isTakingScreenshot()) {
+            screenGrabber.saveScreenshot();
+        }
         PerformanceMonitor.endActivity();
     }
 

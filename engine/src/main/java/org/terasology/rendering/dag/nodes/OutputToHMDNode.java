@@ -26,6 +26,7 @@ import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
@@ -51,12 +52,16 @@ public class OutputToHMDNode extends ConditionDependentNode {
     private FBO rightEyeFbo;
     private FBO finalFbo;
 
+    private ScreenGrabber screenGrabber;
+
     /**
      * Constructs an instance of this node. Specifically, initialize the vrProvider and pass the frame buffer
      * information for the vrProvider to use.
      */
     public OutputToHMDNode(String nodeUri, Context context) {
         super(nodeUri, context);
+
+        screenGrabber = context.get(ScreenGrabber.class);
 
         vrProvider = context.get(OpenVRProvider.class);
         requiresCondition(() -> (context.get(Config.class).getRendering().isVrSupport() && vrProvider.isInitialized()));
@@ -90,6 +95,9 @@ public class OutputToHMDNode extends ConditionDependentNode {
         PerformanceMonitor.startActivity("rendering/" + getUri());
         finalFbo.bindTexture();
         renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
+        if (screenGrabber.isTakingScreenshot()) {
+            screenGrabber.saveScreenshot();
+        }
         PerformanceMonitor.endActivity();
     }
 

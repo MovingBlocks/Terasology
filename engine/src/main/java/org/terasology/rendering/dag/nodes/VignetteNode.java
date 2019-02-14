@@ -31,7 +31,6 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -61,8 +60,6 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
     private WorldRenderer worldRenderer;
     private SubmersibleCamera activeCamera;
 
-    private ScreenGrabber screenGrabber;
-
     private Material vignetteMaterial;
 
     private boolean vignetteIsEnabled;
@@ -79,7 +76,6 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
 
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
-        screenGrabber = context.get(ScreenGrabber.class);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         // TODO: see if we could write this straight into a GBUFFER
@@ -127,10 +123,6 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
         // Actual Node Processing
 
         renderFullscreenQuad();
-
-        if (screenGrabber.isTakingScreenshot()) {
-            screenGrabber.saveScreenshot();
-        }
 
         PerformanceMonitor.endActivity();
     }
