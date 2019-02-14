@@ -63,9 +63,9 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
     private Material vignetteMaterial;
 
     private boolean vignetteIsEnabled;
+
     // TODO: figure where from to set this variable
     private Vector3f tint = new Vector3f(.0f, .0f, .0f);
-//    private Vector3f tint = new Vector3f(0.937f,0.126f,0.016f);
 
     private StateChange setVignetteInputTexture;
 
@@ -78,8 +78,7 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
         activeCamera = worldRenderer.getActiveCamera();
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        // TODO: see if we could write this straight into a GBUFFER
-        // FBO vignetteFbo = requiresFBO(new FBOConfig(VIGNETTE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+
         FBO finalBuffer = displayResolutionDependentFBOs.get(FINAL_BUFFER);
         addDesiredStateChange(new BindFbo(finalBuffer));
         addDesiredStateChange(new SetViewportToSizeOf(finalBuffer));
@@ -93,8 +92,6 @@ public class VignetteNode extends AbstractNode implements PropertyChangeListener
         renderingConfig.subscribe(RenderingConfig.VIGNETTE, this);
 
         int textureSlot = 0;
-//        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), ColorTexture,
-//                displayResolutionDependentFBOs, VIGNETTE_MATERIAL_URN, "texScene"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, POST_FBO_URI, ColorTexture, displayResolutionDependentFBOs, VIGNETTE_MATERIAL_URN, "texScene"));
 
         setVignetteInputTexture = new SetInputTexture2D(textureSlot++, "engine:vignette", VIGNETTE_MATERIAL_URN, "texVignette");

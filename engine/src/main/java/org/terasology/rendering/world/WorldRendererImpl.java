@@ -825,10 +825,10 @@ public final class WorldRendererImpl implements WorldRenderer {
      * concerned Nodes, which in turn take care of executing them.
      * <p>
      * Usage:
-     * dagCommandNode <nodeUri> <command> <parameters>
+     *      dagCommandNode <nodeUri> <command> <parameters>
      * <p>
      * Example:
-     * dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
+     *      dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
      */
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void dagNodeCommand(
