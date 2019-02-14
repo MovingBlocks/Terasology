@@ -108,3 +108,4 @@ blacklist.json
 
 # Profiling related
 terasology.jfr
+local.properties
