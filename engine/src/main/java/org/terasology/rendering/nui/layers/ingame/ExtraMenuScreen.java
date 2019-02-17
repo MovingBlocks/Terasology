@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layers.ingame;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.LoggingContext;
 import org.terasology.engine.Time;
-import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -38,22 +37,10 @@ public class ExtraMenuScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        WidgetUtil.trySubscribe(this, "telemetry", button -> triggerForwardAnimation(TelemetryScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "devTools", widget -> getManager().pushScreen("devToolsMenuScreen"));
         WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("There is no error."), LoggingContext.getLoggingPath(), CrashReporter.MODE.ISSUE_REPORTER));
-        WidgetUtil.trySubscribe(this, "telemetry", button -> triggerForwardAnimation(TelemetryScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "close", widget -> getManager().closeScreen(ExtraMenuScreen.this));
-    }
-
-    @Override
-    public void onScreenOpened() {
-        getManager().removeOverlay("engine:onlinePlayersOverlay");
-    }
-
-    @Override
-    public void onClosed() {
-        if (networkSystem.getMode() == NetworkMode.NONE) {
-            time.setPaused(false);
-        }
     }
 }
 
