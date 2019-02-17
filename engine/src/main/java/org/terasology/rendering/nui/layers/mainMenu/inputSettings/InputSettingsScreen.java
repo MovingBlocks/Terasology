@@ -302,6 +302,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
+        super.onClosed();
         bindsManager.registerBinds();
     }
 

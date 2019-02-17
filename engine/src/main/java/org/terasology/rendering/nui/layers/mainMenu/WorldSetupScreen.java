@@ -27,6 +27,7 @@ import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.Property;
@@ -69,6 +70,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         WidgetUtil.trySubscribe(this, "close", button -> {
             triggerBackAnimation();
@@ -77,6 +79,8 @@ public class WorldSetupScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         UILabel subitle = find("subtitle", UILabel.class);
         subitle.setText(translationSystem.translate("${engine:menu#world-setup}") + " for " + world.getWorldName().toString());
     }
@@ -230,5 +234,10 @@ public class WorldSetupScreen extends CoreScreenLayer {
                 ((Binding<Float>) binding).set(value);
             }
         }
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

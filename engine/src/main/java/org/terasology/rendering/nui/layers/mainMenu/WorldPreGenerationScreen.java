@@ -30,6 +30,7 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
@@ -114,6 +115,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         zoomSlider = find("zoomSlider", UISlider.class);
         if (zoomSlider != null) {
@@ -186,6 +188,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         try {
             if (findWorldByName(selectedWorld).getWorldGenerator() == null) {
                 worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld).getWorldGeneratorInfo().getUri(), context, environment);
@@ -288,4 +292,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         updatePreview();
     }
 
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
 }

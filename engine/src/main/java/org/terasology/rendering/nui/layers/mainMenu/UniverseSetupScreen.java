@@ -47,6 +47,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -105,6 +106,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         final UIDropdownScrollable<WorldGeneratorInfo> worldGenerator = find("worldGenerators", UIDropdownScrollable.class);
         if (worldGenerator != null) {
@@ -235,6 +237,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         worlds.clear();
         worldNumber = 0;
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
@@ -375,5 +379,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         return selectedWorld;
     }
 
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
 }
 
