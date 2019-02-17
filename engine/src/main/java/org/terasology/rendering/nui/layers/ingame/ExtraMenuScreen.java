@@ -39,8 +39,8 @@ public class ExtraMenuScreen extends CoreScreenLayer {
     public void initialise() {
         WidgetUtil.trySubscribe(this, "telemetry", button -> triggerForwardAnimation(TelemetryScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "devTools", widget -> getManager().pushScreen("devToolsMenuScreen"));
-        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("There is no error."), LoggingContext.getLoggingPath(), CrashReporter.MODE.ISSUE_REPORTER));
+        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("There is no error."),
+                LoggingContext.getLoggingPath(), CrashReporter.MODE.ISSUE_REPORTER));
         WidgetUtil.trySubscribe(this, "close", widget -> getManager().closeScreen(ExtraMenuScreen.this));
     }
 }
-

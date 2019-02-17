@@ -26,6 +26,9 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 
 /**
+ * In-game menu that appears when the player presses `ESC` (by default) to open the menu system.
+ *
+ * In single player mode this also pauses the game time.
  */
 public class PauseMenu extends CoreScreenLayer {
 
@@ -57,4 +60,3 @@ public class PauseMenu extends CoreScreenLayer {
         }
     }
 }
-
