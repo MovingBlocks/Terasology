@@ -56,6 +56,8 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
 
     private float scale;
 
+    private static float PAUSED_ANIMATION_FRAME_TICK_TIME = 0.035f;
+
     /**
      * Creates default animations
      * @param duration the duration of the animation in seconds
@@ -180,6 +182,11 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
         if (animDelta > 0.1f) {
             // avoid skipping over fast animations on heavy load
             animDelta = 0.1f;
+        }
+        if (animDelta < 0.0001f) {
+            // when we are inGameState and get to pauseMenu the time is paused
+            // so we need to fake the time is still running at a set rate
+            animDelta = PAUSED_ANIMATION_FRAME_TICK_TIME;
         }
 
         flyIn.update(animDelta);
