@@ -285,7 +285,12 @@ public class GameDetailsScreen extends CoreScreenLayer {
         gameWorlds.setItemRenderer(new AbstractItemRenderer<WorldInfo>() {
             @Override
             public void draw(WorldInfo value, Canvas canvas) {
-                canvas.drawText(value.getCustomTitle());
+                if(value.getCustomTitle().isEmpty()==true) {
+                    canvas.drawText(value.getTitle());
+                }
+                else {
+                    canvas.drawText(value.getCustomTitle());
+                }
             }
 
             @Override
@@ -297,7 +302,14 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private String getWorldDescription(final WorldInfo worldInfo) {
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + worldInfo.getCustomTitle() + '\n' + '\n' +
+        String game_title;
+        if(worldInfo.getCustomTitle().isEmpty()==true) {
+            game_title=worldInfo.getTitle();
+        }
+        else {
+            game_title=worldInfo.getCustomTitle();
+        }
+        return translationSystem.translate("${engine:menu#game-details-game-title} ") + game_title + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldInfo.getWorldGenerator().toString() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
