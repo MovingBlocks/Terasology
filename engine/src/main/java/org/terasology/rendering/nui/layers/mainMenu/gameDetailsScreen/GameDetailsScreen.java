@@ -285,7 +285,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
         gameWorlds.setItemRenderer(new AbstractItemRenderer<WorldInfo>() {
             @Override
             public void draw(WorldInfo value, Canvas canvas) {
-                if(value.getCustomTitle().isEmpty()==true) {
+                if(value.getCustomTitle().isEmpty()) {
                     canvas.drawText(value.getTitle());
                 }
                 else {
@@ -303,7 +303,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
     private String getWorldDescription(final WorldInfo worldInfo) {
         String game_title;
-        if(worldInfo.getCustomTitle().isEmpty()==true) {
+        if(worldInfo.getCustomTitle().isEmpty()) {
             game_title=worldInfo.getTitle();
         }
         else {
