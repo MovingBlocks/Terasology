@@ -45,7 +45,7 @@ public class DebugControlSystem extends BaseComponentSystem {
     private WorldProvider world;
     
     @In
-    private Config config;
+    private Config  config;
 
     @In
     private NUIManager nuiManager;
@@ -113,6 +113,11 @@ public class DebugControlSystem extends BaseComponentSystem {
         // Features for debug mode only
         if (debugEnabled) {
             switch (event.getKey().getId()) {
+                case Keyboard.KeyId.H:
+                    String DebugInfo = "engine:DebugInfo";
+                    nuiManager.toggleScreen(DebugInfo);
+                    event.consume();
+                    break;
                 case Keyboard.KeyId.F6:
                     config.getRendering().getDebug().setEnabled(!config.getRendering().getDebug().isEnabled());
                     event.consume();

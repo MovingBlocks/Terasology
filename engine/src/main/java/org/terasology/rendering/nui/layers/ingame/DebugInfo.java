@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.rendering.nui.layers.ingame;
 
-package org.terasology.rendering.nui.layers.ingame.metrics;
+import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.WidgetUtil;
 
-import gnu.trove.map.TObjectDoubleMap;
-import org.terasology.monitoring.PerformanceMonitor;
-
-/**
- */
-final class SpikesMode extends TimeMetricsMode {
-
-     SpikesMode() {
-        super("\n- Spikes -", 10);
-    }
+public class DebugInfo extends CoreScreenLayer {
 
     @Override
-    protected TObjectDoubleMap<String> gatherMetrics() {
-        return PerformanceMonitor.getDecayingSpikes();
+    public void initialise() {
+        WidgetUtil.trySubscribe(this, "closeButton", widget -> getManager().closeScreen(DebugInfo.this));
     }
 
-    @Override
-    public boolean isAvailable() {
-        return true;
-    }
-
-    @Override
-    public boolean isPerformanceManagerMode() {
-        return true;
-    }
 }

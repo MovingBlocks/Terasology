@@ -54,7 +54,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
         register(new AllocationsMode());
         register(new RunningThreadsMode());
         register(new WorldRendererMode());
-        register(new RenderingExecTimeMeansMode("Rendering - Execution Time: Running Means - Sorted Alphabetically"));
+        register(new RenderingExecTimeMeansMode("\nRendering - Execution Time: Running Means - Sorted Alphabetically"));
         currentMode = defaultMode;
     }
 
