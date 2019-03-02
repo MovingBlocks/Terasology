@@ -265,7 +265,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
     }
 
     /**
-     * Sets a unique seed by simply appending the world name with an incrementing number.
+     * Creates a unique world seed by appending the world name with an incrementing number, on top of the universe seed.
      *
      * @param world {@link WorldSetupWrapper} object whose seed is to be set.
      * @return The seed as a string.
