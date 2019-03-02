@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,10 @@ import org.terasology.world.time.WorldTime;
  */
 public class GameManifestProvider {
 
+    private static final Logger logger = LoggerFactory.getLogger(GameManifestProvider.class);
+
     @In
     private Config config;
-
-    private static final Logger logger = LoggerFactory.getLogger(GameManifestProvider.class);
 
     private GameManifestProvider() {
     }

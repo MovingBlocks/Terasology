@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,9 @@ import java.util.stream.Collectors;
  */
 public class WorldPreGenerationScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorldPreGenerationScreen.class);
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
+
+    private static final Logger logger = LoggerFactory.getLogger(WorldPreGenerationScreen.class);
 
     @In
     private ModuleManager moduleManager;
@@ -78,7 +78,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
     private List<WorldSetupWrapper> worldList;
     private String selectedWorld;
     private List<String> worldNames;
-    private int seedNumber = 0;
+    private int seedNumber;
     private UISlider zoomSlider;
 
     /**
@@ -279,7 +279,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         for (WorldSetupWrapper worldSetupWrapper : worldList) {
             if (worldSetupWrapper.getWorldGenerator() == null) {
                 try {
-                    worldSetupWrapper.setWorldGenerator(WorldGeneratorManager.createWorldGenerator(findWorldByName(worldSetupWrapper.getWorldName().toString()).getWorldGeneratorInfo().getUri(), context, environment));
+                    worldSetupWrapper.setWorldGenerator(WorldGeneratorManager.createWorldGenerator(findWorldByName(
+                            worldSetupWrapper.getWorldName().toString()).getWorldGeneratorInfo().getUri(), context, environment));
                 } catch (UnresolvedWorldGeneratorException e) {
                     e.printStackTrace();
                 }
