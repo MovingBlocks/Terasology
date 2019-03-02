@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private GameInfo gameInfo;
     private List<String> errors;
@@ -159,7 +159,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
             showErrors.setEnabled(!errors.isEmpty());
         } else {
             final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
+                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
             popup.subscribeButton(e -> triggerBackAnimation());
             getManager().pushScreen(popup);
             // disable child widgets
@@ -196,7 +197,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
                 .append(". ")
                 .append(error)
                 .append('\n'));
-        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
+        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate(
+                "${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
     }
 
     private void setUpBiomes() {
@@ -285,10 +287,9 @@ public class GameDetailsScreen extends CoreScreenLayer {
         gameWorlds.setItemRenderer(new AbstractItemRenderer<WorldInfo>() {
             @Override
             public void draw(WorldInfo value, Canvas canvas) {
-                if(value.getCustomTitle().isEmpty()) {
+                if (value.getCustomTitle().isEmpty()) {
                     canvas.drawText(value.getTitle());
-                }
-                else {
+                } else {
                     canvas.drawText(value.getCustomTitle());
                 }
             }
@@ -302,17 +303,17 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private String getWorldDescription(final WorldInfo worldInfo) {
-        String game_title;
-        if(worldInfo.getCustomTitle().isEmpty()) {
-            game_title=worldInfo.getTitle();
+        String gameTitle;
+        if (worldInfo.getCustomTitle().isEmpty()) {
+            gameTitle = worldInfo.getTitle();
+        } else {
+            gameTitle = worldInfo.getCustomTitle();
         }
-        else {
-            game_title=worldInfo.getCustomTitle();
-        }
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + game_title + '\n' + '\n' +
+        return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldInfo.getWorldGenerator().toString() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
+                translationSystem.translate("${engine:menu#game-details-game-duration} ")
+                + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
     }
 
     private void setUpPreviewSlideshow() {
@@ -428,7 +429,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
                         module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
                         if (module != null) {
                             logger.debug("Get the latest available version of module {} in your classpath", nameVersion.getName());
-                            errors.add(String.format("Can't find module %s:%s in your classpath; loaded description for the latest available version.", nameVersion.getName(), nameVersion.getVersion()));
+                            errors.add(String.format("Can't find module %s:%s in your classpath; loaded description for the latest available version.",
+                                    nameVersion.getName(), nameVersion.getVersion()));
                             return ModuleSelectionInfo.latestVersion(module);
                         }
                         logger.error("Can't find any versions of module {} in your classpath!", nameVersion.getName());
@@ -448,13 +450,14 @@ public class GameDetailsScreen extends CoreScreenLayer {
         title.setText(translationSystem.translate("${engine:menu#game-details-title}") + " : " + gameInfo.getManifest().getTitle());
     }
 
-    private String getGeneralInfo(final GameInfo gameInfo) {
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameInfo.getManifest().getTitle() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-last-play}: ") + dateFormat.format(gameInfo.getTimestamp()) + '\n' + '\n' +
+    private String getGeneralInfo(final GameInfo theGameInfo) {
+        return translationSystem.translate("${engine:menu#game-details-game-title} ") + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-last-play}: ") + DATE_FORMAT.format(theGameInfo.getTimestamp()) + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper
-                .getDeltaBetweenTimestamps(new Date(0).getTime(), gameInfo.getManifest().getTime()) + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-seed} ") + gameInfo.getManifest().getSeed() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + '\t' + gameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator().getObjectName().toString();
+                .getDeltaBetweenTimestamps(new Date(0).getTime(), theGameInfo.getManifest().getTime()) + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-game-seed} ") + theGameInfo.getManifest().getSeed() + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + '\t'
+                + theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator().getObjectName().toString();
     }
 
     private void loadBiomes() {
