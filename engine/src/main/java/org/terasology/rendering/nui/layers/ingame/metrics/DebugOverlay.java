@@ -86,7 +86,7 @@ public class DebugOverlay extends CoreScreenLayer {
                 @Override
                 public String get() {
                     double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-                    return String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f MB, max mem: %.2f MB",
+                    return String.format("FPS: %.2f, Memory Usage: %.2f MB, Total Memory: %.2f MB, Max Memory: %.2f MB",
                             time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0);
                 }
             });
@@ -111,7 +111,7 @@ public class DebugOverlay extends CoreScreenLayer {
                     Vector3i chunkPos = ChunkMath.calcChunkPos((int) pos.x, (int) pos.y, (int) pos.z);
                     Vector3f rotation = localPlayer.getViewDirection();
                     Vector3f cameraPos = localPlayer.getViewPosition();
-                    return String.format(Locale.US, "Pos (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z,
+                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z,
                             chunkPos.x, chunkPos.y, chunkPos.z,
                             cameraPos.x, cameraPos.y, cameraPos.z,
                             rotation.x, rotation.y, rotation.z);
@@ -124,13 +124,13 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine4.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    String biomeId = "unavailable";
+                    String biomeId = "Unavailable";
                     Vector3i blockPos = new Vector3i(localPlayer.getPosition());
                     if (worldProvider.isBlockRelevant(blockPos)) {
                         Biome biome = worldProvider.getBiome(blockPos);
                         biomeId = CoreRegistry.get(BiomeManager.class).getBiomeId(biome);
                     }
-                    return String.format("total vus: %s | worldTime: %.3f | tiDi: %.1f |  biome: %s",
+                    return String.format("Total VUS: %s, World Time: %.3f, Time Dilation: %.1f, Biome: %s",
                             ChunkTessellator.getVertexArrayUpdateCount(),
                             worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
                             time.getGameTimeDilation(),
@@ -138,6 +138,17 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
         }
+
+        UILabel debugInfo = find("debugInfo", UILabel.class);
+        if (debugInfo != null) {
+            debugInfo.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return String.format("[H] : Debug Documentation");
+                }
+            });
+        }
+
         UILabel saveStatusLabel = find("saveStatusLabel", UILabel.class);
         // clients do not have a storage manager
         if (saveStatusLabel != null && storageManager != null) {
@@ -152,6 +163,44 @@ public class DebugOverlay extends CoreScreenLayer {
                         @Override
                         public Boolean get() {
                             return storageManager.isSaving();
+                        }
+                    }
+            );
+        }
+
+        UILabel wireframeMode = find("wireframeMode", UILabel.class);
+
+        if (wireframeMode != null) {
+            wireframeMode.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return "WIREFRAME MODE";
+                }
+            });
+            wireframeMode.bindVisible(
+                    new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return config.getRendering().getDebug().isWireframe();
+                        }
+                    }
+            );
+        }
+
+        UILabel chunkRenderMode = find("chunkBBRenderMode", UILabel.class);
+
+        if (chunkRenderMode != null) {
+            chunkRenderMode.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return "CHUNK BOUNDING BOX RENDER MODE";
+                }
+            });
+            chunkRenderMode.bindVisible(
+                    new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return config.getRendering().getDebug().isRenderChunkBoundingBoxes();
                         }
                     }
             );

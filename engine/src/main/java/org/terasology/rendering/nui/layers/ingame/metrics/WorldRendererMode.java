@@ -23,7 +23,7 @@ import org.terasology.rendering.world.WorldRenderer;
 public class WorldRendererMode extends MetricsMode {
 
     public WorldRendererMode() {
-        super("World Rendering");
+        super("\n- World Rendering -");
     }
 
     @Override

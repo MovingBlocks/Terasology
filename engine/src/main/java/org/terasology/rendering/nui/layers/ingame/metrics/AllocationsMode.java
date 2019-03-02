@@ -24,7 +24,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 final class AllocationsMode extends TimeMetricsMode {
 
     AllocationsMode() {
-        super("Memory Allocations", 10, "bytes");
+        super("\n- Memory Allocations -", 10, "bytes");
     }
 
     @Override

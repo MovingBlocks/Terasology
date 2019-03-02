@@ -1,0 +1,65 @@
+{
+  "type": "DebugInfo",
+  "contents": {
+    "type": "relativeLayout",
+    "contents": [
+      {
+        "type": "UIBox",
+        "layoutInfo": {
+          "width": 500,
+          "height": 300,
+          "position-horizontal-center": {},
+          "position-vertical-center": {}
+        },
+        "content": {
+          "type": "relativeLayout",
+          "contents": [
+            {
+              "type": "UILabel",
+              "id": "windowTitle",
+              "text": "Debug Documentation",
+              "layoutInfo": {
+                "use-content-width": true,
+                "position-horizontal-center": {},
+                "height": 30
+              }
+            },
+            {
+              "type": "ScrollableArea",
+              "id": "infoArea",
+              "layoutInfo": {
+                "verticalScrollbar": true,
+                "position-top": {
+                  "widget": "windowTitle",
+                  "target": "BOTTOM"
+                },
+                "position-bottom": {
+                  "widget": "closeButton",
+                  "target": "TOP"
+                }
+              },
+              "multiline": true,
+              "readOnly": true,
+              "content": {
+                "type": "UIText",
+                "id": "debugDocumentation",
+                "layoutInfo": {},
+                "text": "[Arrow Up/Down] : Forward/Reverse Time In Small Steps\n[Arrow Right/Left] : Forward/Reverse Time In Big Steps\n[F4] : Cycle Debug Metrics Modes\n         -Means Mode\n         -Spikes Mode\n         -Memory Allocations Mode\n         -Running Threads Mode\n         -World Renderer Mode\n         -Rendering Execution Mode\n[F6] : Debug Rendering Enabled\n[F8] : Render Chunk Bounding Boxes\n[F9] : Render Wireframe Mode",
+                "multiline": true
+              }
+            },
+            {
+              "type": "UIButton",
+              "id": "closeButton",
+              "text": "Close",
+              "layoutInfo": {
+                "use-content-height": true,
+                "position-bottom": {}
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
