@@ -97,6 +97,7 @@ public class SolidRasterizer implements WorldRasterizer {
                 } else if (posY <= seaLevel) {         // either OCEAN or SNOW
                     chunk.setBlock(pos, water);
 //                }
+                }
             }
         }
     }
