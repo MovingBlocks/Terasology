@@ -152,6 +152,11 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
     }
 
+    @Override
+    public void preSave() {
+        config.getSystem().setDebugEnabled(false);
+    }
+
     @ReceiveEvent(components = CharacterComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void onMouseX(MouseAxisEvent event, EntityRef entity) {
         if (!mouseGrabbed) {
