@@ -45,7 +45,7 @@ public class DebugControlSystem extends BaseComponentSystem {
     private WorldProvider world;
     
     @In
-    private Config  config;
+    private Config config;
 
     @In
     private NUIManager nuiManager;
