@@ -258,7 +258,9 @@ Contributors
  [Snooober](https://github.com/Snooober),
  [costinvisan](https://github.com/costinvisan),
  [Vishwaak](https://github.com/Vishwaak),
- [shaunakdixit](https://github.com/shaunakdixit)
+ [shaunakdixit](https://github.com/shaunakdixit),
+ [e-aakash](https://github.com/e-aakash),
+ [majordwarf](https://github.com/majordwarf)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
