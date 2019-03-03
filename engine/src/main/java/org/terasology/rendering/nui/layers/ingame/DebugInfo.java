@@ -24,5 +24,4 @@ public class DebugInfo extends CoreScreenLayer {
     public void initialise() {
         WidgetUtil.trySubscribe(this, "closeButton", widget -> getManager().closeScreen(DebugInfo.this));
     }
-
 }
