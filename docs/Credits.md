@@ -260,7 +260,8 @@ Contributors
  [Vishwaak](https://github.com/Vishwaak),
  [shaunakdixit](https://github.com/shaunakdixit),
  [e-aakash](https://github.com/e-aakash),
- [majordwarf](https://github.com/majordwarf)
+ [majordwarf](https://github.com/majordwarf),
+ [Soundwave](https://github.com/PS-Soundwave)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
