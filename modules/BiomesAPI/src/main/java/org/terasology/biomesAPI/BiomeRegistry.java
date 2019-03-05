@@ -19,6 +19,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.CoreChunk;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface BiomeRegistry {
@@ -87,4 +88,12 @@ public interface BiomeRegistry {
      * @return Biome of the block
      */
     Optional<Biome> getBiome(int x, int y, int z);
+
+    /**
+     * Returns all registered biomes of specified subtype.
+     *
+     * @param biomeClass Type of the biomes to get
+     * @return Collection of biomes of given subtype
+     */
+    <T extends Biome> Collection<T> getRegisteredBiomes(Class<T> biomeClass);
 }

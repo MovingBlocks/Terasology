@@ -30,6 +30,9 @@ public class CoreBiomes extends BaseComponentSystem {
     @In
     private BiomeRegistry biomeRegistry;
 
+    /**
+     * Registration of systems must be done in preBegin to be early enough.
+     */
     @Override
     public void preBegin() {
         Stream.of(CoreBiome.values()).forEach(biomeRegistry::registerBiome);

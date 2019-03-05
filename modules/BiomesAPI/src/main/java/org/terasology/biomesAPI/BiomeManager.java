@@ -35,9 +35,12 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.blockdata.ExtraDataSystem;
 import org.terasology.world.chunks.blockdata.RegisterExtraData;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Share(BiomeRegistry.class)
 @RegisterSystem
@@ -87,6 +90,11 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
     @Override
     public void setBiome(Biome biome, CoreChunk chunk, Vector3i pos) {
         setBiome(biome, chunk.chunkToWorldPosition(pos));
+    }
+
+    @Override
+    public <T extends Biome> List<T> getRegisteredBiomes(Class<T> biomeClass) {
+        return biomeMap.values().stream().filter(biomeClass::isInstance).map(biomeClass::cast).collect(Collectors.toList());
     }
 
     /**
