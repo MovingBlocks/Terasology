@@ -88,9 +88,6 @@ public class UIButton extends ActivatableWidget {
         public void onMouseRelease(NUIMouseReleaseEvent event) {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 if (isMouseOver()) {
-                    if (getClickSound() != null) {
-                        getClickSound().play(getClickVolume());
-                    }
                     activateWidget();
                 }
                 down = false;
@@ -193,6 +190,14 @@ public class UIButton extends ActivatableWidget {
             return HOVER_MODE;
         }
         return DEFAULT_MODE;
+    }
+
+    @Override
+    protected void activateWidget() {
+        if (getClickSound() != null) {
+            getClickSound().play(getClickVolume());
+        }
+        super.activateWidget();
     }
 
     /**
