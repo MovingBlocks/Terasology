@@ -16,18 +16,16 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.base.Function;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
+import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
@@ -35,7 +33,7 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 /**
  * A simple value slider bar with one handle
  */
-public class UISlider extends CoreWidget {
+public class UISlider extends ActivatableWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
 
@@ -173,12 +171,37 @@ public class UISlider extends CoreWidget {
             return DISABLED_MODE;
         }
 
-        if (active) {
+        if (active || (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this))) {
             return ACTIVE_MODE;
         } else if (tickerListener.isMouseOver()) {
             return HOVER_MODE;
         }
         return DEFAULT_MODE;
+    }
+
+    private void changeValue(float delta) {
+        float newValue = TeraMath.clamp(getValue() + delta, 0, getRange() + getMinimum());
+        setValue(newValue);
+    }
+
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && TabbingManager.focusedWidget.equals(this)) {
+            int keyId = event.getKey().getId();
+            if (keyId == Keyboard.KeyId.RIGHT || keyId == Keyboard.KeyId.UP) {
+                this.changeValue(getIncrement());
+                return true;
+            } else if (keyId == Keyboard.KeyId.LEFT || keyId == Keyboard.KeyId.DOWN) {
+                this.changeValue(-1 * getIncrement());
+                return true;
+            }
+        }
+        return super.onKeyEvent(event);
+    }
+
+    @Override
+    public void onMouseWheelEvent(MouseWheelEvent event) {
+        event.consume();
     }
 
     public void bindMinimum(Binding<Float> binding) {
