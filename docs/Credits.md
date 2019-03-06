@@ -261,7 +261,8 @@ Contributors
  [shaunakdixit](https://github.com/shaunakdixit),
  [e-aakash](https://github.com/e-aakash),
  [majordwarf](https://github.com/majordwarf),
- [Soundwave](https://github.com/PS-Soundwave)
+ [Soundwave](https://github.com/PS-Soundwave),
+ [mayant15](https://github.com/mayant15)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
