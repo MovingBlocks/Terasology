@@ -22,7 +22,13 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.ActivatableWidget;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -171,7 +177,7 @@ public class UISlider extends ActivatableWidget {
             return DISABLED_MODE;
         }
 
-        if (active || (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this))) {
+        if (active || this.equals(TabbingManager.focusedWidget)) {
             return ACTIVE_MODE;
         } else if (tickerListener.isMouseOver()) {
             return HOVER_MODE;
@@ -180,13 +186,13 @@ public class UISlider extends ActivatableWidget {
     }
 
     private void changeValue(float delta) {
-        float newValue = TeraMath.clamp(getValue() + delta, 0, getRange() + getMinimum());
+        float newValue = TeraMath.clamp(getValue() + delta, getMinimum(), getRange() + getMinimum());
         setValue(newValue);
     }
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown() && TabbingManager.focusedWidget.equals(this)) {
+        if (event.isDown() && this.equals(TabbingManager.focusedWidget)) {
             int keyId = event.getKey().getId();
             if (keyId == Keyboard.KeyId.RIGHT || keyId == Keyboard.KeyId.UP) {
                 this.changeValue(getIncrement());
