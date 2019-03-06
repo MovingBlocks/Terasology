@@ -16,9 +16,11 @@
 package org.terasology.engine.subsystem.common;
 
 import com.google.common.collect.Iterables;
+import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.config.facade.BindsConfiguration;
 import org.terasology.config.facade.BindsConfigurationImpl;
 import org.terasology.config.facade.InputDeviceConfiguration;
@@ -124,6 +126,16 @@ public class ConfigurationSubsystem implements EngineSubsystem {
 
     @Override
     public void shutdown() {
+        RenderingConfig renderingConfig = config.getRendering();
+
+        // Save window position
+        renderingConfig.setWindowPosX(Display.getX());
+        renderingConfig.setWindowPosY(Display.getY());
+
+        // Save window width and height
+        renderingConfig.setWindowWidth(Display.getWidth());
+        renderingConfig.setWindowHeight(Display.getHeight());
+
         config.save();
     }
 
