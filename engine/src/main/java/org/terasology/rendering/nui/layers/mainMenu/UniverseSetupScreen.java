@@ -55,6 +55,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
+import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.block.family.BlockFamilyLibrary;
@@ -103,6 +104,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private Context context;
     private int worldNumber;
     private String selectedWorld = "";
+    public int camelLocation;
+    public WorldSetupWrapper camelWorld;
 
     @Override
     public void initialise() {
@@ -174,6 +177,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             @Override
             public void set(String value) {
                 selectedWorld = value;
+                camelLocation = findIndex(worlds,selectedWorld);
             }
         });
 
@@ -182,6 +186,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         );
 
         WidgetUtil.trySubscribe(this, "worldConfig", button -> {
+            refresh(worldsDropdown);
             final WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
             try {
                 if (!worlds.isEmpty() || !selectedWorld.isEmpty()) {
@@ -193,7 +198,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             } catch (UnresolvedWorldGeneratorException e) {
                 logger.error("Can't configure the world! due to {}", e.getMessage());
             }
-        });
+        }
+        );
 
         WidgetUtil.trySubscribe(this, "addGenerator", button -> {
             if (worldGenerator.getSelection().getUri().toString().equals("Core:heightMap")) {
@@ -206,6 +212,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "continue", button -> {
+            refresh(worldsDropdown);
             final WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
             if (!worlds.isEmpty()) {
                 final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
@@ -246,6 +253,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             worldsDropdown.setOptions(worldNames());
         }
         selectedWorld = "";
+        camelLocation = findIndex(worlds,selectedWorld);
     }
 
     private Set<Name> getAllEnabledModuleNames() {
@@ -276,7 +284,14 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
         worlds.add(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
+        camelLocation = findIndex(worlds,selectedWorld);
         worldNumber++;
+    }
+
+    public void refresh(UIDropdownScrollable worldsDropdown) {
+        worldsDropdown.setOptions(worldNames());
+        camelWorld = worlds.get(camelLocation);
+        selectedWorld = camelWorld.getWorldName().toString();
     }
 
     /**
@@ -313,6 +328,19 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
             environmentSwitcher.handleSwitchToPreviewEnvironment(context, environment);
         }
+    }
+
+    public int findIndex(List<WorldSetupWrapper> worlds,String worldName)
+    {
+
+        for(int i = 0 ;i<worlds.size();i++) {
+            WorldSetupWrapper random = worlds.get(i);
+            Name customName= random.getWorldName();
+            if(customName.toString().equals(worldName)) {
+                return(i);
+            }
+        }
+        return(-1);
     }
 
     private void initAssets() {

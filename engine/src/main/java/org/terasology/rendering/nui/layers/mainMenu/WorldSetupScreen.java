@@ -23,6 +23,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -34,6 +35,7 @@ import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldConfigurator;
@@ -67,14 +69,24 @@ public class WorldSetupScreen extends CoreScreenLayer {
     private ModuleEnvironment environment;
     private Context context;
     private WorldConfigurator oldWorldConfig;
+    private Name camelCase;
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
-
         WidgetUtil.trySubscribe(this, "close", button -> {
+
+            UIText customWorldName = find("world_name", UIText.class);
+            if(customWorldName.getText().isEmpty()==false) {
+                camelCase = new Name(customWorldName.getText());
+                world.setWorldName(camelCase);
+            }
             triggerBackAnimation();
         });
+    }
+
+    private void setName(UIText customWorldName) {
+        customWorldName.setText(world.getWorldName().toString());
     }
 
     @Override
@@ -83,6 +95,10 @@ public class WorldSetupScreen extends CoreScreenLayer {
 
         UILabel subitle = find("subtitle", UILabel.class);
         subitle.setText(translationSystem.translate("${engine:menu#world-setup}") + " for " + world.getWorldName().toString());
+
+        UIText customWorldName = find("world_name", UIText.class);
+        setName(customWorldName);
+
     }
 
     /**
