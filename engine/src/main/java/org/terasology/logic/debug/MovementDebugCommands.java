@@ -24,6 +24,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
@@ -239,9 +240,24 @@ public class MovementDebugCommands extends BaseComponentSystem {
         try {
             ClientComponent clientComp = client.getComponent(ClientComponent.class);
             CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
+            HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
+
+            Optional<Prefab> prefab = Assets.get(new ResourceUrn("engine:player"), Prefab.class);
+            CharacterMovementComponent moveDefault = prefab.get().getComponent(CharacterMovementComponent.class);
+            HealthComponent healthDefault = prefab.get().getComponent(HealthComponent.class);
+
+            float jumpSpeedConst = 0.5f;
+            float runFactorConst = 0.1f;
+            float stepHeightConst = 0.05f;
+
             if (move != null) {
                 float prevHeight = move.height;
                 move.height = amount;
+                move.jumpSpeed = moveDefault.jumpSpeed + (move.height-moveDefault.height)*jumpSpeedConst;
+                move.stepHeight = moveDefault.stepHeight + (move.height-moveDefault.height)*stepHeightConst;
+                move.runFactor= moveDefault.runFactor+(move.height-moveDefault.height)*runFactorConst;
+                health.fallingDamageSpeedThreshold = healthDefault.fallingDamageSpeedThreshold+move.height-moveDefault.height;
+                health.horizontalDamageSpeedThreshold = healthDefault.horizontalDamageSpeedThreshold+move.height-moveDefault.height;
                 clientComp.character.saveComponent(move);
                 LocationComponent loc = client.getComponent(LocationComponent.class);
                 Vector3f currentPosition = loc.getWorldPosition();
