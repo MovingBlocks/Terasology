@@ -24,6 +24,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
@@ -239,9 +240,15 @@ public class MovementDebugCommands extends BaseComponentSystem {
         try {
             ClientComponent clientComp = client.getComponent(ClientComponent.class);
             CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
+            HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
             if (move != null) {
                 float prevHeight = move.height;
                 move.height = amount;
+                move.jumpSpeed = 10.0f + (move.height-2)*0.5f;
+                move.stepHeight = 0.35f + (move.height-2)*0.05f;
+                move.runFactor= 1.5f+(move.height-2)*0.1f;
+                health.fallingDamageSpeedThreshold = 18.0f+move.height;
+                health.horizontalDamageSpeedThreshold = 18.0f+move.height;
                 clientComp.character.saveComponent(move);
                 LocationComponent loc = client.getComponent(LocationComponent.class);
                 Vector3f currentPosition = loc.getWorldPosition();
