@@ -103,6 +103,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private Context context;
     private int worldNumber;
     private String selectedWorld = "";
+    public int indexOfWorld;
+    public WorldSetupWrapper customWorld;
 
     @Override
     public void initialise() {
@@ -174,6 +176,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             @Override
             public void set(String value) {
                 selectedWorld = value;
+                indexOfWorld = findIndex(worlds, selectedWorld);
             }
         });
 
@@ -185,7 +188,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             final WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
             try {
                 if (!worlds.isEmpty() || !selectedWorld.isEmpty()) {
-                    worldSetupScreen.setWorld(context, findWorldByName());
+                    worldSetupScreen.setWorld(context, findWorldByName(), worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
@@ -246,6 +249,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             worldsDropdown.setOptions(worldNames());
         }
         selectedWorld = "";
+        indexOfWorld =findIndex(worlds, selectedWorld);
     }
 
     private Set<Name> getAllEnabledModuleNames() {
@@ -276,7 +280,19 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
         worlds.add(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
+        indexOfWorld = findIndex(worlds, selectedWorld);
         worldNumber++;
+    }
+
+    /**
+     * This method refresh the dropdown menu
+     * it is called from worldSetupScreen and also
+     * set selected world in dropdown Bar
+     */
+    public void refresh(UIDropdownScrollable worldsDropdown) {
+        worldsDropdown.setOptions(worldNames());
+        customWorld = worlds.get(indexOfWorld);
+        selectedWorld = customWorld.getWorldName().toString();
     }
 
     /**
@@ -313,6 +329,17 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
             environmentSwitcher.handleSwitchToPreviewEnvironment(context, environment);
         }
+    }
+
+    public int findIndex(List<WorldSetupWrapper> worldsList,String worldName) {
+        for(int i = 0 ;i<worldsList.size();i++) {
+            WorldSetupWrapper random = worldsList.get(i);
+            Name customName= random.getWorldName();
+            if(customName.toString().equals(worldName)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private void initAssets() {
