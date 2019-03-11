@@ -23,6 +23,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -33,7 +34,9 @@ import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldConfigurator;
@@ -67,14 +70,32 @@ public class WorldSetupScreen extends CoreScreenLayer {
     private ModuleEnvironment environment;
     private Context context;
     private WorldConfigurator oldWorldConfig;
+    private Name newWorldName;
+    private UIDropdownScrollable worldsDropdown;
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         WidgetUtil.trySubscribe(this, "close", button -> {
+            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+            final WorldPreGenerationScreen worldPreGenerationScreen =getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class );
+            UIText customWorldName = find("customisedWorldName", UIText.class);
+            if(customWorldName.getText().isEmpty()==false) {
+                newWorldName = new Name(customWorldName.getText());
+                world.setWorldName(newWorldName);
+            }
+            universeSetupScreen.refresh(worldsDropdown);
+            worldPreGenerationScreen.setName(newWorldName);
             triggerBackAnimation();
         });
+    }
+
+    /**
+     * This method sets the world name in title as well as in UITextBox
+     */
+    private void setName(UIText customWorldName) {
+        customWorldName.setText(world.getWorldName().toString());
     }
 
     @Override
@@ -83,6 +104,8 @@ public class WorldSetupScreen extends CoreScreenLayer {
 
         UILabel subitle = find("subtitle", UILabel.class);
         subitle.setText(translationSystem.translate("${engine:menu#world-setup}") + " for " + world.getWorldName().toString());
+        UIText customWorldName = find("customisedWorldName", UIText.class);
+        setName(customWorldName);
     }
 
     /**
@@ -92,9 +115,10 @@ public class WorldSetupScreen extends CoreScreenLayer {
      * @param worldSelected the world whose configurations are to be changed.
      * @throws UnresolvedWorldGeneratorException
      */
-    public void setWorld(Context subContext, WorldSetupWrapper worldSelected) throws UnresolvedWorldGeneratorException {
+    public void setWorld(Context subContext, WorldSetupWrapper worldSelected, UIDropdownScrollable dropDown) throws UnresolvedWorldGeneratorException {
         world = worldSelected;
         context = subContext;
+        worldsDropdown = dropDown;
         SimpleUri worldGenUri = worldSelected.getWorldGeneratorInfo().getUri();
         environment = context.get(ModuleEnvironment.class);
         context.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary(environment, context));
