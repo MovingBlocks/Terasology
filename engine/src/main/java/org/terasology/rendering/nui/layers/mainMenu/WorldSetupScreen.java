@@ -79,22 +79,23 @@ public class WorldSetupScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "close", button -> {
             final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
-            final WorldPreGenerationScreen worldPreGenerationScreen =getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class );
+            final WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
             UIText customWorldName = find("customisedWorldName", UIText.class);
-            if(customWorldName.getText().isEmpty()==false) {
+            if (!customWorldName.getText().isEmpty()) {
                 newWorldName = new Name(customWorldName.getText());
                 world.setWorldName(newWorldName);
+                universeSetupScreen.refreshWorldDropdown(worldsDropdown);
+                worldPreGenerationScreen.setName(newWorldName);
             }
-            universeSetupScreen.refresh(worldsDropdown);
-            worldPreGenerationScreen.setName(newWorldName);
             triggerBackAnimation();
         });
     }
 
     /**
      * This method sets the world name in title as well as in UITextBox
+     * @param customWorldName
      */
-    private void setName(UIText customWorldName) {
+    private void setCustomWorldName(UIText customWorldName) {
         customWorldName.setText(world.getWorldName().toString());
     }
 
@@ -105,7 +106,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
         UILabel subitle = find("subtitle", UILabel.class);
         subitle.setText(translationSystem.translate("${engine:menu#world-setup}") + " for " + world.getWorldName().toString());
         UIText customWorldName = find("customisedWorldName", UIText.class);
-        setName(customWorldName);
+        setCustomWorldName(customWorldName);
     }
 
     /**
