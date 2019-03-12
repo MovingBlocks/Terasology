@@ -49,7 +49,9 @@ public class WorldSetupWrapper {
         return this.worldName;
     }
 
-    public void setWorldName(Name newName) { this.worldName = newName;}
+    public void setWorldName(Name newName) {
+        this.worldName = newName;
+    }
 
     public void setWorldConfigurator(WorldConfigurator worldConfigurator) {
         this.worldConfigurator = worldConfigurator;

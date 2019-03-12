@@ -103,8 +103,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private Context context;
     private int worldNumber;
     private String selectedWorld = "";
-    public int indexOfWorld;
-    public WorldSetupWrapper customWorld;
+    public int indexOfSelectedWorld;
+    public WorldSetupWrapper copyOfSelectedWorld;
 
     @Override
     public void initialise() {
@@ -176,7 +176,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             @Override
             public void set(String value) {
                 selectedWorld = value;
-                indexOfWorld = findIndex(worlds, selectedWorld);
+                indexOfSelectedWorld = findIndex(worlds, selectedWorld);
             }
         });
 
@@ -201,7 +201,6 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "addGenerator", button -> {
             if (worldGenerator.getSelection().getUri().toString().equals("Core:heightMap")) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("HeightMap not supported", "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
-
             } else {
                 addNewWorld(worldGenerator.getSelection());
                 worldsDropdown.setOptions(worldNames());
@@ -249,7 +248,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             worldsDropdown.setOptions(worldNames());
         }
         selectedWorld = "";
-        indexOfWorld =findIndex(worlds, selectedWorld);
+        indexOfSelectedWorld = findIndex(worlds, selectedWorld);
     }
 
     private Set<Name> getAllEnabledModuleNames() {
@@ -280,19 +279,19 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
         worlds.add(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
-        indexOfWorld = findIndex(worlds, selectedWorld);
+        indexOfSelectedWorld = findIndex(worlds, selectedWorld);
         worldNumber++;
     }
 
     /**
-     * This method refresh the dropdown menu
-     * it is called from worldSetupScreen and also
-     * set selected world in dropdown Bar
+     * This method refreshes the worlds drop-down menu
+     * when world name is changed and updates variable selectedWorld.
+     * @param worldsDropdown
      */
-    public void refresh(UIDropdownScrollable worldsDropdown) {
+    public void refreshWorldDropdown(UIDropdownScrollable worldsDropdown) {
         worldsDropdown.setOptions(worldNames());
-        customWorld = worlds.get(indexOfWorld);
-        selectedWorld = customWorld.getWorldName().toString();
+        copyOfSelectedWorld = worlds.get(indexOfSelectedWorld);
+        selectedWorld = copyOfSelectedWorld.getWorldName().toString();
     }
 
     /**
@@ -331,11 +330,18 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         }
     }
 
-    public int findIndex(List<WorldSetupWrapper> worldsList,String worldName) {
-        for(int i = 0 ;i<worldsList.size();i++) {
-            WorldSetupWrapper random = worldsList.get(i);
-            Name customName= random.getWorldName();
-            if(customName.toString().equals(worldName)) {
+    /**
+     * This method finds index of selected world from array list.
+     * and return -1 if unable to find it.
+     * @param worldsList
+     * @param worldName
+     * @return
+     */
+    public int findIndex(List<WorldSetupWrapper> worldsList, String worldName) {
+        for (int i = 0; i < worldsList.size(); i++) {
+            WorldSetupWrapper currentWorldFromList = worldsList.get(i);
+            Name customName = currentWorldFromList.getWorldName();
+            if (customName.toString().equals(worldName)) {
                 return i;
             }
         }

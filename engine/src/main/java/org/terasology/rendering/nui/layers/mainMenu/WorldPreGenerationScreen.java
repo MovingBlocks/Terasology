@@ -181,7 +181,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         WidgetUtil.trySubscribe(this, "close", button -> {
             final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             UIDropdownScrollable worldsDropdownOfUniverse = universeSetupScreen.find("worlds", UIDropdownScrollable.class);
-            universeSetupScreen.refresh(worldsDropdownOfUniverse);
+            universeSetupScreen.refreshWorldDropdown(worldsDropdownOfUniverse);
             triggerBackAnimation();
         });
 
@@ -210,12 +210,13 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
             e.printStackTrace();
         }
     }
-
+    
     /**
-     * Set selectedWorld when configure from WorldPreGenerationScreen
+     * Set seletedWorld when configure from WorldPreGenerationScreen
+     * @param newNameToSet
      */
-    public void setName(Name setNewName) {
-        selectedWorld = setNewName.toString();
+    public void setName(Name newNameToSet) {
+        selectedWorld = newNameToSet.toString();
     }
 
     /**
