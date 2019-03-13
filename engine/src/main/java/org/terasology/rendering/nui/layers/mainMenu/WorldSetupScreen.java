@@ -122,6 +122,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
 
     /**
      * This method sets the world name in title as well as in UITextBox
+     *
      * @param customWorldName
      */
     private void setCustomWorldName(UIText customWorldName) {
@@ -141,7 +142,8 @@ public class WorldSetupScreen extends CoreScreenLayer {
     /**
      * This method sets the world whose properties are to be changed. This function is called before the screen comes
      * to the forefront.
-     * @param subContext the new environment created in {@link UniverseSetupScreen}
+     *
+     * @param subContext    the new environment created in {@link UniverseSetupScreen}
      * @param worldSelected the world whose configurations are to be changed.
      * @throws UnresolvedWorldGeneratorException
      */
