@@ -81,13 +81,42 @@ public class WorldSetupScreen extends CoreScreenLayer {
             final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             final WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
             UIText customWorldName = find("customisedWorldName", UIText.class);
-            if (!customWorldName.getText().isEmpty()) {
+
+            boolean goBack = false;
+
+            //sanity checks on world name
+            if (customWorldName.getText().isEmpty()) {
+                //name empty: display a popup, stay on the same screen
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Name Cannot Be Empty!", "Please add a name for the world");
+            } else if (customWorldName.getText().equalsIgnoreCase(world.getWorldName().toString())) {
+                //same name as before: go back to universe setup
+                goBack = true;
+            } else {
+                boolean worldNameMatchesAnother = false;
+
+                //check for case insensitive equality of world names
+                for (String worldName : universeSetupScreen.worldNames()) {
+                    if (worldName.equalsIgnoreCase(customWorldName.getText())) {
+                        worldNameMatchesAnother = true;
+                        break;
+                    }
+                }
+
+                if (worldNameMatchesAnother == true) {
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Name Already Used!", "Please use a different name for this world");
+                } else {
+                    //no match found: go back to universe setup
+                    goBack = true;
+                }
+            }
+
+            if (goBack == true) {
                 newWorldName = new Name(customWorldName.getText());
                 world.setWorldName(newWorldName);
                 universeSetupScreen.refreshWorldDropdown(worldsDropdown);
                 worldPreGenerationScreen.setName(newWorldName);
+                triggerBackAnimation();
             }
-            triggerBackAnimation();
         });
     }
 
