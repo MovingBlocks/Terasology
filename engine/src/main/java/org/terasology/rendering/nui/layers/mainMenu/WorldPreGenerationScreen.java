@@ -24,6 +24,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.math.TeraMath;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -167,7 +168,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         WidgetUtil.trySubscribe(this, "config", button -> {
             try {
                 if (!selectedWorld.isEmpty()) {
-                    worldSetupScreen.setWorld(context, findWorldByName(selectedWorld));
+                    worldSetupScreen.setWorld(context, findWorldByName(selectedWorld), worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
@@ -177,9 +178,12 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
             }
         });
 
-        WidgetUtil.trySubscribe(this, "close", button ->
-                triggerBackAnimation()
-        );
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+            UIDropdownScrollable worldsDropdownOfUniverse = universeSetupScreen.find("worlds", UIDropdownScrollable.class);
+            universeSetupScreen.refreshWorldDropdown(worldsDropdownOfUniverse);
+            triggerBackAnimation();
+        });
 
         WidgetUtil.trySubscribe(this, "mainMenu", button -> {
             getManager().pushScreen("engine:mainMenuScreen");
@@ -205,6 +209,14 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         } catch (UnresolvedWorldGeneratorException e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Set seletedWorld when configure from WorldPreGenerationScreen
+     * @param newNameToSet
+     */
+    public void setName(Name newNameToSet) {
+        selectedWorld = newNameToSet.toString();
     }
 
     /**
