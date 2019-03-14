@@ -102,7 +102,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
                     }
                 }
 
-                if (worldNameMatchesAnother == true) {
+                if (worldNameMatchesAnother) {
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Name Already Used!", "Please use a different name for this world");
                 } else {
                     //no match found: go back to universe setup
@@ -110,7 +110,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
                 }
             }
 
-            if (goBack == true) {
+            if (goBack) {
                 newWorldName = new Name(customWorldName.getText());
                 world.setWorldName(newWorldName);
                 universeSetupScreen.refreshWorldDropdown(worldsDropdown);
