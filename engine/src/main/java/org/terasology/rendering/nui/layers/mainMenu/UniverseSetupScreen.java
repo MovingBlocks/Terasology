@@ -277,11 +277,11 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      * returns true if 'name' matches (case-insensitive) with another world already present
      * @param name The world name to be checked
      */
-    public boolean worldNameMatchesAnother(String name){
+    public boolean worldNameMatchesAnother(String name) {
         boolean taken = false;
 
-        for(WorldSetupWrapper worldTaken: worlds){
-            if (worldTaken.getWorldName().toString().equalsIgnoreCase(name)){
+        for (WorldSetupWrapper worldTaken: worlds) {
+            if (worldTaken.getWorldName().toString().equalsIgnoreCase(name)) {
                 taken = true;
                 break;
             }
@@ -297,7 +297,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
         String selectedWorldName = worldGeneratorInfo.getDisplayName();
 
-        while(worldNameMatchesAnother(selectedWorldName + "-" + worldNumber)){
+        while (worldNameMatchesAnother(selectedWorldName + "-" + worldNumber)) {
             ++worldNumber;
         }
 
