@@ -91,23 +91,12 @@ public class WorldSetupScreen extends CoreScreenLayer {
             } else if (customWorldName.getText().equalsIgnoreCase(world.getWorldName().toString())) {
                 //same name as before: go back to universe setup
                 goBack = true;
+            } else if (universeSetupScreen.worldNameMatchesAnother(customWorldName.getText())) {
+                //if same name is already used, inform user with a  popup
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Name Already Used!", "Please use a different name for this world");
             } else {
-                boolean worldNameMatchesAnother = false;
-
-                //check for case insensitive equality of world names
-                for (String worldName : universeSetupScreen.worldNames()) {
-                    if (worldName.equalsIgnoreCase(customWorldName.getText())) {
-                        worldNameMatchesAnother = true;
-                        break;
-                    }
-                }
-
-                if (worldNameMatchesAnother) {
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Name Already Used!", "Please use a different name for this world");
-                } else {
-                    //no match found: go back to universe setup
-                    goBack = true;
-                }
+                //no match found: go back to universe setup
+                goBack = true;
             }
 
             if (goBack) {
