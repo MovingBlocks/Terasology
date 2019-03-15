@@ -228,7 +228,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         installedVersion.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                if (dependencyInfoBinding.get() != null) {
+                if (dependencyInfoBinding.get() != null && moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()) != null) {
                     return String.valueOf(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()).getVersion());
                 }
                 return "";
@@ -316,7 +316,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             public Boolean get() {
                 final String online = onlineVersion.getText();
                 final String installed = installedVersion.getText();
-                if (StringUtils.isNotBlank(online)) {
+                if (StringUtils.isNotBlank(online) && StringUtils.isNotBlank(installed)) {
                     return new Version(online).compareTo(new Version(installed)) > 0;
                 }
                 return false;
