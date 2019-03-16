@@ -288,6 +288,11 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(DependencyInfo value, Canvas canvas) {
+                if (moduleManager.getRegistry().getLatestModuleVersion(value.getId()) == null) {
+                    canvas.setMode("invalid");
+                } else {
+                    canvas.setMode("available");
+                }
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
