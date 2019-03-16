@@ -54,7 +54,7 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
             getResolvedFields(typeInfo).forEach(
                     (field, fieldType) ->
                     {
-                        Optional<TypeHandler<?>> declaredFieldTypeHandler = context.getTypeSerializationLibrary().getTypeHandler(fieldType, context.getClassLoaders());
+                        Optional<TypeHandler<?>> declaredFieldTypeHandler = context.getTypeHandler(fieldType);
 
                         TypeInfo<?> fieldTypeInfo = TypeInfo.of(fieldType);
 

@@ -45,6 +45,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RuntimeDelegatingTypeHandler.class);
 
+    // TODO: Use Optional
     private TypeHandler<T> delegateHandler;
     private TypeInfo<T> typeInfo;
     private TypeSerializationLibrary typeSerializationLibrary;

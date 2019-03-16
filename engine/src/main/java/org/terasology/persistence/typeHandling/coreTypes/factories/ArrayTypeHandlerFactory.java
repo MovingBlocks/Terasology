@@ -45,7 +45,7 @@ public class ArrayTypeHandlerFactory implements TypeHandlerFactory {
 
         TypeInfo<?> elementTypeInfo = TypeInfo.of(elementType);
 
-        Optional<TypeHandler<?>> declaredElementTypeHandler = context.getTypeSerializationLibrary().getTypeHandler(elementType, context.getClassLoaders());
+        Optional<TypeHandler<?>> declaredElementTypeHandler = context.getTypeHandler(elementType);
 
         @SuppressWarnings({"unchecked"})
         TypeHandler<?> elementTypeHandler = new RuntimeDelegatingTypeHandler(

@@ -17,7 +17,9 @@ package org.terasology.persistence.typeHandling;
 
 import org.terasology.reflection.TypeInfo;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Represents the context in which a {@link TypeHandlerFactory} creates {@link TypeHandler} instances.
@@ -59,5 +61,26 @@ public class TypeHandlerFactoryContext {
      */
     public ClassLoader[] getClassLoaders() {
         return classLoaders;
+    }
+
+    /**
+     * Retrieve the {@link TypeHandler} for the given type in the current context.
+     */
+    public Optional<TypeHandler<?>> getTypeHandler(Type elementType) {
+        return typeSerializationLibrary.getTypeHandler(elementType, classLoaders);
+    }
+
+    /**
+     * Retrieve the {@link TypeHandler} for the given type in the current context.
+     */
+    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> elementType) {
+        return typeSerializationLibrary.getTypeHandler(elementType, classLoaders);
+    }
+
+    /**
+     * Retrieve the {@link TypeHandler} for the given type in the current context.
+     */
+    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> elementType) {
+        return typeSerializationLibrary.getTypeHandler(elementType, classLoaders);
     }
 }

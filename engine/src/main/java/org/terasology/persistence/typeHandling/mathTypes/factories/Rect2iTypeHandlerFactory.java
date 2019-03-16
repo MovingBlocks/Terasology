@@ -36,7 +36,7 @@ public class Rect2iTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        Optional<TypeHandler<Vector2i>> vector2iTypeHandler = context.getTypeSerializationLibrary().getTypeHandler(Vector2i.class, context.getClassLoaders());
+        Optional<TypeHandler<Vector2i>> vector2iTypeHandler = context.getTypeHandler(Vector2i.class);
 
         if (!vector2iTypeHandler.isPresent()) {
             LOGGER.error("No Vector2i type handler found");
