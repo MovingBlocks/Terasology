@@ -134,6 +134,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         return typeInfo.getRawType();
     }
 
+    @SuppressWarnings({"unchecked"})
     @Override
     public Optional<T> deserialize(PersistedData data) {
         if (!data.isValueMap()) {
@@ -152,6 +153,11 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         if (!typeToDeserializeAs.isPresent()) {
             LOGGER.error("Cannot find class to deserialize {}", runtimeTypeName);
+            return Optional.empty();
+        }
+
+        if (!typeInfo.getRawType().isAssignableFrom(typeToDeserializeAs.get())) {
+            LOGGER.error("Given type {} is not a sub-type of expected type {}", typeToDeserializeAs.get(), typeInfo.getType());
             return Optional.empty();
         }
 
