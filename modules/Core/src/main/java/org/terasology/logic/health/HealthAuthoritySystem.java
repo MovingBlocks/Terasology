@@ -227,9 +227,15 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
         checkHeal(entity, event.getAmount(), event.getInstigator());
     }
 
-    // TODO: This should be in a separate system
+    /**
+     * React to any vertical collision of an entity that has a
+     * health component and establishes if the character should
+     * take damage and what's the amount
+     * @param event the event that triggered the vertical collision
+     * @param entity the entity that collide
+     */
     @ReceiveEvent(components = {HealthComponent.class})
-    public void onLand(VerticalCollisionEvent event, EntityRef entity) {
+    public void onVerticalCollision(VerticalCollisionEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
         float speed = Math.abs(event.getVelocity().y);
 
@@ -241,8 +247,15 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
         }
     }
 
+    /**
+     * React to any horrizontal collision of an entity that has a
+     * health component and establishes if the character should
+     * take damage and what's the amount
+     * @param event the event that triggered the vertical collision
+     * @param entity the entity that collide
+     */
     @ReceiveEvent(components = {HealthComponent.class})
-    public void onCrash(HorizontalCollisionEvent event, EntityRef entity) {
+    public void onHorizontalCollision(HorizontalCollisionEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
 
         Vector3f vel = new Vector3f(event.getVelocity());
@@ -253,24 +266,6 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
             int damage = (int) ((speed - health.horizontalDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
             if (damage > 0) {
                 checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, EntityRef.NULL);
-            }
-        }
-    }
-
-    @ReceiveEvent
-    public void onCrash(HorizontalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds, HealthComponent healthComponent) {
-        Vector3f horizVelocity = new Vector3f(event.getVelocity());
-        horizVelocity.y = 0;
-        float velocity = horizVelocity.length();
-
-        if (velocity > healthComponent.horizontalDamageSpeedThreshold) {
-            if (characterSounds.lastSoundTime + CharacterSoundSystem.MIN_TIME < time.getGameTimeInMs()) {
-                StaticSound sound = random.nextItem(characterSounds.landingSounds);
-                if (sound != null) {
-                    entity.send(new PlaySoundEvent(sound, characterSounds.landingVolume));
-                    characterSounds.lastSoundTime = time.getGameTimeInMs();
-                    entity.saveComponent(characterSounds);
-                }
             }
         }
     }

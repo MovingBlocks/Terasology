@@ -31,6 +31,7 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
+import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
@@ -52,6 +53,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
     public static final long MIN_TIME = 10;
 
     private static final Logger logger = LoggerFactory.getLogger(CharacterSoundSystem.class);
+    private static final float HORIZONTAL_DAMAGE_SPEED_THRESHOLD = 20.0f; //How fast do you have to collide horizontal for the sound to play
     private static final float LANDING_VOLUME_MODIFIER = 0.2f; //The sound volume is multiplied by this number
     private static final float LANDING_VELOCITY_THRESHOLD = 7; //How fast do you have to be falling for the sound to play
     private static final float LANDING_VOLUME_MAX = 2; //The maximum modifier value
@@ -105,8 +107,17 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * React to any vertical collison of a character that has
+     * a component for character sounds and decide what the volume
+     * of the landing sound should be and the sounds should pe played.
+     * Then send a PlaysSoundEvent
+     * @param event the event that triggered the vertical collision
+     * @param entity the entity that collide vertical
+     * @param characterSounds the component that contains info about character sounds
+     */
     @ReceiveEvent
-    public void onLanded(VerticalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
+    public void onVerticalCollision(VerticalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         Vector3f velocity = event.getVelocity();
         float soundVolumeModifier = (velocity.y * -1 - LANDING_VELOCITY_THRESHOLD) * LANDING_VOLUME_MODIFIER;
 
@@ -129,6 +140,33 @@ public class CharacterSoundSystem extends BaseComponentSystem {
                 entity.send(new PlaySoundEvent(entity, sound, characterSounds.landingVolume * soundVolumeModifier));
                 characterSounds.lastSoundTime = time.getGameTimeInMs();
                 entity.saveComponent(characterSounds);
+            }
+        }
+    }
+
+    /**
+     * React to any horziontal collison of a character that has a
+     * component for character sounds and decide what the volume
+     * of the landing sound should be and the sounds should pe played.
+     * Then send a PlaysSoundEvent
+     * @param event the event that triggered the horizontal collision
+     * @param entity the entity that collide horizontal
+     * @param characterSounds the component that contains info about character sounds
+     */
+    @ReceiveEvent
+    public void onHorrizontalCollision(HorizontalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
+        Vector3f horizVelocity = new Vector3f(event.getVelocity());
+        horizVelocity.y = 0;
+        float velocity = horizVelocity.length();
+
+        if (velocity > HORIZONTAL_DAMAGE_SPEED_THRESHOLD) {
+            if (characterSounds.lastSoundTime + CharacterSoundSystem.MIN_TIME < time.getGameTimeInMs()) {
+                StaticSound sound = random.nextItem(characterSounds.landingSounds);
+                if (sound != null) {
+                    entity.send(new PlaySoundEvent(sound, characterSounds.landingVolume));
+                    characterSounds.lastSoundTime = time.getGameTimeInMs();
+                    entity.saveComponent(characterSounds);
+                }
             }
         }
     }
