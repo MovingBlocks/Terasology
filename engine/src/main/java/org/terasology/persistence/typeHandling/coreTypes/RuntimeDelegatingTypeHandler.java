@@ -40,8 +40,8 @@ import java.util.Optional;
  * @param <T> The base type whose instances may be delegated to a subtype's {@link TypeHandler} at runtime.
  */
 public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
-    static final String TYPE_FIELD = "@type";
-    static final String VALUE_FIELD = "@value";
+    static final String TYPE_FIELD = "class";
+    static final String VALUE_FIELD = "content";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RuntimeDelegatingTypeHandler.class);
 
