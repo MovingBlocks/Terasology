@@ -58,6 +58,7 @@ import org.terasology.engine.modes.loadProcesses.RegisterSystems;
 import org.terasology.engine.modes.loadProcesses.SetupLocalPlayer;
 import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
 import org.terasology.engine.modes.loadProcesses.StartServer;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
@@ -67,6 +68,7 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
+import org.terasology.world.chunks.event.OnChunkLoaded;
 
 import java.util.Queue;
 
@@ -87,6 +89,10 @@ public class StateLoading implements GameState {
 
     private int progress;
     private int maxProgress;
+
+    private static final long chunkGenerationTimeout = 20000;
+    private boolean chunkGenerationStarted;
+    private long timeLastChunkGenerated;
 
     /**
      * Constructor for server or single player games
@@ -138,6 +144,8 @@ public class StateLoading implements GameState {
         popStep();
         loadingScreen = nuiManager.pushScreen("engine:loadingScreen", LoadingScreen.class);
         loadingScreen.updateStatus(current.getMessage(), current.getProgress());
+
+        chunkGenerationStarted = false;
     }
 
     private void initClient() {
@@ -252,6 +260,20 @@ public class StateLoading implements GameState {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
             loadingScreen.updateStatus(current.getMessage(), progressValue);
             nuiManager.update(delta);
+
+            // chunk generation begins at the AwaitCharacterSpawn step
+            if (current instanceof AwaitCharacterSpawn && !chunkGenerationStarted) {
+                chunkGenerationStarted = true;
+                // in case no chunks generate, this should be set for a basis
+                timeLastChunkGenerated = time.getRealTimeInMs();
+            }
+
+            if (chunkGenerationStarted) {
+                long timeSinceLastChunk = time.getRealTimeInMs() - timeLastChunkGenerated;
+                if (timeSinceLastChunk > chunkGenerationTimeout) {
+                    gameEngine.changeState(new StateMainMenu("World generation timed out"));
+                }
+            }
         }
     }
 
@@ -273,5 +295,11 @@ public class StateLoading implements GameState {
     @Override
     public Context getContext() {
         return context;
+    }
+
+    @Override
+    public void onChunkLoaded(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
+        EngineTime time = (EngineTime) context.get(Time.class);
+        timeLastChunkGenerated = time.getRealTimeInMs();
     }
 }
