@@ -261,6 +261,7 @@ public class StateLoading implements GameState {
             loadingScreen.updateStatus(current.getMessage(), progressValue);
             nuiManager.update(delta);
 
+            // chunk generation begins at the AwaitCharacterSpawn step
             if (current instanceof AwaitCharacterSpawn && !chunkGenerationStarted) {
                 chunkGenerationStarted = true;
                 // in case no chunks generate, this should be set for a basis
