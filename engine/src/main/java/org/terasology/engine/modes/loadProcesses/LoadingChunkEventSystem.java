@@ -26,12 +26,22 @@ import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 
+/**
+ * A system to send new chunk events to the current game state, which can be
+ * useful to identify when chunk generation fails on initial load
+ */
 @RegisterSystem
 public class LoadingChunkEventSystem extends BaseComponentSystem {
 
     @In
     private Context context;
 
+    /**
+     * Event handler which waits for new chunk events, then sends those
+     * events to the current game state
+     * @param chunkAvailable an event which includes the position of the new chunk
+     * @param worldEntity the world entity that this event was sent to
+     */
     @ReceiveEvent(components = {WorldComponent.class})
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         GameEngine gameEngine = context.get(GameEngine.class);
