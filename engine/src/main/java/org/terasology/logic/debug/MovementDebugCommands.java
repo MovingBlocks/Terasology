@@ -239,9 +239,19 @@ public class MovementDebugCommands extends BaseComponentSystem {
         try {
             ClientComponent clientComp = client.getComponent(ClientComponent.class);
             CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
+
+            Optional<Prefab> prefab = Assets.get(new ResourceUrn("engine:player"), Prefab.class);
+            CharacterMovementComponent moveDefault = prefab.get().getComponent(CharacterMovementComponent.class);
+
+            float jumpSpeedConst = 0.5f;
+            float runFactorConst = 0.1f;
+            float stepHeightConst = 0.05f;
             if (move != null) {
                 float prevHeight = move.height;
                 move.height = amount;
+                move.jumpSpeed = moveDefault.jumpSpeed + (move.height-moveDefault.height)*jumpSpeedConst;
+                move.stepHeight = moveDefault.stepHeight + (move.height-moveDefault.height)*stepHeightConst;
+                move.runFactor = moveDefault.runFactor+(move.height-moveDefault.height)*runFactorConst;
                 clientComp.character.saveComponent(move);
                 LocationComponent loc = client.getComponent(LocationComponent.class);
                 Vector3f currentPosition = loc.getWorldPosition();
