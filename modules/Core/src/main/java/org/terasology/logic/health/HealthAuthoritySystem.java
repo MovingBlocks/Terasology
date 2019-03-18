@@ -21,6 +21,7 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.audio.StaticSound;
@@ -44,8 +45,11 @@ import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
+
+import java.util.Optional;
 
 /**
  * This system reacts to OnDamageEvent events and lowers health on the HealthComponent.
@@ -231,9 +235,14 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     @ReceiveEvent(components = {HealthComponent.class})
     public void onLand(VerticalCollisionEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
+        CharacterMovementComponent move = entity.getComponent(CharacterMovementComponent.class);
+
+        Optional<Prefab> prefab = Assets.get(new ResourceUrn("engine:player"), Prefab.class);
+        CharacterMovementComponent moveDefault = prefab.get().getComponent(CharacterMovementComponent.class);
+
         float speed = Math.abs(event.getVelocity().y);
 
-        if (speed > health.fallingDamageSpeedThreshold) {
+        if (speed > health.fallingDamageSpeedThreshold*Math.max(move.height/moveDefault.height,1.0f)) {
             int damage = (int) ((speed - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
             if (damage > 0) {
                 checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, EntityRef.NULL);
