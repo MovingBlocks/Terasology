@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
@@ -87,10 +88,11 @@ public class StateLoading implements GameState {
 
     private LoadingScreen loadingScreen;
 
+    private Config config;
+
     private int progress;
     private int maxProgress;
 
-    private static final long chunkGenerationTimeout = 20000;
     private boolean chunkGenerationStarted;
     private long timeLastChunkGenerated;
 
@@ -117,6 +119,8 @@ public class StateLoading implements GameState {
     public void init(GameEngine engine) {
         this.context = engine.createChildContext();
         CoreRegistry.setContext(context);
+
+        config = context.get(Config.class);
 
         this.nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
@@ -270,8 +274,10 @@ public class StateLoading implements GameState {
 
             if (chunkGenerationStarted) {
                 long timeSinceLastChunk = time.getRealTimeInMs() - timeLastChunkGenerated;
+                long chunkGenerationTimeout = config.getSystem().getChunkGenerationFailTimeoutInMs();
                 if (timeSinceLastChunk > chunkGenerationTimeout) {
-                    gameEngine.changeState(new StateMainMenu("World generation timed out"));
+                    String errorMessage = "World generation timed out, check the log for more info";
+                    gameEngine.changeState(new StateMainMenu(errorMessage));
                 }
             }
         }
