@@ -24,7 +24,6 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
