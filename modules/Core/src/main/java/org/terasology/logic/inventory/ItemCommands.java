@@ -105,7 +105,7 @@ public class ItemCommands extends BaseComponentSystem {
             return builder.toString();
         }
 
-        // If no no matches are found for items, try blocks
+        // If no matches are found for items, try blocks
         String message = blockCommands.giveBlock(client, itemPrefabName, amount, shapeUriParam);
         if (message != null) {
             return message;
