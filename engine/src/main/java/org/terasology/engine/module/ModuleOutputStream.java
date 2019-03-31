@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,27 +18,27 @@ package org.terasology.engine.module;
 import org.terasology.module.sandbox.API;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
- * This class is a wrapper for {@link InputStream} which should be used by modules.
+ * This class is a wrapper for {@link OutputStream} which should be used by modules.
  * <p>
  * By using this class, the caller is not allowed to close the stream at all.
  * For security reasons, only {@link SandboxFileManager} have the permissions to close it,
  * since the caller may completely forget to do so.
  */
 @API
-public class ModuleInputStream extends InputStream {
+public class ModuleOutputStream extends OutputStream {
 
-    private InputStream inputStream;
+    private OutputStream outputStream;
 
-    public ModuleInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
+    public ModuleOutputStream(OutputStream outputStream) {
+        this.outputStream = outputStream;
     }
 
     @Override
-    public int read() throws IOException {
-        return inputStream.read();
+    public void write(int b) throws IOException {
+        outputStream.write(b);
     }
 
     @Override
