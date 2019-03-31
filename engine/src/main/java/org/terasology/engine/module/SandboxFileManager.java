@@ -122,7 +122,7 @@ public class SandboxFileManager {
                 // consumer to write the file
                 consumer.accept(moduleInputStream);
             } catch (IOException e) {
-                logger.error("Could not read the file: " + filename, e);
+                logger.error("Could not write the file: " + filename, e);
             }
 
             return null;

@@ -42,8 +42,43 @@ public class ModuleInputStream extends InputStream {
     }
 
     @Override
+    public int read(byte[] b) throws IOException {
+        return inputStream.read(b);
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        return inputStream.read(b, off, len);
+    }
+
+    @Override
+    public long skip(long n) throws IOException {
+        return inputStream.skip(n);
+    }
+
+    @Override
+    public int available() throws IOException {
+        return inputStream.available();
+    }
+
+    @Override
     public void close() throws IOException {
         throw new IOException("You must not close the stream. " +
                 "The SandboxFileManager will do it automatically.");
+    }
+
+    @Override
+    public synchronized void mark(int readLimit) {
+        inputStream.mark(readLimit);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+        inputStream.reset();
+    }
+
+    @Override
+    public boolean markSupported() {
+        return inputStream.markSupported();
     }
 }
