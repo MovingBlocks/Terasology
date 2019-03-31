@@ -18,8 +18,6 @@ package org.terasology.logic.inventory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -43,8 +41,6 @@ import java.util.Set;
 
 @RegisterSystem
 public class ItemCommands extends BaseComponentSystem {
-
-    Logger logger = LoggerFactory.getLogger(ItemCommands.class);
 
     @In
     private BlockCommands blockCommands;
@@ -121,7 +117,7 @@ public class ItemCommands extends BaseComponentSystem {
             helpText = "Removes the desired number of the given item with the given shape from your inventory",
             runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String take(
+    public String remove(
             @Sender EntityRef client,
             @CommandParam("prefabId") String itemPrefabName,
             @CommandParam(value = "amount", required = false) Integer amount) {
@@ -135,26 +131,38 @@ public class ItemCommands extends BaseComponentSystem {
 
         if (matches.size() == 1) {
             Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
+
             if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
                 EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+                List<EntityRef> itemsSlots = playerEntity.getComponent(InventoryComponent.class).itemSlots;
+                int removedItems = 0;
 
-                EntityRef item = entityManager.create(prefab);
+                for (EntityRef slot : itemsSlots) {
+                    Prefab currentPrefab = slot.getParentPrefab();
 
-                EntityRef result = inventoryManager.removeItem(playerEntity, playerEntity, item, false, 1);
-
-                if (result == null) {
-                    return "Could not remove "
-                            + (itemAmount > 1 ? itemAmount + " items of " : "an item of ")
-                            + prefab.getName();
+                    if (currentPrefab != null && currentPrefab.equals(prefab) && itemAmount > 0) {
+                        EntityRef result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
+                        itemAmount = itemAmount - 1;
+                        if (result == null) {
+                            return "Could not remove "
+                                    + prefab.getName();
+                        }
+                        if (result == EntityRef.NULL) {
+                            removedItems = removedItems + 1;
+                        }
+                    }
                 }
 
-                if (result == EntityRef.NULL) {
-                    return "Removed "
-                            + (itemAmount > 1 ? itemAmount + " items of " : "an item of ")
+                if (removedItems > 0) {
+                    return "You removed "
+                            + (removedItems > 1 ? removedItems + " items of " : "an item of ")
                             + prefab.getName();
+                } else {
+                    return "Could not find "
+                            + prefab.getName()
+                            + " in your inventory";
                 }
             }
-
         } else if (matches.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Requested item \"");
