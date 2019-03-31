@@ -21,10 +21,10 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.module.sandbox.API;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.OutputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.function.Consumer;
@@ -53,7 +53,7 @@ public class SandboxFileManager {
      * <ul>
      * <li>First of all, we need to create a file read consumer, for example:
      * <pre>{@code
-     * Consumer<ModuleInputStream> consumer = inputStream -> {
+     * Consumer<InputStream> consumer = inputStream -> {
      *      try {
      *          int value = inputStream.read();
      *
@@ -62,7 +62,7 @@ public class SandboxFileManager {
      *              value = inputStream.read();
      *          }
      *      } catch (IOException e) {
-     *          logger.error("Cannot read file.")
+     *          logger.error("Cannot read file.");
      *      }
      * };
      * }</pre></li>
@@ -73,7 +73,7 @@ public class SandboxFileManager {
      * @param filename Filename.
      * @param consumer Consumer to read the file.
      */
-    public void readFile(String filename, Consumer<ModuleInputStream> consumer) {
+    public void readFile(String filename, Consumer<InputStream> consumer) {
         String sandboxPath = pathManager.getSandboxPath(filename).toString();
 
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
@@ -91,38 +91,38 @@ public class SandboxFileManager {
     }
 
     /**
-     * Write a new file using the filename and data passed as parameter.
+     * Write a new file.
+     * <p>
+     * How to use:
+     * <ul>
+     * <li>First of all, we need to create a file writer consumer, for example:
+     * <pre>{@code
+     * Consumer<OutputStream> consumer = outputStream -> {
+     *      try {
+     *          outputStream.write(someBytes);
+     *      } catch (IOException e) {
+     *          logger.error("error", e);
+     *      }
+     * };
+     * }</pre></li>
+     * <li>Call {@code writeFile} passing in the filename and the consumer as parameter.</li>
+     * <li>When the execution is completed the {@code OutputStream} is automatically closed.</li>
+     * </ul>
      *
      * @param filename Filename.
-     * @param data The file's content.
+     * @param consumer Consumer to write the file.
      */
-    public void writeFile(String filename, byte[] data) {
-        Path sandboxPath = pathManager.getSandboxPath(filename);
+    public void writeFile(String filename, Consumer<OutputStream> consumer) {
+        String sandboxPath = pathManager.getSandboxPath(filename).toString();
 
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-            try {
-                Files.write(sandboxPath, data);
+            try (OutputStream outputStream = new FileOutputStream(sandboxPath)) {
+                ModuleOutputStream moduleInputStream = new ModuleOutputStream(outputStream);
+
+                // consumer to write the file
+                consumer.accept(moduleInputStream);
             } catch (IOException e) {
-                logger.error("Could not write the file: " + filename, e);
-            }
-
-            return null;
-        });
-    }
-
-    /**
-     * Delete the file that matches the passed filename.
-     *
-     * @param filename Filename.
-     */
-    public void deleteFile(String filename) {
-        Path sandboxPath = pathManager.getSandboxPath(filename);
-
-        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-            try {
-                Files.delete(sandboxPath);
-            } catch (IOException e) {
-                logger.error("Could not delete the file: " + filename, e);
+                logger.error("Could not read the file: " + filename, e);
             }
 
             return null;
