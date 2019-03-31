@@ -113,8 +113,8 @@ public class ItemCommands extends BaseComponentSystem {
         return "Could not find an item or block matching \"" + itemPrefabName + "\"";
     }
 
-    @Command(shortDescription = "Takes an item from your inventory",
-            helpText = "Removes the desired number of the given item with the given shape from your inventory",
+    @Command(shortDescription = "Removes an item from your inventory",
+            helpText = "Removes the desired number of the given item from your inventory",
             runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String remove(
@@ -124,7 +124,7 @@ public class ItemCommands extends BaseComponentSystem {
 
         int itemAmount = amount != null ? amount : 1;
         if (itemAmount < 1) {
-            return "Requested zero (0) items / blocks!";
+            return "Invalid amount of items!";
         }
 
         Set<ResourceUrn> matches = assetManager.resolve(itemPrefabName, Prefab.class);
