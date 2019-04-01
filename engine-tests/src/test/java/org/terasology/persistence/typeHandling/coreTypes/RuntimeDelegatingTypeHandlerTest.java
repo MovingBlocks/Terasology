@@ -24,7 +24,7 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
@@ -49,8 +49,8 @@ public class RuntimeDelegatingTypeHandlerTest {
 
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
 
-    private final TypeHandlerFactoryContext context =
-            new TypeHandlerFactoryContext(typeSerializationLibrary, getClass().getClassLoader());
+    private final TypeHandlerContext context =
+            new TypeHandlerContext(typeSerializationLibrary, getClass().getClassLoader());
 
     private static class Base {
         int x;

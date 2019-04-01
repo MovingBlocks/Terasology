@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.reflection.TypeInfo;
@@ -40,8 +40,8 @@ public class CollectionTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
     private final CollectionTypeHandlerFactory typeHandlerFactory = new CollectionTypeHandlerFactory(new ConstructorLibrary(Maps.newHashMap()));
 
-    private final TypeHandlerFactoryContext context =
-            new TypeHandlerFactoryContext(typeSerializationLibrary, getClass().getClassLoader());
+    private final TypeHandlerContext context =
+            new TypeHandlerContext(typeSerializationLibrary, getClass().getClassLoader());
 
     @Test
     public void testList() {

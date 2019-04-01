@@ -22,7 +22,7 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.utilities.ReflectionUtil;
@@ -51,7 +51,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     private TypeSerializationLibrary typeSerializationLibrary;
     private ClassLoader[] classLoaders;
 
-    public RuntimeDelegatingTypeHandler(TypeHandler<T> delegateHandler, TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
+    public RuntimeDelegatingTypeHandler(TypeHandler<T> delegateHandler, TypeInfo<T> typeInfo, TypeHandlerContext context) {
         this.delegateHandler = delegateHandler;
         this.typeInfo = typeInfo;
         this.typeSerializationLibrary = context.getTypeSerializationLibrary();

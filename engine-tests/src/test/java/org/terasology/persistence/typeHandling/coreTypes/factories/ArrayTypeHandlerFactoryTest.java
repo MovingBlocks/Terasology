@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import org.junit.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ArrayTypeHandler;
 import org.terasology.reflection.TypeInfo;
@@ -35,8 +35,8 @@ import static org.mockito.Mockito.verify;
 public class ArrayTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
     private final ArrayTypeHandlerFactory typeHandlerFactory = new ArrayTypeHandlerFactory();
-    private final TypeHandlerFactoryContext context =
-            new TypeHandlerFactoryContext(typeSerializationLibrary, getClass().getClassLoader());
+    private final TypeHandlerContext context =
+            new TypeHandlerContext(typeSerializationLibrary, getClass().getClassLoader());
 
     @Test
     public void testArray() {

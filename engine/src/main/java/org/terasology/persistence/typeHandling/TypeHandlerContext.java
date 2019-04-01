@@ -24,14 +24,14 @@ import java.util.Optional;
 /**
  * Represents the context in which a {@link TypeHandlerFactory} creates {@link TypeHandler} instances.
  * <p>
- * The {@link TypeHandlerFactoryContext} is used to look up {@link TypeHandler} instances and load classes
+ * The {@link TypeHandlerContext} is used to look up {@link TypeHandler} instances and load classes
  * while staying within the sandbox rules if called from a module.
  */
-public class TypeHandlerFactoryContext {
+public class TypeHandlerContext {
     private TypeSerializationLibrary typeSerializationLibrary;
     private ClassLoader[] classLoaders;
 
-    public TypeHandlerFactoryContext(TypeSerializationLibrary typeSerializationLibrary, Class<?>... classes) {
+    public TypeHandlerContext(TypeSerializationLibrary typeSerializationLibrary, Class<?>... classes) {
         this(
                 typeSerializationLibrary,
                 Arrays.stream(classes)
@@ -40,13 +40,13 @@ public class TypeHandlerFactoryContext {
         );
     }
 
-    public TypeHandlerFactoryContext(TypeSerializationLibrary typeSerializationLibrary, ClassLoader... classLoaders) {
+    public TypeHandlerContext(TypeSerializationLibrary typeSerializationLibrary, ClassLoader... classLoaders) {
         this.typeSerializationLibrary = typeSerializationLibrary;
         this.classLoaders = classLoaders;
     }
 
     /**
-     * Returns the {@link TypeSerializationLibrary} that called the {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerFactoryContext)} method.
+     * Returns the {@link TypeSerializationLibrary} that called the {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerContext)} method.
      */
     public TypeSerializationLibrary getTypeSerializationLibrary() {
         return typeSerializationLibrary;
@@ -54,7 +54,7 @@ public class TypeHandlerFactoryContext {
 
     /**
      * Returns the {@link ClassLoader}s to use to load classes in the
-     * {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerFactoryContext)} method.
+     * {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerContext)} method.
      * <p>
      * If classes are loaded manually using a method like {@link Class#forName(String)}, these
      * {@link ClassLoader}s must be used so that modules remain sandboxed.

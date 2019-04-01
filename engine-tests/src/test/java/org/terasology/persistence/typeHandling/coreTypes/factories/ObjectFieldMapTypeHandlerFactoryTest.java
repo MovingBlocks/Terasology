@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
@@ -40,8 +40,8 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
     private final ObjectFieldMapTypeHandlerFactory typeHandlerFactory = new ObjectFieldMapTypeHandlerFactory(
             constructorLibrary);
 
-    private final TypeHandlerFactoryContext context =
-            new TypeHandlerFactoryContext(typeSerializationLibrary, getClass().getClassLoader());
+    private final TypeHandlerContext context =
+            new TypeHandlerContext(typeSerializationLibrary, getClass().getClassLoader());
 
     private static class SomeClass<T> {
         private T t;

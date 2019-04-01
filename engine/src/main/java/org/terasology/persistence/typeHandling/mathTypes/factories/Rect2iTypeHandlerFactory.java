@@ -21,7 +21,7 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.mathTypes.Rect2iTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
@@ -31,7 +31,7 @@ public class Rect2iTypeHandlerFactory implements TypeHandlerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(Rect2iTypeHandlerFactory.class);
 
     @Override
-    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
+    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerContext context) {
         if (!typeInfo.equals(TypeInfo.of(Rect2i.class))) {
             return Optional.empty();
         }

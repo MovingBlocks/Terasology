@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
@@ -34,7 +34,7 @@ public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
+    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerContext context) {
         if (!Map.class.isAssignableFrom(typeInfo.getRawType())) {
             return Optional.empty();
         }

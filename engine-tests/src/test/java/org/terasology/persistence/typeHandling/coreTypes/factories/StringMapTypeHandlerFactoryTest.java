@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
@@ -37,8 +37,8 @@ public class StringMapTypeHandlerFactoryTest {
     private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
     private final StringMapTypeHandlerFactory typeHandlerFactory = new StringMapTypeHandlerFactory();
 
-    private final TypeHandlerFactoryContext context =
-            new TypeHandlerFactoryContext(typeSerializationLibrary, getClass().getClassLoader());
+    private final TypeHandlerContext context =
+            new TypeHandlerContext(typeSerializationLibrary, getClass().getClassLoader());
 
     @Test
     public void testStringMap() {

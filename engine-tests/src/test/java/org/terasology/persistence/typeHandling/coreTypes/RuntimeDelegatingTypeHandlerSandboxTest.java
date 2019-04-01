@@ -32,7 +32,7 @@ import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.inMemory.PersistedInteger;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
@@ -127,7 +127,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
 
     @Test
     public void testAccessModuleClassFromEngine() {
-        TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(typeSerializationLibrary,
+        TypeHandlerContext context = new TypeHandlerContext(typeSerializationLibrary,
                 ReflectionUtil.getComprehensiveEngineClassLoaders(moduleEnvironment));
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(AutoCloseable.class), context);
@@ -149,7 +149,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
 
     @Test
     public void testCannotAccessModuleClassFromEngineWithoutClassLoader() {
-        TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(typeSerializationLibrary,
+        TypeHandlerContext context = new TypeHandlerContext(typeSerializationLibrary,
                 ReflectionUtil.class.getClassLoader());
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(AutoCloseable.class), context);
@@ -180,7 +180,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
     }
 
     private void testCanAccessClassFromModule(Class<?> testClass, TypeHandler testClassHandlerMock) {
-        TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(typeSerializationLibrary,
+        TypeHandlerContext context = new TypeHandlerContext(typeSerializationLibrary,
                 moduleClass);
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(Object.class), context);
@@ -202,7 +202,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
 
     @Test
     public void testCannotAccessNonApiClassFromModule() {
-        TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(typeSerializationLibrary,
+        TypeHandlerContext context = new TypeHandlerContext(typeSerializationLibrary,
                 moduleClass);
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(Object.class), context);

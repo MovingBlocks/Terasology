@@ -40,5 +40,5 @@ public interface TypeHandlerFactory {
      * @return An {@link Optional} wrapping the created {@link TypeHandler}, or {@link Optional#empty()}
      * if the type is not supported by this {@link TypeHandlerFactory}.
      */
-    <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context);
+    <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerContext context);
 }

@@ -208,7 +208,7 @@ public class TypeSerializationLibrary {
         TypeHandlerFactory factory = new TypeHandlerFactory() {
             @SuppressWarnings("unchecked")
             @Override
-            public <R> Optional<TypeHandler<R>> create(TypeInfo<R> typeInfo, TypeHandlerFactoryContext context) {
+            public <R> Optional<TypeHandler<R>> create(TypeInfo<R> typeInfo, TypeHandlerContext context) {
                 return typeInfo.equals(type) ? Optional.of((TypeHandler<R>) typeHandler) : Optional.empty();
             }
         };
@@ -257,7 +257,7 @@ public class TypeSerializationLibrary {
 
     @SuppressWarnings("unchecked")
     public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type, ClassLoader... contextClassLoaders) {
-        TypeHandlerFactoryContext context = new TypeHandlerFactoryContext(this, contextClassLoaders);
+        TypeHandlerContext context = new TypeHandlerContext(this, contextClassLoaders);
 
         if (typeHandlerCache.containsKey(type)) {
             return Optional.of((TypeHandler<T>) typeHandlerCache.get(type));

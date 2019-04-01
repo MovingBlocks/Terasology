@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.coreTypes.ArrayTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.reflection.TypeInfo;
@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 public class ArrayTypeHandlerFactory implements TypeHandlerFactory {
     @Override
-    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
+    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerContext context) {
         Type type = typeInfo.getType();
 
         if (!(type instanceof GenericArrayType || type instanceof Class && ((Class<?>) type).isArray())) {

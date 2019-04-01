@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeHandlerFactoryContext;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.reflection.TypeInfo;
@@ -43,7 +43,7 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
     }
 
     @Override
-    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerFactoryContext context) {
+    public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerContext context) {
         Class<? super T> typeClass = typeInfo.getRawType();
 
         if (!Modifier.isAbstract(typeClass.getModifiers())
