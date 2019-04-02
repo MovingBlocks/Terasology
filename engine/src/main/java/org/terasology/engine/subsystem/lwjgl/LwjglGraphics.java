@@ -177,6 +177,10 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         if (Display.isCreated() && !Display.isFullscreen() && Display.isVisible()) {
             config.setWindowPosX(Display.getX());
             config.setWindowPosY(Display.getY());
+
+            config.setWindowWidth(Display.getWidth());
+            config.setWindowHeight(Display.getHeight());
+
         }
     }
 
