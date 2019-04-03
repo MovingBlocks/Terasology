@@ -89,7 +89,7 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine1.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    //Memory stats without using Runtime.getRuntime()
+                    //Memory stats without using Runtime.getRuntime() for client side
                     String memHeap="";
                     for (MemoryPoolMXBean mpBean: ManagementFactory.getMemoryPoolMXBeans()) {
                         if (mpBean.getType() == MemoryType.HEAP) {
