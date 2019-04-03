@@ -96,6 +96,7 @@ public class DebugOverlay extends CoreScreenLayer {
                         }
                     }
                     double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
+                    //showing server, client stats organized way.
                     return String.format("[Server] Memory Usage: %.2f MB, Total Memory: %.2f MB, Max Memory: %.2f MB\n[Client] FPS: %.2f %s",
                             memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0, time.getFps(), memHeap);
                 }
