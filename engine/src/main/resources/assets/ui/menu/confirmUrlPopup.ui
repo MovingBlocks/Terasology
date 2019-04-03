@@ -1,0 +1,107 @@
+{
+    "type": "confirmUrlPopup",
+    "skin": "messageBox",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIBox",
+                "layoutInfo": {
+                    "width": 500,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                },
+                "content": {
+                    "type": "ColumnLayout",
+                    "columns": 1,
+                    "verticalSpacing": 8,
+                    "contents": [
+                        {
+                            "type": "UILabel",
+                            "id": "title",
+                            "family": "title"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
+                            "id": "message"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type":"ColumnLayout",
+                            "columns":2,
+                            "column-widths":[0.1,0.90],
+                            "contents": [
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "saveUrl",
+                                    "family": "option-grid"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "Always accept this URL",
+                                    "id": "alwaysAccept"
+                                },
+                            ]
+                        },
+                        {
+                            "type":"ColumnLayout",
+                            "columns":2,
+                            "column-widths":[0.1,0.90],
+                            "contents": [
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "saveHostName",
+                                    "family": "option-grid"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "Always accept URLs to this website",
+                                    "id": "alwaysAccept"
+                                },
+                            ]
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 4,
+                            "contents": [
+                                {
+                                    "type": "UIButton",
+                                    "id": "leftButton"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "id": "rightButton"
+                                }
+                            ],
+                            "layoutInfo": {
+                                "width": 200,
+                                "position-right": {}
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

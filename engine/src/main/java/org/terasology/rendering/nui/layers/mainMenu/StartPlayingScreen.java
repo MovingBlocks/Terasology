@@ -25,19 +25,20 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
-import org.terasology.module.ResolutionResult;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
+
+import java.util.List;
 
 public class StartPlayingScreen extends CoreScreenLayer {
 
@@ -56,62 +57,78 @@ public class StartPlayingScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
 
     private Texture texture;
-    private WorldSetupWrapper world;
+    private List<WorldSetupWrapper> worldSetupWrappers;
     private UniverseWrapper universeWrapper;
+    private WorldSetupWrapper targetWorld;
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
         );
 
         WidgetUtil.trySubscribe(this, "play", button -> {
-            GameManifest gameManifest = new GameManifest();
+            universeWrapper.setTargetWorld(targetWorld);
+            final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
+            if (gameManifest != null) {
+                gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            } else {
+                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
+            }
 
-            gameManifest.setTitle(universeWrapper.getGameName());
 
-            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-            ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
-            if (!result.isSuccess()) {
-                MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                if (errorMessagePopup != null) {
-                    errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
+            SimpleUri uri;
+            WorldInfo worldInfo;
+            //gameManifest.addWorld(worldInfo);
+            int i = 0;
+            for (WorldSetupWrapper world : worldSetupWrappers) {
+                if (world != targetWorld) {
+                    i++;
+                    uri = world.getWorldGeneratorInfo().getUri();
+                    worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD + i, world.getWorldName().toString(), world.getWorldGenerator().getWorldSeed(),
+                            (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
+                    gameManifest.addWorld(worldInfo);
+                    config.getUniverseConfig().addWorldManager(worldInfo);
                 }
-                return;
-            }
-            for (Module module : result.getModules()) {
-                gameManifest.addModule(module.getId(), module.getVersion());
+
             }
 
-            SimpleUri uri = world.getWorldGeneratorInfo().getUri();
-            // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
-            final float timeOffset = 0.50f;
-            WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, world.getWorldGenerator().getWorldSeed(),
-                    (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
-            gameManifest.addWorld(worldInfo);
             gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+        });
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
         });
     }
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         UIImage previewImage = find("preview", UIImage.class);
         previewImage.setImage(texture);
 
         UILabel subitle = find("subtitle", UILabel.class);
-        subitle.setText(translationSystem.translate("${engine:menu#start-playing}") + " in " + world.getWorldName().toString());
+        subitle.setText(translationSystem.translate("${engine:menu#start-playing}") + " in " + targetWorld.getWorldName().toString());
     }
 
     /**
      * This method is called before the screen comes to the forefront to set the world
      * in which the player is about to spawn.
-     * @param targetWorld The world in which the player is going to spawn.
+     * @param worldSetupWrapperList The world in which the player is going to spawn.
      * @param targetWorldTexture The world texture generated in {@link WorldPreGenerationScreen} to be displayed on this screen.
      */
-    public void setTargetWorld(WorldSetupWrapper targetWorld, Texture targetWorldTexture, Context context) {
+    public void setTargetWorld(List<WorldSetupWrapper> worldSetupWrapperList, WorldSetupWrapper spawnWorld, Texture targetWorldTexture, Context context) {
         texture = targetWorldTexture;
-        world = targetWorld;
+        worldSetupWrappers = worldSetupWrapperList;
         universeWrapper = context.get(UniverseWrapper.class);
+        targetWorld = spawnWorld;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

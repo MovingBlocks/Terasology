@@ -56,15 +56,14 @@ public final class HTMLLikeParser {
         int i = 0;
         while (i < chars.length) {
             char c = chars[i];
-            i++;
             if (c == '&') {
-                if (chars[i + 1] == 'a' && chars[i + 2] == 'm' && chars[i + 3] == 'p' && chars[i + 4] == ';') {
+                if (i + 4 < chars.length && chars[i + 1] == 'a' && chars[i + 2] == 'm' && chars[i + 3] == 'p' && chars[i + 4] == ';') {
                     result.append('&');
                     i += 4;
-                } else if (chars[i + 1] == 'l' && chars[i + 2] == 't' && chars[i + 3] == ';') {
+                } else if (i + 3 < chars.length && chars[i + 1] == 'l' && chars[i + 2] == 't' && chars[i + 3] == ';') {
                     result.append('<');
                     i += 3;
-                } else if (chars[i + 1] == 'g' && chars[i + 3] == 't' && chars[i + 3] == ';') {
+                } else if (i + 3 < chars.length && chars[i + 1] == 'g' && chars[i + 2] == 't' && chars[i + 3] == ';') {
                     result.append('>');
                     i += 3;
                 } else {
@@ -73,6 +72,8 @@ public final class HTMLLikeParser {
             } else {
                 result.append(c);
             }
+
+            i++;
         }
         return result.toString();
     }

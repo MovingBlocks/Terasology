@@ -68,7 +68,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
             Mouse.create();
             InputSystem inputSystem = new InputSystem();
             context.put(InputSystem.class, inputSystem);
-            inputSystem.setMouseDevice(new LwjglMouseDevice());
+            inputSystem.setMouseDevice(new LwjglMouseDevice(context));
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
 
             ControllerConfig controllerConfig = context.get(Config.class).getInput().getControllers();

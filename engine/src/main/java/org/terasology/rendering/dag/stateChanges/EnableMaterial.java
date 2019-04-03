@@ -84,6 +84,11 @@ public final class EnableMaterial implements StateChange {
         }
 
         @Override
+        public int hashCode() {
+            return DisableMaterial.class.hashCode();
+        }
+
+        @Override
         public String toString() {
             return String.format("%30s", this.getClass().getSimpleName());
         }

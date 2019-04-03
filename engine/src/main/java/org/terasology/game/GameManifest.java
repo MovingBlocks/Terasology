@@ -109,6 +109,10 @@ public class GameManifest {
         return worlds.get(name);
     }
 
+    public Map<String, WorldInfo> getWorldInfoMap() {
+        return worlds;
+    }
+
     public void addWorld(WorldInfo worldInfo) {
         this.worlds.put(worldInfo.getTitle(), worldInfo);
     }
@@ -154,4 +158,5 @@ public class GameManifest {
     public void addModule(Name id, Version version) {
         modules.add(new NameVersion(id, version));
     }
+
 }

@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
@@ -36,12 +37,14 @@ import org.terasology.engine.modes.loadProcesses.InitialiseComponentSystemManage
 import org.terasology.engine.modes.loadProcesses.InitialiseEntitySystem;
 import org.terasology.engine.modes.loadProcesses.InitialiseGraphics;
 import org.terasology.engine.modes.loadProcesses.InitialisePhysics;
+import org.terasology.engine.modes.loadProcesses.InitialiseRecordAndReplay;
 import org.terasology.engine.modes.loadProcesses.InitialiseRemoteWorld;
 import org.terasology.engine.modes.loadProcesses.InitialiseSystems;
 import org.terasology.engine.modes.loadProcesses.InitialiseWorld;
 import org.terasology.engine.modes.loadProcesses.InitialiseWorldGenerator;
 import org.terasology.engine.modes.loadProcesses.JoinServer;
 import org.terasology.engine.modes.loadProcesses.LoadEntities;
+import org.terasology.engine.modes.loadProcesses.LoadExtraBlockData;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.modes.loadProcesses.PostBeginSystems;
 import org.terasology.engine.modes.loadProcesses.PreBeginSystems;
@@ -56,6 +59,7 @@ import org.terasology.engine.modes.loadProcesses.RegisterSystems;
 import org.terasology.engine.modes.loadProcesses.SetupLocalPlayer;
 import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
 import org.terasology.engine.modes.loadProcesses.StartServer;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
@@ -65,6 +69,7 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
+import org.terasology.world.chunks.event.OnChunkLoaded;
 
 import java.util.Queue;
 
@@ -83,8 +88,13 @@ public class StateLoading implements GameState {
 
     private LoadingScreen loadingScreen;
 
+    private Config config;
+
     private int progress;
     private int maxProgress;
+
+    private boolean chunkGenerationStarted;
+    private long timeLastChunkGenerated;
 
     /**
      * Constructor for server or single player games
@@ -109,6 +119,8 @@ public class StateLoading implements GameState {
     public void init(GameEngine engine) {
         this.context = engine.createChildContext();
         CoreRegistry.setContext(context);
+
+        config = context.get(Config.class);
 
         this.nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
@@ -136,6 +148,8 @@ public class StateLoading implements GameState {
         popStep();
         loadingScreen = nuiManager.pushScreen("engine:loadingScreen", LoadingScreen.class);
         loadingScreen.updateStatus(current.getMessage(), current.getProgress());
+
+        chunkGenerationStarted = false;
     }
 
     private void initClient() {
@@ -148,6 +162,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new CacheBlocks(context));
         loadProcesses.add(new LoadPrefabs(context));
         loadProcesses.add(new ProcessBlockPrefabs(context));
+        loadProcesses.add(new LoadExtraBlockData(context));
         loadProcesses.add(new InitialiseComponentSystemManager(context));
         loadProcesses.add(new RegisterInputSystem(context));
         loadProcesses.add(new RegisterSystems(context, netMode));
@@ -178,6 +193,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterInputSystem(context));
         loadProcesses.add(new RegisterSystems(context, netMode));
         loadProcesses.add(new InitialiseCommandSystem(context));
+        loadProcesses.add(new LoadExtraBlockData(context));
         loadProcesses.add(new InitialiseWorld(gameManifest, context));
         loadProcesses.add(new RegisterBlockFamilies(context));
         loadProcesses.add(new EnsureSaveGameConsistency(context));
@@ -186,8 +202,9 @@ public class StateLoading implements GameState {
         loadProcesses.add(new PreBeginSystems(context));
         loadProcesses.add(new LoadEntities(context));
         loadProcesses.add(new InitialiseBlockTypeEntities(context));
-        loadProcesses.add(new CreateWorldEntity(context));
+        loadProcesses.add(new CreateWorldEntity(context, gameManifest));
         loadProcesses.add(new InitialiseWorldGenerator(context));
+        loadProcesses.add(new InitialiseRecordAndReplay(context));
         if (netMode.isServer()) {
             boolean dedicated;
             if (netMode == NetworkMode.DEDICATED_SERVER) {
@@ -247,6 +264,22 @@ public class StateLoading implements GameState {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
             loadingScreen.updateStatus(current.getMessage(), progressValue);
             nuiManager.update(delta);
+
+            // chunk generation begins at the AwaitCharacterSpawn step
+            if (current instanceof AwaitCharacterSpawn && !chunkGenerationStarted) {
+                chunkGenerationStarted = true;
+                // in case no chunks generate, this should be set for a basis
+                timeLastChunkGenerated = time.getRealTimeInMs();
+            }
+
+            if (chunkGenerationStarted) {
+                long timeSinceLastChunk = time.getRealTimeInMs() - timeLastChunkGenerated;
+                long chunkGenerationTimeout = config.getSystem().getChunkGenerationFailTimeoutInMs();
+                if (timeSinceLastChunk > chunkGenerationTimeout) {
+                    String errorMessage = "World generation timed out, check the log for more info";
+                    gameEngine.changeState(new StateMainMenu(errorMessage));
+                }
+            }
         }
     }
 
@@ -268,5 +301,11 @@ public class StateLoading implements GameState {
     @Override
     public Context getContext() {
         return context;
+    }
+
+    @Override
+    public void onChunkLoaded(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
+        EngineTime time = (EngineTime) context.get(Time.class);
+        timeLastChunkGenerated = time.getRealTimeInMs();
     }
 }

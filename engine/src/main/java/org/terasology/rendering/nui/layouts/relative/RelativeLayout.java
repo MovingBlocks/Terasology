@@ -194,7 +194,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
                     Rect2i region = getRegion(target, canvas);
                     loopDetectionId = "";
                     return region;
-                } catch (StackOverflowError e){
+                } catch (StackOverflowError e) {
                     logger.error("Stack Overflow detected resolving layout of element {}, unable to render", loopDetectionId);
                 }
             }

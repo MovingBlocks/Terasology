@@ -22,7 +22,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 
 import java.util.Collection;
@@ -143,26 +142,6 @@ public interface WorldProviderCore {
     Biome getBiome(Vector3i pos);
 
     /**
-     * @param x
-     * @param y
-     * @param z
-     * @param newData
-     * @param oldData
-     * @return Whether the liquid change was made successfully. Will fail if the current data doesn't match the oldData, or if the underlying chunk is not available
-     */
-    boolean setLiquid(int x, int y, int z, LiquidData newData, LiquidData oldData);
-
-    /**
-     * Returns the liquid state at the given position.
-     *
-     * @param x The X-coordinate
-     * @param y The Y-coordinate
-     * @param z The Z-coordinate
-     * @return The liquid data of the block
-     */
-    LiquidData getLiquid(int x, int y, int z);
-
-    /**
      * Returns the block at the given position.
      *
      * @param x The X-coordinate
@@ -193,6 +172,27 @@ public interface WorldProviderCore {
     byte getSunlight(int x, int y, int z);
 
     byte getTotalLight(int x, int y, int z);
+    
+    /**
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
+     *
+     * @param index The index of the extra data field
+     * @param x
+     * @param y
+     * @param z
+     * @return The (index)th extra-data value at the given position
+     */
+    int getExtraData(int index, int x, int y, int z);
+    
+    /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param index The index of the extra data field
+     * @param pos
+     * @param value
+     * @return The replaced value
+     */
+    int setExtraData(int index, Vector3i pos, int value);
 
     /**
      * Disposes this world provider.

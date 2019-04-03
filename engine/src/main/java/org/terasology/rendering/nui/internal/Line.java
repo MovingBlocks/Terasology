@@ -77,9 +77,9 @@ public final class Line {
             t = 0.05f;
             r = 0.48f + 0.32f * f;
             if (!alphaBlend) {
-                cRed += 0.88 * (1 - f);
-                cGreen += 0.88 * (1 - f);
-                cBlue += 0.88 * (1 - f);
+                cRed += 0.88f * (1 - f);
+                cGreen += 0.88f * (1 - f);
+                cBlue += 0.88f * (1 - f);
                 if (cRed > 1.0f) {
                     cRed = 1.0f;
                 }
@@ -177,7 +177,7 @@ public final class Line {
             } else { //calculate to exact
                 dx = y1 - y2;
                 dy = x2 - x1;
-                float len = (float) Math.sqrt(dx * dx + dy * dy);
+                float len = (float) Math.sqrt((double) dx * dx + (double) dy * dy);
                 dx /= len;
                 dy /= len;
                 cx = -0.6f * dy;

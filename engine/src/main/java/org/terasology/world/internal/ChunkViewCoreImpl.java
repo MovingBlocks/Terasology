@@ -27,7 +27,6 @@ import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.liquid.LiquidData;
 
 /**
  */
@@ -180,36 +179,6 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public LiquidData getLiquid(Vector3i pos) {
-        return getLiquid(pos.x, pos.y, pos.z);
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        if (!blockRegion.encompasses(x, y, z)) {
-            return new LiquidData();
-        }
-
-        int chunkIndex = relChunkIndex(x, y, z);
-        return chunks[chunkIndex].getLiquid(ChunkMath.calcBlockPos(x, y, z, chunkFilterSize));
-    }
-
-    @Override
-    public void setLiquid(Vector3i pos, LiquidData newState) {
-        setLiquid(pos.x, pos.y, pos.z, newState);
-    }
-
-    @Override
-    public void setLiquid(int x, int y, int z, LiquidData newState) {
-        if (blockRegion.encompasses(x, y, z)) {
-            int chunkIndex = relChunkIndex(x, y, z);
-            chunks[chunkIndex].setLiquid(ChunkMath.calcBlockPos(x, y, z, chunkFilterSize), newState);
-        } else {
-            throw new IllegalStateException("Attempted to modify liquid data though an unlocked view");
-        }
-    }
-
-    @Override
     public void setLight(Vector3i pos, byte light) {
         setLight(pos.x, pos.y, pos.z, light);
     }
@@ -236,6 +205,36 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
             chunks[chunkIndex].setSunlight(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
         } else {
             throw new IllegalStateException("Attempted to modify sunlight though an unlocked view");
+        }
+    }
+
+    @Override
+    public int getExtraData(int index, Vector3i pos) {
+        return getExtraData(index, pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public int getExtraData(int index, int blockX, int blockY, int blockZ) {
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return 0;
+        }
+
+        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+        return chunks[chunkIndex].getExtraData(index, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
+    }
+
+    @Override
+    public void setExtraData(int index, Vector3i pos, int value) {
+        setExtraData(index, pos.x, pos.y, pos.z, value);
+    }
+
+    @Override
+    public void setExtraData(int index, int blockX, int blockY, int blockZ, int value) {
+        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
+            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+            chunks[chunkIndex].setExtraData(index, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), value);
+        } else {
+            throw new IllegalStateException("Attempted to modify extra data though an unlocked view");
         }
     }
 

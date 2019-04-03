@@ -25,6 +25,7 @@ import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
@@ -36,17 +37,19 @@ public final class ChunkSerializer {
     private ChunkSerializer() {
     }
 
-    public static EntityData.ChunkStore.Builder encode(Vector3i pos, TeraArray blockData, TeraArray liquidData, TeraArray biomeData) {
+    public static EntityData.ChunkStore.Builder encode(Vector3i pos, TeraArray blockData, TeraArray biomeData, TeraArray[] extraData) {
         final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
                 .setX(pos.x).setY(pos.y).setZ(pos.z);
         b.setBlockData(runLengthEncode16(blockData));
-        b.setLiquidData(runLengthEncode8(liquidData));
         b.setBiomeData(runLengthEncode16(biomeData));
+        for (int i = 0; i < extraData.length; i++) {
+            b.addExtraData(runLengthEncode16(extraData[i]));
+        }
 
         return b;
     }
 
-    public static Chunk decode(EntityData.ChunkStore message, BlockManager blockManager, BiomeManager biomeManager) {
+    public static Chunk decode(EntityData.ChunkStore message, BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
         Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
         if (!message.hasX() || !message.hasY() || !message.hasZ()) {
             throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk position.");
@@ -55,14 +58,14 @@ public final class ChunkSerializer {
         if (!message.hasBlockData()) {
             throw new IllegalArgumentException("Ill-formed protobuf message. Missing block data.");
         }
-        if (!message.hasLiquidData()) {
-            throw new IllegalArgumentException("Ill-formed protobuf message. Missing liquid data.");
-        }
 
         final TeraArray blockData = runLengthDecode(message.getBlockData());
-        final TeraArray liquidData = runLengthDecode(message.getLiquidData());
         final TeraArray biomeData = runLengthDecode(message.getBiomeData());
-        return new ChunkImpl(pos, blockData, liquidData, biomeData, blockManager, biomeManager);
+        final TeraArray[] extraData = extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+        for (int i = 0; i < extraData.length; i++) {
+            runLengthDecode(message.getExtraData(i), extraData[i]);
+        }
+        return new ChunkImpl(pos, blockData, biomeData, extraData, blockManager, biomeManager);
     }
 
     private static EntityData.RunLengthEncoding16 runLengthEncode16(TeraArray array) {
@@ -146,5 +149,32 @@ public final class ChunkSerializer {
             }
         }
         return new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z, decodedData);
+    }
+    
+    /**
+     * Decode compressed data into an existing TeraArray.
+     * Generic w.r.t. TeraArray subclasses, allowing the data to be used for any type of TeraArray.
+     */
+    private static void runLengthDecode(EntityData.RunLengthEncoding16 data, TeraArray array) {
+        int index = 0;
+        int count = 0;
+        int value = 0;
+        outer:
+        for (int y = 0; y < array.getSizeY(); ++y) {
+            for (int z = 0; z < array.getSizeZ(); ++z) {
+                for (int x = 0; x < array.getSizeX(); ++x) {
+                    if (count == 0) {
+                        if (index >= data.getRunLengthsCount()) {
+                            break outer;
+                        }
+                        count = data.getRunLengths(index);
+                        value = data.getValues(index);
+                        index++;
+                    }
+                    count--;
+                    array.set(x, y, z, value);
+                }
+            }
+        }
     }
 }

@@ -120,12 +120,12 @@ public abstract class Camera {
             return;
         }
         if (activeFov < targetFov) {
-            activeFov += 50.0 * delta;
+            activeFov += 50.0f * delta;
             if (activeFov >= targetFov) {
                 activeFov = targetFov;
             }
         } else if (activeFov > targetFov) {
-            activeFov -= 50.0 * delta;
+            activeFov -= 50.0f * delta;
             if (activeFov <= targetFov) {
                 activeFov = targetFov;
             }

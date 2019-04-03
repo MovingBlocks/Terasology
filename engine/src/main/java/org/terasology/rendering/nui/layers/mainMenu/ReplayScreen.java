@@ -23,18 +23,19 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
 
 import java.nio.file.Path;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Screen for the replay menu.
@@ -47,59 +48,82 @@ public class ReplayScreen extends SelectionScreen {
 
     private RecordAndReplayUtils recordAndReplayUtils;
 
+    // widgets
+    private UIButton load;
+    private UIButton delete;
+    private UIButton close;
+
+    @In
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
-        final UILabel saveGamePath = find("saveGamePath", UILabel.class);
-        if (saveGamePath != null) {
-            Path recordingPath = PathManager.getInstance().getRecordingsPath();
-            saveGamePath.setText(
-                    translationSystem.translate("${engine:menu#save-game-path} ") +
-                            recordingPath.toAbsolutePath().toString()); //save path
+        initWidgets();
+
+        if (isValidScreen()) {
+
+            initSaveGamePathWidget(PathManager.getInstance().getRecordingsPath());
+
+            getGameInfos().subscribeSelection((widget, item) -> {
+                load.setEnabled(item != null);
+                delete.setEnabled(item != null);
+                updateDescription(item);
+            });
+
+            getGameInfos().subscribe((widget, item) -> loadGame(item));
+
+            load.subscribe(e -> {
+                GameInfo gameInfo = getGameInfos().getSelection();
+                if (gameInfo != null) {
+                    loadGame(gameInfo);
+                }
+            });
+
+            delete.subscribe(button -> {
+                TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
+                confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup-title}"),
+                        translationSystem.translate("${engine:menu#remove-confirmation-popup-message}"));
+                confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::removeSelectedReplay);
+                confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
+            });
+
+            close.subscribe(button -> {
+                recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                triggerBackAnimation();
+            });
         }
-
-        final UIList<GameInfo> gameList = find("gameList", UIList.class);
-
-        refreshList(gameList);
-
-        gameList.subscribeSelection((widget, item) -> {
-            find("load", UIButton.class).setEnabled(item != null);
-            find("delete", UIButton.class).setEnabled(item != null);
-            updateDescription(item);
-        });
-
-        super.startWorldGeneratorAndModuleNames();
-
-        gameList.select(0);
-        gameList.subscribe((widget, item) -> loadGame(item));
-
-        WidgetUtil.trySubscribe(this, "load", button -> {
-            GameInfo gameInfo = gameList.getSelection();
-            if (gameInfo != null) {
-                loadGame(gameInfo);
-            }
-        });
-
-        WidgetUtil.trySubscribe(this, "delete", button -> {
-            TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
-            confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup-title}"),
-                    translationSystem.translate("${engine:menu#remove-confirmation-popup-message}"));
-            confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), () -> removeSelectedReplay(gameList));
-            confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
-        });
-
-        WidgetUtil.trySubscribe(this, "close", button -> {
-            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
-            triggerBackAnimation();
-        });
     }
 
-    private void removeSelectedReplay(final UIList<GameInfo> gameList) {
-        Path world = PathManager.getInstance().getRecordingPath(gameList.getSelection().getManifest().getTitle());
-        super.remove(gameList, world, REMOVE_STRING);
+    @Override
+    public void onOpened() {
+        super.onOpened();
+
+        if (isValidScreen()) {
+            refreshGameInfoList(GameProvider.getSavedRecordings());
+        } else {
+            final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.subscribeButton(e -> triggerBackAnimation());
+            getManager().pushScreen(popup);
+            // disable child widgets
+            setEnabled(false);
+        }
     }
 
+    @Override
+    protected void initWidgets() {
+        super.initWidgets();
+        load = find("load", UIButton.class);
+        delete = find("delete", UIButton.class);
+        close = find("close", UIButton.class);
+    }
+
+    private void removeSelectedReplay() {
+        final Path world = PathManager.getInstance().getRecordingPath(getGameInfos().getSelection().getManifest().getTitle());
+        remove(getGameInfos(), world, REMOVE_STRING);
+    }
 
     private void loadGame(GameInfo item) {
         try {
@@ -114,11 +138,23 @@ public class ReplayScreen extends SelectionScreen {
         }
     }
 
-    private void refreshList(UIList<GameInfo> gameList) {
-        gameList.setList(GameProvider.getSavedRecordings());
-    }
-
     void setRecordAndReplayUtils(RecordAndReplayUtils recordAndReplayUtils) {
         this.recordAndReplayUtils = recordAndReplayUtils;
+    }
+
+    @Override
+    protected boolean isValidScreen() {
+        if (Stream.of(load, delete, close)
+                .anyMatch(Objects::isNull) ||
+                !super.isValidScreen()) {
+            logger.error("Can't initialize screen correctly. At least one widget was missed!");
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

@@ -39,6 +39,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.subsystem.openvr.OpenVRInput;
+import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
@@ -101,6 +102,7 @@ public final class Terasology {
     private static final String LOAD_LAST_GAME = "-loadlastgame";
     private static final String NO_CRASH_REPORT = "-noCrashReport";
     private static final String NO_SAVE_GAMES = "-noSaveGames";
+    private static final String PERMISSIVE_SECURITY = "-permissiveSecurity";
     private static final String NO_SOUND = "-noSound";
     private static final String NO_SPLASH = "-noSplash";
     private static final String SERVER_PORT = "-serverPort=";
@@ -251,6 +253,7 @@ public final class Terasology {
                 LOAD_LAST_GAME,
                 NO_CRASH_REPORT,
                 NO_SAVE_GAMES,
+                PERMISSIVE_SECURITY,
                 NO_SOUND,
                 NO_SPLASH,
                 OVERRIDE_DEFAULT_CONFIG + "<path>",
@@ -330,6 +333,8 @@ public final class Terasology {
                 splashEnabled = false;
             } else if (arg.equals(NO_SAVE_GAMES)) {
                 System.setProperty(SystemConfig.SAVED_GAMES_ENABLED_PROPERTY, "false");
+            } else if (arg.equals(PERMISSIVE_SECURITY)) {
+                System.setProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY, "true");
             } else if (arg.equals(NO_CRASH_REPORT)) {
                 crashReportEnabled = false;
             } else if (arg.equals(NO_SOUND)) {
@@ -376,6 +381,7 @@ public final class Terasology {
                     .add(new LwjglInput())
                     .add(new BindsSubsystem())
                     .add(new OpenVRInput());
+            builder.add(new DiscordRPCSubSystem());
         }
         builder.add(new HibernationSubsystem());
     }

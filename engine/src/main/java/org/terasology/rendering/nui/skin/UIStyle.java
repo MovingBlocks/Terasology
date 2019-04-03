@@ -43,7 +43,7 @@ public class UIStyle {
 
     private ScaleMode textureScaleMode = ScaleMode.STRETCH;
 
-    private Font font = Assets.getFont("engine:default").get();
+    private Font font = Assets.getFont("engine:NotoSans-Regular").get();
     private Color textColor = Color.WHITE;
     private Color textShadowColor = Color.BLACK;
     private Color hintTextColor = Color.GREY;

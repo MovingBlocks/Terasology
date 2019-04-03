@@ -96,4 +96,8 @@ public final class ModuleSelectionInfo {
         this.latestVersion = true;
         return this;
     }
+
+    protected Module getModule() {
+        return module;
+    }
 }

@@ -40,7 +40,6 @@ import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.BiomeChange;
 import org.terasology.world.propagation.BlockChange;
@@ -70,6 +69,7 @@ import java.util.Set;
 public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private String title;
+    private String customTitle;
     private String seed = "";
     private SimpleUri worldGenerator;
 
@@ -85,9 +85,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private Block unloadedBlock;
 
-    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator,
+    public WorldProviderCoreImpl(String title, String customTitle, String seed, long time, SimpleUri worldGenerator,
                                  GeneratingChunkProvider chunkProvider, Block unloadedBlock, Context context) {
         this.title = (title == null) ? seed : title;
+        this.customTitle = customTitle;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
@@ -109,7 +110,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider, Block unloadedBlock,
                                  Context context) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider,
+        this(info.getTitle(), info.getCustomTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider,
                 unloadedBlock, context);
     }
 
@@ -134,7 +135,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        return new WorldInfo(title, seed, worldTime.getMilliseconds(), worldGenerator);
+        return new WorldInfo(title, customTitle, seed, worldTime.getMilliseconds(), worldGenerator);
     }
 
     @Override
@@ -202,12 +203,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 } else {
                     oldChange.setTo(type);
                 }
-                for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
-                    RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
-                    if (dirtiedChunk != null) {
-                        dirtiedChunk.setDirty(true);
-                    }
-                }
+                setDirtyChunksNear(worldPos);
                 notifyBlockChanged(worldPos, type, oldBlockType);
             }
             return oldBlockType;
@@ -222,7 +218,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
          * command "showSCreen BenchmarkScreen".
          */
-        Set<RenderableChunk> dirtiedChunks = new HashSet<>();
         Set<BlockChange> changedBlocks = new HashSet<>();
         Map<Vector3i, Block> result = new HashMap<>(blocks.size());
 
@@ -242,12 +237,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                     } else {
                         oldChange.setTo(type);
                     }
-                    for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
-                        RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
-                        if (dirtiedChunk != null) {
-                            dirtiedChunks.add(dirtiedChunk);
-                        }
-                    }
+                    setDirtyChunksNear(worldPos);
                     changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
                 }
                 result.put(worldPos, oldBlockType);
@@ -256,14 +246,20 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
         }
 
-        for (RenderableChunk chunk : dirtiedChunks) {
-            chunk.setDirty(true);
-        }
         for (BlockChange change : changedBlocks) {
             notifyBlockChanged(change.getPosition(), change.getTo(), change.getFrom());
         }
 
         return result;
+    }
+    
+    private void setDirtyChunksNear(Vector3i pos0) {
+        for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(pos0, 1)) {
+            RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
+            if (dirtiedChunk != null) {
+                dirtiedChunk.setDirty(true);
+            }
+        }
     }
 
     private void notifyBlockChanged(Vector3i pos, Block type, Block oldType) {
@@ -285,31 +281,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
         }
     }
-
-    @Override
-    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
-        if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
-            LiquidData liquidState = chunk.getLiquid(blockPos);
-            if (liquidState.equals(oldState)) {
-                chunk.setLiquid(blockPos, newState);
-                return true;
+    
+    private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
+        // TODO: Change to match block and biome, if those changes are made.
+        synchronized (listeners) {
+            for (WorldChangeListener listener : listeners) {
+                listener.onExtraDataChanged(index, pos, newData, oldData);
             }
         }
-        return false;
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
-        if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
-            return chunk.getLiquid(blockPos);
-        }
-        return new LiquidData();
     }
 
     @Override
@@ -346,12 +325,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 } else {
                     oldChange.setTo(biome);
                 }
-                for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
-                    RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
-                    if (dirtiedChunk != null) {
-                        dirtiedChunk.setDirty(true);
-                    }
-                }
+                setDirtyChunksNear(worldPos);
                 notifyBiomeChanged(worldPos, biome, oldBiomeType);
             }
             return oldBiomeType;
@@ -389,6 +363,32 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         if (chunk != null) {
             Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
+        }
+        return 0;
+    }
+
+    @Override
+    public int getExtraData(int index, int x, int y, int z) {
+        CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPosX(x), ChunkMath.calcChunkPosY(y), ChunkMath.calcChunkPosZ(z));
+        if (chunk != null) {
+            return chunk.getExtraData(index, ChunkMath.calcBlockPosX(x), ChunkMath.calcBlockPosY(y), ChunkMath.calcBlockPosZ(z));
+        }
+        return 0;
+    }
+
+    @Override
+    public int setExtraData(int index, Vector3i worldPos, int value) {
+        Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
+        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        if (chunk != null) {
+            Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
+            int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);
+            chunk.setExtraData(index, blockPos.x, blockPos.y, blockPos.z, value);
+            if (oldValue != value) {
+                setDirtyChunksNear(worldPos);
+                notifyExtraDataChanged(index, worldPos, value, oldValue);
+            }
+            return oldValue;
         }
         return 0;
     }

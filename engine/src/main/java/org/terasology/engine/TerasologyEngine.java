@@ -57,6 +57,8 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.recording.CharacterStateEventPositionMap;
+import org.terasology.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -67,7 +69,6 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.version.TerasologyVersion;
-import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
@@ -153,10 +154,16 @@ public class TerasologyEngine implements GameEngine {
         this.rootContext = new ContextImpl();
         rootContext.put(GameEngine.class, this);
         this.timeSubsystem = timeSubsystem;
+
+        //Record and Replay classes
+        RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
+        rootContext.put(RecordAndReplayCurrentStatus.class, recordAndReplayCurrentStatus);
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         rootContext.put(RecordAndReplayUtils.class, recordAndReplayUtils);
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         rootContext.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
+        DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
+        rootContext.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
         /*
          * We can't load the engine without core registry yet.
          * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
@@ -318,8 +325,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initAssets() {
-        BlockFamilyRegistry familyFactoryRegistry = new BlockFamilyRegistry();
-        rootContext.put(BlockFamilyRegistry.class, familyFactoryRegistry);
+
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.registerCoreAssetType(Prefab.class,
@@ -333,7 +339,7 @@ public class TerasologyEngine implements GameEngine {
         assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
                 (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
-                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), familyFactoryRegistry));
+                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
         assetTypeManager.registerCoreAssetType(UISkin.class,
                 (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");
         assetTypeManager.registerCoreAssetType(BehaviorTree.class,

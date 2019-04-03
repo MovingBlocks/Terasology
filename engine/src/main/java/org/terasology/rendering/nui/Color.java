@@ -171,22 +171,22 @@ public class Color {
     }
 
     public Color alterRed(int value) {
-        Preconditions.checkArgument(value >= 0 || value <= MAX, "Color values must be in range 0-255");
+        Preconditions.checkArgument(value >= 0 && value <= MAX, "Color values must be in range 0-255");
         return new Color(value << RED_OFFSET | (representation & RED_FILTER));
     }
 
     public Color alterBlue(int value) {
-        Preconditions.checkArgument(value >= 0 || value <= MAX, "Color values must be in range 0-255");
+        Preconditions.checkArgument(value >= 0 && value <= MAX, "Color values must be in range 0-255");
         return new Color(value << BLUE_OFFSET | (representation & BLUE_FILTER));
     }
 
     public Color alterGreen(int value) {
-        Preconditions.checkArgument(value >= 0 || value <= MAX, "Color values must be in range 0-255");
+        Preconditions.checkArgument(value >= 0 && value <= MAX, "Color values must be in range 0-255");
         return new Color(value << GREEN_OFFSET | (representation & GREEN_FILTER));
     }
 
     public Color alterAlpha(int value) {
-        Preconditions.checkArgument(value >= 0 || value <= MAX, "Color values must be in range 0-255");
+        Preconditions.checkArgument(value >= 0 && value <= MAX, "Color values must be in range 0-255");
         return new Color(value | (representation & ALPHA_FILTER));
     }
 

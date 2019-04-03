@@ -32,6 +32,11 @@
                         ]
                     },
                     {
+                       "type": "UIButton",
+                       "id": "extra",
+                       "text": "${engine:menu#extras-label}"
+                    },
+                    {
                         "type": "UIButton",
                         "id": "settings",
                         "text": "${engine:menu#game-settings}"
@@ -54,53 +59,6 @@
                     "position-vertical-center": {}
                 }
             },
-            {
-                "type": "UIButton",
-                "id": "devTools",
-                "text": "${engine:menu#dev-tools-title}",
-                "layoutInfo": {
-                    "use-content-width": true,
-                    "use-content-height": true,
-                    "position-bottom": {
-                        "offset": 8
-                    },
-                    "position-right": {
-                        "offset": 8
-                    }
-                }
-            },
-            {
-                "type": "UIButton",
-                "id": "crashReporter",
-                "text": "${engine:menu#crash-reporter}",
-                "layoutInfo": {
-                    "use-content-width": true,
-                    "use-content-height": true,
-                    "position-bottom": {
-                        "offset": 8
-                    },
-                    "position-right": {
-                        "offset": 8,
-                        "target": "LEFT",
-                        "widget": "devTools"
-                    }
-                }
-            },
-            {
-                "type": "UIButton",
-                "text": "${engine:menu#telemetry-button}",
-                "id": "telemetry",
-                "layoutInfo": {
-                    "use-content-width": true,
-                    "use-content-height": true,
-                    "position-bottom": {
-                        "offset": 8
-                    },
-                    "position-left": {
-                        "offset": 8
-                    }
-                }
-            }
         ]
     }
 }

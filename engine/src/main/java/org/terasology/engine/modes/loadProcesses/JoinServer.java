@@ -62,7 +62,7 @@ public class JoinServer implements LoadProcess {
     @Override
     public String getMessage() {
         if (applyModuleThread != null) {
-            return "Scanning for Assets...";
+            return "${engine:menu#scanning-for-assets}";
         } else {
             return joinStatus.getCurrentActivity();
         }

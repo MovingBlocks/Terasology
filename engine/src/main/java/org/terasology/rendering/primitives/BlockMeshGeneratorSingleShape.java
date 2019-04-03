@@ -33,6 +33,7 @@ import org.terasology.world.block.shapes.BlockMeshPart;
 import java.util.Map;
 
 public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
+
     private static final Logger logger = LoggerFactory.getLogger(BlockMeshGeneratorSingleShape.class);
 
     private Block block;
@@ -65,7 +66,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
         // Gather adjacent blocks
         Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             Vector3i offset = side.getVector3i();
             Block blockToCheck = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
             adjacentBlocks.put(side, blockToCheck);
@@ -94,61 +95,46 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
         }
 
-        boolean[] drawDir = new boolean[6];
+        BlockMeshPart[] drawParts = new BlockMeshPart[6];
 
-        for (Side side : Side.values()) {
-            drawDir[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side);
+        for (Side side : Side.getAllSides()) {
+            if (isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side)) {
+                drawParts[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side));
+            }
         }
 
-        // If the selfBlock is lowered, some more faces may have to be drawn
+        // If the selfBlock isn't lowered, some more faces may have to be drawn
         if (selfBlock.isLiquid()) {
-            Block bottomBlock = adjacentBlocks.get(Side.BOTTOM);
+            Block topBlock = adjacentBlocks.get(Side.TOP);
             // Draw horizontal sides if visible from below
-            for (Side side : Side.horizontalSides()) {
-                Vector3i offset = side.getVector3i();
-                Block adjacentBelow = view.getBlock(x + offset.x, y - 1, z + offset.z);
-                Block adjacent = adjacentBlocks.get(side);
-
-                boolean visible = (blockAppearance.getPart(BlockPart.fromSide(side)) != null
-                        && isSideVisibleForBlockTypes(adjacentBelow, selfBlock, side) && !isSideVisibleForBlockTypes(bottomBlock, adjacent, side.reverse()));
-                drawDir[side.ordinal()] |= visible;
-            }
-
-            // Draw the top if below a non-lowered selfBlock
-            // TODO: Don't need to render the top if each side and the selfBlock above each side are either liquid or opaque solids.
-            Block blockToCheck = adjacentBlocks.get(Side.TOP);
-            drawDir[Side.TOP.ordinal()] |= !blockToCheck.isLiquid();
-
-            if (bottomBlock.isLiquid() || bottomBlock.getMeshGenerator() == null) {
-                for (Side dir : Side.values()) {
-                    if (drawDir[dir.ordinal()]) {
-                        Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(dir), selfBiome);
-                        selfBlock.getLoweredLiquidMesh(dir).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
+            if (topBlock.isLiquid()) {
+                for (Side side : Side.horizontalSides()) {
+                    Vector3i offset = side.getVector3i();
+                    Block adjacentAbove = view.getBlock(x + offset.x, y + 1, z + offset.z);
+                    Block adjacent = adjacentBlocks.get(side);
+                    
+                    if (adjacent.isLiquid() && !adjacentAbove.isLiquid()) {
+                        drawParts[side.ordinal()] = selfBlock.getTopLiquidMesh(side);
                     }
                 }
-                return;
+            } else {
+                for (Side side : Side.getAllSides()) {
+                    if (drawParts[side.ordinal()] != null) {
+                        drawParts[side.ordinal()] = selfBlock.getLowLiquidMesh(side);
+                    }
+                }
             }
         }
 
-        for (Side dir : Side.values()) {
-            if (drawDir[dir.ordinal()]) {
+        for (Side dir : Side.getAllSides()) {
+            if (drawParts[dir.ordinal()] != null) {
                 Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(dir), selfBiome);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
+                ChunkVertexFlag sideVertexFlag = vertexFlag;
                 if (selfBlock.isGrass() && dir != Side.TOP && dir != Side.BOTTOM) {
-                    blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(chunkMesh, x, y, z, colorOffset, renderType, ChunkVertexFlag.COLOR_MASK);
-                } else {
-                    //if(dir == Side.TOP) logger.info("Generating: " + (new Vector3i(x, y, z)).toString() + " " + view.getChunkRegion().toString() + " " + dir.toString());
-
-                    if (blockAppearance.getPart(BlockPart.fromSide(dir)) == null) {
-                        // TODO: This would catch something like water blocks attempting to render with a "fixed" trimmedLoweredCube shape
-                        // That shape has its top trimmed down a bit to let water sit slightly lower than land, however, underwater this shouldn't show
-                        // Normally we would configure that shape with CENTER instead of TOP, that way the trimmed part wouldn't occlude in a stack
-                        // But with that handling you don't get water blocks occluding tops underwater... and there's no TOP to retrieve below -> NPE
-                        logger.debug("Cannot render side '{}' for a block - no stored block appearance for it. renderType {}, vertexFlag {}", dir, renderType, vertexFlag);
-                    } else {
-                        blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
-                    }
+                    sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                 }
+                drawParts[dir.ordinal()].appendTo(chunkMesh, x, y, z, colorOffset, renderType, sideVertexFlag);
             }
         }
     }

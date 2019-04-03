@@ -34,7 +34,7 @@ public class EnsureSaveGameConsistency implements LoadProcess {
 
     @Override
     public String getMessage() {
-        return "Ensuring save game consistency";
+        return "${engine:menu#ensuring-save-game-consistency}";
     }
 
     @Override

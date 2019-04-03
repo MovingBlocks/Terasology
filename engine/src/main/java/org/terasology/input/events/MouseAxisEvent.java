@@ -52,4 +52,8 @@ public class MouseAxisEvent extends AxisEvent {
         event.value = value;
         return event;
     }
+
+    public static MouseAxisEvent createCopy(MouseAxisEvent toBeCopied) {
+        return new MouseAxisEvent(toBeCopied.getMouseAxis(), toBeCopied.getValue(), toBeCopied.getDelta());
+    }
 }

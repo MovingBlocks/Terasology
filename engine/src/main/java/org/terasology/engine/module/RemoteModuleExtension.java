@@ -63,7 +63,7 @@ public enum RemoteModuleExtension {
         meta.setExtension(LAST_UPDATED.getKey(), date);
     }
 
-    public static long getArtifactSize(ModuleMetadata meta) {
+    public static Long getArtifactSize(ModuleMetadata meta) {
         return meta.getExtension(ARTIFACT_SIZE.getKey(), Long.class);
     }
 

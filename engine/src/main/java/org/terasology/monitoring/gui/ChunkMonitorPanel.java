@@ -15,8 +15,8 @@
  */
 package org.terasology.monitoring.gui;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
 
 @SuppressWarnings("serial")
 public class ChunkMonitorPanel extends JPanel {
@@ -32,4 +32,7 @@ public class ChunkMonitorPanel extends JPanel {
         add(display, BorderLayout.CENTER);
     }
 
+    public void stopThread() {
+        display.stopThread();
+    }
 }

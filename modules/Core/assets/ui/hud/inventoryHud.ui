@@ -61,7 +61,6 @@
             {
                 "type": "UICrosshair",
                 "id": "crosshair",
-                "crosshairIcon": "engine:gui#crosshair",
                 "chargeStages": [
                     "engine:gui#crosshairCharge1",
                     "engine:gui#crosshairCharge2",

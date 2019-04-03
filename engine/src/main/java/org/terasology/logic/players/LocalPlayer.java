@@ -29,7 +29,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
-import org.terasology.recording.EntityIdMap;
+import org.terasology.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.CoreRegistry;
 
@@ -37,7 +38,10 @@ public class LocalPlayer {
 
     private EntityRef clientEntity = EntityRef.NULL;
     private int nextActivationId;
-    private EntityIdMap entityIdMap;
+
+    //Record and Replay classes
+    private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     public LocalPlayer() {
 
@@ -50,11 +54,6 @@ public class LocalPlayer {
     // TODO: instance. If that can be avoided the code in the following method
     // TODO: might be more rightfully placed in the LocalPlayer constructor.
     public void setClientEntity(EntityRef entity) {
-
-        //Gets the client ids for record and replay
-        if (RecordAndReplayStatus.getCurrentStatus() != RecordAndReplayStatus.NOT_ACTIVATED) {
-            this.entityIdMap.add("client", entity.getId());
-        }
         this.clientEntity = entity;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         if (clientComp != null) {
@@ -63,8 +62,9 @@ public class LocalPlayer {
         }
     }
 
-    public void setEntityIdMap(EntityIdMap entityIdMap) {
-        this.entityIdMap = entityIdMap;
+    public void setRecordAndReplayClasses(DirectionAndOriginPosRecorderList list, RecordAndReplayCurrentStatus status) {
+        this.directionAndOriginPosRecorderList = list;
+        this.recordAndReplayCurrentStatus = status;
     }
 
     public EntityRef getClientEntity() {
@@ -206,6 +206,13 @@ public class LocalPlayer {
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         Vector3f direction = getViewDirection();
         Vector3f originPos = getViewPosition();
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
+            this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().add(direction, originPos);
+        } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
+            Vector3f[] data = this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().poll();
+            direction = data[0];
+            originPos = data[1];
+        }
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Responsible for saving the recorded events.
+ * Responsible for storing the recorded events.
  */
 public class RecordedEventStore {
 

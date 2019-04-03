@@ -115,7 +115,7 @@ public class Voronoi {
     }
 
     private void processCell(int cellX, int cellY, Vector2f at, VoronoiResult[] results) {
-        long seed = (702395077 * cellX + 915488749 * cellY);
+        long seed = (702395077 * (long) cellX + 915488749 * (long) cellY);
         // Number of features
         int count = poissonCount[(int) (seed >> 24)];
         seed = incrementSeed(seed);

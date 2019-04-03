@@ -82,7 +82,7 @@ public class RotationTest {
     public void testReverseRotation() {
         for (Rotation rotation : Rotation.allValues()) {
             Rotation reverseRotation = Rotation.findReverse(rotation);
-            for (Side side : Side.values()) {
+            for (Side side : Side.getAllSides()) {
                 assertEquals(side, reverseRotation.rotate(rotation.rotate(side)));
             }
         }

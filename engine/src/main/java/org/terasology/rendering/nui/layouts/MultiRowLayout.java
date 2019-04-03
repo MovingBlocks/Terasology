@@ -148,7 +148,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
             } else {
                 minColumnHeight = canvas.size().y;
                 for (int i = 0; i < rows; ++i) {
-                    minHeights[i] = TeraMath.floorToInt((minColumnHeight - (rows - 1) * verticalSpacing) * rowHeights[i]);
+                    minHeights[i] = TeraMath.floorToInt((minColumnHeight - (rows - 1) * (float) verticalSpacing) * rowHeights[i]);
                 }
             }
 
@@ -186,7 +186,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
             UIWidget widget = column.get(i);
             Vector2i cellSize = new Vector2i(areaHint.x, availableHeight);
             if (!autoSizeRows) {
-                cellSize.y *= rowHeights[i];
+                cellSize.y = (int) (cellSize.y * rowHeights[i]);
             }
             if (widget != null) {
                 Vector2i contentSize = canvas.calculateRestrictedSize(widget, cellSize);
@@ -269,7 +269,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
             }
         }
 
-        height += verticalSpacing * (rows - 1);
+        height += (long) verticalSpacing * (rows - 1);
 
         size.y = (int) Math.min(Integer.MAX_VALUE, height);
         return size;

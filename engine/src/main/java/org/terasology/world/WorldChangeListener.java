@@ -27,5 +27,6 @@ public interface WorldChangeListener {
     void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock);
 
     void onBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome);
-
+    
+    void onExtraDataChanged(int i, Vector3i pos, int newData, int oldData);
 }

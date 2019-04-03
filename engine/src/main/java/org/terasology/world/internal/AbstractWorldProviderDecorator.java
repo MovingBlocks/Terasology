@@ -24,7 +24,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 
 /**
@@ -103,16 +102,6 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
-        return base.setLiquid(x, y, z, newState, oldState);
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        return base.getLiquid(x, y, z);
-    }
-
-    @Override
     public Block getBlock(int x, int y, int z) {
         return base.getBlock(x, y, z);
     }
@@ -140,6 +129,16 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public byte getTotalLight(int x, int y, int z) {
         return base.getTotalLight(x, y, z);
+    }
+    
+    @Override
+    public int getExtraData(int index, int x, int y, int z) {
+        return base.getExtraData(index, x, y, z);
+    }
+    
+    @Override
+    public int setExtraData(int index, Vector3i pos, int value) {
+        return base.setExtraData(index, pos, value);
     }
 
     @Override

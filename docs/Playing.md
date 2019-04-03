@@ -29,15 +29,19 @@ Note: Keys between the latest stable and latest develop build may differ.
 * [C] - Show character screen for stats and equipment (requires "Equipment" module active)
 * [H] - Hide user interface
 * [T] - Toggle chat interface (effectively a mini-console that only does chat)
-* [Tab] - Auto-completion in the console
+* [Tab] - Auto-completion if in the console
+* [Tab] - Tab through widgets if not in the console 
+* [Shift + Tab] - Tab through widgets in reverse if not in the console 
+* [Control + Tab] - Cycle between in-game windows 
 * [Home] - Increase viewing distance
 * [End] - Decrease viewing distance
 * [Escape] - Show/hide the game menu screen
 * [F1] OR [`] - Toggle full developer console (the "grave" key, usually above tab)
-* [F2] - Toggle window focus and reveals a debug pane (only contains stuff if module(s) using it is enabled)
+* [F2] - Show online players overlay 
 * [F3] - Toggle debug mode and information
 * [F5] - Show behavior tree editor
 * [F10] - Show NUI editor
+* [F11] - Toggle window focus and reveals a debug pane (only contains stuff if module(s) using it is enabled) 
 * [F12] - Take screenshot (goes to /screenshots in game data dir)
 
 
@@ -160,5 +164,4 @@ See all available images at https://hub.docker.com/r/qwick/terasology/tags/
 Example: `docker pull qwick/terasology:latest`
 
 The Docker server starts with no extra modules configured, you would have to go update the game server's config accordingly if desired.
-
 

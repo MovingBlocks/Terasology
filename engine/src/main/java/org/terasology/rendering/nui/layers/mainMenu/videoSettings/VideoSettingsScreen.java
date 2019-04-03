@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.Time;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.Resolution;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.logic.players.LocalPlayer;
@@ -33,23 +35,27 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
+import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 import javax.imageio.ImageIO;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
-/**
- */
 public class VideoSettingsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:VideoMenuScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
+    private static final long RESOLUTION_REVERT_TIME_MS = 15000;
 
     @In
     private GameEngine engine;
@@ -65,6 +71,9 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
     @In
     private TranslationSystem translationSystem;
+
+    @In
+    private Time time;
 
     public VideoSettingsScreen() {
     }
@@ -230,6 +239,21 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             });
         }
 
+        final UILabel uiScaleLabel = find("uiScaleLabel", UILabel.class);
+        uiScaleLabel.setText(" " + config.getRendering().getUiScale() + "% ");
+
+        WidgetUtil.trySubscribe(this, "uiScaleSmaller", button -> {
+            int newScale = Math.max(50, config.getRendering().getUiScale() - 25);
+            config.getRendering().setUiScale(newScale);
+            uiScaleLabel.setText(" " + config.getRendering().getUiScale() + "% ");
+        });
+
+        WidgetUtil.trySubscribe(this, "uiScaleLarger", button -> {
+            int newScale = Math.min(250, config.getRendering().getUiScale() + 25);
+            config.getRendering().setUiScale(newScale);
+            uiScaleLabel.setText(" " + config.getRendering().getUiScale() + "% ");
+        });
+
         UIDropdown<CameraSetting> cameraSetting = find("camera", UIDropdown.class);
         if (cameraSetting != null) {
             cameraSetting.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
@@ -242,6 +266,23 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             displaySetting.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
             displaySetting.setOptions(Arrays.asList(DisplayModeSetting.values()));
             displaySetting.bindSelection(BindHelper.bindBeanProperty("displayModeSetting", displayDevice, DisplayModeSetting.class));
+        }
+
+        UIDropdown<Resolution> resolution = find("resolution", UIDropdown.class);
+        if (resolution != null) {
+            resolution.setOptions(displayDevice.getResolutions());
+            resolution.bindSelection(new Binding<Resolution>() {
+
+                @Override
+                public Resolution get() {
+                    return displayDevice.getResolution();
+                }
+
+                @Override
+                public void set(Resolution value) {
+                    onResolutionChange(value);
+                }
+            });
         }
 
         WidgetUtil.tryBindCheckbox(this, "menu-animations", BindHelper.bindBeanProperty("animatedMenu", config.getRendering(), Boolean.TYPE));
@@ -292,5 +333,39 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    private void onFullScreenResolutionChange(Resolution oldResolution) {
+        Callable<Resolution> revertOperation = () -> {
+            Thread.sleep(RESOLUTION_REVERT_TIME_MS);
+            return oldResolution;
+        };
+
+        @SuppressWarnings("unchecked")
+        WaitPopup<Resolution> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+
+        popup.startOperation(revertOperation, true);
+        popup.onSuccess(resolution -> displayDevice.setResolution(resolution));
+        popup.setTitleText(translationSystem.translate("${engine:menu#video-resolution-popup-title}"));
+        popup.setCancelText(translationSystem.translate("${engine:menu#video-resolution-popup-cancel}"));
+
+        long revertAtMs = time.getGameTimeInMs() + RESOLUTION_REVERT_TIME_MS;
+        String message = translationSystem.translate("${engine:menu#video-resolution-popup-message}");
+
+        popup.bindMessageText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                long remaining = TimeUnit.MILLISECONDS.toSeconds(revertAtMs - time.getGameTimeInMs());
+                return message + ": " + remaining + "s";
+            }
+        });
+    }
+
+    private void onResolutionChange(Resolution newResolution) {
+        Resolution oldResolution = displayDevice.getResolution();
+        displayDevice.setResolution(newResolution);
+        if (DisplayModeSetting.FULLSCREEN == displayDevice.getDisplayModeSetting()) {
+            onFullScreenResolutionChange(oldResolution);
+        }
     }
 }

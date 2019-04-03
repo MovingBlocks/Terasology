@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.world.chunks.ChunkConstants;
@@ -34,14 +35,11 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
 import static org.lwjgl.opengl.GL11.glColorPointer;
-import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glDisableClientState;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnableClientState;
 import static org.lwjgl.opengl.GL11.glNormalPointer;
 import static org.lwjgl.opengl.GL11.glTexCoordPointer;
@@ -56,6 +54,7 @@ public class ChunkMesh {
     /**
      * Possible rendering types.
      */
+    @API
     public enum RenderType {
         OPAQUE(0),
         TRANSLUCENT(1),

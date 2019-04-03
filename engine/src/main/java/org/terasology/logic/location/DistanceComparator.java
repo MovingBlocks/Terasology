@@ -58,12 +58,6 @@ public class DistanceComparator implements Comparator<EntityRef> {
      * Creates this Distance comparator and sets the temp to the
      * given parameter.
      * The temp is used to calculate distances from.
-     * @param temp used to calculate distances from when comparing entities.
-     */
-    /**
-     * Creates this Distance comparator and sets the temp to the
-     * given parameter.
-     * The temp is used to calculate distances from.
      *
      * @param origin used to calculate distances from when comparing entities.
      */

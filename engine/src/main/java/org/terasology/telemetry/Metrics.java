@@ -89,10 +89,10 @@ public class Metrics {
                         metric = (Metric) constructor.newInstance(context);
                         classNameToMetric.put(metric.getClass().getName(), metric);
                     } else {
-                        logger.warn("Can't initialize the Metric, please initialize it and add it to Metrics:", constructor);
+                        logger.warn("Can't initialize the Metric, please initialize it and add it to Metrics: {}", constructor);
                     }
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    logger.error("Fail to initialize the metric instance", constructor);
+                    logger.error("Fail to initialize the metric instance: {}", constructor);
                 }
             }
         }

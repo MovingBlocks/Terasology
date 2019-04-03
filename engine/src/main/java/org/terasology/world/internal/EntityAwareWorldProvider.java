@@ -242,7 +242,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         Optional<Prefab> oldPrefab = oldType.getPrefab();
         EntityBuilder oldEntityBuilder = entityManager.newBuilder(oldPrefab.orElse(null));
-        oldEntityBuilder.addComponent(new BlockComponent(oldType, new Vector3i(blockComponent.getPosition())));
+        oldEntityBuilder.addComponent(new BlockComponent(oldType, blockComponent.position));
         BeforeEntityCreated oldEntityEvent = new BeforeEntityCreated(oldPrefab.orElse(null), oldEntityBuilder.iterateComponents());
         blockEntity.send(oldEntityEvent);
         for (Component comp : oldEntityEvent.getResultComponents()) {
@@ -251,7 +251,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         Optional<Prefab> newPrefab = type.getPrefab();
         EntityBuilder newEntityBuilder = entityManager.newBuilder(newPrefab.orElse(null));
-        newEntityBuilder.addComponent(new BlockComponent(type, new Vector3i(blockComponent.getPosition())));
+        newEntityBuilder.addComponent(new BlockComponent(type, blockComponent.position));
         BeforeEntityCreated newEntityEvent = new BeforeEntityCreated(newPrefab.orElse(null), newEntityBuilder.iterateComponents());
         blockEntity.send(newEntityEvent);
         for (Component comp : newEntityEvent.getResultComponents()) {
@@ -267,7 +267,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
 
 
-        blockComponent.setBlock(type);
+        blockComponent.block = type;
         blockEntity.saveComponent(blockComponent);
 
         for (Component comp : newEntityBuilder.iterateComponents()) {
@@ -362,7 +362,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @ReceiveEvent(components = {BlockComponent.class})
     public void onActivateBlock(OnActivatedComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
-        EntityRef oldEntity = blockEntityLookup.put(new Vector3i(block.getPosition()), entity);
+        EntityRef oldEntity = blockEntityLookup.put(new Vector3i(block.position), entity);
         // If this is a client, then an existing block entity may exist. Destroy it.
         if (oldEntity != null && !Objects.equal(oldEntity, entity)) {
             oldEntity.destroy();
@@ -372,9 +372,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @ReceiveEvent(components = {BlockComponent.class})
     public void onDeactivateBlock(BeforeDeactivateComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
-        Vector3i pos = new Vector3i(block.getPosition());
-        if (blockEntityLookup.get(pos) == entity) {
-            blockEntityLookup.remove(pos);
+        if (blockEntityLookup.get(block.position) == entity) {
+            blockEntityLookup.remove(block.position);
         }
     }
 
@@ -472,7 +471,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         if (entityManager.getComponentLibrary().getMetadata(component).isForceBlockActive()) {
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
             if (blockComp != null) {
-                Block block = getBlock(blockComp.getPosition().x, blockComp.getPosition().y, blockComp.getPosition().z);
+                Block block = getBlock(blockComp.position.x, blockComp.position.y, blockComp.position.z);
                 if (isTemporaryBlock(entity, block, component)) {
                     temporaryBlockEntities.add(entity);
                 }

@@ -21,9 +21,6 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.monitoring.gui.AdvancedMonitor;
 
-/**
- *
- */
 public class MonitoringSubsystem implements EngineSubsystem {
 
     private AdvancedMonitor advancedMonitor;
@@ -44,7 +41,7 @@ public class MonitoringSubsystem implements EngineSubsystem {
     @Override
     public void shutdown() {
         if (advancedMonitor != null) {
-            advancedMonitor.setVisible(false);
+            advancedMonitor.close();
         }
     }
 }

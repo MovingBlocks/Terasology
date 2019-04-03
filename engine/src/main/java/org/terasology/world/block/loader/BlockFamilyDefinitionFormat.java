@@ -38,13 +38,14 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.DefaultColorSource;
-import org.terasology.world.block.family.AbstractBlockFamily;
-import org.terasology.world.block.family.BlockFamilyRegistry;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyLibrary;
 import org.terasology.world.block.family.FreeformFamily;
 import org.terasology.world.block.family.HorizontalFamily;
 import org.terasology.world.block.family.MultiSection;
@@ -74,7 +75,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
     private final AssetManager assetManager;
     private final Gson gson;
 
-    public BlockFamilyDefinitionFormat(AssetManager assetManager, BlockFamilyRegistry blockFamilyRegistry) {
+    public BlockFamilyDefinitionFormat(AssetManager assetManager) {
         super("block");
         this.assetManager = assetManager;
         gson = new GsonBuilder()
@@ -83,7 +84,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 .registerTypeAdapter(BlockFamilyDefinitionData.class, new BlockFamilyDefinitionDataHandler())
                 .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
                 .registerTypeAdapter(Vector4f.class, new Vector4fTypeAdapter())
-                .registerTypeAdapter(Class.class, new BlockFamilyHandler(blockFamilyRegistry))
+                .registerTypeAdapter(Class.class, new BlockFamilyHandler())
                 .create();
     }
 
@@ -146,7 +147,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
 
             if (result.getBlockFamily() != null) {
-                for (MultiSection multiSection : BlockFamilyRegistry.getMultiSections(result.getBlockFamily())) {
+                for (MultiSection multiSection : BlockFamilyLibrary.getMultiSections(result.getBlockFamily())) {
                     if (jsonObject.has(multiSection.name()) && jsonObject.get(multiSection.name()).isJsonObject()) {
                         JsonObject jsonMultiSection = jsonObject.getAsJsonObject(multiSection.name());
                         for (String section : multiSection.appliesToSections()) {
@@ -160,7 +161,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                         }
                     }
                 }
-                for (String section : BlockFamilyRegistry.getSections(result.getBlockFamily())) {
+                for (String section : BlockFamilyLibrary.getSections(result.getBlockFamily())) {
                     if (jsonObject.has(section) && jsonObject.get(section).isJsonObject()) {
                         SectionDefinitionData sectionData = result.getSections().get(section);
                         if (sectionData == null) {
@@ -323,17 +324,15 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         }
     }
 
-    private static class BlockFamilyHandler implements JsonDeserializer<Class<? extends AbstractBlockFamily>> {
-
-        private final BlockFamilyRegistry blockFamilyRegistry;
-
-        BlockFamilyHandler(BlockFamilyRegistry blockFamilyRegistry) {
-            this.blockFamilyRegistry = blockFamilyRegistry;
+    private static class BlockFamilyHandler implements JsonDeserializer<Class<? extends BlockFamily>> {
+        BlockFamilyHandler() {
         }
 
         @Override
-        public Class<? extends AbstractBlockFamily> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return blockFamilyRegistry.getBlockFamily(json.getAsString());
+        public Class<? extends BlockFamily> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+
+            BlockFamilyLibrary library = CoreRegistry.get(BlockFamilyLibrary.class);
+            return library.getBlockFamily(json.getAsString());
         }
     }
 

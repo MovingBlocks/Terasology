@@ -73,15 +73,15 @@ public class GLSLShader extends Shader {
 
     static {
         try (
-                InputStream vertStream = GLSLShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
-                InputStream fragStream = GLSLShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl");
-                InputStream uniformsStream = GLSLShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalUniformsIncl.glsl");
-                InputStream definesStream = GLSLShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalDefinesIncl.glsl")
+                InputStreamReader vertStream = getInputStreamReaderFromResource("org/terasology/include/globalFunctionsVertIncl.glsl");
+                InputStreamReader fragStream = getInputStreamReaderFromResource("org/terasology/include/globalFunctionsFragIncl.glsl");
+                InputStreamReader uniformsStream = getInputStreamReaderFromResource("org/terasology/include/globalUniformsIncl.glsl");
+                InputStreamReader definesStream = getInputStreamReaderFromResource("org/terasology/include/globalDefinesIncl.glsl")
         ) {
-            includedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream, Charsets.UTF_8));
-            includedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream, Charsets.UTF_8));
-            includedDefines = CharStreams.toString(new InputStreamReader(definesStream, Charsets.UTF_8));
-            includedUniforms = CharStreams.toString(new InputStreamReader(uniformsStream, Charsets.UTF_8));
+            includedFunctionsVertex = CharStreams.toString(vertStream);
+            includedFunctionsFragment = CharStreams.toString(fragStream);
+            includedDefines = CharStreams.toString(uniformsStream);
+            includedUniforms = CharStreams.toString(definesStream);
         } catch (IOException e) {
             logger.error("Failed to load Include shader resources");
         }
@@ -101,6 +101,11 @@ public class GLSLShader extends Shader {
         disposalAction = new DisposalAction(urn);
         getDisposalHook().setDisposeAction(disposalAction);
         reload(data);
+    }
+
+    private static InputStreamReader getInputStreamReaderFromResource(String resource) {
+        InputStream resourceStream = GLSLShader.class.getClassLoader().getResourceAsStream(resource);
+        return new InputStreamReader(resourceStream, Charsets.UTF_8);
     }
 
     // made package-private after CheckStyle suggestion

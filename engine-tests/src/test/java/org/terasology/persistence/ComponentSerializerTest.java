@@ -38,6 +38,7 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -66,6 +67,7 @@ public class ComponentSerializerTest {
     @Before
     public void setup() {
         context = new ContextImpl();
+        context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
         context.put(ModuleManager.class, moduleManager);
         CoreRegistry.setContext(context);
 

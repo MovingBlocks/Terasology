@@ -159,7 +159,7 @@ void main()
         vec4 normalAndOffset = calcWaterNormalAndOffset(vertexWorldPos.xz);
 
         waterNormalViewSpace = gl_NormalMatrix * normalAndOffset.xyz;
-        vertexViewPos.y += normalAndOffset.w + waterOffsetY;
+        vertexViewPos += gl_ModelViewMatrix[1] * (normalAndOffset.w + waterOffsetY);
     }
 #else
     waterNormalViewSpace = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);

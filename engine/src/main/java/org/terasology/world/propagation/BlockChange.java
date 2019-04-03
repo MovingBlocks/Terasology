@@ -19,6 +19,9 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
+ * Represents a block change at a given position. Used to update listeners that a block has been changed
+ * <p>
+ * A POJO hence no methods are documented.
  */
 public class BlockChange {
     private Vector3i position;

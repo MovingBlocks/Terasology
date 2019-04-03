@@ -36,7 +36,7 @@
                 "type": "UIBox",
                 "id": "container",
                 "layoutInfo": {
-                    "width": 1050,
+                    "width": 1016,
                     "position-horizontal-center": {},
                     "position-top": {
                         "target": "BOTTOM",
@@ -57,7 +57,7 @@
                 "verticalSpacing": 16,
                 "horizontalSpacing": 8,
                 "layoutInfo": {
-                    "width": 1034,
+                    "width": 1000,
                     "use-content-height": true,
                     "position-horizontal-center": {},
                     "position-top": {
@@ -99,55 +99,53 @@
                         "family": "description",
                         "contents": [
                             {
-                                "type": "UIImage",
+                                "type": "UIImageSlideshow",
                                 "skin": "framed_image",
                                 "id": "previewImage",
                                 "layoutInfo": {
                                     "position-top": {
                                         "target": "TOP"
-                                     },
-                                     "position-bottom": {
+                                    },
+                                    "position-bottom": {
                                         "target": "BOTTOM",
                                         "offset": 130
-                                     }
+                                    }
                                 }
                             },
                             {
                                 "type": "ScrollableArea",
                                 "family": "shortDescription",
-                                "contents": [
-                                    {
-                                        "type": "ColumnLayout",
-                                        "id": "shortDescriptionItems",
-                                        "columns": 2,
-                                        "column-widths": [0.2, 0.8],
-                                        "verticalSpacing": 16,
-                                        "horizontalSpacing": 4,
-                                        "fillVerticalSpace": false,
-                                        "contents": [
-                                            {
-                                                "type": "UILabel",
-                                                "text": "${engine:menu#world-generator}: ",
-                                                "family": "description"
-                                            },
-                                            {
-                                                "type": "UILabel",
-                                                "id": "worldGenerator",
-                                                "family": "description"
-                                            },
-                                            {
-                                                "type": "UILabel",
-                                                "text": "${engine:menu#module-list}: ",
-                                                "family": "description"
-                                            },
-                                            {
-                                                "type": "UILabel",
-                                                "id": "moduleNames",
-                                                "family": "description"
-                                            }
-                                        ]
-                                    }
-                                ],
+                                "content": {
+                                    "type": "ColumnLayout",
+                                    "id": "shortDescriptionItems",
+                                    "columns": 2,
+                                    "column-widths": [0.2, 0.8],
+                                    "verticalSpacing": 16,
+                                    "horizontalSpacing": 4,
+                                    "fillVerticalSpace": false,
+                                    "contents": [
+                                        {
+                                            "type": "UILabel",
+                                            "text": "${engine:menu#world-generator}: ",
+                                            "family": "description"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "id": "worldGenerator",
+                                            "family": "description"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "text": "${engine:menu#module-list}: ",
+                                            "family": "description"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "id": "moduleNames",
+                                            "family": "description"
+                                        }
+                                    ]
+                                },
                                 "layoutInfo": {
                                     "position-top": {
                                         "target": "BOTTOM",

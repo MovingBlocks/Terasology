@@ -19,7 +19,9 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
@@ -27,6 +29,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyLibrary;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.tiles.WorldAtlas;
 import org.terasology.world.block.tiles.WorldAtlasImpl;
@@ -52,6 +55,10 @@ public class RegisterBlocks extends SingleStepLoadProcess {
         NetworkSystem networkSystem = context.get(NetworkSystem.class);
         WorldAtlas atlas = new WorldAtlasImpl(context.get(Config.class).getRendering().getMaxTextureAtlasResolution());
         context.put(WorldAtlas.class, atlas);
+
+        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
+        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment, context));
+
 
         BlockManagerImpl blockManager;
         if (networkSystem.getMode().isAuthority()) {

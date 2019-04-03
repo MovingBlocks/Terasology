@@ -15,28 +15,21 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.game.GameManifest;
-import org.terasology.network.NetworkMode;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
 
-import java.io.File;
-import java.nio.file.Path;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Screen for the record menu.
@@ -47,88 +40,97 @@ public class RecordScreen extends SelectionScreen {
 
     private static final Logger logger = LoggerFactory.getLogger(RecordScreen.class);
 
-    private UIList<GameInfo> gameList;
     private RecordAndReplayUtils recordAndReplayUtils;
+
+    @In
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+
+    // widgets
+    private UIButton load;
+    private UIButton close;
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
-        final UILabel saveGamePath = find("saveGamePath", UILabel.class);
-        if (saveGamePath != null) {
-            Path savePath = PathManager.getInstance().getSavesPath();
-            saveGamePath.setText(
-                    translationSystem.translate("${engine:menu#save-game-path} ") +
-                            savePath.toAbsolutePath().toString()); //save path
+        initWidgets();
+
+        if (isValidScreen()) {
+
+            initSaveGamePathWidget(PathManager.getInstance().getSavesPath());
+
+            NameRecordingScreen nameRecordingScreen = getManager().createScreen(NameRecordingScreen.ASSET_URI, NameRecordingScreen.class);
+
+            getGameInfos().subscribeSelection((widget, item) -> {
+                load.setEnabled(item != null);
+                updateDescription(item);
+            });
+
+            getGameInfos().subscribe((widget, item) -> launchNamingScreen(nameRecordingScreen, item));
+
+            load.subscribe(button -> {
+                final GameInfo gameInfo = getGameInfos().getSelection();
+                if (gameInfo != null) {
+                    launchNamingScreen(nameRecordingScreen, gameInfo);
+                }
+            });
+
+            close.subscribe(button -> {
+                recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                triggerBackAnimation();
+            });
         }
-
-        gameList = find("gameList", UIList.class);
-
-        refreshGameList();
-
-        gameList.subscribeSelection((widget, item) -> {
-            find("load", UIButton.class).setEnabled(item != null);
-            updateDescription(item);
-        });
-
-        super.startWorldGeneratorAndModuleNames();
-
-        gameList.select(0);
-        gameList.subscribe((widget, item) -> loadGame(item));
-
-        WidgetUtil.trySubscribe(this, "load", button -> {
-            GameInfo gameInfo = gameList.getSelection();
-            if (gameInfo != null) {
-                loadGame(gameInfo);
-            }
-        });
-
-
-        WidgetUtil.trySubscribe(this, "close", button -> {
-            RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.NOT_ACTIVATED);
-            triggerBackAnimation();
-        });
     }
-
 
     @Override
     public void onOpened() {
-        refreshGameList();
         super.onOpened();
-    }
 
-    private void loadGame(GameInfo item) {
-        try {
-            GameManifest manifest = item.getManifest();
-            copySaveDirectoryToRecordingLibrary(manifest.getTitle());
-            recordAndReplayUtils.setGameTitle(manifest.getTitle());
-            config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
-            config.getWorldGeneration().setWorldTitle(manifest.getTitle());
-            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, NetworkMode.NONE));
-        } catch (Exception e) {
-            logger.error("Failed to load saved game", e);
-            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
+        if (isValidScreen()) {
+            refreshGameInfoList(GameProvider.getSavedGames());
+        } else {
+            final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
+                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.subscribeButton(e -> triggerBackAnimation());
+            getManager().pushScreen(popup);
+            // disable child widgets
+            setEnabled(false);
         }
     }
 
-    private void copySaveDirectoryToRecordingLibrary(String gameTitle) {
-        File saveDirectory = new File(PathManager.getInstance().getSavePath(gameTitle).toString());
-        Path destinationPath = PathManager.getInstance().getRecordingPath(gameTitle);
-        File destDirectory = new File(destinationPath.toString());
-        try {
-            FileUtils.copyDirectoryStructure(saveDirectory, destDirectory);
-        } catch (Exception e) {
-            logger.error("Error trying to copy the save directory:", e);
-        }
-
+    @Override
+    protected void initWidgets() {
+        super.initWidgets();
+        load = find("load", UIButton.class);
+        close = find("close", UIButton.class);
     }
 
-    private void refreshGameList() {
-        gameList.setList(GameProvider.getSavedGames());
-        gameList.setSelection(null);
+    /**
+     * Launches {@link NameRecordingScreen} with the info of the game selected in this screen.
+     *
+     * @param nameRecordingScreen The instance of the screen to launch
+     * @param info The info of the selected game.
+     */
+    private void launchNamingScreen(NameRecordingScreen nameRecordingScreen, GameInfo info) {
+        nameRecordingScreen.setGameInfo(info);
+        nameRecordingScreen.setRecordAndReplayUtils(recordAndReplayUtils);
+        triggerForwardAnimation(nameRecordingScreen);
     }
 
     void setRecordAndReplayUtils(RecordAndReplayUtils recordAndReplayUtils) {
         this.recordAndReplayUtils = recordAndReplayUtils;
     }
+
+    @Override
+    protected boolean isValidScreen() {
+        if (Stream.of(load, close)
+                .anyMatch(Objects::isNull)
+                || !super.isValidScreen()) {
+            logger.error("Can't initialize screen correctly. At least one widget was missed!");
+            return false;
+        }
+        return true;
+    }
+
 }

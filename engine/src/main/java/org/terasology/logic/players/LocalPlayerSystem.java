@@ -487,7 +487,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     private float calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
-        return (float) java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
+        return (float) java.lang.Math.sin((double) bobFactor * frequency + phaseOffset) * amplitude;
     }
 
     @Override

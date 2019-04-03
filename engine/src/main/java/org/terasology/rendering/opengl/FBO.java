@@ -711,8 +711,8 @@ public final class FBO {
          * @param multiplier A float representing a multiplication factor.
          */
         public void multiplySelfBy(float multiplier) {
-            width  *= multiplier;
-            height *= multiplier;
+            width  = (int) (width * multiplier);
+            height = (int) (width * multiplier);
         }
 
         /**

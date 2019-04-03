@@ -77,10 +77,6 @@ public final class TerasologyConstants {
      * Path to a module's info file.
      */
     public static final Path MODULE_INFO_FILENAME = Paths.get("module.txt");
-    /**
-     * Name of a saved game's preview image.
-     */
-    public static final String DEFAULT_GAME_PREVIEW_IMAGE_NAME = "preview.jpg";
 
     private TerasologyConstants() {
     }
