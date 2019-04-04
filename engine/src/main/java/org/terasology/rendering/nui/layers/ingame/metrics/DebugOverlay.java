@@ -34,6 +34,9 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryType;
 
 import java.util.Locale;
 
@@ -85,9 +88,17 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine1.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
+                    //Memory stats without using Runtime.getRuntime() for client side
+                    String memHeap="";
+                    for (MemoryPoolMXBean mpBean: ManagementFactory.getMemoryPoolMXBeans()) {
+                        if (mpBean.getType() == MemoryType.HEAP) {
+                            memHeap+="\n[Client] Memory Heap: "+mpBean.getName() +":"+ mpBean.getUsage();
+                        }
+                    }
                     double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-                    return String.format("FPS: %.2f, Memory Usage: %.2f MB, Total Memory: %.2f MB, Max Memory: %.2f MB",
-                            time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0);
+                    //showing server, client stats organized way.
+                    return String.format("[Server] Memory Usage: %.2f MB, Total Memory: %.2f MB, Max Memory: %.2f MB\n[Client] FPS: %.2f %s",
+                            memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0, time.getFps(), memHeap);
                 }
             });
         }
@@ -101,7 +112,7 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
         }
-
+//
         UILabel debugLine3 = find("debugLine3", UILabel.class);
         if (debugLine3 != null) {
             debugLine3.bindText(new ReadOnlyBinding<String>() {
@@ -111,10 +122,25 @@ public class DebugOverlay extends CoreScreenLayer {
                     Vector3i chunkPos = ChunkMath.calcChunkPos((int) pos.x, (int) pos.y, (int) pos.z);
                     Vector3f rotation = localPlayer.getViewDirection();
                     Vector3f cameraPos = localPlayer.getViewPosition();
-                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z,
+
+                    //compass direction debugging
+                    String compassDir = "N";
+                    double highEq=0.4;
+                    compassDir = rotation.x > 0.0-highEq && rotation.x < 0.0+highEq && rotation.z<0 && rotation.z>-1 ? "N" : compassDir;
+                    compassDir = rotation.x > 0.6-highEq && rotation.x < 0.6+highEq && rotation.z<0 && rotation.z>-1 ? "NE" : compassDir;
+                    compassDir = rotation.z > 0.0-highEq && rotation.z < 0.0+highEq && rotation.x<1 && rotation.x>0 ? "E" : compassDir;
+                    compassDir = rotation.z > 0.6-highEq && rotation.z < 0.6+highEq && rotation.x<1 && rotation.x>0 ? "SE" : compassDir;
+                    compassDir = rotation.x > 0.0-highEq && rotation.x < 0.0+highEq && rotation.z<1 && rotation.z>0 ? "S" : compassDir;
+                    compassDir = rotation.x > -0.6-highEq && rotation.x < -0.6+highEq && rotation.z<1 && rotation.z>0 ? "SW" : compassDir;
+                    compassDir = rotation.z > 0.0-highEq && rotation.z < 0.0+highEq && rotation.x<0 && rotation.x>-1 ? "W" : compassDir;
+                    compassDir = rotation.x > -0.6-highEq && rotation.x < -0.6+highEq && rotation.z<0 && rotation.z>-1 ? "NW" : compassDir;
+
+                    //show debug positions rotations and compass
+                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f) \nCompass Direction: %s", pos.x, pos.y, pos.z,
                             chunkPos.x, chunkPos.y, chunkPos.z,
                             cameraPos.x, cameraPos.y, cameraPos.z,
-                            rotation.x, rotation.y, rotation.z);
+                            rotation.x, rotation.y, rotation.z,
+                            compassDir);
                 }
             });
         }
@@ -208,6 +234,7 @@ public class DebugOverlay extends CoreScreenLayer {
 
         metricsLabel = find("metrics", UILabel.class);
     }
+
 
     @Override
     public void update(float delta) {
