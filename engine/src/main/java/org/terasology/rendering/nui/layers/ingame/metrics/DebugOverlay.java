@@ -112,7 +112,7 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
         }
-//
+
         UILabel debugLine3 = find("debugLine3", UILabel.class);
         if (debugLine3 != null) {
             debugLine3.bindText(new ReadOnlyBinding<String>() {
