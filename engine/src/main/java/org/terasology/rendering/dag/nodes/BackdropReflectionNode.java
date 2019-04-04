@@ -26,24 +26,14 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.BindFbo;
-import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
-import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
-import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
-import org.terasology.rendering.dag.stateChanges.ReflectedCamera;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.dag.stateChanges.*;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.dag.nodes.BackdropNode.getAllWeatherZenith;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 
@@ -112,6 +102,7 @@ public class BackdropReflectionNode extends AbstractNode {
         addDesiredStateChange(new BindFbo(reflectedFbo));
         addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo));
         addDesiredStateChange(new EnableFaceCulling());
+        addDesiredStateChange(new SetFacesToCull(GL_FRONT));
         addDesiredStateChange(new DisableDepthWriting());
         addDesiredStateChange(new EnableMaterial(SKY_MATERIAL_URN));
 
