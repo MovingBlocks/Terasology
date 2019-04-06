@@ -31,9 +31,7 @@ import org.terasology.assets.format.AssetFileFormat;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.naming.Name;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.PathMatcher;
 import java.util.List;
@@ -75,18 +73,23 @@ public class GLSLShaderFormat implements AssetFileFormat<ShaderData> {
         String vertProgram = null;
         String fragProgram = null;
         ShaderMetadata metadata = new ShaderMetadata();
+        AssetDataFile vertFile = null;
+        AssetDataFile fragFile = null;
 
         for (AssetDataFile input : inputs) {
             if (input.getFilename().endsWith(VERTEX_SUFFIX)) {
                 vertProgram = readInput(input);
+                vertFile = input;
+
             } else if (input.getFilename().endsWith(FRAGMENT_SUFFIX)) {
                 fragProgram = readInput(input);
+                fragFile = input;
             } else {
                 metadata = readMetadata(input);
             }
         }
         if (vertProgram != null && fragProgram != null) {
-            return new ShaderData(vertProgram, fragProgram, metadata.getParameters());
+            return new ShaderData(vertProgram, fragProgram, metadata.getParameters(), vertFile, fragFile);
         }
         throw new IOException("Failed to load shader '" + urn + "' - missing vertex or fragment program");
     }

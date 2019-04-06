@@ -125,6 +125,19 @@ public class GLSLShader extends Shader {
     }
 
     @Override
+    public void nonInitialRecompile() {
+        // try to load the shaders from the source folder, not the build folder,
+        // on recompiles caused by the recompileShaders command
+        try {
+            shaderProgramBase.reloadFromSource();
+        }
+        catch (IOException e) {
+            logger.warn("Shader source files not found for {}", getUrn());
+        }
+        recompile();
+    }
+
+    @Override
     public void recompile() {
         registerAllShaderPermutations();
         // TODO: reload materials

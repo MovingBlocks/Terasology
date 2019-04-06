@@ -29,6 +29,14 @@ public abstract class Shader extends Asset<ShaderData> {
     }
 
     /**
+     * Recompiles the shader, but only to be used after the initial load and compilation
+     * of a shader. This allows for behavior to change on subsequent recompiles of a shader,
+     * specifically so that the shader can come from the build folder on the first compile,
+     * but will be loaded from source folder on subsequent recompiles
+     */
+    public abstract void nonInitialRecompile();
+
+    /**
      * Recompiles the shader
      */
     public abstract void recompile();
