@@ -130,8 +130,7 @@ public class GLSLShader extends Shader {
         // on recompiles caused by the recompileShaders command
         try {
             shaderProgramBase.reloadFromSource();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.warn("Shader source files not found for {}", getUrn());
         }
         recompile();

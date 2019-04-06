@@ -31,7 +31,9 @@ import org.terasology.assets.format.AssetFileFormat;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.naming.Name;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Type;
 import java.nio.file.PathMatcher;
 import java.util.List;
