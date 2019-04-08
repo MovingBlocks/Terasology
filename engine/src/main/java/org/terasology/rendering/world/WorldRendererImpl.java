@@ -787,7 +787,10 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void recompileShaders() {
         console.addMessage("Recompiling shaders... ", false);
-        shaderManager.recompileAllShaders();
+        // if this command is used in game, it means the user is developing shaders
+        // so we should try to load and compile then from the source directory this time,
+        // which is what happens when development is set to true for recompileAllShaders
+        shaderManager.recompileAllShaders(true);
         console.addMessage("done!");
     }
 

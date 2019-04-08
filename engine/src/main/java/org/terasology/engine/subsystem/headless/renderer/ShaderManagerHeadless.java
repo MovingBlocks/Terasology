@@ -43,7 +43,7 @@ public class ShaderManagerHeadless implements ShaderManager {
     }
 
     @Override
-    public void recompileAllShaders() {
+    public void recompileAllShaders(boolean development) {
         // Do nothing
     }
 

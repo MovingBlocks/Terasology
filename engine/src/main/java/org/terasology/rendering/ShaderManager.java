@@ -28,7 +28,16 @@ public interface ShaderManager {
 
     Material getActiveMaterial();
 
-    void recompileAllShaders();
+    default void recompileAllShaders() {
+        recompileAllShaders(false);
+    }
+
+    /**
+     * Shader recompilation that considers if the recompilation is for development
+     * purposes or not, allowing to change what the source of the shaders is
+     * @param development whether this recompile is for development purposes
+     */
+    void recompileAllShaders(boolean development);
 
     /**
      * Enables the default shader program.

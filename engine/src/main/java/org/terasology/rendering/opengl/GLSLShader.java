@@ -125,7 +125,7 @@ public class GLSLShader extends Shader {
     }
 
     @Override
-    public void nonInitialRecompile() {
+    public void developmentRecompile() {
         // try to load the shaders from the source folder, not the build folder,
         // on recompiles caused by the recompileShaders command
         try {

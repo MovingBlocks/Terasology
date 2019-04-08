@@ -33,11 +33,6 @@ public class HeadlessShader extends Shader {
     }
 
     @Override
-    public void nonInitialRecompile() {
-        // do nothing
-    }
-
-    @Override
     public void recompile() {
         // do nothing
     }
