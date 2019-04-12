@@ -74,6 +74,7 @@ public class WorldAtlasImpl implements WorldAtlas {
     private List<BlockTile> tilesNormal = Lists.newArrayList();
     private List<BlockTile> tilesHeight = Lists.newArrayList();
     private List<BlockTile> tilesGloss = Lists.newArrayList();
+    private int numFrames = 0;
 
     private BlockingQueue<BlockTile> reloadQueue = Queues.newLinkedBlockingQueue();
 
@@ -158,20 +159,22 @@ public class WorldAtlasImpl implements WorldAtlas {
     }
 
     private int indexTile(ResourceUrn uri) {
-        if (tiles.size() == MAX_TILES) {
-            logger.error("Maximum tiles exceeded");
-            return 0;
-        }
-        Optional<BlockTile> tile = Assets.get(uri, BlockTile.class);
-        if (tile.isPresent()) {
-            if (checkTile(tile.get())) {
-                int index = tiles.size();
-                tiles.add(tile.get());
-                addNormal(uri);
-                addHeightMap(uri);
-                addGlossMap(uri);
+        Optional<BlockTile> maybeTile = Assets.get(uri, BlockTile.class);
+        if (maybeTile.isPresent()) {
+            BlockTile tile = maybeTile.get();
+            if (numFrames + tile.getLength() > MAX_TILES) {
+                logger.error("Maximum tiles exceeded");
+                return 0;
+            }
+            if (checkTile(tile)) {
+                tiles.add(tile);
+                addTilePart(uri, tile.getLength(), tilesNormal, "Normal");
+                addTilePart(uri, tile.getLength(), tilesHeight, "Height");
+                addTilePart(uri, tile.getLength(), tilesGloss, "Gloss");
+                int index = numFrames;
+                numFrames += tile.getLength();
                 tileIndexes.put(uri, index);
-                tile.get().subscribe(tileReloadListener);
+                tile.subscribe(tileReloadListener);
                 return index;
             } else {
                 logger.error("Invalid tile {}, must be a square with power-of-two sides.", uri);
@@ -182,40 +185,29 @@ public class WorldAtlasImpl implements WorldAtlas {
     }
 
     private boolean checkTile(BlockTile tile) {
-        return tile.getImage().getWidth() == tile.getImage().getHeight()
-                && IntMath.isPowerOfTwo(tile.getImage().getWidth());
-    }
-
-    private void addNormal(ResourceUrn uri) {
-        String name = uri.toString() + "Normal";
-        Optional<BlockTile> tile = Assets.get(name, BlockTile.class);
-        if (tile.isPresent()) {
-            tilesNormal.add(tile.get());
-        } else {
-            // intentionally pad this list with null so that the indexes match the main atlas
-            tilesNormal.add(null);
+        for (int i=0; i<tile.getLength(); i++) {
+            if (tile.getImage(i).getWidth() != tile.getImage(i).getHeight()
+               || !IntMath.isPowerOfTwo(tile.getImage(i).getWidth())) {
+                return false;
+            }
         }
+        return true;
     }
 
-    private void addHeightMap(ResourceUrn uri) {
-        String name = uri.toString() + "Height";
+    private void addTilePart(ResourceUrn uri, int length, List<BlockTile> list, String nameExtension) {
+        String name = uri.toString() + nameExtension;
         Optional<BlockTile> tile = Assets.get(name, BlockTile.class);
         if (tile.isPresent()) {
-            tilesHeight.add(tile.get());
-        } else {
-            // intentionally pad this list with null so that the indexes match the main atlas
-            tilesHeight.add(null);
+            if (tile.get().getLength() == length) {
+                list.add(tile.get());
+                return;
+            } else {
+                logger.error("Supplementary tiles {} for tile {} has an incorrect number of frames.", nameExtension, uri);
+            }
         }
-    }
-
-    private void addGlossMap(ResourceUrn uri) {
-        String name = uri.toString() + "Gloss";
-        Optional<BlockTile> tile = Assets.get(name, BlockTile.class);
-        if (tile.isPresent()) {
-            tilesGloss.add(tile.get());
-        } else {
-            // intentionally pad this list with null so that the indexes match the main atlas
-            tilesGloss.add(null);
+        // intentionally pad this list with null so that the indexes match the main atlas
+        for (int i=0; i<length; i++) {
+            list.add(null);
         }
     }
 
@@ -328,10 +320,10 @@ public class WorldAtlasImpl implements WorldAtlas {
     // 4.   The size of the atlas is always a power of two - as is the tile size
     private void calculateAtlasSizes() {
         tileSize = 16;
-        tiles.stream().filter(tile -> tile.getImage().getWidth() > tileSize).forEach(tile -> tileSize = tile.getImage().getWidth());
+        tiles.stream().filter(tile -> tile.getImage(0).getWidth() > tileSize).forEach(tile -> tileSize = tile.getImage(0).getWidth());
 
         atlasSize = 1;
-        while (atlasSize * atlasSize < tiles.size()) {
+        while (atlasSize * atlasSize < numFrames) {
             atlasSize *= 2;
         }
         atlasSize = atlasSize * tileSize;
@@ -339,7 +331,7 @@ public class WorldAtlasImpl implements WorldAtlas {
         if (atlasSize > maxAtlasSize) {
             atlasSize = maxAtlasSize;
             int maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
-            while (maxTiles < tiles.size()) {
+            while (maxTiles < numFrames) {
                 tileSize >>= 1;
                 maxTiles = (atlasSize / tileSize) * (atlasSize / tileSize);
             }
@@ -355,14 +347,20 @@ public class WorldAtlasImpl implements WorldAtlas {
         Graphics g = result.getGraphics();
 
         g.setColor(clearColor);
-        for (int index = 0; index < tileImages.size(); ++index) {
-            int posX = (index) % tilesPerDim;
-            int posY = (index) / tilesPerDim;
-            BlockTile tile = tileImages.get(index);
-            if (tile != null) {
-                g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+        g.fillRect(0, 0, size, size);
+        
+        int totalIndex = 0;
+        for (int tileIndex = 0; tileIndex < tileImages.size(); tileIndex++) {
+            BlockTile tile = tileImages.get(tileIndex);
+            if (tile == null) {
+                totalIndex++;
             } else {
-                g.fillRect(posX * textureSize, posY * textureSize, textureSize, textureSize);
+                for (int frameIndex = 0; frameIndex < tile.getLength(); frameIndex++) {
+                    int posX = totalIndex % tilesPerDim;
+                    int posY = totalIndex / tilesPerDim;
+                    g.drawImage(tile.getImage(frameIndex).getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+                    totalIndex++;
+                }
             }
         }
 

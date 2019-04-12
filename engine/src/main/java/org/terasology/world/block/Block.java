@@ -87,7 +87,6 @@ public final class Block {
 
     // Special rendering flags (TODO: clean this up)
     private boolean water;
-    private boolean lava;
     private boolean grass;
     private boolean ice;
 
@@ -216,14 +215,6 @@ public final class Block {
 
     public void setWater(boolean water) {
         this.water = water;
-    }
-
-    public boolean isLava() {
-        return lava;
-    }
-
-    public void setLava(boolean lava) {
-        this.lava = lava;
     }
 
     public boolean isGrass() {
