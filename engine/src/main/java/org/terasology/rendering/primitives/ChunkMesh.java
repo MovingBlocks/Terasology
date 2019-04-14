@@ -81,9 +81,9 @@ public class ChunkMesh {
 
     // some constants
     private static final int SIZE_VERTEX = 3;   // vertices have 3 positional components, x,y,z
-    private static final int SIZE_TEX0 = 3;     // the first texture has 3 color components, r,g,b
-    private static final int SIZE_TEX1 = 3;     // the second texture is the same
-    private static final int SIZE_COLOR = 1;    // the color field has 4 components, r,g,b,a
+    private static final int SIZE_TEX0 = 4;     // the first texture has 4 components, u,v, flags, animation frame count
+    private static final int SIZE_TEX1 = 3;     // the second texture stores lighting, with components: light, block light, ambient occlusion
+    private static final int SIZE_COLOR = 1;    // the color field's 4 components are packed into 1 float-sized field.
     private static final int SIZE_NORMAL = 3;   // normals are 3-dimensional vectors with u,v,t components
 
     // offset to the beginning of each data field, from the start of the data regarding an individual vertex
@@ -370,6 +370,7 @@ public class ChunkMesh {
         public final TFloatList color;
         public final TIntList indices;
         public final TIntList flags;
+        public final TIntList frames;
         public int vertexCount;
 
         public IntBuffer finalVertices;
@@ -383,6 +384,7 @@ public class ChunkMesh {
             color = new TFloatArrayList();
             indices = new TIntArrayList();
             flags = new TIntArrayList();
+            frames = new TIntArrayList();
         }
     }
 }

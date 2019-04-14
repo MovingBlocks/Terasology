@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block.tiles;
+package org.terasology.world.generation.facets;
 
-import org.terasology.assets.AssetData;
+import org.terasology.math.Region3i;
+import org.terasology.world.generation.Border3D;
+import org.terasology.world.generation.facets.base.BaseStrictlySparseFieldFacet2D;
 
-import java.awt.image.BufferedImage;
-
-/**
+/***
+ * Stores the height at which the player may be spawned, if it exists for a given coordinate
  */
-public class TileData implements AssetData {
-    private BufferedImage[] images;
-    private boolean autoBlock;
-
-    public TileData(BufferedImage[] images, boolean autoBlock) {
-        this.images = images;
-        this.autoBlock = autoBlock;
-    }
-
-    public BufferedImage[] getImages() {
-        return images;
-    }
-
-    public boolean isAutoBlock() {
-        return autoBlock;
+public class SpawnHeightFacet extends BaseStrictlySparseFieldFacet2D {
+    public SpawnHeightFacet(Region3i targetRegion, Border3D border) {
+        super(targetRegion, border);
     }
 }

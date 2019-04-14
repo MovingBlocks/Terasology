@@ -113,7 +113,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
         addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
-        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL_URN, "textureLava"));
         setTerrainNormalsInputTexture = new SetInputTexture2D(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
         setTerrainHeightInputTexture = new SetInputTexture2D(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
 
@@ -167,12 +166,11 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
         chunkMaterial.setInt("textureAtlas", 0, true);
         chunkMaterial.setInt("textureEffects", 1, true);
-        chunkMaterial.setInt("textureLava", 2, true);
         if (normalMappingIsEnabled) {
-            chunkMaterial.setInt("textureAtlasNormal", 3, true);
+            chunkMaterial.setInt("textureAtlasNormal", 2, true);
         }
         if (parallaxMappingIsEnabled) {
-            chunkMaterial.setInt("textureAtlasHeight", 4, true);
+            chunkMaterial.setInt("textureAtlasHeight", 3, true);
             chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
         }
 

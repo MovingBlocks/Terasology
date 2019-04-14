@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block.tiles;
+package org.terasology.rendering.nui.layers.ingame;
 
-import org.terasology.assets.AssetData;
+import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.WidgetUtil;
 
-import java.awt.image.BufferedImage;
+public class DebugInfo extends CoreScreenLayer {
 
-/**
- */
-public class TileData implements AssetData {
-    private BufferedImage[] images;
-    private boolean autoBlock;
-
-    public TileData(BufferedImage[] images, boolean autoBlock) {
-        this.images = images;
-        this.autoBlock = autoBlock;
-    }
-
-    public BufferedImage[] getImages() {
-        return images;
-    }
-
-    public boolean isAutoBlock() {
-        return autoBlock;
+    @Override
+    public void initialise() {
+        WidgetUtil.trySubscribe(this, "closeButton", widget -> getManager().closeScreen(DebugInfo.this));
     }
 }

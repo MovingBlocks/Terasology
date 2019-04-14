@@ -257,7 +257,15 @@ Contributors
  [fishfred](https://github.com/fishfred),
  [Snooober](https://github.com/Snooober),
  [costinvisan](https://github.com/costinvisan),
- [Vishwaak](https://github.com/Vishwaak)
+ [Vishwaak](https://github.com/Vishwaak),
+ [shaunakdixit](https://github.com/shaunakdixit),
+ [e-aakash](https://github.com/e-aakash),
+ [majordwarf](https://github.com/majordwarf),
+ [Soundwave](https://github.com/PS-Soundwave),
+ [mayant15](https://github.com/mayant15),
+ [kinshukk](https://github.com/kinshukk),
+ [darshan3](https://github.com/darshan3),
+ [Loonride](https://github.com/Loonride)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

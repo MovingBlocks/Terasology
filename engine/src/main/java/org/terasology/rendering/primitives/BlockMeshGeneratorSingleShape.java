@@ -56,8 +56,6 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             } else {
                 vertexFlag = ChunkVertexFlag.WATER_SURFACE;
             }
-        } else if (selfBlock.isLava()) {
-            vertexFlag = ChunkVertexFlag.LAVA;
         } else if (selfBlock.isWaving() && selfBlock.isDoubleSided()) {
             vertexFlag = ChunkVertexFlag.WAVING;
         } else if (selfBlock.isWaving()) {

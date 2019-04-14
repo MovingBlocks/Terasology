@@ -18,6 +18,8 @@ package org.terasology.engine.modes;
 
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.world.chunks.event.OnChunkLoaded;
 
 /**
  * @version 0.1
@@ -55,4 +57,8 @@ public interface GameState {
     String getLoggingPhase();
 
     Context getContext();
+
+    default void onChunkLoaded(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
+        
+    }
 }

@@ -84,6 +84,8 @@ public class RecordScreen extends SelectionScreen {
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         if (isValidScreen()) {
             refreshGameInfoList(GameProvider.getSavedGames());
         } else {
