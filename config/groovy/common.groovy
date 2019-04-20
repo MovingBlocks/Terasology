@@ -2,7 +2,6 @@ import groovy.json.JsonSlurper
 
 @Grab(group='org.slf4j', module='slf4j-api', version='1.6.1')
 @Grab(group='org.slf4j', module='slf4j-nop', version='1.6.1')
-import org.slf4j.*
 
 @GrabResolver(name = 'jcenter', root = 'http://jcenter.bintray.com/')
 @Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
