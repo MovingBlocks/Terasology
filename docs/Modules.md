@@ -63,13 +63,14 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Equipment](https://github.com/Terasology/Equipment) - an equipment system with a character screen (`c`) showing stats and slots for various equipment types
 * [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system
 * [Fences](https://github.com/Terasology/Fences) - fences!
+* [FlexibleMovement](https://github.com/Terasology/FlexibleMovement) - a movement implementation for FlexiblePathfinding (see below)
 * [FlexiblePathfinding](https://github.com/Terasology/FlexiblePathfinding) - a more flexible variant pathfinding framework
 * [FlowingLiquids](https://github.com/Terasology/FlowingLiquids) - a more advanced flowing liquid system than SimpleLiquids - treats liquids as finite, makes them propagate, and current will even drag you around!
 * [Fluid](https://github.com/Terasology/Fluid) - adds support for fluid in non-world situations (such as for storage in workstations)
 * [FluidComputerIntegration](https://github.com/Terasology/FluidComputerIntegration) - allows for interactions with fluids via computers
 * [FunnyBlocks](https://github.com/Terasology/FunnyBlocks) - cheese wheels and bowling pins - why not
 * [Genome](https://github.com/Terasology/Genome) - genetics WOO! Complete with DNA letters and mutating plants. Part of the Wood & Stone line-up
-* [GooeyDefense](https://github.com/Terasology/GooeyDefense) - tower defense gameplay! Face down the hordes of Gooeys with defensive towers protecting a central shrine
+* [GooeyDefence](https://github.com/Terasology/GooeyDefence) - tower defense gameplay! Face down the hordes of Gooeys with defensive towers protecting a central shrine
 * [GooeysQuests](https://github.com/Terasology/GooeysQuests) - spawn our mascot Gooey (console: `spawnPrefab gooey`) then `e` click to interact for commands and quests!
 * [GooKeeper](https://github.com/Terasology/GooKeeper) - those wild Gooeys totally look like they'd be happy in some Zoo enclosures. Don't they? Then have visitors pay you!
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
