@@ -63,7 +63,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Equipment](https://github.com/Terasology/Equipment) - an equipment system with a character screen (`c`) showing stats and slots for various equipment types
 * [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system
 * [Fences](https://github.com/Terasology/Fences) - fences!
-* [FlexibleMovement](https://github.com/Terasology/FlexibleMovement) - a movement implementation for FlexiblePathfinding (see below)
+* [FlexibleMovement](https://github.com/Terasology/FlexibleMovement) - a movement implementation for FlexiblePathfinding (see below) (DISCLAIMER: this module is currently unstable)
 * [FlexiblePathfinding](https://github.com/Terasology/FlexiblePathfinding) - a more flexible variant pathfinding framework
 * [FlowingLiquids](https://github.com/Terasology/FlowingLiquids) - a more advanced flowing liquid system than SimpleLiquids - treats liquids as finite, makes them propagate, and current will even drag you around!
 * [Fluid](https://github.com/Terasology/Fluid) - adds support for fluid in non-world situations (such as for storage in workstations)
@@ -146,7 +146,6 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [TutorialAssetSystem](https://github.com/Terasology/TutorialAssetSystem) - a tutorial module covering our asset system, see also its [wiki](https://github.com/Terasology/TutorialAssetSystem/wiki)
 * [TutorialBehaviors](https://github.com/Terasology/TutorialBehaviors) - a tutorial module covering our behavior tree system
 * [TutorialDynamicCities](https://github.com/Terasology/TutorialDynamicCities) - GSOC 2016 project tutorial / docs. Covers how dynamic cities function. [Shared wiki with DynamicCities](https://github.com/Terasology/DynamicCities/wiki)
-* ~~[TutorialGraphicTweaks](https://github.com/Terasology/TutorialGraphicTweaks) - GSOC 2016 project tutorial / docs. Contains examples of how to modify rendering from a module~~ (pending some refactoring before final merge of needed changes to the engine)
 * [TutorialNui](https://github.com/Terasology/TutorialNui) - GSOC 2016 project tutorial / docs. Includes details both on NUI itself as well as its editor in the [wiki](https://github.com/Terasology/TutorialNui/wiki)
 * [TutorialSectors](https://github.com/Terasology/TutorialSectors) - a tutorial module covering our sector system (separated entity pools based on geographic location and differing entity scope)
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - a world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
