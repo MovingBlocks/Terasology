@@ -15,9 +15,17 @@
  */
 package org.terasology.rendering.logic;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glVertex3f;
+
+import java.nio.FloatBuffer;
+import java.util.Map;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.assets.management.AssetManager;
@@ -39,16 +47,9 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
 
-import java.nio.FloatBuffer;
-import java.util.Map;
-
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glLineWidth;
-import static org.lwjgl.opengl.GL11.glVertex3f;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 
 /**
  * Renderes region outlines for all entities with  {@link RegionOutlineComponent}s.
@@ -79,13 +80,13 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
 
     @ReceiveEvent
     public void onRegionOutlineComponentActivation(OnActivatedComponent event, EntityRef entity,
-                                                   RegionOutlineComponent component) {
+            RegionOutlineComponent component) {
         entityToRegionOutlineMap.put(entity, component);
     }
 
     @ReceiveEvent
     public void onRegionOutlineComponentDeactivation(BeforeDeactivateComponent event, EntityRef entity,
-                                     RegionOutlineComponent component) {
+            RegionOutlineComponent component) {
         entityToRegionOutlineMap.remove(entity);
     }
 
@@ -96,7 +97,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
             return; // skip everything if there is nothing to do to avoid possibly costly draw mode changes
         }
         glDisable(GL_DEPTH_TEST);
-        glLineWidth(2);
+        glLineWidth(1);
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);

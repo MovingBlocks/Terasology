@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.players;
 
+import java.util.List;
+
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
@@ -78,8 +80,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
-
-import java.util.List;
 
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?
@@ -162,26 +162,26 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
         Quat4f viewRotation;
         switch (characterMovementComponent.mode) {
-            case CROUCHING:
-            case WALKING:
-                if (!config.getRendering().isVrSupport()) {
-                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
-                    playerCamera.setOrientation(viewRotation);
-                }
-                playerCamera.getOrientation().rotate(relMove, relMove);
-                break;
-            case CLIMBING:
-                // Rotation is applied in KinematicCharacterMover
-                relMove.y += relativeMovement.y;
-                break;
-            default:
-                if (!config.getRendering().isVrSupport()) {
-                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
-                    playerCamera.setOrientation(viewRotation);
-                }
-                playerCamera.getOrientation().rotate(relMove, relMove);
-                relMove.y += relativeMovement.y;
-                break;
+        case CROUCHING:
+        case WALKING:
+            if (!config.getRendering().isVrSupport()) {
+                viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
+                playerCamera.setOrientation(viewRotation);
+            }
+            playerCamera.getOrientation().rotate(relMove, relMove);
+            break;
+        case CLIMBING:
+            // Rotation is applied in KinematicCharacterMover
+            relMove.y += relativeMovement.y;
+            break;
+        default:
+            if (!config.getRendering().isVrSupport()) {
+                viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
+                playerCamera.setOrientation(viewRotation);
+            }
+            playerCamera.getOrientation().rotate(relMove, relMove);
+            relMove.y += relativeMovement.y;
+            break;
         }
         // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing trouble down the line.
         if (!Float.isNaN(relMove.getX()) && !Float.isNaN(relMove.getY()) && !Float.isNaN(relMove.getZ())) {
@@ -399,7 +399,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         if (config.getRendering().isRenderPlacingBox()) {
             if (aabb != null) {
                 aabbRenderer.setAABB(aabb);
-                aabbRenderer.render(2f);
+                aabbRenderer.render(1f);
             }
         }
     }
