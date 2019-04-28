@@ -16,24 +16,14 @@
 
 package org.terasology.rendering.logic;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glLineWidth;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glVertex3f;
-
-import java.nio.FloatBuffer;
-import java.util.List;
-import java.util.Random;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -60,10 +50,20 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.nio.FloatBuffer;
+import java.util.List;
+import java.util.Random;
+
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glVertex3f;
 
 /**
  */
