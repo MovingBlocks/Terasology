@@ -16,8 +16,6 @@
 package org.terasology.rendering.primitives;
 
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -33,8 +31,6 @@ import org.terasology.world.block.shapes.BlockMeshPart;
 import java.util.Map;
 
 public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
-
-    private static final Logger logger = LoggerFactory.getLogger(BlockMeshGeneratorSingleShape.class);
 
     private Block block;
     private Mesh mesh;
@@ -70,8 +66,6 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             adjacentBlocks.put(side, blockToCheck);
         }
 
-        BlockAppearance blockAppearance = selfBlock.getAppearance(adjacentBlocks);
-
         /*
          * Determine the render process.
          */
@@ -88,51 +82,46 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             renderType = ChunkMesh.RenderType.BILLBOARD;
         }
 
-        if (blockAppearance.getPart(BlockPart.CENTER) != null) {
-            Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.CENTER, selfBiome);
-            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
-        }
-
         BlockMeshPart[] drawParts = new BlockMeshPart[6];
 
-        for (Side side : Side.getAllSides()) {
+        for (final Side side : Side.getAllSides()) {
             if (isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side)) {
+                BlockAppearance blockAppearance = selfBlock.getAppearance(adjacentBlocks);
+                if (blockAppearance.getPart(BlockPart.CENTER) != null) {
+                    Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.CENTER, selfBiome);
+                    blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
+                }
+
                 drawParts[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side));
-            }
-        }
 
-        // If the selfBlock isn't lowered, some more faces may have to be drawn
-        if (selfBlock.isLiquid()) {
-            Block topBlock = adjacentBlocks.get(Side.TOP);
-            // Draw horizontal sides if visible from below
-            if (topBlock.isLiquid()) {
-                for (Side side : Side.horizontalSides()) {
-                    Vector3i offset = side.getVector3i();
-                    Block adjacentAbove = view.getBlock(x + offset.x, y + 1, z + offset.z);
-                    Block adjacent = adjacentBlocks.get(side);
-                    
-                    if (adjacent.isLiquid() && !adjacentAbove.isLiquid()) {
-                        drawParts[side.ordinal()] = selfBlock.getTopLiquidMesh(side);
+                // If the selfBlock isn't lowered, some more faces may have to be drawn
+                if (selfBlock.isLiquid()) {
+                    Block topBlock = adjacentBlocks.get(Side.TOP);
+                    // Draw horizontal sides if visible from below
+                    if (topBlock.isLiquid() && Side.horizontalSides().contains(side)) {
+                        Vector3i offset = side.getVector3i();
+                        Block adjacentAbove = view.getBlock(x + offset.x, y + 1, z + offset.z);
+                        Block adjacent = adjacentBlocks.get(side);
+
+                        if (adjacent.isLiquid() && !adjacentAbove.isLiquid()) {
+                            drawParts[side.ordinal()] = selfBlock.getTopLiquidMesh(side);
+                        }
+                    } else {
+                        if (drawParts[side.ordinal()] != null) {
+                            drawParts[side.ordinal()] = selfBlock.getLowLiquidMesh(side);
+                        }
                     }
                 }
-            } else {
-                for (Side side : Side.getAllSides()) {
-                    if (drawParts[side.ordinal()] != null) {
-                        drawParts[side.ordinal()] = selfBlock.getLowLiquidMesh(side);
-                    }
-                }
-            }
-        }
 
-        for (Side dir : Side.getAllSides()) {
-            if (drawParts[dir.ordinal()] != null) {
-                Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(dir), selfBiome);
-                // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
-                ChunkVertexFlag sideVertexFlag = vertexFlag;
-                if (selfBlock.isGrass() && dir != Side.TOP && dir != Side.BOTTOM) {
-                    sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
+                if (drawParts[side.ordinal()] != null) {
+                    Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(side), selfBiome);
+                    // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
+                    ChunkVertexFlag sideVertexFlag = vertexFlag;
+                    if (selfBlock.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
+                        sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
+                    }
+                    drawParts[side.ordinal()].appendTo(chunkMesh, x, y, z, colorOffset, renderType, sideVertexFlag);
                 }
-                drawParts[dir.ordinal()].appendTo(chunkMesh, x, y, z, colorOffset, renderType, sideVertexFlag);
             }
         }
     }
