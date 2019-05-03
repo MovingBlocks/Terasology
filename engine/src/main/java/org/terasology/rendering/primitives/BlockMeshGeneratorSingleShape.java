@@ -41,8 +41,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
-        Biome selfBiome = view.getBiome(x, y, z);
-        Block selfBlock = view.getBlock(x, y, z);
+        final Block selfBlock = view.getBlock(x, y, z);
 
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
         ChunkVertexFlag vertexFlag = ChunkVertexFlag.NORMAL;
@@ -59,7 +58,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         }
 
         // Gather adjacent blocks
-        Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
+        final Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
         for (Side side : Side.getAllSides()) {
             Vector3i offset = side.getVector3i();
             Block blockToCheck = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
@@ -70,11 +69,12 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
         for (final Side side : Side.getAllSides()) {
             if (isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side)) {
-                BlockAppearance blockAppearance = selfBlock.getAppearance(adjacentBlocks);
+                final Biome selfBiome = view.getBiome(x, y, z);
                 final ChunkMesh.RenderType renderType = getRenderType(selfBlock);
+                final BlockAppearance blockAppearance = selfBlock.getPrimaryAppearance();
 
                 if (blockAppearance.getPart(BlockPart.CENTER) != null) {
-                    Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.CENTER, selfBiome);
+                    final Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.CENTER, selfBiome);
                     blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
                 }
 
@@ -82,12 +82,12 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
                 // If the selfBlock isn't lowered, some more faces may have to be drawn
                 if (selfBlock.isLiquid()) {
-                    Block topBlock = adjacentBlocks.get(Side.TOP);
+                    final Block topBlock = adjacentBlocks.get(Side.TOP);
                     // Draw horizontal sides if visible from below
                     if (topBlock.isLiquid() && Side.horizontalSides().contains(side)) {
-                        Vector3i offset = side.getVector3i();
-                        Block adjacentAbove = view.getBlock(x + offset.x, y + 1, z + offset.z);
-                        Block adjacent = adjacentBlocks.get(side);
+                        final Vector3i offset = side.getVector3i();
+                        final Block adjacentAbove = view.getBlock(x + offset.x, y + 1, z + offset.z);
+                        final Block adjacent = adjacentBlocks.get(side);
 
                         if (adjacent.isLiquid() && !adjacentAbove.isLiquid()) {
                             drawParts[side.ordinal()] = selfBlock.getTopLiquidMesh(side);
@@ -100,7 +100,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 }
 
                 if (drawParts[side.ordinal()] != null) {
-                    Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(side), selfBiome);
+                    final Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(side), selfBiome);
                     // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
                     ChunkVertexFlag sideVertexFlag = vertexFlag;
                     if (selfBlock.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
