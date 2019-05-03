@@ -66,27 +66,13 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             adjacentBlocks.put(side, blockToCheck);
         }
 
-        /*
-         * Determine the render process.
-         */
-        ChunkMesh.RenderType renderType = ChunkMesh.RenderType.TRANSLUCENT;
-
-        if (!selfBlock.isTranslucent()) {
-            renderType = ChunkMesh.RenderType.OPAQUE;
-        }
-        // TODO: Review special case, or alternatively compare uris.
-        if (selfBlock.isWater() || selfBlock.isIce()) {
-            renderType = ChunkMesh.RenderType.WATER_AND_ICE;
-        }
-        if (selfBlock.isDoubleSided()) {
-            renderType = ChunkMesh.RenderType.BILLBOARD;
-        }
-
         BlockMeshPart[] drawParts = new BlockMeshPart[6];
 
         for (final Side side : Side.getAllSides()) {
             if (isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side)) {
                 BlockAppearance blockAppearance = selfBlock.getAppearance(adjacentBlocks);
+                final ChunkMesh.RenderType renderType = getRenderType(selfBlock);
+
                 if (blockAppearance.getPart(BlockPart.CENTER) != null) {
                     Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.CENTER, selfBiome);
                     blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
@@ -125,6 +111,27 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             }
         }
     }
+
+    /**
+     * Determine the render process of the block.
+     * @return The render process for the block
+     */
+    private ChunkMesh.RenderType getRenderType(final Block selfBlock) {
+        ChunkMesh.RenderType renderType = ChunkMesh.RenderType.TRANSLUCENT;
+
+        if (!selfBlock.isTranslucent()) {
+            renderType = ChunkMesh.RenderType.OPAQUE;
+        }
+        // TODO: Review special case, or alternatively compare uris.
+        if (selfBlock.isWater() || selfBlock.isIce()) {
+            renderType = ChunkMesh.RenderType.WATER_AND_ICE;
+        }
+        if (selfBlock.isDoubleSided()) {
+            renderType = ChunkMesh.RenderType.BILLBOARD;
+        }
+        return renderType;
+    }
+
 
     /**
      * Returns true if the side should be rendered adjacent to the second side provided.
