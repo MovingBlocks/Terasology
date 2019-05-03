@@ -43,20 +43,6 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
         final Block selfBlock = view.getBlock(x, y, z);
 
-        // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
-        ChunkVertexFlag vertexFlag = ChunkVertexFlag.NORMAL;
-        if (selfBlock.isWater()) {
-            if (view.getBlock(x, y + 1, z).isWater()) {
-                vertexFlag = ChunkVertexFlag.WATER;
-            } else {
-                vertexFlag = ChunkVertexFlag.WATER_SURFACE;
-            }
-        } else if (selfBlock.isWaving() && selfBlock.isDoubleSided()) {
-            vertexFlag = ChunkVertexFlag.WAVING;
-        } else if (selfBlock.isWaving()) {
-            vertexFlag = ChunkVertexFlag.WAVING_BLOCK;
-        }
-
         // Gather adjacent blocks
         final Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
         for (Side side : Side.getAllSides()) {
@@ -70,6 +56,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 final Biome selfBiome = view.getBiome(x, y, z);
                 final ChunkMesh.RenderType renderType = getRenderType(selfBlock);
                 final BlockAppearance blockAppearance = selfBlock.getPrimaryAppearance();
+                final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, selfBlock);
 
                 if (blockAppearance.getPart(BlockPart.CENTER) != null) {
                     final Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.CENTER, selfBiome);
@@ -108,6 +95,23 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 }
             }
         }
+    }
+
+    private ChunkVertexFlag getChunkVertexFlag(ChunkView view, int x, int y, int z, Block selfBlock) {
+        // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
+        ChunkVertexFlag vertexFlag = ChunkVertexFlag.NORMAL;
+        if (selfBlock.isWater()) {
+            if (view.getBlock(x, y + 1, z).isWater()) {
+                vertexFlag = ChunkVertexFlag.WATER;
+            } else {
+                vertexFlag = ChunkVertexFlag.WATER_SURFACE;
+            }
+        } else if (selfBlock.isWaving() && selfBlock.isDoubleSided()) {
+            vertexFlag = ChunkVertexFlag.WAVING;
+        } else if (selfBlock.isWaving()) {
+            vertexFlag = ChunkVertexFlag.WAVING_BLOCK;
+        }
+        return vertexFlag;
     }
 
     /**
