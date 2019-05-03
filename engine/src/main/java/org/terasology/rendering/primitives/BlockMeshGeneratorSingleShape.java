@@ -65,8 +65,6 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             adjacentBlocks.put(side, blockToCheck);
         }
 
-        BlockMeshPart[] drawParts = new BlockMeshPart[6];
-
         for (final Side side : Side.getAllSides()) {
             if (isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side)) {
                 final Biome selfBiome = view.getBiome(x, y, z);
@@ -78,7 +76,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                     blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, colorOffset, renderType, vertexFlag);
                 }
 
-                drawParts[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side));
+                BlockMeshPart blockMeshPart = blockAppearance.getPart(BlockPart.fromSide(side));
 
                 // If the selfBlock isn't lowered, some more faces may have to be drawn
                 if (selfBlock.isLiquid()) {
@@ -90,23 +88,23 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                         final Block adjacent = adjacentBlocks.get(side);
 
                         if (adjacent.isLiquid() && !adjacentAbove.isLiquid()) {
-                            drawParts[side.ordinal()] = selfBlock.getTopLiquidMesh(side);
+                            blockMeshPart = selfBlock.getTopLiquidMesh(side);
                         }
                     } else {
-                        if (drawParts[side.ordinal()] != null) {
-                            drawParts[side.ordinal()] = selfBlock.getLowLiquidMesh(side);
+                        if (blockMeshPart != null) {
+                            blockMeshPart = selfBlock.getLowLiquidMesh(side);
                         }
                     }
                 }
 
-                if (drawParts[side.ordinal()] != null) {
+                if (blockMeshPart != null) {
                     final Vector4f colorOffset = selfBlock.calcColorOffsetFor(BlockPart.fromSide(side), selfBiome);
                     // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
                     ChunkVertexFlag sideVertexFlag = vertexFlag;
                     if (selfBlock.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
                         sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                     }
-                    drawParts[side.ordinal()].appendTo(chunkMesh, x, y, z, colorOffset, renderType, sideVertexFlag);
+                    blockMeshPart.appendTo(chunkMesh, x, y, z, colorOffset, renderType, sideVertexFlag);
                 }
             }
         }
