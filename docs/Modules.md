@@ -80,6 +80,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Inferno](https://github.com/Terasology/Inferno) - live on in an underworld after death!
 * [InGameHelp](https://github.com/Terasology/InGameHelp) - system for showing help in-game, default key `P`
 * [InGameHelpAPI](https://github.com/Terasology/InGameHelpAPI) - separate API module for IGH to allow support but not forced activation for the help system
+* [Inventory](https://github.com/Terasology/Inventory) - basic inventory originally bundled with the engine via Core - slot-based, no weight limits
 * [IRLCorp](https://github.com/Terasology/IRLCorp) - Industrialized Reduction of Labor Corporation - Helping workmen everywhere
 * [ItemPipes](https://github.com/Terasology/ItemPipes) - pipes! That can contain items!
 * [ItemRendering](https://github.com/Terasology/ItemRendering) - a library for displaying "holographic" items in the world
