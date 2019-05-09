@@ -51,9 +51,12 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             adjacentBlocks.put(side, blockToCheck);
         }
 
+        Biome selfBiome = null;
         for (final Side side : Side.getAllSides()) {
             if (isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side)) {
-                final Biome selfBiome = view.getBiome(x, y, z);
+                if (selfBiome == null) {
+                    selfBiome = view.getBiome(x, y, z);
+                }
                 final ChunkMesh.RenderType renderType = getRenderType(selfBlock);
                 final BlockAppearance blockAppearance = selfBlock.getPrimaryAppearance();
                 final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, selfBlock);
