@@ -181,6 +181,9 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                 drawItem(canvas, itemMargin, i, itemRegion);
             }
         }
+
+//        canvas.addInteractionRegion(verticalBar.getSliderListener());
+        canvas.addInteractionRegion(verticalBar.getHandleListener(), scrollbarRegion);
     }
 
     /**
