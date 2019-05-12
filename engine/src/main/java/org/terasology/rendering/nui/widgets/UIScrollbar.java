@@ -123,6 +123,14 @@ public class UIScrollbar extends CoreWidget {
         }
     };
 
+    public InteractionListener getSliderListener() {
+        return sliderListener;
+    }
+
+    public InteractionListener getHandleListener() {
+        return handleListener;
+    }
+
     public UIScrollbar() {
         this(true);
     }

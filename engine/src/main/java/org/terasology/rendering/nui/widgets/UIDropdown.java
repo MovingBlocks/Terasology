@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import com.google.common.collect.Lists;
+import com.google.api.client.util.Lists;
 import org.terasology.input.Keyboard;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;

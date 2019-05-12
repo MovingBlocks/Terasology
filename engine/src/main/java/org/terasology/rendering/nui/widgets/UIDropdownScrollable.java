@@ -15,25 +15,24 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import com.google.common.collect.Lists;
+import com.google.api.client.util.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TabbingManager;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
-
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * A scrollable dropdown widget.
@@ -53,16 +52,22 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private Binding<T> selection = new DefaultBinding<>();
     private List<InteractionListener> optionListeners = Lists.newArrayList();
     private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
+    private static final Logger logger = LoggerFactory.getLogger(UIDropdownScrollable.class);
 
     private InteractionListener mainListener = new BaseInteractionListener() {
+
+
+
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             opened = !opened;
+            logger.info(String.valueOf(opened));
             if (opened) {
                 optionListeners.clear();
                 for (int i = 0; i < getOptions().size(); ++i) {
                     optionListeners.add(new ItemListener(i));
                 }
+
             }
             return true;
         }
@@ -75,7 +80,9 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         }
     };
 
+
     public UIDropdownScrollable() {
+
     }
 
     public UIDropdownScrollable(String id) {
@@ -172,6 +179,8 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         float maxVertBarDesired = itemHeight * (optionListeners.size() - visibleOptionsNum - 0.5f) + itemMargin.getBottom();
         verticalBar.setRange((int) maxVertBarDesired);
 
+
+
         for (int i = 0; i < optionListeners.size(); ++i) {
             readItemMouseOver(canvas, i);
             Rect2i itemRegion = Rect2i.createFromMinAndSize(0, itemHeight * i - verticalBar.getValue(), availableWidth, itemHeight);
@@ -181,6 +190,9 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                 drawItem(canvas, itemMargin, i, itemRegion);
             }
         }
+
+//        canvas.addInteractionRegion(verticalBar.getSliderListener());
+        canvas.addInteractionRegion(verticalBar.getHandleListener(), scrollbarRegion);
     }
 
     /**
@@ -313,6 +325,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
 
     public void changeHighlighted(boolean increase) {
+
         if (!opened) {
             highlighted = getOptions().indexOf(getSelection());
         }
