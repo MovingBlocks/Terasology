@@ -26,7 +26,6 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -110,7 +109,8 @@ public class UIDropdown<T> extends ActivatableWidget {
             for (int i = 0; i < optionListeners.size(); ++i) {
                 if (optionListeners.get(i).isMouseOver()) {
                     canvas.setMode(HOVER_MODE);
-                } else if (i==highlighted && TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
+                    highlighted = i;
+                } else if (i==highlighted) {
                     canvas.setMode(HOVER_MODE);
                 } else {
                     canvas.setMode(DEFAULT_MODE);
@@ -137,7 +137,7 @@ public class UIDropdown<T> extends ActivatableWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (opened || (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this))) {
+        } else if (opened) {
             return ACTIVE_MODE;
         }
         return DEFAULT_MODE;
@@ -264,31 +264,31 @@ public class UIDropdown<T> extends ActivatableWidget {
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown() && TabbingManager.focusedWidget.equals(this)) {
-            if (opened) {
-                TabbingManager.setWidgetIsOpen(true);
-            } else {
-                TabbingManager.setWidgetIsOpen(false);
-            }
-
+        if (event.isDown()) {
             int keyId = event.getKey().getId();
-            if (keyId == Keyboard.KeyId.UP) {
-                this.changeHighlighted(false);
-                return true;
-            } else if (keyId == Keyboard.KeyId.DOWN) {
-                this.changeHighlighted(true);
-                return true;
-            }
-            if (keyId == Keyboard.KeyId.LEFT) {
-                if (opened) {
-                    setOpenedReverse(false);
-                }
-                return true;
-            } else if (keyId == Keyboard.KeyId.RIGHT) {
-                if (!opened) {
-                    setOpenedReverse(false);
-                }
-                return true;
+            switch (keyId){
+                case Keyboard.KeyId.UP:
+                    this.changeHighlighted(false);
+                    return false;
+                case Keyboard.KeyId.DOWN:
+                    this.changeHighlighted(true);
+                    return false;
+                case Keyboard.KeyId.LEFT:
+                    if (opened) {
+                        setOpenedReverse(false);
+                    }
+                    return true;
+                case Keyboard.KeyId.ENTER:
+                    if (opened) {
+                        setSelection(getOptions().get(highlighted));
+                        setOpenedReverse(false);
+                    }
+                    return true;
+                case Keyboard.KeyId.RIGHT:
+                    if (!opened) {
+                        setOpenedReverse(false);
+                    }
+                    return true;
             }
         }
         return super.onKeyEvent(event);
