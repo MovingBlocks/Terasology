@@ -26,6 +26,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -110,7 +111,7 @@ public class UIDropdown<T> extends ActivatableWidget {
                 if (optionListeners.get(i).isMouseOver()) {
                     canvas.setMode(HOVER_MODE);
                     highlighted = i;
-                } else if (i==highlighted) {
+                } else if (i == highlighted) {
                     canvas.setMode(HOVER_MODE);
                 } else {
                     canvas.setMode(DEFAULT_MODE);
@@ -137,7 +138,7 @@ public class UIDropdown<T> extends ActivatableWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (opened) {
+        } else if (opened || this.equals(TabbingManager.focusedWidget)) {
             return ACTIVE_MODE;
         }
         return DEFAULT_MODE;
@@ -251,7 +252,7 @@ public class UIDropdown<T> extends ActivatableWidget {
         } else {
             highlighted--;
             if (highlighted < 0) {
-                highlighted = getOptions().size()-1;
+                highlighted = getOptions().size() - 1;
             }
         }
 
@@ -266,7 +267,7 @@ public class UIDropdown<T> extends ActivatableWidget {
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown()) {
             int keyId = event.getKey().getId();
-            switch (keyId){
+            switch (keyId) {
                 case Keyboard.KeyId.UP:
                     this.changeHighlighted(false);
                     return false;
