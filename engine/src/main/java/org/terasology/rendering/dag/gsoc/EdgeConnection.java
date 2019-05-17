@@ -13,7 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
 
-public class InputPlug implements EdgeConnection {
+package org.terasology.rendering.dag.gsoc;
+
+import org.terasology.naming.Name;
+
+public abstract class EdgeConnection {
+
+    Name connectionName;
+    Type connectionType;
+
+    EdgeConnection(Name name, Type type){
+        this.connectionName = name;
+        this.connectionType = type;
+    }
+
+    public enum Type {/**Might differentiate by name only*/
+        INPUT,
+        OUTPUT
+    }
+
+    public Name getName(){
+        return this.connectionName;
+    }
+    public Type getType(){
+        return this.connectionType;
+    }
+
 }

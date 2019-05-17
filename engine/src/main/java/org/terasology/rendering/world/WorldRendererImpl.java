@@ -43,6 +43,8 @@ import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
+import org.terasology.rendering.dag.gsoc.EdgeConnection;
+import org.terasology.rendering.dag.gsoc.FBOConnection;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
@@ -533,7 +535,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         LateBlurNode secondLateBlurNode = new LateBlurNode("secondLateBlurNode", context, firstLateBlurFbo, secondLateBlurFbo);
         renderGraph.addNode(secondLateBlurNode);
 
-        Node finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context);
+        FBOConnection finalPostProcessingOutputFBO = new FBOConnection("finalPostProcessingOutputFBO", EdgeConnection.Type.OUTPUT);
+        FBOConnection finalPostProcessingInputFBO = new FBOConnection("finalPostProcessingOutputFBO", EdgeConnection.Type.OUTPUT);
+        Node finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context,finalPostProcessingInputFBO,finalPostProcessingOutputFBO);
         renderGraph.addNode(finalPostProcessingNode);
 
         renderGraph.connect(toneMappingNode, firstLateBlurNode, secondLateBlurNode, finalPostProcessingNode);
