@@ -49,11 +49,35 @@ public abstract class NewAbstractNode implements Node {
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private final SimpleUri nodeUri;
-    private Map<Name,EdgeConnection> input;
-    private Map<Name,EdgeConnection> output;
+    private Map<Name,EdgeConnection> inputConnections;
+    private Map<Name,EdgeConnection> outputConnections;
 
-    //TODO
-   // private final input
+    private void addInputConnection(EdgeConnection input){
+        this.inputConnections.putIfAbsent(input.getName(),input);
+    }
+    private void addOutputConnection(EdgeConnection output){
+        this.outputConnections.putIfAbsent(output.getName(),output);
+    }
+
+    protected void addInputFBOConnection(Name name, EdgeConnection.Type type, SimpleUri fboUri){
+        EdgeConnection fboConnection = new FBOConnection(name, type, fboUri);
+        addInputConnection(fboConnection);
+    }
+
+    protected void addOutputFBOConnection(Name name, EdgeConnection.Type type, SimpleUri fboUri){
+        EdgeConnection fboConnection = new FBOConnection(name, type, fboUri);
+        addOutputConnection(fboConnection);
+    }
+
+    protected void addInputMaterialConnection(Name name, EdgeConnection.Type type, ResourceUrn materialUrn){
+        EdgeConnection materialConnection = new MaterialConnection(name, type, materialUrn);
+        addInputConnection(materialConnection);
+    }
+
+    protected void addOutputMaterialConnection(Name name, EdgeConnection.Type type, ResourceUrn materialUrn){
+        EdgeConnection materialConnection = new MaterialConnection(name, type, materialUrn);
+        addOutputConnection(materialConnection);
+    }
 
     /**
      * Constructor to be used by inheriting classes.
@@ -66,13 +90,14 @@ public abstract class NewAbstractNode implements Node {
      * @param in
      * @param out
      *////TODO LIST OF INS AND OUTS
-    protected NewAbstractNode(String nodeId, Context context, EdgeConnection in, EdgeConnection out) {
+    protected NewAbstractNode(String nodeId, Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
 
-        this.nodeUri = new SimpleUri(providingModule.toString() + ":" + nodeId);
+       /* this.nodeUri = new SimpleUri(providingModule.toString() + ":" + nodeId);
         this.input.putIfAbsent(in.getName(),in);
-        this.output.putIfAbsent(out.getName(),out);
+        this.output.putIfAbsent(out.getName(),out);*/
+       //TODO Check for empty list of either in or out
     }
 
     /**
