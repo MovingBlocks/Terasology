@@ -13,9 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.edgeConnectionTypes;
 
-import org.terasology.rendering.dag.InputPlug;
+package org.terasology.rendering.dag.gsoc;
 
-public class InputFBOSocket extends InputPlug{
+import org.terasology.engine.SimpleUri;
+import org.terasology.naming.Name;
+
+public class FBOConnection extends EdgeConnection {
+
+    private SimpleUri fboUri;
+
+    public FBOConnection(Name name, Type type, SimpleUri fboUri) {
+        super(name, type);
+
+        this.fboUri = fboUri;
+    }
+
 }

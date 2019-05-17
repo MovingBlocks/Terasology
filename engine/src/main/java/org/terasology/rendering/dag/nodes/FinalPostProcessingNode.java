@@ -24,7 +24,8 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.gsoc.EdgeConnection;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -59,7 +60,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * the content of a number of technical buffers rather than the final, post-processed rendering
  * of the scene.
  */
-public class FinalPostProcessingNode extends AbstractNode implements PropertyChangeListener {
+public class FinalPostProcessingNode extends NewAbstractNode implements PropertyChangeListener {
     private static final ResourceUrn POST_MATERIAL_URN = new ResourceUrn("engine:prog.post");
 
     private WorldRenderer worldRenderer;
@@ -87,8 +88,8 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
     private final int noiseTextureSize = 1024;
 
-    public FinalPostProcessingNode(String nodeUri, Context context) {
-        super(nodeUri, context);
+    public FinalPostProcessingNode(String nodeUri, Context context, EdgeConnection in, EdgeConnection out) {
+        super(nodeUri, context, in, out);
 
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
