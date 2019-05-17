@@ -32,6 +32,8 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.utilities.Assets;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,9 +50,9 @@ public abstract class NewAbstractNode implements Node {
     protected boolean enabled = true;
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
-    private final SimpleUri nodeUri;
     private Map<Name,EdgeConnection> inputConnections = Maps.newHashMap();
     private Map<Name,EdgeConnection> outputConnections = Maps.newHashMap();
+    private final SimpleUri nodeUri;
 
     private void addInputConnection(EdgeConnection input){
         this.inputConnections.putIfAbsent(input.getName(),input);
@@ -77,6 +79,42 @@ public abstract class NewAbstractNode implements Node {
     protected void addOutputMaterialConnection(Name name, EdgeConnection.Type type, ResourceUrn materialUrn){
         EdgeConnection materialConnection = new MaterialConnection(name, type, materialUrn);
         addOutputConnection(materialConnection);
+    }
+
+    protected void removeInputConnection(Name name){
+        inputConnections.remove(name);
+    }
+
+    protected void removeOutputConnection(Name name){
+        outputConnections.remove(name);
+    }
+
+    public int getNumberOfInputConnections(){
+        return this.inputConnections.size();
+    }
+
+    public int getNumberOfOutputConnections(){
+        return this.outputConnections.size();
+    }
+
+    public EdgeConnection getInputConnection(Name name){
+        return inputConnections.get(name);
+    }
+
+    public EdgeConnection getOutputConnection(Name name){
+        return inputConnections.get(name);
+    }
+
+    public List<Name> getInputConnections(){
+        List<Name> inputConnectionNameList = new ArrayList<>();
+        this.inputConnections.forEach((name,connection) -> inputConnectionNameList.add(name));
+        return inputConnectionNameList;
+    }
+
+    public List<Name> getOutputConnections(){
+        List<Name> outputConnectionNameList = new ArrayList<>();
+        this.inputConnections.forEach((name,connection) -> outputConnectionNameList.add(name));
+        return outputConnectionNameList;
     }
 
     /**
