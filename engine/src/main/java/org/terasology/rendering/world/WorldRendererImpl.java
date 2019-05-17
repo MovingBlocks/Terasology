@@ -536,7 +536,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(secondLateBlurNode);
 
         FBOConnection finalPostProcessingOutputFBO = new FBOConnection("finalPostProcessingOutputFBO", EdgeConnection.Type.OUTPUT);
-        FBOConnection finalPostProcessingInputFBO = new FBOConnection("finalPostProcessingOutputFBO", EdgeConnection.Type.OUTPUT);
+        FBOConnection finalPostProcessingInputFBO = new FBOConnection("finalPostProcessingInputFBO", EdgeConnection.Type.OUTPUT);
         Node finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context,finalPostProcessingInputFBO,finalPostProcessingOutputFBO);
         renderGraph.addNode(finalPostProcessingNode);
 
