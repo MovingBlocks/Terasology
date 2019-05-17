@@ -49,8 +49,8 @@ public abstract class NewAbstractNode implements Node {
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private final SimpleUri nodeUri;
-    private Map<Name,EdgeConnection> inputConnections;
-    private Map<Name,EdgeConnection> outputConnections;
+    private Map<Name,EdgeConnection> inputConnections = Maps.newHashMap();
+    private Map<Name,EdgeConnection> outputConnections = Maps.newHashMap();
 
     private void addInputConnection(EdgeConnection input){
         this.inputConnections.putIfAbsent(input.getName(),input);
@@ -94,9 +94,6 @@ public abstract class NewAbstractNode implements Node {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
 
-       /* this.nodeUri = new SimpleUri(providingModule.toString() + ":" + nodeId);
-        this.input.putIfAbsent(in.getName(),in);
-        this.output.putIfAbsent(out.getName(),out);*/
        //TODO Check for empty list of either in or out
     }
 
