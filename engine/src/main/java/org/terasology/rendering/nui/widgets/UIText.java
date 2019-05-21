@@ -102,7 +102,7 @@ public class UIText extends WidgetWithOrder {
     protected Binding<String> text = new DefaultBinding<>("");
 
     @LayoutConfig
-    private String[] textArr = new String[]{};
+    private String[] linesOfText = new String[]{};
 
     /**
      * The interaction listener of the widget. This handles how the widget reacts to different stimuli from the user.
@@ -212,7 +212,7 @@ public class UIText extends WidgetWithOrder {
         if (text.get() == null) {
             text.set("");
         }
-        if (text.get().equals("") && textArr == null) {
+        if (text.get().equals("") && linesOfText == null) {
             text.set(hintText);
             isShowingHintText = true;
         }
@@ -671,13 +671,14 @@ public class UIText extends WidgetWithOrder {
     /**
      * Get the text contained by the text box.
      *
-     * @return The text contained by the text box
+     * @return The text contained by the text box.
+     * If both the linesOfText array and the text string are populated,
+     * return the text concatenated with the array text, else return
+     * contents of linesOfText or text accordingly.
      */
     public String getText() {
         String arrayText = "";
-        if(textArr != null){
-            for(int i = 0;i < textArr.length;i++) arrayText += textArr[i] + "\n";
-        }
+        if(linesOfText != null) arrayText = String.join("\n", linesOfText);
         if(text.get() != "") return text.get() + "\n" + arrayText;
         return text.get() + arrayText;
     }
@@ -692,7 +693,7 @@ public class UIText extends WidgetWithOrder {
         boolean callEvent = !prevText.equals(val);
 
         text.set(val != null ? val : "");
-        textArr = null;
+        linesOfText = null;
         correctCursor();
 
         if (callEvent) {
@@ -702,9 +703,9 @@ public class UIText extends WidgetWithOrder {
         }
     }
 
-    public void setTextArr(String[] arr){
+    public void setLinesOfText(String[] arr){
         String prevText = getText();
-        textArr = arr;
+        linesOfText = arr;
         text.set("");
         String newText = getText();
         correctCursor();
