@@ -101,6 +101,9 @@ public class UIText extends WidgetWithOrder {
     @LayoutConfig
     protected Binding<String> text = new DefaultBinding<>("");
 
+    @LayoutConfig
+    private String[] textArr = new String[]{};
+
     /**
      * The interaction listener of the widget. This handles how the widget reacts to different stimuli from the user.
      */
@@ -165,6 +168,7 @@ public class UIText extends WidgetWithOrder {
 
     private TextureRegion cursorTexture;
 
+
     /**
      * Default constructor.
      */
@@ -202,11 +206,13 @@ public class UIText extends WidgetWithOrder {
         drawAll(canvas, canvas.size().x);
     }
 
+
     protected void drawAll(Canvas canvas, int multilineWidth) {
+
         if (text.get() == null) {
             text.set("");
         }
-        if (text.get().equals("")) {
+        if (text.get().equals("") && textArr == null) {
             text.set(hintText);
             isShowingHintText = true;
         }
@@ -218,9 +224,10 @@ public class UIText extends WidgetWithOrder {
                 isShowingHintText = false;
             }
         }
+
         lastFont = canvas.getCurrentStyle().getFont();
         correctCursor();
-        String textToDraw = passwordMode ? buildPasswordString() : text.get();
+        String textToDraw = passwordMode ? buildPasswordString() : getText();
         int widthForDraw = (multiline) ? multilineWidth : lastFont.getWidth(textToDraw);
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
              SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
@@ -299,8 +306,8 @@ public class UIText extends WidgetWithOrder {
     protected void drawCursor(Canvas canvas) {
         if (blinkCounter < BLINK_RATE) {
             Font font = canvas.getCurrentStyle().getFont();
-            String beforeCursor = text.get();
-            if (getCursorPosition() < text.get().length()) {
+            String beforeCursor = getText();
+            if (getCursorPosition() < getText().length()) {
                 beforeCursor = beforeCursor.substring(0, getCursorPosition());
             }
             List<String> lines = TextLineBuilder.getLines(font, beforeCursor, canvas.size().x);
@@ -374,7 +381,7 @@ public class UIText extends WidgetWithOrder {
                     }
                     eventHandled = true;
                 } else if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
-                    String fullText = text.get();
+                    String fullText = getText();
                     String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
                     String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
                     setText(before + event.getKeyCharacter() + after);
@@ -382,7 +389,7 @@ public class UIText extends WidgetWithOrder {
                     eventHandled = true;
                 }
             } else {
-                String fullText = text.get();
+                String fullText = getText();
 
                 switch (event.getKey().getId()) {
                     case KeyId.LEFT: {
@@ -667,7 +674,12 @@ public class UIText extends WidgetWithOrder {
      * @return The text contained by the text box
      */
     public String getText() {
-        return text.get();
+        String arrayText = "";
+        if(textArr != null){
+            for(int i = 0;i < textArr.length;i++) arrayText += textArr[i] + "\n";
+        }
+        if(text.get() != "") return text.get() + "\n" + arrayText;
+        return text.get() + arrayText;
     }
 
     /**
@@ -680,6 +692,7 @@ public class UIText extends WidgetWithOrder {
         boolean callEvent = !prevText.equals(val);
 
         text.set(val != null ? val : "");
+//        textArr = null;
         correctCursor();
 
         if (callEvent) {
@@ -687,6 +700,18 @@ public class UIText extends WidgetWithOrder {
                 listener.onTextChange(prevText, val);
             }
         }
+    }
+
+    public void setTextArr(String[] arr){
+        String prevText = getText();
+        textArr = arr;
+        text.set("");
+        String newText = getText();
+        correctCursor();
+        for (TextChangeEventListener listener : textChangeListeners) {
+            listener.onTextChange(prevText, newText);
+        }
+
     }
 
     /**
