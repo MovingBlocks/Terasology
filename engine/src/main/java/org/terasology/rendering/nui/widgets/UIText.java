@@ -692,7 +692,7 @@ public class UIText extends WidgetWithOrder {
         boolean callEvent = !prevText.equals(val);
 
         text.set(val != null ? val : "");
-//        textArr = null;
+        textArr = null;
         correctCursor();
 
         if (callEvent) {
