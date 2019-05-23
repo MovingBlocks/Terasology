@@ -20,10 +20,10 @@ import org.terasology.naming.Name;
 
 public abstract class EdgeConnection {
 
-    Name connectionName;
-    Type connectionType;
+    private String connectionName;
+    private Type connectionType;
 
-    EdgeConnection(Name name, Type type){
+    EdgeConnection(String name, Type type){
         this.connectionName = name;
         this.connectionType = type;
     }
@@ -33,7 +33,7 @@ public abstract class EdgeConnection {
         OUTPUT
     }
 
-    public Name getName(){
+    public String getName(){
         return this.connectionName;
     }
     public Type getType(){
