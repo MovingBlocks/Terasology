@@ -23,10 +23,17 @@ public class FBOConnection extends EdgeConnection {
 
     private SimpleUri fboUri;
 
-    public FBOConnection(Name name, Type type, SimpleUri fboUri) {
+    public FBOConnection(String name, Type type, SimpleUri fboUri) {
         super(name, type);
 
         this.fboUri = fboUri;
+    }
+    public SimpleUri getUri(){
+        return this.fboUri;
+    }
+
+    public void setUri(SimpleUri fbo){
+        this.fboUri =  fbo;
     }
 
 }

@@ -23,10 +23,18 @@ public class MaterialConnection extends EdgeConnection {
 
     private ResourceUrn materialUrn;
 
-    public MaterialConnection(Name name, Type type, ResourceUrn materialUrn) {
+    public MaterialConnection(String name, Type type, ResourceUrn materialUrn) {
         super(name, type);
 
         this.materialUrn = materialUrn;
+    }
+
+    public ResourceUrn getUrn(){
+        return this.materialUrn;
+    }
+
+    public void setUrn(ResourceUrn material){
+        this.materialUrn =  material;
     }
 
 }
