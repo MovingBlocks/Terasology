@@ -21,6 +21,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
@@ -45,7 +46,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  *
  * This node stores its output in TONE_MAPPED_FBO_URI.
  */
-public class ToneMappingNode extends AbstractNode {
+public class ToneMappingNode extends NewAbstractNode {
     public static final SimpleUri TONE_MAPPING_FBO_URI = new SimpleUri("engine:fbo.toneMapping");
     private static final ResourceUrn TONE_MAPPING_MATERIAL_URN = new ResourceUrn("engine:prog.toneMapping");
 
