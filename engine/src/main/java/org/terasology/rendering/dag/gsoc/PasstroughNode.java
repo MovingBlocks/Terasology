@@ -16,33 +16,26 @@
 package org.terasology.rendering.dag.gsoc;
 
 import org.terasology.context.Context;
-import org.terasology.monitoring.PerformanceMonitor;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class PasstroughNode {
-    public class PasstroughNode extends NewAbstractNode implements PropertyChangeListener {
+public class PasstroughNode extends NewAbstractNode implements PropertyChangeListener {
 
-        public PasstroughNode(String nodeUri, Context context) {
-            super(nodeUri, context);
-        }
-        /**
-         * Execute the final post processing on the rendering of the scene obtained so far.
-         *
-         * It uses the data stored in multiple FBOs as input and the FINAL FBO to store its output, rendering everything to a quad.
-         */
-        @Override
-        public void process() {
-            PerformanceMonitor.startActivity("rendering/" + getUri());
-
-            PerformanceMonitor.endActivity();
-        }
-
-        @Override
-        public void propertyChange(PropertyChangeEvent event) {
-
-        }
+    public PasstroughNode(String nodeUri, Context context) {
+        super(nodeUri, context);
     }
 
+    /**
+     * Connect two nodes and their dependencies doing nothing but linking them trough this node.
+     */
+    @Override
+    public void process() {
+
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+
+    }
 }
