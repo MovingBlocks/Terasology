@@ -50,8 +50,8 @@ public abstract class NewAbstractNode implements Node {
     protected boolean enabled = true;
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
-    private Map<Name,EdgeConnection> inputConnections = Maps.newHashMap();
-    private Map<Name,EdgeConnection> outputConnections = Maps.newHashMap();
+    private Map<String,EdgeConnection> inputConnections = Maps.newHashMap();
+    private Map<String,EdgeConnection> outputConnections = Maps.newHashMap();
     private final SimpleUri nodeUri;
 
     /**
@@ -77,32 +77,54 @@ public abstract class NewAbstractNode implements Node {
     private void addOutputConnection(EdgeConnection output){
         this.outputConnections.putIfAbsent(output.getName(),output);
     }
+    /**TODO String to SimpleUri or make ConnectionUri and change Strings for names to ConnectionUris*/
+    private String getFBOName(int number){
+        return new StringBuilder("FBO").append(number).toString();
+    }
+    private String getMaterialName(int number){
+        return new StringBuilder("Material").append(number).toString();
+    }
 
-    public void addInputFBOConnection(Name name, EdgeConnection.Type type, SimpleUri fboUri){
-        EdgeConnection fboConnection = new FBOConnection(name, type, fboUri);
+    protected SimpleUri getInputFBOUri(int number){
+        return ((FBOConnection)this.inputConnections.get((new StringBuilder("FBO").append(number).toString()))).getUri();
+    }
+
+    protected ResourceUrn getInputMaterialUrn(int number){
+        return ((MaterialConnection)this.inputConnections.get((new StringBuilder("Material").append(number).toString()))).getUrn();
+    }
+
+    public void addInputFBOConnection(int id, SimpleUri fboUri){
+        EdgeConnection fboConnection = new FBOConnection(getFBOName(id), EdgeConnection.Type.INPUT, fboUri);
         addInputConnection(fboConnection);
     }
 
-    public void addOutputFBOConnection(Name name, EdgeConnection.Type type, SimpleUri fboUri){
-        EdgeConnection fboConnection = new FBOConnection(name, type, fboUri);
+    public void addOutputFBOConnection(int id, SimpleUri fboUri){
+        EdgeConnection fboConnection = new FBOConnection(getFBOName(id), EdgeConnection.Type.OUTPUT, fboUri);
         addOutputConnection(fboConnection);
     }
 
-    public void addInputMaterialConnection(Name name, EdgeConnection.Type type, ResourceUrn materialUrn){
-        EdgeConnection materialConnection = new MaterialConnection(name, type, materialUrn);
+    public void addInputMaterialConnection(int id, ResourceUrn materialUrn){
+        EdgeConnection materialConnection = new MaterialConnection(getMaterialName(id), EdgeConnection.Type.INPUT, materialUrn);
         addInputConnection(materialConnection);
     }
 
-    public void addOutputMaterialConnection(Name name, EdgeConnection.Type type, ResourceUrn materialUrn){
-        EdgeConnection materialConnection = new MaterialConnection(name, type, materialUrn);
+    public void addOutputMaterialConnection(int id,  ResourceUrn materialUrn){
+        EdgeConnection materialConnection = new MaterialConnection(getMaterialName(id), EdgeConnection.Type.OUTPUT, materialUrn);
         addOutputConnection(materialConnection);
     }
 
-    public void removeInputConnection(Name name){
+    public SimpleUri getOutputFBOUri(int id){/**Do i need instanceof check here?*/
+        return ((FBOConnection)this.outputConnections.get(getFBOName(id))).getUri();
+    }
+    public ResourceUrn getOutputMaterialUrn(int id){/**Do i need instanceof check here?*/
+        return ((MaterialConnection)this.outputConnections.get(getMaterialName(id))).getUrn();
+    }
+
+    public void removeInputConnection(String name){
         inputConnections.remove(name);
     }
 
-    public void removeOutputConnection(Name name){
+    public void removeOutputConnection(String name){
         outputConnections.remove(name);
     }
 
@@ -114,22 +136,22 @@ public abstract class NewAbstractNode implements Node {
         return this.outputConnections.size();
     }
 
-    public EdgeConnection getInputConnection(Name name){
+    public EdgeConnection getInputConnection(String name){
         return inputConnections.get(name);
     }
 
-    public EdgeConnection getOutputConnection(Name name){
+    public EdgeConnection getOutputConnection(String name){
         return inputConnections.get(name);
     }
 
-    public List<Name> getInputConnections(){
-        List<Name> inputConnectionNameList = new ArrayList<>();
+    public List<String> getInputConnections(){
+        List<String> inputConnectionNameList = new ArrayList<>();
         this.inputConnections.forEach((name,connection) -> inputConnectionNameList.add(name));
         return inputConnectionNameList;
     }
 
-    public List<Name> getOutputConnections(){
-        List<Name> outputConnectionNameList = new ArrayList<>();
+    public List<String> getOutputConnections(){
+        List<String> outputConnectionNameList = new ArrayList<>();
         this.inputConnections.forEach((name,connection) -> outputConnectionNameList.add(name));
         return outputConnectionNameList;
     }
