@@ -32,6 +32,7 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.naming.Name;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -517,7 +518,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node initialPostProcessingNode = renderGraph.findNode("engine:initialPostProcessingNode");
         Node updateExposureNode = renderGraph.findNode("engine:updateExposureNode");
 
-        Node toneMappingNode = new ToneMappingNode("toneMappingNode", context);
+        ToneMappingNode toneMappingNode = new ToneMappingNode("toneMappingNode", context);
+        /**naming just a concept, would probably need to extend to connectionUri or similar*/
+        toneMappingNode.addOutputFBOConnection(1,ToneMappingNode.TONE_MAPPING_FBO_URI);
         renderGraph.addNode(toneMappingNode);
         renderGraph.connect(updateExposureNode, toneMappingNode);
         renderGraph.connect(initialPostProcessingNode, toneMappingNode);
@@ -528,6 +531,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         LateBlurNode firstLateBlurNode = new LateBlurNode("firstLateBlurNode", context, displayResolutionDependentFBOs.get(ToneMappingNode.TONE_MAPPING_FBO_URI), firstLateBlurFbo);
         renderGraph.addNode(firstLateBlurNode);
+        firstLateBlurNode.addOutputFBOConnection(1,LateBlurNode.FIRST_LATE_BLUR_FBO_URI);
+        firstLateBlurNode.addOutputFBOConnection(2,LateBlurNode.SECOND_LATE_BLUR_FBO_URI);
 
         FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
         FBO secondLateBlurFbo = displayResolutionDependentFBOs.request(secondLateBlurConfig);
@@ -535,9 +540,19 @@ public final class WorldRendererImpl implements WorldRenderer {
         LateBlurNode secondLateBlurNode = new LateBlurNode("secondLateBlurNode", context, firstLateBlurFbo, secondLateBlurFbo);
         renderGraph.addNode(secondLateBlurNode);
 
-        FBOConnection finalPostProcessingOutputFBO = new FBOConnection("finalPostProcessingOutputFBO", EdgeConnection.Type.OUTPUT);
-        FBOConnection finalPostProcessingInputFBO = new FBOConnection("finalPostProcessingInputFBO", EdgeConnection.Type.OUTPUT);
-        Node finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context,finalPostProcessingInputFBO,finalPostProcessingOutputFBO);
+        //FBOConnection finalPostProcessingOutputFBO = new FBOConnection("finalPostProcessingOutputFBO", EdgeConnection.Type.OUTPUT);
+        //FBOConnection finalPostProcessingInputFBO = new FBOConnection("finalPostProcessingInputFBO", EdgeConnection.Type.OUTPUT);
+        FinalPostProcessingNode finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context);
+        /**As the last attribute - getting output dependencyUri/wholeconnection(can't see why now, but possible) from nodes - how? -
+         *                                                       either type -
+         *                                                          getOutputFBOConnection{ByNameContains}(substr/prefix/suffix..)/
+         *                                                       or getOutputFBOConnection{ByPriority}(#)-fetch output FBO
+*                                                                    - requires List instead of Map, OR adding priority attribute or...
+         *                                                       or getOutputFBOConnection{ByName}(name)*/
+        finalPostProcessingNode.addInputFBOConnection(1,toneMappingNode.getOutputFBOUri(1));
+        finalPostProcessingNode.addInputFBOConnection(2,firstLateBlurNode.getOutputFBOUri(2));
+
+
         renderGraph.addNode(finalPostProcessingNode);
 
         renderGraph.connect(toneMappingNode, firstLateBlurNode, secondLateBlurNode, finalPostProcessingNode);
