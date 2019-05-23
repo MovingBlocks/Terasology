@@ -54,6 +54,23 @@ public abstract class NewAbstractNode implements Node {
     private Map<Name,EdgeConnection> outputConnections = Maps.newHashMap();
     private final SimpleUri nodeUri;
 
+    /**
+     * Constructor to be used by inheriting classes.
+     *
+     * The nodeId provided in input will become part of the nodeUri uniquely identifying the node in the RenderGraph,
+     * i.e. "engine:hazeNode".
+     *
+     * @param nodeId a String representing the id of the node, namespace -excluded-: that's added automatically.
+     * @param context a Context object.
+     *////TODO LIST OF INS AND OUTS
+    protected NewAbstractNode(String nodeId, Context context) {
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
+
+        this.nodeUri = new SimpleUri(providingModule.toString() + ":" + nodeId);
+        //TODO Check for empty list of either in or out
+    }
+
     private void addInputConnection(EdgeConnection input){
         this.inputConnections.putIfAbsent(input.getName(),input);
     }
@@ -61,31 +78,31 @@ public abstract class NewAbstractNode implements Node {
         this.outputConnections.putIfAbsent(output.getName(),output);
     }
 
-    protected void addInputFBOConnection(Name name, EdgeConnection.Type type, SimpleUri fboUri){
+    public void addInputFBOConnection(Name name, EdgeConnection.Type type, SimpleUri fboUri){
         EdgeConnection fboConnection = new FBOConnection(name, type, fboUri);
         addInputConnection(fboConnection);
     }
 
-    protected void addOutputFBOConnection(Name name, EdgeConnection.Type type, SimpleUri fboUri){
+    public void addOutputFBOConnection(Name name, EdgeConnection.Type type, SimpleUri fboUri){
         EdgeConnection fboConnection = new FBOConnection(name, type, fboUri);
         addOutputConnection(fboConnection);
     }
 
-    protected void addInputMaterialConnection(Name name, EdgeConnection.Type type, ResourceUrn materialUrn){
+    public void addInputMaterialConnection(Name name, EdgeConnection.Type type, ResourceUrn materialUrn){
         EdgeConnection materialConnection = new MaterialConnection(name, type, materialUrn);
         addInputConnection(materialConnection);
     }
 
-    protected void addOutputMaterialConnection(Name name, EdgeConnection.Type type, ResourceUrn materialUrn){
+    public void addOutputMaterialConnection(Name name, EdgeConnection.Type type, ResourceUrn materialUrn){
         EdgeConnection materialConnection = new MaterialConnection(name, type, materialUrn);
         addOutputConnection(materialConnection);
     }
 
-    protected void removeInputConnection(Name name){
+    public void removeInputConnection(Name name){
         inputConnections.remove(name);
     }
 
-    protected void removeOutputConnection(Name name){
+    public void removeOutputConnection(Name name){
         outputConnections.remove(name);
     }
 
@@ -115,24 +132,6 @@ public abstract class NewAbstractNode implements Node {
         List<Name> outputConnectionNameList = new ArrayList<>();
         this.inputConnections.forEach((name,connection) -> outputConnectionNameList.add(name));
         return outputConnectionNameList;
-    }
-
-    /**
-     * Constructor to be used by inheriting classes.
-     *
-     * The nodeId provided in input will become part of the nodeUri uniquely identifying the node in the RenderGraph,
-     * i.e. "engine:hazeNode".
-     *
-     * @param nodeId a String representing the id of the node, namespace -excluded-: that's added automatically.
-     * @param context a Context object.
-     * @param in
-     * @param out
-     *////TODO LIST OF INS AND OUTS
-    protected NewAbstractNode(String nodeId, Context context) {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
-        Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
-
-       //TODO Check for empty list of either in or out
     }
 
     /**
