@@ -199,11 +199,16 @@ class common {
         def clean = itemGit.status().clean
         println "Is \"$itemName\" clean? $clean"
         if (!clean) {
-            println "$itemType has uncommitted changes. Aborting."
+            println "$itemType has uncommitted changes. Skipping."
             return
         }
         println "Updating $itemType $itemName"
-        itemGit.pull remote: defaultRemote
+
+        try {
+            itemGit.pull remote: defaultRemote
+        } catch (GrgitException exception) {
+            println "Unable to update $itemName, Skipping: ${exception.getMessage()}"
+        }
     }
 
     /**
