@@ -54,7 +54,19 @@ switch(cleanerArgs[0]) {
         } else {
             // Note: processCustomRemote also drops one of the array elements from cleanerArgs
             cleanerArgs = common.processCustomRemote(cleanerArgs)
-            common.retrieve cleanerArgs, recurse
+            ArrayList<String> selectedItems = new ArrayList<String>()
+
+            common.cacheItemList()
+            for (String arg : cleanerArgs) {
+                if (!arg.contains('*') && !arg.contains('?')) {
+                    selectedItems.add(arg)
+                } else {
+                    selectedItems.addAll(common.retrieveAvalibleItemsWithWildcardMatch(arg));
+                }
+            }
+            common.unCacheItemList()
+
+            common.retrieve(((String[])selectedItems.toArray()), recurse)
         }
         break
 
@@ -214,6 +226,13 @@ def printUsage() {
     println "'-condensed-list-format' to group items by starting letter for the 'list' sub-command (default with many items)"
     println ""
     println "Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub."
+    println "Example: 'groovyw module get *' - would retrieve all the modules in the Terasology organisation on GitHub."
+    println "Example: 'groovyw module get Sa??l*' - would retrieve all the modules in the Terasology organisation on GitHub" +
+            " that start with \"Sa\", have any two characters after that, then an \"l\" and then end with anything else." +
+            " This should retrieve the Sample repository from the Terasology organisation on GitHub."
+    println ""
+    println "*NOTE*: On UNIX platforms (MacOS and Linux), the wildcard arguments must be escaped with single quotes e.g. groovyw module get '*'."
+    println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source"
     println "Example: 'groovyw lib list' - would list library projects compatible with being embedded in a Terasology workspace"
     println ""
