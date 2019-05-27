@@ -46,6 +46,7 @@ switch(cleanerArgs[0]) {
     //noinspection GroovyFallthrough
     case "get":
         println "Preparing to get $itemType"
+        //println "cleanerArgs is $cleanerArgs"
         if (cleanerArgs.length == 1) {
             def itemString = common.getUserString("Enter what to get - separate multiple with spaces, CapiTaliZation MatterS): ")
             println "User wants: $itemString"
@@ -56,11 +57,14 @@ switch(cleanerArgs[0]) {
             cleanerArgs = common.processCustomRemote(cleanerArgs)
             ArrayList<String> selectedItems = new ArrayList<String>()
 
-            common.cacheItemList()
             for (String arg : cleanerArgs) {
+                //println "Checking arg $arg"
                 if (!arg.contains('*') && !arg.contains('?')) {
+                    println "Got into the non-wilcard option to fetch a fully specified item for $arg"
                     selectedItems.add(arg)
                 } else {
+                    println "Got into the wildcard option to fetch something matching a pattern for $arg, may need to cache first"
+                    common.cacheItemList()
                     selectedItems.addAll(common.retrieveAvalibleItemsWithWildcardMatch(arg));
                 }
             }

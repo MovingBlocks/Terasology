@@ -319,7 +319,7 @@ class common {
         // TODO: We need better ways to display the result especially when it contains a lot of items
         // However, in some cases heavy filtering could still mean that very few items will actually display ...
         // Another consideration is if we should be more specific in the API request, like only retrieving name + description
-        def githubHomeApiUrl = "https://api.github.com/users/$githubTargetHome/repos?per_page=100"
+        def githubHomeApiUrl = "https://api.github.com/users/$githubTargetHome/repos?per_page=99" //Note: 99 instead of 100  - see TODO below ..
 
         if(!isUrlValid(githubHomeApiUrl)){
             println "Deduced GitHub API URL $githubHomeApiUrl seems inaccessible."
@@ -331,13 +331,20 @@ class common {
         def currentPageUrl = githubHomeApiUrl
         def slurper = new JsonSlurper()
         while (currentPageUrl) {
+            //println "currentPageUrl: $currentPageUrl"
             new URL(currentPageUrl).openConnection().with { connection ->
                 connection.content.withReader { reader ->
                     slurper.parseText(reader.text).each { item ->
                         mappedPossibleItems.put(item.name, item.description)
+                        //println "Want to get item " + item.name
                     }
                 }
                 currentPageUrl = getLink(connection, "next")
+                // TODO: This comparison is vulnerable to a page request size of "100" or anything that starts with a 1, but just using 99 above ..
+                if (currentPageUrl.contains("page=1")) {
+                    //println "The pagination warped back to page 1, we're done!"
+                    currentPageUrl = null
+                }
             }
         }
 
@@ -415,7 +422,9 @@ class common {
     }
 
     void cacheItemList() {
-        cachedItemList = retrieveAvailableItems()
+        if (!itemListCached) {
+            cachedItemList = retrieveAvailableItems()
+        }
         itemListCached = true
     }
 
