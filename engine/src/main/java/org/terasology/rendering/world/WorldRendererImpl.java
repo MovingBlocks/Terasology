@@ -32,7 +32,6 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.naming.Name;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -44,8 +43,6 @@ import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
-import org.terasology.rendering.dag.gsoc.EdgeConnection;
-import org.terasology.rendering.dag.gsoc.FBOConnection;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
@@ -520,7 +517,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         ToneMappingNode toneMappingNode = new ToneMappingNode("toneMappingNode", context);
         /**naming just a concept, would probably need to extend to connectionUri or similar*/
-        toneMappingNode.addOutputFBOConnection(1,ToneMappingNode.TONE_MAPPING_FBO_URI);
         renderGraph.addNode(toneMappingNode);
         renderGraph.connect(updateExposureNode, toneMappingNode);
         renderGraph.connect(initialPostProcessingNode, toneMappingNode);
@@ -539,8 +535,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         LateBlurNode secondLateBlurNode = new LateBlurNode("secondLateBlurNode", context, firstLateBlurFbo, secondLateBlurFbo);
         renderGraph.addNode(secondLateBlurNode);
 
-       // EdgeConnection finalIn1 = EdgeConnection.createFBOConnection(1, EdgeConnection.Type.INPUT,toneMappingNode.getOutputFBOUri(1));
-       // FBOConnection finalIn2 = EdgeConnection.createFBOConnection(2, EdgeConnection.Type.INPUT,secondLateBlurNode.getOutputFBOUri(2));
+        // DependencyConnection finalIn1 = DependencyConnection.createFBOConnection(1, DependencyConnection.Type.INPUT,toneMappingNode.getOutputFBOUri(1));
+        // FboConnection finalIn2 = DependencyConnection.createFBOConnection(2, DependencyConnection.Type.INPUT,secondLateBlurNode.getOutputFBOUri(2));
         FinalPostProcessingNode finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context/*finalIn1*/);
         /**As the last attribute - getting output dependencyUri/wholeconnection(can't see why now, but possible) from nodes - how? -
          *                                                       either type -
@@ -548,8 +544,9 @@ public final class WorldRendererImpl implements WorldRenderer {
          *                                                       or getOutputFBOConnection{ByPriority}(#)-fetch output FBO
          *                                                         - requires List instead of Map, OR adding priority attribute or...
          *                                                       or getOutputFBOConnection{ByName}(name)*/
-        finalPostProcessingNode.addInputFBOConnection(1, toneMappingNode.getOutputFBOUri(1));
-        finalPostProcessingNode.addInputFBOConnection(2, firstLateBlurNode.getOutputFBOUri(2));
+        finalPostProcessingNode.connectFbo(1, toneMappingNode.getOutputFboConnection(1)); //addInputFboConnection(1, toneMappingNode.getOutputFBOUri(1));
+        finalPostProcessingNode.setDependencies(context);
+        //finalPostProcessingNode.addInputFboConnection(2, firstLateBlurNode.getOutputFBOUri(2));
 
 
         renderGraph.addNode(finalPostProcessingNode);
