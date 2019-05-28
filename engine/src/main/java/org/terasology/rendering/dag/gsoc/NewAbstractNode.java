@@ -40,7 +40,7 @@ import java.util.Set;
 /**
  * This class implements a number of default methods for the convenience of classes
  * wishing to implement the Node interface.
- *
+ * <p>
  * It provides the default functionality to identify a node, handle its status (enabled/disabled),
  * deal with StateChange objects and Frame Buffer objects.
  */
@@ -49,18 +49,18 @@ public abstract class NewAbstractNode implements Node {
 
     protected boolean enabled = true;
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
-   // private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
-    private Map<String,EdgeConnection> inputConnections = Maps.newHashMap();
-    private Map<String,EdgeConnection> outputConnections = Maps.newHashMap();
+    private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
+    private Map<String, DependencyConnection> inputConnections = Maps.newHashMap();
+    private Map<String, DependencyConnection> outputConnections = Maps.newHashMap();
     private final SimpleUri nodeUri;
 
     /**
      * Constructor to be used by inheriting classes.
-     *
+     * <p>
      * The nodeId provided in input will become part of the nodeUri uniquely identifying the node in the RenderGraph,
      * i.e. "engine:hazeNode".
      *
-     * @param nodeId a String representing the id of the node, namespace -excluded-: that's added automatically.
+     * @param nodeId  a String representing the id of the node, namespace -excluded-: that's added automatically.
      * @param context a Context object.
      *////TODO LIST OF INS AND OUTS
     protected NewAbstractNode(String nodeId, Context context) {
@@ -71,39 +71,50 @@ public abstract class NewAbstractNode implements Node {
         //TODO Check for empty list of either in or out
     }
 
-    private void addInputConnection(EdgeConnection input) {
+    /**
+     * Each node must implement this method to be called when the node is fully connected.
+     * This method should call other private node methods to use dependencies.
+     */
+    public abstract void setDependencies(Context context);
+
+    private void addInputConnection(DependencyConnection input) {
         this.inputConnections.putIfAbsent(input.getName(), input);
     }
-    private void addOutputConnection(EdgeConnection output) {
-        this.outputConnections.putIfAbsent(output.getName(), output);
-    }
-    /**TODO String to SimpleUri or make ConnectionUri and change Strings for names to ConnectionUris*/
-    private String getFBOName(int number) {
-        return new StringBuilder("FBO").append(number).toString();
-    }
 
-    protected SimpleUri getInputFBOUri(int number) {
-        return ((FBOConnection) this.inputConnections.get((new StringBuilder("FBO").append(number).toString()))).getUri();
+    private void addOutputConnection(DependencyConnection output) {
+        this.outputConnections.putIfAbsent(output.getName(), output);
     }
 
     /**
-     * Each node must implement this method to be called when the node is fully connected.
-     * This method should call other private node methods to use dependencies.*/
-    public abstract void setDependencies();
+     * TODO String to SimpleUri or make ConnectionUri and change Strings for names to ConnectionUris
+     */
 
-    public void addInputFBOConnection(int id, SimpleUri fboUri) {
-        EdgeConnection fboConnection = new FBOConnection(EdgeConnection.getFBOName(id), EdgeConnection.Type.INPUT, fboUri);
+    protected FBO getInputFboData(int number) {
+        return ((FboConnection) this.inputConnections.get((new StringBuilder("FBO").append(number).toString()))).getFboData();
+    }
+
+    protected void addInputFboConnection(int id, FboConnection from) {
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, from.getFboData());
         addInputConnection(fboConnection);
     }
 
-    public void addOutputFBOConnection(int id, SimpleUri fboUri) {
-        EdgeConnection fboConnection = new FBOConnection(EdgeConnection.getFBOName(id), EdgeConnection.Type.OUTPUT, fboUri);
+    protected void addOutputFboConnection(int id, FBO fboData) {
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.OUTPUT, fboData);
         addOutputConnection(fboConnection);
     }
 
-    public SimpleUri getOutputFBOUri(int id) {/**Do i need instanceof check here?*/
-        return ((FBOConnection)this.outputConnections.get(EdgeConnection.getFBOName(id))).getUri();
+    public void connectFbo(int inputFboId, FboConnection from) {
+
+        addInputFboConnection(inputFboId, from);
     }
+
+    public FboConnection getOutputFboConnection(int outputFboId) {
+        return (FboConnection) getOutputConnection(FboConnection.getFboName(outputFboId));
+    }
+
+    /*public FBO getOutputFboData(int id)
+        return ((FboConnection) this.outputConnections.get(DependencyConnection.getFboName(id))).getFboData();
+    }*/
 
     public void removeInputConnection(String name) {
         inputConnections.remove(name);
@@ -121,21 +132,28 @@ public abstract class NewAbstractNode implements Node {
         return this.outputConnections.size();
     }
 
-    public EdgeConnection getInputConnection(String name) {
+    private DependencyConnection getInputConnection(String name) {
         return inputConnections.get(name);
     }
 
-    public EdgeConnection getOutputConnection(String name) {
-        return inputConnections.get(name);
+    private DependencyConnection getOutputConnection(String name) {
+        DependencyConnection connection = outputConnections.get(name);
+        if (connection == null) {
+            String errorMessage = String.format("Getting output connection named %s returned null. No such output connection" +
+                    "in %s", name, this.toString());
+            logger.error(errorMessage);
+            throw new NullPointerException(errorMessage);
+        }
+        return connection;
     }
 
-    public List<String> getInputConnections() {
+    private List<String> getInputConnections() {
         List<String> inputConnectionNameList = new ArrayList<>();
         this.inputConnections.forEach((name, connection) -> inputConnectionNameList.add(name));
         return inputConnectionNameList;
     }
 
-    public List<String> getOutputConnections() {
+    private List<String> getOutputConnections() {
         List<String> outputConnectionNameList = new ArrayList<>();
         this.inputConnections.forEach((name, connection) -> outputConnectionNameList.add(name));
         return outputConnectionNameList;
@@ -156,7 +174,7 @@ public abstract class NewAbstractNode implements Node {
      * @return the requested FBO object, either newly created or a pre-existing one.
      * @throws IllegalArgumentException if the fboUri in fboConfig already in use by FBO with different characteristics.
      */
-    /*protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
+    protected FBO requiresFbo(FBOConfig fboConfig, BaseFBOsManager fboManager) {
         SimpleUri fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {
@@ -167,7 +185,7 @@ public abstract class NewAbstractNode implements Node {
         }
 
         return fboManager.request(fboConfig);
-    }*/
+    }
 
     /**
      * Inheriting classes must call this method to ensure that any FBO requested and acquired by a node
@@ -175,23 +193,23 @@ public abstract class NewAbstractNode implements Node {
      * are also disposed.
      */
     @Override
-    public void dispose() {/**Dispose of data in connection maps
-        for (Map.Entry<String,EdgeConnection > entry : inputConnections.entrySet()) {
-            SimpleUri fboName = entry.getKey();
-            EdgeConnection connection = entry.getValue();
-            connection.FboDatarelease(fboName);
-        }
+    public void dispose() { /**Dispose of data in connection maps
+     for (Map.Entry<String,DependencyConnection > entry : inputConnections.entrySet()) {
+     SimpleUri fboName = entry.getKey();
+     DependencyConnection connection = entry.getValue();
+     connection.FboDatarelease(fboName);
+     }
 
-        inputConnections.clear();*/
+     inputConnections.clear();*/
     }
 
     /**
      * Adds a StateChange object to the set of state changes desired by a node.
-     *
+     * <p>
      * This method is normally used within the constructor of a concrete node class, to set the OpenGL state
      * a node requires. However, it can also be used when runtime conditions change, i.e. a switch from
      * a normal rendering style to wireframe and viceversa.
-     *
+     * <p>
      * Only StateChange objects that are in the set and are not redundant make it into the TaskList
      * and actually modify the OpenGL state every frame.
      *
@@ -234,7 +252,8 @@ public abstract class NewAbstractNode implements Node {
     }
 
     @Override
-    public void handleCommand(String command, String... arguments) { }
+    public void handleCommand(String command, String... arguments) {
+    }
 
     @Override
     public SimpleUri getUri() {

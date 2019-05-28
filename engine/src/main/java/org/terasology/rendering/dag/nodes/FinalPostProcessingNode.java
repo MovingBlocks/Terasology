@@ -89,7 +89,10 @@ public class FinalPostProcessingNode extends NewAbstractNode implements Property
 
     public FinalPostProcessingNode(String nodeUri, Context context) {
         super(nodeUri, context);
+    }
 
+    @Override
+    public void setDependencies(Context context) {
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
         screenGrabber = context.get(ScreenGrabber.class);
@@ -114,7 +117,7 @@ public class FinalPostProcessingNode extends NewAbstractNode implements Property
         lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
 
         int texId = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(texId++, this.getInputFBOUri(1), ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(texId++, this.getInputFboData(1), ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texScene"));
         addDesiredStateChange(new SetInputTextureFromFbo(texId++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texDepth"));
         setBlurTexture = new SetInputTextureFromFbo(texId++, SECOND_LATE_BLUR_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texBlur");
         addDesiredStateChange(new SetInputTexture3D(texId++, "engine:colorGradingLut1", POST_MATERIAL_URN, "texColorGradingLut"));

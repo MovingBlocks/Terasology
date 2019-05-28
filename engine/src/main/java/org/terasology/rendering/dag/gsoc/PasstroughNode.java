@@ -35,6 +35,11 @@ public class PasstroughNode extends NewAbstractNode implements PropertyChangeLis
     }
 
     @Override
+    public void setDependencies(Context context) {
+
+    }
+
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
 
     }
