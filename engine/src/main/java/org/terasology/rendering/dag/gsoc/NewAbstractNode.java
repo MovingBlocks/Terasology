@@ -49,9 +49,9 @@ public abstract class NewAbstractNode implements Node {
 
     protected boolean enabled = true;
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
-    private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
-    private Map<String, EdgeConnection> inputConnections = Maps.newHashMap();
-    private Map<String, EdgeConnection> outputConnections = Maps.newHashMap();
+   // private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
+    private Map<String,EdgeConnection> inputConnections = Maps.newHashMap();
+    private Map<String,EdgeConnection> outputConnections = Maps.newHashMap();
     private final SimpleUri nodeUri;
 
     /**
@@ -86,18 +86,23 @@ public abstract class NewAbstractNode implements Node {
         return ((FBOConnection) this.inputConnections.get((new StringBuilder("FBO").append(number).toString()))).getUri();
     }
 
+    /**
+     * Each node must implement this method to be called when the node is fully connected.
+     * This method should call other private node methods to use dependencies.*/
+    public abstract void setDependencies();
+
     public void addInputFBOConnection(int id, SimpleUri fboUri) {
-        EdgeConnection fboConnection = new FBOConnection(getFBOName(id), EdgeConnection.Type.INPUT, fboUri);
+        EdgeConnection fboConnection = new FBOConnection(EdgeConnection.getFBOName(id), EdgeConnection.Type.INPUT, fboUri);
         addInputConnection(fboConnection);
     }
 
     public void addOutputFBOConnection(int id, SimpleUri fboUri) {
-        EdgeConnection fboConnection = new FBOConnection(getFBOName(id), EdgeConnection.Type.OUTPUT, fboUri);
+        EdgeConnection fboConnection = new FBOConnection(EdgeConnection.getFBOName(id), EdgeConnection.Type.OUTPUT, fboUri);
         addOutputConnection(fboConnection);
     }
 
-    public SimpleUri getOutputFBOUri(int id) { /*Do i need instanceof check here?*/
-        return ((FBOConnection)this.outputConnections.get(getFBOName(id))).getUri();
+    public SimpleUri getOutputFBOUri(int id) {/**Do i need instanceof check here?*/
+        return ((FBOConnection)this.outputConnections.get(EdgeConnection.getFBOName(id))).getUri();
     }
 
     public void removeInputConnection(String name) {
@@ -151,7 +156,7 @@ public abstract class NewAbstractNode implements Node {
      * @return the requested FBO object, either newly created or a pre-existing one.
      * @throws IllegalArgumentException if the fboUri in fboConfig already in use by FBO with different characteristics.
      */
-    protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
+    /*protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
         SimpleUri fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {
@@ -162,7 +167,7 @@ public abstract class NewAbstractNode implements Node {
         }
 
         return fboManager.request(fboConfig);
-    }
+    }*/
 
     /**
      * Inheriting classes must call this method to ensure that any FBO requested and acquired by a node
@@ -170,14 +175,14 @@ public abstract class NewAbstractNode implements Node {
      * are also disposed.
      */
     @Override
-    public void dispose() {
-        for (Map.Entry<SimpleUri, BaseFBOsManager> entry : fboUsages.entrySet()) {
+    public void dispose() {/**Dispose of data in connection maps
+        for (Map.Entry<String,EdgeConnection > entry : inputConnections.entrySet()) {
             SimpleUri fboName = entry.getKey();
-            BaseFBOsManager baseFBOsManager = entry.getValue();
-            baseFBOsManager.release(fboName);
+            EdgeConnection connection = entry.getValue();
+            connection.FboDatarelease(fboName);
         }
 
-        fboUsages.clear();
+        inputConnections.clear();*/
     }
 
     /**

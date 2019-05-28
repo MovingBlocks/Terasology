@@ -16,7 +16,8 @@
 
 package org.terasology.rendering.dag.gsoc;
 
-import org.terasology.naming.Name;
+
+import org.terasology.engine.SimpleUri;
 
 public abstract class EdgeConnection {
 
@@ -33,11 +34,24 @@ public abstract class EdgeConnection {
         OUTPUT
     }
 
+    public static FBOConnection createFBOConnection(int id,Type type,SimpleUri uri){
+        return new FBOConnection(getFBOName(id),type,uri);
+    }
+
     public String getName() {
         return this.connectionName;
     }
     public Type getType() {
         return this.connectionType;
     }
+
+    /**TODO String to SimpleUri or make ConnectionUri and change Strings for names to ConnectionUris*/
+    public static String getFBOName(int number) {
+        return new StringBuilder("FBO").append(number).toString();
+    }
+    public static String getMaterialName(int number) {
+        return new StringBuilder("Material").append(number).toString();
+    }
+
 
 }

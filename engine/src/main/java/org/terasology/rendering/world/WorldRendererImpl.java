@@ -529,10 +529,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         FBOConfig firstLateBlurConfig = new FBOConfig(FIRST_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
         FBO firstLateBlurFbo = displayResolutionDependentFBOs.request(firstLateBlurConfig);
 
+
         LateBlurNode firstLateBlurNode = new LateBlurNode("firstLateBlurNode", context, displayResolutionDependentFBOs.get(ToneMappingNode.TONE_MAPPING_FBO_URI), firstLateBlurFbo);
         renderGraph.addNode(firstLateBlurNode);
-        firstLateBlurNode.addOutputFBOConnection(1,LateBlurNode.FIRST_LATE_BLUR_FBO_URI);
-        firstLateBlurNode.addOutputFBOConnection(2,LateBlurNode.SECOND_LATE_BLUR_FBO_URI);
 
         FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
         FBO secondLateBlurFbo = displayResolutionDependentFBOs.request(secondLateBlurConfig);
@@ -540,14 +539,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         LateBlurNode secondLateBlurNode = new LateBlurNode("secondLateBlurNode", context, firstLateBlurFbo, secondLateBlurFbo);
         renderGraph.addNode(secondLateBlurNode);
 
-        //FBOConnection finalPostProcessingOutputFBO = new FBOConnection("finalPostProcessingOutputFBO", EdgeConnection.Type.OUTPUT);
-        //FBOConnection finalPostProcessingInputFBO = new FBOConnection("finalPostProcessingInputFBO", EdgeConnection.Type.OUTPUT);
-        FinalPostProcessingNode finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context);
+       // EdgeConnection finalIn1 = EdgeConnection.createFBOConnection(1, EdgeConnection.Type.INPUT,toneMappingNode.getOutputFBOUri(1));
+       // FBOConnection finalIn2 = EdgeConnection.createFBOConnection(2, EdgeConnection.Type.INPUT,secondLateBlurNode.getOutputFBOUri(2));
+        FinalPostProcessingNode finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context/*finalIn1*/);
         /**As the last attribute - getting output dependencyUri/wholeconnection(can't see why now, but possible) from nodes - how? -
          *                                                       either type -
          *                                                          getOutputFBOConnection{ByNameContains}(substr/prefix/suffix..)/
          *                                                       or getOutputFBOConnection{ByPriority}(#)-fetch output FBO
-*                                                                    - requires List instead of Map, OR adding priority attribute or...
+         *                                                         - requires List instead of Map, OR adding priority attribute or...
          *                                                       or getOutputFBOConnection{ByName}(name)*/
         finalPostProcessingNode.addInputFBOConnection(1, toneMappingNode.getOutputFBOUri(1));
         finalPostProcessingNode.addInputFBOConnection(2, firstLateBlurNode.getOutputFBOUri(2));

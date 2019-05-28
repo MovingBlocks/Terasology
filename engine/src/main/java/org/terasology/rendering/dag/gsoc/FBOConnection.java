@@ -18,22 +18,28 @@ package org.terasology.rendering.dag.gsoc;
 
 import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
+import org.terasology.rendering.opengl.FBO;
 
 public class FBOConnection extends EdgeConnection {
 
-    private SimpleUri fboUri;
+   // private SimpleUri fboUri;
+    private FBO fboData;
 
     public FBOConnection(String name, Type type, SimpleUri fboUri) {
         super(name, type);
 
-        this.fboUri = fboUri;
+       // this.fboUri = fboUri;
     }
-    public SimpleUri getUri() {
+   /* public SimpleUri getUri(){
         return this.fboUri;
-    }
+    }*/
 
-    public void setUri(SimpleUri fbo) {
+    /*public void setUri(SimpleUri fbo){
         this.fboUri =  fbo;
+    }*/
+
+    public FBO getFboData(){
+        return this.fboData;
     }
 
 }

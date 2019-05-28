@@ -21,6 +21,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.gsoc.EdgeConnection;
 import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -64,6 +65,8 @@ public class ToneMappingNode extends NewAbstractNode {
     public ToneMappingNode(String nodeUri, Context context) {
         super(nodeUri, context);
 
+        this.addOutputFBOConnection(1,TONE_MAPPING_FBO_URI);
+
         screenGrabber = context.get(ScreenGrabber.class);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
@@ -77,6 +80,11 @@ public class ToneMappingNode extends NewAbstractNode {
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, INITIAL_POST_FBO_URI, ColorTexture, displayResolutionDependentFBOs, TONE_MAPPING_MATERIAL_URN, "texScene"));
+    }
+
+    @Override
+    public void setDependencies(){
+
     }
 
     /**
