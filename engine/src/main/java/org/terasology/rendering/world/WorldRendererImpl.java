@@ -549,8 +549,8 @@ public final class WorldRendererImpl implements WorldRenderer {
          *                                                       or getOutputFBOConnection{ByPriority}(#)-fetch output FBO
 *                                                                    - requires List instead of Map, OR adding priority attribute or...
          *                                                       or getOutputFBOConnection{ByName}(name)*/
-        finalPostProcessingNode.addInputFBOConnection(1,toneMappingNode.getOutputFBOUri(1));
-        finalPostProcessingNode.addInputFBOConnection(2,firstLateBlurNode.getOutputFBOUri(2));
+        finalPostProcessingNode.addInputFBOConnection(1, toneMappingNode.getOutputFBOUri(1));
+        finalPostProcessingNode.addInputFBOConnection(2, firstLateBlurNode.getOutputFBOUri(2));
 
 
         renderGraph.addNode(finalPostProcessingNode);
