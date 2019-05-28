@@ -34,14 +34,6 @@ public abstract class DependencyConnection {
         OUTPUT
     }
 
-    public static FboConnection createFBOConnection(int id, Type type) {
-        return new FboConnection(getFboName(id), type);
-    }
-
-    public static FboConnection createFBOConnection(int id, Type type, FBO fboData) {
-        return new FboConnection(getFboName(id), type, fboData);
-    }
-
     public String getName() {
         return this.connectionName;
     }
@@ -53,8 +45,5 @@ public abstract class DependencyConnection {
     /**
      * TODO String to SimpleUri or make ConnectionUri and change Strings for names to ConnectionUris
      */
-    static String getFboName(int number) {
-        return new StringBuilder("FBO").append(number).toString();
-    }
 
 }
