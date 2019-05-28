@@ -23,20 +23,20 @@ public abstract class EdgeConnection {
     private String connectionName;
     private Type connectionType;
 
-    EdgeConnection(String name, Type type){
+    EdgeConnection(String name, Type type) {
         this.connectionName = name;
         this.connectionType = type;
     }
 
-    public enum Type {/**Might differentiate by name only*/
+    public enum Type { /*Might differentiate by name only*/
         INPUT,
         OUTPUT
     }
 
-    public String getName(){
+    public String getName() {
         return this.connectionName;
     }
-    public Type getType(){
+    public Type getType() {
         return this.connectionType;
     }
 

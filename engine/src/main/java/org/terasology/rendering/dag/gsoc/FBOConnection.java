@@ -28,11 +28,11 @@ public class FBOConnection extends EdgeConnection {
 
         this.fboUri = fboUri;
     }
-    public SimpleUri getUri(){
+    public SimpleUri getUri() {
         return this.fboUri;
     }
 
-    public void setUri(SimpleUri fbo){
+    public void setUri(SimpleUri fbo) {
         this.fboUri =  fbo;
     }
 
