@@ -139,8 +139,8 @@ public abstract class NewAbstractNode implements Node {
     private DependencyConnection getOutputConnection(String name) {
         DependencyConnection connection = outputConnections.get(name);
         if (connection == null) {
-            String errorMessage = String.format("Getting output connection named %s returned null. No such output connection" +
-                    "in %s", name, this.toString());
+            String errorMessage = String.format("Getting output connection named %s returned null." +
+                                                " No such output connection in %s", name, this.toString());
             logger.error(errorMessage);
             throw new NullPointerException(errorMessage);
         }
@@ -193,7 +193,7 @@ public abstract class NewAbstractNode implements Node {
      * are also disposed.
      */
     @Override
-    public void dispose() { /**Dispose of data in connection maps
+    public void dispose() { /** Dispose of data in connection maps
      for (Map.Entry<String,DependencyConnection > entry : inputConnections.entrySet()) {
      SimpleUri fboName = entry.getKey();
      DependencyConnection connection = entry.getValue();

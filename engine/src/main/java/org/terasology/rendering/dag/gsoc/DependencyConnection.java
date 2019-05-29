@@ -16,9 +16,6 @@
 
 package org.terasology.rendering.dag.gsoc;
 
-
-import org.terasology.rendering.opengl.FBO;
-
 public abstract class DependencyConnection {
 
     private String connectionName;
@@ -29,7 +26,7 @@ public abstract class DependencyConnection {
         this.connectionType = type;
     }
 
-    public enum Type { /*Might differentiate by name only*/
+    public enum Type { // Might differentiate by name only
         INPUT,
         OUTPUT
     }
@@ -41,9 +38,5 @@ public abstract class DependencyConnection {
     public Type getType() {
         return this.connectionType;
     }
-
-    /**
-     * TODO String to SimpleUri or make ConnectionUri and change Strings for names to ConnectionUris
-     */
 
 }

@@ -516,7 +516,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node updateExposureNode = renderGraph.findNode("engine:updateExposureNode");
 
         ToneMappingNode toneMappingNode = new ToneMappingNode("toneMappingNode", context);
-        /**naming just a concept, would probably need to extend to connectionUri or similar*/
+        /** naming just a concept, would probably need to extend to connectionUri or similar*/
         renderGraph.addNode(toneMappingNode);
         renderGraph.connect(updateExposureNode, toneMappingNode);
         renderGraph.connect(initialPostProcessingNode, toneMappingNode);
@@ -538,7 +538,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         // DependencyConnection finalIn1 = DependencyConnection.createFBOConnection(1, DependencyConnection.Type.INPUT,toneMappingNode.getOutputFBOUri(1));
         // FboConnection finalIn2 = DependencyConnection.createFBOConnection(2, DependencyConnection.Type.INPUT,secondLateBlurNode.getOutputFBOUri(2));
         FinalPostProcessingNode finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context/*finalIn1*/);
-        /**As the last attribute - getting output dependencyUri/wholeconnection(can't see why now, but possible) from nodes - how? -
+        /* As the last attribute - getting output dependencyUri/wholeconnection(can't see why now, but possible) from nodes - how? -
          *                                                       either type -
          *                                                          getOutputFBOConnection{ByNameContains}(substr/prefix/suffix..)/
          *                                                       or getOutputFBOConnection{ByPriority}(#)-fetch output FBO
@@ -736,7 +736,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         lightValueSun *= 0.9f;
         lightValueSun += 0.05f;
 
-        float lightValueBlock = (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - (double)rawLightValueBlock) * 16.0f) * rawLightValueBlock * BLOCK_INTENSITY_FACTOR;
+        float lightValueBlock = (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - (double) rawLightValueBlock) * 16.0f) * rawLightValueBlock * BLOCK_INTENSITY_FACTOR;
 
         return Math.max(lightValueBlock, lightValueSun);
     }
@@ -817,7 +817,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      *      dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
      */
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value= "arguments") final String... arguments) {
+    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value = "arguments") final String... arguments) {
         Node node = renderGraph.findNode(nodeUri);
         if (node == null) {
             throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));
