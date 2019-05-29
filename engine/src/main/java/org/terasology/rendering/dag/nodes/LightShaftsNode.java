@@ -71,7 +71,7 @@ public class LightShaftsNode extends ConditionDependentNode {
     private float exposureDay = 0.0075f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.01f)
-    private float exposureNight = exposure/2.f;
+    private float exposureNight = 0.00375f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float weight = 8.0f;
