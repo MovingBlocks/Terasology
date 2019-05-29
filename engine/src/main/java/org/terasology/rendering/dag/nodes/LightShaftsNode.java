@@ -107,7 +107,8 @@ public class LightShaftsNode extends ConditionDependentNode {
         lightShaftsMaterial = getMaterial(LIGHT_SHAFTS_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL_URN, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(),
+                                    ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL_URN, "texScene"));
     }
 
     /**
@@ -119,13 +120,15 @@ public class LightShaftsNode extends ConditionDependentNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/" + getUri());
 
-        // Get time of day from midnight to midnight <0, 1>, 0.5 being noon;
+        // Get time of day from midnight to midnight <0, 1>, 0.5 being noon.
+
         float days = worldProvider.getTime().getDays();
         days = days - (int) days;
 
         // If sun is down and moon is up, do lightshafts from moon.
         // This is a temporary solution to sun causing light shafts even at night.
-        if(days < 0.25f || days > 0.75f) {
+
+        if (days < 0.25f || days > 0.75f) {
             sunDirection = backdropProvider.getSunDirection(true);
             exposure = exposureNight;
         } else {
