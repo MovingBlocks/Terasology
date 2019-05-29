@@ -546,7 +546,7 @@ public final class WorldRendererImpl implements WorldRenderer {
          *                                                       or getOutputFBOConnection{ByName}(name)*/
         finalPostProcessingNode.connectFbo(1, toneMappingNode.getOutputFboConnection(1)); //addInputFboConnection(1, toneMappingNode.getOutputFBOUri(1));
         finalPostProcessingNode.setDependencies(context);
-        //finalPostProcessingNode.addInputFboConnection(2, firstLateBlurNode.getOutputFBOUri(2));
+        // finalPostProcessingNode.addInputFboConnection(2, firstLateBlurNode.getOutputFBOUri(2));
 
 
         renderGraph.addNode(finalPostProcessingNode);
