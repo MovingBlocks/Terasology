@@ -82,7 +82,7 @@ public class RenderGraph {
         return findNode(new SimpleUri(simpleUri));
     }
 
-    public void connect(Node ... nodeList) {
+    public void connect(Node... nodeList) {
         Preconditions.checkArgument(nodeList.length > 1, "Expected at least 2 nodes as arguments to connect() - found " + nodeList.length);
 
         Node fromNode = null;
@@ -171,17 +171,17 @@ public class RenderGraph {
         nodeMap.clear();
     }
 
-    /*private void matchDependencyConnections(Node fromNode, Node toNode){
-        /**TODO REMOVE THIS IF WE MAKE THIS CHANGE FOR EVERY NODE
-         *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*//*
-        if((fromNode instanceof NewAbstractNode)&&(toNode instanceof NewAbstractNode)){
-            NewAbstractNode fromN=(NewAbstractNode) fromNode;
-            NewAbstractNode toN=(NewAbstractNode) toNode;
+    /* private void matchDependencyConnections(Node fromNode, Node toNode){
+        /** TODO REMOVE THIS IF WE MAKE THIS CHANGE FOR EVERY NODE
+         *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+        /* if((fromNode instanceof NewAbstractNode) && (toNode instanceof NewAbstractNode)) {
+            // NewAbstractNode fromAbstractNode =(NewAbstractNode) fromNode;
+            // NewAbstractNode toAbstractNode =(NewAbstractNode) toNode;
 
-            List<Name> fromOutputs = fromN.getOutputConnections();
-            List<Name> toInputs = toN.getInputConnections();
+            List<Name> fromOutputs = ((NewAbstractNode) fromNode).getOutputConnections();
+            List<Name> toInputs = ((NewAbstractNode) toNode).getInputConnections();
 
-            if(fromOutputs.size() != toInputs.size()){
+            if(fromOutputs.size() != toInputs.size()) {
 
             }
 
@@ -189,8 +189,8 @@ public class RenderGraph {
                  ) {
                 
             }
-        } else{
+        } else {
             return;
         }
-    }*/
+    } */
 }
