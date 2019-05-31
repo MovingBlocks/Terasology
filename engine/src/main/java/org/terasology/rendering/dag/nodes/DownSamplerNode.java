@@ -20,6 +20,7 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
+import org.terasology.rendering.dag.gsoc.FboConnection;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
@@ -45,22 +46,26 @@ public class DownSamplerNode extends ConditionDependentNode {
     /**
      * Constructs the DownSamplerNode instance.
      *
-     * @param inputFboConfig an FBOConfig instance describing the input FBO, to be retrieved from the FBO manager
+     * @param inputConnection an input FboConnection instance containing input data (equals FboConnection output of connected node).
      * @param inputFboManager the FBO manager from which to retrieve the input FBO
      * @param outputFboConfig an FBOConfig instance describing the output FBO, to be retrieved from the FBO manager
      * @param outputFboManager the FBO manager from which to retrieve the output FBO
      */
     public DownSamplerNode(String nodeUri, Context context,
-                                            FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
+                                            FboConnection inputConnection, BaseFBOsManager inputFboManager,
                                             FBOConfig outputFboConfig, BaseFBOsManager outputFboManager) {
         super(nodeUri, context);
 
-        FBO inputFbo = requiresFBO(inputFboConfig, inputFboManager);
-        outputFbo = requiresFBO(outputFboConfig, outputFboManager);
+        // IN
+        addInputFboConnection(1, inputConnection.getFboData());
+
+        // OUT
+        outputFbo = requiresFbo(outputFboConfig, outputFboManager);
+        addOutputFboConnection(1, outputFbo);
 
         addDesiredStateChange(new BindFbo(outputFbo));
         addDesiredStateChange(new SetViewportToSizeOf(outputFbo));
-        addDesiredStateChange(new SetInputTextureFromFbo(0, inputFbo, ColorTexture, inputFboManager,
+        addDesiredStateChange(new SetInputTextureFromFbo(0, this.getInputFboData(1), ColorTexture, inputFboManager,
                 DOWN_SAMPLER_MATERIAL_URN, TEXTURE_NAME));
 
         addDesiredStateChange(new EnableMaterial(DOWN_SAMPLER_MATERIAL_URN));
@@ -79,5 +84,10 @@ public class DownSamplerNode extends ConditionDependentNode {
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 }
