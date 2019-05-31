@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@ package org.terasology.rendering.dag;
 
 //TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
 
+import java.util.Set;
+
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.dag.gsoc.FboConnection;
-
-import java.util.Set;
 
 /**
  * A node is the processing unit within the Renderer.
@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * Classes implementing this interface are meant to be fairly atomic in what they do and, when possible, reusable.
  */
-public interface Node extends RenderPipelineTask {
+public interface NewNode extends RenderPipelineTask {
     // TODO: invoked when Node is removed from RenderGraph
 
     /**
@@ -101,4 +101,36 @@ public interface Node extends RenderPipelineTask {
      * @return a SimpleUri providing the namespace and name of the node.
      */
     SimpleUri getUri();
+
+    /**
+     * This method is called by RenderGraph.addNode().
+     * This method must be called AFTER node has connected all it's dependencies.
+     * @param context a context object, to obtain instances of classes such as the rendering config.
+     */
+    void setDependencies(Context context);
+
+    /**
+     * This method is to set output FboConnection (extends DependencyConnection)
+     * to input connection of the same type in this node.
+     * @param inputFboId Input FBO id is a number of the input connection on this node.
+     *                   Chosen arbitrarily, integers starting by 1 typically.
+     * @param from FboConnection obtained form another node's output.
+     */
+    void connectFbo(int inputFboId, FboConnection from);
+
+    /**
+     * This method obtains node's output FBO connection by its id.
+     * @param outputFboId Output FBO connection's id.
+     * @return FboConnection if an output connection with this id exists.
+     * Otherwise an exception should be thrown.
+     */
+    FboConnection getOutputFboConnection(int outputFboId);
+
+    /**
+     * This method obtains node's input FBO connection by its id.
+     * @param inputFboId Input FBO connection's id.
+     * @return FboConnection if an input connection with this id exists.
+     * Otherwise an exception should be thrown.
+     */
+    FboConnection getInputFboConnection(int inputFboId);
 }
