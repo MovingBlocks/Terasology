@@ -18,7 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
@@ -40,7 +40,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  *
  * This node is integral to the deferred lighting technique.
  */
-public class ApplyDeferredLightingNode extends AbstractNode {
+public class ApplyDeferredLightingNode extends NewAbstractNode {
     private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL_URN = new ResourceUrn("engine:prog.lightBufferPass");
 
     public ApplyDeferredLightingNode(String nodeUri, Context context) {
@@ -66,6 +66,11 @@ public class ApplyDeferredLightingNode extends AbstractNode {
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueLightBuffer"));
 
         addDesiredStateChange(new SwapGBuffers(gBufferPair));
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**

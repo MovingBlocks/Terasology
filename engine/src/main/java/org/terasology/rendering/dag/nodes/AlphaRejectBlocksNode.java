@@ -29,6 +29,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
@@ -58,7 +59,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
  * In alpha-blending the color of a semi-transparent fragment is combined with
  * the color stored in the frame buffer and the resulting color overwrites the previously stored one.
  */
-public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable, PropertyChangeListener {
+public class AlphaRejectBlocksNode extends NewAbstractNode implements WireframeCapable, PropertyChangeListener {
     private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
 
     private WorldRenderer worldRenderer;
@@ -123,6 +124,11 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         if (parallaxMappingIsEnabled) {
             addDesiredStateChange(setTerrainHeightInputTexture);
         }
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     public void enableWireframe() {

@@ -74,7 +74,10 @@ public class OutlineNode extends ConditionDependentNode {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
-        FBO outlineFbo = requiresFBO(new FBOConfig(OUTLINE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        FBO outlineFbo = requiresFbo(new FBOConfig(OUTLINE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+
+        this.addOutputFboConnection(1, outlineFbo);
+
         addDesiredStateChange(new BindFbo(outlineFbo));
 
         addDesiredStateChange(new EnableMaterial(OUTLINE_MATERIAL_URN));
@@ -83,6 +86,11 @@ public class OutlineNode extends ConditionDependentNode {
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL_URN, "texDepth"));
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**

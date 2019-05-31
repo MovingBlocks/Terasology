@@ -59,7 +59,7 @@ public class HighPassNode extends ConditionDependentNode {
         requiresCondition(renderingConfig::isBloom);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO highPassFbo = requiresFBO(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
+        FBO highPassFbo = requiresFbo(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(highPassFbo));
         addDesiredStateChange(new SetViewportToSizeOf(highPassFbo));
 
@@ -69,6 +69,11 @@ public class HighPassNode extends ConditionDependentNode {
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), ColorTexture,
                 displayResolutionDependentFBOs, HIGH_PASS_MATERIAL_URN, "tex"));
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**

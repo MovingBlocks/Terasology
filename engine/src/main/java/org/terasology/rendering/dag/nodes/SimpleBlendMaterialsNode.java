@@ -21,6 +21,7 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
@@ -47,7 +48,7 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
  * the distance to the semi-transparent surface or what's already stored in the depth buffer? As such
  * semi-transparent objects are handled here, after nodes relying on the depth buffer have done their job.
  */
-public class SimpleBlendMaterialsNode extends AbstractNode {
+public class SimpleBlendMaterialsNode extends NewAbstractNode {
     private ComponentSystemManager componentSystemManager;
 
     public SimpleBlendMaterialsNode(String nodeUri, Context context) {
@@ -58,7 +59,8 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
         Camera playerCamera = context.get(WorldRenderer.class).getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
+        this.addOutputFboConnection(1,context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo());
+        addDesiredStateChange(new BindFbo(this.getOutputFboData(1)));
 
         // Sets the state for the rendering of objects or portions of objects having some degree of transparency.
         // Generally speaking objects drawn with this state will have their color blended with the background
@@ -79,6 +81,11 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
         // This is an unresolved (unresolv-able?) issue that would only be reversed, not eliminated,
         // by re-enabling writing to the Depth Buffer.
         addDesiredStateChange(new DisableDepthWriting());
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**

@@ -25,7 +25,7 @@ import org.terasology.context.Context;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.PBO;
@@ -44,7 +44,7 @@ import java.nio.ByteBuffer;
  *
  * (1) See https://en.wikipedia.org/wiki/Luma_(video)#Use_of_relative_luminance
  */
-public class UpdateExposureNode extends AbstractNode {
+public class UpdateExposureNode extends NewAbstractNode {
     private static final Logger logger = LoggerFactory.getLogger(UpdateExposureNode.class);
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -81,8 +81,13 @@ public class UpdateExposureNode extends AbstractNode {
         screenGrabber = context.get(ScreenGrabber.class);
 
         renderingConfig = context.get(Config.class).getRendering();
-        downSampledScene = requiresFBO(DownSamplerForExposureNode.FBO_1X1_CONFIG, context.get(ImmutableFBOs.class));
+        downSampledScene = requiresFbo(DownSamplerForExposureNode.FBO_1X1_CONFIG, context.get(ImmutableFBOs.class));
         writeOnlyPbo = new PBO(1, 1);
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**

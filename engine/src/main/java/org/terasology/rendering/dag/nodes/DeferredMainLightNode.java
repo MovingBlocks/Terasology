@@ -26,7 +26,7 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
@@ -63,7 +63,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * Eventually the content of the light accumulation buffer is combined with other buffers to correctly
  * light up the 3d scene.
  */
-public class DeferredMainLightNode extends AbstractNode {
+public class DeferredMainLightNode extends NewAbstractNode {
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL_URN = new ResourceUrn("engine:prog.lightGeometryPass");
 
     private BackdropProvider backdropProvider;
@@ -122,6 +122,11 @@ public class DeferredMainLightNode extends AbstractNode {
                 addDesiredStateChange(new SetInputTexture2D(textureSlot, "engine:perlinNoiseTileable", LIGHT_GEOMETRY_MATERIAL_URN, "texSceneClouds"));
             }
         }
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     // TODO: one day the main light (sun/moon) should be just another light in the scene.

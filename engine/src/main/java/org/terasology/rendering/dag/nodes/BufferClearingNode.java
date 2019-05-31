@@ -16,7 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.context.Context;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
@@ -31,7 +31,7 @@ import static org.lwjgl.opengl.GL11.glClear;
  * This class could be inherited by a more specific class that sets the default values, via (yet to be written)
  * state changes.
  */
-public class BufferClearingNode extends AbstractNode {
+public class BufferClearingNode extends NewAbstractNode {
     private int clearingMask;
 
     /**
@@ -52,7 +52,7 @@ public class BufferClearingNode extends AbstractNode {
         boolean argumentsAreValid = validateArguments(fboConfig, fboManager, clearingMask);
 
         if (argumentsAreValid) {
-            FBO fbo = requiresFBO(fboConfig, fboManager);
+            FBO fbo = requiresFbo(fboConfig, fboManager);
             addDesiredStateChange(new BindFbo(fbo));
             this.clearingMask = clearingMask;
         } else {
@@ -119,5 +119,10 @@ public class BufferClearingNode extends AbstractNode {
         }
 
         return argumentsAreValid;
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 }

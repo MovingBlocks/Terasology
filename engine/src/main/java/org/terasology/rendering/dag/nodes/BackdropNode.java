@@ -27,9 +27,9 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
@@ -59,7 +59,7 @@ import static org.lwjgl.opengl.GL11.glNewList;
  *
  * The shader also procedurally adds a main light (sun/moon) in the form of a blurred disc.
  */
-public class BackdropNode extends AbstractNode implements WireframeCapable {
+public class BackdropNode extends NewAbstractNode implements WireframeCapable {
     private static final ResourceUrn SKY_MATERIAL_URN = new ResourceUrn("engine:prog.sky");
     private static final int SLICES = 16;
     private static final int STACKS = 128;
@@ -127,6 +127,11 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:sky90", SKY_MATERIAL_URN, "texSky90"));
         addDesiredStateChange(new SetInputTexture2D(textureSlot, "engine:sky180", SKY_MATERIAL_URN, "texSky180"));
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     public void enableWireframe() {

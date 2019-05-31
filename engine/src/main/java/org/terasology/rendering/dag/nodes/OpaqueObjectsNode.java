@@ -22,9 +22,9 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
@@ -39,7 +39,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * Objects to be rendered must be registered as implementing the interface RenderSystem and
  * take advantage of the RenderSystem.renderOpaque() method, which is called in process().
  */
-public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable {
+public class OpaqueObjectsNode extends NewAbstractNode implements WireframeCapable {
     private ComponentSystemManager componentSystemManager;
     private WorldRenderer worldRenderer;
 
@@ -69,6 +69,11 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     public void enableWireframe() {
