@@ -25,7 +25,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.NewNode;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
@@ -44,7 +44,7 @@ import java.util.Set;
  * It provides the default functionality to identify a node, handle its status (enabled/disabled),
  * deal with StateChange objects and Frame Buffer objects.
  */
-public abstract class NewAbstractNode implements Node {
+public abstract class NewAbstractNode implements NewNode {
     protected static final Logger logger = LoggerFactory.getLogger(NewAbstractNode.class);
 
     protected boolean enabled = true;
@@ -93,8 +93,16 @@ public abstract class NewAbstractNode implements Node {
         return ((FboConnection) this.inputConnections.get((new StringBuilder("FBO").append(number).toString()))).getFboData();
     }
 
+    protected FBO getOutputFboData(int number) {
+        return ((FboConnection) this.outputConnections.get((new StringBuilder("FBO").append(number).toString()))).getFboData();
+    }
+
     protected void addInputFboConnection(int id, FboConnection from) {
         DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, from.getFboData());
+        addInputConnection(fboConnection);
+    }
+    protected void addInputFboConnection(int id, FBO fboData) {
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, fboData);
         addInputConnection(fboConnection);
     }
 
@@ -104,12 +112,16 @@ public abstract class NewAbstractNode implements Node {
     }
 
     public void connectFbo(int inputFboId, FboConnection from) {
-
+        // TODO: null checks everywhere
         addInputFboConnection(inputFboId, from);
     }
 
     public FboConnection getOutputFboConnection(int outputFboId) {
         return (FboConnection) getOutputConnection(FboConnection.getFboName(outputFboId));
+    }
+
+    public FboConnection getInputFboConnection(int inputFboId) {
+        return (FboConnection) getInputConnection(FboConnection.getFboName(inputFboId));
     }
 
     /*public FBO getOutputFboData(int id)
