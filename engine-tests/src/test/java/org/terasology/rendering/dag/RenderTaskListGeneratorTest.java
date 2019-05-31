@@ -18,7 +18,9 @@ package org.terasology.rendering.dag;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.junit.Test;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.rendering.dag.gsoc.FboConnection;
 
 import java.util.List;
 import java.util.Set;
@@ -31,12 +33,12 @@ public class RenderTaskListGeneratorTest {
     public void testSimpleReducePersistingStateChanges() {
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
-        List<Node> orderedNodes = Lists.newArrayList();
-        Node alphaNode = new AlphaNode("alphaNode");
+        List<NewNode> orderedNodes = Lists.newArrayList();
+        NewNode alphaNode = new AlphaNode("alphaNode");
         orderedNodes.add(alphaNode);
-        Node bravoNode = new BravoNode("bravoNode");
+        NewNode bravoNode = new BravoNode("bravoNode");
         orderedNodes.add(bravoNode);
-        Node charlieNode = new CharlieNode("charlieNode");
+        NewNode charlieNode = new CharlieNode("charlieNode");
         orderedNodes.add(charlieNode);
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
@@ -51,14 +53,14 @@ public class RenderTaskListGeneratorTest {
     @Test
     public void testReducePersistingStateChanges() {
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
-        List<Node> orderedNodes = Lists.newArrayList();
-        Node alphaNode = new AlphaNode("alphaNode");
+        List<NewNode> orderedNodes = Lists.newArrayList();
+        NewNode alphaNode = new AlphaNode("alphaNode");
         orderedNodes.add(alphaNode);
-        Node bravoNode = new BravoNode("bravoNode");
+        NewNode bravoNode = new BravoNode("bravoNode");
         orderedNodes.add(bravoNode);
-        Node charlieNode = new CharlieNode("charlieNode");
+        NewNode charlieNode = new CharlieNode("charlieNode");
         orderedNodes.add(charlieNode);
-        Node deltaNode = new DeltaNode("deltaNode");
+        NewNode deltaNode = new DeltaNode("deltaNode");
         orderedNodes.add(deltaNode);
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
@@ -75,16 +77,16 @@ public class RenderTaskListGeneratorTest {
     @Test
     public void testReducePersistingStateChangesEcho() {
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
-        List<Node> orderedNodes = Lists.newArrayList();
-        Node alphaNode = new AlphaNode("alphaNode");
+        List<NewNode> orderedNodes = Lists.newArrayList();
+        NewNode alphaNode = new AlphaNode("alphaNode");
         orderedNodes.add(alphaNode);
-        Node bravoNode = new BravoNode("bravoNode");
+        NewNode bravoNode = new BravoNode("bravoNode");
         orderedNodes.add(bravoNode);
-        Node echoNode = new EchoNode("echoNode");
+        NewNode echoNode = new EchoNode("echoNode");
         orderedNodes.add(echoNode);
-        Node charlieNode = new CharlieNode("charlieNode");
+        NewNode charlieNode = new CharlieNode("charlieNode");
         orderedNodes.add(charlieNode);
-        Node deltaNode = new DeltaNode("deltaNode");
+        NewNode deltaNode = new DeltaNode("deltaNode");
         orderedNodes.add(deltaNode);
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
@@ -101,7 +103,7 @@ public class RenderTaskListGeneratorTest {
         assertEquals("SetName: bar",   taskList.get(9).toString().trim());
     }
 
-    private abstract class DummyNode implements Node {
+    private abstract class DummyNode implements NewNode {
         private SimpleUri nodeUri;
         private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
         private boolean enabled;
@@ -145,6 +147,19 @@ public class RenderTaskListGeneratorTest {
         public String toString() {
             return String.format("%s (%s)", getUri(), this.getClass().getSimpleName());
         }
+
+        public void connectFbo(int inputFboId, FboConnection from) {
+            // TODO: null checks everywhere
+           // addInputFboConnection(inputFboId, from);
+        }
+
+        public FboConnection getOutputFboConnection(int outputFboId) {
+            return null; // (FboConnection) getOutputConnection(FboConnection.getFboName(outputFboId));
+        }
+
+        public FboConnection getInputFboConnection(int inputFboId) {
+            return null; // (FboConnection) getInputConnection(FboConnection.getFboName(inputFboId));
+        }
     }
 
     private class AlphaNode extends DummyNode {
@@ -155,6 +170,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     private class BravoNode extends DummyNode {
@@ -165,6 +185,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     private class CharlieNode extends DummyNode {
@@ -175,6 +200,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     private class DeltaNode extends DummyNode {
@@ -185,6 +215,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     private class EchoNode extends DummyNode {
@@ -194,6 +229,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     // TODO: Add new tests with varying state changes
