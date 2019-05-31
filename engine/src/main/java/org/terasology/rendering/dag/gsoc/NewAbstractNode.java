@@ -205,14 +205,13 @@ public abstract class NewAbstractNode implements NewNode {
      * are also disposed.
      */
     @Override
-    public void dispose() { /** Dispose of data in connection maps
-     for (Map.Entry<String,DependencyConnection > entry : inputConnections.entrySet()) {
-     SimpleUri fboName = entry.getKey();
-     DependencyConnection connection = entry.getValue();
-     connection.FboDatarelease(fboName);
-     }
-
-     inputConnections.clear();*/
+    public void dispose() {
+        for (Map.Entry<SimpleUri, BaseFBOsManager> entry : fboUsages.entrySet()) {
+            SimpleUri fboName = entry.getKey();
+            BaseFBOsManager baseFBOsManager = entry.getValue();
+            baseFBOsManager.release(fboName);
+        }
+        fboUsages.clear();
     }
 
     /**
