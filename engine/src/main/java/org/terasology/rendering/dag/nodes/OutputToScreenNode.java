@@ -63,6 +63,11 @@ public class OutputToScreenNode extends ConditionDependentNode {
     }
 
     @Override
+    public void setDependencies(Context context) {
+
+    }
+
+    @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/" + getUri());
         // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).

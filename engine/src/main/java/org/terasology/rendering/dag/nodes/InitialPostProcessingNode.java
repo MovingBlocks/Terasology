@@ -23,8 +23,8 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
@@ -51,7 +51,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
  * 1/8th resolution bloom and vignette onto the rendering achieved so far, stored in the gbuffer.
  * Stores the result into the InitialPostProcessingNode.INITIAL_POST_FBO_URI, to be used at a later stage.
  */
-public class InitialPostProcessingNode extends AbstractNode implements PropertyChangeListener {
+public class InitialPostProcessingNode extends NewAbstractNode implements PropertyChangeListener {
     static final SimpleUri INITIAL_POST_FBO_URI = new SimpleUri("engine:fbo.initialPost");
     private static final ResourceUrn INITIAL_POST_MATERIAL_URN = new ResourceUrn("engine:prog.initialPost");
 
@@ -88,7 +88,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         // TODO: see if we could write this straight into a GBUFFER
-        FBO initialPostFbo = requiresFBO(new FBOConfig(INITIAL_POST_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        FBO initialPostFbo = requiresFbo(new FBOConfig(INITIAL_POST_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(initialPostFbo));
         addDesiredStateChange(new SetViewportToSizeOf(initialPostFbo));
 
@@ -104,7 +104,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
         // TODO: Temporary hack for now.
         FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO_URI, ONE_8TH_SCALE, FBO.Type.DEFAULT);
-        FBO one8thBloomFbo = requiresFBO(one8thScaleBloomConfig, displayResolutionDependentFBOs);
+        FBO one8thBloomFbo = requiresFbo(one8thScaleBloomConfig, displayResolutionDependentFBOs);
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texScene"));
@@ -118,6 +118,11 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
         if (lightShaftsAreEnabled) {
             addDesiredStateChange(setLightShaftsInputTexture);
         }
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**

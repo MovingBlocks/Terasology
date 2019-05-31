@@ -65,8 +65,8 @@ public class OutputToHMDNode extends ConditionDependentNode {
         if (this.isEnabled()) {
             DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
-            leftEyeFbo = requiresFBO(new FBOConfig(LEFT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-            rightEyeFbo = requiresFBO(new FBOConfig(RIGHT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            leftEyeFbo = requiresFbo(new FBOConfig(LEFT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            rightEyeFbo = requiresFbo(new FBOConfig(RIGHT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
             finalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
             vrProvider.texType[0].handle = leftEyeFbo.getColorBufferTextureId();
@@ -80,6 +80,11 @@ public class OutputToHMDNode extends ConditionDependentNode {
 
             addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
         }
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**

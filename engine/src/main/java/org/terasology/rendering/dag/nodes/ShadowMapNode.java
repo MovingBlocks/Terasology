@@ -91,12 +91,17 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
         renderingConfig.subscribe(RenderingConfig.DYNAMIC_SHADOWS, this);
 
         ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
-        FBO shadowMapFbo = requiresFBO(new FBOConfig(SHADOW_MAP_FBO_URI, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
+        FBO shadowMapFbo = requiresFbo(new FBOConfig(SHADOW_MAP_FBO_URI, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(shadowMapFbo));
         addDesiredStateChange(new SetViewportToSizeOf(shadowMapFbo));
         addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL_URN));
 
         addDesiredStateChange(new EnableFaceCulling());
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     private float calculateTexelSize(int shadowMapResolution) {

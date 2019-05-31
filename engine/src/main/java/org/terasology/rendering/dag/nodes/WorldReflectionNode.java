@@ -111,7 +111,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
         addDesiredStateChange(new LookThrough(activeCamera));
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO reflectedFbo = requiresFBO(new FBOConfig(REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        FBO reflectedFbo = requiresFbo(new FBOConfig(REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(reflectedFbo));
         addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo));
         addDesiredStateChange(new EnableFaceCulling());
@@ -143,6 +143,11 @@ public class WorldReflectionNode extends ConditionDependentNode {
                 addDesiredStateChange(setHeightTerrain);
             }
         }
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**

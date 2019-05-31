@@ -26,8 +26,8 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
@@ -68,7 +68,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTI
  * an experimental feature. It produces initially appealing reflections but rotating the
  * camera partially spoils the effect showing its limits.
  */
-public class RefractiveReflectiveBlocksNode extends AbstractNode implements PropertyChangeListener {
+public class RefractiveReflectiveBlocksNode extends NewAbstractNode implements PropertyChangeListener {
     public static final SimpleUri REFRACTIVE_REFLECTIVE_FBO_URI = new SimpleUri("engine:fbo.sceneReflectiveRefractive");
 
     // TODO: rename to more meaningful/precise variable names, like waveAmplitude or waveHeight.
@@ -161,7 +161,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
-        refractiveReflectiveFbo = requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+        refractiveReflectiveFbo = requiresFbo(new FBOConfig(REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(refractiveReflectiveFbo));
         lastUpdatedGBuffer.attachDepthBufferTo(refractiveReflectiveFbo);
         displayResolutionDependentFBOs.subscribe(PRE_FBO_REGENERATION, this);
@@ -197,6 +197,11 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
         if (parallaxMappingIsEnabled) {
             addDesiredStateChange(setTerrainHeightInputTexture);
         }
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**
