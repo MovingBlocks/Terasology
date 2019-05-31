@@ -25,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 //import org.terasology.logic.console.Console;
 //import org.terasology.naming.Name;
 //import org.terasology.rendering.dag.gsoc.NewAbstractNode;
@@ -36,15 +38,17 @@ import org.terasology.engine.SimpleUri;
 public class RenderGraph {
     private static final Logger logger = LoggerFactory.getLogger(RenderGraph.class);
 
-    private Map<SimpleUri, Node> nodeMap;
-    private MutableGraph<Node> graph;
+    private Map<SimpleUri, NewNode> nodeMap;
+    private MutableGraph<NewNode> graph;
+    private Context context;
 
-    public RenderGraph() {
+    public RenderGraph(Context context) {
         nodeMap = Maps.newHashMap();
         graph = GraphBuilder.directed().build();
+        this.context = context;
     }
 
-    public void addNode(Node node) {
+    public void addNode(NewNode node) {
         Preconditions.checkNotNull(node, "node cannot be null!");
 
         SimpleUri nodeUri = node.getUri();
@@ -52,48 +56,52 @@ public class RenderGraph {
             throw new RuntimeException("A node with uri " + nodeUri + " already exists!");
         }
 
+        if (node instanceof NewAbstractNode) {
+            node.setDependencies(context);
+        }
+
         nodeMap.put(nodeUri, node);
         graph.addNode(node);
     }
 
-    public Node removeNode(SimpleUri nodeUri) {
+    public NewNode removeNode(SimpleUri nodeUri) {
         Preconditions.checkNotNull(nodeUri, "nodeUri cannot be null!");
 
-        Node node = findNode(nodeUri);
+        NewNode node = findNode(nodeUri);
         if (node == null) {
-            throw new RuntimeException("Node removal failure: there is no '" + nodeUri + "' in the render graph!");
+            throw new RuntimeException("NewNode removal failure: there is no '" + nodeUri + "' in the render graph!");
         }
 
         if (graph.adjacentNodes(node).size() != 0) {
-            throw new RuntimeException("Node removal failure: node '" + nodeUri + "' is still connected to other nodes in the render graph!");
+            throw new RuntimeException("NewNode removal failure: node '" + nodeUri + "' is still connected to other nodes in the render graph!");
         }
 
         nodeMap.remove(nodeUri);
         return nodeMap.remove(nodeUri);
     }
 
-    public Node findNode(SimpleUri nodeUri) {
+    public NewNode findNode(SimpleUri nodeUri) {
         Preconditions.checkNotNull(nodeUri, "nodeUri cannot be null!");
 
         return nodeMap.get(nodeUri);
     }
 
-    public Node findNode(String simpleUri) {
+    public NewNode findNode(String simpleUri) {
         return findNode(new SimpleUri(simpleUri));
     }
 
-    public void connect(Node... nodeList) {
+    public void connect(NewNode... nodeList) {
         Preconditions.checkArgument(nodeList.length > 1, "Expected at least 2 nodes as arguments to connect() - found " + nodeList.length);
 
-        Node fromNode = null;
+        NewNode fromNode = null;
 
-        for (Node toNode : nodeList) {
+        for (NewNode toNode : nodeList) {
             Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
             if (fromNode != null) {
                 if (!graph.hasEdgeConnecting(fromNode, toNode)) {
                     graph.putEdge(fromNode, toNode);
-                   // matchDependencyConnections(fromNode, toNode);
+                    // matchDependencyConnections(fromNode, toNode);
                 } else {
                     logger.warn("Trying to connect two already connected nodes, " + fromNode.getUri() + " and " + toNode.getUri());
                 }
@@ -103,7 +111,7 @@ public class RenderGraph {
         }
     }
 
-    public void disconnect(Node fromNode, Node toNode) {
+    public void disconnect(NewNode fromNode, NewNode toNode) {
         Preconditions.checkNotNull(fromNode, "fromNode cannot be null!");
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
@@ -114,23 +122,23 @@ public class RenderGraph {
         graph.removeEdge(fromNode, toNode);
     }
 
-    // TODO: Add `boolean isFullyFunctional(Node node)`
+    // TODO: Add `boolean isFullyFunctional(NewNode node)`
 
     // TODO: Add handler methods which the graph uses to communicate changes to a node.
 
-    public List<Node> getNodesInTopologicalOrder() {
+    public List<NewNode> getNodesInTopologicalOrder() {
         // This implementation of Kahn's Algorithm is adapted from the algorithm described at
         // https://www.geeksforgeeks.org/topological-sorting-indegree-based-solution/
 
-        List<Node> topologicalList = new ArrayList<>();
+        List<NewNode> topologicalList = new ArrayList<>();
 
         // In-degree (or incoming-degree) is the number of incoming edges of a particular node.
-        Map<Node, Integer> inDegreeMap = Maps.newHashMap();
-        List<Node> nodesToExamine = Lists.newArrayList();
+        Map<NewNode, Integer> inDegreeMap = Maps.newHashMap();
+        List<NewNode> nodesToExamine = Lists.newArrayList();
         int visitedNodes = 0;
 
         // Calculate the in-degree for each node, and mark all nodes with no incoming edges for examination.
-        for (Node node : graph.nodes()) {
+        for (NewNode node : graph.nodes()) {
             int inDegree = graph.inDegree(node);
             inDegreeMap.put(node, inDegree);
 
@@ -140,9 +148,9 @@ public class RenderGraph {
         }
 
         while (!nodesToExamine.isEmpty()) {
-            Node currentNode = nodesToExamine.remove(0);
+            NewNode currentNode = nodesToExamine.remove(0);
 
-            for (Node adjacentNode : graph.successors(currentNode)) {
+            for (NewNode adjacentNode : graph.successors(currentNode)) {
                 int updatedInDegree = inDegreeMap.get(adjacentNode) - 1;
                 inDegreeMap.put(adjacentNode, updatedInDegree);
 
@@ -164,14 +172,14 @@ public class RenderGraph {
     }
 
     public void dispose() {
-        for (Node node : nodeMap.values()) {
+        for (NewNode node : nodeMap.values()) {
             graph.removeNode(node);
             node.dispose();
         }
         nodeMap.clear();
     }
 
-    /* private void matchDependencyConnections(Node fromNode, Node toNode){
+    /* private void matchDependencyConnections(NewNode fromNode, NewNode toNode){
         /** TODO REMOVE THIS IF WE MAKE THIS CHANGE FOR EVERY NODE
          *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
         /* if((fromNode instanceof NewAbstractNode) && (toNode instanceof NewAbstractNode)) {
