@@ -98,7 +98,8 @@ public class LightShaftsNode extends ConditionDependentNode {
         requiresCondition(renderingConfig::isLightShafts);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO lightShaftsFbo = requiresFBO(new FBOConfig(LIGHT_SHAFTS_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        FBO lightShaftsFbo = requiresFbo(new FBOConfig(LIGHT_SHAFTS_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addOutputFboConnection(1, lightShaftsFbo);
         addDesiredStateChange(new BindFbo(lightShaftsFbo));
         addDesiredStateChange(new SetViewportToSizeOf(lightShaftsFbo));
 
@@ -109,6 +110,11 @@ public class LightShaftsNode extends ConditionDependentNode {
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(),
                                     ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL_URN, "texScene"));
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 
     /**
