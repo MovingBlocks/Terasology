@@ -53,6 +53,9 @@ public class BlurNode extends ConditionDependentNode {
 
         this.blurRadius = blurRadius;
 
+        addInputFboConnection(1, inputFbo);
+        addOutputFboConnection(1, outputFbo);
+
         this.inputFbo = inputFbo;
         this.outputFbo = outputFbo;
         addDesiredStateChange(new BindFbo(outputFbo));
@@ -79,5 +82,10 @@ public class BlurNode extends ConditionDependentNode {
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void setDependencies(Context context) {
+
     }
 }

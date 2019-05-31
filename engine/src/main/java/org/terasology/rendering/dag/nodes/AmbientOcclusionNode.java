@@ -107,15 +107,21 @@ public class AmbientOcclusionNode extends ConditionDependentNode {
 
         addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL_URN));
         ssaoMaterial = getMaterial(SSAO_MATERIAL_URN);
+    }
+
+    @Override
+    public void setDependencies(Context context) {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        ssaoFbo = requiresFBO(new FBOConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        ssaoFbo = requiresFbo(new FBOConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+
+        this.addOutputFboConnection(1,ssaoFbo);
+
         addDesiredStateChange(new BindFbo(ssaoFbo));
         addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo));
         displayResolutionDependentFBOs.subscribe(POST_FBO_REGENERATION, this);
 
         retrieveFboDimensions();
-
         // TODO: check for input textures brought in by the material
 
         FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();

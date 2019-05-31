@@ -22,8 +22,8 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
@@ -37,7 +37,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import static org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode.SSAO_BLURRED_FBO_URI;
 import static org.terasology.rendering.dag.nodes.HazeNode.FINAL_HAZE_FBO_URI;
 import static org.terasology.rendering.dag.nodes.OutlineNode.OUTLINE_FBO_URI;
 import static org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE_FBO_URI;
@@ -59,7 +58,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  *
  * [1] And refractions? To be verified.
  */
-public class PrePostCompositeNode extends AbstractNode implements PropertyChangeListener {
+public class PrePostCompositeNode extends NewAbstractNode implements PropertyChangeListener {
     private static final ResourceUrn PRE_POST_MATERIAL_URN = new ResourceUrn("engine:prog.prePostComposite");
 
     private RenderingConfig renderingConfig;
@@ -109,7 +108,11 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
 
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
+    }
 
+    @Override
+    public void setDependencies(Context context) {
+        // TODO: Move everything you can into constructor
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
 
@@ -140,8 +143,8 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, LightAccumulationTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneOpaqueLightBuffer"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, refractiveReflectiveFbo, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneReflectiveRefractive"));
         setReflectiveRefractiveNormalsInputTexture = new SetInputTextureFromFbo(textureSlot++, refractiveReflectiveFbo, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneReflectiveRefractiveNormals");
-        setSsaoInputTexture = new SetInputTextureFromFbo(textureSlot++, SSAO_BLURRED_FBO_URI, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSsao");
-        setEdgesInputTexture = new SetInputTextureFromFbo(textureSlot++, OUTLINE_FBO_URI, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texEdges");
+        setSsaoInputTexture = new SetInputTextureFromFbo(textureSlot++, this.getInputFboData(1), ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSsao");
+        setEdgesInputTexture = new SetInputTextureFromFbo(textureSlot++, this.getInputFboData(2), ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texEdges");
         setHazeInputTexture = new SetInputTextureFromFbo(textureSlot, FINAL_HAZE_FBO_URI, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneSkyBand");
 
         if (localReflectionsAreEnabled) {
