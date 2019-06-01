@@ -49,7 +49,7 @@ public class GsonTypeSerializationLibraryAdapterFactoryTest {
     private final ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
     private final CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
     private final TypeSerializationLibrary typeSerializationLibrary =
-            TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
+            TypeSerializationLibrary.createDefaultLibrary();
 
     private final Gson gson =
             GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeSerializationLibrary)

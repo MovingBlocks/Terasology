@@ -51,8 +51,7 @@ public class TypeSerializerTest {
     public static class Json {
         private static final String INSTANCE_JSON = "{\"data\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"content\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"content\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
 
-        private ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-        private final TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, new CopyStrategyLibrary(reflectFactory));
+        private final TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary();
 
         @Test
         public void testJsonSerialize() {
@@ -77,8 +76,7 @@ public class TypeSerializerTest {
     }
 
     public static class Protobuf {
-        private ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-        private final TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, new CopyStrategyLibrary(reflectFactory));
+        private final TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary();
 
         @Test
         public void testSerializeDeserialize() throws IOException {

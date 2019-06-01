@@ -64,7 +64,6 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ConstructorLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
 
@@ -99,18 +98,11 @@ public class TypeSerializationLibrary {
     private Map<Type, InstanceCreator<?>> instanceCreators = Maps.newHashMap();
     private ConstructorLibrary constructorLibrary;
 
-    private ReflectFactory reflectFactory;
-    private CopyStrategyLibrary copyStrategies;
-
     private Map<ClassMetadata<?, ?>, Serializer> serializerMap = Maps.newHashMap();
 
     /**
-     * @param factory        The factory providing reflect implementation.
-     * @param copyStrategies The provider of copy strategies
      */
-    public TypeSerializationLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
-        this.reflectFactory = factory;
-        this.copyStrategies = copyStrategies;
+    public TypeSerializationLibrary() {
 
         constructorLibrary = new ConstructorLibrary(instanceCreators);
 
@@ -148,14 +140,11 @@ public class TypeSerializationLibrary {
      * @param original The original type serialization library to copy.
      */
     public TypeSerializationLibrary(TypeSerializationLibrary original) {
-        this.reflectFactory = original.reflectFactory;
-        this.copyStrategies = original.copyStrategies;
         this.typeHandlerFactories.addAll(original.typeHandlerFactories);
     }
 
-    public static TypeSerializationLibrary createDefaultLibrary(ReflectFactory factory,
-                                                                CopyStrategyLibrary copyStrategies) {
-        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(factory, copyStrategies);
+    public static TypeSerializationLibrary createDefaultLibrary() {
+        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary();
 
         serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
         serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());

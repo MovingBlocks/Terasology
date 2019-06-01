@@ -55,8 +55,6 @@ import static org.mockito.Mockito.mock;
 public class ComponentSerializerTest {
     private static ModuleManager moduleManager;
     private ComponentSerializer componentSerializer;
-    private ReflectFactory reflectFactory = new ReflectionReflectFactory();
-    private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
     private Context context;
 
     @BeforeClass
@@ -71,7 +69,7 @@ public class ComponentSerializerTest {
         context.put(ModuleManager.class, moduleManager);
         CoreRegistry.setContext(context);
 
-        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
+        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary();
         serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
 

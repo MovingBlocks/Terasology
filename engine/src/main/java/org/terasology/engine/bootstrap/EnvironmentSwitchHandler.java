@@ -79,7 +79,7 @@ public final class EnvironmentSwitchHandler {
         }
 
         ReflectFactory reflectFactory = context.get(ReflectFactory.class);
-        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
+        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary();
         typeSerializationLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
         context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
 

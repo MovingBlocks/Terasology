@@ -35,10 +35,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TypeSerializationLibraryTest {
-    private final ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-    private final CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-    private final TypeSerializationLibrary typeSerializationLibrary =
-            new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
+    private final TypeSerializationLibrary typeSerializationLibrary = new TypeSerializationLibrary();
 
     private enum AnEnum {}
 

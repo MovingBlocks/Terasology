@@ -60,9 +60,7 @@ public class EventSystemReplayImplTest {
     public void setup() {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
-        ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
-        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategies);
+        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary();
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, serializationLibrary);
         PojoEntityManager entityManager = new PojoEntityManager();
         entityManager.setComponentLibrary(entitySystemLibrary.getComponentLibrary());

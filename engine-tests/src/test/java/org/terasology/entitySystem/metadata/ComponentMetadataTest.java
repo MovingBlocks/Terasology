@@ -48,7 +48,7 @@ public class ComponentMetadataTest {
 
     @Test
     public void testStaticFieldsIgnored() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeSerializationLibrary(reflectFactory, copyStrategies));
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeSerializationLibrary());
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(new SimpleUri("unittest:string"), StringComponent.class);
         ComponentMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
@@ -57,7 +57,7 @@ public class ComponentMetadataTest {
 
     @Test
     public void testOwnsReferencesPopulated() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeSerializationLibrary(reflectFactory, copyStrategies));
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeSerializationLibrary());
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(new SimpleUri("unittest:owner"), OwnerComponent.class);
         ComponentMetadata<OwnerComponent> metadata = lib.getMetadata(OwnerComponent.class);
