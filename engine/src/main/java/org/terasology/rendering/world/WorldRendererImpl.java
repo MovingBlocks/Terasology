@@ -151,7 +151,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
 
-    private ImmutableFbo immutableFBOs;
+    private ImmutableFbo immutableFbo;
     private DisplayResolutionDependentFbo displayResolutionDependentFbo;
     private ShadowMapResolutionDependentFbo shadowMapResolutionDependentFbo;
 
@@ -221,12 +221,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         ScreenGrabber screenGrabber = new ScreenGrabber(context);
         context.put(ScreenGrabber.class, screenGrabber);
 
-        immutableFBOs = new ImmutableFbo();
+        immutableFbo = new ImmutableFbo();
         displayResolutionDependentFbo = new DisplayResolutionDependentFbo(context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
         shadowMapResolutionDependentFbo = new ShadowMapResolutionDependentFbo();
 
         context.put(DisplayResolutionDependentFbo.class, displayResolutionDependentFbo);
-        context.put(ImmutableFbo.class, immutableFBOs);
+        context.put(ImmutableFbo.class, immutableFbo);
         context.put(ShadowMapResolutionDependentFbo.class, shadowMapResolutionDependentFbo);
 
         shaderManager.initShaders();
@@ -483,23 +483,23 @@ public final class WorldRendererImpl implements WorldRenderer {
         SimpleBlendMaterialsNode simpleBlendMaterialsNode = (SimpleBlendMaterialsNode) renderGraph.findNode("engine:simpleBlendMaterialsNode");
         // FboConfig gBuffer2Config = displayResolutionDependentFbo.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
         DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode("exposureDownSamplerTo16pixels", context,
-                                                  simpleBlendMaterialsNode.getOutputFboConnection(1), displayResolutionDependentFbo, FBO_16X16_CONFIG, immutableFBOs);
+                                                  simpleBlendMaterialsNode.getOutputFboConnection(1), displayResolutionDependentFbo, FBO_16X16_CONFIG, immutableFbo);
         renderGraph.addNode(exposureDownSamplerTo16pixels);
 
         DownSamplerForExposureNode exposureDownSamplerTo8pixels = new DownSamplerForExposureNode("exposureDownSamplerTo8pixels", context,
-                                            exposureDownSamplerTo16pixels.getOutputFboConnection(1), immutableFBOs, FBO_8X8_CONFIG, immutableFBOs);
+                                            exposureDownSamplerTo16pixels.getOutputFboConnection(1), immutableFbo, FBO_8X8_CONFIG, immutableFbo);
         renderGraph.addNode(exposureDownSamplerTo8pixels);
 
         DownSamplerForExposureNode exposureDownSamplerTo4pixels = new DownSamplerForExposureNode("exposureDownSamplerTo4pixels", context,
-                                             exposureDownSamplerTo8pixels.getOutputFboConnection(1), immutableFBOs, FBO_4X4_CONFIG, immutableFBOs);
+                                             exposureDownSamplerTo8pixels.getOutputFboConnection(1), immutableFbo, FBO_4X4_CONFIG, immutableFbo);
         renderGraph.addNode(exposureDownSamplerTo4pixels);
 
         DownSamplerForExposureNode exposureDownSamplerTo2pixels = new DownSamplerForExposureNode("exposureDownSamplerTo2pixels", context,
-                                             exposureDownSamplerTo4pixels.getOutputFboConnection(1), immutableFBOs, FBO_2X2_CONFIG, immutableFBOs);
+                                             exposureDownSamplerTo4pixels.getOutputFboConnection(1), immutableFbo, FBO_2X2_CONFIG, immutableFbo);
         renderGraph.addNode(exposureDownSamplerTo2pixels);
 
         DownSamplerForExposureNode exposureDownSamplerTo1pixel = new DownSamplerForExposureNode("exposureDownSamplerTo1pixel", context,
-                                            exposureDownSamplerTo2pixels.getOutputFboConnection(1), immutableFBOs, FBO_1X1_CONFIG, immutableFBOs);
+                                            exposureDownSamplerTo2pixels.getOutputFboConnection(1), immutableFbo, FBO_1X1_CONFIG, immutableFbo);
         renderGraph.addNode(exposureDownSamplerTo1pixel);
 
         NewNode updateExposureNode = new UpdateExposureNode("updateExposureNode", context);
