@@ -678,8 +678,13 @@ public class UIText extends WidgetWithOrder {
      */
     public String getText() {
         String arrayText = "";
-        if(linesOfText != null) arrayText = String.join("\n", linesOfText);
-        if(text.get() != "") return text.get() + "\n" + arrayText;
+        if(linesOfText.length > 0) {
+            arrayText = String.join("\n", linesOfText);
+        }
+
+        if(text.get() != "") {
+            return text.get() + "\n" + arrayText;
+        }
         return text.get() + arrayText;
     }
 
@@ -693,7 +698,7 @@ public class UIText extends WidgetWithOrder {
         boolean callEvent = !prevText.equals(val);
 
         text.set(val != null ? val : "");
-        linesOfText = null;
+        linesOfText = new String[]{};
         correctCursor();
 
         if (callEvent) {
