@@ -29,14 +29,14 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 
 import java.beans.PropertyChangeEvent;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.POST_FBO_REGENERATION;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.POST_FBO_REGENERATION;
 
 /**
  * Instances of this node work in tandem with instances of the AmbientOcclusionNode class.
@@ -76,7 +76,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode {
         addDesiredStateChange(new EnableMaterial(SSAO_BLURRED_MATERIAL_URN));
         ssaoBlurredMaterial = getMaterial(SSAO_BLURRED_MATERIAL_URN);
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
 
         ssaoBlurredFbo = requiresFbo(new FboConfig(SSAO_BLURRED_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addOutputFboConnection(1, ssaoBlurredFbo);
@@ -86,7 +86,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode {
 
         retrieveFboDimensions();
 
-        // DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        // DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         addDesiredStateChange(new SetInputTextureFromFbo(0, this.getInputFboData(1), ColorTexture,
                 displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL_URN, "tex"));
     }

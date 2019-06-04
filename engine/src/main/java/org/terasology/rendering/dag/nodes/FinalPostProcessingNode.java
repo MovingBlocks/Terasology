@@ -35,7 +35,7 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -48,7 +48,7 @@ import java.beans.PropertyChangeListener;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.FINAL_BUFFER;
 
 /**
  * An instance of this class adds depth of field blur, motion blur and film grain to the rendering
@@ -99,7 +99,7 @@ public class FinalPostProcessingNode extends NewAbstractNode implements Property
 
         addDesiredStateChange(new EnableMaterial(POST_MATERIAL_URN));
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         FBO finalBuffer = displayResolutionDependentFBOs.get(FINAL_BUFFER);
         addDesiredStateChange(new BindFbo(finalBuffer));
         addDesiredStateChange(new SetViewportToSizeOf(finalBuffer));
@@ -117,7 +117,7 @@ public class FinalPostProcessingNode extends NewAbstractNode implements Property
 
     @Override
     public void setDependencies(Context context) {
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
 
         int texId = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(texId++, this.getInputFboData(1), ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texScene"));

@@ -20,7 +20,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.dag.gsoc.FboConnection;
-import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 
@@ -42,8 +42,8 @@ public class DownSamplerForExposureNode extends DownSamplerNode {
     public static final FboConfig FBO_1X1_CONFIG = new FboConfig(new SimpleUri("engine:fbo.1x1px"), 1, 1, FBO.Type.DEFAULT);
 
     public DownSamplerForExposureNode(String nodeUri, Context context,
-                                      FboConnection inputConnection, BaseFBOsManager inputFboManager,
-                                      FboConfig outputFboConfig, BaseFBOsManager outputFboManager) {
+                                      FboConnection inputConnection, BaseFboManager inputFboManager,
+                                      FboConfig outputFboConfig, BaseFboManager outputFboManager) {
         super(nodeUri, context, inputConnection, inputFboManager, outputFboConfig, outputFboManager);
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();

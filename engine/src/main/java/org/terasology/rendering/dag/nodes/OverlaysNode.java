@@ -30,7 +30,7 @@ import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -60,7 +60,7 @@ public class OverlaysNode extends NewAbstractNode implements WireframeCapable {
         RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
-        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFbo.class).getGBufferPair().getLastUpdatedFbo()));
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
     }

@@ -26,7 +26,7 @@ import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 
@@ -37,7 +37,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.FINAL_BUFFER;
 
 public class OutputToHMDNode extends ConditionDependentNode {
     private static final SimpleUri LEFT_EYE_FBO_URI = new SimpleUri("engine:fbo.leftEye");
@@ -63,7 +63,7 @@ public class OutputToHMDNode extends ConditionDependentNode {
 
         // TODO: Consider reworking this, since it might cause problems later, when we support switching vr in-game.
         if (this.isEnabled()) {
-            DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+            DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
 
             leftEyeFbo = requiresFbo(new FboConfig(LEFT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
             rightEyeFbo = requiresFbo(new FboConfig(RIGHT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);

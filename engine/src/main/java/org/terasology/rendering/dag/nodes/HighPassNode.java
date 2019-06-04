@@ -30,7 +30,7 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -58,7 +58,7 @@ public class HighPassNode extends ConditionDependentNode {
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         FBO highPassFbo = requiresFbo(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(highPassFbo));
         addDesiredStateChange(new SetViewportToSizeOf(highPassFbo));

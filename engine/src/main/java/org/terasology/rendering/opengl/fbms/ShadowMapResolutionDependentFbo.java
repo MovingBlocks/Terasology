@@ -22,7 +22,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.opengl.AbstractFBOsManager;
+import org.terasology.rendering.opengl.AbstractFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 
@@ -34,7 +34,7 @@ import org.terasology.rendering.opengl.FboConfig;
  * i.e. to simulate the shadows of more than one light source, i.e. multiple suns. This doesn't imply
  * that the rest of the engine is capable of that.
  */
-public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implements PropertyChangeListener {
+public class ShadowMapResolutionDependentFbo extends AbstractFboManager implements PropertyChangeListener {
     // TODO: see if we can pass the Context to the constructor and initialize these variables there.
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
@@ -44,7 +44,7 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
      * The constructor: creates an instance of this class and subscribes to the
      * SHADOW_MAP_RESOLUTION setting of the Rendering Config, listening for changes.
      */
-    public ShadowMapResolutionDependentFBOs() {
+    public ShadowMapResolutionDependentFbo() {
         renderingConfig.subscribe(RenderingConfig.SHADOW_MAP_RESOLUTION, this);
         int resolution = renderingConfig.getShadowMapResolution();
         shadowMapResolution = new FBO.Dimensions(resolution, resolution);

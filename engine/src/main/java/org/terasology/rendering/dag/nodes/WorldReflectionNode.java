@@ -38,7 +38,7 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.world.WorldProvider;
@@ -110,7 +110,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
         addDesiredStateChange(new ReflectedCamera(activeCamera)); // this has to go before the LookThrough state change
         addDesiredStateChange(new LookThrough(activeCamera));
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         FBO reflectedFbo = requiresFbo(new FboConfig(REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(reflectedFbo));
         addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo));

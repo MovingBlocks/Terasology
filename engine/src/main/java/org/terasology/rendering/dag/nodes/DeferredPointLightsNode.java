@@ -44,7 +44,7 @@ import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -108,7 +108,7 @@ public class DeferredPointLightsNode extends NewAbstractNode {
 
         addDesiredStateChange(new DisableDepthTest());
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
         // TODO: make sure to read from the lastUpdatedGBuffer and write to the staleGBuffer.
         addDesiredStateChange(new BindFbo(lastUpdatedGBuffer));

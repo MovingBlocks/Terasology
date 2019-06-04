@@ -34,7 +34,7 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
@@ -91,7 +91,7 @@ public class LightShaftsNode extends ConditionDependentNode {
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
         requiresCondition(renderingConfig::isLightShafts);
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         FBO lightShaftsFbo = requiresFbo(new FboConfig(LIGHT_SHAFTS_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addOutputFboConnection(1, lightShaftsFbo);
         addDesiredStateChange(new BindFbo(lightShaftsFbo));

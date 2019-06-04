@@ -16,7 +16,7 @@
 package org.terasology.rendering.opengl.fbms;
 
 import org.terasology.engine.SimpleUri;
-import org.terasology.rendering.opengl.AbstractFBOsManager;
+import org.terasology.rendering.opengl.AbstractFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 
@@ -25,7 +25,7 @@ import org.terasology.rendering.opengl.FboConfig;
  *
  * Once an FBO is first generated through the request(FboConfig) method, it stays the same until it is disposed.
  */
-public class ImmutableFBOs extends AbstractFBOsManager {
+public class ImmutableFbo extends AbstractFboManager {
 
     @Override
     public FBO request(FboConfig fboConfig) {

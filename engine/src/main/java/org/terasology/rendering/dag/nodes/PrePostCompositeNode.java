@@ -31,7 +31,7 @@ import org.terasology.rendering.dag.stateChanges.SwapGBuffers;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.SwappableFBO;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.beans.PropertyChangeEvent;
@@ -112,7 +112,7 @@ public class PrePostCompositeNode extends NewAbstractNode implements PropertyCha
     @Override
     public void setDependencies(Context context) {
         // TODO: Move everything you can into constructor
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
 
         addDesiredStateChange(new EnableMaterial(PRE_POST_MATERIAL_URN));

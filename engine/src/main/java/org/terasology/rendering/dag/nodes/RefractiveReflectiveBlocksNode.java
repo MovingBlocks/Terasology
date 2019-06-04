@@ -36,7 +36,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -49,8 +49,8 @@ import java.beans.PropertyChangeListener;
 import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO_URI;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.POST_FBO_REGENERATION;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.PRE_FBO_REGENERATION;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.POST_FBO_REGENERATION;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.PRE_FBO_REGENERATION;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTIVE;
 
 /**
@@ -159,7 +159,7 @@ public class RefractiveReflectiveBlocksNode extends NewAbstractNode implements P
         activeCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(activeCamera));
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
         refractiveReflectiveFbo = requiresFbo(new FboConfig(REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(refractiveReflectiveFbo));
