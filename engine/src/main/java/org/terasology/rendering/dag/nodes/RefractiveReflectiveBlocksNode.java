@@ -35,7 +35,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -161,7 +161,7 @@ public class RefractiveReflectiveBlocksNode extends NewAbstractNode implements P
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
-        refractiveReflectiveFbo = requiresFbo(new FBOConfig(REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+        refractiveReflectiveFbo = requiresFbo(new FboConfig(REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(refractiveReflectiveFbo));
         lastUpdatedGBuffer.attachDepthBufferTo(refractiveReflectiveFbo);
         displayResolutionDependentFBOs.subscribe(PRE_FBO_REGENERATION, this);

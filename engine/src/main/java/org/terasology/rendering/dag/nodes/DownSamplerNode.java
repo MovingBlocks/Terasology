@@ -27,7 +27,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -48,12 +48,12 @@ public class DownSamplerNode extends ConditionDependentNode {
      *
      * @param inputConnection an input FboConnection instance containing input data (equals FboConnection output of connected node).
      * @param inputFboManager the FBO manager from which to retrieve the input FBO
-     * @param outputFboConfig an FBOConfig instance describing the output FBO, to be retrieved from the FBO manager
+     * @param outputFboConfig an FboConfig instance describing the output FBO, to be retrieved from the FBO manager
      * @param outputFboManager the FBO manager from which to retrieve the output FBO
      */
     public DownSamplerNode(String nodeUri, Context context,
-                                            FboConnection inputConnection, BaseFBOsManager inputFboManager,
-                                            FBOConfig outputFboConfig, BaseFBOsManager outputFboManager) {
+                           FboConnection inputConnection, BaseFBOsManager inputFboManager,
+                           FboConfig outputFboConfig, BaseFBOsManager outputFboManager) {
         super(nodeUri, context);
 
         // IN

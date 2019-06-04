@@ -37,7 +37,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -94,7 +94,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
      * Constructs an instance of this class.
      *
      * Internally requires the "engine:sceneReflected" buffer, stored in the (display) resolution-dependent FBO manager.
-     * This is a default, half-scale buffer inclusive of a depth buffer FBO. See FBOConfig and ScalingFactors for details
+     * This is a default, half-scale buffer inclusive of a depth buffer FBO. See FboConfig and ScalingFactors for details
      * on possible FBO configurations.
      *
      * This method also requests the material using the "chunk" shaders (vertex, fragment) to be enabled.
@@ -111,7 +111,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
         addDesiredStateChange(new LookThrough(activeCamera));
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO reflectedFbo = requiresFbo(new FBOConfig(REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        FBO reflectedFbo = requiresFbo(new FboConfig(REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(reflectedFbo));
         addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo));
         addDesiredStateChange(new EnableFaceCulling());

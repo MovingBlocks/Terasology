@@ -24,7 +24,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 
 /**
  * An instance of this class manages the ShadowMap FBOs, regenerating as necessary when a user changes
@@ -51,7 +51,7 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
     }
 
     @Override
-    public FBO request(FBOConfig fboConfig) {
+    public FBO request(FboConfig fboConfig) {
         FBO fbo;
         SimpleUri fboName = fboConfig.getName();
         if (fboConfigs.containsKey(fboName)) {
@@ -81,9 +81,9 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
             int shadowMapResFromSettings = (int) evt.getNewValue();
             shadowMapResolution = new FBO.Dimensions(shadowMapResFromSettings, shadowMapResFromSettings);
 
-            for (Map.Entry<SimpleUri, FBOConfig> entry : fboConfigs.entrySet()) {
+            for (Map.Entry<SimpleUri, FboConfig> entry : fboConfigs.entrySet()) {
                 SimpleUri fboName = entry.getKey();
-                FBOConfig fboConfig = entry.getValue();
+                FboConfig fboConfig = entry.getValue();
 
                 if (fboLookup.containsKey(fboName)) {
                     FBO fbo = fboLookup.get(fboName);

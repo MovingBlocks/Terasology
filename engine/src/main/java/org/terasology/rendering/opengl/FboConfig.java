@@ -29,7 +29,7 @@ import org.terasology.engine.SimpleUri;
  * The new FBO is automatically registered with the LwjglRenderingProcess, overwriting any
  * existing FBO with the same title.
  */
-public class FBOConfig {
+public class FboConfig {
     private SimpleUri fboName;
     private FBO.Dimensions dimensions;
     private FBO.Type type;
@@ -56,7 +56,7 @@ public class FBOConfig {
      *                   Type.NO_COLOR will result in -no- color buffer attached to the FBO
      *                   (WARNING: this could result in an FBO with Status.DISPOSED - see FBO.getStatus()).
      */
-    public FBOConfig(SimpleUri fboName, FBO.Dimensions dimensions, FBO.Type type) {
+    public FboConfig(SimpleUri fboName, FBO.Dimensions dimensions, FBO.Type type) {
         this.fboName = fboName;
         this.dimensions = dimensions;
         this.type = type;
@@ -66,11 +66,11 @@ public class FBOConfig {
      * Same as the previous FBObuilder constructor, but taking in input
      * explicit, integer width and height instead of a Dimensions object.
      */
-    public FBOConfig(SimpleUri fboName, int width, int height, FBO.Type type) {
+    public FboConfig(SimpleUri fboName, int width, int height, FBO.Type type) {
         this(fboName, new FBO.Dimensions(width, height), type);
     }
 
-    public FBOConfig(SimpleUri fboName, ScalingFactors factors, FBO.Type type) {
+    public FboConfig(SimpleUri fboName, ScalingFactors factors, FBO.Type type) {
         Preconditions.checkArgument(factors.getScale() != 0, "Scale can not be zero.");
         this.fboName = fboName;
         this.type = type;
@@ -78,14 +78,14 @@ public class FBOConfig {
     }
 
 
-    public FBOConfig(SimpleUri fboName, float scale, FBO.Type type) {
+    public FboConfig(SimpleUri fboName, float scale, FBO.Type type) {
         Preconditions.checkArgument(scale != 0, "Scale can not be zero.");
         this.fboName = fboName;
         this.type = type;
         this.scale = scale;
     }
 
-    public FBOConfig(SimpleUri fboName, FBO.Type type) {
+    public FboConfig(SimpleUri fboName, FBO.Type type) {
         this.fboName = fboName;
         this.type = type;
     }
@@ -97,7 +97,7 @@ public class FBOConfig {
      *
      * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useDepthBuffer().build();
      */
-    public FBOConfig useDepthBuffer() {
+    public FboConfig useDepthBuffer() {
         useDepthBuffer = true;
         return this;
     }
@@ -108,7 +108,7 @@ public class FBOConfig {
      *
      * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useNormalsBuffer().build();
      */
-    public FBOConfig useNormalBuffer() {
+    public FboConfig useNormalBuffer() {
         useNormalBuffer = true;
         return this;
     }
@@ -120,7 +120,7 @@ public class FBOConfig {
      *
      * @return The calling instance, to chain calls, i.e.: new FBObuilder(...).useLightBuffer().build();
      */
-    public FBOConfig useLightBuffer() {
+    public FboConfig useLightBuffer() {
         useLightBuffer = true;
         return this;
     }
@@ -133,7 +133,7 @@ public class FBOConfig {
      * @return The calling instance of FBObuilder, to chain calls,
      * i.e.: new FBObuilder(...).useDepthBuffer().useStencilBuffer().build();
      */
-    public FBOConfig useStencilBuffer() {
+    public FboConfig useStencilBuffer() {
         useStencilBuffer = true;
         return this;
     }
@@ -186,9 +186,9 @@ public class FBOConfig {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof FBOConfig) {
+        if (obj instanceof FboConfig) {
             // TODO: add scale and dimension check here
-            FBOConfig config = (FBOConfig) obj;
+            FboConfig config = (FboConfig) obj;
             return this.fboName.equals(config.getName())
                     && this.type == config.getType()
                     && this.useDepthBuffer == config.useDepthBuffer

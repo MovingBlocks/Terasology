@@ -18,17 +18,17 @@ package org.terasology.rendering.opengl.fbms;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 
 /**
  * Instances of this class manage Frame buffer Objects (FBOs) whose characteristics are immutable.
  *
- * Once an FBO is first generated through the request(FBOConfig) method, it stays the same until it is disposed.
+ * Once an FBO is first generated through the request(FboConfig) method, it stays the same until it is disposed.
  */
 public class ImmutableFBOs extends AbstractFBOsManager {
 
     @Override
-    public FBO request(FBOConfig fboConfig) {
+    public FBO request(FboConfig fboConfig) {
         FBO fbo;
         SimpleUri fboName = fboConfig.getName();
         if (fboConfigs.containsKey(fboName)) {

@@ -29,7 +29,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
@@ -42,7 +42,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  */
 public class HighPassNode extends ConditionDependentNode {
     public static final SimpleUri HIGH_PASS_FBO_URI = new SimpleUri("engine:fbo.highPass");
-    public static final FBOConfig HIGH_PASS_FBO_CONFIG = new FBOConfig(HIGH_PASS_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT);
+    public static final FboConfig HIGH_PASS_FBO_CONFIG = new FboConfig(HIGH_PASS_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT);
     private static final ResourceUrn HIGH_PASS_MATERIAL_URN = new ResourceUrn("engine:prog.highPass");
 
     @SuppressWarnings("FieldCanBeLocal")
