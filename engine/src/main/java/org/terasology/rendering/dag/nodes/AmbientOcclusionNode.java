@@ -37,7 +37,7 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -51,7 +51,7 @@ import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.F
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.POST_FBO_REGENERATION;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.POST_FBO_REGENERATION;
 
 /**
  * Instances of this node work in tandem with instances of the BlurredAmbientOcclusionNode class.
@@ -112,7 +112,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode {
     @Override
     public void setDependencies(Context context) {
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         ssaoFbo = requiresFbo(new FboConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
 
         this.addOutputFboConnection(1,ssaoFbo);

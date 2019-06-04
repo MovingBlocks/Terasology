@@ -30,7 +30,7 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.PBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
+import org.terasology.rendering.opengl.fbms.ImmutableFbo;
 
 import java.nio.ByteBuffer;
 
@@ -81,7 +81,7 @@ public class UpdateExposureNode extends NewAbstractNode {
         screenGrabber = context.get(ScreenGrabber.class);
 
         renderingConfig = context.get(Config.class).getRendering();
-        downSampledScene = requiresFbo(DownSamplerForExposureNode.FBO_1X1_CONFIG, context.get(ImmutableFBOs.class));
+        downSampledScene = requiresFbo(DownSamplerForExposureNode.FBO_1X1_CONFIG, context.get(ImmutableFbo.class));
         writeOnlyPbo = new PBO(1, 1);
     }
 

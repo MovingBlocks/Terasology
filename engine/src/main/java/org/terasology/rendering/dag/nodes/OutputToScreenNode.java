@@ -26,19 +26,19 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.SwappableFBO;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.FINAL_BUFFER;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
 public class OutputToScreenNode extends ConditionDependentNode {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    private DisplayResolutionDependentFbo displayResolutionDependentFBOs;
 
     private FBO lastUpdatedGBuffer;
     private FBO staleGBuffer;
@@ -48,7 +48,7 @@ public class OutputToScreenNode extends ConditionDependentNode {
     public OutputToScreenNode(String nodeUri, Context context) {
         super(nodeUri, context);
 
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
 
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 

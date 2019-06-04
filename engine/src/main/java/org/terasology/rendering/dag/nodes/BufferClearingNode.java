@@ -18,7 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.context.Context;
 import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
-import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 
@@ -40,13 +40,13 @@ public class BufferClearingNode extends NewAbstractNode {
      * stores the clearing mask, for use in process().
      *
      * @param fboConfig an FboConfig object characterizing the FBO to act upon, if necessary prompting its creation.
-     * @param fboManager an instance implementing the BaseFBOsManager interface, used to retrieve and bind the FBO.
+     * @param fboManager an instance implementing the BaseFboManager interface, used to retrieve and bind the FBO.
      * @param clearingMask a glClear(int)-compatible mask, selecting which FBO-attached buffers to clear,
      *                      i.e. "GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT". This argument can't be zero.
      *                      Non GL_*_BIT values will be accepted but might eventually generate an opengl error.
      * @throws IllegalArgumentException if fboConfig, fboManager are null and if clearingMask is zero.
      */
-    public BufferClearingNode(String nodeUri, Context context, FboConfig fboConfig, BaseFBOsManager fboManager, int clearingMask) {
+    public BufferClearingNode(String nodeUri, Context context, FboConfig fboConfig, BaseFboManager fboManager, int clearingMask) {
         super(nodeUri, context);
 
         boolean argumentsAreValid = validateArguments(fboConfig, fboManager, clearingMask);
@@ -84,7 +84,7 @@ public class BufferClearingNode extends NewAbstractNode {
         glClear(clearingMask);
     }
 
-    private boolean validateArguments(FboConfig fboConfig, BaseFBOsManager fboManager, int clearingMask) {
+    private boolean validateArguments(FboConfig fboConfig, BaseFboManager fboManager, int clearingMask) {
         boolean argumentsAreValid = true;
 
         if (fboConfig == null) {

@@ -33,7 +33,7 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -86,7 +86,7 @@ public class InitialPostProcessingNode extends NewAbstractNode implements Proper
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         // TODO: see if we could write this straight into a GBUFFER
         FBO initialPostFbo = requiresFbo(new FboConfig(INITIAL_POST_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(initialPostFbo));

@@ -27,7 +27,7 @@ import org.terasology.naming.Name;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.NewNode;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.utilities.Assets;
@@ -49,7 +49,7 @@ public abstract class NewAbstractNode implements NewNode {
 
     protected boolean enabled = true;
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
-    private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
+    private Map<SimpleUri, BaseFboManager> fboUsages = Maps.newHashMap();
     private Map<String, DependencyConnection> inputConnections = Maps.newHashMap();
     private Map<String, DependencyConnection> outputConnections = Maps.newHashMap();
     private final SimpleUri nodeUri;
@@ -182,11 +182,11 @@ public abstract class NewAbstractNode implements NewNode {
      * those described in the fboConfig object, an IllegalArgumentException is thrown.
      *
      * @param fboConfig an FboConfig object describing the required FBO.
-     * @param fboManager a BaseFBOsManager object from which to obtain the FBO.
+     * @param fboManager a BaseFboManager object from which to obtain the FBO.
      * @return the requested FBO object, either newly created or a pre-existing one.
      * @throws IllegalArgumentException if the fboUri in fboConfig already in use by FBO with different characteristics.
      */
-    protected FBO requiresFbo(FboConfig fboConfig, BaseFBOsManager fboManager) {
+    protected FBO requiresFbo(FboConfig fboConfig, BaseFboManager fboManager) {
         SimpleUri fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {
@@ -206,10 +206,10 @@ public abstract class NewAbstractNode implements NewNode {
      */
     @Override
     public void dispose() {
-        for (Map.Entry<SimpleUri, BaseFBOsManager> entry : fboUsages.entrySet()) {
+        for (Map.Entry<SimpleUri, BaseFboManager> entry : fboUsages.entrySet()) {
             SimpleUri fboName = entry.getKey();
-            BaseFBOsManager baseFBOsManager = entry.getValue();
-            baseFBOsManager.release(fboName);
+            BaseFboManager baseFboManager = entry.getValue();
+            baseFboManager.release(fboName);
         }
         fboUsages.clear();
     }

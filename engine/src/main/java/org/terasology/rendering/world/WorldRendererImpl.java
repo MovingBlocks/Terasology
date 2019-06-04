@@ -77,9 +77,9 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.SwappableFBO;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
-import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
+import org.terasology.rendering.opengl.fbms.ImmutableFbo;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFbo;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
@@ -151,9 +151,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
 
-    private ImmutableFBOs immutableFBOs;
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-    private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
+    private ImmutableFbo immutableFBOs;
+    private DisplayResolutionDependentFbo displayResolutionDependentFBOs;
+    private ShadowMapResolutionDependentFbo shadowMapResolutionDependentFBOs;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -221,13 +221,13 @@ public final class WorldRendererImpl implements WorldRenderer {
         ScreenGrabber screenGrabber = new ScreenGrabber(context);
         context.put(ScreenGrabber.class, screenGrabber);
 
-        immutableFBOs = new ImmutableFBOs();
-        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
-        shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
+        immutableFBOs = new ImmutableFbo();
+        displayResolutionDependentFBOs = new DisplayResolutionDependentFbo(context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
+        shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFbo();
 
-        context.put(DisplayResolutionDependentFBOs.class, displayResolutionDependentFBOs);
-        context.put(ImmutableFBOs.class, immutableFBOs);
-        context.put(ShadowMapResolutionDependentFBOs.class, shadowMapResolutionDependentFBOs);
+        context.put(DisplayResolutionDependentFbo.class, displayResolutionDependentFBOs);
+        context.put(ImmutableFbo.class, immutableFBOs);
+        context.put(ShadowMapResolutionDependentFbo.class, shadowMapResolutionDependentFBOs);
 
         shaderManager.initShaders();
 

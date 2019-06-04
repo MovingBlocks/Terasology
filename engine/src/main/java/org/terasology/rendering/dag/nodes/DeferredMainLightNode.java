@@ -37,8 +37,8 @@ import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFbo;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -102,7 +102,7 @@ public class DeferredMainLightNode extends NewAbstractNode {
         addDesiredStateChange(new EnableBlending());
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
         // TODO: make sure to read from the lastUpdatedGBuffer and write to the staleGBuffer.
         addDesiredStateChange(new BindFbo(lastUpdatedGBuffer));
@@ -110,7 +110,7 @@ public class DeferredMainLightNode extends NewAbstractNode {
 
         initMainDirectionalLight();
 
-        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
+        ShadowMapResolutionDependentFbo shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFbo.class);
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL_URN, "texSceneOpaqueDepth"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL_URN, "texSceneOpaqueNormals"));

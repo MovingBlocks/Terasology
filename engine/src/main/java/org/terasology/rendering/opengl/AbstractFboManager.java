@@ -27,8 +27,8 @@ import java.util.Map;
 /**
  * Abstract class providing the default implementation for a number of FBO manager's methods.
  */
-public abstract class AbstractFBOsManager extends AbstractSubscribable implements BaseFBOsManager {
-    protected static final Logger logger = LoggerFactory.getLogger(AbstractFBOsManager.class);
+public abstract class AbstractFboManager extends AbstractSubscribable implements BaseFboManager {
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractFboManager.class);
     protected Map<SimpleUri, FboConfig> fboConfigs = Maps.newHashMap();
     protected Map<SimpleUri, FBO> fboLookup = Maps.newHashMap();
     protected Map<SimpleUri, Integer> fboUsageCountMap = Maps.newHashMap();

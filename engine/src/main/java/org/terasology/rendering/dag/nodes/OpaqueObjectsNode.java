@@ -29,7 +29,7 @@ import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -68,7 +68,7 @@ public class OpaqueObjectsNode extends NewAbstractNode implements WireframeCapab
         RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
-        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFbo.class).getGBufferPair().getLastUpdatedFbo()));
     }
 
     @Override

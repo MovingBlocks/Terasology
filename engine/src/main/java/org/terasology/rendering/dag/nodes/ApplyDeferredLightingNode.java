@@ -25,7 +25,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SwapGBuffers;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.SwappableFBO;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
@@ -46,7 +46,7 @@ public class ApplyDeferredLightingNode extends NewAbstractNode {
     public ApplyDeferredLightingNode(String nodeUri, Context context) {
         super(nodeUri, context);
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
 
         addDesiredStateChange(new BindFbo(gBufferPair.getStaleFbo()));

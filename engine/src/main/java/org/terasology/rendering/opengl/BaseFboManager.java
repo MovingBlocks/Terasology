@@ -33,7 +33,7 @@ import org.terasology.utilities.subscribables.Subscribable;
  *
  * This interface defines the minimum set of methods each Frame Buffer Manager must implement to provide its services.
  */
-public interface BaseFBOsManager extends Subscribable {
+public interface BaseFboManager extends Subscribable {
 
     /**
      * Used to release an FBO when it is no longer needed.

@@ -34,7 +34,7 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFbo;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
@@ -90,7 +90,7 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
         requiresCondition(() -> renderingConfig.isDynamicShadows());
         renderingConfig.subscribe(RenderingConfig.DYNAMIC_SHADOWS, this);
 
-        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
+        ShadowMapResolutionDependentFbo shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFbo.class);
         FBO shadowMapFbo = requiresFbo(new FboConfig(SHADOW_MAP_FBO_URI, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(shadowMapFbo));
         addDesiredStateChange(new SetViewportToSizeOf(shadowMapFbo));

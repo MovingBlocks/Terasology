@@ -20,7 +20,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
-import org.terasology.rendering.opengl.AbstractFBOsManager;
+import org.terasology.rendering.opengl.AbstractFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
@@ -44,7 +44,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  *
  * An instance of this class also generates a number of default FBOs: see the constructor for details.
  */
-public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implements PropertyChangeListener {
+public class DisplayResolutionDependentFbo extends AbstractFboManager implements PropertyChangeListener {
     public static final SimpleUri FINAL_BUFFER = new SimpleUri("engine:fbo.finalBuffer");
     public static final String PRE_FBO_REGENERATION = "preFboRegeneration";
     public static final String POST_FBO_REGENERATION = "postFboRegeneration";
@@ -65,13 +65,13 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
      * if necessary.
      *
      * This constructor also initializes the SwappableFBOs of the GBuffer and the buffer identified by the
-     * SimpleUri stored in DisplayResolutionDependentFBOs.FINAL_BUFFER.
+     * SimpleUri stored in DisplayResolutionDependentFbo.FINAL_BUFFER.
      *
      * @param renderingConfig the RenderingConfig instance.
      * @param screenGrabber the ScreenGrabber instance.
      * @param displayDevice the DisplayDevice instance
      */
-    public DisplayResolutionDependentFBOs(RenderingConfig renderingConfig, ScreenGrabber screenGrabber, DisplayDevice displayDevice) {
+    public DisplayResolutionDependentFbo(RenderingConfig renderingConfig, ScreenGrabber screenGrabber, DisplayDevice displayDevice) {
         this.renderingConfig = renderingConfig;
         this.screenGrabber = screenGrabber;
 
