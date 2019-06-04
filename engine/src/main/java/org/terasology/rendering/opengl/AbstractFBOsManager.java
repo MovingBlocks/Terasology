@@ -29,12 +29,12 @@ import java.util.Map;
  */
 public abstract class AbstractFBOsManager extends AbstractSubscribable implements BaseFBOsManager {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractFBOsManager.class);
-    protected Map<SimpleUri, FBOConfig> fboConfigs = Maps.newHashMap();
+    protected Map<SimpleUri, FboConfig> fboConfigs = Maps.newHashMap();
     protected Map<SimpleUri, FBO> fboLookup = Maps.newHashMap();
     protected Map<SimpleUri, Integer> fboUsageCountMap = Maps.newHashMap();
 
     /**
-     * Generates and returns an FBO as characterized by the FBOConfig and the dimensions arguments.
+     * Generates and returns an FBO as characterized by the FboConfig and the dimensions arguments.
      *
      * Notice that if the name of the FBO being generated matches the name of an FBO already stored
      * by the manager, the latter will be overwritten. However, the GPU-side Frame Buffer associated
@@ -46,11 +46,11 @@ public abstract class AbstractFBOsManager extends AbstractSubscribable implement
      * This method produces errors in the log in case the FBO generation process results in
      * FBO.Status.INCOMPLETE or FBO.Status.UNEXPECTED.
      *
-     * @param fboConfig an FBOConfig object providing FBO configuration details.
+     * @param fboConfig an FboConfig object providing FBO configuration details.
      * @param dimensions an FBO.Dimensions instance providing the dimensions of the FBO.
      * @return an FBO instance
      */
-    protected FBO generateWithDimensions(FBOConfig fboConfig, FBO.Dimensions dimensions) {
+    protected FBO generateWithDimensions(FboConfig fboConfig, FBO.Dimensions dimensions) {
         fboConfig.setDimensions(dimensions);
         FBO fbo = FBO.create(fboConfig);
 
@@ -123,19 +123,19 @@ public abstract class AbstractFBOsManager extends AbstractSubscribable implement
     }
 
     /**
-     * Returns an FBOConfig given its name.
+     * Returns an FboConfig given its name.
      *
-     * If no FBOConfig maps to the given name, null is returned and an error is logged.
+     * If no FboConfig maps to the given name, null is returned and an error is logged.
      *
      * @param fboName a SimpleUri representing the name of an FBO
-     * @return an FBOConfig instance if one is found associated with the given fboName, null otherwise
+     * @return an FboConfig instance if one is found associated with the given fboName, null otherwise
      */
     @Override
-    public FBOConfig getFboConfig(SimpleUri fboName) {
-        FBOConfig fboConfig = fboConfigs.get(fboName);
+    public FboConfig getFboConfig(SimpleUri fboName) {
+        FboConfig fboConfig = fboConfigs.get(fboName);
 
         if (fboConfig == null) {
-            logger.warn("Failed to retrieve FBOConfig '" + fboName + "'!");
+            logger.warn("Failed to retrieve FboConfig '" + fboName + "'!");
         }
 
         return fboConfig;

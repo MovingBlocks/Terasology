@@ -22,7 +22,7 @@ import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.SwappableFBO;
 
@@ -84,17 +84,17 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
     }
 
     private void generateDefaultFBOs() {
-        FBO gBuffer1 = generateWithDimensions(new FBOConfig(new SimpleUri("engine:fbo.gBuffer1"), FULL_SCALE, FBO.Type.HDR)
+        FBO gBuffer1 = generateWithDimensions(new FboConfig(new SimpleUri("engine:fbo.gBuffer1"), FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
-        FBO gBuffer2 = generateWithDimensions(new FBOConfig(new SimpleUri("engine:fbo.gBuffer2"), FULL_SCALE, FBO.Type.HDR)
+        FBO gBuffer2 = generateWithDimensions(new FboConfig(new SimpleUri("engine:fbo.gBuffer2"), FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
-        generateWithDimensions(new FBOConfig(FINAL_BUFFER, FULL_SCALE, FBO.Type.DEFAULT), fullScale);
+        generateWithDimensions(new FboConfig(FINAL_BUFFER, FULL_SCALE, FBO.Type.DEFAULT), fullScale);
 
         gBufferPair = new SwappableFBO(gBuffer1, gBuffer2);
     }
 
     @Override
-    public FBO request(FBOConfig fboConfig) {
+    public FBO request(FboConfig fboConfig) {
         FBO fbo;
         SimpleUri fboName = fboConfig.getName();
         if (fboConfigs.containsKey(fboName)) {
@@ -140,7 +140,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
         propertyChangeSupport.firePropertyChange(PRE_FBO_REGENERATION, 0, 1);
 
         for (SimpleUri urn : fboConfigs.keySet()) {
-            FBOConfig fboConfig = getFboConfig(urn);
+            FboConfig fboConfig = getFboConfig(urn);
             fboConfig.setDimensions(fullScale.multiplyBy(fboConfig.getScale()));
             FBO.recreate(get(urn), getFboConfig(urn));
         }

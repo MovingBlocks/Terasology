@@ -29,7 +29,7 @@ import org.terasology.rendering.dag.NewNode;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.utilities.Assets;
 
 import java.util.ArrayList;
@@ -181,12 +181,12 @@ public abstract class NewAbstractNode implements NewNode {
      * If the fboManager already contains an FBO with the same fboUri but different characteristics from
      * those described in the fboConfig object, an IllegalArgumentException is thrown.
      *
-     * @param fboConfig an FBOConfig object describing the required FBO.
+     * @param fboConfig an FboConfig object describing the required FBO.
      * @param fboManager a BaseFBOsManager object from which to obtain the FBO.
      * @return the requested FBO object, either newly created or a pre-existing one.
      * @throws IllegalArgumentException if the fboUri in fboConfig already in use by FBO with different characteristics.
      */
-    protected FBO requiresFbo(FBOConfig fboConfig, BaseFBOsManager fboManager) {
+    protected FBO requiresFbo(FboConfig fboConfig, BaseFBOsManager fboManager) {
         SimpleUri fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {

@@ -25,7 +25,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
@@ -65,8 +65,8 @@ public class OutputToHMDNode extends ConditionDependentNode {
         if (this.isEnabled()) {
             DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
-            leftEyeFbo = requiresFbo(new FBOConfig(LEFT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-            rightEyeFbo = requiresFbo(new FBOConfig(RIGHT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            leftEyeFbo = requiresFbo(new FboConfig(LEFT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            rightEyeFbo = requiresFbo(new FboConfig(RIGHT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
             finalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
             vrProvider.texType[0].handle = leftEyeFbo.getColorBufferTextureId();

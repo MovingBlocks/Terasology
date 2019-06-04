@@ -29,7 +29,7 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
@@ -74,7 +74,7 @@ public class OutlineNode extends ConditionDependentNode {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
-        FBO outlineFbo = requiresFbo(new FBOConfig(OUTLINE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        FBO outlineFbo = requiresFbo(new FboConfig(OUTLINE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
 
         this.addOutputFboConnection(1, outlineFbo);
 

@@ -27,7 +27,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
@@ -66,12 +66,12 @@ public class ToneMappingNode extends NewAbstractNode {
         screenGrabber = context.get(ScreenGrabber.class);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFboManager = context.get(DisplayResolutionDependentFBOs.class);
-        FBO toneMappingFbo = requiresFbo(new FBOConfig(TONE_MAPPING_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFboManager);
+        FBO toneMappingFbo = requiresFbo(new FboConfig(TONE_MAPPING_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFboManager);
 
         addOutputFboConnection(1,toneMappingFbo);
 
         //DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        //FBO toneMappingFbo = requiresFbo(new FBOConfig(TONE_MAPPING_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        //FBO toneMappingFbo = requiresFbo(new FboConfig(TONE_MAPPING_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(toneMappingFbo));
         addDesiredStateChange(new SetViewportToSizeOf(toneMappingFbo));
 

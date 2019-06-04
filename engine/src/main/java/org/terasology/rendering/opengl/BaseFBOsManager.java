@@ -46,22 +46,22 @@ public interface BaseFBOsManager extends Subscribable {
     void release(SimpleUri fboName);
 
     /**
-     * Returns an FBO with the characteristics defined by the FBOConfig provided in input.
+     * Returns an FBO with the characteristics defined by the FboConfig provided in input.
      *
      * Normally this method always returns an FBO with the requested characteristics,
      * either because one exists already or because the manager creates one on the first request for it.
      *
      * This method can however throw an IllegalArgumentException if an FBO with the name
-     * in the FBOConfig already exists within the manager but has different characteristics.
+     * in the FboConfig already exists within the manager but has different characteristics.
      * However, separate managers may use the same fboName for FBOs having different characteristics.
      *
      * Callers of this method must eventually call the method release() to ensure
      * that unused FBOs are eventually disposed.
      *
-     * @param fboConfig an FBOConfig object providing the characteristics of the requested FBO.
+     * @param fboConfig an FboConfig object providing the characteristics of the requested FBO.
      * @return an FBO object with the requested characteristics.
      */
-    FBO request(FBOConfig fboConfig);
+    FBO request(FboConfig fboConfig);
 
     /**
      * Returns an FBO given a SimpleUri uniquely identifying it within the context of a single manager.
@@ -75,10 +75,10 @@ public interface BaseFBOsManager extends Subscribable {
     FBO get(SimpleUri fboName);
 
     /**
-     * Obtains the FBOConfig of the FBO uniquely associated with the given fboName.
+     * Obtains the FboConfig of the FBO uniquely associated with the given fboName.
      *
      * @param fboName a SimpleUri uniquely identifying an FBO stored by the manager.
-     * @return the FBOConfig associated with the given fboName
+     * @return the FboConfig associated with the given fboName
      */
-    FBOConfig getFboConfig(SimpleUri fboName);
+    FboConfig getFboConfig(SimpleUri fboName);
 }

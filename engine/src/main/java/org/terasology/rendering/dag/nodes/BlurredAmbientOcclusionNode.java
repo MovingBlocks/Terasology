@@ -28,7 +28,7 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import java.beans.PropertyChangeEvent;
@@ -78,7 +78,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
-        ssaoBlurredFbo = requiresFbo(new FBOConfig(SSAO_BLURRED_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        ssaoBlurredFbo = requiresFbo(new FboConfig(SSAO_BLURRED_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addOutputFboConnection(1, ssaoBlurredFbo);
         addDesiredStateChange(new BindFbo(ssaoBlurredFbo));
         addDesiredStateChange(new SetViewportToSizeOf(ssaoBlurredFbo));

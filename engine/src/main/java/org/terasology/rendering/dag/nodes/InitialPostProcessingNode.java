@@ -32,7 +32,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -88,7 +88,7 @@ public class InitialPostProcessingNode extends NewAbstractNode implements Proper
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         // TODO: see if we could write this straight into a GBUFFER
-        FBO initialPostFbo = requiresFbo(new FBOConfig(INITIAL_POST_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        FBO initialPostFbo = requiresFbo(new FboConfig(INITIAL_POST_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(initialPostFbo));
         addDesiredStateChange(new SetViewportToSizeOf(initialPostFbo));
 
@@ -103,7 +103,7 @@ public class InitialPostProcessingNode extends NewAbstractNode implements Proper
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
 
         // TODO: Temporary hack for now.
-        FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO_URI, ONE_8TH_SCALE, FBO.Type.DEFAULT);
+        FboConfig one8thScaleBloomConfig = new FboConfig(BloomBlurNode.ONE_8TH_SCALE_FBO_URI, ONE_8TH_SCALE, FBO.Type.DEFAULT);
         FBO one8thBloomFbo = requiresFbo(one8thScaleBloomConfig, displayResolutionDependentFBOs);
 
         int textureSlot = 0;

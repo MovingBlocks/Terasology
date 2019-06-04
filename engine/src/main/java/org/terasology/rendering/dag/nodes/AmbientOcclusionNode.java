@@ -36,7 +36,7 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
@@ -113,7 +113,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode {
     public void setDependencies(Context context) {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        ssaoFbo = requiresFbo(new FBOConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        ssaoFbo = requiresFbo(new FboConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
 
         this.addOutputFboConnection(1,ssaoFbo);
 
