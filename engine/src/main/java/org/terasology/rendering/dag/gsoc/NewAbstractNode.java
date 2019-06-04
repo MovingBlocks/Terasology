@@ -144,11 +144,18 @@ public abstract class NewAbstractNode implements NewNode {
         return this.outputConnections.size();
     }
 
-    private DependencyConnection getInputConnection(String name) {
-        return inputConnections.get(name);
+    public DependencyConnection getInputConnection(String name) {
+        DependencyConnection connection = inputConnections.get(name);
+        if (connection == null) {
+            String errorMessage = String.format("Getting input connection named %s returned null." +
+                    " No such input connection in %s", name, this.toString());
+            logger.error(errorMessage);
+            throw new NullPointerException(errorMessage);
+        }
+        return connection;
     }
 
-    private DependencyConnection getOutputConnection(String name) {
+    public DependencyConnection getOutputConnection(String name) {
         DependencyConnection connection = outputConnections.get(name);
         if (connection == null) {
             String errorMessage = String.format("Getting output connection named %s returned null." +
@@ -159,13 +166,13 @@ public abstract class NewAbstractNode implements NewNode {
         return connection;
     }
 
-    private List<String> getInputConnections() {
+    public List<String> getInputConnections() {
         List<String> inputConnectionNameList = new ArrayList<>();
         this.inputConnections.forEach((name, connection) -> inputConnectionNameList.add(name));
         return inputConnectionNameList;
     }
 
-    private List<String> getOutputConnections() {
+    public List<String> getOutputConnections() {
         List<String> outputConnectionNameList = new ArrayList<>();
         this.inputConnections.forEach((name, connection) -> outputConnectionNameList.add(name));
         return outputConnectionNameList;
