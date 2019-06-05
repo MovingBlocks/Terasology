@@ -209,7 +209,7 @@ public class UIText extends WidgetWithOrder {
 
     protected void drawAll(Canvas canvas, int multilineWidth) {
 
-        if (text.get().isEmpty()) {
+        if (text.get() == null) {
             text.set("");
         }
         if (text.get().equals("") && linesOfText.length > 0) {
