@@ -209,10 +209,10 @@ public class UIText extends WidgetWithOrder {
 
     protected void drawAll(Canvas canvas, int multilineWidth) {
 
-        if (text.get() == null) {
+        if (text.get().isEmpty()) {
             text.set("");
         }
-        if (text.get().equals("") && linesOfText == null) {
+        if (text.get().equals("") && linesOfText.length > 0) {
             text.set(hintText);
             isShowingHintText = true;
         }
