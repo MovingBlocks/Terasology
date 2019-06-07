@@ -72,6 +72,10 @@ public abstract class DependencyConnection {
         this.connectedNode = connectedNode;
     }
 
+    protected void setParentNode(SimpleUri parentNode) {
+        this.parentNode = parentNode;
+    }
+
     public String getName() {
         return this.connectionName;
     }
