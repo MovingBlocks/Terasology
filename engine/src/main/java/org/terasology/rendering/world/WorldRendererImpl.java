@@ -552,19 +552,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         LateBlurNode secondLateBlurNode = new LateBlurNode("secondLateBlurNode", context, firstLateBlurFbo, secondLateBlurFbo);
         renderGraph.addNode(secondLateBlurNode);
 
-        // DependencyConnection finalIn1 = DependencyConnection.createFBOConnection(1, DependencyConnection.Type.INPUT,toneMappingNode.getOutputFBOUri(1));
-        // FboConnection finalIn2 = DependencyConnection.createFBOConnection(2, DependencyConnection.Type.INPUT,secondLateBlurNode.getOutputFBOUri(2));
         FinalPostProcessingNode finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context/*finalIn1*/);
-        /* As the last attribute - getting output dependencyUri/wholeconnection(can't see why now, but possible) from nodes - how? -
-         *                                                       either type -
-         *                                                          getOutputFBOConnection{ByNameContains}(substr/prefix/suffix..)/
-         *                                                       or getOutputFBOConnection{ByPriority}(#)-fetch output FBO
-         *                                                         - requires List instead of Map, OR adding priority attribute or...
-         *                                                       or getOutputFBOConnection{ByName}(name)*/
-        finalPostProcessingNode.connectFbo(1, toneMappingNode.getOutputFboConnection(1)); //addInputFboConnection(1, toneMappingNode.getOutputFBOUri(1));
-        finalPostProcessingNode.connectFbo(2, secondLateBlurNode.getOutputFboConnection(1)); //addInputFboConnection(1, toneMappingNode.getOutputFBOUri(1));
-        // finalPostProcessingNode.addInputFboConnection(2, firstLateBlurNode.getOutputFBOUri(2));
-
+        finalPostProcessingNode.connectFbo(1, toneMappingNode.getOutputFboConnection(1));
+        finalPostProcessingNode.connectFbo(2, secondLateBlurNode.getOutputFboConnection(1));
+        // finalPostProcessingNode.connectFbo(1, secondLateBlurNode.getOutputFboConnection(1)); // THIS INSTEAD OF A LINE ABOVE SHOULD CRASH WITH CAN'T ADD EXISTING CONNECTION
+        // finalPostProcessingNode.connectFbo(1, secondLateBlurNode.getOutputFboConnection(1)); // THIS SHOULD CRASH WITH ALREADY CONNECTED EXCEPTION
+        // TODO REMOVE ABOVE COMMENTS WHEN COMITTED
 
         renderGraph.addNode(finalPostProcessingNode);
 
