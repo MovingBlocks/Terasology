@@ -24,7 +24,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.serializers.GsonSerializer;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -51,12 +51,12 @@ class RecordedEventSerializer {
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
 
-        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary();
-        typeSerializationLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.createDefaultLibrary();
+        typeHandlerLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
 
         ClassLoader[] classLoaders = ReflectionUtil.getComprehensiveEngineClassLoaders(moduleEnvironment);
 
-        this.recordedEventListTypeHandler = typeSerializationLibrary.getTypeHandler(
+        this.recordedEventListTypeHandler = typeHandlerLibrary.getTypeHandler(
                 new TypeInfo<List<RecordedEvent>>() {}, classLoaders).get();
     }
 

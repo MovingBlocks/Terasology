@@ -40,7 +40,7 @@ import org.terasology.input.events.InputEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
@@ -74,9 +74,9 @@ public final class EntitySystemSetupUtil {
         context.put(ReflectFactory.class, reflectFactory);
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
-        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary();
-        context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
-        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.createDefaultLibrary();
+        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
+        EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
         context.put(EntitySystemLibrary.class, library);
         context.put(ComponentLibrary.class, library.getComponentLibrary());
         context.put(EventLibrary.class, library.getEventLibrary());
@@ -90,7 +90,7 @@ public final class EntitySystemSetupUtil {
      * <li>{@link NetworkSystem}</li>
      * <li>{@link ReflectFactory}</li>
      * <li>{@link CopyStrategyLibrary}</li>
-     * <li>{@link org.terasology.persistence.typeHandling.TypeSerializationLibrary}</li>
+     * <li>{@link TypeHandlerLibrary}</li>
      * </ul>
      * <p>
      * The method will make objects for the following classes available in the context:
@@ -112,9 +112,9 @@ public final class EntitySystemSetupUtil {
         context.put(EngineEntityManager.class, entityManager);
 
         // Standard serialization library
-        TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
-        typeSerializationLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler(entityManager));
-        entityManager.setTypeSerializerLibrary(typeSerializationLibrary);
+        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        typeHandlerLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler(entityManager));
+        entityManager.setTypeSerializerLibrary(typeHandlerLibrary);
 
         // Prefab Manager
         PrefabManager prefabManager = new PojoPrefabManager(context);

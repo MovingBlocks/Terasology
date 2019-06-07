@@ -33,7 +33,7 @@ import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.inMemory.PersistedInteger;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
@@ -56,7 +56,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class RuntimeDelegatingTypeHandlerSandboxTest {
-    private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
+    private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
     private final Class<?> apiClass = AABB.class;
     private final Class<?> nonApiClass = Region3i.class;
 
@@ -115,19 +115,19 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
         when(apiClassHandlerMock.deserialize(any()))
                 .thenReturn(Optional.of(new PersistedInteger(0)));
 
-        when(typeSerializationLibrary.getTypeHandler(eq(Object.class), (ClassLoader) any()))
+        when(typeHandlerLibrary.getTypeHandler(eq(Object.class), (ClassLoader) any()))
                 .thenReturn(Optional.of(baseTypeHandlerMock));
 
-        when(typeSerializationLibrary.getTypeHandler(eq(moduleClass), (ClassLoader) any()))
+        when(typeHandlerLibrary.getTypeHandler(eq(moduleClass), (ClassLoader) any()))
                 .thenReturn(Optional.of(moduleClassHandlerMock));
 
-        when(typeSerializationLibrary.getTypeHandler(eq(apiClass), (ClassLoader) any()))
+        when(typeHandlerLibrary.getTypeHandler(eq(apiClass), (ClassLoader) any()))
                 .thenReturn(Optional.of(apiClassHandlerMock));
     }
 
     @Test
     public void testAccessModuleClassFromEngine() {
-        TypeHandlerContext context = new TypeHandlerContext(typeSerializationLibrary,
+        TypeHandlerContext context = new TypeHandlerContext(typeHandlerLibrary,
                 ReflectionUtil.getComprehensiveEngineClassLoaders(moduleEnvironment));
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(AutoCloseable.class), context);
@@ -149,7 +149,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
 
     @Test
     public void testCannotAccessModuleClassFromEngineWithoutClassLoader() {
-        TypeHandlerContext context = new TypeHandlerContext(typeSerializationLibrary,
+        TypeHandlerContext context = new TypeHandlerContext(typeHandlerLibrary,
                 ReflectionUtil.class.getClassLoader());
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(AutoCloseable.class), context);
@@ -180,7 +180,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
     }
 
     private void testCanAccessClassFromModule(Class<?> testClass, TypeHandler testClassHandlerMock) {
-        TypeHandlerContext context = new TypeHandlerContext(typeSerializationLibrary,
+        TypeHandlerContext context = new TypeHandlerContext(typeHandlerLibrary,
                 moduleClass);
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(Object.class), context);
@@ -202,7 +202,7 @@ public class RuntimeDelegatingTypeHandlerSandboxTest {
 
     @Test
     public void testCannotAccessNonApiClassFromModule() {
-        TypeHandlerContext context = new TypeHandlerContext(typeSerializationLibrary,
+        TypeHandlerContext context = new TypeHandlerContext(typeHandlerLibrary,
                 moduleClass);
 
         RuntimeDelegatingTypeHandler<?> typeHandler = new RuntimeDelegatingTypeHandler<>(mock(TypeHandler.class), TypeInfo.of(Object.class), context);

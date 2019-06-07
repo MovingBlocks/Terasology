@@ -30,7 +30,7 @@ import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.module.Module;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.protobuf.EntityData;
@@ -55,7 +55,7 @@ public class ComponentSerializer {
     private ComponentLibrary componentLibrary;
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
     private boolean usingFieldIds;
-    private TypeSerializationLibrary typeSerializationLibrary;
+    private TypeHandlerLibrary typeHandlerLibrary;
     private ProtobufPersistedDataSerializer serializationContext;
 
     /**
@@ -63,9 +63,9 @@ public class ComponentSerializer {
      *
      * @param componentLibrary The component library used to provide information on each component and its fields.
      */
-    public ComponentSerializer(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
+    public ComponentSerializer(ComponentLibrary componentLibrary, TypeHandlerLibrary typeHandlerLibrary) {
         this.componentLibrary = componentLibrary;
-        this.typeSerializationLibrary = typeSerializationLibrary;
+        this.typeHandlerLibrary = typeHandlerLibrary;
         this.serializationContext = new ProtobufPersistedDataSerializer();
     }
 
@@ -179,7 +179,7 @@ public class ComponentSerializer {
 
     private <T extends Component> Component deserializeOnto(Component targetComponent, EntityData.Component componentData,
                                                             ComponentMetadata<T> componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
-        Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
+        Serializer serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
         Map<FieldMetadata<?, ?>, PersistedData> dataMap = Maps.newHashMapWithExpectedSize(componentData.getFieldCount());
         for (EntityData.NameValue field : componentData.getFieldList()) {
             FieldMetadata<?, ?> fieldInfo = null;
@@ -225,7 +225,7 @@ public class ComponentSerializer {
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
         serializeComponentType(componentMetadata, componentMessage);
 
-        Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
+        Serializer serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
         for (ReplicatedFieldMetadata<?, ?> field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, component)) {
                 PersistedData result = serializer.serialize(field, component, serializationContext);
@@ -281,7 +281,7 @@ public class ComponentSerializer {
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
         serializeComponentType(componentMetadata, componentMessage);
 
-        Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
+        Serializer serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
         boolean changed = false;
         for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, delta) && serializer.getHandlerFor(field) != null) {

@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.lang.reflect.Field;
@@ -31,7 +32,7 @@ import java.util.Optional;
 
 /**
  * Serializes objects as a fieldName -> fieldValue map. It is used as the last resort while serializing an
- * object through a {@link org.terasology.persistence.typeHandling.TypeSerializationLibrary}.
+ * object through a {@link TypeHandlerLibrary}.
  */
 public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
 

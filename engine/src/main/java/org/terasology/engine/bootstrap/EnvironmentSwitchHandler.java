@@ -36,7 +36,7 @@ import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.RegisterTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
@@ -79,12 +79,12 @@ public final class EnvironmentSwitchHandler {
         }
 
         ReflectFactory reflectFactory = context.get(ReflectFactory.class);
-        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary();
-        typeSerializationLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
-        context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.createDefaultLibrary();
+        typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         // Entity System Library
-        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
+        EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
         context.put(EntitySystemLibrary.class, library);
         ComponentLibrary componentLibrary = library.getComponentLibrary();
         context.put(ComponentLibrary.class, componentLibrary);
@@ -92,7 +92,7 @@ public final class EnvironmentSwitchHandler {
         context.put(ClassMetaLibrary.class, new ClassMetaLibraryImpl(context));
 
         registerComponents(componentLibrary, moduleManager.getEnvironment());
-        registerTypeHandlers(context, typeSerializationLibrary, moduleManager.getEnvironment());
+        registerTypeHandlers(context, typeHandlerLibrary, moduleManager.getEnvironment());
 
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
 
@@ -104,9 +104,9 @@ public final class EnvironmentSwitchHandler {
          * existing then yet.
          */
         unregisterPrefabFormats(assetTypeManager);
-        registeredPrefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        registeredPrefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.registerCoreFormat(Prefab.class, registeredPrefabFormat);
-        registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeSerializationLibrary);
+        registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.registerCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
 
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
@@ -178,7 +178,7 @@ public final class EnvironmentSwitchHandler {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void registerTypeHandlers(Context context, TypeSerializationLibrary library, ModuleEnvironment environment) {
+    private static void registerTypeHandlers(Context context, TypeHandlerLibrary library, ModuleEnvironment environment) {
         for (Class<? extends TypeHandler> handler : environment.getSubtypesOf(TypeHandler.class)) {
             RegisterTypeHandler register = handler.getAnnotation(RegisterTypeHandler.class);
             if (register != null) {

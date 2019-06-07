@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
@@ -34,11 +34,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class StringMapTypeHandlerFactoryTest {
-    private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
+    private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
     private final StringMapTypeHandlerFactory typeHandlerFactory = new StringMapTypeHandlerFactory();
 
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeSerializationLibrary, getClass().getClassLoader());
+            new TypeHandlerContext(typeHandlerLibrary, getClass().getClassLoader());
 
     @Test
     public void testStringMap() {
@@ -50,8 +50,8 @@ public class StringMapTypeHandlerFactoryTest {
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof StringMapTypeHandler);
 
-        // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
+        // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
+        verify(typeHandlerLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class StringMapTypeHandlerFactoryTest {
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof StringMapTypeHandler);
 
-        // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
+        // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
+        verify(typeHandlerLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
     }
 }

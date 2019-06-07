@@ -40,7 +40,7 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.math.Side;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
@@ -78,8 +78,8 @@ public class PrefabTest {
         assetTypeManager.registerCoreAssetType(Prefab.class,
                 (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
         ComponentLibrary componentLibrary = context.get(ComponentLibrary.class);
-        TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
-        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.registerCoreFormat(Prefab.class, prefabFormat);
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());

@@ -17,7 +17,6 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import org.junit.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
@@ -33,7 +32,7 @@ public class EnumTypeHandlerFactoryTest {
     @Test
     public void testEnum() {
         EnumTypeHandlerFactory typeHandlerFactory = new EnumTypeHandlerFactory();
-        // EnumTypeHandlerFactory does not require a TypeSerializationLibrary
+        // EnumTypeHandlerFactory does not require a TypeHandlerLibrary
         Optional<TypeHandler<SomeEnum>> typeHandler = typeHandlerFactory.create(TypeInfo.of(SomeEnum.class), null);
 
         assertTrue(typeHandler.isPresent());
@@ -44,7 +43,7 @@ public class EnumTypeHandlerFactoryTest {
     public void testNonEnum() {
         EnumTypeHandlerFactory typeHandlerFactory = new EnumTypeHandlerFactory();
 
-        // EnumTypeHandlerFactory does not require a TypeSerializationLibrary
+        // EnumTypeHandlerFactory does not require a TypeHandlerLibrary
         Optional<TypeHandler<Integer>> typeHandler = typeHandlerFactory.create(TypeInfo.of(Integer.class), null);
 
         assertFalse(typeHandler.isPresent());

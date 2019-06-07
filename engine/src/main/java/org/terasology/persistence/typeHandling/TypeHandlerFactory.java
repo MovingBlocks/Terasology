@@ -35,7 +35,7 @@ public interface TypeHandlerFactory {
      *
      * @param <T> The type for which a {@link TypeHandler} must be generated.
      * @param typeInfo The {@link TypeInfo} of the type for which a {@link TypeHandler} must be generated.
-     * @param context The {@link TypeSerializationLibrary} for which the {@link TypeHandler}
+     * @param context The {@link TypeHandlerLibrary} for which the {@link TypeHandler}
      *                                 is being created.
      * @return An {@link Optional} wrapping the created {@link TypeHandler}, or {@link Optional#empty()}
      * if the type is not supported by this {@link TypeHandlerFactory}.

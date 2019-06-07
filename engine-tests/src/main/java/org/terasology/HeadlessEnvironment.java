@@ -55,7 +55,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
@@ -164,7 +164,7 @@ public class HeadlessEnvironment extends Environment {
     protected void setupCollisionManager() {
         CollisionGroupManager collisionGroupManager = new CollisionGroupManager();
         context.put(CollisionGroupManager.class, collisionGroupManager);
-        context.get(TypeSerializationLibrary.class).addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
+        context.get(TypeHandlerLibrary.class).addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
     }
 
     @Override
@@ -172,9 +172,9 @@ public class HeadlessEnvironment extends Environment {
         WorldAtlas worldAtlas = new NullWorldAtlas();
         BlockManagerImpl blockManager = new BlockManagerImpl(worldAtlas, assetManager);
         context.put(BlockManager.class, blockManager);
-        TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
-        typeSerializationLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
-        typeSerializationLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
+        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        typeHandlerLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
+        typeHandlerLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
     }
     
     @Override

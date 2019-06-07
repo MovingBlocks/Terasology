@@ -19,7 +19,7 @@ import com.google.common.collect.Maps;
 import org.junit.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
@@ -34,14 +34,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class ObjectFieldMapTypeHandlerFactoryTest {
-    private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
+    private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
 
     private final ConstructorLibrary constructorLibrary = new ConstructorLibrary(Maps.newHashMap());
     private final ObjectFieldMapTypeHandlerFactory typeHandlerFactory = new ObjectFieldMapTypeHandlerFactory(
             constructorLibrary);
 
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeSerializationLibrary, getClass().getClassLoader());
+            new TypeHandlerContext(typeHandlerLibrary, getClass().getClassLoader());
 
     private static class SomeClass<T> {
         private T t;
@@ -56,12 +56,12 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof ObjectFieldMapTypeHandler);
 
-        // Verify that the Integer and List<Integer> TypeHandlers were loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(
+        // Verify that the Integer and List<Integer> TypeHandlers were loaded from the TypeHandlerLibrary
+        verify(typeHandlerLibrary).getTypeHandler(
                 eq(TypeInfo.of(Integer.class).getType()),
                 (ClassLoader) any());
 
-        verify(typeSerializationLibrary).getTypeHandler(
+        verify(typeHandlerLibrary).getTypeHandler(
                 eq(new TypeInfo<List<Integer>>() {}.getType()),
                 (ClassLoader) any());
     }

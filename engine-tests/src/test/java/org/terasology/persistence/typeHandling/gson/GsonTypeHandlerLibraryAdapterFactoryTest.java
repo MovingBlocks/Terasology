@@ -22,7 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector4f;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.rendering.nui.Color;
@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class GsonTypeSerializationLibraryAdapterFactoryTest {
+public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static final TestClass OBJECT = new TestClass(
             new Color(0xDEADBEEF),
             ImmutableSet.of(Vector4f.zero(), Vector4f.one()),
@@ -48,11 +48,11 @@ public class GsonTypeSerializationLibraryAdapterFactoryTest {
 
     private final ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
     private final CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-    private final TypeSerializationLibrary typeSerializationLibrary =
-            TypeSerializationLibrary.createDefaultLibrary();
+    private final TypeHandlerLibrary typeHandlerLibrary =
+            TypeHandlerLibrary.createDefaultLibrary();
 
     private final Gson gson =
-            GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeSerializationLibrary)
+            GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary)
             .create();
 
     @Test

@@ -28,28 +28,28 @@ import java.util.Optional;
  * while staying within the sandbox rules if called from a module.
  */
 public class TypeHandlerContext {
-    private TypeSerializationLibrary typeSerializationLibrary;
+    private TypeHandlerLibrary typeHandlerLibrary;
     private ClassLoader[] classLoaders;
 
-    public TypeHandlerContext(TypeSerializationLibrary typeSerializationLibrary, Class<?>... classes) {
+    public TypeHandlerContext(TypeHandlerLibrary typeHandlerLibrary, Class<?>... classes) {
         this(
-                typeSerializationLibrary,
+                typeHandlerLibrary,
                 Arrays.stream(classes)
                         .map(Class::getClassLoader)
                         .toArray(ClassLoader[]::new)
         );
     }
 
-    public TypeHandlerContext(TypeSerializationLibrary typeSerializationLibrary, ClassLoader... classLoaders) {
-        this.typeSerializationLibrary = typeSerializationLibrary;
+    public TypeHandlerContext(TypeHandlerLibrary typeHandlerLibrary, ClassLoader... classLoaders) {
+        this.typeHandlerLibrary = typeHandlerLibrary;
         this.classLoaders = classLoaders;
     }
 
     /**
-     * Returns the {@link TypeSerializationLibrary} that called the {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerContext)} method.
+     * Returns the {@link TypeHandlerLibrary} that called the {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerContext)} method.
      */
-    public TypeSerializationLibrary getTypeSerializationLibrary() {
-        return typeSerializationLibrary;
+    public TypeHandlerLibrary getTypeHandlerLibrary() {
+        return typeHandlerLibrary;
     }
 
     /**
@@ -67,20 +67,20 @@ public class TypeHandlerContext {
      * Retrieve the {@link TypeHandler} for the given type in the current context.
      */
     public Optional<TypeHandler<?>> getTypeHandler(Type elementType) {
-        return typeSerializationLibrary.getTypeHandler(elementType, classLoaders);
+        return typeHandlerLibrary.getTypeHandler(elementType, classLoaders);
     }
 
     /**
      * Retrieve the {@link TypeHandler} for the given type in the current context.
      */
     public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> elementType) {
-        return typeSerializationLibrary.getTypeHandler(elementType, classLoaders);
+        return typeHandlerLibrary.getTypeHandler(elementType, classLoaders);
     }
 
     /**
      * Retrieve the {@link TypeHandler} for the given type in the current context.
      */
     public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> elementType) {
-        return typeSerializationLibrary.getTypeHandler(elementType, classLoaders);
+        return typeHandlerLibrary.getTypeHandler(elementType, classLoaders);
     }
 }

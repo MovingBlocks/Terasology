@@ -35,7 +35,7 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.persistence.ModuleContext;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.gson.GsonTypeSerializationLibraryAdapterFactory;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -94,10 +94,10 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     public UIData load(JsonElement element, Locale otherLocale) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         TranslationSystem translationSystem = CoreRegistry.get(TranslationSystem.class);
-        TypeSerializationLibrary library = new TypeSerializationLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
+        TypeHandlerLibrary library = new TypeHandlerLibrary(CoreRegistry.get(TypeHandlerLibrary.class));
         library.addTypeHandler(UISkin.class, new AssetTypeHandler<>(UISkin.class));
 
-        // TODO: Rewrite to use TypeSerializationLibrary
+        // TODO: Rewrite to use TypeHandlerLibrary
 
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new GsonTypeSerializationLibraryAdapterFactory(library))

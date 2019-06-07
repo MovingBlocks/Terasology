@@ -23,7 +23,7 @@ import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -35,7 +35,7 @@ import java.util.Optional;
  * Delegates serialization of a value to a handler of its runtime type if needed. It is used in
  * cases where a subclass instance can be referred to as its supertype. As such, it is meant
  * for internal use in another {@link TypeHandler} only, and is never directly registered
- * in a {@link TypeSerializationLibrary}.
+ * in a {@link TypeHandlerLibrary}.
  *
  * @param <T> The base type whose instances may be delegated to a subtype's {@link TypeHandler} at runtime.
  */
@@ -47,13 +47,13 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
     private TypeHandler<T> delegateHandler;
     private TypeInfo<T> typeInfo;
-    private TypeSerializationLibrary typeSerializationLibrary;
+    private TypeHandlerLibrary typeHandlerLibrary;
     private ClassLoader[] classLoaders;
 
     public RuntimeDelegatingTypeHandler(TypeHandler<T> delegateHandler, TypeInfo<T> typeInfo, TypeHandlerContext context) {
         this.delegateHandler = delegateHandler;
         this.typeInfo = typeInfo;
-        this.typeSerializationLibrary = context.getTypeSerializationLibrary();
+        this.typeHandlerLibrary = context.getTypeHandlerLibrary();
         this.classLoaders = context.getClassLoaders();
     }
 
@@ -73,7 +73,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         Class<?> runtimeClass = getRuntimeTypeIfMoreSpecific(typeInfo, value);
 
         if (!typeInfo.getRawType().equals(runtimeClass)) {
-            Optional<TypeHandler<?>> runtimeTypeHandler = typeSerializationLibrary.getTypeHandler((Type) runtimeClass, classLoaders);
+            Optional<TypeHandler<?>> runtimeTypeHandler = typeHandlerLibrary.getTypeHandler((Type) runtimeClass, classLoaders);
 
             chosenHandler = (TypeHandler<T>) runtimeTypeHandler
                     .map(typeHandler -> {
@@ -165,7 +165,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
             return Optional.empty();
         }
 
-        TypeHandler<T> runtimeTypeHandler = (TypeHandler<T>) typeSerializationLibrary.getTypeHandler(typeToDeserializeAs.get(), classLoaders)
+        TypeHandler<T> runtimeTypeHandler = (TypeHandler<T>) typeHandlerLibrary.getTypeHandler(typeToDeserializeAs.get(), classLoaders)
                 // To avoid compile errors in the orElseGet
                 .map(typeHandler -> (TypeHandler) typeHandler)
                 .orElseGet(() -> {

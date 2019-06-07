@@ -44,7 +44,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
@@ -153,7 +153,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private static EngineEntityManager createPrivateEntityManager(ComponentLibrary componentLibrary) {
         PojoEntityManager pojoEntityManager = new PojoEntityManager();
         pojoEntityManager.setComponentLibrary(componentLibrary);
-        pojoEntityManager.setTypeSerializerLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
+        pojoEntityManager.setTypeSerializerLibrary(CoreRegistry.get(TypeHandlerLibrary.class));
         return pojoEntityManager;
     }
 

@@ -36,12 +36,9 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.recording.EventCatcher;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 
 import java.util.List;
@@ -64,7 +61,7 @@ public class PojoEventSystemTests {
     public void setup() {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
-        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary();
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary();
 
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, serializationLibrary);
         compLibrary = entitySystemLibrary.getComponentLibrary();

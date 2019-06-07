@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 import org.junit.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ArrayTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
@@ -33,10 +33,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class ArrayTypeHandlerFactoryTest {
-    private final TypeSerializationLibrary typeSerializationLibrary = mock(TypeSerializationLibrary.class);
+    private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
     private final ArrayTypeHandlerFactory typeHandlerFactory = new ArrayTypeHandlerFactory();
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeSerializationLibrary, getClass().getClassLoader());
+            new TypeHandlerContext(typeHandlerLibrary, getClass().getClassLoader());
 
     @Test
     public void testArray() {
@@ -48,8 +48,8 @@ public class ArrayTypeHandlerFactoryTest {
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof ArrayTypeHandler);
 
-        // Verify that the Integer TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(eq(TypeInfo.of(int.class).getType()), (ClassLoader) any());
+        // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
+        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(int.class).getType()), (ClassLoader) any());
     }
 
     @Test
@@ -62,8 +62,8 @@ public class ArrayTypeHandlerFactoryTest {
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof ArrayTypeHandler);
 
-        // Verify that the List<Integer> TypeHandler was loaded from the TypeSerializationLibrary
-        verify(typeSerializationLibrary).getTypeHandler(eq(new TypeInfo<List<Integer>>() {}.getType()), (ClassLoader) any());
+        // Verify that the List<Integer> TypeHandler was loaded from the TypeHandlerLibrary
+        verify(typeHandlerLibrary).getTypeHandler(eq(new TypeInfo<List<Integer>>() {}.getType()), (ClassLoader) any());
     }
 
     @Test

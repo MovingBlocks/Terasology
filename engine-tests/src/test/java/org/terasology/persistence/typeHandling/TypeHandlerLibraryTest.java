@@ -22,8 +22,6 @@ import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandl
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -34,8 +32,8 @@ import java.util.Set;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class TypeSerializationLibraryTest {
-    private final TypeSerializationLibrary typeSerializationLibrary = new TypeSerializationLibrary();
+public class TypeHandlerLibraryTest {
+    private final TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary();
 
     private enum AnEnum {}
 
@@ -44,14 +42,14 @@ public class TypeSerializationLibraryTest {
 
     @Test
     public void testEnumHandler() {
-        TypeHandler<AnEnum> handler = typeSerializationLibrary.getTypeHandler(AnEnum.class, getClass().getClassLoader()).get();
+        TypeHandler<AnEnum> handler = typeHandlerLibrary.getTypeHandler(AnEnum.class, getClass().getClassLoader()).get();
 
         assertTrue(handler instanceof EnumTypeHandler);
     }
 
     @Test
     public void testMappedContainerHandler() {
-        TypeHandler<AMappedContainer> handler = typeSerializationLibrary.getTypeHandler(AMappedContainer.class, getClass().getClassLoader()).get();
+        TypeHandler<AMappedContainer> handler = typeHandlerLibrary.getTypeHandler(AMappedContainer.class, getClass().getClassLoader()).get();
 
         assertTrue(handler instanceof ObjectFieldMapTypeHandler);
     }
@@ -59,17 +57,17 @@ public class TypeSerializationLibraryTest {
     @Test
     public void testCollectionHandler() {
         TypeHandler<Set<Integer>> setHandler =
-                typeSerializationLibrary.getTypeHandler(new TypeInfo<Set<Integer>>() {}, getClass().getClassLoader()).get();
+                typeHandlerLibrary.getTypeHandler(new TypeInfo<Set<Integer>>() {}, getClass().getClassLoader()).get();
 
         assertTrue(setHandler instanceof CollectionTypeHandler);
 
         TypeHandler<List<Integer>> listHandler =
-                typeSerializationLibrary.getTypeHandler(new TypeInfo<List<Integer>>() {}, getClass().getClassLoader()).get();
+                typeHandlerLibrary.getTypeHandler(new TypeInfo<List<Integer>>() {}, getClass().getClassLoader()).get();
 
         assertTrue(listHandler instanceof CollectionTypeHandler);
 
         TypeHandler<Queue<Integer>> queueHandler =
-                typeSerializationLibrary.getTypeHandler(new TypeInfo<Queue<Integer>>() {}, getClass().getClassLoader()).get();
+                typeHandlerLibrary.getTypeHandler(new TypeInfo<Queue<Integer>>() {}, getClass().getClassLoader()).get();
 
         assertTrue(queueHandler instanceof CollectionTypeHandler);
     }
@@ -77,7 +75,7 @@ public class TypeSerializationLibraryTest {
     @Test
     public void testStringMapHandler() {
         TypeHandler<Map<String, Integer>> handler =
-                typeSerializationLibrary.getTypeHandler(new TypeInfo<Map<String, Integer>>() {}, getClass().getClassLoader()).get();
+                typeHandlerLibrary.getTypeHandler(new TypeInfo<Map<String, Integer>>() {}, getClass().getClassLoader()).get();
 
         assertTrue(handler instanceof StringMapTypeHandler);
     }
@@ -85,7 +83,7 @@ public class TypeSerializationLibraryTest {
     @Test
     public void testInvalidTypeHandler() {
         Optional<TypeHandler<Map<Integer, Integer>>> handler =
-                typeSerializationLibrary.getTypeHandler(new TypeInfo<Map<Integer, Integer>>() {}, getClass().getClassLoader());
+                typeHandlerLibrary.getTypeHandler(new TypeInfo<Map<Integer, Integer>>() {}, getClass().getClassLoader());
 
         assertFalse(handler.isPresent());
     }

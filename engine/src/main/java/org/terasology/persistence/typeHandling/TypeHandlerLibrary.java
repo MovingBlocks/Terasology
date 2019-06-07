@@ -60,7 +60,6 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ConstructorLibrary;
@@ -79,8 +78,8 @@ import java.util.Optional;
  * This library should be initialised by adding a number of base type handlers, describing how to serialize each supported type.
  * It will then produce serializers for classes (through their ClassMetadata) on request.
  */
-public class TypeSerializationLibrary {
-    private static final Logger logger = LoggerFactory.getLogger(TypeSerializationLibrary.class);
+public class TypeHandlerLibrary {
+    private static final Logger logger = LoggerFactory.getLogger(TypeHandlerLibrary.class);
 
     private List<TypeHandlerFactory> typeHandlerFactories = Lists.newArrayList();
 
@@ -102,7 +101,7 @@ public class TypeSerializationLibrary {
 
     /**
      */
-    public TypeSerializationLibrary() {
+    public TypeHandlerLibrary() {
 
         constructorLibrary = new ConstructorLibrary(instanceCreators);
 
@@ -139,12 +138,12 @@ public class TypeSerializationLibrary {
      *
      * @param original The original type serialization library to copy.
      */
-    public TypeSerializationLibrary(TypeSerializationLibrary original) {
+    public TypeHandlerLibrary(TypeHandlerLibrary original) {
         this.typeHandlerFactories.addAll(original.typeHandlerFactories);
     }
 
-    public static TypeSerializationLibrary createDefaultLibrary() {
-        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary();
+    public static TypeHandlerLibrary createDefaultLibrary() {
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary();
 
         serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
         serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
