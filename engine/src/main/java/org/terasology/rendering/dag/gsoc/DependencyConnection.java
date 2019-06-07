@@ -80,4 +80,11 @@ public abstract class DependencyConnection {
         return this.connectionType;
     }
 
+    @Override
+    public String toString() {
+        return (this.connectionType == Type.OUTPUT) ?
+                String.format("Output:%s([Parent]%s->%s)", this.connectionName, this.parentNode, this.connectedNode) :
+                String.format("Input:%s([Parent]%s<-%s)", this.connectionName, this.parentNode, this.connectedNode);
+    }
+
 }
