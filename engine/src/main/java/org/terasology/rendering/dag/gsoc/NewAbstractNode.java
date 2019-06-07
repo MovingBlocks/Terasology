@@ -147,14 +147,19 @@ public abstract class NewAbstractNode implements NewNode {
      * @param fromConnection FboConnection obtained form another node's output.
      */
     public void connectFbo(int inputFboId, FboConnection fromConnection) {
-        // TODO: null checks everywhere?
-        // Upon successful insertion - save connected node. If node is already connected, throw an exception.
-        if (addInputFboConnection(inputFboId, fromConnection)) {
-            if (fromConnection.getConnectedNode() == null) {
+        // TODO To Change OR NOT To Change parent node for the fromConnection being stored as toConnection?
+        // Is not yet connected? TODO this will have to be caught by a try-catch or redone if we were going use gui to tamper with dag
+        if (fromConnection.getConnectedNode() == null) {
+            if (addInputFboConnection(inputFboId, fromConnection)) {
+                // Upon successful insertion - save connected node. If node is already connected, throw an exception.
                 fromConnection.setConnectedNode(this.getUri());
-            } else {
-                throw new RuntimeException("connectFbo(" + inputFboId + ", " + fromConnection.getName() + "): Connection " + fromConnection + " is already connected.");
             }
+            else {
+                throw new RuntimeException(this.getUri() + ".connectFbo(" + inputFboId + ", " + fromConnection.getName() + "):" +
+                                            " Could not add connection for " + this + ", inputConnection with id " + inputFboId + " already exists.");
+            }
+        } else {
+            throw new RuntimeException("connectFbo(" + inputFboId + ", " + fromConnection.getName() + "): Connection " + fromConnection + " is already connected.");
         }
     }
 
