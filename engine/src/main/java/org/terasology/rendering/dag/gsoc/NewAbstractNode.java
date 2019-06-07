@@ -77,12 +77,22 @@ public abstract class NewAbstractNode implements NewNode {
      */
     public abstract void setDependencies(Context context);
 
-    private void addInputConnection(DependencyConnection input) {
-        this.inputConnections.putIfAbsent(input.getName(), input);
+    /**
+     *
+     * @param input
+     * @return true if successful insertion, false otherwise
+     */
+    private boolean addInputConnection(DependencyConnection input) {
+        return (this.inputConnections.putIfAbsent(input.getName(), input) == null);
     }
 
-    private void addOutputConnection(DependencyConnection output) {
-        this.outputConnections.putIfAbsent(output.getName(), output);
+    /**
+     *
+     * @param output
+     * @return true if successful insertion, false otherwise
+     */
+    private boolean addOutputConnection(DependencyConnection output) {
+        return (this.outputConnections.putIfAbsent(output.getName(), output) == null);
     }
 
     /**
@@ -97,28 +107,55 @@ public abstract class NewAbstractNode implements NewNode {
         return ((FboConnection) this.outputConnections.get((new StringBuilder("FBO").append(number).toString()))).getFboData();
     }
 
-    protected void addInputFboConnection(int id, FboConnection from) {
+    /**
+     *
+     * @param id
+     * @param from
+     * @return true if inserted, false otherwise
+     */
+    protected boolean addInputFboConnection(int id, FboConnection from) {
         DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, from.getFboData(), this.getUri());
-        addInputConnection(fboConnection);
+        return addInputConnection(fboConnection);
     }
-    protected void addInputFboConnection(int id, FBO fboData) {
+
+    /**
+     * TODO This connection is not necessarily getting its new FBO, should be setting connectedNode if not
+     * @param id
+     * @param fboData
+     * @return true if inserted, false otherwise
+     */
+    protected boolean addInputFboConnection(int id, FBO fboData) {
         DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, fboData, this.getUri());
-        addInputConnection(fboConnection);
+        return addInputConnection(fboConnection);
+    }
+
+    /**
+     * TODO do something if could not insert
+     * @param id
+     * @param fboData
+     * @return true if inserted, false otherwise
+     */
+    protected boolean addOutputFboConnection(int id, FBO fboData) {
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
+        return addOutputConnection(fboConnection);
     }
 
     /**
      *
-     * @param id
-     * @param fboData
+     * @param inputFboId Input FBO id is a number of the input connection on this node.
+     *                   Chosen arbitrarily, integers starting by 1 typically.
+     * @param fromConnection FboConnection obtained form another node's output.
      */
-    protected void addOutputFboConnection(int id, FBO fboData) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
-        addOutputConnection(fboConnection);
-    }
-
-    public void connectFbo(int inputFboId, FboConnection from) {
-        // TODO: null checks everywhere
-        addInputFboConnection(inputFboId, from);
+    public void connectFbo(int inputFboId, FboConnection fromConnection) {
+        // TODO: null checks everywhere?
+        // Upon successful insertion - save connected node. If node is already connected, throw an exception.
+        if (addInputFboConnection(inputFboId, fromConnection)) {
+            if (fromConnection.getConnectedNode() == null) {
+                fromConnection.setConnectedNode(this.getUri());
+            } else {
+                throw new RuntimeException("connectFbo(" + inputFboId + ", " + fromConnection.getName() + "): Connection " + fromConnection + " is already connected.");
+            }
+        }
     }
 
     public FboConnection getOutputFboConnection(int outputFboId) {
