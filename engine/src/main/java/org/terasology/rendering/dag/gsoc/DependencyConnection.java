@@ -68,7 +68,7 @@ public abstract class DependencyConnection {
      * TODO Whether to set this for input connections which do not origin in it's parent node remains a question.
      * @param connectedNode A SimpleUri name of connected node.
      */
-    public void setConnectedNode(SimpleUri connectedNode) {
+    protected void setConnectedNode(SimpleUri connectedNode) {
         this.connectedNode = connectedNode;
     }
 
