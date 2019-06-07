@@ -62,7 +62,7 @@ public abstract class NewAbstractNode implements NewNode {
      *
      * @param nodeId  a String representing the id of the node, namespace -excluded-: that's added automatically.
      * @param context a Context object.
-     *////TODO LIST OF INS AND OUTS
+     */
     protected NewAbstractNode(String nodeId, Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
@@ -98,16 +98,21 @@ public abstract class NewAbstractNode implements NewNode {
     }
 
     protected void addInputFboConnection(int id, FboConnection from) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, from.getFboData());
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, from.getFboData(), this.getUri());
         addInputConnection(fboConnection);
     }
     protected void addInputFboConnection(int id, FBO fboData) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, fboData);
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, fboData, this.getUri());
         addInputConnection(fboConnection);
     }
 
+    /**
+     *
+     * @param id
+     * @param fboData
+     */
     protected void addOutputFboConnection(int id, FBO fboData) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.OUTPUT, fboData);
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
         addOutputConnection(fboConnection);
     }
 
@@ -123,10 +128,6 @@ public abstract class NewAbstractNode implements NewNode {
     public FboConnection getInputFboConnection(int inputFboId) {
         return (FboConnection) getInputConnection(FboConnection.getFboName(inputFboId));
     }
-
-    /*public FBO getOutputFboData(int id)
-        return ((FboConnection) this.outputConnections.get(DependencyConnection.getFboName(id))).getFboData();
-    }*/
 
     public void removeInputConnection(String name) {
         inputConnections.remove(name);

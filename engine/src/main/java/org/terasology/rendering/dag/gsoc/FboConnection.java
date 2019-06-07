@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.dag.gsoc;
 
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.FBO;
 
 public class FboConnection extends DependencyConnection {
@@ -23,12 +24,25 @@ public class FboConnection extends DependencyConnection {
     // private SimpleUri fboUri;
     private FBO fboData;
 
-    public FboConnection(String name, Type type) {
-        super(name, type);
+    /**
+     *
+     * @param name
+     * @param type
+     * @param parentNode
+     */
+    public FboConnection(String name, Type type, SimpleUri parentNode) {
+        super(name, type, parentNode);
     }
 
-    public FboConnection(String name, Type type, FBO fboData) {
-        super(name, type);
+    /**
+     *
+     * @param name
+     * @param type
+     * @param fboData
+     * @param parentNode
+     */
+    public FboConnection(String name, Type type, FBO fboData, SimpleUri parentNode) {
+        super(name, type, parentNode);
         this.fboData = fboData;
     }
 
