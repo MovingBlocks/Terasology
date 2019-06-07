@@ -555,9 +555,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         FinalPostProcessingNode finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context/*finalIn1*/);
         finalPostProcessingNode.connectFbo(1, toneMappingNode.getOutputFboConnection(1));
         finalPostProcessingNode.connectFbo(2, secondLateBlurNode.getOutputFboConnection(1));
-        // finalPostProcessingNode.connectFbo(1, secondLateBlurNode.getOutputFboConnection(1)); // THIS INSTEAD OF A LINE ABOVE SHOULD CRASH WITH CAN'T ADD EXISTING CONNECTION
-        // finalPostProcessingNode.connectFbo(1, secondLateBlurNode.getOutputFboConnection(1)); // THIS SHOULD CRASH WITH ALREADY CONNECTED EXCEPTION
-        // TODO REMOVE ABOVE COMMENTS WHEN COMITTED
 
         renderGraph.addNode(finalPostProcessingNode);
 
