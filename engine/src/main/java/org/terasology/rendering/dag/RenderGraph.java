@@ -28,9 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.dag.gsoc.NewAbstractNode;
-//import org.terasology.logic.console.Console;
-//import org.terasology.naming.Name;
-//import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 
 /**
  * TODO: Add javadocs
@@ -101,7 +98,6 @@ public class RenderGraph {
             if (fromNode != null) {
                 if (!graph.hasEdgeConnecting(fromNode, toNode)) {
                     graph.putEdge(fromNode, toNode);
-                    // matchDependencyConnections(fromNode, toNode);
                 } else {
                     logger.warn("Trying to connect two already connected nodes, " + fromNode.getUri() + " and " + toNode.getUri());
                 }
@@ -179,26 +175,4 @@ public class RenderGraph {
         nodeMap.clear();
     }
 
-    /* private void matchDependencyConnections(NewNode fromNode, NewNode toNode){
-        /** TODO REMOVE THIS IF WE MAKE THIS CHANGE FOR EVERY NODE
-         *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-        /* if((fromNode instanceof NewAbstractNode) && (toNode instanceof NewAbstractNode)) {
-            // NewAbstractNode fromAbstractNode =(NewAbstractNode) fromNode;
-            // NewAbstractNode toAbstractNode =(NewAbstractNode) toNode;
-
-            List<Name> fromOutputs = ((NewAbstractNode) fromNode).getOutputConnections();
-            List<Name> toInputs = ((NewAbstractNode) toNode).getInputConnections();
-
-            if(fromOutputs.size() != toInputs.size()) {
-
-            }
-
-            for (Name n: fromOutputs
-                 ) {
-                
-            }
-        } else {
-            return;
-        }
-    } */
 }
