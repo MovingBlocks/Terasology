@@ -31,7 +31,7 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.FINAL_BUFFER;
+// import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.FINAL_BUFFER;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
@@ -52,19 +52,17 @@ public class OutputToScreenNode extends ConditionDependentNode {
 
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 
-        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
+    }
 
-        bindFbo = new SetInputTextureFromFbo(0, FINAL_BUFFER, ColorTexture, displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL_URN, "texture");
+    @Override
+    public void setDependencies(Context context) {
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
+        bindFbo = new SetInputTextureFromFbo(0, this.getInputFboData(1), ColorTexture, displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL_URN, "texture");
         addDesiredStateChange(bindFbo);
 
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
         lastUpdatedGBuffer = gBufferPair.getLastUpdatedFbo();
         staleGBuffer = gBufferPair.getStaleFbo();
-    }
-
-    @Override
-    public void setDependencies(Context context) {
-
     }
 
     @Override
