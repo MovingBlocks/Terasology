@@ -42,6 +42,8 @@ import org.terasology.rendering.dag.NewNode;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
+import org.terasology.rendering.dag.gsoc.RenderGraphAPI;
+import org.terasology.rendering.dag.gsoc.TintNode;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
@@ -123,6 +125,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
     private RenderGraph renderGraph;
 
+    public RenderGraphAPI renderGraphApi;
+
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
@@ -174,6 +178,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     public WorldRendererImpl(Context context, GLBufferPool bufferPool) {
         this.context = context;
         renderGraph = new RenderGraph(context);
+
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
@@ -213,8 +218,14 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         initRenderingSupport();
 
+        initRenderingAPI();
+
         console = context.get(Console.class);
         MethodCommand.registerAvailable(this, console, context);
+    }
+
+    private void initRenderingAPI() {
+         renderGraphApi = RenderGraphAPI.getRenderGraphAPI(renderGraph);
     }
 
     private void initRenderingSupport() {
@@ -564,13 +575,19 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void addOutputNodes(RenderGraph renderGraph) {
         NewNode finalPostProcessingNode = renderGraph.findNode("engine:finalPostProcessingNode");
 
+        NewNode  tintNode = new TintNode("tintNode", context);
+        tintNode.connectFbo(1, finalPostProcessingNode.getOutputFboConnection(1));
+        renderGraph.addNode(tintNode);
+
         NewNode outputToVRFrameBufferNode = new OutputToHMDNode("outputToVRFrameBufferNode", context);
         renderGraph.addNode(outputToVRFrameBufferNode);
         renderGraph.connect(finalPostProcessingNode, outputToVRFrameBufferNode);
 
         NewNode outputToScreenNode = new OutputToScreenNode("outputToScreenNode", context);
+        outputToScreenNode.connectFbo(1, tintNode.getOutputFboConnection(1));
         renderGraph.addNode(outputToScreenNode);
-        renderGraph.connect(finalPostProcessingNode, outputToScreenNode);
+        // renderGraph.connect(finalPostProcessingNode, outputToScreenNode);
+        renderGraph.connect(finalPostProcessingNode, tintNode, outputToScreenNode);
     }
 
     @Override
