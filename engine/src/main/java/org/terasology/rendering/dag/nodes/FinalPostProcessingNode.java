@@ -101,6 +101,7 @@ public class FinalPostProcessingNode extends NewAbstractNode implements Property
 
         DisplayResolutionDependentFbo displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFbo.class);
         FBO finalBuffer = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+        this.addOutputFboConnection(1, finalBuffer);
         addDesiredStateChange(new BindFbo(finalBuffer));
         addDesiredStateChange(new SetViewportToSizeOf(finalBuffer));
 
