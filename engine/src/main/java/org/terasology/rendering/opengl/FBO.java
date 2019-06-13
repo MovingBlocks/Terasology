@@ -495,6 +495,11 @@ public final class FBO {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
+    @Override
+    public String toString(){
+        return "FBO: " + this.fboName;
+    }
+
     private static void verifyCompleteness(SimpleUri urn, Type type, FBO fbo) {
         int checkFB = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
         switch (checkFB) {
