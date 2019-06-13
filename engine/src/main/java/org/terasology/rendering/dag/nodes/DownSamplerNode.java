@@ -57,7 +57,7 @@ public class DownSamplerNode extends ConditionDependentNode {
         super(nodeUri, context);
 
         // IN
-        addInputFboConnection(1, inputConnection.getFboData());
+        addInputFboConnection(1, inputConnection.getData());
 
         // OUT
         outputFbo = requiresFbo(outputFboConfig, outputFboManager);
