@@ -20,7 +20,9 @@ import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.rendering.dag.gsoc.DependencyConnection;
 import org.terasology.rendering.dag.gsoc.FboConnection;
+import org.terasology.rendering.dag.gsoc.NewNode;
 
 import java.util.List;
 import java.util.Set;
@@ -148,17 +150,17 @@ public class RenderTaskListGeneratorTest {
             return String.format("%s (%s)", getUri(), this.getClass().getSimpleName());
         }
 
-        public void connectFbo(int inputFboId, FboConnection from) {
+        public void connect(int inputFboId, DependencyConnection from) {
             // TODO: null checks everywhere
            // addInputFboConnection(inputFboId, from);
         }
 
         public FboConnection getOutputFboConnection(int outputFboId) {
-            return null; // (FboConnection) getOutputConnection(FboConnection.getFboName(outputFboId));
+            return null; // (FboConnection) getOutputConnection(FboConnection.getConnectionName(outputFboId));
         }
 
         public FboConnection getInputFboConnection(int inputFboId) {
-            return null; // (FboConnection) getInputConnection(FboConnection.getFboName(inputFboId));
+            return null; // (FboConnection) getInputFboConnection(FboConnection.getConnectionName(inputFboId));
         }
     }
 
