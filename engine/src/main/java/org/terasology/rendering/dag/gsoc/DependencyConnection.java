@@ -121,4 +121,11 @@ public abstract class DependencyConnection<T> {
                 String.format("Input:%s([Parent]%s<-%s)", connectionName, parentNode, connectedConnection.getName());
     }
 
+    /**
+     * Constructs DependencyConnection name based on ID and Dep.connection type.
+     * @param id
+     * @return
+     */
+    // public abstract String getConnectionName(int id);
+
 }
