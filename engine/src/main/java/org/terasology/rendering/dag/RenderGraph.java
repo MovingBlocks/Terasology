@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.dag.gsoc.NewAbstractNode;
+import org.terasology.rendering.dag.gsoc.NewNode;
 
 /**
  * TODO: Add javadocs
