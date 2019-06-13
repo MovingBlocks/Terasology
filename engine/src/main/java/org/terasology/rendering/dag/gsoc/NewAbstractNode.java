@@ -232,6 +232,21 @@ public abstract class NewAbstractNode implements NewNode {
         return outputConnectionNameList;
     }
 
+    public void disconnectInputFbo(int inputId) {
+        logger.info("Disconnecting" + this.getUri() + " input Fbo number " + inputId);
+            DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId));
+        if (connectionToDisconnect != null) {
+            // TODO make it reconnectInputToOutput
+            if (connectionToDisconnect.getConnectedConnection()!=null) {
+                connectionToDisconnect.disconnect();
+            } else {
+                logger.warn("Connection was not connected, it probably originated in this node. (Support FBOs can be created inside nodes)");
+            }
+        } else {
+            logger.error("No such connection");
+        }
+    }
+
     /**
      * Reconnects dependencies only
      * @param inputId

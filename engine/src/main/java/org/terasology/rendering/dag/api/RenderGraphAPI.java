@@ -21,7 +21,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.registry.Share;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.gsoc.DependencyConnection;
-import org.terasology.rendering.dag.gsoc.FboConnection;
 import org.terasology.rendering.dag.gsoc.NewNode;
 
 @Share(RenderGraphAPI.class)
@@ -50,8 +49,34 @@ public class RenderGraphAPI {
         // connect in renderGraph (order, to be executed somewhere)
     }
 
-    public void disconnectFboOutput() {
+    public void disconnectOutputFbo(String nodeUri, int connectionId) {
+        logger.info("Attempting disconnection of " + nodeUri + "'s output fbo number " + connectionId);
+        NewNode node = renderGraph.findNode(new SimpleUri(nodeUri));
+        if (node != null) {
+            DependencyConnection outputConnection = node.getOutputFboConnection(connectionId);
+            if (outputConnection != null) {
+                outputConnection.disconnect();
+            } else {
+                logger.warn("Could not find output Fbo connection number " + connectionId + "within " + nodeUri + ".");
+            }
+        } else {
+            throw new RuntimeException("Could not find node named " + nodeUri + " within renderGraph.");
+        }
+    }
 
+    public void disconnectInputFbo(String nodeUri, int connectionId) {
+        logger.info("Attempting disconnection of " + nodeUri + "'s input fbo number " + connectionId);
+        NewNode node = renderGraph.findNode(new SimpleUri(nodeUri));
+        if (node != null) {
+            DependencyConnection inputConnection = node.getInputFboConnection(connectionId);
+            if (inputConnection != null) {
+                inputConnection.disconnect();
+            } else {
+                logger.warn("Could not find input Fbo connection number " + connectionId + "within " + nodeUri + ".");
+            }
+        } else {
+            throw new RuntimeException("Could not find node named " + nodeUri + " within renderGraph.");
+        }
     }
 
     // TODO generic type all the way, reusability
@@ -96,7 +121,8 @@ public class RenderGraphAPI {
     }
 
     public void diconnectNode(NewNode fromNode, NewNode toNode) {
-        renderGraph.disconnect(fromNode, toNode);
+        // TODO ADD RENDER GRAPH DISCONNECTION if last dependency between the two
+        // renderGraph.disconnect(fromNode, toNode);
         // TODO dependencies
     }
 
