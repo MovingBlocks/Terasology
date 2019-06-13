@@ -101,6 +101,13 @@ public abstract class DependencyConnection<T> {
         this.connectedConnection.connectedConnection = null;
         this.connectedConnection = connectToConnection;
         this.setData(connectToConnection.getData());
+    /**
+     * Remove connection
+     */
+    public void disconnect() {
+        this.connectedConnection.connectedConnection = null;
+        this.connectedConnection = null;
+        this.data = null;
     }
 
     // String getConnectionName(int number);
