@@ -112,27 +112,27 @@ public interface NewNode extends RenderPipelineTask {
     void setDependencies(Context context);
 
     /**
-     * This method is to set output FboConnection (extends DependencyConnection)
+     * This method is to set output DependencyConnection
      * to input connection of the same type in this node.
-     * @param inputFboId Input FBO id is a number of the input connection on this node.
+     * @param inputId Input id is a number of the input connection on this node.
      *                   Chosen arbitrarily, integers starting by 1 typically.
-     * @param from FboConnection obtained form another node's output.
+     * @param from DependencyConnection obtained form another node's output.
      */
-    void connectFbo(int inputFboId, FboConnection from);
+    void connect(int inputId, DependencyConnection from);
 
     /**
-     * This method obtains node's output FBO connection by its id.
-     * @param outputFboId Output FBO connection's id.
+     * This method obtains node's output connection by its id.
+     * @param outputId Output connection's id.
      * @return FboConnection if an output connection with this id exists.
      * Otherwise an exception should be thrown.
      */
-    FboConnection getOutputFboConnection(int outputFboId);
+    DependencyConnection getOutputFboConnection(int outputId);
 
     /**
-     * This method obtains node's input FBO connection by its id.
-     * @param inputFboId Input FBO connection's id.
-     * @return FboConnection if an input connection with this id exists.
+     * This method obtains node's input connection by its id.
+     * @param inputId Input connection's id.
+     * @return Connection if an input connection with this id exists.
      * Otherwise an exception should be thrown.
      */
-    FboConnection getInputFboConnection(int inputFboId);
+    DependencyConnection getInputFboConnection(int inputId);
 }
