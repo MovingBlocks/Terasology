@@ -162,6 +162,10 @@ public class RenderTaskListGeneratorTest {
         public FboConnection getInputFboConnection(int inputFboId) {
             return null; // (FboConnection) getInputFboConnection(FboConnection.getConnectionName(inputFboId));
         }
+
+        public void reconnectInputFboToOutput(int inputId, NewNode fromNode, DependencyConnection fromConnection) {
+            // ???
+        }
     }
 
     private class AlphaNode extends DummyNode {
