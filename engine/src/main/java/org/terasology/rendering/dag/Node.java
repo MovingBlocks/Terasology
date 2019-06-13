@@ -19,6 +19,8 @@ package org.terasology.rendering.dag;
 
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.gsoc.FboConnection;
 
 import java.util.Set;
