@@ -62,6 +62,7 @@ public class RenderGraphAPI {
         } else {
             throw new RuntimeException("Could not find node named " + nodeUri + " within renderGraph.");
         }
+        //TODO disconnect from rendergraph if needed
     }
 
     public void disconnectInputFbo(String nodeUri, int connectionId) {
@@ -77,6 +78,7 @@ public class RenderGraphAPI {
         } else {
             throw new RuntimeException("Could not find node named " + nodeUri + " within renderGraph.");
         }
+        //TODO disconnect from rendergraph if needed
     }
 
     // TODO generic type all the way, reusability
@@ -106,7 +108,6 @@ public class RenderGraphAPI {
         if (fromConnection == null) {
             throw new RuntimeException("Reconnecting FBO dependency failed. Could not find output connection.");
         }
-
         toNode.reconnectInputFboToOutput(inputId, fromNode, fromConnection);
         // TODO ADD RENDERGRAPH CONNECTION if needed
     }
