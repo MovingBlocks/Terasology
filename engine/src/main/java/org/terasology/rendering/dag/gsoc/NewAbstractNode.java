@@ -25,13 +25,13 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.NewNode;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.utilities.Assets;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -100,13 +100,20 @@ public abstract class NewAbstractNode implements NewNode {
      */
 
     protected FBO getInputFboData(int number) {
-        return ((FboConnection) this.inputConnections.get((new StringBuilder("FBO").append(number).toString()))).getFboData();
+        return ((FboConnection) this.inputConnections.get(FboConnection.getConnectionName(number))).getData();
     }
 
     protected FBO getOutputFboData(int number) {
-        return ((FboConnection) this.outputConnections.get((new StringBuilder("FBO").append(number).toString()))).getFboData();
+        return ((FboConnection) this.outputConnections.get(FboConnection.getConnectionName(number))).getData();
     }
 
+    private boolean addInputConnection(int id, DependencyConnection from) {
+        if(from instanceof FboConnection) {
+            return addInputFboConnection(id, (FboConnection) from);
+        } else {
+            throw new RuntimeException("addInputConnection failed on unknown connection type");
+        }
+    }
     /**
      *
      * @param id
@@ -114,18 +121,19 @@ public abstract class NewAbstractNode implements NewNode {
      * @return true if inserted, false otherwise
      */
     protected boolean addInputFboConnection(int id, FboConnection from) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, from.getFboData(), this.getUri());
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id), DependencyConnection.Type.INPUT, from.getData(), this.getUri());
+        fboConnection.setConnectedConnection(from); // must remember where I'm connected from
         return addInputConnection(fboConnection);
     }
 
     /**
-     * TODO This connection is not necessarily getting its new FBO, should be setting connectedNode if not
-     * @param id
+     * This connection must be getting a NEW FBO which is not from another node otherwise it's going to break things!
+     * This is going to be private : TODO WHEN #3680 IS DONE, MUST BE PRIVATE ONLY !!!
      * @param fboData
      * @return true if inserted, false otherwise
      */
     protected boolean addInputFboConnection(int id, FBO fboData) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.INPUT, fboData, this.getUri());
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id), DependencyConnection.Type.INPUT, fboData, this.getUri());
         return addInputConnection(fboConnection);
     }
 
@@ -136,7 +144,7 @@ public abstract class NewAbstractNode implements NewNode {
      * @return true if inserted, false otherwise
      */
     protected boolean addOutputFboConnection(int id, FBO fboData) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getFboName(id), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
         return addOutputConnection(fboConnection);
     }
 
@@ -146,36 +154,39 @@ public abstract class NewAbstractNode implements NewNode {
      *                   Chosen arbitrarily, integers starting by 1 typically.
      * @param fromConnection FboConnection obtained form another node's output.
      */
-    public void connectFbo(int inputFboId, FboConnection fromConnection) {
-        // TODO To Change OR NOT To Change parent node for the fromConnection being stored as toConnection?
-        // Is not yet connected? TODO this will have to be caught by a try-catch or redone if we were going use gui to tamper with dag
-        if (fromConnection.getConnectedNode() == null) {
-            if (addInputFboConnection(inputFboId, fromConnection)) {
-                // Upon successful insertion - save connected node. If node is already connected, throw an exception.
-                fromConnection.setConnectedNode(this.getUri());
-            }
-            else {
-                throw new RuntimeException(this.getUri() + ".connectFbo(" + inputFboId + ", " + fromConnection.getName() + "):" +
+    public void connect(int inputFboId, DependencyConnection fromConnection) {
+        // TODO this will have to be caught by a try-catch or redone if we were going use gui to tamper with dag
+        // Is not yet connected?
+        if (fromConnection.getConnectedConnection() == null) {
+            if (addInputConnection(inputFboId, fromConnection)) {
+                DependencyConnection localConnection = this.getInputFboConnection(inputFboId);
+                // Upon successful insertion - save connected connection. If node is already connected, throw an exception.
+                fromConnection.setConnectedConnection(localConnection);
+                localConnection.setConnectedConnection(fromConnection);
+            } else {
+                throw new RuntimeException(this.getUri() + ".connect(" + inputFboId + ", " + fromConnection.getName() + "):" +
                                             " Could not add connection for " + this + ", inputConnection with id " + inputFboId + " already exists.");
             }
         } else {
-            throw new RuntimeException("connectFbo(" + inputFboId + ", " + fromConnection.getName() + "): Connection " + fromConnection + " is already connected.");
+            throw new RuntimeException("connect(" + inputFboId + ", " + fromConnection.getName() + "): Connection " + fromConnection + " is already connected.");
         }
     }
-
+    @Nullable
     public FboConnection getOutputFboConnection(int outputFboId) {
-        return (FboConnection) getOutputConnection(FboConnection.getFboName(outputFboId));
+        return (FboConnection) getOutputConnection(FboConnection.getConnectionName(outputFboId));
     }
-
+    @Nullable
     public FboConnection getInputFboConnection(int inputFboId) {
-        return (FboConnection) getInputConnection(FboConnection.getFboName(inputFboId));
+        return (FboConnection) getInputConnection(FboConnection.getConnectionName(inputFboId));
     }
 
     public void removeInputConnection(String name) {
+        // TODO add check - what do if connected
         inputConnections.remove(name);
     }
 
     public void removeOutputConnection(String name) {
+        // TODO add check - what do if connected
         outputConnections.remove(name);
     }
 
@@ -238,15 +249,17 @@ public abstract class NewAbstractNode implements NewNode {
      */
     protected FBO requiresFbo(FboConfig fboConfig, BaseFboManager fboManager) {
         SimpleUri fboName = fboConfig.getName();
-
+        FBO fbo;
         if (!fboUsages.containsKey(fboName)) {
             fboUsages.put(fboName, fboManager);
         } else {
             logger.warn("FBO " + fboName + " is already requested.");
-            return fboManager.get(fboName);
+            fbo = fboManager.get(fboName);
+            this.addInputFboConnection(inputConnections.size()+1, fbo);
+            return fbo;
         }
-
-        return fboManager.request(fboConfig);
+        fbo = fboManager.request(fboConfig);
+        return fbo;
     }
 
     /**
