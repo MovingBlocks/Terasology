@@ -15,7 +15,9 @@
  */
 package org.terasology.rendering.dag.gsoc;
 
+import org.terasology.engine.SimpleUri;
 import org.terasology.registry.Share;
+import org.terasology.rendering.dag.NewNode;
 import org.terasology.rendering.dag.RenderGraph;
 
 @Share(RenderGraphAPI.class)
@@ -38,6 +40,35 @@ public class RenderGraphAPI {
 
     public void addNode() {
 
+    }
+
+    public void reconnectInputFboTo(NewNode fromNode, int inputFboId, FboConnection connectionToConnect) {
+        FboConnection connectionToReconnect = fromNode.getInputFboConnection(inputFboId);
+        // If this connection exists
+        if(connectionToReconnect != null) {
+            // if is connected to something
+            if(connectionToReconnect.getConnectedNode() != null) {
+                // reconnect to connectToConnection
+                // remove connected node's connection
+            } else {
+
+            }
+        } else {
+            // addInputFboConnection(inputFboId, ); which
+            // TODO log warning No such connection for node this.toString(); Add new connection first (read some node's output))
+        }
+    }
+
+    public void removeNode(SimpleUri nodeUri) {
+        // first check dependencies
+
+        // remove node from the graph - is not gonna be run
+        renderGraph.removeNode(nodeUri);
+    }
+
+    public void diconnectNode(NewNode fromNode, NewNode toNode) {
+        renderGraph.disconnect(fromNode,toNode);
+        // TODO dependencies
     }
 
 }

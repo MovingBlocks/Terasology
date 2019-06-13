@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.api;
 
 //TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
 
@@ -21,6 +21,8 @@ import java.util.Set;
 
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.gsoc.FboConnection;
 
 /**
