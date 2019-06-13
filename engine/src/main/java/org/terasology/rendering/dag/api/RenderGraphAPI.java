@@ -50,7 +50,7 @@ public class RenderGraphAPI {
         // connect in renderGraph (order, to be executed somewhere)
     }
 
-    public void disconnectFboOutput(){
+    public void disconnectFboOutput() {
 
     }
 
@@ -91,9 +91,9 @@ public class RenderGraphAPI {
      * @param fromConnection
      */
     private void reconnectInputFboToOutput(NewNode toNode, int inputId, NewNode fromNode, DependencyConnection fromConnection) {
-        logger.warn("Attempting reconnection of " + toNode.getUri() + " to " + fromConnection.getParentNode());
+        logger.info("Attempting reconnection of " + toNode.getUri() + " to " + fromConnection.getParentNode());
         if(fromConnection.getConnectedConnection() != null) {
-            throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to (" + fromConnection.getConnectedConnection() + "). Remove connection first.");
+          // throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to (" + fromConnection.getConnectedConnection() + "). Remove connection first.");
         }
         DependencyConnection connectionToReconnect = toNode.getInputFboConnection(inputId);
         // If this connection exists
@@ -103,13 +103,14 @@ public class RenderGraphAPI {
                 // Sets data and change toNode's connectedConnection to fromConnection. Sets previous fromConnection's connected node to null.
                 connectionToReconnect.reconnectInputConnectionToOutput(fromConnection);
             } else {
-                logger.warn(toNode + "'s connection " + connectionToReconnect + " was not connected. Attempting new connection...");
+                logger.info(toNode + "'s connection " + connectionToReconnect + " was not connected. Attempting new connection...");
                 toNode.connect(inputId, fromConnection);
             }
         } else {
-            logger.warn("No such input connection (" + FboConnection.getConnectionName(inputId) + ") for node " + toNode.toString() + ". Attempting new connection...");
+            logger.info("No such input connection (" + FboConnection.getConnectionName(inputId) + ") for node " + toNode.toString() + ". Attempting new connection...");
             toNode.connect(inputId, fromConnection);
         }
+        logger.info("Reconnecting finished."); // TODO return errors...connect-true false
     }
 
     private void reconnectNodeRunOrder(){}
