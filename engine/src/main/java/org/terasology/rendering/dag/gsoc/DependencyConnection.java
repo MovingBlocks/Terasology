@@ -100,7 +100,9 @@ public abstract class DependencyConnection<T> {
     public void reconnectInputConnectionToOutput(DependencyConnection<T> connectToConnection) {
         this.connectedConnection.connectedConnection = null;
         this.connectedConnection = connectToConnection;
-        this.setData(connectToConnection.getData());
+        this.data = connectToConnection.getData();
+    }
+
     /**
      * Remove connection
      */
