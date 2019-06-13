@@ -26,7 +26,7 @@
  *
  * Eventually some or all of these nodes, together or in groups, might migrate to one or more external modules.
  */
-@API
+// @API
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.module.sandbox.API;
