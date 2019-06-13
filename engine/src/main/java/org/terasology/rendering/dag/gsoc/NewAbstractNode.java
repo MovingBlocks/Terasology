@@ -233,6 +233,36 @@ public abstract class NewAbstractNode implements NewNode {
     }
 
     /**
+     * Reconnects dependencies only
+     * @param inputId
+     * @param fromNode
+     * @param fromConnection
+     */// TODO make it reconnectInputToOutput
+    public void reconnectInputFboToOutput(int inputId, NewNode fromNode, DependencyConnection fromConnection) {
+        logger.info("Attempting reconnection of " + this.getUri() + " to " + fromConnection.getParentNode());
+        if(fromConnection.getConnectedConnection() != null) {
+            throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to (" + fromConnection.getConnectedConnection() + "). Remove connection first.");
+        } // TODO                                   make it getInputConnection
+        DependencyConnection connectionToReconnect = this.getInputFboConnection(inputId);
+        // If this connection exists
+        if(connectionToReconnect != null) {
+            // if is connected to something
+            if(connectionToReconnect.getConnectedConnection() != null) {
+                // Sets data and change toNode's connectedConnection to fromConnection. Sets previous fromConnection's connected node to null.
+                connectionToReconnect.reconnectInputConnectionToOutput(fromConnection);
+            } else {
+                logger.info(this + "'s connection " + connectionToReconnect + " was not connected. Attempting new connection...");
+                this.connect(inputId, fromConnection);
+            }
+        } else { //                               TODO make it connectionToReconnect
+            logger.info("No such input connection (" + FboConnection.getConnectionName(inputId) + ") for node " + this.toString() + ". Attempting new connection...");
+            this.connect(inputId, fromConnection);
+        }
+        logger.info("Reconnecting finished."); // TODO return errors...connect-true false
+
+    }
+
+    /**
      * Used by inheriting classes to declare the need for a specific Frame Buffer Object and obtain it.
      *
      * The characteristics of the required FBO are described in the fboConfig provided in input.

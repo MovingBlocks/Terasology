@@ -135,4 +135,12 @@ public interface NewNode extends RenderPipelineTask {
      * Otherwise an exception should be thrown.
      */
     DependencyConnection getInputFboConnection(int inputId);
+
+    /**
+     *
+     * @param inputId
+     * @param fromNode
+     * @param fromConnection
+     */
+    void reconnectInputFboToOutput(int inputId, NewNode fromNode, DependencyConnection fromConnection);
 }

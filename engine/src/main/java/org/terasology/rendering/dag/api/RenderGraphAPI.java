@@ -73,44 +73,17 @@ public class RenderGraphAPI {
         NewNode toNode = renderGraph.findNode(new SimpleUri(toNodeUri));
         NewNode fromNode = renderGraph.findNode(new SimpleUri(fromNodeUri));
         // Would use of Preconditions be clearer?
-        if(toNode == null || fromNode == null) {
+        if (toNode == null || fromNode == null) {
             throw new RuntimeException("Reconnecting FBO dependency failed. One of the nodes not found in the renderGraph."
                                         + "\n toNode: " + toNode + ". fromNode: " + fromNode);
         }
         DependencyConnection fromConnection = fromNode.getOutputFboConnection(outputId);
-        if(fromConnection == null) {
+        if (fromConnection == null) {
             throw new RuntimeException("Reconnecting FBO dependency failed. Could not find output connection.");
         }
-        reconnectInputFboToOutput(toNode, inputId, fromNode, fromConnection);
-    }
 
-    /**
-     * Reconnects dependencies only
-     * @param toNode
-     * @param inputId
-     * @param fromConnection
-     */
-    private void reconnectInputFboToOutput(NewNode toNode, int inputId, NewNode fromNode, DependencyConnection fromConnection) {
-        logger.info("Attempting reconnection of " + toNode.getUri() + " to " + fromConnection.getParentNode());
-        if(fromConnection.getConnectedConnection() != null) {
-          // throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to (" + fromConnection.getConnectedConnection() + "). Remove connection first.");
-        }
-        DependencyConnection connectionToReconnect = toNode.getInputFboConnection(inputId);
-        // If this connection exists
-        if(connectionToReconnect != null) {
-            // if is connected to something
-            if(connectionToReconnect.getConnectedConnection() != null) {
-                // Sets data and change toNode's connectedConnection to fromConnection. Sets previous fromConnection's connected node to null.
-                connectionToReconnect.reconnectInputConnectionToOutput(fromConnection);
-            } else {
-                logger.info(toNode + "'s connection " + connectionToReconnect + " was not connected. Attempting new connection...");
-                toNode.connect(inputId, fromConnection);
-            }
-        } else {
-            logger.info("No such input connection (" + FboConnection.getConnectionName(inputId) + ") for node " + toNode.toString() + ". Attempting new connection...");
-            toNode.connect(inputId, fromConnection);
-        }
-        logger.info("Reconnecting finished."); // TODO return errors...connect-true false
+        toNode.reconnectInputFboToOutput(inputId, fromNode, fromConnection);
+        // TODO ADD RENDERGRAPH CONNECTION if needed
     }
 
     private void reconnectNodeRunOrder(){}
