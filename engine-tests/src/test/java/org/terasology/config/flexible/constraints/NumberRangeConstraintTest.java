@@ -23,12 +23,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Enclosed.class)
-public class RangedNumberValidatorTest {
+public class NumberRangeConstraintTest {
     public static class IntegerValidator {
-        private RangedNumberValidator<Integer> validator;
+        private NumberRangeConstraint<Integer> validator;
 
         private void initValidator(Integer min, Integer max, boolean minInclusive, boolean maxInclusive) {
-            validator = new RangedNumberValidator<>(min, max, minInclusive, maxInclusive);
+            validator = new NumberRangeConstraint<>(min, max, minInclusive, maxInclusive);
         }
 
         @Test
@@ -115,10 +115,10 @@ public class RangedNumberValidatorTest {
     public static class DoubleValidator {
         private static final double MAX_ALLOWED_ERROR = 0.000001d;
 
-        private RangedNumberValidator<Double> validator;
+        private NumberRangeConstraint<Double> validator;
 
         private void initValidator(Double min, Double max, boolean minInclusive, boolean maxInclusive) {
-            validator = new RangedNumberValidator<>(min, max, minInclusive, maxInclusive);
+            validator = new NumberRangeConstraint<>(min, max, minInclusive, maxInclusive);
         }
 
         @Test

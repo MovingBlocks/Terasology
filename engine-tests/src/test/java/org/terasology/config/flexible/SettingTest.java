@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.terasology.config.flexible.constraints.RangedNumberValidator;
+import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.engine.SimpleUri;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -40,7 +40,7 @@ public class SettingTest {
         @Before
         public void setUp() {
             setting = new SettingImpl<>(SETTING_ID,
-                    50, new RangedNumberValidator<>(0, 100, false, false));
+                    50, new NumberRangeConstraint<>(0, 100, false, false));
 
             eventResult = -1;
 
@@ -72,7 +72,7 @@ public class SettingTest {
         @Before
         public void setUp() {
             setting = new SettingImpl<>(SETTING_ID,
-                    50, new RangedNumberValidator<>(0, 100, false, false));
+                    50, new NumberRangeConstraint<>(0, 100, false, false));
 
             eventCallCount = 0;
 
