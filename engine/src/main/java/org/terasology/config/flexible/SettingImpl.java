@@ -76,7 +76,7 @@ public class SettingImpl<T> implements Setting<T> {
 
         this.constraint = constraint;
 
-        if (!validate(defaultValue)) {
+        if (isConstraintUnsatisfiedBy(defaultValue)) {
             throw new IllegalArgumentException("The default value must be a valid value. " +
                     "Check the logs for more information.");
         }
@@ -100,9 +100,13 @@ public class SettingImpl<T> implements Setting<T> {
         }
     }
 
-    private boolean validate(T valueToValidate) {
-        // TODO: Log warnings
-        return constraint == null || constraint.isSatisfiedBy(valueToValidate);
+    private boolean isConstraintUnsatisfiedBy(T theValue) {
+        if (constraint == null || constraint.isSatisfiedBy(theValue)) {
+            return false;
+        } else {
+            constraint.warnUnsatisfiedBy(theValue);
+            return true;
+        }
     }
 
     /**
@@ -196,7 +200,7 @@ public class SettingImpl<T> implements Setting<T> {
     public boolean setValue(T newValue) {
         Preconditions.checkNotNull(newValue, formatWarning("The value of a setting cannot be null."));
 
-        if (!validate(newValue)) {
+        if (isConstraintUnsatisfiedBy(newValue)) {
             return false;
         }
 
