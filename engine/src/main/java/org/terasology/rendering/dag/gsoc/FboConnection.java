@@ -20,8 +20,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.FBO;
 
 public class FboConnection extends DependencyConnection<FBO> {
-    // private SimpleUri fboUri;
-    //private FBO data;
 
     /**
      *
@@ -44,23 +42,6 @@ public class FboConnection extends DependencyConnection<FBO> {
         super(name, type, parentNode);
         super.setData(data);
     }
-
-    /*
-    /**
-     * Set FBO for this connection
-     * @param data FBO
-     *//*
-    protected void setData(FBO data) {
-        this.data = data;
-    }
-
-    /**
-     * Get FBO for this connection
-     * @return FBO
-     *//*
-    public FBO getData() {
-        return this.data;
-    }*/
 
     public static String getConnectionName(int number) {
         return new StringBuilder("FBO").append(number).toString();
