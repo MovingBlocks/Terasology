@@ -38,21 +38,4 @@ public interface SettingConstraint<T> {
      * @param value The value to issue warnings for.
      */
     void warnUnsatisfiedBy(T value);
-
-    /**
-     * Checks whether the constraint is satisfied by the given value, and logs
-     * appropriate warnings if the constraint is unsatisfied.
-     *
-     * @param value The value to validate.
-     * @return True if the value is valid, false otherwise.
-     */
-    default boolean validate(T value) {
-        boolean isValid = isSatisfiedBy(value);
-
-        if (!isValid) {
-            warnUnsatisfiedBy(value);
-        }
-
-        return isValid;
-    }
 }

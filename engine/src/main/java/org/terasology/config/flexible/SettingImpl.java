@@ -101,7 +101,8 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     private boolean validate(T valueToValidate) {
-        return constraint == null || constraint.validate(valueToValidate);
+        // TODO: Log warnings
+        return constraint == null || constraint.isSatisfiedBy(valueToValidate);
     }
 
     /**
