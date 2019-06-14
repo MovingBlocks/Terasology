@@ -18,24 +18,23 @@ package org.terasology.rendering.dag.gsoc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
-import org.terasology.registry.Share;
 import org.terasology.rendering.dag.RenderGraph;
+import org.terasology.rendering.dag.api.RenderDagApiInterface;
 
-@Share(RenderingApi.class)
-public class RenderingApi {
-    private static final Logger logger = LoggerFactory.getLogger(RenderingApi.class);
+public class RenderDagApi implements RenderDagApiInterface {
+    private static final Logger logger = LoggerFactory.getLogger(RenderDagApi.class);
 
-    private static RenderingApi singleInstance = null;
+    private static RenderDagApi singleInstance = null;
 
     private RenderGraph renderGraph;
 
-    private RenderingApi(RenderGraph renderGraph) {
+    private RenderDagApi(RenderGraph renderGraph) {
         this.renderGraph = renderGraph;
     }
 
-    public static RenderingApi getRenderGraphAPI(RenderGraph renderGraph) {
+    public static RenderDagApi getRenderDagApi(RenderGraph renderGraph) {
         if (singleInstance == null) {
-            singleInstance = new RenderingApi(renderGraph);
+            singleInstance = new RenderDagApi(renderGraph);
         }
         return singleInstance;
     }
@@ -54,6 +53,7 @@ public class RenderingApi {
             DependencyConnection outputConnection = node.getOutputFboConnection(connectionId);
             if (outputConnection != null) {
                 outputConnection.disconnect();
+                logger.info("..disconnecting complete.");
             } else {
                 logger.warn("Could not find output Fbo connection number " + connectionId + "within " + nodeUri + ".");
             }
@@ -70,6 +70,7 @@ public class RenderingApi {
             DependencyConnection inputConnection = node.getInputFboConnection(connectionId);
             if (inputConnection != null) {
                 inputConnection.disconnect();
+                logger.info("..disconnecting complete.");
             } else {
                 logger.warn("Could not find input Fbo connection number " + connectionId + "within " + nodeUri + ".");
             }
@@ -112,11 +113,11 @@ public class RenderingApi {
 
     private void reconnectNodeRunOrder(){}
 
-    public void removeNode(SimpleUri nodeUri) {
+    public void removeNode(String nodeUri) {
         // first check dependencies
 
         // remove node from the graph - is not gonna be run
-        renderGraph.removeNode(nodeUri);
+        renderGraph.removeNode(new SimpleUri(nodeUri));
     }
 
     public void diconnectNode(NewNode fromNode, NewNode toNode) {
