@@ -680,12 +680,13 @@ public class UIText extends WidgetWithOrder {
         String arrayText = "";
         if(linesOfText.length > 0) {
             arrayText = String.join("\n", linesOfText);
+            if(text.get() != "") {
+                return text.get() + "\n" + arrayText;
+            }
+            return text.get() + arrayText;
+        } else {
+            return text.get();
         }
-
-        if(text.get() != "") {
-            return text.get() + "\n" + arrayText;
-        }
-        return text.get() + arrayText;
     }
 
     /**
