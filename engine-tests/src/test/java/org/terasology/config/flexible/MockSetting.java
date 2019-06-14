@@ -47,7 +47,7 @@ class MockSetting<T> implements Setting<T> {
     }
 
     @Override
-    public SettingConstraint<T> getValidator() {
+    public SettingConstraint<T> getConstraint() {
         return null;
     }
 

@@ -34,10 +34,10 @@ public interface Setting<T> {
     SimpleUri getId();
 
     /**
-     * Returns the {@link SettingConstraint <T>} used by this {@link Setting<T>}, if present.
+     * Returns the {@link SettingConstraint} used by this {@link Setting}, if present.
      * Returns null otherwise.
      */
-    SettingConstraint<T> getValidator();
+    SettingConstraint<T> getConstraint();
 
     /**
      * Returns the default value of this {@link Setting}.
@@ -50,10 +50,14 @@ public interface Setting<T> {
     T getValue();
 
     /**
-     * Sets the value stored in this {@link Setting<T>}. When no Validator is
-     * present the new value immediately replaces the stored one and any subscriber is notified of the change.
-     * If a Validator is present, the value is first validated. Only if the value is valid it replaces the
+     * Sets the value stored in this {@link Setting<T>}. When no {@link SettingConstraint} is
+     * present the new value immediately replaces the stored one and any subscriber is notified
+     * of the change.
+     *
+     * If a {@link SettingConstraint} is present, the constraint must be satisfied by
+     * the new value. If the constraint is satisfied, the new value replaces the
      * stored one and subscribers are notified.
+     *
      * @param newValue The new value to store.
      * @return True if the value was stored successfully, false otherwise.
      */

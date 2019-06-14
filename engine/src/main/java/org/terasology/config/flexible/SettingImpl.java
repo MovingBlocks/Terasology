@@ -48,13 +48,13 @@ public class SettingImpl<T> implements Setting<T> {
     protected T value;
 
     private String humanReadableName;
-
     private String description;
-    private SettingConstraint<T> validator;
+
+    private SettingConstraint<T> constraint;
     private Set<PropertyChangeListener> subscribers;
 
     /**
-     * Creates a new {@link SettingImpl} with the given id and default value but no validator.
+     * Creates a new {@link SettingImpl} with the given id and default value but no constraint.
      *
      * @param id           the id of the setting.
      * @param defaultValue the default value of the setting.
@@ -64,17 +64,17 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     /**
-     * Creates a new {@link SettingImpl} with the given id, default value and validator.
+     * Creates a new {@link SettingImpl} with the given id, default value and constraint.
      * @param id           the id of the setting.
      * @param defaultValue the default value of the setting.
-     * @param validator    the validator to be used to validate values.
+     * @param constraint   the constraint that the setting values must satisfy.
      */
     @SuppressWarnings("unchecked")
-    public SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> validator) {
+    public SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint) {
         this.id = id;
         this.warningFormatString = MessageFormat.format("Setting {0}: '{'0}'", this.id);
 
-        this.validator = validator;
+        this.constraint = constraint;
 
         if (!validate(defaultValue)) {
             throw new IllegalArgumentException("The default value must be a valid value. " +
@@ -101,7 +101,7 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     private boolean validate(T valueToValidate) {
-        return validator == null || validator.validate(valueToValidate);
+        return constraint == null || constraint.validate(valueToValidate);
     }
 
     /**
@@ -168,8 +168,8 @@ public class SettingImpl<T> implements Setting<T> {
      * {@inheritDoc}
      */
     @Override
-    public SettingConstraint<T> getValidator() {
-        return validator;
+    public SettingConstraint<T> getConstraint() {
+        return constraint;
     }
 
     /**
