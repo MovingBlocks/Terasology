@@ -53,7 +53,7 @@ public abstract class NewAbstractNode implements NewNode {
     private Map<String, DependencyConnection> inputConnections = Maps.newHashMap();
     private Map<String, DependencyConnection> outputConnections = Maps.newHashMap();
     private final SimpleUri nodeUri;
-
+    private Context context;
     /**
      * Constructor to be used by inheriting classes.
      * <p>
@@ -66,6 +66,7 @@ public abstract class NewAbstractNode implements NewNode {
     protected NewAbstractNode(String nodeId, Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
+        this.context = context;
 
         this.nodeUri = new SimpleUri(providingModule.toString() + ":" + nodeId);
         //TODO Check for empty list of either in or out
@@ -265,6 +266,7 @@ public abstract class NewAbstractNode implements NewNode {
             if(connectionToReconnect.getConnectedConnection() != null) {
                 // Sets data and change toNode's connectedConnection to fromConnection. Sets previous fromConnection's connected node to null.
                 connectionToReconnect.reconnectInputConnectionToOutput(fromConnection);
+                setDependencies(this.context);
             } else {
                 logger.info(this + "'s connection " + connectionToReconnect + " was not connected. Attempting new connection...");
                 this.connect(inputId, fromConnection);
