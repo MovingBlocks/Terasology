@@ -13,31 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.api;
+package org.terasology.rendering.dag.gsoc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.registry.Share;
 import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.dag.gsoc.DependencyConnection;
-import org.terasology.rendering.dag.gsoc.NewNode;
 
-@Share(RenderGraphAPI.class)
-public class RenderGraphAPI {
-    private static final Logger logger = LoggerFactory.getLogger(RenderGraphAPI.class);
+@Share(RenderingApi.class)
+public class RenderingApi {
+    private static final Logger logger = LoggerFactory.getLogger(RenderingApi.class);
 
-    private static RenderGraphAPI singleInstance = null;
+    private static RenderingApi singleInstance = null;
 
     private RenderGraph renderGraph;
 
-    private RenderGraphAPI(RenderGraph renderGraph) {
+    private RenderingApi(RenderGraph renderGraph) {
         this.renderGraph = renderGraph;
     }
 
-    public static RenderGraphAPI getRenderGraphAPI(RenderGraph renderGraph) {
+    public static RenderingApi getRenderGraphAPI(RenderGraph renderGraph) {
         if (singleInstance == null) {
-            singleInstance = new RenderGraphAPI(renderGraph);
+            singleInstance = new RenderingApi(renderGraph);
         }
         return singleInstance;
     }
