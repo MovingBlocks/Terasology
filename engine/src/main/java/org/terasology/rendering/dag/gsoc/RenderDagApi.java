@@ -21,6 +21,14 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.api.RenderDagApiInterface;
 
+/**
+ * <p>
+ * Singleton class which is used by modules trough {@link RenderDagApiInterface} obtained from {@link Context}.
+ * </p>
+ * <p>
+ * Implements basic operations over DAG and dependency passing.
+ * </p>
+ */
 public class RenderDagApi implements RenderDagApiInterface {
     private static final Logger logger = LoggerFactory.getLogger(RenderDagApi.class);
 
