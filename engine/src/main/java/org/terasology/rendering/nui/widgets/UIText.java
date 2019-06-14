@@ -677,10 +677,9 @@ public class UIText extends WidgetWithOrder {
      * contents of linesOfText or text accordingly.
      */
     public String getText() {
-        String arrayText = "";
-        if(linesOfText.length > 0) {
-            arrayText = String.join("\n", linesOfText);
-            if(text.get() != "") {
+        if (linesOfText.length > 0) {
+            String arrayText = String.join("\n", linesOfText);
+            if (text.get().equals("")) {
                 return text.get() + "\n" + arrayText;
             }
             return text.get() + arrayText;
