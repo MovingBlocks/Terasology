@@ -109,7 +109,9 @@ public abstract class DependencyConnection<T> {
     public void disconnect() {
         this.connectedConnection.connectedConnection = null;
         this.connectedConnection = null;
-        this.data = null;
+        if (this.connectionType == Type.INPUT) {
+            this.data = null;
+        }
     }
 
     // String getConnectionName(int number);
