@@ -15,34 +15,42 @@
  */
 package org.terasology.config.flexible.constraints;
 
+import org.terasology.config.flexible.Setting;
+
 /**
- * Validates the given value and issues warnings if the value is invalid.
- * @param <T> The type of values this {@link SettingConstraint} validates.
+ * Represents constraints on values that can be stored in a {@link Setting}.
+ *
+ * @param <T> The type of values that are constrained by this {@link SettingConstraint}.
  */
 public interface SettingConstraint<T> {
     /**
-     * Checks whether the given value is valid or not.
-     * @param value The value to validate.
-     * @return True if the value is valid, false otherwise.
+     * Checks whether the constraint is satisfied by the given value.
+     *
+     * @param value The value to check.
+     * @return True if the value satisfies the constraint, false otherwise.
      */
-    boolean fastValidate(T value);
+    boolean isSatisfiedBy(T value);
 
     /**
-     * Issues (logs) appropriate warnings assuming that the given value is invalid.
+     * Logs appropriate warnings assuming that the given value does not satisfy
+     * the constraint.
+     *
      * @param value The value to issue warnings for.
      */
-    void issueWarnings(T value);
+    void warnUnsatisfiedBy(T value);
 
     /**
-     * Checks whether the given value is valid or not and issues appropriate warnings if it is invalid.
+     * Checks whether the constraint is satisfied by the given value, and logs
+     * appropriate warnings if the constraint is unsatisfied.
+     *
      * @param value The value to validate.
      * @return True if the value is valid, false otherwise.
      */
     default boolean validate(T value) {
-        boolean isValid = fastValidate(value);
+        boolean isValid = isSatisfiedBy(value);
 
         if (!isValid) {
-            issueWarnings(value);
+            warnUnsatisfiedBy(value);
         }
 
         return isValid;

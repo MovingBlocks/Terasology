@@ -78,7 +78,7 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
      * {@inheritDoc}
      */
     @Override
-    public boolean fastValidate(T value) {
+    public boolean isSatisfiedBy(T value) {
         boolean withinMinBoundary = true;
 
         if (min != null) {
@@ -107,7 +107,7 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
      * {@inheritDoc}
      */
     @Override
-    public void issueWarnings(T value) {
+    public void warnUnsatisfiedBy(T value) {
         LOGGER.warn("Value {} is not in the range {}{}, {}{}", value, minInclusive ? "[" : "(",
                 min != null ? min : "UNBOUNDED", max != null ? max : "UNBOUNDED", maxInclusive ? "]" : ")");
     }

@@ -35,80 +35,80 @@ public class RangedNumberValidatorTest {
         public void testAllInclusive() {
             initValidator(0, 100, true, true);
 
-            assertTrue(String.format("%d returned invalid", 0), validator.fastValidate(0));
-            assertTrue(String.format("%d returned invalid", 12), validator.fastValidate(12));
-            assertTrue(String.format("%d returned invalid", 83), validator.fastValidate(83));
-            assertTrue(String.format("%d returned invalid", 100), validator.fastValidate(100));
+            assertTrue(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0));
+            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12));
+            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83));
+            assertTrue(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100));
 
 
-            assertFalse(validator.fastValidate(0 - 1));
-            assertFalse(validator.fastValidate(100 + 1));
+            assertFalse(validator.isSatisfiedBy(0 - 1));
+            assertFalse(validator.isSatisfiedBy(100 + 1));
         }
 
         @Test
         public void testMinExclusive() {
             initValidator(0, 100, false, true);
 
-            assertFalse(String.format("%d returned invalid", 0), validator.fastValidate(0));
-            assertTrue(String.format("%d returned invalid", 12), validator.fastValidate(12));
-            assertTrue(String.format("%d returned invalid", 83), validator.fastValidate(83));
-            assertTrue(String.format("%d returned invalid", 100), validator.fastValidate(100));
+            assertFalse(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0));
+            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12));
+            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83));
+            assertTrue(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100));
         }
 
         @Test
         public void testMaxExclusive() {
             initValidator(0, 100, true, false);
 
-            assertTrue(String.format("%d returned invalid", 0), validator.fastValidate(0));
-            assertTrue(String.format("%d returned invalid", 12), validator.fastValidate(12));
-            assertTrue(String.format("%d returned invalid", 83), validator.fastValidate(83));
-            assertFalse(String.format("%d returned invalid", 100), validator.fastValidate(100));
+            assertTrue(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0));
+            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12));
+            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83));
+            assertFalse(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100));
         }
 
         @Test
         public void testAllExclusive() {
             initValidator(0, 100, false, false);
 
-            assertFalse(String.format("%d returned invalid", 0), validator.fastValidate(0));
-            assertTrue(String.format("%d returned invalid", 12), validator.fastValidate(12));
-            assertTrue(String.format("%d returned invalid", 83), validator.fastValidate(83));
-            assertFalse(String.format("%d returned invalid", 100), validator.fastValidate(100));
+            assertFalse(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0));
+            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12));
+            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83));
+            assertFalse(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100));
         }
 
         @Test
         public void testLowUnbounded() {
             initValidator(null, 100, false, false);
 
-            assertTrue(validator.fastValidate(-1000));
-            assertTrue(validator.fastValidate(-50000));
+            assertTrue(validator.isSatisfiedBy(-1000));
+            assertTrue(validator.isSatisfiedBy(-50000));
 
-            assertTrue(validator.fastValidate(50));
+            assertTrue(validator.isSatisfiedBy(50));
 
-            assertFalse(validator.fastValidate(100 + 1));
+            assertFalse(validator.isSatisfiedBy(100 + 1));
         }
 
         @Test
         public void testHighUnbounded() {
             initValidator(0, null, false, false);
 
-            assertTrue(validator.fastValidate(1000));
-            assertTrue(validator.fastValidate(50000));
+            assertTrue(validator.isSatisfiedBy(1000));
+            assertTrue(validator.isSatisfiedBy(50000));
 
-            assertTrue(validator.fastValidate(50));
+            assertTrue(validator.isSatisfiedBy(50));
 
-            assertFalse(validator.fastValidate(0 - 1));
+            assertFalse(validator.isSatisfiedBy(0 - 1));
         }
 
         @Test
         public void testAllUnbounded() {
             initValidator(null, null, false, false);
 
-            assertTrue(validator.fastValidate(1000));
-            assertTrue(validator.fastValidate(50000));
-            assertTrue(validator.fastValidate(50));
+            assertTrue(validator.isSatisfiedBy(1000));
+            assertTrue(validator.isSatisfiedBy(50000));
+            assertTrue(validator.isSatisfiedBy(50));
 
-            assertTrue(validator.fastValidate(-1000));
-            assertTrue(validator.fastValidate(-50000));
+            assertTrue(validator.isSatisfiedBy(-1000));
+            assertTrue(validator.isSatisfiedBy(-50000));
         }
     }
 
@@ -125,77 +125,77 @@ public class RangedNumberValidatorTest {
         public void testAllInclusive() {
             initValidator(0d, 100d, true, true);
 
-            assertTrue(String.format("%d returned invalid", 0), validator.fastValidate(0d));
-            assertTrue(String.format("%d returned invalid", 12), validator.fastValidate(12d));
-            assertTrue(String.format("%d returned invalid", 83), validator.fastValidate(83d));
-            assertTrue(String.format("%d returned invalid", 100), validator.fastValidate(100d));
+            assertTrue(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0d));
+            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12d));
+            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83d));
+            assertTrue(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100d));
 
-            assertFalse(validator.fastValidate(0 - MAX_ALLOWED_ERROR));
-            assertFalse(validator.fastValidate(100 + MAX_ALLOWED_ERROR));
+            assertFalse(validator.isSatisfiedBy(0 - MAX_ALLOWED_ERROR));
+            assertFalse(validator.isSatisfiedBy(100 + MAX_ALLOWED_ERROR));
         }
 
         @Test
         public void testMinExclusive() {
             initValidator(0d, 100d, false, true);
 
-            assertFalse(String.format("%d returned invalid", 0), validator.fastValidate(0d));
-            assertTrue(String.format("%d returned invalid", 12), validator.fastValidate(12d));
-            assertTrue(String.format("%d returned invalid", 83), validator.fastValidate(83d));
-            assertTrue(String.format("%d returned invalid", 100), validator.fastValidate(100d));
+            assertFalse(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0d));
+            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12d));
+            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83d));
+            assertTrue(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100d));
         }
 
         @Test
         public void testMaxExclusive() {
             initValidator(0d, 100d, true, false);
 
-            assertTrue(String.format("%d returned invalid", 0), validator.fastValidate(0d));
-            assertTrue(String.format("%d returned invalid", 12), validator.fastValidate(12d));
-            assertTrue(String.format("%d returned invalid", 83), validator.fastValidate(83d));
-            assertFalse(String.format("%d returned invalid", 100), validator.fastValidate(100d));
+            assertTrue(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0d));
+            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12d));
+            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83d));
+            assertFalse(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100d));
         }
 
         @Test
         public void testAllExclusive() {
             initValidator(0d, 100d, false, false);
 
-            assertFalse(String.format("%d returned invalid", 0), validator.fastValidate(0d));
-            assertTrue(String.format("%d returned invalid", 12), validator.fastValidate(12d));
-            assertTrue(String.format("%d returned invalid", 83), validator.fastValidate(83d));
-            assertFalse(String.format("%d returned invalid", 100), validator.fastValidate(100d));
+            assertFalse(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0d));
+            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12d));
+            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83d));
+            assertFalse(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100d));
         }
 
         @Test
         public void testLowUnbounded() {
             initValidator(null, 100d, false, false);
 
-            assertTrue(validator.fastValidate(-1000d));
-            assertTrue(validator.fastValidate(-50000d));
-            assertTrue(validator.fastValidate(50d));
+            assertTrue(validator.isSatisfiedBy(-1000d));
+            assertTrue(validator.isSatisfiedBy(-50000d));
+            assertTrue(validator.isSatisfiedBy(50d));
 
-            assertFalse(validator.fastValidate(100 + MAX_ALLOWED_ERROR));
+            assertFalse(validator.isSatisfiedBy(100 + MAX_ALLOWED_ERROR));
         }
 
         @Test
         public void testHighUnbounded() {
             initValidator(0d, null, false, false);
 
-            assertTrue(validator.fastValidate(1000d));
-            assertTrue(validator.fastValidate(50000d));
-            assertTrue(validator.fastValidate(50d));
+            assertTrue(validator.isSatisfiedBy(1000d));
+            assertTrue(validator.isSatisfiedBy(50000d));
+            assertTrue(validator.isSatisfiedBy(50d));
 
-            assertFalse(validator.fastValidate(0 - MAX_ALLOWED_ERROR));
+            assertFalse(validator.isSatisfiedBy(0 - MAX_ALLOWED_ERROR));
         }
 
         @Test
         public void testAllUnbounded() {
             initValidator(null, null, false, false);
 
-            assertTrue(validator.fastValidate(1000d));
-            assertTrue(validator.fastValidate(50000d));
-            assertTrue(validator.fastValidate(50d));
+            assertTrue(validator.isSatisfiedBy(1000d));
+            assertTrue(validator.isSatisfiedBy(50000d));
+            assertTrue(validator.isSatisfiedBy(50d));
 
-            assertTrue(validator.fastValidate(-1000d));
-            assertTrue(validator.fastValidate(-50000d));
+            assertTrue(validator.isSatisfiedBy(-1000d));
+            assertTrue(validator.isSatisfiedBy(-50000d));
         }
     }
 }
