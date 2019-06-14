@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.terasology.config.flexible.validators.RangedNumberValidator;
+import org.terasology.config.flexible.constraints.RangedNumberValidator;
 import org.terasology.engine.SimpleUri;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;

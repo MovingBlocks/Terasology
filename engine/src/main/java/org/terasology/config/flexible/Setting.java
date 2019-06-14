@@ -16,14 +16,15 @@
 package org.terasology.config.flexible;
 
 import com.google.gson.JsonElement;
-import org.terasology.config.flexible.validators.SettingValueValidator;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeListener;
 
 /**
- * Represents a setting uniquely identified by an id. Contains a value that may be validated by a
- * {@link SettingValueValidator<T>} and notifies subscribers when the stored value is changed.
+ * Represents a setting uniquely identified by an id. Contains a value that may be constrained by a
+ * {@link SettingConstraint} and notifies subscribers when the stored value is changed.
+ *
  * @param <T> The type of the value this {@link Setting} contains.
  */
 public interface Setting<T> {
@@ -33,10 +34,10 @@ public interface Setting<T> {
     SimpleUri getId();
 
     /**
-     * Returns the {@link SettingValueValidator<T>} used by this {@link Setting<T>}, if present.
+     * Returns the {@link SettingConstraint <T>} used by this {@link Setting<T>}, if present.
      * Returns null otherwise.
      */
-    SettingValueValidator<T> getValidator();
+    SettingConstraint<T> getValidator();
 
     /**
      * Returns the default value of this {@link Setting}.

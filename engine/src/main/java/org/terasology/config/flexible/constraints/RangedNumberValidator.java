@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.validators;
+package org.terasology.config.flexible.constraints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> The type of the {@link Number} to validate.
  */
-public class RangedNumberValidator<T extends Number & Comparable<? super T>> implements SettingValueValidator<T> {
+public class RangedNumberValidator<T extends Number & Comparable<? super T>> implements SettingConstraint<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RangedNumberValidator.class);
     private boolean minInclusive;
     private boolean maxInclusive;

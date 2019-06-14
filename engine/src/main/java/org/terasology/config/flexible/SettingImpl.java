@@ -22,7 +22,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.validators.SettingValueValidator;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeEvent;
@@ -50,7 +50,7 @@ public class SettingImpl<T> implements Setting<T> {
     private String humanReadableName;
 
     private String description;
-    private SettingValueValidator<T> validator;
+    private SettingConstraint<T> validator;
     private Set<PropertyChangeListener> subscribers;
 
     /**
@@ -70,7 +70,7 @@ public class SettingImpl<T> implements Setting<T> {
      * @param validator    the validator to be used to validate values.
      */
     @SuppressWarnings("unchecked")
-    public SettingImpl(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
+    public SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> validator) {
         this.id = id;
         this.warningFormatString = MessageFormat.format("Setting {0}: '{'0}'", this.id);
 
@@ -168,7 +168,7 @@ public class SettingImpl<T> implements Setting<T> {
      * {@inheritDoc}
      */
     @Override
-    public SettingValueValidator<T> getValidator() {
+    public SettingConstraint<T> getValidator() {
         return validator;
     }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.validators;
+package org.terasology.config.flexible.constraints;
 
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;

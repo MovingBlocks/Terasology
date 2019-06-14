@@ -16,7 +16,7 @@
 package org.terasology.config.flexible;
 
 import com.google.gson.JsonElement;
-import org.terasology.config.flexible.validators.SettingValueValidator;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeListener;
@@ -47,7 +47,7 @@ class MockSetting<T> implements Setting<T> {
     }
 
     @Override
-    public SettingValueValidator<T> getValidator() {
+    public SettingConstraint<T> getValidator() {
         return null;
     }
 

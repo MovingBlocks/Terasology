@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.validators;
+package org.terasology.config.flexible.constraints;
 
 /**
  * Validates the given value and issues warnings if the value is invalid.
- * @param <T> The type of values this {@link SettingValueValidator} validates.
+ * @param <T> The type of values this {@link SettingConstraint} validates.
  */
-public interface SettingValueValidator<T> {
+public interface SettingConstraint<T> {
     /**
      * Checks whether the given value is valid or not.
      * @param value The value to validate.
