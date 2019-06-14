@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.ObjectArrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.input.Keyboard;
@@ -677,15 +678,7 @@ public class UIText extends WidgetWithOrder {
      * contents of linesOfText or text accordingly.
      */
     public String getText() {
-        if (linesOfText.length > 0) {
-            String arrayText = String.join("\n", linesOfText);
-            if (text.get().equals("")) {
-                return text.get() + "\n" + arrayText;
-            }
-            return text.get() + arrayText;
-        } else {
-            return text.get();
-        }
+        return String.join("\n", ObjectArrays.concat(text.get(), linesOfText));
     }
 
     /**
