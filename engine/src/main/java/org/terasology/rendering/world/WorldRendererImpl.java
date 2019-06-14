@@ -38,11 +38,12 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
+import org.terasology.rendering.dag.api.RenderDagApiInterface;
 import org.terasology.rendering.dag.gsoc.NewNode;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
-import org.terasology.rendering.dag.api.RenderGraphAPI;
+import org.terasology.rendering.dag.gsoc.RenderDagApi;
 import org.terasology.rendering.dag.gsoc.TintNode;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
@@ -125,7 +126,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
     private RenderGraph renderGraph;
 
-    public RenderGraphAPI renderGraphApi;
+    public RenderDagApiInterface renderDagApi;
 
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
@@ -225,8 +226,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingAPI() {
-         renderGraphApi = RenderGraphAPI.getRenderGraphAPI(renderGraph);
-         context.put(RenderGraphAPI.class, renderGraphApi);
+         renderDagApi = RenderDagApi.getRenderDagApi(renderGraph);
+         context.put(RenderDagApiInterface.class, renderDagApi);
     }
 
     private void initRenderingSupport() {
