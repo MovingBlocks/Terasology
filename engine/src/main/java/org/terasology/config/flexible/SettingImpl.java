@@ -47,10 +47,10 @@ public class SettingImpl<T> implements Setting<T> {
 
     protected T value;
 
-    private String humanReadableName;
-    private String description;
+    private final String humanReadableName;
+    private final String description;
 
-    private SettingConstraint<T> constraint;
+    private final SettingConstraint<T> constraint;
     private final Set<PropertyChangeListener> subscribers = Sets.newHashSet();
 
     /**
@@ -60,18 +60,26 @@ public class SettingImpl<T> implements Setting<T> {
      * @param defaultValue the default value of the setting.
      */
     public SettingImpl(SimpleUri id, T defaultValue) {
-        this(id, defaultValue, null);
+        // TODO: Remove constructor in favor of a SettingBuilder
+        this(id, defaultValue, null, "", "");
     }
 
     /**
      * Creates a new {@link SettingImpl} with the given id, default value and constraint.
-     * @param id           the id of the setting.
-     * @param defaultValue the default value of the setting.
-     * @param constraint   the constraint that the setting values must satisfy.
+     *
+     * @param id                The id of the setting.
+     * @param defaultValue      The default value of the setting.
+     * @param constraint        The constraint that the setting values must satisfy.
+     * @param humanReadableName The human readable name of the setting.
+     * @param description       A description of the setting.
      */
     @SuppressWarnings("unchecked")
-    public SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint) {
+    public SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint,
+                       String humanReadableName, String description) {
         this.id = id;
+        this.humanReadableName = humanReadableName;
+        this.description = description;
+
         this.warningFormatString = MessageFormat.format("Setting {0}: '{'0}'", this.id);
 
         this.constraint = constraint;
