@@ -51,7 +51,7 @@ public class SettingImpl<T> implements Setting<T> {
     private String description;
 
     private SettingConstraint<T> constraint;
-    private Set<PropertyChangeListener> subscribers;
+    private final Set<PropertyChangeListener> subscribers = Sets.newHashSet();
 
     /**
      * Creates a new {@link SettingImpl} with the given id and default value but no constraint.
@@ -93,10 +93,8 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     private void dispatchChangedEvent(PropertyChangeEvent event) {
-        if (subscribers != null) {
-            for (PropertyChangeListener subscriber : subscribers) {
-                subscriber.propertyChange(event);
-            }
+        for (PropertyChangeListener subscriber : subscribers) {
+            subscriber.propertyChange(event);
         }
     }
 
@@ -114,18 +112,13 @@ public class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean subscribe(PropertyChangeListener listener) {
-        if (subscribers == null) {
-            subscribers = Sets.newHashSet();
-        }
-
         if (listener == null) {
             LOGGER.warn(formatWarning("A null subscriber cannot be added."));
-
             return false;
         }
+
         if (subscribers.contains(listener)) {
             LOGGER.warn(formatWarning("The listener has already been subscribed."));
-
             return false;
         }
 
@@ -146,10 +139,6 @@ public class SettingImpl<T> implements Setting<T> {
 
         subscribers.remove(listener);
 
-        if (subscribers.size() <= 0) {
-            subscribers = null;
-        }
-
         return true;
     }
 
@@ -158,7 +147,7 @@ public class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean hasSubscribers() {
-        return subscribers != null;
+        return !subscribers.isEmpty();
     }
 
     /**
