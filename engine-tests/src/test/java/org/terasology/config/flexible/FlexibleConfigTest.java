@@ -19,6 +19,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.terasology.config.flexible.setting.MockSetting;
+import org.terasology.config.flexible.setting.Setting;
+import org.terasology.config.flexible.setting.SettingImpl;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;

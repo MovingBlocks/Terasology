@@ -15,6 +15,7 @@
  */
 package org.terasology.config.flexible;
 
+import org.terasology.config.flexible.setting.Setting;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.setting;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.config.flexible.setting.constraints.NumberRangeConstraint;
+import org.terasology.config.flexible.setting.Setting;
+import org.terasology.config.flexible.setting.SettingImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;

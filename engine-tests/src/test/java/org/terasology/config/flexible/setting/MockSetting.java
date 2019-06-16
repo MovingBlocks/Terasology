@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.setting;
 
 import com.google.gson.JsonElement;
-import org.terasology.config.flexible.constraints.SettingConstraint;
+import org.terasology.config.flexible.setting.constraints.SettingConstraint;
+import org.terasology.config.flexible.setting.Setting;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeListener;
 
-class MockSetting<T> implements Setting<T> {
+public class MockSetting<T> implements Setting<T> {
     private final SimpleUri id;
     private boolean isSubscribedTo;
 
-    MockSetting(SimpleUri id) {
+    public MockSetting(SimpleUri id) {
         this.id = id;
     }
 
