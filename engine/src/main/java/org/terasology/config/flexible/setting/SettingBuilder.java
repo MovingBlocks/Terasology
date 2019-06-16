@@ -15,7 +15,7 @@
  */
 package org.terasology.config.flexible.setting;
 
-import org.terasology.config.flexible.setting.constraints.SettingConstraint;
+import org.terasology.config.flexible.setting.constraints.Constraint;
 import org.terasology.engine.SimpleUri;
 
 public class SettingBuilder {
@@ -28,7 +28,7 @@ public class SettingBuilder {
         private T defaultValue;
         private Class<T> valueClass;
 
-        private SettingConstraint<T> constraint = null;
+        private Constraint<T> constraint = null;
 
         private String humanReadableName = "";
         private String description = "";
@@ -52,7 +52,7 @@ public class SettingBuilder {
         }
 
         @Override
-        public Build<T> constraint(SettingConstraint<T> constraint) {
+        public Build<T> constraint(Constraint<T> constraint) {
             this.constraint = constraint;
 
             return this;
@@ -93,7 +93,7 @@ public class SettingBuilder {
     }
 
     public interface Build<T> {
-        Build<T> constraint(SettingConstraint<T> constraint);
+        Build<T> constraint(Constraint<T> constraint);
 
         Build<T> humanReadableName(String humanReadableName);
 

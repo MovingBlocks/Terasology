@@ -16,14 +16,14 @@
 package org.terasology.config.flexible.setting;
 
 import com.google.gson.JsonElement;
-import org.terasology.config.flexible.setting.constraints.SettingConstraint;
+import org.terasology.config.flexible.setting.constraints.Constraint;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeListener;
 
 /**
  * Represents a setting uniquely identified by an id. Contains a value that may be constrained by a
- * {@link SettingConstraint} and notifies subscribers when the stored value is changed.
+ * {@link Constraint} and notifies subscribers when the stored value is changed.
  *
  * @param <T> The type of the value this {@link Setting} contains.
  */
@@ -34,10 +34,10 @@ public interface Setting<T> {
     SimpleUri getId();
 
     /**
-     * Returns the {@link SettingConstraint} used by this {@link Setting}, if present.
+     * Returns the {@link Constraint} used by this {@link Setting}, if present.
      * Returns null otherwise.
      */
-    SettingConstraint<T> getConstraint();
+    Constraint<T> getConstraint();
 
     /**
      * Returns the default value of this {@link Setting}.
@@ -50,11 +50,11 @@ public interface Setting<T> {
     T getValue();
 
     /**
-     * Sets the value stored in this {@link Setting<T>}. When no {@link SettingConstraint} is
+     * Sets the value stored in this {@link Setting<T>}. When no {@link Constraint} is
      * present the new value immediately replaces the stored one and any subscriber is notified
      * of the change.
      *
-     * If a {@link SettingConstraint} is present, the constraint must be satisfied by
+     * If a {@link Constraint} is present, the constraint must be satisfied by
      * the new value. If the constraint is satisfied, the new value replaces the
      * stored one and subscribers are notified.
      *

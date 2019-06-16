@@ -22,7 +22,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.setting.constraints.SettingConstraint;
+import org.terasology.config.flexible.setting.constraints.Constraint;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeEvent;
@@ -50,7 +50,7 @@ public class SettingImpl<T> implements Setting<T> {
     private final String humanReadableName;
     private final String description;
 
-    private final SettingConstraint<T> constraint;
+    private final Constraint<T> constraint;
     private final Set<PropertyChangeListener> subscribers = Sets.newHashSet();
 
     /**
@@ -63,7 +63,7 @@ public class SettingImpl<T> implements Setting<T> {
      * @param description       A description of the setting.
      */
     @SuppressWarnings("unchecked")
-    SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint,
+    SettingImpl(SimpleUri id, T defaultValue, Constraint<T> constraint,
                        String humanReadableName, String description) {
         this.id = id;
         this.humanReadableName = humanReadableName;
@@ -159,7 +159,7 @@ public class SettingImpl<T> implements Setting<T> {
      * {@inheritDoc}
      */
     @Override
-    public SettingConstraint<T> getConstraint() {
+    public Constraint<T> getConstraint() {
         return constraint;
     }
 

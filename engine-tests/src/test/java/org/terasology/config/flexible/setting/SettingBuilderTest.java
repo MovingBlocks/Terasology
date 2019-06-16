@@ -16,7 +16,7 @@
 package org.terasology.config.flexible.setting;
 
 import org.junit.Test;
-import org.terasology.config.flexible.setting.constraints.SettingConstraint;
+import org.terasology.config.flexible.setting.constraints.Constraint;
 import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.*;
@@ -26,7 +26,7 @@ public class SettingBuilderTest {
     public void testBuild() {
         final SimpleUri id = new SimpleUri("engine-test:Setting");
         final Integer defaultValue = 15;
-        final SettingConstraint<Integer> constraint = null;
+        final Constraint<Integer> constraint = null;
         final String humanReadableName = "Name";
         final String description = "Description";
 

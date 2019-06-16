@@ -24,7 +24,7 @@ import org.terasology.config.flexible.setting.Setting;
  *
  * @param <T> The type of {@link Number} to constrain.
  */
-public class NumberRangeConstraint<T extends Number & Comparable<? super T>> implements SettingConstraint<T> {
+public class NumberRangeConstraint<T extends Number & Comparable<? super T>> implements Constraint<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(NumberRangeConstraint.class);
     private boolean minInclusive;
     private boolean maxInclusive;

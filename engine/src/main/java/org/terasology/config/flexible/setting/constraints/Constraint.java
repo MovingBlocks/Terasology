@@ -20,9 +20,9 @@ import org.terasology.config.flexible.setting.Setting;
 /**
  * Represents constraints on values that can be stored in a {@link Setting}.
  *
- * @param <T> The type of values that are constrained by this {@link SettingConstraint}.
+ * @param <T> The type of values that are constrained by this {@link Constraint}.
  */
-public interface SettingConstraint<T> {
+public interface Constraint<T> {
     /**
      * Checks whether the constraint is satisfied by the given value.
      *

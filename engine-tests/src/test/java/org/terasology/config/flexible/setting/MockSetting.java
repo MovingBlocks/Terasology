@@ -16,8 +16,7 @@
 package org.terasology.config.flexible.setting;
 
 import com.google.gson.JsonElement;
-import org.terasology.config.flexible.setting.constraints.SettingConstraint;
-import org.terasology.config.flexible.setting.Setting;
+import org.terasology.config.flexible.setting.constraints.Constraint;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeListener;
@@ -48,7 +47,7 @@ public class MockSetting<T> implements Setting<T> {
     }
 
     @Override
-    public SettingConstraint<T> getConstraint() {
+    public Constraint<T> getConstraint() {
         return null;
     }
 
