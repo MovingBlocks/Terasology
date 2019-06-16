@@ -21,6 +21,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.terasology.config.flexible.setting.MockSetting;
 import org.terasology.config.flexible.setting.Setting;
+import org.terasology.config.flexible.setting.SettingBuilder;
 import org.terasology.config.flexible.setting.SettingImpl;
 import org.terasology.engine.SimpleUri;
 
@@ -173,18 +174,30 @@ public class FlexibleConfigTest {
 
         private FlexibleConfig config;
 
-        private SettingImpl<TestEnum> testEnumSetting;
-        private SettingImpl<Double> doubleSetting;
-        private SettingImpl<TestClass> testClassSetting;
+        private Setting<TestEnum> testEnumSetting;
+        private Setting<Double> doubleSetting;
+        private Setting<TestClass> testClassSetting;
 
         private void setupSettings() {
-            testEnumSetting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting1"), TestEnum.A1);
+            testEnumSetting = SettingBuilder.ofType(TestEnum.class)
+                    .id(new SimpleUri("engine-tests:TestSetting1"))
+                    .defaultValue(TestEnum.A1)
+                    .build();
+
             config.add(testEnumSetting);
 
-            doubleSetting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting2"), 30.0);
+            doubleSetting = SettingBuilder.ofType(Double.class)
+                    .id(new SimpleUri("engine-tests:TestSetting2"))
+                    .defaultValue(30.0)
+                    .build();
+
             config.add(doubleSetting);
 
-            testClassSetting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting3"), new TestClass(101));
+            testClassSetting = SettingBuilder.ofType(TestClass.class)
+                    .id(new SimpleUri("engine-tests:TestSetting3"))
+                    .defaultValue(new TestClass(101))
+                    .build();
+
             config.add(testClassSetting);
         }
 

@@ -36,7 +36,7 @@ import java.util.Set;
  * @param <T> The type of the value this {@link SettingImpl} contains.
  */
 public class SettingImpl<T> implements Setting<T> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Setting.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final SimpleUri id;
@@ -54,17 +54,6 @@ public class SettingImpl<T> implements Setting<T> {
     private final Set<PropertyChangeListener> subscribers = Sets.newHashSet();
 
     /**
-     * Creates a new {@link SettingImpl} with the given id and default value but no constraint.
-     *
-     * @param id           the id of the setting.
-     * @param defaultValue the default value of the setting.
-     */
-    public SettingImpl(SimpleUri id, T defaultValue) {
-        // TODO: Remove constructor in favor of a SettingBuilder
-        this(id, defaultValue, null, "", "");
-    }
-
-    /**
      * Creates a new {@link SettingImpl} with the given id, default value and constraint.
      *
      * @param id                The id of the setting.
@@ -74,7 +63,7 @@ public class SettingImpl<T> implements Setting<T> {
      * @param description       A description of the setting.
      */
     @SuppressWarnings("unchecked")
-    public SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint,
+    SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint,
                        String humanReadableName, String description) {
         this.id = id;
         this.humanReadableName = humanReadableName;
