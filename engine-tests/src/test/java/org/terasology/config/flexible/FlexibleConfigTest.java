@@ -175,25 +175,28 @@ public class FlexibleConfigTest {
         private Setting<TestClass> testClassSetting;
 
         private void setupSettings() {
-            testEnumSetting = SettingBuilder.ofType(TestEnum.class)
-                    .id(new SimpleUri("engine-tests:TestSetting1"))
-                    .defaultValue(TestEnum.A1)
-                    .build();
+            testEnumSetting = new SettingImpl<>(
+                    new SimpleUri("engine-tests:TestSetting1"),
+                    TestEnum.A1,
+                    null, "", ""
+            );
 
             config.add(testEnumSetting);
 
-            doubleSetting = SettingBuilder.ofType(Double.class)
-                    .id(new SimpleUri("engine-tests:TestSetting2"))
-                    .defaultValue(30.0)
-                    .build();
+            doubleSetting = new SettingImpl<>(
+                    new SimpleUri("engine-tests:TestSetting2"),
+                    30.0,
+                    null, "", ""
+            );
 
             config.add(doubleSetting);
 
-            testClassSetting = SettingBuilder.ofType(TestClass.class)
-                    .id(new SimpleUri("engine-tests:TestSetting3"))
-                    .defaultValue(new TestClass(101))
-                    .build();
-
+            testClassSetting = new SettingImpl<>(
+                    new SimpleUri("engine-tests:TestSetting3"),
+                    new TestClass(101),
+                    null, "", ""
+            );
+            
             config.add(testClassSetting);
         }
 

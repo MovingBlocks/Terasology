@@ -39,11 +39,10 @@ public class SettingTest {
 
         @Before
         public void setUp() {
-            setting = SettingBuilder.ofType(Integer.class)
-                    .id(SETTING_ID)
-                    .defaultValue(50)
-                    .constraint(new NumberRangeConstraint<>(0, 100, false, false))
-                    .build();
+            setting = new SettingImpl<>(SETTING_ID,
+                    50,
+                    new NumberRangeConstraint<>(0, 100, false, false),
+                    "", "");
 
             eventResult = -1;
 
@@ -74,11 +73,10 @@ public class SettingTest {
 
         @Before
         public void setUp() {
-            setting = SettingBuilder.ofType(Integer.class)
-                    .id(SETTING_ID)
-                    .defaultValue(50)
-                    .constraint(new NumberRangeConstraint<>(0, 100, false, false))
-                    .build();
+            setting = new SettingImpl<>(SETTING_ID,
+                    50,
+                    new NumberRangeConstraint<>(0, 100, false, false),
+                    "", "");
 
             eventCallCount = 0;
 
