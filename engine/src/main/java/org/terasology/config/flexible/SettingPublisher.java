@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting;
+package org.terasology.config.flexible;
 
-import org.terasology.config.flexible.setting.constraints.Constraint;
+
+import org.terasology.config.flexible.constraints.SettingConstraint;
 
 public interface SettingPublisher<T> {
-    SettingPublisher<T> constraint(Constraint<T> constraint);
+    SettingPublisher<T> constraint(SettingConstraint<T> constraint);
 
     SettingPublisher<T> humanReadableName(String humanReadableName);
 

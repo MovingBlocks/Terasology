@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting;
+package org.terasology.config.flexible;
 
 import org.junit.Test;
-import org.terasology.config.flexible.setting.constraints.Constraint;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.*;
@@ -26,7 +26,7 @@ public class SettingBuilderTest {
     public void testBuild() {
         final SimpleUri id = new SimpleUri("engine-test:Setting");
         final Integer defaultValue = 15;
-        final Constraint<Integer> constraint = null;
+        final SettingConstraint<Integer> constraint = null;
         final String humanReadableName = "Name";
         final String description = "Description";
 

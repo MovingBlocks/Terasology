@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting;
+package org.terasology.config.flexible;
 
 public interface PartialSetting<T> {
     SettingPublisher<T> defaultValue(T defaultValue);

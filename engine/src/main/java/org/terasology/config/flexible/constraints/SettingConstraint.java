@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting.constraints;
+package org.terasology.config.flexible.constraints;
 
-import org.terasology.config.flexible.setting.Setting;
+import org.terasology.config.flexible.Setting;
 
 /**
  * Represents constraints on values that can be stored in a {@link Setting}.
  *
- * @param <T> The type of values that are constrained by this {@link Constraint}.
+ * @param <T> The type of values that are constrained by this {@link SettingConstraint}.
  */
-public interface Constraint<T> {
+public interface SettingConstraint<T> {
     /**
      * Checks whether the constraint is satisfied by the given value.
      *

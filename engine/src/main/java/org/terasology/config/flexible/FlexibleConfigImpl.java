@@ -23,11 +23,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.setting.PartialSetting;
-import org.terasology.config.flexible.setting.Setting;
-import org.terasology.config.flexible.setting.SettingImpl;
-import org.terasology.config.flexible.setting.SettingPublisher;
-import org.terasology.config.flexible.setting.constraints.Constraint;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
@@ -165,7 +161,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     private class PartialSettingImpl<T> implements PartialSetting<T>, SettingPublisher<T> {
         private SimpleUri id;
         private T defaultValue;
-        private Constraint<T> constraint;
+        private SettingConstraint<T> constraint;
         private String humanReadableName;
         private String description;
 
@@ -181,7 +177,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         }
 
         @Override
-        public SettingPublisher<T> constraint(Constraint<T> constraint) {
+        public SettingPublisher<T> constraint(SettingConstraint<T> constraint) {
             this.constraint = constraint;
 
             return this;

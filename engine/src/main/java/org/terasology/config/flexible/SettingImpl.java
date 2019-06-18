@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting;
+package org.terasology.config.flexible;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -22,7 +22,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.setting.constraints.Constraint;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeEvent;
@@ -50,7 +50,7 @@ public class SettingImpl<T> implements Setting<T> {
     private final String humanReadableName;
     private final String description;
 
-    private final Constraint<T> constraint;
+    private final SettingConstraint<T> constraint;
     private final Set<PropertyChangeListener> subscribers = Sets.newHashSet();
 
     /**
@@ -63,7 +63,7 @@ public class SettingImpl<T> implements Setting<T> {
      * @param description       A description of the setting.
      */
     @SuppressWarnings("unchecked")
-    SettingImpl(SimpleUri id, T defaultValue, Constraint<T> constraint,
+    SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint,
                        String humanReadableName, String description) {
         this.id = id;
         this.humanReadableName = humanReadableName;
@@ -159,7 +159,7 @@ public class SettingImpl<T> implements Setting<T> {
      * {@inheritDoc}
      */
     @Override
-    public Constraint<T> getConstraint() {
+    public SettingConstraint<T> getConstraint() {
         return constraint;
     }
 

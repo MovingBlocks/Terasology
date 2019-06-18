@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting;
+package org.terasology.config.flexible;
 
 import com.google.gson.JsonElement;
-import org.terasology.config.flexible.setting.constraints.Constraint;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeListener;
 
 /**
  * Represents a setting uniquely identified by an id. Contains a value that may be constrained by a
- * {@link Constraint} and notifies subscribers when the stored value is changed.
+ * {@link SettingConstraint} and notifies subscribers when the stored value is changed.
  *
  * @param <T> The type of the value this {@link Setting} contains.
  */
@@ -34,10 +34,10 @@ public interface Setting<T> {
     SimpleUri getId();
 
     /**
-     * Returns the {@link Constraint} used by this {@link Setting}, if present.
+     * Returns the {@link SettingConstraint} used by this {@link Setting}, if present.
      * Returns null otherwise.
      */
-    Constraint<T> getConstraint();
+    SettingConstraint<T> getConstraint();
 
     /**
      * Returns the default value of this {@link Setting}.
@@ -50,11 +50,11 @@ public interface Setting<T> {
     T getValue();
 
     /**
-     * Sets the value stored in this {@link Setting<T>}. When no {@link Constraint} is
+     * Sets the value stored in this {@link Setting<T>}. When no {@link SettingConstraint} is
      * present the new value immediately replaces the stored one and any subscriber is notified
      * of the change.
      *
-     * If a {@link Constraint} is present, the constraint must be satisfied by
+     * If a {@link SettingConstraint} is present, the constraint must be satisfied by
      * the new value. If the constraint is satisfied, the new value replaces the
      * stored one and subscribers are notified.
      *

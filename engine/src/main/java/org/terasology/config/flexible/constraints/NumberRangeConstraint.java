@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting.constraints;
+package org.terasology.config.flexible.constraints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.setting.Setting;
+import org.terasology.config.flexible.Setting;
 
 /**
  * Constrains a {@link Number} within the specified range in a {@link Setting}.
  *
  * @param <T> The type of {@link Number} to constrain.
  */
-public class NumberRangeConstraint<T extends Number & Comparable<? super T>> implements Constraint<T> {
+public class NumberRangeConstraint<T extends Number & Comparable<? super T>> implements SettingConstraint<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(NumberRangeConstraint.class);
     private boolean minInclusive;
     private boolean maxInclusive;

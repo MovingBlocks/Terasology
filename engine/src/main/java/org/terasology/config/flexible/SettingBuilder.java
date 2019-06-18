@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting;
+package org.terasology.config.flexible;
 
-import org.terasology.config.flexible.setting.constraints.Constraint;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 public class SettingBuilder {
@@ -28,7 +28,7 @@ public class SettingBuilder {
         private T defaultValue;
         private Class<T> valueClass;
 
-        private Constraint<T> constraint = null;
+        private SettingConstraint<T> constraint = null;
 
         private String humanReadableName = "";
         private String description = "";
@@ -52,7 +52,7 @@ public class SettingBuilder {
         }
 
         @Override
-        public Build<T> constraint(Constraint<T> constraint) {
+        public Build<T> constraint(SettingConstraint<T> constraint) {
             this.constraint = constraint;
 
             return this;
@@ -93,7 +93,7 @@ public class SettingBuilder {
     }
 
     public interface Build<T> {
-        Build<T> constraint(Constraint<T> constraint);
+        Build<T> constraint(SettingConstraint<T> constraint);
 
         Build<T> humanReadableName(String humanReadableName);
 
