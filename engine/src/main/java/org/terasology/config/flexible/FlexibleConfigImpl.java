@@ -23,7 +23,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.flexible.setting.PartialSetting;
 import org.terasology.config.flexible.setting.Setting;
+import org.terasology.config.flexible.setting.SettingImpl;
+import org.terasology.config.flexible.setting.SettingPublisher;
+import org.terasology.config.flexible.setting.constraints.Constraint;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
@@ -155,6 +159,70 @@ public class FlexibleConfigImpl implements FlexibleConfig {
 
         } catch (Exception e) {
             throw new RuntimeException("Error parsing config file!");
+        }
+    }
+
+    private class PartialSettingImpl<T> implements PartialSetting<T>, SettingPublisher<T> {
+        private SimpleUri id;
+        private T defaultValue;
+        private Constraint<T> constraint;
+        private String humanReadableName;
+        private String description;
+
+        private PartialSettingImpl(SimpleUri id) {
+            this.id = id;
+        }
+
+        @Override
+        public SettingPublisher<T> defaultValue(T defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        @Override
+        public SettingPublisher<T> constraint(Constraint<T> constraint) {
+            this.constraint = constraint;
+
+            return this;
+        }
+
+        @Override
+        public SettingPublisher<T> humanReadableName(String humanReadableName) {
+            this.humanReadableName = humanReadableName;
+
+            return this;
+        }
+
+        @Override
+        public SettingPublisher<T> description(String description) {
+            this.description = description;
+
+            return this;
+        }
+
+        @Override
+        public boolean publish() {
+            SettingImpl<T> setting = new SettingImpl<>(
+                    id, defaultValue, constraint, humanReadableName, description
+            );
+
+            if (id == null) {
+                LOGGER.warn("The id of a setting cannot be null.");
+                return false;
+            } else if (FlexibleConfigImpl.this.contains(id)) {
+                LOGGER.warn("A Setting with the id \"{}\" already exists.", id);
+                return false;
+            }
+
+            if (FlexibleConfigImpl.this.temporarilyParkedSettings.containsKey(id)) {
+                String valueAsJson = FlexibleConfigImpl.this.temporarilyParkedSettings.remove(id);
+                setting.setValueFromJson(valueAsJson);
+            }
+
+            FlexibleConfigImpl.this.settings.put(id, setting);
+
+            return true;
         }
     }
 }
