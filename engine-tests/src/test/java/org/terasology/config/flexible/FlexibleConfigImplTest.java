@@ -31,7 +31,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Enclosed.class)
-public class FlexibleConfigTest {
+public class FlexibleConfigImplTest {
     private static final SimpleUri KEY_NON_EXISTENT = new SimpleUri("engine-tests:TestSettingX");
 
     public static class Get {

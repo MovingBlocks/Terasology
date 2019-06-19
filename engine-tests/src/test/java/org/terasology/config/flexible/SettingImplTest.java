@@ -29,7 +29,7 @@ import java.beans.PropertyChangeListener;
 import static org.junit.Assert.*;
 
 @RunWith(Enclosed.class)
-public class SettingTest {
+public class SettingImplTest {
     private static final SimpleUri SETTING_ID = new SimpleUri("engine-tests:TestSetting");
 
     public static class SetValue {
