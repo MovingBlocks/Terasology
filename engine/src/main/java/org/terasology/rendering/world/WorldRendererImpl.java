@@ -44,7 +44,6 @@ import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
 import org.terasology.rendering.dag.gsoc.RenderDagApi;
-import org.terasology.rendering.dag.gsoc.TintNode;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
@@ -400,7 +399,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.connect(applyDeferredLightingNode, ambientOcclusionNode);
 
         NewNode blurredAmbientOcclusionNode = new BlurredAmbientOcclusionNode("blurredAmbientOcclusionNode", context);
-        blurredAmbientOcclusionNode.connect(1, ambientOcclusionNode.getOutputFboConnection(1));
+        blurredAmbientOcclusionNode.connectFbo(1, ambientOcclusionNode.getOutputFboConnection(1));
         renderGraph.addNode(blurredAmbientOcclusionNode);
         renderGraph.connect(ambientOcclusionNode, blurredAmbientOcclusionNode);
     }
@@ -447,8 +446,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         NewNode blurredAmbientOcclusionNode = renderGraph.findNode("engine:blurredAmbientOcclusionNode");
 
         NewNode prePostCompositeNode = new PrePostCompositeNode("prePostCompositeNode", context);
-        prePostCompositeNode.connect(1, blurredAmbientOcclusionNode.getOutputFboConnection(1));
-        prePostCompositeNode.connect(2, outlineNode.getOutputFboConnection(1));
+        prePostCompositeNode.connectFbo(1, blurredAmbientOcclusionNode.getOutputFboConnection(1));
+        prePostCompositeNode.connectFbo(2, outlineNode.getOutputFboConnection(1));
         renderGraph.addNode(prePostCompositeNode);
         renderGraph.connect(overlaysNode, prePostCompositeNode);
         renderGraph.connect(finalHazeNode, prePostCompositeNode);
@@ -566,8 +565,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(secondLateBlurNode);
 
         FinalPostProcessingNode finalPostProcessingNode = new FinalPostProcessingNode("finalPostProcessingNode", context/*finalIn1*/);
-        finalPostProcessingNode.connect(1, toneMappingNode.getOutputFboConnection(1));
-        finalPostProcessingNode.connect(2, secondLateBlurNode.getOutputFboConnection(1));
+        finalPostProcessingNode.connectFbo(1, toneMappingNode.getOutputFboConnection(1));
+        finalPostProcessingNode.connectFbo(2, secondLateBlurNode.getOutputFboConnection(1));
 
         renderGraph.addNode(finalPostProcessingNode);
 
@@ -577,19 +576,19 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void addOutputNodes(RenderGraph renderGraph) {
         NewNode finalPostProcessingNode = renderGraph.findNode("engine:finalPostProcessingNode");
 
-        NewNode  tintNode = new TintNode("tintNode", context);
-        tintNode.connect(1, finalPostProcessingNode.getOutputFboConnection(1));
-        renderGraph.addNode(tintNode);
+//        NewNode  tintNode = new TintNode("tintNode", context);
+//        tintNode.connectFbo(1, finalPostProcessingNode.getOutputFboConnection(1));
+//        renderGraph.addNode(tintNode);
 
         NewNode outputToVRFrameBufferNode = new OutputToHMDNode("outputToVRFrameBufferNode", context);
         renderGraph.addNode(outputToVRFrameBufferNode);
         renderGraph.connect(finalPostProcessingNode, outputToVRFrameBufferNode);
 
         NewNode outputToScreenNode = new OutputToScreenNode("outputToScreenNode", context);
-        outputToScreenNode.connect(1, tintNode.getOutputFboConnection(1));
+        outputToScreenNode.connectFbo(1, finalPostProcessingNode.getOutputFboConnection(1));
         renderGraph.addNode(outputToScreenNode);
-        // renderGraph.connect(finalPostProcessingNode, outputToScreenNode);
-        renderGraph.connect(finalPostProcessingNode, tintNode, outputToScreenNode);
+        renderGraph.connect(finalPostProcessingNode, outputToScreenNode);
+        // renderGraph.connectFbo(finalPostProcessingNode, tintNode, outputToScreenNode);
     }
 
     @Override
