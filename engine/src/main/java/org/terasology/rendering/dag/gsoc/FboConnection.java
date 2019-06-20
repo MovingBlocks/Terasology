@@ -43,6 +43,10 @@ public class FboConnection extends DependencyConnection<FBO> {
         super.setData(data);
     }
 
+    public String toString() {
+        return super.toString();
+    }
+
     public static String getConnectionName(int number) {
         return new StringBuilder("FBO").append(number).toString();
     }
