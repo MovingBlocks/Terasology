@@ -150,4 +150,10 @@ public interface NewNode extends RenderPipelineTask {
      * @param fromConnection
      */
     void reconnectInputFboToOutput(int inputId, NewNode fromNode, DependencyConnection fromConnection);
+
+    /**
+     * Deletes all desired state changes for the node and add them all again.
+     * Must call after changing dependency connections.
+     */
+    void resetDesiredStateChanges();
 }
