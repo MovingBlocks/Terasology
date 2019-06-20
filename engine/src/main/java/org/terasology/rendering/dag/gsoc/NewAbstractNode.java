@@ -25,6 +25,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
@@ -54,6 +55,7 @@ public abstract class NewAbstractNode implements NewNode {
     private Map<String, DependencyConnection> outputConnections = Maps.newHashMap();
     private final SimpleUri nodeUri;
     private Context context;
+    private RenderGraph renderGraph;
     /**
      * Constructor to be used by inheriting classes.
      * <p>
@@ -70,6 +72,10 @@ public abstract class NewAbstractNode implements NewNode {
 
         this.nodeUri = new SimpleUri(providingModule.toString() + ":" + nodeId);
         //TODO Check for empty list of either in or out
+    }
+
+    public void setRenderGraph(RenderGraph renderGraph) {
+        this.renderGraph = renderGraph;
     }
 
     /**
