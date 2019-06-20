@@ -158,40 +158,40 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         }
     }
 
-    private class PartialSettingImpl<T> implements PartialSetting<T>, SettingPublisher<T> {
+    private class SettingImplBuilder<T> implements SettingBuilder<T>, SettingBuilder.Build<T> {
         private SimpleUri id;
         private T defaultValue;
         private SettingConstraint<T> constraint;
         private String humanReadableName;
         private String description;
 
-        private PartialSettingImpl(SimpleUri id) {
+        private SettingImplBuilder(SimpleUri id) {
             this.id = id;
         }
 
         @Override
-        public SettingPublisher<T> defaultValue(T defaultValue) {
+        public SettingBuilder.Build<T> defaultValue(T defaultValue) {
             this.defaultValue = defaultValue;
 
             return this;
         }
 
         @Override
-        public SettingPublisher<T> constraint(SettingConstraint<T> constraint) {
+        public SettingBuilder.Build<T> constraint(SettingConstraint<T> constraint) {
             this.constraint = constraint;
 
             return this;
         }
 
         @Override
-        public SettingPublisher<T> humanReadableName(String humanReadableName) {
+        public SettingBuilder.Build<T> humanReadableName(String humanReadableName) {
             this.humanReadableName = humanReadableName;
 
             return this;
         }
 
         @Override
-        public SettingPublisher<T> description(String description) {
+        public Build<T> description(String description) {
             this.description = description;
 
             return this;

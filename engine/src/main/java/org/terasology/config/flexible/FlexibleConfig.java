@@ -15,6 +15,7 @@
  */
 package org.terasology.config.flexible;
 
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
@@ -97,4 +98,18 @@ public interface FlexibleConfig {
      * @param reader A reader that will serve as the source of the settings.
      */
     void load(Reader reader);
+
+    interface SettingBuilder<T> {
+        Build<T> defaultValue(T defaultValue);
+
+        interface Build<T> {
+            Build<T> constraint(SettingConstraint<T> constraint);
+
+            Build<T> humanReadableName(String humanReadableName);
+
+            Build<T> description(String description);
+
+            boolean publish();
+        }
+    }
 }
