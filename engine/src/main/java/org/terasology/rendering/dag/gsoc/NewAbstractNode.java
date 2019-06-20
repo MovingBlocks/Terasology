@@ -363,6 +363,15 @@ public abstract class NewAbstractNode implements NewNode {
         return desiredStateChanges;
     }
 
+    /**
+     * Deletes all desired state changes for the node and adds them all again.
+     * Must call after changing dependency connections.
+     */
+    public void resetDesiredStateChanges(){
+        desiredStateChanges.clear();
+        setDependencies(context);
+    }
+
     @Override
     public String toString() {
         return String.format("%s (%s)", getUri(), this.getClass().getSimpleName());
