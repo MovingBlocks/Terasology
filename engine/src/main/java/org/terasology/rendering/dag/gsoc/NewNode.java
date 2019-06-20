@@ -125,7 +125,7 @@ public interface NewNode extends RenderPipelineTask {
      *                   Chosen arbitrarily, integers starting by 1 typically.
      * @param from DependencyConnection obtained form another node's output.
      */
-    void connect(int inputId, DependencyConnection from);
+    void connectFbo(int inputId, DependencyConnection from);
 
     /**
      * This method obtains node's output connection by its id.
