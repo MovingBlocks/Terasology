@@ -150,7 +150,7 @@ public class RenderTaskListGeneratorTest {
             return String.format("%s (%s)", getUri(), this.getClass().getSimpleName());
         }
 
-        public void connect(int inputFboId, DependencyConnection from) {
+        public void connectFbo(int inputFboId, DependencyConnection from) {
             // TODO: null checks everywhere
            // addInputFboConnection(inputFboId, from);
         }
@@ -165,6 +165,14 @@ public class RenderTaskListGeneratorTest {
 
         public void reconnectInputFboToOutput(int inputId, NewNode fromNode, DependencyConnection fromConnection) {
             // ???
+        }
+
+        public void resetDesiredStateChanges(){
+
+        }
+
+        public void setRenderGraph(RenderGraph renderGraph){
+
         }
     }
 

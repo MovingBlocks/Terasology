@@ -112,12 +112,12 @@ public final class RenderTaskListGenerator {
 
         for (NewNode node : orderedNodes) {
             if (node.isEnabled()) {
-                if (logger.isDebugEnabled()) {
+                // if (logger.isDebugEnabled()) {
                     // Marker tasks just add a dividing line to the logger output
                     taskList.add(new MarkerTask(node.getUri() + " (" + node.getClass().getSimpleName() + ")"));
                     enabledNodes++; // we count them only for statistical purposes
                     potentialTasks += 2 * node.getDesiredStateChanges().size() + 1;
-                }
+                // }
 
                 for (StateChange currentStateChange : node.getDesiredStateChanges()) {
                     // A persistentStateChange is one that persists across the processing of two or more consecutive nodes.
@@ -180,7 +180,7 @@ public final class RenderTaskListGenerator {
 
         long endTimeInNanoSeconds = System.nanoTime();
 
-        if (logger.isDebugEnabled()) {
+        // if (logger.isDebugEnabled()) {
             logger.debug("===== INTERMEDIATE RENDERER LIST =========================");
             logIntermediateRendererListForDebugging(orderedNodes);
             logger.debug("===== RENDERER TASK LIST =================================");
@@ -190,7 +190,7 @@ public final class RenderTaskListGenerator {
             logger.debug(String.format("%s nodes, %s enabled - %s tasks (excluding marker tasks) out of %s potential tasks.",
                     nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks));
             logger.debug("----------------------------------------------------------");
-        }
+        // }
 
         return taskList;
     }
