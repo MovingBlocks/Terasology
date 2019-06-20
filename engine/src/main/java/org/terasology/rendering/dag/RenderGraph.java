@@ -58,6 +58,8 @@ public class RenderGraph {
             node.setDependencies(context);
         }
 
+        node.setRenderGraph(this);
+
         nodeMap.put(nodeUri, node);
         graph.addNode(node);
     }
@@ -73,6 +75,8 @@ public class RenderGraph {
         if (graph.adjacentNodes(node).size() != 0) {
             throw new RuntimeException("NewNode removal failure: node '" + nodeUri + "' is still connected to other nodes in the render graph!");
         }
+
+        node.setRenderGraph(null);
 
         nodeMap.remove(nodeUri);
         return nodeMap.remove(nodeUri);
@@ -106,6 +110,13 @@ public class RenderGraph {
 
             fromNode = toNode;
         }
+    }
+
+    public boolean areConnected(NewNode fromNode, NewNode toNode){
+        Preconditions.checkNotNull(fromNode, "fromNode cannot be null!");
+        Preconditions.checkNotNull(toNode, "toNode cannot be null!");
+
+        return graph.hasEdgeConnecting(fromNode, toNode);
     }
 
     public void disconnect(NewNode fromNode, NewNode toNode) {
