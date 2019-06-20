@@ -97,9 +97,12 @@ public abstract class DependencyConnection<T> {
      * Removes current link for both ends of the connection, set's connected node to connectToConnection and gets its data
      * @param connectToConnection
      */
-    public void reconnectInputConnectionToOutput(DependencyConnection<T> connectToConnection) {
-        this.connectedConnection.connectedConnection = null;
+    public void connectInputToOutput(DependencyConnection<T> connectToConnection) {
+        if (this.connectedConnection != null) {
+            this.connectedConnection.connectedConnection = null;
+        }
         this.connectedConnection = connectToConnection;
+        this.connectedConnection.connectedConnection = this;
         this.data = connectToConnection.getData();
     }
 
@@ -118,9 +121,11 @@ public abstract class DependencyConnection<T> {
 
     @Override
     public String toString() {
+        String connectedConnectionString = (connectedConnection == null) ? "no connection" : connectedConnection.getName();
+
         return (connectionType == Type.OUTPUT) ?
-                String.format("Output:%s([Parent]%s->%s)", connectionName, parentNode, connectedConnection.getName()) :
-                String.format("Input:%s([Parent]%s<-%s)", connectionName, parentNode, connectedConnection.getName());
+                String.format("Output:%s([Parent]%s->%s)", connectionName, parentNode, connectedConnectionString) :
+                String.format("Input:%s([Parent]%s<-%s)", connectionName, parentNode, connectedConnectionString);
     }
 
     /**
