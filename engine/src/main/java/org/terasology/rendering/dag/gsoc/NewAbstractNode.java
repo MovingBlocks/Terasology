@@ -283,6 +283,21 @@ public abstract class NewAbstractNode implements NewNode {
         }
         logger.info("Reconnecting finished."); // TODO return errors...connect-true false
 
+    /**
+     * Is {@code thisNode} dependent on {@param anotherNode}?
+     * @param anotherNode
+     * @return If this node has at least one {@param anotherNode}'s connection on input - true. Otherwise false.
+     */
+    public boolean isDependentOn(NewNode anotherNode) {
+        boolean isDependent = false;
+        for (DependencyConnection connection: inputConnections.values()) {
+            if (connection.getConnectedConnection() != null) {
+                if (connection.getConnectedConnection().equals(anotherNode)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
