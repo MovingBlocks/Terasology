@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.gsoc.FboConnection;
@@ -40,6 +41,12 @@ public interface NewNode extends RenderPipelineTask {
      * Called to dispose the Node and any support object it instantiated.
      */
     void dispose();
+
+    /**
+     * RenderGraph tells the node it's its owner now.
+     * @param renderGraph
+     */
+    public void setRenderGraph(RenderGraph renderGraph);
 
     /**
      * Used to obtain the set of StateChange objects representing the state changes desired by the node.
