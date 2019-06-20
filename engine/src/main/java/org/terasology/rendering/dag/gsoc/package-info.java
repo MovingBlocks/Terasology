@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@API
+ package org.terasology.rendering.dag.gsoc;
 
-// package org.terasology.rendering.dag.gsoc;
-
-// import org.terasology.module.sandbox.API;
+ import org.terasology.module.sandbox.API;

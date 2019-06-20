@@ -35,4 +35,7 @@
 // package org.terasology.rendering.dag;
 
 // import org.terasology.module.sandbox.API;
+@API
+package org.terasology.rendering.dag;
 
+import org.terasology.module.sandbox.API;
