@@ -47,15 +47,73 @@ public class RenderDagApi implements RenderDagApiInterface {
         return singleInstance;
     }
 
-    public void addNode() {
+    public NewNode findNode(SimpleUri nodeUri) {
+        return renderGraph.findNode(nodeUri);
+    }
+
+    public NewNode findNode(String nodeUri) {
+        return renderGraph.findNode(nodeUri);
+    }
+
+    public void insertBefore(NewNode nodeBefore, String nodeAfter){
+
+    }
+
+    /**
+     * Deletes all desired state changes for the node and add them all again.
+     * Must call after changing dependency connections.
+     * This can be called directly from the node if the node is already retrieved.
+     * @param node Said node
+     */
+    public void resetDesiredStateChanges(NewNode node) {
+        node.resetDesiredStateChanges();
+    }
+
+    /**
+     * Deletes all desired state changes for the node and add them all again.
+     * Must call after changing dependency connections.
+     * @param nodeUri Said node's uri as String.
+     */
+    public void resetDesiredStateChanges(String nodeUri) {
+        resetDesiredStateChanges(renderGraph.findNode(new SimpleUri(nodeUri)));
+    }
+
+    public void addNode(NewNode node) {
+        renderGraph.addNode(node);
         // create
         // connectDependencies
         // add to render graph
-        // connect in renderGraph (order, to be executed somewhere)
+        // connectFbo in renderGraph (order, to be executed somewhere)
+    }
+
+    /**
+     * Connect Fbo output of fromNode to toNode's Fbo input.
+     * @param toNode Input node
+     * @param inputId Number/id of input
+     * @param fromNode Output node
+     * @param outputId Number/id of output
+     */
+    public void connectFbo(NewNode toNode, int inputId, NewNode fromNode, int outputId) {
+        toNode.connectFbo(inputId, fromNode.getOutputFboConnection(outputId));
+        if (!renderGraph.areConnected(toNode,fromNode)) {
+            renderGraph.connect(toNode, fromNode);
+        }
+    }
+
+    /**
+     * Connect Fbo output of fromNode to toNode's Fbo input.
+     * @param toNode Input node
+     * @param inputId Number/id of input
+     * @param fromNodeUri Output node's Uri (already added to graph)
+     * @param outputId Number/id of output
+     */
+    public void connectFbo(NewNode toNode, int inputId, String fromNodeUri, int outputId) {
+        NewNode fromNode = renderGraph.findNode(new SimpleUri(fromNodeUri));
+        connectFbo(toNode, inputId, fromNode, outputId);
     }
 
     public void disconnectOutputFbo(String nodeUri, int connectionId) {
-        logger.info("Attempting disconnection of " + nodeUri + "'s output fbo number " + connectionId);
+        logger.info("Attempting disconnection of " + nodeUri + "'s output fbo number " + connectionId + "..");
         NewNode node = renderGraph.findNode(new SimpleUri(nodeUri));
         if (node != null) {
             DependencyConnection outputConnection = node.getOutputFboConnection(connectionId);
@@ -96,7 +154,7 @@ public class RenderDagApi implements RenderDagApiInterface {
      * Expects 2 existing nodes and an existing output connection on fromNode. Output connection must be created explicitly
      * beforehand or simply exist already.
      *
-     * If previous requirements are met, attempts to connect or reconnect toNode's (toNodeUri) input (inputId)
+     * If previous requirements are met, attempts to connectFbo or reconnect toNode's (toNodeUri) input (inputId)
      * to fromNode's (fromNodeUri) output (outputId).
      * @param toNodeUri toNode's SimpleUri name. Node must exist in the renderGraph.
      * @param inputId Id of toNode's input. Input does NOT have to exist beforehand.
@@ -106,25 +164,52 @@ public class RenderDagApi implements RenderDagApiInterface {
     public void reconnectInputFboToOutput(String toNodeUri, int inputId, String fromNodeUri, int outputId) {
         NewNode toNode = renderGraph.findNode(new SimpleUri(toNodeUri));
         NewNode fromNode = renderGraph.findNode(new SimpleUri(fromNodeUri));
+        reconnectInputFboToOutput(toNode, inputId, fromNode, outputId);
+    }
+
+    public void reconnectInputFboToOutput(NewNode toNode, int inputId, String fromNodeUri, int outputId) {
+        NewNode fromNode = renderGraph.findNode(new SimpleUri(fromNodeUri));
+        reconnectInputFboToOutput(toNode, inputId, fromNode, outputId);
+    }
+
+    /**
+     * API for reconnecting input FBO dependency.
+     *
+     * Expects 2 existing nodes and an existing output connection on fromNode. Output connection must be created explicitly
+     * beforehand or simply exist already.
+     *
+     * If previous requirements are met, attempts to connectFbo or reconnect toNode's (toNodeUri) input (inputId)
+     * to fromNode's (fromNodeUri) output (outputId).
+     * @param toNode toNode's SimpleUri name. Node must exist in the renderGraph.
+     * @param inputId Id of toNode's input. Input does NOT have to exist beforehand.
+     * @param fromNode fromNode's SimpleUri name. Node must exist in the renderGraph.
+     * @param outputId Id of fromNode's output. Output must exist.
+     */
+    public void reconnectInputFboToOutput(NewNode toNode, int inputId, NewNode fromNode, int outputId) {
         // Would use of Preconditions be clearer?
         if (toNode == null || fromNode == null) {
             throw new RuntimeException("Reconnecting FBO dependency failed. One of the nodes not found in the renderGraph."
-                                        + "\n toNode: " + toNode + ". fromNode: " + fromNode);
+                    + "\n toNode: " + toNode + ". fromNode: " + fromNode);
         }
         DependencyConnection fromConnection = fromNode.getOutputFboConnection(outputId);
         if (fromConnection == null) {
             throw new RuntimeException("Reconnecting FBO dependency failed. Could not find output connection.");
         }
+        // TODO REMOVE RENDERGRAPH CONNECTION if needed
+
         toNode.reconnectInputFboToOutput(inputId, fromNode, fromConnection);
-        // TODO ADD RENDERGRAPH CONNECTION if needed
+
+        if (!renderGraph.areConnected(toNode, fromNode)) {
+            renderGraph.connect(fromNode, toNode);
+        }
     }
 
-    private void reconnectNodeRunOrder(){}
-
     public void removeNode(String nodeUri) {
-        // first check dependencies
+        // first check dependencies ? Won't have to if every dependency call has a check and automatically
+        // connects/disconnects nodes
 
-        // remove node from the graph - is not gonna be run
+        // remove node from the graph - is not gonna be run - can only do this if node is disconnected
+        // in the render graph from all other nodes.
         renderGraph.removeNode(new SimpleUri(nodeUri));
     }
 
