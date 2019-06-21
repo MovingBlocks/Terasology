@@ -265,7 +265,9 @@ Contributors
  [mayant15](https://github.com/mayant15),
  [kinshukk](https://github.com/kinshukk),
  [darshan3](https://github.com/darshan3),
- [Loonride](https://github.com/Loonride)
+ [Loonride](https://github.com/Loonride),
+ [casals](https://github.com/casals),
+ [Prafful 'profgrammer' Javare](https://github.com/profgrammer)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
