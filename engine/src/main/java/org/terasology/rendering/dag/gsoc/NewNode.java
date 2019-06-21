@@ -24,7 +24,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.gsoc.FboConnection;
 
 /**
  * A node is the processing unit within the Renderer.
@@ -46,7 +45,7 @@ public interface NewNode extends RenderPipelineTask {
      * RenderGraph tells the node it's its owner now.
      * @param renderGraph
      */
-    public void setRenderGraph(RenderGraph renderGraph);
+    void setRenderGraph(RenderGraph renderGraph);
 
     /**
      * Used to obtain the set of StateChange objects representing the state changes desired by the node.

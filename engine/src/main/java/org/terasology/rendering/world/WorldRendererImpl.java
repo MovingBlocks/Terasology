@@ -125,7 +125,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
     private RenderGraph renderGraph;
 
-    public RenderDagApiInterface renderDagApi;
+    private RenderDagApiInterface renderDagApi;
 
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;

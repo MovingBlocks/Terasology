@@ -115,7 +115,7 @@ public abstract class NewAbstractNode implements NewNode {
     }
 
     private boolean addInputConnection(int id, DependencyConnection from) {
-        if(from instanceof FboConnection) {
+        if (from instanceof FboConnection) {
             return addInputFboConnection(id, (FboConnection) from);
         } else {
             throw new RuntimeException("addInputConnection failed on unknown connection type");
@@ -259,7 +259,7 @@ public abstract class NewAbstractNode implements NewNode {
             DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId));
         if (connectionToDisconnect != null) {
             // TODO make it reconnectInputToOutput
-            if (connectionToDisconnect.getConnectedConnection()!=null) {
+            if (connectionToDisconnect.getConnectedConnection() != null) {
                 connectionToDisconnect.disconnect();
             } else {
                 logger.warn("Connection was not connected, it probably originated in this node. (Support FBOs can be created inside nodes)");
@@ -278,7 +278,8 @@ public abstract class NewAbstractNode implements NewNode {
     public void reconnectInputFboToOutput(int inputId, NewNode fromNode, DependencyConnection fromConnection) {
         logger.info("Attempting reconnection of " + this.getUri() + " to " + fromConnection.getParentNode());
         if (fromConnection.getConnectedConnection() != null) {
-            throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to (" + fromConnection.getConnectedConnection() + "). Remove connection first.");
+            throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
+                                        + fromConnection.getConnectedConnection() + "). Remove connection first.");
         } // TODO                                   make it getInputConnection
         DependencyConnection connectionToReconnect = this.getInputFboConnection(inputId);
         // If this connection exists
@@ -350,7 +351,7 @@ public abstract class NewAbstractNode implements NewNode {
         } else {
             logger.warn("FBO " + fboName + " is already requested.");
             fbo = fboManager.get(fboName);
-            this.addInputFboConnection(inputConnections.size()+1, fbo);
+            this.addInputFboConnection(inputConnections.size() + 1, fbo);
             return fbo;
         }
         fbo = fboManager.request(fboConfig);
@@ -409,7 +410,7 @@ public abstract class NewAbstractNode implements NewNode {
      * Deletes all desired state changes for the node and adds them all again.
      * Must call after changing dependency connections.
      */
-    public void resetDesiredStateChanges(){
+    public void resetDesiredStateChanges() {
         desiredStateChanges.clear();
         setDependencies(context);
     }
