@@ -29,10 +29,11 @@ public interface FlexibleConfig {
     /**
      * Adds a {@link Setting} to the config. In case of failure warnings will be issued through the logger
      * detailing the exact nature of the failure.
-     * @param setting The {@link Setting} to add.
+     * @param id The {@link Setting} to add.
+     * @param valueType
      * @return True if the {@link Setting} was added, false otherwise.
      */
-    boolean add(Setting setting);
+    <V> SettingBuilder<V> getSettingBuilder(SimpleUri id, Class<V> valueType);
 
     /**
      * Returns the {@link Setting<V>} with the given id. Null is returned if a setting with the given id does not

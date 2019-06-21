@@ -49,26 +49,13 @@ public class FlexibleConfigImpl implements FlexibleConfig {
 
     /**
      * {@inheritDoc}
+     * @param id
+     * @param valueType
+     * @return
      */
     @Override
-    public boolean add(Setting setting) {
-        SimpleUri id = setting.getId();
-
-        if (id == null) {
-            LOGGER.warn("The id of a setting cannot be null.");
-            return false;
-        } else if (contains(id)) {
-            LOGGER.warn("A Setting with the id \"{}\" already exists.", id);
-            return false;
-        }
-
-        if (temporarilyParkedSettings.containsKey(id)) {
-            setting.setValueFromJson(temporarilyParkedSettings.remove(id));
-        }
-
-        settings.put(id, setting);
-
-        return true;
+    public <V> SettingBuilder<V> getSettingBuilder(SimpleUri id, Class<V> valueType) {
+        return new SettingImplBuilder<>(id);
     }
 
     /**
