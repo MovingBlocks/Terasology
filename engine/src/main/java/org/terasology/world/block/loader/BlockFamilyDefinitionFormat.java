@@ -219,7 +219,6 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
             setObject(data::setShape, jsonObject, "shape", BlockShape.class, context);
             setBoolean(data::setWater, jsonObject, "water");
-            setBoolean(data::setLava, jsonObject, "lava");
             setBoolean(data::setGrass, jsonObject, "grass");
             setBoolean(data::setIce, jsonObject, "ice");
         }

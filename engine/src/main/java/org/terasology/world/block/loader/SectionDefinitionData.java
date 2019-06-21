@@ -71,7 +71,6 @@ public class SectionDefinitionData {
 
     private BlockShape shape;
     private boolean water;
-    private boolean lava;
     private boolean grass;
     private boolean ice;
 
@@ -122,7 +121,6 @@ public class SectionDefinitionData {
         this.shape = other.shape;
 
         this.water = other.water;
-        this.lava = other.lava;
         this.grass = other.grass;
         this.ice = other.ice;
     }
@@ -355,14 +353,6 @@ public class SectionDefinitionData {
 
     public void setWater(boolean water) {
         this.water = water;
-    }
-
-    public boolean isLava() {
-        return lava;
-    }
-
-    public void setLava(boolean lava) {
-        this.lava = lava;
     }
 
     public boolean isGrass() {

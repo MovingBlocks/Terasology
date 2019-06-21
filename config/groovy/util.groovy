@@ -46,6 +46,7 @@ switch(cleanerArgs[0]) {
     //noinspection GroovyFallthrough
     case "get":
         println "Preparing to get $itemType"
+        //println "cleanerArgs is $cleanerArgs"
         if (cleanerArgs.length == 1) {
             def itemString = common.getUserString("Enter what to get - separate multiple with spaces, CapiTaliZation MatterS): ")
             println "User wants: $itemString"
@@ -54,7 +55,22 @@ switch(cleanerArgs[0]) {
         } else {
             // Note: processCustomRemote also drops one of the array elements from cleanerArgs
             cleanerArgs = common.processCustomRemote(cleanerArgs)
-            common.retrieve cleanerArgs, recurse
+            ArrayList<String> selectedItems = new ArrayList<String>()
+
+            for (String arg : cleanerArgs) {
+                //println "Checking arg $arg"
+                if (!arg.contains('*') && !arg.contains('?')) {
+                    println "Got into the non-wilcard option to fetch a fully specified item for $arg"
+                    selectedItems.add(arg)
+                } else {
+                    println "Got into the wildcard option to fetch something matching a pattern for $arg, may need to cache first"
+                    common.cacheItemList()
+                    selectedItems.addAll(common.retrieveAvalibleItemsWithWildcardMatch(arg));
+                }
+            }
+            common.unCacheItemList()
+
+            common.retrieve(((String[])selectedItems.toArray()), recurse)
         }
         break
 
@@ -214,6 +230,13 @@ def printUsage() {
     println "'-condensed-list-format' to group items by starting letter for the 'list' sub-command (default with many items)"
     println ""
     println "Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub."
+    println "Example: 'groovyw module get *' - would retrieve all the modules in the Terasology organisation on GitHub."
+    println "Example: 'groovyw module get Sa??l*' - would retrieve all the modules in the Terasology organisation on GitHub" +
+            " that start with \"Sa\", have any two characters after that, then an \"l\" and then end with anything else." +
+            " This should retrieve the Sample repository from the Terasology organisation on GitHub."
+    println ""
+    println "*NOTE*: On UNIX platforms (MacOS and Linux), the wildcard arguments must be escaped with single quotes e.g. groovyw module get '*'."
+    println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source"
     println "Example: 'groovyw lib list' - would list library projects compatible with being embedded in a Terasology workspace"
     println ""

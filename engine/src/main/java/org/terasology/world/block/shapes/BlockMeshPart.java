@@ -36,12 +36,18 @@ public class BlockMeshPart {
     private Vector3f[] normals;
     private Vector2f[] texCoords;
     private int[] indices;
+    private int texFrames;
 
     public BlockMeshPart(Vector3f[] vertices, Vector3f[] normals, Vector2f[] texCoords, int[] indices) {
+        this(vertices, normals, texCoords, indices, 1);
+    }
+    
+    private BlockMeshPart(Vector3f[] vertices, Vector3f[] normals, Vector2f[] texCoords, int[] indices, int texFrames) {
         this.vertices = Arrays.copyOf(vertices, vertices.length);
         this.normals = Arrays.copyOf(normals, normals.length);
         this.texCoords = Arrays.copyOf(texCoords, texCoords.length);
         this.indices = Arrays.copyOf(indices, indices.length);
+        this.texFrames = texFrames;
     }
 
     public int size() {
@@ -67,15 +73,19 @@ public class BlockMeshPart {
     public int getIndex(int i) {
         return indices[i];
     }
+    
+    public int getTexFrames() {
+        return texFrames;
+    }
 
-    public BlockMeshPart mapTexCoords(Vector2f offset, float width) {
+    public BlockMeshPart mapTexCoords(Vector2f offset, float width, int frames) {
         float normalisedBorder = BORDER * width;
         Vector2f[] newTexCoords = new Vector2f[texCoords.length];
         for (int i = 0; i < newTexCoords.length; ++i) {
             newTexCoords[i] = new Vector2f(offset.x + normalisedBorder + texCoords[i].x * (width - 2 * normalisedBorder),
                     offset.y + normalisedBorder + texCoords[i].y * (width - 2 * normalisedBorder));
         }
-        return new BlockMeshPart(vertices, normals, newTexCoords, indices);
+        return new BlockMeshPart(vertices, normals, newTexCoords, indices, frames);
     }
 
     public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, Vector4f colorOffset, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
@@ -98,6 +108,7 @@ public class BlockMeshPart {
             elements.normals.add(normals[vIdx].y);
             elements.normals.add(normals[vIdx].z);
             elements.flags.add(flags.getValue());
+            elements.frames.add(texFrames);
         }
         elements.vertexCount += vertices.length;
 
@@ -116,6 +127,6 @@ public class BlockMeshPart {
             newNormals[i].normalize();
         }
 
-        return new BlockMeshPart(newVertices, newNormals, texCoords, indices);
+        return new BlockMeshPart(newVertices, newNormals, texCoords, indices, texFrames);
     }
 }

@@ -84,6 +84,10 @@ public class UIScrollbar extends CoreWidget {
         }
     };
 
+    public InteractionListener getHandleListener() {
+        return handleListener;
+    }
+
     private InteractionListener sliderListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
@@ -122,6 +126,10 @@ public class UIScrollbar extends CoreWidget {
             dragging = false;
         }
     };
+
+    public InteractionListener getSliderListener() {
+        return sliderListener;
+    }
 
     public UIScrollbar() {
         this(true);
