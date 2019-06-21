@@ -32,10 +32,10 @@ import org.terasology.rendering.dag.api.RenderDagApiInterface;
  * Implements basic operations over DAG and dependency passing.
  * </p>
  */
-public class RenderDagApi implements RenderDagApiInterface {
+public final class RenderDagApi implements RenderDagApiInterface {
     private static final Logger logger = LoggerFactory.getLogger(RenderDagApi.class);
 
-    private static RenderDagApi singleInstance = null;
+    private static RenderDagApi singleInstance;
 
     private RenderGraph renderGraph;
     private Context context;
@@ -62,7 +62,7 @@ public class RenderDagApi implements RenderDagApiInterface {
         return renderGraph.findNode(nodeUri);
     }
 
-    public void insertBefore(NewNode nodeBefore, String nodeAfter){
+    public void insertBefore(NewNode nodeBefore, String nodeAfter) {
 
     }
 
@@ -106,7 +106,7 @@ public class RenderDagApi implements RenderDagApiInterface {
      */
     public void connectFbo(NewNode toNode, int inputId, NewNode fromNode, int outputId) {
         toNode.connectFbo(inputId, fromNode.getOutputFboConnection(outputId));
-        if (!renderGraph.areConnected(toNode,fromNode)) {
+        if (!renderGraph.areConnected(toNode, fromNode)) {
             renderGraph.connect(toNode, fromNode);
         }
     }

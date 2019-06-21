@@ -78,7 +78,7 @@ public abstract class DependencyConnection<T> {
      * @param connectedConnection A DependenyConnection connection of connected node.
      */
     protected void setConnectedConnection(DependencyConnection connectedConnection) {
-        this.connectedConnection= connectedConnection;
+        this.connectedConnection = connectedConnection;
     }
 
     protected void setParentNode(SimpleUri parentNode) {
@@ -123,12 +123,12 @@ public abstract class DependencyConnection<T> {
     public String toString() {
         String connectedConnectionString = (connectedConnection == null) ? "no connection" : connectedConnection.getName();
 
-        return (connectionType == Type.OUTPUT) ?
-                String.format("Output:%s([Parent]%s->%s)", connectionName, parentNode, connectedConnectionString) :
-                String.format("Input:%s([Parent]%s<-%s)", connectionName, parentNode, connectedConnectionString);
+        return (connectionType == Type.OUTPUT)
+                ? String.format("Output:%s([Parent]%s->%s)", connectionName, parentNode, connectedConnectionString)
+                : String.format("Input:%s([Parent]%s<-%s)", connectionName, parentNode, connectedConnectionString);
     }
 
-    /**
+    /*
      * Constructs DependencyConnection name based on ID and Dep.connection type.
      * @param id
      * @return

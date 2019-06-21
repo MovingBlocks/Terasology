@@ -112,7 +112,7 @@ public class RenderGraph {
         }
     }
 
-    public boolean areConnected(NewNode fromNode, NewNode toNode){
+    public boolean areConnected(NewNode fromNode, NewNode toNode) {
         Preconditions.checkNotNull(fromNode, "fromNode cannot be null!");
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
