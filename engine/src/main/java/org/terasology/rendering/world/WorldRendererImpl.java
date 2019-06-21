@@ -225,7 +225,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingAPI() {
-         renderDagApi = RenderDagApi.getRenderDagApi(renderGraph);
+         renderDagApi = RenderDagApi.getRenderDagApi(renderGraph, shaderManager, context);
          context.put(RenderDagApiInterface.class, renderDagApi);
     }
 

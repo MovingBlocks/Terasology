@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.api;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.naming.Name;
 import org.terasology.rendering.dag.gsoc.NewNode;
 
 public interface RenderDagApiInterface {
@@ -90,6 +91,9 @@ public interface RenderDagApiInterface {
     void disconnectOutputFbo(String nodeUri, int connectionId);
     void disconnectInputFbo(String nodeUri, int connectionId);
     void removeNode(String nodeUri);
+
+    void addShader(String title, Name moduleName);
+
     void addNode(NewNode node);
 
     /**

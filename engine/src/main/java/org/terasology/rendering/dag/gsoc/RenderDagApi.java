@@ -17,7 +17,10 @@ package org.terasology.rendering.dag.gsoc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.naming.Name;
+import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.api.RenderDagApiInterface;
 
@@ -35,14 +38,18 @@ public class RenderDagApi implements RenderDagApiInterface {
     private static RenderDagApi singleInstance = null;
 
     private RenderGraph renderGraph;
+    private Context context;
+    private ShaderManager shaderManager;
 
-    private RenderDagApi(RenderGraph renderGraph) {
+    private RenderDagApi(RenderGraph renderGraph, ShaderManager shaderManager, Context context) {
         this.renderGraph = renderGraph;
+        this.context = context;
+        this.shaderManager = shaderManager;
     }
 
-    public static RenderDagApi getRenderDagApi(RenderGraph renderGraph) {
+    public static RenderDagApi getRenderDagApi(RenderGraph renderGraph, ShaderManager shaderManager, Context context) {
         if (singleInstance == null) {
-            singleInstance = new RenderDagApi(renderGraph);
+            singleInstance = new RenderDagApi(renderGraph, shaderManager, context);
         }
         return singleInstance;
     }
@@ -84,6 +91,10 @@ public class RenderDagApi implements RenderDagApiInterface {
         // connectDependencies
         // add to render graph
         // connectFbo in renderGraph (order, to be executed somewhere)
+    }
+
+    public void addShader(String title, Name moduleName) {
+        shaderManager.addShaderProgram(title, moduleName.toString());
     }
 
     /**
