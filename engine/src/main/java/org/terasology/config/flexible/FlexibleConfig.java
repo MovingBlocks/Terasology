@@ -27,13 +27,15 @@ import java.util.Map;
  */
 public interface FlexibleConfig {
     /**
-     * Adds a {@link Setting} to the config. In case of failure warnings will be issued through the logger
-     * detailing the exact nature of the failure.
-     * @param id The {@link Setting} to add.
-     * @param valueType
-     * @return True if the {@link Setting} was added, false otherwise.
+     * Registers the addition of a new {@link Setting} to this {@link FlexibleConfig}
+     * through a {@link SettingEntry}, which allows you to construct the new
+     * {@link Setting} and add it to this {@link FlexibleConfig} once it is constructed.
+     *
+     * @param id The id of the {@link Setting} that will be added.
+     * @param valueType The type of values that the {@link Setting} will store.
+     * @return The {@link SettingEntry} object that can construct a {@link Setting} and
+     * then add it to this {@link FlexibleConfig}.
      */
-    // TODO: Complete documentation
     <V> SettingEntry<V> newEntry(SimpleUri id, Class<V> valueType);
 
     /**
@@ -101,16 +103,67 @@ public interface FlexibleConfig {
      */
     void load(Reader reader);
 
+    /**
+     * Represents an under-construction {@link Setting} storing values of type {@link T}
+     * which will eventually be added to the {@link FlexibleConfig} that created this object.
+     *
+     * This type follows a state machine-like Builder pattern to make it easier to set the
+     * various required and optional components of a {@link Setting}. This interface is the
+     * first entry point of the Builder pattern, which allows you to set the required components
+     * of the {@link Setting}.
+     *
+     * @param <T> The type of values that will be stored by the setting under construction.
+     */
     interface SettingEntry<T> {
+        /**
+         * Specifies the default value of the {@link Setting} that will be constructed.
+         *
+         * @param defaultValue The default value of the new Setting.
+         * @return A builder object to continue the {@link Setting} building process.
+         */
         Builder<T> setDefaultValue(T defaultValue);
 
+        /**
+         * A builder that allows you to set the optional components of a {@link Setting},
+         * and add it to the {@link FlexibleConfig} that created this object.
+         *
+         * @param <T> The type of values that will be stored by the setting under construction.
+         */
         interface Builder<T> {
+            /**
+             * Specifies the {@link SettingConstraint} that will be used by the {@link Setting}.
+             *
+             * @param constraint The constraint for the setting.
+             * @return This builder object.
+             */
             Builder<T> setConstraint(SettingConstraint<T> constraint);
 
+            /**
+             * Specifies the name of the {@link Setting} being created.
+             *
+             * @param humanReadableName The name of the setting.
+             * @return This builder object.
+             */
             Builder<T> setHumanReadableName(String humanReadableName);
 
+            /**
+             * Specifies the description of the {@link Setting} being created.
+             *
+             * @param description The setting description.
+             * @return This builder object.
+             */
             Builder<T> setDescription(String description);
 
+            /**
+             * Builds the {@link Setting} with the components that have already been specified
+             * and adds the constructed {@link Setting} to the {@link FlexibleConfig} that created
+             * this object. Returns a boolean specifying if the addition of the constructed
+             * {@link Setting} to the {@link FlexibleConfig} was successful. In case of failure,
+             * warnings will be logged detailing the issues.
+             *
+             * @return True if the constructed setting was successfully added to the config,
+             * false otherwise.
+             */
             boolean addToConfig();
         }
     }
