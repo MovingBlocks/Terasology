@@ -148,9 +148,9 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     private class SettingImplEntry<T> implements SettingEntry<T>, SettingEntry.Builder<T> {
         private SimpleUri id;
         private T defaultValue;
-        private SettingConstraint<T> constraint;
-        private String humanReadableName;
-        private String description;
+        private SettingConstraint<T> constraint = null;
+        private String humanReadableName = "";
+        private String description = "";
 
         private SettingImplEntry(SimpleUri id) {
             this.id = id;
