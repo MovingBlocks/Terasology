@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
@@ -26,9 +28,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(Enclosed.class)
 public class FlexibleConfigImplTest {
@@ -96,6 +96,7 @@ public class FlexibleConfigImplTest {
     }
 
     public static class Add {
+        private static final SimpleUri ID = new SimpleUri("engine-tests:TestSetting");
         private FlexibleConfig config;
 
         @Before
@@ -105,22 +106,41 @@ public class FlexibleConfigImplTest {
 
         @Test
         public void testAdd() throws Exception {
-            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
+            final Integer defaultValue = 5;
 
-            assertTrue(config.newEntry(id, Integer.class)
-                    .setDefaultValue(0)
+            final SettingConstraint<Integer> constraint =
+                    new NumberRangeConstraint<>(0, 10, true, true);
+
+            final String name = "name";
+            final String description = "description";
+
+            assertTrue(config.newEntry(ID, Integer.class)
+                    .setDefaultValue(defaultValue)
+                    .setConstraint(constraint)
+                    .setHumanReadableName(name)
+                    .setDescription(description)
                     .addToConfig());
+
+            Setting<Integer> setting = config.get(ID);
+
+            assertEquals(ID, setting.getId());
+            assertEquals(defaultValue, setting.getDefaultValue());
+            assertEquals(constraint, setting.getConstraint());
+            assertEquals(name, setting.getHumanReadableName());
+            assertEquals(description, setting.getDescription());
         }
 
         @Test
         public void testAddExisting() throws Exception {
-            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
-
-            assertTrue(config.newEntry(id, Integer.class)
+            assertTrue(config.newEntry(ID, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig());
-            assertFalse(config.newEntry(id, Integer.class)
-                    .setDefaultValue(0)
+
+            FlexibleConfig.SettingEntry<Integer> entry = config.newEntry(ID, Integer.class);
+
+            assertNotNull(entry);
+
+            assertFalse(entry.setDefaultValue(0)
                     .addToConfig());
         }
     }
