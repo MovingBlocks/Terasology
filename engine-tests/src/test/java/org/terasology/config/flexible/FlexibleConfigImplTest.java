@@ -47,13 +47,13 @@ public class FlexibleConfigImplTest {
             SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
             SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
-            config.getSettingBuilder(id1, Integer.class)
-                    .defaultValue(0)
-                    .publish();
+            config.newEntry(id1, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
-            config.getSettingBuilder(id2, Double.class)
-                    .defaultValue(0.0)
-                    .publish();
+            config.newEntry(id2, Double.class)
+                    .setDefaultValue(0.0)
+                    .addToConfig();
 
             Setting<Integer> retrievedSetting1 = config.get(id1);
             Setting<Double> retrievedSetting2 = config.get(id2);
@@ -76,9 +76,9 @@ public class FlexibleConfigImplTest {
         public void testContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.getSettingBuilder(id, Integer.class)
-                    .defaultValue(0)
-                    .publish();
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
             assertTrue(config.contains(id));
         }
@@ -87,9 +87,9 @@ public class FlexibleConfigImplTest {
         public void testNotContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.getSettingBuilder(id, Integer.class)
-                    .defaultValue(0)
-                    .publish();
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
             assertFalse(config.contains(KEY_NON_EXISTENT));
         }
@@ -107,21 +107,21 @@ public class FlexibleConfigImplTest {
         public void testAdd() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            assertTrue(config.getSettingBuilder(id, Integer.class)
-                    .defaultValue(0)
-                    .publish());
+            assertTrue(config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig());
         }
 
         @Test
         public void testAddExisting() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            assertTrue(config.getSettingBuilder(id, Integer.class)
-                    .defaultValue(0)
-                    .publish());
-            assertFalse(config.getSettingBuilder(id, Integer.class)
-                    .defaultValue(0)
-                    .publish());
+            assertTrue(config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig());
+            assertFalse(config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig());
         }
     }
 
@@ -138,12 +138,12 @@ public class FlexibleConfigImplTest {
             SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
             SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
-            config.getSettingBuilder(id1, Integer.class)
-                    .defaultValue(0)
-                    .publish();
-            config.getSettingBuilder(id2, Integer.class)
-                    .defaultValue(0)
-                    .publish();
+            config.newEntry(id1, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
+            config.newEntry(id2, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
             assertTrue(config.remove(id1));
             assertTrue(config.remove(id2));
@@ -153,9 +153,9 @@ public class FlexibleConfigImplTest {
         public void testNonexistentRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.getSettingBuilder(id, Integer.class)
-                    .defaultValue(0)
-                    .publish();
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
             assertFalse(config.remove(KEY_NON_EXISTENT));
         }
@@ -164,9 +164,9 @@ public class FlexibleConfigImplTest {
         public void testSubscribedRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.getSettingBuilder(id, Integer.class)
-                    .defaultValue(0)
-                    .publish();
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
             Setting setting = config.get(id);
 
@@ -203,25 +203,25 @@ public class FlexibleConfigImplTest {
         private void setupSettings() {
             SimpleUri testEnumSettingId = new SimpleUri("engine-tests:TestSetting1");
 
-            config.getSettingBuilder(testEnumSettingId, TestEnum.class)
-                    .defaultValue(TestEnum.A1)
-                    .publish();
+            config.newEntry(testEnumSettingId, TestEnum.class)
+                    .setDefaultValue(TestEnum.A1)
+                    .addToConfig();
 
             testEnumSetting = config.get(testEnumSettingId);
 
             SimpleUri doubleSettingId = new SimpleUri("engine-tests:TestSetting2");
 
-            config.getSettingBuilder(doubleSettingId, Double.class)
-                    .defaultValue(30.0)
-                    .publish();
+            config.newEntry(doubleSettingId, Double.class)
+                    .setDefaultValue(30.0)
+                    .addToConfig();
 
             doubleSetting = config.get(doubleSettingId);
 
             SimpleUri testClassSettingId = new SimpleUri("engine-tests:TestSetting3");
 
-            config.getSettingBuilder(testClassSettingId, TestClass.class)
-                    .defaultValue(new TestClass(101))
-                    .publish();
+            config.newEntry(testClassSettingId, TestClass.class)
+                    .setDefaultValue(new TestClass(101))
+                    .addToConfig();
 
             testClassSetting = config.get(testClassSettingId);
         }

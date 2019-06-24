@@ -54,8 +54,8 @@ public class FlexibleConfigImpl implements FlexibleConfig {
      * @return
      */
     @Override
-    public <V> SettingBuilder<V> getSettingBuilder(SimpleUri id, Class<V> valueType) {
-        return new SettingImplBuilder<>(id);
+    public <V> SettingEntry<V> newEntry(SimpleUri id, Class<V> valueType) {
+        return new SettingImplEntry<>(id);
     }
 
     /**
@@ -145,47 +145,47 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         }
     }
 
-    private class SettingImplBuilder<T> implements SettingBuilder<T>, SettingBuilder.Build<T> {
+    private class SettingImplEntry<T> implements SettingEntry<T>, SettingEntry.Builder<T> {
         private SimpleUri id;
         private T defaultValue;
         private SettingConstraint<T> constraint;
         private String humanReadableName;
         private String description;
 
-        private SettingImplBuilder(SimpleUri id) {
+        private SettingImplEntry(SimpleUri id) {
             this.id = id;
         }
 
         @Override
-        public SettingBuilder.Build<T> defaultValue(T defaultValue) {
+        public Builder<T> setDefaultValue(T defaultValue) {
             this.defaultValue = defaultValue;
 
             return this;
         }
 
         @Override
-        public SettingBuilder.Build<T> constraint(SettingConstraint<T> constraint) {
+        public Builder<T> setConstraint(SettingConstraint<T> constraint) {
             this.constraint = constraint;
 
             return this;
         }
 
         @Override
-        public SettingBuilder.Build<T> humanReadableName(String humanReadableName) {
+        public Builder<T> setHumanReadableName(String humanReadableName) {
             this.humanReadableName = humanReadableName;
 
             return this;
         }
 
         @Override
-        public Build<T> description(String description) {
+        public Builder<T> setDescription(String description) {
             this.description = description;
 
             return this;
         }
 
         @Override
-        public boolean publish() {
+        public boolean addToConfig() {
             SettingImpl<T> setting = new SettingImpl<>(
                     id, defaultValue, constraint, humanReadableName, description
             );

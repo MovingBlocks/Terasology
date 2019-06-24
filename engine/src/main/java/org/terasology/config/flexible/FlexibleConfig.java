@@ -33,7 +33,8 @@ public interface FlexibleConfig {
      * @param valueType
      * @return True if the {@link Setting} was added, false otherwise.
      */
-    <V> SettingBuilder<V> getSettingBuilder(SimpleUri id, Class<V> valueType);
+    // TODO: Complete documentation
+    <V> SettingEntry<V> newEntry(SimpleUri id, Class<V> valueType);
 
     /**
      * Returns the {@link Setting<V>} with the given id. Null is returned if a setting with the given id does not
@@ -100,17 +101,17 @@ public interface FlexibleConfig {
      */
     void load(Reader reader);
 
-    interface SettingBuilder<T> {
-        Build<T> defaultValue(T defaultValue);
+    interface SettingEntry<T> {
+        Builder<T> setDefaultValue(T defaultValue);
 
-        interface Build<T> {
-            Build<T> constraint(SettingConstraint<T> constraint);
+        interface Builder<T> {
+            Builder<T> setConstraint(SettingConstraint<T> constraint);
 
-            Build<T> humanReadableName(String humanReadableName);
+            Builder<T> setHumanReadableName(String humanReadableName);
 
-            Build<T> description(String description);
+            Builder<T> setDescription(String description);
 
-            boolean publish();
+            boolean addToConfig();
         }
     }
 }
