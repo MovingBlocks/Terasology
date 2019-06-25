@@ -49,9 +49,6 @@ public class FlexibleConfigImpl implements FlexibleConfig {
 
     /**
      * {@inheritDoc}
-     * @param id
-     * @param valueType
-     * @return
      */
     @Override
     public <V> SettingEntry<V> newEntry(SimpleUri id, Class<V> valueType) {
@@ -145,6 +142,12 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         }
     }
 
+    /**
+     * The {@link FlexibleConfig.SettingEntry} implementation to build and add a {@link SettingImpl}
+     * to a {@link FlexibleConfigImpl}.
+     *
+     * @param <T> The type of values that can be stored in the {@link SettingImpl}.
+     */
     private class SettingImplEntry<T> implements SettingEntry<T>, SettingEntry.Builder<T> {
         private SimpleUri id;
         private T defaultValue;
