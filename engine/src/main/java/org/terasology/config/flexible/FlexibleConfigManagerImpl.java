@@ -36,12 +36,12 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
     private Map<SimpleUri, FlexibleConfig> flexibleConfigs = Maps.newHashMap();
 
     @Override
-    public void addConfig(SimpleUri configId, FlexibleConfig config) {
+    public void addNewConfig(SimpleUri configId, String description) {
         if (flexibleConfigs.containsKey(configId)) {
             throw new RuntimeException("Attempting to add another config with id " + configId);
         }
 
-        flexibleConfigs.put(configId, config);
+        flexibleConfigs.put(configId, new FlexibleConfigImpl(description));
     }
 
     @Override
