@@ -28,6 +28,8 @@ import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -92,8 +94,8 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     }
 
     @Override
-    public Map<SimpleUri, Setting> getSettings() {
-        return settings;
+    public Collection<Setting> getSettings() {
+        return Collections.unmodifiableCollection(settings.values());
     }
 
     @Override

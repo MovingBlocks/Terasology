@@ -20,7 +20,7 @@ import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * Stores multiple {@link Setting} instances that can be retrieved using their id.
@@ -31,7 +31,7 @@ public interface FlexibleConfig {
      * through a {@link SettingEntry}, which allows you to construct the new
      * {@link Setting} and add it to this {@link FlexibleConfig} once it is constructed.
      *
-     * @param id The id of the {@link Setting} that will be added.
+     * @param id        The id of the {@link Setting} that will be added.
      * @param valueType The type of values that the {@link Setting} will store.
      * @return The {@link SettingEntry} object that can construct a {@link Setting} and
      * then add it to this {@link FlexibleConfig}.
@@ -41,12 +41,13 @@ public interface FlexibleConfig {
     /**
      * Returns the {@link Setting<V>} with the given id. Null is returned if a setting with the given id does not
      * exist in the config.
-     * @param id The id of the {@link Setting} to retrieve.
+     *
+     * @param id  The id of the {@link Setting} to retrieve.
      * @param <V> The type of the value the retrieved {@link Setting} must contain.
      * @return The {@link Setting<V>}, if found in the config. Null if a {@link Setting} with the given id
      * does not exist in the config.
      * @throws ClassCastException when {@link V} does not match the type of the values stored inside the retrieved
-     * {@link Setting}.
+     *                            {@link Setting}.
      */
     <V> Setting<V> get(SimpleUri id);
 
@@ -54,6 +55,7 @@ public interface FlexibleConfig {
      * Removes the {@link Setting} with the given id if it exists in the config and if the {@link Setting} does
      * not have any subscribers. In case of failure warnings will be issued through the logger detailing the
      * exact nature of the failure.
+     *
      * @param id The id of the {@link Setting} to remove.
      * @return True if the {@link Setting} was removed, false otherwise.
      */
@@ -65,11 +67,13 @@ public interface FlexibleConfig {
     boolean contains(SimpleUri id);
 
     /**
-     * Returns a map of all the settings, allowing iteration of all the settings.
+     * Returns an unmodifiable {@link Collection} containing all the settings in
+     * the {@link FlexibleConfig}. The returned collection is automatically updated
+     * whenever a new {@link Setting} is added or removed from the {@link FlexibleConfig}.
      *
-     * @return A map containing all the settings, along with their id.
+     * @return An unmodifiable collection containing all the settings.
      */
-    Map<SimpleUri, Setting> getSettings();
+    Collection<Setting> getSettings();
 
     /**
      * Returns a potentially verbose, human-readable description regarding the purpose of this {@link FlexibleConfig}.
@@ -81,7 +85,7 @@ public interface FlexibleConfig {
      * Saves the values of all settings having non-default values, to enable persistence across sessions.
      * Also saved for documentation purposes is the description of the {@link FlexibleConfig}, as
      * determined by {@link #getDescription()}.
-     *
+     * <p>
      * All the non-default values that were not used in this session and are still "parked" are also
      * saved as-is, to be used later.
      *
@@ -91,12 +95,12 @@ public interface FlexibleConfig {
 
     /**
      * Loads the values of the settings having non-default values, to enable persistence across sessions.
-     *
-     * All the non-default values are loaded and "parked", initially remaining inaccessible. 
-     * Once a Setting object is added to the config, a corresponding non-default value is sought 
+     * <p>
+     * All the non-default values are loaded and "parked", initially remaining inaccessible.
+     * Once a Setting object is added to the config, a corresponding non-default value is sought
      * among the parked values. If one is found it is parsed and stored in the Setting object.
-     *
-     * Note that this function should be called -before- adding any settings to the FlexibleConfig. 
+     * <p>
+     * Note that this function should be called -before- adding any settings to the FlexibleConfig.
      * Otherwise any corresponding parked value will never be loaded.
      *
      * @param reader A reader that will serve as the source of the settings.
@@ -106,7 +110,7 @@ public interface FlexibleConfig {
     /**
      * Represents an under-construction {@link Setting} storing values of type {@link T}
      * which will eventually be added to the {@link FlexibleConfig} that created this object.
-     *
+     * <p>
      * This type follows a state machine-like Builder pattern to make it easier to set the
      * various required and optional components of a {@link Setting}. This interface is the
      * first entry point of the Builder pattern, which allows you to set the required components
