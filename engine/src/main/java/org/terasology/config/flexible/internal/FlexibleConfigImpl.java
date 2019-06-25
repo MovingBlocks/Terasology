@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.internal;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -23,6 +23,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.flexible.FlexibleConfig;
+import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
@@ -35,7 +37,7 @@ import java.util.Map;
 /**
  * {@inheritDoc}
  */
-public class FlexibleConfigImpl implements FlexibleConfig {
+class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final String DESCRIPTION_PROPERTY_NAME = "description";
