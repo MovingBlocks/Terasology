@@ -18,6 +18,7 @@ package org.terasology.config.flexible;
 import com.google.gson.JsonElement;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
+import org.terasology.module.sandbox.API;
 
 import java.beans.PropertyChangeListener;
 
@@ -27,6 +28,7 @@ import java.beans.PropertyChangeListener;
  *
  * @param <T> The type of the value this {@link Setting} contains.
  */
+@API
 public interface Setting<T> {
     /**
      * Returns the id of this {@link Setting}.

@@ -16,11 +16,13 @@
 package org.terasology.config.flexible;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.module.sandbox.API;
 
 /**
  * Stores multiple {@link FlexibleConfig} instances that can be retrieved using their id.
  * Also responsible for coordinating their serialization - to and from - disk.
  */
+@API
 public interface FlexibleConfigManager {
     /**
      * Adds the given {@link FlexibleConfig} to this manager.

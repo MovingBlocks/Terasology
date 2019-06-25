@@ -17,6 +17,7 @@ package org.terasology.config.flexible;
 
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
+import org.terasology.module.sandbox.API;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -25,6 +26,7 @@ import java.util.Collection;
 /**
  * Stores multiple {@link Setting} instances that can be retrieved using their id.
  */
+@API
 public interface FlexibleConfig {
     /**
      * Registers the addition of a new {@link Setting} to this {@link FlexibleConfig}
