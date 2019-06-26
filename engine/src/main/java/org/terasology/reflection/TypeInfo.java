@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
 
 /**
  * Represents the type {@link T}. The type information generated is more comprehensive than {@link Class},
- * and {@link #type} correctly represents {@link T} whether it is generic or a wildcard type.
+ * and {@link #type} correctly represents {@link T} regardless of whether it is generic or a wildcard type.
  *
  * <p>
  * Clients must create a subclass so that the proper {@link Type} can be retrieved at run-time:
