@@ -33,6 +33,7 @@ import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -290,7 +291,7 @@ public final class ReflectionUtil {
      * will be thrown.
      *
      * @param contextType The {@link Type} which contains all type parameter definitions used in {@code type}.
-     * @param type The {@link Type} whose {@link TypeVariable}s are to be resolved.
+     * @param type        The {@link Type} whose {@link TypeVariable}s are to be resolved.
      * @return A copy of {@code type} with all {@link TypeVariable}s resolved.
      */
     public static Type resolveType(Type contextType, Type type) {
@@ -335,22 +336,7 @@ public final class ReflectionUtil {
 
             final Type rawType = parameterizedType.getRawType();
 
-            return new ParameterizedType() {
-                @Override
-                public Type[] getActualTypeArguments() {
-                    return resolvedTypeArguments;
-                }
-
-                @Override
-                public Type getRawType() {
-                    return rawType;
-                }
-
-                @Override
-                public Type getOwnerType() {
-                    return resolvedOwnerType;
-                }
-            };
+            return new ParameterizedTypeImpl(rawType, resolvedTypeArguments, resolvedOwnerType);
         }
 
         // T[] field || List<T>[] field;
@@ -363,13 +349,7 @@ public final class ReflectionUtil {
             if (resolvedComponentType == componentType) {
                 return type;
             } else {
-                return new GenericArrayType() {
-                    final Type genericComponentType = resolvedComponentType;
-                    @Override
-                    public Type getGenericComponentType() {
-                        return genericComponentType;
-                    }
-                };
+                return new GenericArrayTypeImpl(resolvedComponentType);
             }
         }
 
@@ -392,17 +372,7 @@ public final class ReflectionUtil {
                 return wildcardType;
             }
 
-            return new WildcardType() {
-                @Override
-                public Type[] getUpperBounds() {
-                    return resolvedUpperBounds;
-                }
-
-                @Override
-                public Type[] getLowerBounds() {
-                    return resolvedLowerBounds;
-                }
-            };
+            return new WildcardTypeImpl(resolvedUpperBounds, resolvedLowerBounds);
         }
 
         return type;
@@ -487,5 +457,195 @@ public final class ReflectionUtil {
                 // TODO: Reflection - can break with updates to gestalt
                 (ClassLoader) readField(moduleEnvironment, "finalClassLoader")
         };
+    }
+
+    private static class WildcardTypeImpl implements WildcardType {
+        private final Type[] upperBounds;
+        private final Type[] lowerBounds;
+
+        public WildcardTypeImpl(Type[] upperBounds, Type[] lowerBounds) {
+            this.upperBounds = upperBounds;
+            this.lowerBounds = lowerBounds;
+        }
+
+        @Override
+        public Type[] getUpperBounds() {
+            return upperBounds;
+        }
+
+        @Override
+        public Type[] getLowerBounds() {
+            return lowerBounds;
+        }
+
+        public String toString() {
+            Type[] lowerBounds = this.getLowerBounds();
+            Type[] bounds = lowerBounds;
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            if (lowerBounds.length > 0) {
+                stringBuilder.append("? super ");
+            } else {
+                Type[] upperBounds = this.getUpperBounds();
+                if (upperBounds.length <= 0 || upperBounds[0].equals(Object.class)) {
+                    return "?";
+                }
+
+                bounds = upperBounds;
+                stringBuilder.append("? extends ");
+            }
+
+            boolean isFirstBound = true;
+
+            for (Type bound : bounds) {
+                if (!isFirstBound) {
+                    stringBuilder.append(" & ");
+                }
+
+                isFirstBound = false;
+                stringBuilder.append(bound.getTypeName());
+            }
+
+            return stringBuilder.toString();
+        }
+
+        public boolean equals(Object var1) {
+            if (!(var1 instanceof WildcardType)) {
+                return false;
+            } else {
+                WildcardType var2 = (WildcardType) var1;
+                return Arrays.equals(this.getLowerBounds(), var2.getLowerBounds()) && Arrays.equals(this.getUpperBounds(), var2.getUpperBounds());
+            }
+        }
+
+        public int hashCode() {
+            Type[] var1 = this.getLowerBounds();
+            Type[] var2 = this.getUpperBounds();
+            return Arrays.hashCode(var1) ^ Arrays.hashCode(var2);
+        }
+    }
+
+    private static class GenericArrayTypeImpl implements GenericArrayType {
+        private final Type genericComponentType;
+
+        private GenericArrayTypeImpl(Type genericComponentType) {
+            this.genericComponentType = genericComponentType;
+        }
+
+        public Type getGenericComponentType() {
+            return this.genericComponentType;
+        }
+
+        public String toString() {
+            Type genericComponentType = this.getGenericComponentType();
+            StringBuilder stringBuilder = new StringBuilder();
+            if (genericComponentType instanceof Class) {
+                stringBuilder.append(((Class) genericComponentType).getName());
+            } else {
+                stringBuilder.append(genericComponentType.toString());
+            }
+
+            stringBuilder.append("[]");
+            return stringBuilder.toString();
+        }
+
+        public boolean equals(Object var1) {
+            if (var1 instanceof GenericArrayType) {
+                GenericArrayType var2 = (GenericArrayType) var1;
+                return Objects.equals(this.genericComponentType, var2.getGenericComponentType());
+            } else {
+                return false;
+            }
+        }
+
+        public int hashCode() {
+            return Objects.hashCode(this.genericComponentType);
+        }
+    }
+
+    private static class ParameterizedTypeImpl implements ParameterizedType {
+        private final Type[] actualTypeArguments;
+        private final Class<?> rawType;
+        private final Type ownerType;
+
+        private ParameterizedTypeImpl(Type rawType, Type[] actualTypeArguments, Type ownerType) {
+            this.actualTypeArguments = actualTypeArguments;
+            this.rawType = (Class<?>) rawType;
+            this.ownerType = ownerType != null ? ownerType : this.rawType.getDeclaringClass();
+        }
+
+        public Type[] getActualTypeArguments() {
+            return this.actualTypeArguments.clone();
+        }
+
+        public Class<?> getRawType() {
+            return this.rawType;
+        }
+
+        public Type getOwnerType() {
+            return this.ownerType;
+        }
+
+        public boolean equals(Object other) {
+            if (!(other instanceof ParameterizedType)) {
+                return false;
+            }
+
+            ParameterizedType otherParameterizedType = (ParameterizedType) other;
+
+            if (this == otherParameterizedType) {
+                return true;
+            }
+
+            return Objects.equals(this.ownerType, otherParameterizedType.getOwnerType()) &&
+                    Objects.equals(this.rawType, otherParameterizedType.getRawType()) &&
+                    Arrays.equals(this.actualTypeArguments, otherParameterizedType.getActualTypeArguments());
+        }
+
+        public int hashCode() {
+            return Arrays.hashCode(this.actualTypeArguments) ^ Objects.hashCode(this.ownerType) ^ Objects.hashCode(this.rawType);
+        }
+
+        public String toString() {
+            StringBuilder var1 = new StringBuilder();
+            if (this.ownerType != null) {
+                if (this.ownerType instanceof Class) {
+                    var1.append(((Class) this.ownerType).getName());
+                } else {
+                    var1.append(this.ownerType.toString());
+                }
+
+                var1.append("$");
+                if (this.ownerType instanceof ParameterizedTypeImpl) {
+                    var1.append(this.rawType.getName().replace(((ParameterizedTypeImpl) this.ownerType).rawType.getName() + "$", ""));
+                } else {
+                    var1.append(this.rawType.getSimpleName());
+                }
+            } else {
+                var1.append(this.rawType.getName());
+            }
+
+            if (this.actualTypeArguments != null && this.actualTypeArguments.length > 0) {
+                var1.append("<");
+                boolean var2 = true;
+                Type[] var3 = this.actualTypeArguments;
+                int var4 = var3.length;
+
+                for (int var5 = 0; var5 < var4; ++var5) {
+                    Type var6 = var3[var5];
+                    if (!var2) {
+                        var1.append(", ");
+                    }
+
+                    var1.append(var6.getTypeName());
+                    var2 = false;
+                }
+
+                var1.append(">");
+            }
+
+            return var1.toString();
+        }
     }
 }
