@@ -28,6 +28,7 @@ public final class ExternalApiWhitelist {
             // TODO: This one org.terasology entry is a hack and needs a proper fix
             .add("org.terasology.math.geom")
             .add("java.lang")
+            .add("java.beans")
             .add("java.lang.invoke")
             .add("java.lang.ref")
             .add("java.math")
