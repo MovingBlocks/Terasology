@@ -29,6 +29,7 @@ public final class ExternalApiWhitelist {
             .add("org.terasology.world.biomes")
             .add("org.terasology.math.geom")
             .add("java.lang")
+            .add("java.beans")
             .add("java.lang.invoke")
             .add("java.lang.ref")
             .add("java.math")
