@@ -78,10 +78,8 @@ public final class EnvironmentSwitchHandler {
             }
         }
 
-        ReflectFactory reflectFactory = context.get(ReflectFactory.class);
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.createDefaultLibrary();
+        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
         typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
-        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         // Entity System Library
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);

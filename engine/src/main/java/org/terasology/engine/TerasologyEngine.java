@@ -315,7 +315,7 @@ public class TerasologyEngine implements GameEngine {
 
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         rootContext.put(CopyStrategyLibrary.class, copyStrategyLibrary);
-        rootContext.put(TypeHandlerLibrary.class, new TypeHandlerLibrary());
+        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibrary.createDefaultLibrary());
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
         assetTypeManager = new ModuleAwareAssetTypeManager();
