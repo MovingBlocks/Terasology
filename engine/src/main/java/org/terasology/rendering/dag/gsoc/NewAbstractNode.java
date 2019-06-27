@@ -320,7 +320,7 @@ public abstract class NewAbstractNode implements NewNode {
         boolean isDependent = false;
         for (DependencyConnection connection: inputConnections.values()) {
             if (connection.getConnectedConnection() != null) {
-                if (connection.getConnectedConnection().getParentNode().equals(anotherNode)) {
+                if (connection.getConnectedConnection().getParentNode().equals(anotherNode.getUri())) {
                     return true;
                 }
             }
