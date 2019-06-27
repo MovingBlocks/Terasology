@@ -22,34 +22,34 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.dag.api.RenderDagApiInterface;
+import org.terasology.rendering.dag.api.RenderDagApi;
 
 /**
  * <p>
- * Singleton class which is used by modules trough {@link RenderDagApiInterface} obtained from {@link Context}.
+ * Singleton class which is used by modules trough {@link RenderDagApi} obtained from {@link Context}.
  * </p>
  * <p>
  * Implements basic operations over DAG and dependency passing.
  * </p>
  */
-public final class RenderDagApi implements RenderDagApiInterface {
-    private static final Logger logger = LoggerFactory.getLogger(RenderDagApi.class);
+public final class RenderDagApiImpl implements RenderDagApi {
+    private static final Logger logger = LoggerFactory.getLogger(RenderDagApiImpl.class);
 
-    private static RenderDagApi singleInstance;
+    private static RenderDagApiImpl singleInstance;
 
     private RenderGraph renderGraph;
     private Context context;
     private ShaderManager shaderManager;
 
-    private RenderDagApi(RenderGraph renderGraph, ShaderManager shaderManager, Context context) {
+    private RenderDagApiImpl(RenderGraph renderGraph, ShaderManager shaderManager, Context context) {
         this.renderGraph = renderGraph;
         this.context = context;
         this.shaderManager = shaderManager;
     }
 
-    public static RenderDagApi getRenderDagApi(RenderGraph renderGraph, ShaderManager shaderManager, Context context) {
+    public static RenderDagApiImpl getRenderDagApi(RenderGraph renderGraph, ShaderManager shaderManager, Context context) {
         if (singleInstance == null) {
-            singleInstance = new RenderDagApi(renderGraph, shaderManager, context);
+            singleInstance = new RenderDagApiImpl(renderGraph, shaderManager, context);
         }
         return singleInstance;
     }
