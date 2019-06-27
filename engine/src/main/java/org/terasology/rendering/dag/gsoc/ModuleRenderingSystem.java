@@ -20,19 +20,19 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
-import org.terasology.rendering.dag.api.RenderDagApiInterface;
+import org.terasology.rendering.dag.RenderGraph;
 
 public abstract class ModuleRenderingSystem extends BaseComponentSystem {
 
     @In
     protected Context context;
     protected Name providingModule;
-    protected RenderDagApiInterface renderDagApi;
+    protected RenderGraph renderGraph;
 
     @Override
     public void initialise() {
         super.initialise();
-        renderDagApi = context.get(RenderDagApiInterface.class);
+        renderGraph = context.get(RenderGraph.class);
 
         /* Class implementingClass;
         ModuleManager moduleManager = context.get(ModuleManager.class);

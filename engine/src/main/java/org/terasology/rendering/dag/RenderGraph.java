@@ -27,6 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.naming.Name;
+import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.dag.gsoc.DependencyConnection;
 import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.gsoc.NewNode;
 
@@ -39,11 +42,13 @@ public class RenderGraph {
     private Map<SimpleUri, NewNode> nodeMap;
     private MutableGraph<NewNode> graph;
     private Context context;
+    private ShaderManager shaderManager;
 
     public RenderGraph(Context context) {
         nodeMap = Maps.newHashMap();
         graph = GraphBuilder.directed().build();
         this.context = context;
+        this.shaderManager = context.get(ShaderManager.class);
     }
 
     public void addNode(NewNode node) {
@@ -185,6 +190,136 @@ public class RenderGraph {
             node.dispose();
         }
         nodeMap.clear();
+    }
+
+    public void resetDesiredStateChanges(NewNode node) {
+        node.resetDesiredStateChanges();
+    }
+
+    public void resetDesiredStateChanges(String nodeUri) {
+        resetDesiredStateChanges(findNode(new SimpleUri(nodeUri)));
+    }
+
+    public void addShader(String title, Name moduleName) {
+        shaderManager.addShaderProgram(title, moduleName.toString());
+    }
+
+    /**
+     * Connect Fbo output of fromNode to toNode's Fbo input.
+     * @param toNode Input node
+     * @param inputId Number/id of input
+     * @param fromNode Output node
+     * @param outputId Number/id of output
+     */
+    public void connectFbo(NewNode toNode, int inputId, NewNode fromNode, int outputId) {
+        toNode.connectFbo(inputId, fromNode.getOutputFboConnection(outputId));
+        if (!areConnected(toNode, fromNode)) {
+            connect(toNode, fromNode);
+        }
+    }
+
+    /**
+     * Connect Fbo output of fromNode to toNode's Fbo input.
+     * @param toNode Input node
+     * @param inputId Number/id of input
+     * @param fromNodeUri Output node's Uri (already added to graph)
+     * @param outputId Number/id of output
+     */
+    public void connectFbo(NewNode toNode, int inputId, String fromNodeUri, int outputId) {
+        NewNode fromNode = findNode(new SimpleUri(fromNodeUri));
+        connectFbo(toNode, inputId, fromNode, outputId);
+    }
+
+    public void disconnectOutputFbo(String nodeUri, int connectionId) {
+        logger.info("Attempting disconnection of " + nodeUri + "'s output fbo number " + connectionId + "..");
+        NewNode node = findNode(new SimpleUri(nodeUri));
+        if (node != null) {
+            DependencyConnection outputConnection = node.getOutputFboConnection(connectionId);
+            if (outputConnection != null) {
+                outputConnection.disconnect();
+                logger.info("..disconnecting complete.");
+            } else {
+                logger.warn("Could not find output Fbo connection number " + connectionId + "within " + nodeUri + ".");
+            }
+        } else {
+            throw new RuntimeException("Could not find node named " + nodeUri + " within renderGraph.");
+        }
+        //TODO disconnect from rendergraph if needed
+    }
+
+    public void disconnectInputFbo(String nodeUri, int connectionId) {
+        logger.info("Attempting disconnection of " + nodeUri + "'s input fbo number " + connectionId);
+        NewNode node = findNode(new SimpleUri(nodeUri));
+        if (node != null) {
+            DependencyConnection inputConnection = node.getInputFboConnection(connectionId);
+            if (inputConnection != null) {
+                inputConnection.disconnect();
+                logger.info("..disconnecting complete.");
+            } else {
+                logger.warn("Could not find input Fbo connection number " + connectionId + "within " + nodeUri + ".");
+            }
+        } else {
+            throw new RuntimeException("Could not find node named " + nodeUri + " within renderGraph.");
+        }
+        //TODO disconnect from rendergraph if needed
+    }
+
+    // TODO generic type all the way, reusability
+
+    /**
+     * API for reconnecting input FBO dependency.
+     *
+     * Expects 2 existing nodes and an existing output connection on fromNode. Output connection must be created explicitly
+     * beforehand or simply exist already.
+     *
+     * If previous requirements are met, attempts to connectFbo or reconnect toNode's (toNodeUri) input (inputId)
+     * to fromNode's (fromNodeUri) output (outputId).
+     * @param toNodeUri toNode's SimpleUri name. Node must exist in the renderGraph.
+     * @param inputId Id of toNode's input. Input does NOT have to exist beforehand.
+     * @param fromNodeUri fromNode's SimpleUri name. Node must exist in the renderGraph.
+     * @param outputId Id of fromNode's output. Output must exist.
+     */
+    public void reconnectInputFboToOutput(String toNodeUri, int inputId, String fromNodeUri, int outputId) {
+        NewNode toNode = findNode(new SimpleUri(toNodeUri));
+        NewNode fromNode = findNode(new SimpleUri(fromNodeUri));
+        reconnectInputFboToOutput(toNode, inputId, fromNode, outputId);
+    }
+
+    public void reconnectInputFboToOutput(NewNode toNode, int inputId, String fromNodeUri, int outputId) {
+        NewNode fromNode = findNode(new SimpleUri(fromNodeUri));
+        reconnectInputFboToOutput(toNode, inputId, fromNode, outputId);
+    }
+
+    /**
+     * API for reconnecting input FBO dependency.
+     *
+     * Expects 2 existing nodes and an existing output connection on fromNode. Output connection must be created explicitly
+     * beforehand or simply exist already.
+     *
+     * If previous requirements are met, attempts to connectFbo or reconnect toNode's (toNodeUri) input (inputId)
+     * to fromNode's (fromNodeUri) output (outputId).
+     * @param toNode toNode's SimpleUri name. Node must exist in the renderGraph.
+     * @param inputId Id of toNode's input. Input does NOT have to exist beforehand.
+     * @param fromNode fromNode's SimpleUri name. Node must exist in the renderGraph.
+     * @param outputId Id of fromNode's output. Output must exist.
+     */
+    public void reconnectInputFboToOutput(NewNode toNode, int inputId, NewNode fromNode, int outputId) {
+        // Would use of Preconditions be clearer?
+        if (toNode == null || fromNode == null) {
+            throw new RuntimeException("Reconnecting FBO dependency failed. One of the nodes not found in the renderGraph."
+                    + "\n toNode: " + toNode + ". fromNode: " + fromNode);
+        }
+        DependencyConnection fromConnection = fromNode.getOutputFboConnection(outputId);
+        if (fromConnection == null) {
+            throw new RuntimeException("Reconnecting FBO dependency failed. Could not find output connection.");
+        }
+        // TODO REMOVE RENDERGRAPH CONNECTION if needed
+
+        toNode.reconnectInputFboToOutput(inputId, fromNode, fromConnection);
+
+        if (!areConnected(toNode, fromNode)) {
+            connect(fromNode, toNode);
+        }
     }
 
 }

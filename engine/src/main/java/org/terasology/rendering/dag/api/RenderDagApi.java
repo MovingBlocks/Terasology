@@ -19,7 +19,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
 import org.terasology.rendering.dag.gsoc.NewNode;
 
-public interface RenderDagApiInterface {
+public interface RenderDagApi {
 
     public NewNode findNode(SimpleUri nodeUri);
 
