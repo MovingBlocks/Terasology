@@ -84,7 +84,17 @@ class FlexibleConfigImpl implements FlexibleConfig {
     @Override
     @SuppressWarnings("unchecked")
     public <V> Setting<V> get(SimpleUri id, Class<V> valueType) {
-        return (Setting<V>) settings.get(id);
+        Setting setting = settings.get(id);
+        Class settingValueClass = setting.getValueClass();
+
+        if (!settingValueClass.equals(valueType)) {
+            throw new ClassCastException(
+                    "Expected a Setting of type " + valueType.getName() +
+                    ", found a Setting of type " + settingValueClass.getName()
+            );
+        }
+
+        return (Setting<V>) setting;
     }
 
     /**
