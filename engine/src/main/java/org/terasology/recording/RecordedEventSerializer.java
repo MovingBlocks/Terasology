@@ -57,7 +57,7 @@ class RecordedEventSerializer {
         ClassLoader[] classLoaders = ReflectionUtil.getComprehensiveEngineClassLoaders(moduleEnvironment);
 
         this.recordedEventListTypeHandler = typeHandlerLibrary.getTypeHandler(
-                new TypeInfo<List<RecordedEvent>>() {}, classLoaders).get();
+                new TypeInfo<List<RecordedEvent>>() {}).get();
     }
 
     /**

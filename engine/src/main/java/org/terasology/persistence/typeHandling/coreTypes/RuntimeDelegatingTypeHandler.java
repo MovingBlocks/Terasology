@@ -16,6 +16,7 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Maps;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
@@ -48,13 +49,13 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     private TypeHandler<T> delegateHandler;
     private TypeInfo<T> typeInfo;
     private TypeHandlerLibrary typeHandlerLibrary;
-    private ClassLoader[] classLoaders;
+    private Reflections reflections;
 
     public RuntimeDelegatingTypeHandler(TypeHandler<T> delegateHandler, TypeInfo<T> typeInfo, TypeHandlerContext context) {
         this.delegateHandler = delegateHandler;
         this.typeInfo = typeInfo;
         this.typeHandlerLibrary = context.getTypeHandlerLibrary();
-        this.classLoaders = context.getClassLoaders();
+        this.reflections = context.getReflections();
     }
 
     @Override
@@ -73,7 +74,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         Class<?> runtimeClass = getRuntimeTypeIfMoreSpecific(typeInfo, value);
 
         if (!typeInfo.getRawType().equals(runtimeClass)) {
-            Optional<TypeHandler<?>> runtimeTypeHandler = typeHandlerLibrary.getTypeHandler((Type) runtimeClass, classLoaders);
+            Optional<TypeHandler<?>> runtimeTypeHandler = typeHandlerLibrary.getTypeHandler((Type) runtimeClass);
 
             chosenHandler = (TypeHandler<T>) runtimeTypeHandler
                     .map(typeHandler -> {
@@ -153,7 +154,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         String runtimeTypeName = valueMap.getAsString(TYPE_FIELD);
 
-        Optional<Class<?>> typeToDeserializeAs = ReflectionUtil.findClassInClassLoaders(runtimeTypeName, classLoaders);
+        Optional<Class<?>> typeToDeserializeAs = findSubtypeWithName(runtimeTypeName);
 
         if (!typeToDeserializeAs.isPresent()) {
             LOGGER.error("Cannot find class to deserialize {}", runtimeTypeName);
@@ -161,11 +162,12 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         }
 
         if (!typeInfo.getRawType().isAssignableFrom(typeToDeserializeAs.get())) {
-            LOGGER.error("Given type {} is not a sub-type of expected type {}", typeToDeserializeAs.get(), typeInfo.getType());
+            LOGGER.error("Given type {} is not a sub-type of expected type {}",
+                    typeToDeserializeAs.get(), typeInfo.getType());
             return Optional.empty();
         }
 
-        TypeHandler<T> runtimeTypeHandler = (TypeHandler<T>) typeHandlerLibrary.getTypeHandler(typeToDeserializeAs.get(), classLoaders)
+        TypeHandler<T> runtimeTypeHandler = (TypeHandler<T>) typeHandlerLibrary.getTypeHandler(typeToDeserializeAs.get())
                 // To avoid compile errors in the orElseGet
                 .map(typeHandler -> (TypeHandler) typeHandler)
                 .orElseGet(() -> {
@@ -179,6 +181,17 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         return runtimeTypeHandler.deserialize(valueData);
 
+    }
+
+    private Optional<Class<?>> findSubtypeWithName(String runtimeTypeName) {
+        for (Class<?> clazz : reflections.getSubTypesOf(typeInfo.getRawType())) {
+            if (runtimeTypeName.equals(clazz.getSimpleName()) ||
+                    runtimeTypeName.equals(clazz.getName())) {
+                return Optional.of(clazz);
+            }
+        }
+
+        return Optional.empty();
     }
 
 }

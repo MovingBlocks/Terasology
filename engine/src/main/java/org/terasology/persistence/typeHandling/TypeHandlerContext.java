@@ -15,10 +15,10 @@
  */
 package org.terasology.persistence.typeHandling;
 
+import org.reflections.Reflections;
 import org.terasology.reflection.TypeInfo;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -29,20 +29,11 @@ import java.util.Optional;
  */
 public class TypeHandlerContext {
     private TypeHandlerLibrary typeHandlerLibrary;
-    private ClassLoader[] classLoaders;
+    private Reflections reflections;
 
-    public TypeHandlerContext(TypeHandlerLibrary typeHandlerLibrary, Class<?>... classes) {
-        this(
-                typeHandlerLibrary,
-                Arrays.stream(classes)
-                        .map(Class::getClassLoader)
-                        .toArray(ClassLoader[]::new)
-        );
-    }
-
-    public TypeHandlerContext(TypeHandlerLibrary typeHandlerLibrary, ClassLoader... classLoaders) {
+    public TypeHandlerContext(TypeHandlerLibrary typeHandlerLibrary, Reflections reflections) {
         this.typeHandlerLibrary = typeHandlerLibrary;
-        this.classLoaders = classLoaders;
+        this.reflections = reflections;
     }
 
     /**
@@ -53,34 +44,10 @@ public class TypeHandlerContext {
     }
 
     /**
-     * Returns the {@link ClassLoader}s to use to load classes in the
+     * Returns the {@link Reflections} to use to load classes in the
      * {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerContext)} method.
-     * <p>
-     * If classes are loaded manually using a method like {@link Class#forName(String)}, these
-     * {@link ClassLoader}s must be used so that modules remain sandboxed.
      */
-    public ClassLoader[] getClassLoaders() {
-        return classLoaders;
-    }
-
-    /**
-     * Retrieve the {@link TypeHandler} for the given type in the current context.
-     */
-    public Optional<TypeHandler<?>> getTypeHandler(Type elementType) {
-        return typeHandlerLibrary.getTypeHandler(elementType, classLoaders);
-    }
-
-    /**
-     * Retrieve the {@link TypeHandler} for the given type in the current context.
-     */
-    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> elementType) {
-        return typeHandlerLibrary.getTypeHandler(elementType, classLoaders);
-    }
-
-    /**
-     * Retrieve the {@link TypeHandler} for the given type in the current context.
-     */
-    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> elementType) {
-        return typeHandlerLibrary.getTypeHandler(elementType, classLoaders);
+    public Reflections getReflections() {
+        return reflections;
     }
 }

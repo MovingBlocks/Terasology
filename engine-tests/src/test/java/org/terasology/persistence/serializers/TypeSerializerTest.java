@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.reflections.Reflections;
-import org.reflections.util.ConfigurationBuilder;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -51,9 +50,7 @@ public class TypeSerializerTest {
     public static class Json {
         private static final String INSTANCE_JSON = "{\"data\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"content\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"content\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
 
-        final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                .addClassLoader(getClass().getClassLoader());
-        final Reflections reflections = new Reflections(configurationBuilder);
+        final Reflections reflections = new Reflections(getClass().getClassLoader());
 
         private final TypeHandlerLibrary typeHandlerLibrary =
                 TypeHandlerLibrary.withDefaultHandlers(reflections);
@@ -62,7 +59,7 @@ public class TypeSerializerTest {
         public void testJsonSerialize() {
             GsonSerializer gsonSerializer = new GsonSerializer();
 
-            TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, TypeSerializerTest.class).get();
+            TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
 
             assertEquals(INSTANCE_JSON, gsonSerializer.toJson(INSTANCE, typeHandler));
         }
@@ -72,7 +69,7 @@ public class TypeSerializerTest {
             GsonSerializer gsonSerializer = new GsonSerializer();
             PersistedData persistedData = gsonSerializer.persistedDataFromJson(INSTANCE_JSON);
 
-            TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, getClass().getClassLoader()).get();
+            TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
 
             SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData).get();
 
@@ -81,15 +78,13 @@ public class TypeSerializerTest {
     }
 
     public static class Protobuf {
-        final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                .addClassLoader(getClass().getClassLoader());
-        final Reflections reflections = new Reflections(configurationBuilder);
+        final Reflections reflections = new Reflections(getClass().getClassLoader());
 
         private final TypeHandlerLibrary typeHandlerLibrary =
                 TypeHandlerLibrary.withDefaultHandlers(reflections);
         @Test
         public void testSerializeDeserialize() throws IOException {
-            TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, getClass().getClassLoader()).get();
+            TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
 
             ProtobufSerializer protobufSerializer = new ProtobufSerializer();
 

@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.reflections.Reflections;
-import org.reflections.util.ConfigurationBuilder;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -44,9 +43,7 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -68,9 +65,7 @@ public class ComponentSerializerTest {
         context.put(ModuleManager.class, moduleManager);
         CoreRegistry.setContext(context);
 
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                .addClassLoader(getClass().getClassLoader());
-        Reflections reflections = new Reflections(configurationBuilder);
+        Reflections reflections = new Reflections(getClass().getClassLoader());
         TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
 
         serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());

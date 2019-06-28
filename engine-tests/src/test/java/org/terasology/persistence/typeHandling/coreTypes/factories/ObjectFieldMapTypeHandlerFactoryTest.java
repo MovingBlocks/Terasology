@@ -17,6 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import com.google.common.collect.Maps;
 import org.junit.Test;
+import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -41,7 +42,7 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
             constructorLibrary);
 
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeHandlerLibrary, getClass().getClassLoader());
+            new TypeHandlerContext(typeHandlerLibrary, mock(Reflections.class));
 
     private static class SomeClass<T> {
         private T t;
@@ -57,12 +58,8 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof ObjectFieldMapTypeHandler);
 
         // Verify that the Integer and List<Integer> TypeHandlers were loaded from the TypeHandlerLibrary
-        verify(typeHandlerLibrary).getTypeHandler(
-                eq(TypeInfo.of(Integer.class).getType()),
-                (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()));
 
-        verify(typeHandlerLibrary).getTypeHandler(
-                eq(new TypeInfo<List<Integer>>() {}.getType()),
-                (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(eq(new TypeInfo<List<Integer>>() {}.getType()));
     }
 }

@@ -434,17 +434,6 @@ public final class ReflectionUtil {
                 "Cannot find field " + cls.getName() + "." + fieldName);
     }
 
-    public static Optional<Class<?>> findClassInClassLoaders(String className, ClassLoader... classLoaders) {
-        for (ClassLoader classLoader : classLoaders) {
-            try {
-                return Optional.of(Class.forName(className, true, classLoader));
-            } catch (ClassNotFoundException ignored) {
-            }
-        }
-
-        return Optional.empty();
-    }
-
     /**
      * Returns a list of {@link ClassLoader}s which have access to <i>all</i> engine and loaded module
      * classes. This function must NOT be accessible to modules.

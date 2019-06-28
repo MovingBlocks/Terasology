@@ -36,17 +36,18 @@ public class Rect2iTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        Optional<TypeHandler<Vector2i>> vector2iTypeHandler = context.getTypeHandler(Vector2i.class);
+        Optional<TypeHandler<Vector2i>> vector2iTypeHandler =
+                context.getTypeHandlerLibrary().getTypeHandler(Vector2i.class);
 
         if (!vector2iTypeHandler.isPresent()) {
             LOGGER.error("No Vector2i type handler found");
             return Optional.empty();
         }
 
-        Rect2iTypeHandler rect2fTypeHandler =
+        Rect2iTypeHandler rect2iTypeHandler =
                 new Rect2iTypeHandler(vector2iTypeHandler.get());
 
-        return Optional.of((TypeHandler<T>) rect2fTypeHandler);
+        return Optional.of((TypeHandler<T>) rect2iTypeHandler);
 
     }
 }

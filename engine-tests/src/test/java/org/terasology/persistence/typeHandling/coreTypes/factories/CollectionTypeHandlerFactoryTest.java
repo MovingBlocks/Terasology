@@ -17,6 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import com.google.common.collect.Maps;
 import org.junit.Test;
+import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -41,7 +42,7 @@ public class CollectionTypeHandlerFactoryTest {
     private final CollectionTypeHandlerFactory typeHandlerFactory = new CollectionTypeHandlerFactory(new ConstructorLibrary(Maps.newHashMap()));
 
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeHandlerLibrary, getClass().getClassLoader());
+            new TypeHandlerContext(typeHandlerLibrary, mock(Reflections.class));
 
     @Test
     public void testList() {
@@ -54,7 +55,7 @@ public class CollectionTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof CollectionTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
-        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()));
     }
 
     @Test
@@ -68,7 +69,7 @@ public class CollectionTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof CollectionTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
-        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()));
     }
 
     @Test
@@ -82,7 +83,7 @@ public class CollectionTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof CollectionTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
-        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()));
     }
 
     @Test
@@ -96,6 +97,6 @@ public class CollectionTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof CollectionTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
-        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()));
     }
 }

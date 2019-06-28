@@ -20,6 +20,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.persistence.typeHandling.*;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
@@ -46,7 +48,7 @@ public class RuntimeDelegatingTypeHandlerTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
 
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeHandlerLibrary, getClass().getClassLoader());
+            new TypeHandlerContext(typeHandlerLibrary, new Reflections(getClass().getClassLoader()));
 
     private static class Base {
         int x;
@@ -70,10 +72,10 @@ public class RuntimeDelegatingTypeHandlerTest {
         TypeHandler baseTypeHandler = mock(TypeHandler.class);
         TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);
 
-        when(typeHandlerLibrary.getTypeHandler(eq(baseType), (ClassLoader) any()))
+        when(typeHandlerLibrary.getTypeHandler(eq(baseType)))
                 .thenReturn(Optional.of(baseTypeHandler));
 
-        when(typeHandlerLibrary.getTypeHandler(eq((Type) subType), (ClassLoader) any()))
+        when(typeHandlerLibrary.getTypeHandler(eq((Type) subType)))
                 .thenReturn(Optional.of(subTypeHandler));
 
         TypeHandler<List<Base>> listTypeHandler =
@@ -82,15 +84,17 @@ public class RuntimeDelegatingTypeHandlerTest {
         ArrayList<Base> bases = Lists.newArrayList(new Sub(), new Base(), new Sub(), new Base(), new Sub());
         listTypeHandler.serialize(bases, serializer);
 
-        verify(typeHandlerLibrary).getTypeHandler(eq(baseType), (ClassLoader) any());
-        verify(typeHandlerLibrary, times(3)).getTypeHandler(eq((Type) subType), (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(eq(baseType));
+        verify(typeHandlerLibrary, times(3)).getTypeHandler(eq((Type) subType));
 
         verify(baseTypeHandler, times(2)).serialize(any(), any());
         verify(subTypeHandler, times(3)).serialize(any(), any());
 
         verify(serializer, times(3)).serialize(
                 argThat((ArgumentMatcher<Map<String, PersistedData>>) argument ->
-                        argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD).getAsString().equals(subType.getName()) &&
+                        argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD)
+                                .getAsString()
+                                .equals(subType.getName()) &&
                                 argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD))
         );
     }
@@ -105,10 +109,10 @@ public class RuntimeDelegatingTypeHandlerTest {
         TypeHandler baseTypeHandler = mock(TypeHandler.class);
         TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);
 
-        when(typeHandlerLibrary.getTypeHandler(eq(baseType), (ClassLoader) any()))
+        when(typeHandlerLibrary.getTypeHandler(eq(baseType)))
                 .thenReturn(Optional.of(baseTypeHandler));
 
-        when(typeHandlerLibrary.getTypeHandler(eq(subType), (ClassLoader) any()))
+        when(typeHandlerLibrary.getTypeHandler(eq(subType)))
                 .thenReturn(Optional.of(subTypeHandler));
 
         TypeHandler<List<Base>> listTypeHandler = collectionHandlerFactory.create(
@@ -135,8 +139,8 @@ public class RuntimeDelegatingTypeHandlerTest {
 
         listTypeHandler.deserialize(persistedBases);
 
-        verify(typeHandlerLibrary).getTypeHandler(eq(baseType), (ClassLoader) any());
-        verify(typeHandlerLibrary, times(3)).getTypeHandler(eq(subType), (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(eq(baseType));
+        verify(typeHandlerLibrary, times(3)).getTypeHandler(eq(subType));
 
         verify(baseTypeHandler, times(2)).deserialize(any());
         verify(subTypeHandler, times(3)).deserialize(any());

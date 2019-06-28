@@ -20,21 +20,24 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.reflections.Reflections;
-import org.reflections.util.ConfigurationBuilder;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.both;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class FutureTypeHandlerTest {
-    private final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-            .addClassLoader(getClass().getClassLoader());
-    private final Reflections reflections = new Reflections(configurationBuilder);
+    private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
     private final TypeHandlerLibrary typeHandlerLibrary =
             spy(TypeHandlerLibrary.withDefaultHandlers(reflections));
@@ -68,17 +71,16 @@ public class FutureTypeHandlerTest {
         ResultCaptor<Optional<TypeHandler<RecursiveType<Integer>>>> resultCaptor = new ResultCaptor<>();
 
         doAnswer(resultCaptor).when(typeHandlerLibrary).getTypeHandler(
-                eq(new TypeInfo<RecursiveType<Integer>>() {}.getType()), (ClassLoader) any()
+                eq(new TypeInfo<RecursiveType<Integer>>() {}.getType())
         );
 
         TypeHandler<RecursiveType<Integer>> typeHandler =
                 typeHandlerLibrary.getTypeHandler(
-                        new TypeInfo<RecursiveType<Integer>>() {},
-                        FutureTypeHandlerTest.class
+                        new TypeInfo<RecursiveType<Integer>>() {}
                 ).get();
         
         verify(typeHandlerLibrary, times(1)).getTypeHandler(
-                eq(new TypeInfo<RecursiveType<Integer>>() {}.getType()), (ClassLoader) any()
+                eq(new TypeInfo<RecursiveType<Integer>>() {}.getType())
         );
 
         assertThat(resultCaptor.getResult().get(),

@@ -17,6 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
+import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -38,7 +39,7 @@ public class StringMapTypeHandlerFactoryTest {
     private final StringMapTypeHandlerFactory typeHandlerFactory = new StringMapTypeHandlerFactory();
 
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeHandlerLibrary, getClass().getClassLoader());
+            new TypeHandlerContext(typeHandlerLibrary, mock(Reflections.class));
 
     @Test
     public void testStringMap() {
@@ -51,7 +52,7 @@ public class StringMapTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof StringMapTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
-        verify(typeHandlerLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
     }
 
     @Test
@@ -75,6 +76,6 @@ public class StringMapTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof StringMapTypeHandler);
 
         // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
-        verify(typeHandlerLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()), (ClassLoader) any());
+        verify(typeHandlerLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
     }
 }

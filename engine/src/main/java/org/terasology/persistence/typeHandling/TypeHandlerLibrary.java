@@ -105,7 +105,6 @@ public class TypeHandlerLibrary {
     private Map<ClassMetadata<?, ?>, Serializer> serializerMap = Maps.newHashMap();
 
     /**
-     *
      * @param reflections
      */
     public TypeHandlerLibrary(Reflections reflections) {
@@ -269,38 +268,15 @@ public class TypeHandlerLibrary {
      * requested first, hence a {@link TypeHandlerFactory} can override one that was added
      * before it.
      *
-     * @param type           The {@link Type} describing the type for which to
-     *                       retrieve the {@link TypeHandler}.
-     * @param contextClasses The {@link Class}(es) that the caller has access to. Used to obtain
-     *                       {@link ClassLoader}(s) that the caller has access to.
+     * @param type The {@link Type} describing the type for which to
+     *             retrieve the {@link TypeHandler}.
      * @return The {@link TypeHandler} for the specified type, if available.
      */
     @SuppressWarnings({"unchecked"})
-    public Optional<TypeHandler<?>> getTypeHandler(Type type, Class<?>... contextClasses) {
-        return getTypeHandler(type, Arrays.stream(contextClasses)
-                .map(Class::getClassLoader)
-                .toArray(ClassLoader[]::new));
-    }
-
-    /**
-     * Retrieves the {@link TypeHandler} for the specified type, if available.
-     * <p>
-     * Each {@link TypeHandlerFactory} added to this {@link TypeHandlerLibrary} is requested
-     * to generate a {@link TypeHandler} for the given type. Most recently added factories are
-     * requested first, hence a {@link TypeHandlerFactory} can override one that was added
-     * before it.
-     *
-     * @param type                The {@link Type} describing the type for which to
-     *                            retrieve the {@link TypeHandler}.
-     * @param contextClassLoaders The {@link ClassLoader}(s) that the caller has access to.
-     * @return The {@link TypeHandler} for the specified type, if available.
-     */
-    @SuppressWarnings({"unchecked"})
-    public Optional<TypeHandler<?>> getTypeHandler(Type type, ClassLoader... contextClassLoaders) {
+    public Optional<TypeHandler<?>> getTypeHandler(Type type) {
         TypeInfo typeInfo = TypeInfo.of(type);
-        return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo, contextClassLoaders);
+        return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo);
     }
-
 
     /**
      * Retrieves the {@link TypeHandler} for the specified type, if available.
@@ -310,17 +286,13 @@ public class TypeHandlerLibrary {
      * requested first, hence a {@link TypeHandlerFactory} can override one that was added
      * before it.
      *
-     * @param typeClass      The {@link Class} of the type for which to
-     *                       retrieve the {@link TypeHandler}.
-     * @param contextClasses The {@link Class}(es) that the caller has access to. Used to obtain
-     *                       {@link ClassLoader}(s) that the caller has access to.
-     * @param <T>            The type for which to retrieve the {@link TypeHandler}.
+     * @param typeClass The {@link Class} of the type for which to
+     *                  retrieve the {@link TypeHandler}.
+     * @param <T>       The type for which to retrieve the {@link TypeHandler}.
      * @return The {@link TypeHandler} for the specified type, if available.
      */
-    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass, Class<?>... contextClasses) {
-        return getTypeHandler(typeClass, Arrays.stream(contextClasses)
-                .map(Class::getClassLoader)
-                .toArray(ClassLoader[]::new));
+    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass) {
+        return getTypeHandler(TypeInfo.of(typeClass));
     }
 
     /**
@@ -331,55 +303,14 @@ public class TypeHandlerLibrary {
      * requested first, hence a {@link TypeHandlerFactory} can override one that was added
      * before it.
      *
-     * @param typeClass           The {@link Class} of the type for which to
-     *                            retrieve the {@link TypeHandler}.
-     * @param contextClassLoaders The {@link ClassLoader}(s) that the caller has access to.
-     * @param <T>                 The type for which to retrieve the {@link TypeHandler}.
-     * @return The {@link TypeHandler} for the specified type, if available.
-     */
-    public <T> Optional<TypeHandler<T>> getTypeHandler(Class<T> typeClass, ClassLoader... contextClassLoaders) {
-        return getTypeHandler(TypeInfo.of(typeClass), contextClassLoaders);
-    }
-
-    /**
-     * Retrieves the {@link TypeHandler} for the specified type, if available.
-     * <p>
-     * Each {@link TypeHandlerFactory} added to this {@link TypeHandlerLibrary} is requested
-     * to generate a {@link TypeHandler} for the given type. Most recently added factories are
-     * requested first, hence a {@link TypeHandlerFactory} can override one that was added
-     * before it.
-     *
-     * @param type           The {@link TypeInfo} describing the type for which to
-     *                       retrieve the {@link TypeHandler}.
-     * @param contextClasses The {@link Class}(es) that the caller has access to. Used to obtain
-     *                       {@link ClassLoader}(s) that the caller has access to.
-     * @param <T>            The type for which to retrieve the {@link TypeHandler}.
+     * @param type The {@link TypeInfo} describing the type for which to
+     *             retrieve the {@link TypeHandler}.
+     * @param <T>  The type for which to retrieve the {@link TypeHandler}.
      * @return The {@link TypeHandler} for the specified type, if available.
      */
     @SuppressWarnings("unchecked")
-    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type, Class<?>... contextClasses) {
-        return getTypeHandler(type, Arrays.stream(contextClasses)
-                .map(Class::getClassLoader)
-                .toArray(ClassLoader[]::new));
-    }
-
-    /**
-     * Retrieves the {@link TypeHandler} for the specified type, if available.
-     * <p>
-     * Each {@link TypeHandlerFactory} added to this {@link TypeHandlerLibrary} is requested
-     * to generate a {@link TypeHandler} for the given type. Most recently added factories are
-     * requested first, hence a {@link TypeHandlerFactory} can override one that was added
-     * before it.
-     *
-     * @param type                The {@link TypeInfo} describing the type for which to
-     *                            retrieve the {@link TypeHandler}.
-     * @param contextClassLoaders The {@link ClassLoader}(s) that the caller has access to.
-     * @param <T>                 The type for which to retrieve the {@link TypeHandler}.
-     * @return The {@link TypeHandler} for the specified type, if available.
-     */
-    @SuppressWarnings("unchecked")
-    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type, ClassLoader... contextClassLoaders) {
-        TypeHandlerContext context = new TypeHandlerContext(this, contextClassLoaders);
+    public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type) {
+        TypeHandlerContext context = new TypeHandlerContext(this, reflections);
 
         if (typeHandlerCache.containsKey(type)) {
             return Optional.of((TypeHandler<T>) typeHandlerCache.get(type));
@@ -432,7 +363,7 @@ public class TypeHandlerLibrary {
     private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
         Map<FieldMetadata<?, ?>, TypeHandler> handlerMap = Maps.newHashMap();
         for (FieldMetadata<?, ?> field : type.getFields()) {
-            Optional<TypeHandler<?>> handler = getTypeHandler(field.getField().getGenericType(), getClass());
+            Optional<TypeHandler<?>> handler = getTypeHandler(field.getField().getGenericType());
 
             if (handler.isPresent()) {
                 handlerMap.put(field, handler.get());

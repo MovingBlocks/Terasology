@@ -20,7 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.reflections.Reflections;
-import org.reflections.util.ConfigurationBuilder;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
@@ -60,9 +59,7 @@ public class EventSystemReplayImplTest {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
 
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                .addClassLoader(getClass().getClassLoader());
-        Reflections reflections = new Reflections(configurationBuilder);
+        Reflections reflections = new Reflections(getClass().getClassLoader());
         TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
 
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, serializationLibrary);
