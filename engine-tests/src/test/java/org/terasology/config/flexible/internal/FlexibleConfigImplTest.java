@@ -46,23 +46,29 @@ public class FlexibleConfigImplTest {
 
         @Test
         public void testGet() throws Exception {
-            SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
-            SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting1");
+            SimpleUri absentId = new SimpleUri("engine-tests:TestSetting2");
 
-            config.newEntry(id1, Integer.class)
+            config.newEntry(id, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig();
 
-            config.newEntry(id2, Double.class)
-                    .setDefaultValue(0.0)
+            Setting<Integer> retrievedSetting = config.get(id);
+            Setting<Double> absentSetting = config.get(absentId);
+
+            assertNotNull(retrievedSetting);
+            assertNull(absentSetting);
+        }
+
+        @Test(expected = ClassCastException.class)
+        public void testGetInvalidType() {
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
+
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
                     .addToConfig();
 
-            Setting<Integer> retrievedSetting1 = config.get(id1);
-            Setting<Double> retrievedSetting2 = config.get(id2);
-
-            // We need the references to be equal
-            assertEquals(retrievedSetting1, retrievedSetting1);
-            assertEquals(retrievedSetting2, retrievedSetting2);
+            Setting<String> retrievedSetting = config.get(id);
         }
     }
 

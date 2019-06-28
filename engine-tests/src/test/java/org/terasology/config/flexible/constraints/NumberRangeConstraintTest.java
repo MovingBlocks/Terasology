@@ -24,178 +24,178 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Enclosed.class)
 public class NumberRangeConstraintTest {
-    public static class IntegerValidator {
-        private NumberRangeConstraint<Integer> validator;
+    public static class IntegerConstraint {
+        private NumberRangeConstraint<Integer> constraint;
 
-        private void initValidator(Integer min, Integer max, boolean minInclusive, boolean maxInclusive) {
-            validator = new NumberRangeConstraint<>(min, max, minInclusive, maxInclusive);
+        private void initConstraint(Integer min, Integer max, boolean minInclusive, boolean maxInclusive) {
+            constraint = new NumberRangeConstraint<>(min, max, minInclusive, maxInclusive);
         }
 
         @Test
         public void testAllInclusive() {
-            initValidator(0, 100, true, true);
+            initConstraint(0, 100, true, true);
 
-            assertTrue(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0));
-            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12));
-            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83));
-            assertTrue(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100));
+            assertTrue(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0));
+            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12));
+            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83));
+            assertTrue(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100));
 
 
-            assertFalse(validator.isSatisfiedBy(0 - 1));
-            assertFalse(validator.isSatisfiedBy(100 + 1));
+            assertFalse(constraint.isSatisfiedBy(0 - 1));
+            assertFalse(constraint.isSatisfiedBy(100 + 1));
         }
 
         @Test
         public void testMinExclusive() {
-            initValidator(0, 100, false, true);
+            initConstraint(0, 100, false, true);
 
-            assertFalse(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0));
-            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12));
-            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83));
-            assertTrue(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100));
+            assertFalse(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0));
+            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12));
+            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83));
+            assertTrue(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100));
         }
 
         @Test
         public void testMaxExclusive() {
-            initValidator(0, 100, true, false);
+            initConstraint(0, 100, true, false);
 
-            assertTrue(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0));
-            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12));
-            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83));
-            assertFalse(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100));
+            assertTrue(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0));
+            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12));
+            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83));
+            assertFalse(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100));
         }
 
         @Test
         public void testAllExclusive() {
-            initValidator(0, 100, false, false);
+            initConstraint(0, 100, false, false);
 
-            assertFalse(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0));
-            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12));
-            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83));
-            assertFalse(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100));
+            assertFalse(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0));
+            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12));
+            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83));
+            assertFalse(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100));
         }
 
         @Test
         public void testLowUnbounded() {
-            initValidator(null, 100, false, false);
+            initConstraint(null, 100, false, false);
 
-            assertTrue(validator.isSatisfiedBy(-1000));
-            assertTrue(validator.isSatisfiedBy(-50000));
+            assertTrue(constraint.isSatisfiedBy(-1000));
+            assertTrue(constraint.isSatisfiedBy(-50000));
 
-            assertTrue(validator.isSatisfiedBy(50));
+            assertTrue(constraint.isSatisfiedBy(50));
 
-            assertFalse(validator.isSatisfiedBy(100 + 1));
+            assertFalse(constraint.isSatisfiedBy(100 + 1));
         }
 
         @Test
         public void testHighUnbounded() {
-            initValidator(0, null, false, false);
+            initConstraint(0, null, false, false);
 
-            assertTrue(validator.isSatisfiedBy(1000));
-            assertTrue(validator.isSatisfiedBy(50000));
+            assertTrue(constraint.isSatisfiedBy(1000));
+            assertTrue(constraint.isSatisfiedBy(50000));
 
-            assertTrue(validator.isSatisfiedBy(50));
+            assertTrue(constraint.isSatisfiedBy(50));
 
-            assertFalse(validator.isSatisfiedBy(0 - 1));
+            assertFalse(constraint.isSatisfiedBy(0 - 1));
         }
 
         @Test
         public void testAllUnbounded() {
-            initValidator(null, null, false, false);
+            initConstraint(null, null, false, false);
 
-            assertTrue(validator.isSatisfiedBy(1000));
-            assertTrue(validator.isSatisfiedBy(50000));
-            assertTrue(validator.isSatisfiedBy(50));
+            assertTrue(constraint.isSatisfiedBy(1000));
+            assertTrue(constraint.isSatisfiedBy(50000));
+            assertTrue(constraint.isSatisfiedBy(50));
 
-            assertTrue(validator.isSatisfiedBy(-1000));
-            assertTrue(validator.isSatisfiedBy(-50000));
+            assertTrue(constraint.isSatisfiedBy(-1000));
+            assertTrue(constraint.isSatisfiedBy(-50000));
         }
     }
 
-    public static class DoubleValidator {
+    public static class DoubleConstraint {
         private static final double MAX_ALLOWED_ERROR = 0.000001d;
 
-        private NumberRangeConstraint<Double> validator;
+        private NumberRangeConstraint<Double> constraint;
 
-        private void initValidator(Double min, Double max, boolean minInclusive, boolean maxInclusive) {
-            validator = new NumberRangeConstraint<>(min, max, minInclusive, maxInclusive);
+        private void initConstraint(Double min, Double max, boolean minInclusive, boolean maxInclusive) {
+            constraint = new NumberRangeConstraint<>(min, max, minInclusive, maxInclusive);
         }
 
         @Test
         public void testAllInclusive() {
-            initValidator(0d, 100d, true, true);
+            initConstraint(0d, 100d, true, true);
 
-            assertTrue(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0d));
-            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12d));
-            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83d));
-            assertTrue(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100d));
+            assertTrue(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0d));
+            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12d));
+            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83d));
+            assertTrue(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100d));
 
-            assertFalse(validator.isSatisfiedBy(0 - MAX_ALLOWED_ERROR));
-            assertFalse(validator.isSatisfiedBy(100 + MAX_ALLOWED_ERROR));
+            assertFalse(constraint.isSatisfiedBy(0 - MAX_ALLOWED_ERROR));
+            assertFalse(constraint.isSatisfiedBy(100 + MAX_ALLOWED_ERROR));
         }
 
         @Test
         public void testMinExclusive() {
-            initValidator(0d, 100d, false, true);
+            initConstraint(0d, 100d, false, true);
 
-            assertFalse(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0d));
-            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12d));
-            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83d));
-            assertTrue(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100d));
+            assertFalse(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0d));
+            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12d));
+            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83d));
+            assertTrue(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100d));
         }
 
         @Test
         public void testMaxExclusive() {
-            initValidator(0d, 100d, true, false);
+            initConstraint(0d, 100d, true, false);
 
-            assertTrue(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0d));
-            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12d));
-            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83d));
-            assertFalse(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100d));
+            assertTrue(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0d));
+            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12d));
+            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83d));
+            assertFalse(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100d));
         }
 
         @Test
         public void testAllExclusive() {
-            initValidator(0d, 100d, false, false);
+            initConstraint(0d, 100d, false, false);
 
-            assertFalse(String.format("%d returned invalid", 0), validator.isSatisfiedBy(0d));
-            assertTrue(String.format("%d returned invalid", 12), validator.isSatisfiedBy(12d));
-            assertTrue(String.format("%d returned invalid", 83), validator.isSatisfiedBy(83d));
-            assertFalse(String.format("%d returned invalid", 100), validator.isSatisfiedBy(100d));
+            assertFalse(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0d));
+            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12d));
+            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83d));
+            assertFalse(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100d));
         }
 
         @Test
         public void testLowUnbounded() {
-            initValidator(null, 100d, false, false);
+            initConstraint(null, 100d, false, false);
 
-            assertTrue(validator.isSatisfiedBy(-1000d));
-            assertTrue(validator.isSatisfiedBy(-50000d));
-            assertTrue(validator.isSatisfiedBy(50d));
+            assertTrue(constraint.isSatisfiedBy(-1000d));
+            assertTrue(constraint.isSatisfiedBy(-50000d));
+            assertTrue(constraint.isSatisfiedBy(50d));
 
-            assertFalse(validator.isSatisfiedBy(100 + MAX_ALLOWED_ERROR));
+            assertFalse(constraint.isSatisfiedBy(100 + MAX_ALLOWED_ERROR));
         }
 
         @Test
         public void testHighUnbounded() {
-            initValidator(0d, null, false, false);
+            initConstraint(0d, null, false, false);
 
-            assertTrue(validator.isSatisfiedBy(1000d));
-            assertTrue(validator.isSatisfiedBy(50000d));
-            assertTrue(validator.isSatisfiedBy(50d));
+            assertTrue(constraint.isSatisfiedBy(1000d));
+            assertTrue(constraint.isSatisfiedBy(50000d));
+            assertTrue(constraint.isSatisfiedBy(50d));
 
-            assertFalse(validator.isSatisfiedBy(0 - MAX_ALLOWED_ERROR));
+            assertFalse(constraint.isSatisfiedBy(0 - MAX_ALLOWED_ERROR));
         }
 
         @Test
         public void testAllUnbounded() {
-            initValidator(null, null, false, false);
+            initConstraint(null, null, false, false);
 
-            assertTrue(validator.isSatisfiedBy(1000d));
-            assertTrue(validator.isSatisfiedBy(50000d));
-            assertTrue(validator.isSatisfiedBy(50d));
+            assertTrue(constraint.isSatisfiedBy(1000d));
+            assertTrue(constraint.isSatisfiedBy(50000d));
+            assertTrue(constraint.isSatisfiedBy(50d));
 
-            assertTrue(validator.isSatisfiedBy(-1000d));
-            assertTrue(validator.isSatisfiedBy(-50000d));
+            assertTrue(constraint.isSatisfiedBy(-1000d));
+            assertTrue(constraint.isSatisfiedBy(-50000d));
         }
     }
 }
