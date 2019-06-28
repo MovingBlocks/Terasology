@@ -85,6 +85,11 @@ class FlexibleConfigImpl implements FlexibleConfig {
     @SuppressWarnings("unchecked")
     public <V> Setting<V> get(SimpleUri id, Class<V> valueType) {
         Setting setting = settings.get(id);
+
+        if (setting == null) {
+            return null;
+        }
+
         Class settingValueClass = setting.getValueClass();
 
         if (!settingValueClass.equals(valueType)) {
