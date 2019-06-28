@@ -156,6 +156,11 @@ class SettingImpl<T> implements Setting<T> {
         return id;
     }
 
+    @Override
+    public Class<T> getValueClass() {
+        return valueClass;
+    }
+
     /**
      * {@inheritDoc}
      */

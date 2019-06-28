@@ -36,6 +36,12 @@ public interface Setting<T> {
     SimpleUri getId();
 
     /**
+     * Returns a {@link Class} representing the type of values that can be stored in this
+     * {@link Setting}.
+     */
+    Class<T> getValueClass();
+
+    /**
      * Returns the {@link SettingConstraint} used by this {@link Setting}, if present.
      * Returns null otherwise.
      */
