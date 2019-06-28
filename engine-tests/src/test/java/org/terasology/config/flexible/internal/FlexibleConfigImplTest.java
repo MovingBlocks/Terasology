@@ -53,8 +53,8 @@ public class FlexibleConfigImplTest {
                     .setDefaultValue(0)
                     .addToConfig();
 
-            Setting<Integer> retrievedSetting = config.get(id);
-            Setting<Double> absentSetting = config.get(absentId);
+            Setting<Integer> retrievedSetting = config.get(id, Integer.class);
+            Setting<Double> absentSetting = config.get(absentId, Double.class);
 
             assertNotNull(retrievedSetting);
             assertNull(absentSetting);
@@ -68,7 +68,7 @@ public class FlexibleConfigImplTest {
                     .setDefaultValue(0)
                     .addToConfig();
 
-            Setting<String> retrievedSetting = config.get(id);
+            Setting<String> retrievedSetting = config.get(id, String.class);
         }
     }
 
@@ -129,7 +129,7 @@ public class FlexibleConfigImplTest {
                     .setDescription(description)
                     .addToConfig());
 
-            Setting<Integer> setting = config.get(ID);
+            Setting<Integer> setting = config.get(ID, Integer.class);
 
             assertEquals(ID, setting.getId());
             assertEquals(defaultValue, setting.getDefaultValue());
@@ -196,7 +196,7 @@ public class FlexibleConfigImplTest {
                     .setDefaultValue(0)
                     .addToConfig();
 
-            Setting setting = config.get(id);
+            Setting setting = config.get(id, Integer.class);
 
             setting.subscribe(propertyChangeEvent -> {
             });
@@ -235,7 +235,7 @@ public class FlexibleConfigImplTest {
                     .setDefaultValue(TestEnum.A1)
                     .addToConfig();
 
-            testEnumSetting = config.get(testEnumSettingId);
+            testEnumSetting = config.get(testEnumSettingId, TestEnum.class);
 
             SimpleUri doubleSettingId = new SimpleUri("engine-tests:TestSetting2");
 
@@ -243,7 +243,7 @@ public class FlexibleConfigImplTest {
                     .setDefaultValue(30.0)
                     .addToConfig();
 
-            doubleSetting = config.get(doubleSettingId);
+            doubleSetting = config.get(doubleSettingId, Double.class);
 
             SimpleUri testClassSettingId = new SimpleUri("engine-tests:TestSetting3");
 
@@ -251,7 +251,7 @@ public class FlexibleConfigImplTest {
                     .setDefaultValue(new TestClass(101))
                     .addToConfig();
 
-            testClassSetting = config.get(testClassSettingId);
+            testClassSetting = config.get(testClassSettingId, TestClass.class);
         }
 
         @Before

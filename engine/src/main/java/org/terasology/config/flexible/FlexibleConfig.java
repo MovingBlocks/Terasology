@@ -44,14 +44,15 @@ public interface FlexibleConfig {
      * Returns the {@link Setting<V>} with the given id. Null is returned if a setting with the given id does not
      * exist in the config.
      *
-     * @param id  The id of the {@link Setting} to retrieve.
      * @param <V> The type of the value the retrieved {@link Setting} must contain.
+     * @param id  The id of the {@link Setting} to retrieve.
+     * @param valueType The {@link Class} of the type of the value the retrieved {@link Setting} must contain.
      * @return The {@link Setting<V>}, if found in the config. Null if a {@link Setting} with the given id
      * does not exist in the config.
      * @throws ClassCastException when {@link V} does not match the type of the values stored inside the retrieved
      *                            {@link Setting}.
      */
-    <V> Setting<V> get(SimpleUri id);
+    <V> Setting<V> get(SimpleUri id, Class<V> valueType);
 
     /**
      * Removes the {@link Setting} with the given id if it exists in the config and if the {@link Setting} does

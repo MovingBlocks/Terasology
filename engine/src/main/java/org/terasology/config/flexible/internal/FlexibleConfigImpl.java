@@ -64,7 +64,7 @@ class FlexibleConfigImpl implements FlexibleConfig {
      */
     @Override
     public boolean remove(SimpleUri id) {
-        Setting setting = get(id);
+        Setting setting = settings.get(id);
 
         if (setting == null) {
             LOGGER.warn("Setting \"{}\" does not exist.", id);
@@ -83,7 +83,7 @@ class FlexibleConfigImpl implements FlexibleConfig {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <V> Setting<V> get(SimpleUri id) {
+    public <V> Setting<V> get(SimpleUri id, Class<V> valueType) {
         return (Setting<V>) settings.get(id);
     }
 
