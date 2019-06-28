@@ -20,6 +20,8 @@ import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -49,7 +51,12 @@ public class TypeSerializerTest {
     public static class Json {
         private static final String INSTANCE_JSON = "{\"data\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"content\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"content\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
 
-        private final TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.createDefaultLibrary();
+        final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+                .addClassLoader(getClass().getClassLoader());
+        final Reflections reflections = new Reflections(configurationBuilder);
+
+        private final TypeHandlerLibrary typeHandlerLibrary =
+                TypeHandlerLibrary.withDefaultHandlers(reflections);
 
         @Test
         public void testJsonSerialize() {
@@ -74,8 +81,12 @@ public class TypeSerializerTest {
     }
 
     public static class Protobuf {
-        private final TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.createDefaultLibrary();
+        final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+                .addClassLoader(getClass().getClassLoader());
+        final Reflections reflections = new Reflections(configurationBuilder);
 
+        private final TypeHandlerLibrary typeHandlerLibrary =
+                TypeHandlerLibrary.withDefaultHandlers(reflections);
         @Test
         public void testSerializeDeserialize() throws IOException {
             TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}, getClass().getClassLoader()).get();

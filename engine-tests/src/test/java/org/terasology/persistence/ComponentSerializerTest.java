@@ -19,6 +19,8 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -66,7 +68,11 @@ public class ComponentSerializerTest {
         context.put(ModuleManager.class, moduleManager);
         CoreRegistry.setContext(context);
 
-        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary();
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+                .addClassLoader(getClass().getClassLoader());
+        Reflections reflections = new Reflections(configurationBuilder);
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
+
         serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
 

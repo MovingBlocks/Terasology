@@ -16,6 +16,8 @@
 package org.terasology.persistence.typeHandling;
 
 import org.junit.Test;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
@@ -33,7 +35,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TypeHandlerLibraryTest {
-    private final TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary();
+    private final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+            .addClassLoader(getClass().getClassLoader());
+    private final Reflections reflections = new Reflections(configurationBuilder);
+    private final TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary(reflections);
 
     private enum AnEnum {}
 

@@ -74,8 +74,11 @@ public final class EntitySystemSetupUtil {
         context.put(ReflectFactory.class, reflectFactory);
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.createDefaultLibrary();
+
+        ModuleEnvironment moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleEnvironment);
         context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
+
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
         context.put(EntitySystemLibrary.class, library);
         context.put(ComponentLibrary.class, library.getComponentLibrary());

@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import org.junit.Assert;
 import org.junit.Test;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -46,10 +48,12 @@ public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static final String OBJECT_JSON = "{\"color\":[222,173,190,239],\"vector4fs\":[[0.0,0.0,0.0,0.0]," +
             "[1.0,1.0,1.0,1.0]],\"rect2iMap\":{\"someRect\":{\"min\":[-3,-3],\"size\":[10,10]}},\"i\":-912559}";
 
-    private final ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-    private final CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
+    private final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+            .addClassLoader(getClass().getClassLoader());
+    private final Reflections reflections = new Reflections(configurationBuilder);
+
     private final TypeHandlerLibrary typeHandlerLibrary =
-            TypeHandlerLibrary.createDefaultLibrary();
+            TypeHandlerLibrary.withDefaultHandlers(reflections);
 
     private final Gson gson =
             GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary)

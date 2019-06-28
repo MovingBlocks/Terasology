@@ -17,6 +17,8 @@ package org.terasology.entitySystem;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -57,9 +59,15 @@ public class PojoPrefabManagerTest {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
         ModuleManager moduleManager = ModuleManagerFactory.create();
-        TypeHandlerLibrary lib = new TypeHandlerLibrary();
+
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+                .addClassLoader(getClass().getClassLoader());
+        Reflections reflections = new Reflections(configurationBuilder);
+        TypeHandlerLibrary lib = new TypeHandlerLibrary(reflections);
+
         lib.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         lib.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+
         entitySystemLibrary = new EntitySystemLibrary(context, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
 

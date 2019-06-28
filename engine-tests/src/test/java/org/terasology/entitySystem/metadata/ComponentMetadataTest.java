@@ -18,6 +18,8 @@ package org.terasology.entitySystem.metadata;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -48,7 +50,10 @@ public class ComponentMetadataTest {
 
     @Test
     public void testStaticFieldsIgnored() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeHandlerLibrary());
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+                .addClassLoader(getClass().getClassLoader());
+        Reflections reflections = new Reflections(configurationBuilder);
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeHandlerLibrary(reflections));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(new SimpleUri("unittest:string"), StringComponent.class);
         ComponentMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
@@ -57,7 +62,10 @@ public class ComponentMetadataTest {
 
     @Test
     public void testOwnsReferencesPopulated() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeHandlerLibrary());
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+            .addClassLoader(getClass().getClassLoader());
+        Reflections reflections = new Reflections(configurationBuilder);
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeHandlerLibrary(reflections));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(new SimpleUri("unittest:owner"), OwnerComponent.class);
         ComponentMetadata<OwnerComponent> metadata = lib.getMetadata(OwnerComponent.class);

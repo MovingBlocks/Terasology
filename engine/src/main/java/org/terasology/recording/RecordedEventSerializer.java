@@ -51,7 +51,7 @@ class RecordedEventSerializer {
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
 
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.createDefaultLibrary();
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleEnvironment);
         typeHandlerLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
 
         ClassLoader[] classLoaders = ReflectionUtil.getComprehensiveEngineClassLoaders(moduleEnvironment);

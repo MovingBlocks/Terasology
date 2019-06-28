@@ -19,6 +19,8 @@ import com.google.common.collect.Lists;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
@@ -30,7 +32,12 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 public class FutureTypeHandlerTest {
-    private final TypeHandlerLibrary typeHandlerLibrary = spy(TypeHandlerLibrary.createDefaultLibrary());
+    private final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+            .addClassLoader(getClass().getClassLoader());
+    private final Reflections reflections = new Reflections(configurationBuilder);
+
+    private final TypeHandlerLibrary typeHandlerLibrary =
+            spy(TypeHandlerLibrary.withDefaultHandlers(reflections));
 
     private static class RecursiveType<T> {
         final T data;

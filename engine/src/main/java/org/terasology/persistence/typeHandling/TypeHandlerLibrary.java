@@ -18,6 +18,7 @@ package org.terasology.persistence.typeHandling;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -28,6 +29,7 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteArrayTypeHandler;
@@ -65,6 +67,7 @@ import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
+import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -80,6 +83,8 @@ import java.util.Optional;
  */
 public class TypeHandlerLibrary {
     private static final Logger logger = LoggerFactory.getLogger(TypeHandlerLibrary.class);
+
+    private Reflections reflections;
 
     private List<TypeHandlerFactory> typeHandlerFactories = Lists.newArrayList();
 
@@ -101,8 +106,10 @@ public class TypeHandlerLibrary {
 
     /**
      *
+     * @param reflections
      */
-    public TypeHandlerLibrary() {
+    public TypeHandlerLibrary(Reflections reflections) {
+        this.reflections = reflections;
 
         constructorLibrary = new ConstructorLibrary(instanceCreators);
 
@@ -141,11 +148,25 @@ public class TypeHandlerLibrary {
      */
     public TypeHandlerLibrary(TypeHandlerLibrary original) {
         this.typeHandlerFactories.addAll(original.typeHandlerFactories);
+        this.instanceCreators.putAll(original.instanceCreators);
+        this.reflections = original.reflections;
     }
 
-    public static TypeHandlerLibrary createDefaultLibrary() {
-        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary();
+    public static TypeHandlerLibrary withDefaultHandlers(Reflections reflections) {
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
 
+        populateWithDefaultHandlers(serializationLibrary);
+
+        return serializationLibrary;
+    }
+
+    public static TypeHandlerLibrary forModuleEnvironment(ModuleEnvironment moduleEnvironment) {
+        // TODO: Reflection - may break with updates to gestalt-module
+        Reflections reflections = (Reflections) ReflectionUtil.readField(moduleEnvironment, "fullReflections");
+        return withDefaultHandlers(reflections);
+    }
+
+    private static void populateWithDefaultHandlers(TypeHandlerLibrary serializationLibrary) {
         serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
         serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
 
@@ -165,8 +186,6 @@ public class TypeHandlerLibrary {
         serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());
         serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
-
-        return serializationLibrary;
     }
 
     /**

@@ -18,6 +18,8 @@ package org.terasology.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -61,7 +63,11 @@ public class PojoEventSystemTests {
     public void setup() {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
-        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary();
+
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+                .addClassLoader(getClass().getClassLoader());
+        Reflections reflections = new Reflections(configurationBuilder);
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
 
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, serializationLibrary);
         compLibrary = entitySystemLibrary.getComponentLibrary();
