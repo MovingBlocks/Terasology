@@ -434,20 +434,6 @@ public final class ReflectionUtil {
                 "Cannot find field " + cls.getName() + "." + fieldName);
     }
 
-    /**
-     * Returns a list of {@link ClassLoader}s which have access to <i>all</i> engine and loaded module
-     * classes. This function must NOT be accessible to modules.
-     *
-     * @param moduleEnvironment The {@link ModuleEnvironment} managing all loaded modules.
-     */
-    public static ClassLoader[] getComprehensiveEngineClassLoaders(ModuleEnvironment moduleEnvironment) {
-        return new ClassLoader[]{
-                ReflectionUtil.class.getClassLoader(),
-                // TODO: Reflection - can break with updates to gestalt
-                (ClassLoader) readField(moduleEnvironment, "finalClassLoader")
-        };
-    }
-
     private static class WildcardTypeImpl implements WildcardType {
         private final Type[] upperBounds;
         private final Type[] lowerBounds;
