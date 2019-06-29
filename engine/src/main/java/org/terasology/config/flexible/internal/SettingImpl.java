@@ -46,13 +46,13 @@ class SettingImpl<T> implements Setting<T> {
     private final T defaultValue;
     private final Class<T> valueClass;
 
-    protected T value;
-
     private final String humanReadableName;
     private final String description;
 
     private final SettingConstraint<T> constraint;
     private final Set<PropertyChangeListener> subscribers = Sets.newHashSet();
+
+    protected T value;
 
     /**
      * Creates a new {@link SettingImpl} with the given id, default value and constraint.
@@ -65,7 +65,7 @@ class SettingImpl<T> implements Setting<T> {
      */
     @SuppressWarnings("unchecked")
     SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint,
-                       String humanReadableName, String description) {
+                String humanReadableName, String description) {
         this.id = id;
         this.humanReadableName = humanReadableName;
         this.description = description;

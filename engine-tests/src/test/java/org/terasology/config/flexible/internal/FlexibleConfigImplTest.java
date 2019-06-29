@@ -305,11 +305,11 @@ public class FlexibleConfigImplTest {
 
             TestEnum c;
 
-            public TestClass() {
+            TestClass() {
                 this(31);
             }
 
-            public TestClass(int a) {
+            TestClass(int a) {
                 this.a = a;
                 b = "string";
                 c = TestEnum.A2;
@@ -317,13 +317,23 @@ public class FlexibleConfigImplTest {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
 
                 TestClass testClass = (TestClass) o;
 
-                if (a != testClass.a) return false;
-                if (b != null ? !b.equals(testClass.b) : testClass.b != null) return false;
+                if (a != testClass.a) {
+                    return false;
+                }
+
+                if (b != null ? !b.equals(testClass.b) : testClass.b != null) {
+                    return false;
+                }
                 return c == testClass.c;
             }
         }

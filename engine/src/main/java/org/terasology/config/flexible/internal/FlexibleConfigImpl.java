@@ -39,7 +39,7 @@ import java.util.Map;
  */
 class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String DESCRIPTION_PROPERTY_NAME = "description";
 
     private final Map<SimpleUri, Setting> settings = Maps.newHashMap();
@@ -47,7 +47,7 @@ class FlexibleConfigImpl implements FlexibleConfig {
 
     private final String description;
 
-    public FlexibleConfigImpl(String description) {
+    FlexibleConfigImpl(String description) {
         this.description = description;
     }
 
@@ -94,7 +94,7 @@ class FlexibleConfigImpl implements FlexibleConfig {
 
         if (!settingValueClass.equals(valueType)) {
             throw new ClassCastException(
-                    "Expected a Setting of type " + valueType.getName() +
+                    "For id '" + id + "' expected a Setting of type " + valueType.getName() +
                     ", found a Setting of type " + settingValueClass.getName()
             );
         }
@@ -138,7 +138,7 @@ class FlexibleConfigImpl implements FlexibleConfig {
             jsonObject.addProperty(entry.getKey().toString(), entry.getValue());
         }
 
-        gson.toJson(jsonObject, writer);
+        GSON.toJson(jsonObject, writer);
     }
 
     @Override
@@ -167,10 +167,10 @@ class FlexibleConfigImpl implements FlexibleConfig {
      *
      * @param <T> The type of values that can be stored in the {@link SettingImpl}.
      */
-    private class SettingImplEntry<T> implements SettingEntry<T>, SettingEntry.Builder<T> {
+    private final class SettingImplEntry<T> implements SettingEntry<T>, SettingEntry.Builder<T> {
         private SimpleUri id;
         private T defaultValue;
-        private SettingConstraint<T> constraint = null;
+        private SettingConstraint<T> constraint;
         private String humanReadableName = "";
         private String description = "";
 
@@ -179,29 +179,29 @@ class FlexibleConfigImpl implements FlexibleConfig {
         }
 
         @Override
-        public Builder<T> setDefaultValue(T defaultValue) {
-            this.defaultValue = defaultValue;
+        public Builder<T> setDefaultValue(T theDefaultValue) {
+            defaultValue = theDefaultValue;
 
             return this;
         }
 
         @Override
-        public Builder<T> setConstraint(SettingConstraint<T> constraint) {
-            this.constraint = constraint;
+        public Builder<T> setConstraint(SettingConstraint<T> theConstraint) {
+            constraint = theConstraint;
 
             return this;
         }
 
         @Override
-        public Builder<T> setHumanReadableName(String humanReadableName) {
-            this.humanReadableName = humanReadableName;
+        public Builder<T> setHumanReadableName(String theHumanReadableName) {
+            humanReadableName = theHumanReadableName;
 
             return this;
         }
 
         @Override
-        public Builder<T> setDescription(String description) {
-            this.description = description;
+        public Builder<T> setDescription(String theDescription) {
+            description = theDescription;
 
             return this;
         }
