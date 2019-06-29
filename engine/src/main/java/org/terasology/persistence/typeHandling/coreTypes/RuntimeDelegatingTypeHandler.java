@@ -71,7 +71,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         }
 
         TypeHandler<T> chosenHandler = delegateHandler;
-        Class<?> runtimeClass = getRuntimeTypeIfMoreSpecific(typeInfo, value);
+        Class<?> runtimeClass = getRuntimeTypeIfMoreSpecific(value);
 
         if (!typeInfo.getRawType().equals(runtimeClass)) {
             Optional<TypeHandler<?>> runtimeTypeHandler = typeHandlerLibrary.getTypeHandler((Type) runtimeClass);
@@ -120,7 +120,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         return serializer.serialize(typeValuePersistedDataMap);
     }
 
-    private static <T> Class<?> getRuntimeTypeIfMoreSpecific(TypeInfo<T> typeInfo, T value) {
+    private Class<?> getRuntimeTypeIfMoreSpecific(T value) {
         if (value == null) {
             return typeInfo.getRawType();
         }
@@ -132,6 +132,9 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
             return runtimeClass;
         } else if (typeInfo.getType() instanceof Class) {
             // If given type is a simple class, use more specific runtime type
+            return runtimeClass;
+        } else if (delegateHandler == null) {
+            // If we can't find a handler for the declared type, use the runtime type
             return runtimeClass;
         }
 
