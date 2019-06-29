@@ -42,17 +42,13 @@ import java.io.Writer;
 import java.util.Optional;
 
 /**
- * GsonSerializer provides the ability to serialize and deserialize objects to and from JSON
- * <br>
- * Serialized JSON can be forwarded/written to various output types <br>
- * <br>
- * Various input types can be deserialized and returned as PersistedData types
+ * {@link GsonSerializer} provides the ability to serialize and deserialize objects to and from JSON.
  */
 public class GsonSerializer extends AbstractSerializer {
     private Gson gson;
 
     /**
-     * Constructs a new GsonSerializer object
+     * Constructs a new {@link GsonSerializer} object with the given {@link TypeHandlerLibrary}.
      */
     public GsonSerializer(TypeHandlerLibrary typeHandlerLibrary) {
         super(typeHandlerLibrary, new GsonPersistedDataSerializer());
@@ -61,13 +57,13 @@ public class GsonSerializer extends AbstractSerializer {
     }
 
     /**
-     * Writes the serialized persisted data as a JSON to {@link Writer} and returns the
-     * JSON as a string.
+     * Serializes the given object to JSON and returns the serialized JSON as a {@link String}.
      *
-     * @param object   the object to be serialized
-     * @param typeInfo contains how the object will be serialized
-     * @return contents of the JSON as a string
-     * @throws SerializationException Thrown if serialization fails.
+     * @param object   The object to be serialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type of the object to be serialized.
+     * @param <T>      The type of the object to be serialized.
+     * @return The serialized JSON as a {@link String}.
+     * @throws SerializationException Thrown when serialization fails.
      * @see #writeJson(Object, TypeInfo, Writer)
      */
     public <T> String toJson(T object, TypeInfo<T> typeInfo) throws SerializationException {
@@ -79,13 +75,14 @@ public class GsonSerializer extends AbstractSerializer {
     }
 
     /**
-     * Writes an object's serialized persisted data to the {@link Writer} as JSON.
+     * Serializes the given object to JSON and writes the serialized JSON object to the
+     * {@link Writer}.
      *
-     * @param object   the object to be serialized
-     * @param typeInfo contains how the object will be serialized
-     * @param writer   The writer in which the JSON will be written to
+     * @param object   The object to be serialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type of the object to be serialized.
+     * @param writer   The {@link Writer} to which the JSON will be written.
+     * @param <T>      The type of the object to be serialized.
      * @throws SerializationException Thrown when serialization fails.
-     * @see #writeJson(Object, TypeInfo, OutputStream)
      */
     public <T> void writeJson(T object, TypeInfo<T> typeInfo, Writer writer) throws SerializationException {
         Optional<PersistedData> serialized = this.serialize(object, typeInfo);
@@ -104,57 +101,68 @@ public class GsonSerializer extends AbstractSerializer {
     }
 
     /**
-     * Writes an object's serialized persisted data to the {@link OutputStream} as JSON.
+     * Serializes the given object to JSON and writes the serialized JSON object to the
+     * {@link OutputStream}.
      *
-     * @param object   the object to be serialized
-     * @param typeInfo contains how the object will be serialized
-     * @param stream   stream that the data will be written to
-     * @throws IOException            will be thrown if there is an error writing to the stream
+     * @param object   The object to be serialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type of the object to be serialized.
+     * @param stream   The {@link OutputStream} to which the JSON will be written.
+     * @param <T>      The type of the object to be serialized.
      * @throws SerializationException Thrown when serialization fails.
+     * @throws IOException            Thrown if there is an error in writing to the
+     *                                {@link OutputStream}.
      * @see #writeJson(Object, TypeInfo, Writer)
      */
-    public <T> void writeJson(T object, TypeInfo<T> typeInfo, OutputStream stream) throws IOException, SerializationException {
+    public <T> void writeJson(T object, TypeInfo<T> typeInfo, OutputStream stream)
+            throws IOException, SerializationException {
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(stream))) {
             writeJson(object, typeInfo, writer);
         }
     }
 
     /**
-     * Writes the object's persisted data to the {@link File} as JSON.
+     * Serializes the given object to JSON and writes the serialized JSON object to the
+     * {@link File}.
      *
-     * @param object   the file to be serialized
-     * @param typeInfo contains how the object will be serialized
-     * @param file     file that the bytes will be written to
-     * @throws IOException            gets thrown if there is an issue writing to the file.
+     * @param object   The object to be serialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type of the object to be serialized.
+     * @param file     The {@link File} that the JSON will be written to.
+     * @param <T>      The type of the object to be serialized.
+     * @throws IOException            Thrown if there is an issue writing to the file.
      * @throws SerializationException Thrown when serialization fails.
      * @see #writeJson(Object, TypeInfo, Writer)
      */
-    public <T> void writeJson(T object, TypeInfo<T> typeInfo, File file) throws IOException, SerializationException {
+    public <T> void writeJson(T object, TypeInfo<T> typeInfo, File file)
+            throws IOException, SerializationException {
         try (Writer writer = new BufferedWriter(new FileWriter(file))) {
             writeJson(object, typeInfo, writer);
         }
     }
 
     /**
-     * Writes an object's persisted data to {@link File} of a specified file name as JSON
+     * Serializes the given object to JSON and writes the serialized JSON object to the
+     * file with the given file name.
      *
-     * @param object   the object to be serialized
-     * @param typeInfo contains how the object will be serialized
-     * @param fileName the file name where the JSON will be written
-     * @throws IOException gets thrown if there is an error writing to the file at the specified location
+     * @param object   The object to be serialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type of the object to be serialized.
+     * @param fileName The name of the file that the JSON will be written to.
+     * @param <T>      The type of the object to be serialized.
+     * @throws IOException            Thrown if there is an issue writing to the file.
+     * @throws SerializationException Thrown when serialization fails.
      * @see #writeJson(Object, TypeInfo, File)
      */
-    public <T> void writeJson(T object, TypeInfo<T> typeInfo, String fileName) throws IOException {
+    public <T> void writeJson(T object, TypeInfo<T> typeInfo, String fileName)
+            throws IOException, SerializationException {
         writeJson(object, typeInfo, new File(fileName));
     }
 
     /**
-     * Gets the PersistedData from the {@link Reader}'s contents.
+     * Deserializes an object of type {@link T} from the JSON in the {@link Reader}.
      *
-     * @param reader Reader object that contains the contents that will be deserialized
-     * @param typeInfo
-     * @return deserialized GsonPersistedData object
-     * @see #fromJson(InputStream, TypeInfo)
+     * @param reader   The {@link Reader} that contains the JSON to be deserialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type to deserialize the object as.
+     * @param <T>      The type to deserialize the object as.
+     * @return The deserialized object of type {@link T}.
      * @throws SerializationException Thrown if the deserialization fails.
      */
     public <T> T fromJson(Reader reader, TypeInfo<T> typeInfo) throws SerializationException {
@@ -176,12 +184,14 @@ public class GsonSerializer extends AbstractSerializer {
     }
 
     /**
-     * Gets the PersistedData from an {@link InputStream}'s contents.
+     * Deserializes an object of type {@link T} from the JSON in the {@link InputStream}.
      *
-     * @param stream Contents of the InputStream will be serialized
-     * @param typeInfo
-     * @return deserialized GsonPersistedData object
-     * @throws IOException if there is an issue parsing the stream
+     * @param stream   The {@link InputStream} containing the serialized JSON.
+     * @param typeInfo The {@link TypeInfo} specifying the type to deserialize the object as.
+     * @param <T>      The type to deserialize the object as.
+     * @return The deserialized object of type {@link T}.
+     * @throws IOException            Thrown if there is an issue reading from the {@link InputStream}.
+     * @throws SerializationException Thrown if the deserialization fails.
      * @see #fromJson(Reader, TypeInfo)
      */
     public <T> T fromJson(InputStream stream, TypeInfo<T> typeInfo) throws IOException, SerializationException {
@@ -191,13 +201,15 @@ public class GsonSerializer extends AbstractSerializer {
     }
 
     /**
-     * Gets the PersistedData from a {@link File} object's contents.
+     * Deserializes an object of type {@link T} from the JSON in the {@link File}.
      *
-     * @param file File object containing the JSON that will be deserialized
-     * @param typeInfo
-     * @return deserialized GsonPersistedData object
-     * @throws IOException gets thrown if there is an issue reading the File object
-     * @see #fromJson(String, TypeInfo)
+     * @param file     The file containing the JSON to be deserialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type to deserialize the object as.
+     * @param <T>      The type to deserialize the object as.
+     * @return The deserialized object of type {@link T}.
+     * @throws IOException            Thrown if there is an issue reading from the {@link File}.
+     * @throws SerializationException Thrown if the deserialization fails.
+     * @see #fromJson(Reader, TypeInfo)
      */
     public <T> T fromJson(File file, TypeInfo<T> typeInfo) throws IOException, SerializationException {
         try (Reader reader = new FileReader(file)) {
@@ -206,11 +218,13 @@ public class GsonSerializer extends AbstractSerializer {
     }
 
     /**
-     * Gets the PersistedData from a {@link String}'s contents.
+     * Deserializes an object of type {@link T} from the JSON in the {@link File}.
      *
-     * @param json the String that will be deserialized
-     * @param typeInfo
-     * @return deserialized GsonPersistedData Object
+     * @param json     The JSON to be deserialized
+     * @param typeInfo The {@link TypeInfo} specifying the type to deserialize the object as.
+     * @param <T>      The type to deserialize the object as.
+     * @return The deserialized object of type {@link T}.
+     * @throws SerializationException Thrown if the deserialization fails.
      * @see #fromJson(Reader, TypeInfo)
      */
     public <T> T fromJson(String json, TypeInfo<T> typeInfo) throws SerializationException {

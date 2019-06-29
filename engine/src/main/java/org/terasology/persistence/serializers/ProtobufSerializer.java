@@ -34,26 +34,31 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 /**
- * ProtobufSerializer provides the ability to serialize and deserialize between objects and bytes
- * <p>
- * Serialized bytes can be forwarded/written to various output types
- * <p>
- * Various input types of serialized bytes can be deserialized and returned as PersistedData objects
+ * {@link ProtobufSerializer} provides the ability to serialize and deserialize objects to and
+ * from a binary format using Protobuf.
  */
 public class ProtobufSerializer extends AbstractSerializer {
+    /**
+     * Constructs a new {@link ProtobufSerializer} using the given {@link TypeHandlerLibrary}.
+     */
     public ProtobufSerializer(TypeHandlerLibrary typeHandlerLibrary) {
         super(typeHandlerLibrary, new ProtobufPersistedDataSerializer());
     }
 
     /**
-     * Converts the object into an array of bytes and forwards it to {@link #writeBytes(Object, TypeInfo, OutputStream)}
+     * Serializes the given object to bytes and returns the serialized byte array.
      *
-     * @param object      the object to be serialized
-     * @param typeInfo contains how the object will be serialized
-     * @return the byte array of the object
-     * @throws IOException throws if there is an error writing to the stream
+     * @param object   The object to be serialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type of the object to be serialized.
+     * @param <T>      The type of the object to be serialized.
+     * @return The serialized byte array.
+     * @throws SerializationException Thrown when serialization fails.
+     * @throws IOException            Thrown if there was an error creating the
+     *                                {@link ByteArrayOutputStream}.
+     * @see #writeBytes(Object, TypeInfo, OutputStream)
      */
-    public <T> byte[] toBytes(T object, TypeInfo<T> typeInfo) throws IOException {
+    public <T> byte[] toBytes(T object, TypeInfo<T> typeInfo)
+            throws SerializationException, IOException {
         try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
             writeBytes(object, typeInfo, stream);
             return stream.toByteArray();
@@ -61,12 +66,14 @@ public class ProtobufSerializer extends AbstractSerializer {
     }
 
     /**
-     * Takes a string path of a file and writes the serialized bytes into that file
+     * Serializes the given object to bytes and writes the bytes to the file with the given name.
      *
-     * @param object      the object to be serialized
-     * @param typeInfo contains how the object will be serialized
-     * @param fileName    the path of the file in which it is being written to
-     * @throws IOException gets thrown if there is an error writing to the file
+     * @param object   The object to be serialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type of the object to be serialized.
+     * @param fileName The name of the file to write the serialized bytes to.
+     * @param <T>      The type of the object to be serialized.
+     * @throws SerializationException Thrown when serialization fails.
+     * @throws IOException            Thrown if there was an error writing the bytes to the file.
      * @see #writeBytes(Object, TypeInfo, File)
      */
     public <T> void writeBytes(T object, TypeInfo<T> typeInfo, String fileName)
@@ -75,13 +82,15 @@ public class ProtobufSerializer extends AbstractSerializer {
     }
 
     /**
-     * Writes an object's bytes to a file.
+     * Serializes the given object to bytes and writes the bytes to the {@link File}
      *
-     * @param object      the object to be serialized
-     * @param typeInfo contains how the object will be serialized
-     * @param file        file that the bytes will be written to
-     * @throws IOException gets thrown if there is an error writing to the file
-     * @see #writeBytes(Object, TypeInfo, OutputStream)
+     * @param object   The object to be serialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type of the object to be serialized.
+     * @param file     The {@link File} to write the serialized bytes to.
+     * @param <T>      The type of the object to be serialized.
+     * @throws SerializationException Thrown when serialization fails.
+     * @throws IOException            Thrown if there was an error writing the bytes to the file.
+     * @see #writeBytes(Object, TypeInfo, File)
      */
     public <T> void writeBytes(T object, TypeInfo<T> typeInfo, File file)
             throws SerializationException, IOException {
@@ -91,12 +100,14 @@ public class ProtobufSerializer extends AbstractSerializer {
     }
 
     /**
-     * Writes a given object to an OutputStream using protobuf and TypeHandler
-     * serialization
+     * Serializes the given object to bytes and writes the bytes to the {@link OutputStream}.
      *
-     * @param object      the object to be serialized
-     * @param typeInfo contains how the object will be serialized
-     * @param stream      stream that the bytes will be written to
+     * @param object   The object to be serialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type of the object to be serialized.
+     * @param stream   The {@link OutputStream} to write the serialized bytes to.
+     * @param <T>      The type of the object to be serialized.
+     * @throws SerializationException Thrown when serialization fails.
+     * @see #writeBytes(Object, TypeInfo, File)
      */
     public <T> void writeBytes(T object, TypeInfo<T> typeInfo, OutputStream stream)
             throws SerializationException {
@@ -116,11 +127,13 @@ public class ProtobufSerializer extends AbstractSerializer {
     }
 
     /**
-     * Gets the PersistedData from a byte stream (InputStream).
+     * Deserializes an object of type {@link T} from the bytes in the {@link InputStream}.
      *
-     * @param stream InputStream that will be deserialized
-     * @return deserialized ProtobufPersistedData object
-     * @throws SerializationException if there is an issue parsing the stream
+     * @param stream   The {@link InputStream} that contains the bytes to be deserialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type to deserialize the object as.
+     * @param <T>      The type to deserialize the object as.
+     * @return The deserialized object of type {@link T}.
+     * @throws SerializationException Thrown if the deserialization fails.
      */
     public <T> T fromBytes(InputStream stream, TypeInfo<T> typeInfo) throws SerializationException {
         EntityData.Value value;
@@ -141,11 +154,14 @@ public class ProtobufSerializer extends AbstractSerializer {
     }
 
     /**
-     * Gets the PersistedData from a File.
+     * Deserializes an object of type {@link T} from the bytes in the {@link File}.
      *
-     * @param file contains the bytes that will be deserialized
-     * @return deserialized ProtobufPersistedData object
-     * @throws IOException gets thrown if there is an issue reading the file
+     * @param file     The {@link File} that contains the bytes to be deserialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type to deserialize the object as.
+     * @param <T>      The type to deserialize the object as.
+     * @return The deserialized object of type {@link T}.
+     * @throws IOException            Thrown if there was an error reading from the file.
+     * @throws SerializationException Thrown if the deserialization fails.
      * @see #fromBytes(InputStream, TypeInfo)
      */
     public <T> T fromBytes(File file, TypeInfo<T> typeInfo) throws IOException, SerializationException {
@@ -155,14 +171,17 @@ public class ProtobufSerializer extends AbstractSerializer {
     }
 
     /**
-     * Gets the PersistedData from an array of bytes.
+     * Deserializes an object of type {@link T} from the given bytes.
      *
-     * @param bytes array of bytes to be deserialized
-     * @return deserialized ProtobufData object
-     * @throws IOException gets thrown if there is an issue creating the InputStream
+     * @param bytes    The bytes to be deserialized.
+     * @param typeInfo The {@link TypeInfo} specifying the type to deserialize the object as.
+     * @param <T>      The type to deserialize the object as.
+     * @return The deserialized object of type {@link T}.
+     * @throws IOException            Thrown if there was an error creating a {@link ByteArrayInputStream}.
+     * @throws SerializationException Thrown if the deserialization fails.
      * @see #fromBytes(InputStream, TypeInfo)
      */
-    public <T> T fromBytes(byte[] bytes, TypeInfo<T> typeInfo) throws IOException {
+    public <T> T fromBytes(byte[] bytes, TypeInfo<T> typeInfo) throws IOException, SerializationException {
         try (InputStream reader = new ByteArrayInputStream(bytes)) {
             return fromBytes(reader, typeInfo);
         }
