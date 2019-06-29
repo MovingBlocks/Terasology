@@ -65,13 +65,10 @@ public class TypeSerializerTest {
 
         @Test
         public void testDeserialize() {
-            PersistedData persistedData = serializer.persistedDataFromJson(INSTANCE_JSON);
+            SomeClass<Integer> deserialized =
+                    serializer.fromJson(INSTANCE_JSON, new TypeInfo<SomeClass<Integer>>() {});
 
-            TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
-
-            SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData).get();
-
-            assertEquals(INSTANCE, deserializedInstance);
+            assertEquals(INSTANCE, deserialized);
         }
     }
 

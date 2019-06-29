@@ -18,6 +18,7 @@ package org.terasology.persistence.serializers;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -151,26 +152,41 @@ public class GsonSerializer extends AbstractSerializer {
      * Gets the PersistedData from the {@link Reader}'s contents.
      *
      * @param reader Reader object that contains the contents that will be deserialized
+     * @param typeInfo
      * @return deserialized GsonPersistedData object
-     * @see #persistedDataFromJson(InputStream)
+     * @see #fromJson(InputStream, TypeInfo)
+     * @throws SerializationException Thrown if the deserialization fails.
      */
-    public PersistedData persistedDataFromJson(Reader reader) {
-        JsonElement jsonElement = gson.fromJson(reader, JsonElement.class);
+    public <T> T fromJson(Reader reader, TypeInfo<T> typeInfo) throws SerializationException {
+        JsonElement jsonElement;
 
-        return new GsonPersistedData(jsonElement);
+        try {
+            jsonElement = gson.fromJson(reader, JsonElement.class);
+        } catch (JsonIOException | JsonSyntaxException e) {
+            throw new SerializationException("Could not read JSON from reader", e);
+        }
+
+        Optional<T> deserialized = deserialize(new GsonPersistedData(jsonElement), typeInfo);
+
+        if (!deserialized.isPresent()) {
+            throw new SerializationException("Could not deserialize object of type " + typeInfo);
+        }
+
+        return deserialized.get();
     }
 
     /**
      * Gets the PersistedData from an {@link InputStream}'s contents.
      *
      * @param stream Contents of the InputStream will be serialized
+     * @param typeInfo
      * @return deserialized GsonPersistedData object
      * @throws IOException if there is an issue parsing the stream
-     * @see #persistedDataFromJson(Reader)
+     * @see #fromJson(Reader, TypeInfo)
      */
-    public PersistedData persistedDataFromJson(InputStream stream) throws IOException {
+    public <T> T fromJson(InputStream stream, TypeInfo<T> typeInfo) throws IOException, SerializationException {
         try (Reader reader = new InputStreamReader(stream)) {
-            return persistedDataFromJson(reader);
+            return fromJson(reader, typeInfo);
         }
     }
 
@@ -178,13 +194,14 @@ public class GsonSerializer extends AbstractSerializer {
      * Gets the PersistedData from a {@link File} object's contents.
      *
      * @param file File object containing the JSON that will be deserialized
+     * @param typeInfo
      * @return deserialized GsonPersistedData object
      * @throws IOException gets thrown if there is an issue reading the File object
-     * @see #persistedDataFromJson(String)
+     * @see #fromJson(String, TypeInfo)
      */
-    public PersistedData persistedDataFromJson(File file) throws IOException {
+    public <T> T fromJson(File file, TypeInfo<T> typeInfo) throws IOException, SerializationException {
         try (Reader reader = new FileReader(file)) {
-            return persistedDataFromJson(reader);
+            return fromJson(reader, typeInfo);
         }
     }
 
@@ -192,12 +209,13 @@ public class GsonSerializer extends AbstractSerializer {
      * Gets the PersistedData from a {@link String}'s contents.
      *
      * @param json the String that will be deserialized
+     * @param typeInfo
      * @return deserialized GsonPersistedData Object
-     * @see #persistedDataFromJson(Reader)
+     * @see #fromJson(Reader, TypeInfo)
      */
-    public PersistedData persistedDataFromJson(String json) {
+    public <T> T fromJson(String json, TypeInfo<T> typeInfo) throws SerializationException {
         try (StringReader reader = new StringReader(json)) {
-            return persistedDataFromJson(reader);
+            return fromJson(reader, typeInfo);
         }
     }
 }
