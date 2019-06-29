@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.internal;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.terasology.config.flexible.validators.RangedNumberValidator;
+import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.engine.SimpleUri;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -29,7 +30,7 @@ import java.beans.PropertyChangeListener;
 import static org.junit.Assert.*;
 
 @RunWith(Enclosed.class)
-public class SettingTest {
+public class SettingImplTest {
     private static final SimpleUri SETTING_ID = new SimpleUri("engine-tests:TestSetting");
 
     public static class SetValue {
@@ -40,7 +41,9 @@ public class SettingTest {
         @Before
         public void setUp() {
             setting = new SettingImpl<>(SETTING_ID,
-                    50, new RangedNumberValidator<>(0, 100, false, false));
+                    50,
+                    new NumberRangeConstraint<>(0, 100, false, false),
+                    "", "");
 
             eventResult = -1;
 
@@ -72,7 +75,9 @@ public class SettingTest {
         @Before
         public void setUp() {
             setting = new SettingImpl<>(SETTING_ID,
-                    50, new RangedNumberValidator<>(0, 100, false, false));
+                    50,
+                    new NumberRangeConstraint<>(0, 100, false, false),
+                    "", "");
 
             eventCallCount = 0;
 

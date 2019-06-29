@@ -16,20 +16,22 @@
 package org.terasology.config.flexible;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.module.sandbox.API;
 
 /**
  * Stores multiple {@link FlexibleConfig} instances that can be retrieved using their id.
  * Also responsible for coordinating their serialization - to and from - disk.
  */
+@API
 public interface FlexibleConfigManager {
     /**
      * Adds the given {@link FlexibleConfig} to this manager.
      *
-     * @param configId A SimpleUri that effectively becomes the id of the config.
-     * @param config The config that is to be added.
+     * @param configId    A SimpleUri that effectively becomes the id of the config.
+     * @param description The config that is to be added.
      * @throws RuntimeException if a FlexibleConfig with the given id already exists.
      */
-    void addConfig(SimpleUri configId, FlexibleConfig config) throws RuntimeException;
+    void addNewConfig(SimpleUri configId, String description) throws RuntimeException;
 
     /**
      * Removes the config associated with the given id, and returns it.

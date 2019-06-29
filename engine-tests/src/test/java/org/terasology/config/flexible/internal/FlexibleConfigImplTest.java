@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.internal;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.terasology.config.flexible.FlexibleConfig;
+import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
@@ -26,12 +30,10 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(Enclosed.class)
-public class FlexibleConfigTest {
+public class FlexibleConfigImplTest {
     private static final SimpleUri KEY_NON_EXISTENT = new SimpleUri("engine-tests:TestSettingX");
 
     public static class Get {
@@ -44,21 +46,29 @@ public class FlexibleConfigTest {
 
         @Test
         public void testGet() throws Exception {
-            SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
-            SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting1");
+            SimpleUri absentId = new SimpleUri("engine-tests:TestSetting2");
 
-            Setting<Integer> expectedSetting1 = new MockSetting<>(id1);
-            config.add(expectedSetting1);
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
-            Setting<Double> expectedSetting2 = new MockSetting<>(id2);
-            config.add(expectedSetting2);
+            Setting<Integer> retrievedSetting = config.get(id, Integer.class);
+            Setting<Double> absentSetting = config.get(absentId, Double.class);
 
-            Setting<Integer> retrievedSetting1 = config.get(id1);
-            Setting<Double> retrievedSetting2 = config.get(id2);
+            assertNotNull(retrievedSetting);
+            assertNull(absentSetting);
+        }
 
-            // We need the references to be equal
-            assertEquals(expectedSetting1, retrievedSetting1);
-            assertEquals(expectedSetting2, retrievedSetting2);
+        @Test(expected = ClassCastException.class)
+        public void testGetInvalidType() {
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
+
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
+
+            Setting<String> retrievedSetting = config.get(id, String.class);
         }
     }
 
@@ -73,7 +83,10 @@ public class FlexibleConfigTest {
         @Test
         public void testContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
-            config.add(new MockSetting<Integer>(id));
+
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
             assertTrue(config.contains(id));
         }
@@ -81,13 +94,17 @@ public class FlexibleConfigTest {
         @Test
         public void testNotContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
-            config.add(new MockSetting<Integer>(id));
+
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
             assertFalse(config.contains(KEY_NON_EXISTENT));
         }
     }
 
     public static class Add {
+        private static final SimpleUri ID = new SimpleUri("engine-tests:TestSetting");
         private FlexibleConfig config;
 
         @Before
@@ -97,17 +114,42 @@ public class FlexibleConfigTest {
 
         @Test
         public void testAdd() throws Exception {
-            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
+            final Integer defaultValue = 5;
 
-            assertTrue(config.add(new MockSetting(id)));
+            final SettingConstraint<Integer> constraint =
+                    new NumberRangeConstraint<>(0, 10, true, true);
+
+            final String name = "name";
+            final String description = "description";
+
+            assertTrue(config.newEntry(ID, Integer.class)
+                    .setDefaultValue(defaultValue)
+                    .setConstraint(constraint)
+                    .setHumanReadableName(name)
+                    .setDescription(description)
+                    .addToConfig());
+
+            Setting<Integer> setting = config.get(ID, Integer.class);
+
+            assertEquals(ID, setting.getId());
+            assertEquals(defaultValue, setting.getDefaultValue());
+            assertEquals(constraint, setting.getConstraint());
+            assertEquals(name, setting.getHumanReadableName());
+            assertEquals(description, setting.getDescription());
         }
 
         @Test
         public void testAddExisting() throws Exception {
-            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
+            assertTrue(config.newEntry(ID, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig());
 
-            assertTrue(config.add(new MockSetting<Integer>(id)));
-            assertFalse(config.add(new MockSetting<Double>(id)));
+            FlexibleConfig.SettingEntry<Integer> entry = config.newEntry(ID, Integer.class);
+
+            assertNotNull(entry);
+
+            assertFalse(entry.setDefaultValue(0)
+                    .addToConfig());
         }
     }
 
@@ -124,8 +166,12 @@ public class FlexibleConfigTest {
             SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
             SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
-            config.add(new MockSetting(id1));
-            config.add(new MockSetting(id2));
+            config.newEntry(id1, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
+            config.newEntry(id2, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
             assertTrue(config.remove(id1));
             assertTrue(config.remove(id2));
@@ -134,7 +180,10 @@ public class FlexibleConfigTest {
         @Test
         public void testNonexistentRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
-            config.add(new MockSetting(id));
+
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
 
             assertFalse(config.remove(KEY_NON_EXISTENT));
         }
@@ -142,8 +191,13 @@ public class FlexibleConfigTest {
         @Test
         public void testSubscribedRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
-            Setting setting = new MockSetting(id);
-            config.add(setting);
+
+            config.newEntry(id, Integer.class)
+                    .setDefaultValue(0)
+                    .addToConfig();
+
+            Setting setting = config.get(id, Integer.class);
+
             setting.subscribe(propertyChangeEvent -> {
             });
 
@@ -170,19 +224,34 @@ public class FlexibleConfigTest {
 
         private FlexibleConfig config;
 
-        private SettingImpl<TestEnum> testEnumSetting;
-        private SettingImpl<Double> doubleSetting;
-        private SettingImpl<TestClass> testClassSetting;
+        private Setting<TestEnum> testEnumSetting;
+        private Setting<Double> doubleSetting;
+        private Setting<TestClass> testClassSetting;
 
         private void setupSettings() {
-            testEnumSetting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting1"), TestEnum.A1);
-            config.add(testEnumSetting);
+            SimpleUri testEnumSettingId = new SimpleUri("engine-tests:TestSetting1");
 
-            doubleSetting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting2"), 30.0);
-            config.add(doubleSetting);
+            config.newEntry(testEnumSettingId, TestEnum.class)
+                    .setDefaultValue(TestEnum.A1)
+                    .addToConfig();
 
-            testClassSetting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting3"), new TestClass(101));
-            config.add(testClassSetting);
+            testEnumSetting = config.get(testEnumSettingId, TestEnum.class);
+
+            SimpleUri doubleSettingId = new SimpleUri("engine-tests:TestSetting2");
+
+            config.newEntry(doubleSettingId, Double.class)
+                    .setDefaultValue(30.0)
+                    .addToConfig();
+
+            doubleSetting = config.get(doubleSettingId, Double.class);
+
+            SimpleUri testClassSettingId = new SimpleUri("engine-tests:TestSetting3");
+
+            config.newEntry(testClassSettingId, TestClass.class)
+                    .setDefaultValue(new TestClass(101))
+                    .addToConfig();
+
+            testClassSetting = config.get(testClassSettingId, TestClass.class);
         }
 
         @Before

@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.validators;
+package org.terasology.config.flexible.constraints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.flexible.Setting;
 
 /**
- * Validates a {@link Number} within the specified range.
+ * Constrains a {@link Number} within the specified range in a {@link Setting}.
  *
- * @param <T> The type of the {@link Number} to validate.
+ * @param <T> The type of {@link Number} to constrain.
  */
-public class RangedNumberValidator<T extends Number & Comparable<? super T>> implements SettingValueValidator<T> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RangedNumberValidator.class);
+public class NumberRangeConstraint<T extends Number & Comparable<? super T>> implements SettingConstraint<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NumberRangeConstraint.class);
     private boolean minInclusive;
     private boolean maxInclusive;
 
@@ -32,13 +33,14 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
     private T max;
 
     /**
-     * Creates a new instance of {@link RangedNumberValidator}.
+     * Creates a new instance of {@link NumberRangeConstraint}.
+     * 
      * @param min The minimum value in the range. A null value signifies the absence of any minimum value.
      * @param max The maximum value in the range. A null value signifies the absence of any maximum value.
      * @param minInclusive Should the minimum value be included in the range?
      * @param maxInclusive Should the maximum value be included in the range?
      */
-    public RangedNumberValidator(T min, T max, boolean minInclusive, boolean maxInclusive) {
+    public NumberRangeConstraint(T min, T max, boolean minInclusive, boolean maxInclusive) {
         this.min = min;
         this.max = max;
 
@@ -78,7 +80,7 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
      * {@inheritDoc}
      */
     @Override
-    public boolean fastValidate(T value) {
+    public boolean isSatisfiedBy(T value) {
         boolean withinMinBoundary = true;
 
         if (min != null) {
@@ -107,7 +109,7 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
      * {@inheritDoc}
      */
     @Override
-    public void issueWarnings(T value) {
+    public void warnUnsatisfiedBy(T value) {
         LOGGER.warn("Value {} is not in the range {}{}, {}{}", value, minInclusive ? "[" : "(",
                 min != null ? min : "UNBOUNDED", max != null ? max : "UNBOUNDED", maxInclusive ? "]" : ")");
     }

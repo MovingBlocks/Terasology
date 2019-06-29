@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.internal;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -23,16 +23,21 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.flexible.FlexibleConfig;
+import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
  * {@inheritDoc}
  */
-public class FlexibleConfigImpl implements FlexibleConfig {
+class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final String DESCRIPTION_PROPERTY_NAME = "description";
@@ -50,24 +55,8 @@ public class FlexibleConfigImpl implements FlexibleConfig {
      * {@inheritDoc}
      */
     @Override
-    public boolean add(Setting setting) {
-        SimpleUri id = setting.getId();
-
-        if (id == null) {
-            LOGGER.warn("The id of a setting cannot be null.");
-            return false;
-        } else if (contains(id)) {
-            LOGGER.warn("A Setting with the id \"{}\" already exists.", id);
-            return false;
-        }
-
-        if (temporarilyParkedSettings.containsKey(id)) {
-            setting.setValueFromJson(temporarilyParkedSettings.remove(id));
-        }
-
-        settings.put(id, setting);
-
-        return true;
+    public <V> SettingEntry<V> newEntry(SimpleUri id, Class<V> valueType) {
+        return new SettingImplEntry<>(id);
     }
 
     /**
@@ -75,7 +64,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
      */
     @Override
     public boolean remove(SimpleUri id) {
-        Setting setting = get(id);
+        Setting setting = settings.get(id);
 
         if (setting == null) {
             LOGGER.warn("Setting \"{}\" does not exist.", id);
@@ -94,8 +83,23 @@ public class FlexibleConfigImpl implements FlexibleConfig {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <V> Setting<V> get(SimpleUri id) {
-        return (Setting<V>) settings.get(id);
+    public <V> Setting<V> get(SimpleUri id, Class<V> valueType) {
+        Setting setting = settings.get(id);
+
+        if (setting == null) {
+            return null;
+        }
+
+        Class settingValueClass = setting.getValueClass();
+
+        if (!settingValueClass.equals(valueType)) {
+            throw new ClassCastException(
+                    "Expected a Setting of type " + valueType.getName() +
+                    ", found a Setting of type " + settingValueClass.getName()
+            );
+        }
+
+        return (Setting<V>) setting;
     }
 
     /**
@@ -107,8 +111,8 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     }
 
     @Override
-    public Map<SimpleUri, Setting> getSettings() {
-        return settings;
+    public Collection<Setting> getSettings() {
+        return Collections.unmodifiableCollection(settings.values());
     }
 
     @Override
@@ -154,6 +158,76 @@ public class FlexibleConfigImpl implements FlexibleConfig {
 
         } catch (Exception e) {
             throw new RuntimeException("Error parsing config file!");
+        }
+    }
+
+    /**
+     * The {@link FlexibleConfig.SettingEntry} implementation to build and add a {@link SettingImpl}
+     * to a {@link FlexibleConfigImpl}.
+     *
+     * @param <T> The type of values that can be stored in the {@link SettingImpl}.
+     */
+    private class SettingImplEntry<T> implements SettingEntry<T>, SettingEntry.Builder<T> {
+        private SimpleUri id;
+        private T defaultValue;
+        private SettingConstraint<T> constraint = null;
+        private String humanReadableName = "";
+        private String description = "";
+
+        private SettingImplEntry(SimpleUri id) {
+            this.id = id;
+        }
+
+        @Override
+        public Builder<T> setDefaultValue(T defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        @Override
+        public Builder<T> setConstraint(SettingConstraint<T> constraint) {
+            this.constraint = constraint;
+
+            return this;
+        }
+
+        @Override
+        public Builder<T> setHumanReadableName(String humanReadableName) {
+            this.humanReadableName = humanReadableName;
+
+            return this;
+        }
+
+        @Override
+        public Builder<T> setDescription(String description) {
+            this.description = description;
+
+            return this;
+        }
+
+        @Override
+        public boolean addToConfig() {
+            SettingImpl<T> setting = new SettingImpl<>(
+                    id, defaultValue, constraint, humanReadableName, description
+            );
+
+            if (id == null) {
+                LOGGER.warn("The id of a setting cannot be null.");
+                return false;
+            } else if (FlexibleConfigImpl.this.contains(id)) {
+                LOGGER.warn("A Setting with the id \"{}\" already exists.", id);
+                return false;
+            }
+
+            if (FlexibleConfigImpl.this.temporarilyParkedSettings.containsKey(id)) {
+                String valueAsJson = FlexibleConfigImpl.this.temporarilyParkedSettings.remove(id);
+                setting.setValueFromJson(valueAsJson);
+            }
+
+            FlexibleConfigImpl.this.settings.put(id, setting);
+
+            return true;
         }
     }
 }

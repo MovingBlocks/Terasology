@@ -23,10 +23,8 @@ import org.terasology.config.facade.BindsConfiguration;
 import org.terasology.config.facade.BindsConfigurationImpl;
 import org.terasology.config.facade.InputDeviceConfiguration;
 import org.terasology.config.facade.InputDeviceConfigurationImpl;
-import org.terasology.config.flexible.FlexibleConfig;
-import org.terasology.config.flexible.FlexibleConfigImpl;
 import org.terasology.config.flexible.FlexibleConfigManager;
-import org.terasology.config.flexible.FlexibleConfigManagerImpl;
+import org.terasology.config.flexible.internal.FlexibleConfigManagerImpl;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -59,8 +57,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         rootContext.put(FlexibleConfigManager.class, flexibleConfigManager);
 
         // TODO: Update rendering config description
-        FlexibleConfig renderingFlexibleConfig = new FlexibleConfigImpl("Rendering Config");
-        flexibleConfigManager.addConfig(new SimpleUri("engine:rendering"), renderingFlexibleConfig);
+        flexibleConfigManager.addNewConfig(new SimpleUri("engine:rendering"), "Rendering Config");
 
         flexibleConfigManager.loadAllConfigs();
         // Add settings to RenderingFC

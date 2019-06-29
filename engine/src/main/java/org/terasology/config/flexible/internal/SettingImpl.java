@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -22,7 +22,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.validators.SettingValueValidator;
+import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeEvent;
@@ -35,7 +36,7 @@ import java.util.Set;
  *
  * @param <T> The type of the value this {@link SettingImpl} contains.
  */
-public class SettingImpl<T> implements Setting<T> {
+class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -47,36 +48,33 @@ public class SettingImpl<T> implements Setting<T> {
 
     protected T value;
 
-    private String humanReadableName;
+    private final String humanReadableName;
+    private final String description;
 
-    private String description;
-    private SettingValueValidator<T> validator;
-    private Set<PropertyChangeListener> subscribers;
+    private final SettingConstraint<T> constraint;
+    private final Set<PropertyChangeListener> subscribers = Sets.newHashSet();
 
     /**
-     * Creates a new {@link SettingImpl} with the given id and default value but no validator.
+     * Creates a new {@link SettingImpl} with the given id, default value and constraint.
      *
-     * @param id           the id of the setting.
-     * @param defaultValue the default value of the setting.
-     */
-    public SettingImpl(SimpleUri id, T defaultValue) {
-        this(id, defaultValue, null);
-    }
-
-    /**
-     * Creates a new {@link SettingImpl} with the given id, default value and validator.
-     * @param id           the id of the setting.
-     * @param defaultValue the default value of the setting.
-     * @param validator    the validator to be used to validate values.
+     * @param id                The id of the setting.
+     * @param defaultValue      The default value of the setting.
+     * @param constraint        The constraint that the setting values must satisfy.
+     * @param humanReadableName The human readable name of the setting.
+     * @param description       A description of the setting.
      */
     @SuppressWarnings("unchecked")
-    public SettingImpl(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
+    SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint,
+                       String humanReadableName, String description) {
         this.id = id;
+        this.humanReadableName = humanReadableName;
+        this.description = description;
+
         this.warningFormatString = MessageFormat.format("Setting {0}: '{'0}'", this.id);
 
-        this.validator = validator;
+        this.constraint = constraint;
 
-        if (!validate(defaultValue)) {
+        if (isConstraintUnsatisfiedBy(defaultValue)) {
             throw new IllegalArgumentException("The default value must be a valid value. " +
                     "Check the logs for more information.");
         }
@@ -93,15 +91,18 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     private void dispatchChangedEvent(PropertyChangeEvent event) {
-        if (subscribers != null) {
-            for (PropertyChangeListener subscriber : subscribers) {
-                subscriber.propertyChange(event);
-            }
+        for (PropertyChangeListener subscriber : subscribers) {
+            subscriber.propertyChange(event);
         }
     }
 
-    private boolean validate(T valueToValidate) {
-        return validator == null || validator.validate(valueToValidate);
+    private boolean isConstraintUnsatisfiedBy(T theValue) {
+        if (constraint == null || constraint.isSatisfiedBy(theValue)) {
+            return false;
+        } else {
+            constraint.warnUnsatisfiedBy(theValue);
+            return true;
+        }
     }
 
     /**
@@ -109,18 +110,13 @@ public class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean subscribe(PropertyChangeListener listener) {
-        if (subscribers == null) {
-            subscribers = Sets.newHashSet();
-        }
-
         if (listener == null) {
             LOGGER.warn(formatWarning("A null subscriber cannot be added."));
-
             return false;
         }
+
         if (subscribers.contains(listener)) {
             LOGGER.warn(formatWarning("The listener has already been subscribed."));
-
             return false;
         }
 
@@ -141,10 +137,6 @@ public class SettingImpl<T> implements Setting<T> {
 
         subscribers.remove(listener);
 
-        if (subscribers.size() <= 0) {
-            subscribers = null;
-        }
-
         return true;
     }
 
@@ -153,7 +145,7 @@ public class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean hasSubscribers() {
-        return subscribers != null;
+        return !subscribers.isEmpty();
     }
 
     /**
@@ -164,12 +156,17 @@ public class SettingImpl<T> implements Setting<T> {
         return id;
     }
 
+    @Override
+    public Class<T> getValueClass() {
+        return valueClass;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public SettingValueValidator<T> getValidator() {
-        return validator;
+    public SettingConstraint<T> getConstraint() {
+        return constraint;
     }
 
     /**
@@ -195,7 +192,7 @@ public class SettingImpl<T> implements Setting<T> {
     public boolean setValue(T newValue) {
         Preconditions.checkNotNull(newValue, formatWarning("The value of a setting cannot be null."));
 
-        if (!validate(newValue)) {
+        if (isConstraintUnsatisfiedBy(newValue)) {
             return false;
         }
 
