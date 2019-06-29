@@ -23,6 +23,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.serializers.GsonSerializer;
 import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
@@ -44,17 +45,14 @@ class RecordedEventSerializer {
 
     private static final Logger logger = LoggerFactory.getLogger(RecordedEventSerializer.class);
 
-    private GsonSerializer gsonSerializer = new GsonSerializer();
+    private GsonSerializer gsonSerializer;
     private TypeHandler<List<RecordedEvent>> recordedEventListTypeHandler;
 
     public RecordedEventSerializer(EntityManager entityManager, ModuleEnvironment moduleEnvironment) {
-        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-
         TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleEnvironment);
         typeHandlerLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
 
-        ClassLoader[] classLoaders = ReflectionUtil.getComprehensiveEngineClassLoaders(moduleEnvironment);
+        gsonSerializer = new GsonSerializer(typeHandlerLibrary);
 
         this.recordedEventListTypeHandler = typeHandlerLibrary.getTypeHandler(
                 new TypeInfo<List<RecordedEvent>>() {}).get();
@@ -68,8 +66,8 @@ class RecordedEventSerializer {
      */
     public void serializeRecordedEvents(List<RecordedEvent> events, String filePath) {
         try {
-            gsonSerializer.writeJson(events, recordedEventListTypeHandler, filePath);
-        } catch (IOException e) {
+            gsonSerializer.writeJson(events, new TypeInfo<List<RecordedEvent>>() {}, filePath);
+        } catch (IOException | SerializationException e) {
             logger.error("Error while serializing recorded events", e);
         }
     }

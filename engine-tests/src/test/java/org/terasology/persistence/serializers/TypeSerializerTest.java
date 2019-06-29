@@ -50,24 +50,22 @@ public class TypeSerializerTest {
     public static class Json {
         private static final String INSTANCE_JSON = "{\"data\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"content\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"content\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
 
-        final Reflections reflections = new Reflections(getClass().getClassLoader());
+        private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
         private final TypeHandlerLibrary typeHandlerLibrary =
                 TypeHandlerLibrary.withDefaultHandlers(reflections);
 
+        private final GsonSerializer serializer = new GsonSerializer(typeHandlerLibrary);
+
         @Test
         public void testJsonSerialize() {
-            GsonSerializer gsonSerializer = new GsonSerializer();
-
-            TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
-
-            assertEquals(INSTANCE_JSON, gsonSerializer.toJson(INSTANCE, typeHandler));
+            String serializedJson = serializer.toJson(INSTANCE, new TypeInfo<SomeClass<Integer>>() {});
+            assertEquals(INSTANCE_JSON, serializedJson);
         }
 
         @Test
         public void testDeserialize() {
-            GsonSerializer gsonSerializer = new GsonSerializer();
-            PersistedData persistedData = gsonSerializer.persistedDataFromJson(INSTANCE_JSON);
+            PersistedData persistedData = serializer.persistedDataFromJson(INSTANCE_JSON);
 
             TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
 
@@ -82,6 +80,7 @@ public class TypeSerializerTest {
 
         private final TypeHandlerLibrary typeHandlerLibrary =
                 TypeHandlerLibrary.withDefaultHandlers(reflections);
+
         @Test
         public void testSerializeDeserialize() throws IOException {
             TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
@@ -109,8 +108,12 @@ public class TypeSerializerTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             SomeClass<?> someClass = (SomeClass<?>) o;
             return Objects.equals(data, someClass.data) &&
                     Objects.equals(list, someClass.list) &&
@@ -141,8 +144,12 @@ public class TypeSerializerTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Animal animal = (Animal) o;
             return Objects.equals(name, animal.name);
         }
@@ -163,9 +170,15 @@ public class TypeSerializerTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             Dog dog = (Dog) o;
             return Objects.equals(tailPosition, dog.tailPosition);
         }
@@ -194,9 +207,15 @@ public class TypeSerializerTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             Cheetah cheetah = (Cheetah) o;
             return Objects.equals(spotColor, cheetah.spotColor);
         }

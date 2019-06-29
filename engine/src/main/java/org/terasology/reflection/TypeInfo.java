@@ -102,4 +102,9 @@ public class TypeInfo<T> {
         return o instanceof TypeInfo<?>
                 && ReflectionUtil.typeEquals(type, ((TypeInfo<?>) o).type);
     }
+
+    @Override
+    public String toString() {
+        return type.toString();
+    }
 }
