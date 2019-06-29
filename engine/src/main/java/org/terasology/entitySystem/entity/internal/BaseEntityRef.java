@@ -30,6 +30,7 @@ import org.terasology.persistence.serializers.EntitySerializer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
+import java.util.List;
 
 import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
 import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
@@ -209,6 +210,15 @@ public abstract class BaseEntityRef extends EntityRef {
     @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return exists() && entityManager.hasComponent(getId(), component);
+    }
+
+    @Override
+    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+        boolean hasComponents = false;
+        for (Class<? extends Component> component : filterComponents) {
+            hasComponents |= entityManager.hasComponent(getId(), component);
+        }
+        return exists() && hasComponents;
     }
 
     @Override

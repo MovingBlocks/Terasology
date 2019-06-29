@@ -29,6 +29,7 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.prefab.Prefab;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -137,6 +138,11 @@ public class EntityBuilder implements MutableComponentContainer {
     @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return components.keySet().contains(component);
+    }
+
+    @Override
+    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+        return !Collections.disjoint(components.keySet(), filterComponents);
     }
 
     @Override

@@ -20,6 +20,8 @@ import org.terasology.assets.AssetData;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.MutableComponentContainer;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,6 +63,11 @@ public class PrefabData implements MutableComponentContainer, AssetData {
     @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return components.containsKey(component);
+    }
+
+    @Override
+    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+        return !Collections.disjoint(components.keySet(), filterComponents);
     }
 
     @Override

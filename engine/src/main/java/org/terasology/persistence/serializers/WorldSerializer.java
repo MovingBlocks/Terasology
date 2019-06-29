@@ -15,7 +15,10 @@
  */
 package org.terasology.persistence.serializers;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.protobuf.EntityData;
+
+import java.util.List;
 
 /**
  * Serializes an entity system, with all prefabs and entities.
@@ -27,6 +30,12 @@ public interface WorldSerializer {
      * @return The serialized form of the current EntityManager's and PrefabManager's data
      */
     EntityData.GlobalStore serializeWorld(boolean verbose);
+
+    /**
+     * @return The serialized form of the current EntityManager's and PrefabManager's data filtered by list of Components
+     */
+    EntityData.GlobalStore serializeWorld(boolean verbose, List<Class<? extends Component>> filterComponent);
+
 
     /**
      * Deserializes a world message, applying it to the current EntityManager

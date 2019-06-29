@@ -15,6 +15,8 @@
  */
 package org.terasology.entitySystem;
 
+import java.util.List;
+
 /**
  */
 public interface ComponentContainer {
@@ -24,6 +26,13 @@ public interface ComponentContainer {
      * @return If this has a component of the given type
      */
     boolean hasComponent(Class<? extends Component> component);
+
+    /**
+     * @param filterComponents
+     * @return If this has at least one component from the list of components
+     */
+    boolean hasComponents(List<Class<? extends Component>> filterComponents);
+
 
     /**
      * @param componentClass

@@ -16,6 +16,7 @@
 package org.terasology.persistence;
 
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.PrefabSerializer;
@@ -27,6 +28,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Used to create a dump of the current state of the world (specifically, entities)
@@ -42,6 +44,25 @@ public class WorldDumper {
 
     public void save(Path file) throws IOException {
         final EntityData.GlobalStore world = persisterHelper.serializeWorld(true);
+
+        Path parentFile = file.toAbsolutePath().getParent();
+        if (!Files.isDirectory(parentFile)) {
+            Files.createDirectories(parentFile);
+        }
+
+        try (BufferedWriter writer = Files.newBufferedWriter(file, TerasologyConstants.CHARSET)) {
+            EntityDataJSONFormat.write(world, writer);
+        }
+    }
+
+    /***
+     * Save World entities, which only contain some of Components
+     * @param file
+     * @param filterComponents
+     * @throws IOException
+     */
+    public void save(Path file, List<Class<? extends Component>> filterComponents) throws IOException {
+        final EntityData.GlobalStore world = persisterHelper.serializeWorld(true, filterComponents);
 
         Path parentFile = file.toAbsolutePath().getParent();
         if (!Files.isDirectory(parentFile)) {

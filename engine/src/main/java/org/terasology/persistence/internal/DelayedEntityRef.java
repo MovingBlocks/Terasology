@@ -21,6 +21,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
+import java.util.List;
+
 /**
  * The class represents a future entity ref that has yet to be bound to an entity manager.
  * <p>
@@ -134,6 +136,11 @@ public class DelayedEntityRef extends EntityRef {
     @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return getEntityRef().hasComponent(component);
+    }
+
+    @Override
+    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+        return getEntityRef().hasComponents(filterComponents);
     }
 
     @Override

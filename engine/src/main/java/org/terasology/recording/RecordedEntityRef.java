@@ -22,6 +22,9 @@ import org.terasology.entitySystem.entity.internal.NullEntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Class used instead of other EntityRef types during RecordedEvent deserialization. This class is necessary because
  * during RecordedEvent deserialization, it is not possible to correctly deserialize EntityRef fields because they do
@@ -144,6 +147,12 @@ public class RecordedEntityRef extends EntityRef {
     public boolean hasComponent(Class<? extends Component> component) {
         updateRealEntityRef();
         return this.realEntityRef.hasComponent(component);
+    }
+
+    @Override
+    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+        updateRealEntityRef();
+        return this.realEntityRef.hasComponents(filterComponents);
     }
 
     @Override
