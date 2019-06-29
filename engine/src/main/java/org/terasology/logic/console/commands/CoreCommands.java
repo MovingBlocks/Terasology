@@ -16,7 +16,6 @@
 package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Ordering;
-import org.apache.http.util.EntityUtils;
 import org.reflections.Reflections;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -33,12 +32,10 @@ import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
@@ -65,10 +62,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.PingService;
 import org.terasology.network.Server;
 import org.terasology.persistence.WorldDumper;
-import org.terasology.persistence.serializers.EntityDataJSONFormat;
-import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.PrefabSerializer;
-import org.terasology.protobuf.EntityData;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
@@ -478,7 +472,7 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             Reflections reflections = new Reflections("org.terasology");
             List<Class<? extends Component>> filterComponents = new LinkedList<>();
-            List<String> componentNamesList = Arrays.asList(componentNames.split(" "));
+            List<String> componentNamesList = new LinkedList<>(Arrays.asList(componentNames.split(" ")));
             for (String componentName : componentNamesList) {
                 if (componentName.trim().length() > 0) {
                     Optional<Class<? extends Component>> component = reflections.getSubTypesOf(Component.class).stream().filter(e -> e.getSimpleName().equals(componentName)).findFirst();
