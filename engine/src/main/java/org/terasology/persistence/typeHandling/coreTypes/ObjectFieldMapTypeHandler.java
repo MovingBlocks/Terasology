@@ -23,6 +23,7 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.lang.reflect.Field;
@@ -46,7 +47,7 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
         this.constructor = constructor;
         this.mappedFields = fieldTypeHandlers;
         for (Field field : fieldTypeHandlers.keySet()) {
-            this.fieldByName.put(field.getName(), field);
+            this.fieldByName.put(getFieldName(field), field);
         }
     }
 
@@ -69,11 +70,21 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
                 TypeHandler handler = entry.getValue();
                 PersistedData fieldValue = handler.serialize(val, serializer);
                 if (fieldValue != null) {
-                    mappedData.put(field.getName(), fieldValue);
+                    mappedData.put(getFieldName(field), fieldValue);
                 }
             }
         }
         return serializer.serialize(mappedData);
+    }
+
+    private String getFieldName(Field field) {
+        SerializedName serializedName = field.getAnnotation(SerializedName.class);
+
+        if (serializedName == null) {
+            return field.getName();
+        }
+        
+        return serializedName.value();
     }
 
     @Override

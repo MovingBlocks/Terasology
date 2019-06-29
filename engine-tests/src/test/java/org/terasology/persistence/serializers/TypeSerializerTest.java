@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.reflections.Reflections;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.Color;
 
@@ -46,7 +47,7 @@ public class TypeSerializerTest {
     }
 
     public static class Json {
-        private static final String INSTANCE_JSON = "{\"data\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"content\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"content\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
+        private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"content\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"content\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
 
         private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
@@ -90,6 +91,7 @@ public class TypeSerializerTest {
     }
 
     private static class SomeClass<T> {
+        @SerializedName("generic-t")
         private T data;
         private List<T> list = Lists.newArrayList();
         private Set<Animal> animals = Sets.newHashSet();
