@@ -16,10 +16,12 @@
 package org.terasology.persistence.serializers;
 
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.SerializationException;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.protobuf.EntityData;
+import org.terasology.reflection.TypeInfo;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,113 +31,140 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Optional;
 
 /**
  * ProtobufSerializer provides the ability to serialize and deserialize between objects and bytes
- * <br><br>
+ * <p>
  * Serialized bytes can be forwarded/written to various output types
- * <br><br>
+ * <p>
  * Various input types of serialized bytes can be deserialized and returned as PersistedData objects
- *
  */
-public class ProtobufSerializer {
+public class ProtobufSerializer extends AbstractSerializer {
+    public ProtobufSerializer(TypeHandlerLibrary typeHandlerLibrary) {
+        super(typeHandlerLibrary, new ProtobufPersistedDataSerializer());
+    }
 
     /**
-     * Converts the object into an array of bytes and forwards it to {@link #writeBytes(Object, TypeHandler, OutputStream)}
-     * 
+     * Converts the object into an array of bytes and forwards it to {@link #writeBytes(Object, TypeInfo, OutputStream)}
+     *
      * @param object      the object to be serialized
-     * @param typeHandler contains how the object will be serialized
+     * @param typeInfo contains how the object will be serialized
      * @return the byte array of the object
      * @throws IOException throws if there is an error writing to the stream
      */
-    public <T> byte[] toBytes(T object, TypeHandler<T> typeHandler) throws IOException {
+    public <T> byte[] toBytes(T object, TypeInfo<T> typeInfo) throws IOException {
         try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
-            writeBytes(object, typeHandler, stream);
+            writeBytes(object, typeInfo, stream);
             return stream.toByteArray();
         }
     }
 
     /**
      * Takes a string path of a file and writes the serialized bytes into that file
-     * 
-     * @see #writeBytes(Object, TypeHandler, File)
+     *
      * @param object      the object to be serialized
-     * @param typeHandler contains how the object will be serialized
+     * @param typeInfo contains how the object will be serialized
      * @param fileName    the path of the file in which it is being written to
      * @throws IOException gets thrown if there is an error writing to the file
+     * @see #writeBytes(Object, TypeInfo, File)
      */
-    public <T> void writeBytes(T object, TypeHandler<T> typeHandler, String fileName) throws IOException {
-        writeBytes(object, typeHandler, new File(fileName));
+    public <T> void writeBytes(T object, TypeInfo<T> typeInfo, String fileName)
+            throws SerializationException, IOException {
+        writeBytes(object, typeInfo, new File(fileName));
     }
 
     /**
      * Writes an object's bytes to a file.
-     * 
-     * @see #writeBytes(Object, TypeHandler, OutputStream)
+     *
      * @param object      the object to be serialized
-     * @param typeHandler contains how the object will be serialized
+     * @param typeInfo contains how the object will be serialized
      * @param file        file that the bytes will be written to
      * @throws IOException gets thrown if there is an error writing to the file
+     * @see #writeBytes(Object, TypeInfo, OutputStream)
      */
-    public <T> void writeBytes(T object, TypeHandler<T> typeHandler, File file) throws IOException {
-        writeBytes(object, typeHandler, new FileOutputStream(file));
+    public <T> void writeBytes(T object, TypeInfo<T> typeInfo, File file)
+            throws SerializationException, IOException {
+        try (FileOutputStream stream = new FileOutputStream(file)) {
+            writeBytes(object, typeInfo, stream);
+        }
     }
 
     /**
      * Writes a given object to an OutputStream using protobuf and TypeHandler
      * serialization
-     * 
+     *
      * @param object      the object to be serialized
-     * @param typeHandler contains how the object will be serialized
+     * @param typeInfo contains how the object will be serialized
      * @param stream      stream that the bytes will be written to
-     * @throws IOException will be thrown if there is an error writing to the stream
      */
-    public <T> void writeBytes(T object, TypeHandler<T> typeHandler, OutputStream stream) throws IOException {
-        ProtobufPersistedData persistedData = (ProtobufPersistedData) typeHandler.serialize(object,
-                new ProtobufPersistedDataSerializer());
+    public <T> void writeBytes(T object, TypeInfo<T> typeInfo, OutputStream stream)
+            throws SerializationException {
+        Optional<PersistedData> serialized = this.serialize(object, typeInfo);
 
-        persistedData.getValue().writeDelimitedTo(stream);
+        if (!serialized.isPresent()) {
+            throw new SerializationException("Could not find a TypeHandler for the type " + typeInfo);
+        }
+
+        ProtobufPersistedData persistedData = (ProtobufPersistedData) serialized.get();
+
+        try {
+            persistedData.getValue().writeDelimitedTo(stream);
+        } catch (IOException e) {
+            throw new SerializationException("Could not write bytes to stream", e);
+        }
     }
 
     /**
      * Gets the PersistedData from a byte stream (InputStream).
-     * 
-     * @see #persistedDatafromBytes(File)
+     *
      * @param stream InputStream that will be deserialized
      * @return deserialized ProtobufPersistedData object
-     * @throws IOException if there is an issue parsing the stream
+     * @throws SerializationException if there is an issue parsing the stream
      */
-    public PersistedData persistedDatafromBytes(InputStream stream) throws IOException {
-        EntityData.Value value = EntityData.Value.parseDelimitedFrom(stream);
+    public <T> T fromBytes(InputStream stream, TypeInfo<T> typeInfo) throws SerializationException {
+        EntityData.Value value;
 
-        return new ProtobufPersistedData(value);
+        try {
+            value = EntityData.Value.parseDelimitedFrom(stream);
+        } catch (IOException e) {
+            throw new SerializationException("Could not parse bytes from Stream", e);
+        }
+
+        Optional<T> deserialized = this.deserialize(new ProtobufPersistedData(value), typeInfo);
+
+        if (!deserialized.isPresent()) {
+            throw new SerializationException("Could not deserialize object of type " + typeInfo);
+        }
+
+        return deserialized.get();
     }
 
     /**
      * Gets the PersistedData from a File.
-     * 
-     * @see #persistedDatafromBytes(InputStream)
+     *
      * @param file contains the bytes that will be deserialized
      * @return deserialized ProtobufPersistedData object
      * @throws IOException gets thrown if there is an issue reading the file
+     * @see #fromBytes(InputStream, TypeInfo)
      */
-    public PersistedData persistedDatafromBytes(File file) throws IOException {
+    public <T> T fromBytes(File file, TypeInfo<T> typeInfo) throws IOException, SerializationException {
         try (InputStream stream = new FileInputStream(file)) {
-            return persistedDatafromBytes(stream);
+            return fromBytes(stream, typeInfo);
         }
     }
 
     /**
      * Gets the PersistedData from an array of bytes.
-     * 
-     * @see #persistedDatafromBytes(InputStream)
+     *
      * @param bytes array of bytes to be deserialized
      * @return deserialized ProtobufData object
      * @throws IOException gets thrown if there is an issue creating the InputStream
+     * @see #fromBytes(InputStream, TypeInfo)
      */
-    public PersistedData persistedDatafromBytes(byte[] bytes) throws IOException {
+    public <T> T fromBytes(byte[] bytes, TypeInfo<T> typeInfo) throws IOException {
         try (InputStream reader = new ByteArrayInputStream(bytes)) {
-            return persistedDatafromBytes(reader);
+            return fromBytes(reader, typeInfo);
         }
     }
 }

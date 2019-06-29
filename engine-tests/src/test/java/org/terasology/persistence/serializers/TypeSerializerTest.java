@@ -22,8 +22,6 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.reflections.Reflections;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.Color;
@@ -73,22 +71,19 @@ public class TypeSerializerTest {
     }
 
     public static class Protobuf {
-        final Reflections reflections = new Reflections(getClass().getClassLoader());
+        private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
         private final TypeHandlerLibrary typeHandlerLibrary =
                 TypeHandlerLibrary.withDefaultHandlers(reflections);
 
+        private final ProtobufSerializer serializer = new ProtobufSerializer(typeHandlerLibrary);
+
         @Test
         public void testSerializeDeserialize() throws IOException {
-            TypeHandler<SomeClass<Integer>> typeHandler = typeHandlerLibrary.getTypeHandler(new TypeInfo<SomeClass<Integer>>() {}).get();
+            byte[] bytes = serializer.toBytes(INSTANCE, new TypeInfo<SomeClass<Integer>>() {});
 
-            ProtobufSerializer protobufSerializer = new ProtobufSerializer();
-
-            byte[] bytes = protobufSerializer.toBytes(INSTANCE, typeHandler);
-
-            PersistedData persistedData = protobufSerializer.persistedDatafromBytes(bytes);
-
-            SomeClass<Integer> deserializedInstance = typeHandler.deserialize(persistedData).get();
+            SomeClass<Integer> deserializedInstance =
+                    serializer.fromBytes(bytes, new TypeInfo<SomeClass<Integer>>() {});
 
             assertEquals(INSTANCE, deserializedInstance);
         }
