@@ -101,7 +101,7 @@ public class RuntimeDelegatingTypeHandlerTest {
 
     @Test
     public void testDeserialize() {
-        Class<Sub> subType = Sub.class;
+        Type subType = Sub.class;
         Type baseType = TypeInfo.of(Base.class).getType();
 
         abstract class SubHandler extends TypeHandler<Sub> {}
@@ -124,7 +124,7 @@ public class RuntimeDelegatingTypeHandlerTest {
         PersistedData persistedSub = new PersistedMap(
                 ImmutableMap.of(
                         RuntimeDelegatingTypeHandler.TYPE_FIELD,
-                        new PersistedString(subType.getName()),
+                        new PersistedString(((Class<?>) subType).getName()),
                         RuntimeDelegatingTypeHandler.VALUE_FIELD,
                         new PersistedMap(ImmutableMap.of())
                 )
