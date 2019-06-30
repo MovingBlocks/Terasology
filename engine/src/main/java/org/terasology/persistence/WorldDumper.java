@@ -42,7 +42,13 @@ public class WorldDumper {
         this.persisterHelper = new WorldSerializerImpl(entityManager, prefabSerializer);
     }
 
-    public void save(Path file) throws IOException {
+    /**
+     * Save all world entities to file
+     * @param file  path to file in which entities will be saved
+     * @return number of saved entities and prefabs
+     * @throws IOException thrown when error occurs while saving world to file
+     */
+    public int save(Path file) throws IOException {
         final EntityData.GlobalStore world = persisterHelper.serializeWorld(true);
 
         Path parentFile = file.toAbsolutePath().getParent();
@@ -53,15 +59,17 @@ public class WorldDumper {
         try (BufferedWriter writer = Files.newBufferedWriter(file, TerasologyConstants.CHARSET)) {
             EntityDataJSONFormat.write(world, writer);
         }
+        return world.getEntityCount() + world.getPrefabCount();
     }
 
     /***
      * Save World entities, which only contain some of Components
-     * @param file
-     * @param filterComponents
-     * @throws IOException
+     * @param file  path to file in which entities will be saved
+     * @param filterComponents list of component classes to filter by World entities
+     * @return number of saved entities and prefabs
+     * @throws IOException thrown when error occurs while saving world to file
      */
-    public void save(Path file, List<Class<? extends Component>> filterComponents) throws IOException {
+    public int save(Path file, List<Class<? extends Component>> filterComponents) throws IOException {
         final EntityData.GlobalStore world = persisterHelper.serializeWorld(true, filterComponents);
 
         Path parentFile = file.toAbsolutePath().getParent();
@@ -72,5 +80,6 @@ public class WorldDumper {
         try (BufferedWriter writer = Files.newBufferedWriter(file, TerasologyConstants.CHARSET)) {
             EntityDataJSONFormat.write(world, writer);
         }
+        return world.getEntityCount() + world.getPrefabCount();
     }
 }

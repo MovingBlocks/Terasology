@@ -16,7 +16,7 @@
 package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Ordering;
-import org.reflections.Reflections;
+import com.google.common.collect.Streams;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -83,10 +83,15 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import java.util.List;
+import java.util.Set;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Arrays;
 
 /**
  * Adds a series of useful commands to the game. Likely these could be moved to more fitting places over time.
@@ -454,8 +459,13 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     /**
-     * Writes out information on all entities to a text file for debugging
+     * Writes out information on entities having specific components to a text file for debugging
+     * If no component names provided - writes out information on all entities
      *
+     * @param componentNames string contains one or several component names, if more then one name
+     *                       provided - they must be braced with double quotes and all names separated
+     *                       by space
+     * @return String containing information about number of entities saved
      * @throws IOException thrown when error with saving file occures
      */
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
@@ -463,26 +473,28 @@ public class CoreCommands extends BaseComponentSystem {
                     " Supports list of component names, which will be used to only save entities that contains" +
                     " all or some of those components. List of component names must be provided in double quotes" +
                     " and all names must be separated by spaces.")
-    public void dumpEntities(@CommandParam(value = "componentNames", required = false) String componentNames) throws IOException {
+    public String dumpEntities(@CommandParam(value = "componentNames", required = false) String componentNames) throws IOException {
+        int savedEntitiCount = 0;
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
         PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
         WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
         if (componentNames == null) {
-            worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+            savedEntitiCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
         } else {
-            Reflections reflections = new Reflections("org.terasology");
-            List<Class<? extends Component>> filterComponents = new LinkedList<>();
             List<String> componentNamesList = new LinkedList<>(Arrays.asList(componentNames.split(" ")));
-            for (String componentName : componentNamesList) {
-                if (componentName.trim().length() > 0) {
-                    Optional<Class<? extends Component>> component = reflections.getSubTypesOf(Component.class).stream().filter(e -> e.getSimpleName().equals(componentName)).findFirst();
-                    component.ifPresent(filterComponents::add);
-                }
-            }
+            List<Class<? extends Component>> filterComponents = componentNamesList.stream()
+                    .filter(o -> o.trim().length() > 0)
+                    .map(String::trim)
+                    .map(o -> Streams.stream(moduleManager.getEnvironment().getSubtypesOf(Component.class))
+                            .filter(e -> e.getSimpleName().equalsIgnoreCase(o)).findFirst())
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
             if (!filterComponents.isEmpty()) {
-                worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), filterComponents);
+                savedEntitiCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), filterComponents);
             }
         }
+        return "Number of entities saved: " + savedEntitiCount;
     }
 
     /**

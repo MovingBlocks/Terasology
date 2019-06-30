@@ -50,8 +50,13 @@ public class EntityStore implements MutableComponentContainer {
     }
 
     @Override
-    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+    public boolean hasAnyComponents(List<Class<? extends Component>> filterComponents) {
         return !Collections.disjoint(components.keySet(), filterComponents);
+    }
+
+    @Override
+    public boolean hasAllComponents(List<Class<? extends Component>> filterComponents) {
+        return components.keySet().containsAll(filterComponents);
     }
 
     @Override

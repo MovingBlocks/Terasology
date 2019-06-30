@@ -58,7 +58,12 @@ public final class NullEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+    public boolean hasAnyComponents(List<Class<? extends Component>> filterComponents) {
+        return false;
+    }
+
+    @Override
+    public boolean hasAllComponents(List<Class<? extends Component>> filterComponents) {
         return false;
     }
 

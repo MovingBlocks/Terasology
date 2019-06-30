@@ -139,8 +139,13 @@ public class DelayedEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
-        return getEntityRef().hasComponents(filterComponents);
+    public boolean hasAnyComponents(List<Class<? extends Component>> filterComponents) {
+        return getEntityRef().hasAnyComponents(filterComponents);
+    }
+
+    @Override
+    public boolean hasAllComponents(List<Class<? extends Component>> filterComponents) {
+        return getEntityRef().hasAllComponents(filterComponents);
     }
 
     @Override
