@@ -22,7 +22,6 @@ import org.terasology.entitySystem.entity.internal.NullEntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -150,9 +149,15 @@ public class RecordedEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+    public boolean hasAnyComponents(List<Class<? extends Component>> filterComponents) {
         updateRealEntityRef();
-        return this.realEntityRef.hasComponents(filterComponents);
+        return this.realEntityRef.hasAnyComponents(filterComponents);
+    }
+
+    @Override
+    public boolean hasAllComponents(List<Class<? extends Component>> filterComponents) {
+        updateRealEntityRef();
+        return this.realEntityRef.hasAllComponents(filterComponents);
     }
 
     @Override

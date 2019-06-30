@@ -101,13 +101,13 @@ public class WorldSerializerImpl implements WorldSerializer {
         }
 
         for (Prefab prefab : prefabManager.listPrefabs()) {
-            if (prefab.hasComponents(filterComponents)) {
+            if (prefab.hasAnyComponents(filterComponents)) {
                 world.addPrefab(prefabSerializer.serialize(prefab));
             }
         }
 
         for (EntityRef entity : entityManager.getAllEntities()) {
-            if ((verbose || entity.isPersistent()) && entity.hasComponents(filterComponents)) {
+            if ((verbose || entity.isPersistent()) && entity.hasAnyComponents(filterComponents)) {
                 world.addEntity(entitySerializer.serialize(entity));
             }
         }

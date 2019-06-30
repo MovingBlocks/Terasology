@@ -74,8 +74,13 @@ public class PojoPrefab extends Prefab {
     }
 
     @Override
-    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+    public boolean hasAnyComponents(List<Class<? extends Component>> filterComponents) {
         return !Collections.disjoint(componentMap.keySet(), filterComponents);
+    }
+
+    @Override
+    public boolean hasAllComponents(List<Class<? extends Component>> filterComponents) {
+        return componentMap.keySet().containsAll(filterComponents);
     }
 
     @Override

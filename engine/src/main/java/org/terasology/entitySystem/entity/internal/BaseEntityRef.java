@@ -213,12 +213,21 @@ public abstract class BaseEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean hasComponents(List<Class<? extends Component>> filterComponents) {
+    public boolean hasAnyComponents(List<Class<? extends Component>> filterComponents) {
         boolean hasComponents = false;
         for (Class<? extends Component> component : filterComponents) {
             hasComponents |= entityManager.hasComponent(getId(), component);
         }
         return exists() && hasComponents;
+    }
+
+    @Override
+    public boolean hasAllComponents(List<Class<? extends Component>> filterComponents) {
+        int numPosessedComponents = 0;
+        for (Class<? extends Component> component : filterComponents) {
+            numPosessedComponents += entityManager.hasComponent(getId(), component) ? 1 : 0;
+        }
+        return exists() && (numPosessedComponents == filterComponents.size());
     }
 
     @Override
