@@ -19,7 +19,6 @@ package org.terasology.utilities;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.rendering.nui.UIWidget;
 
 import java.lang.reflect.Array;
@@ -30,12 +29,14 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  *
@@ -111,8 +112,6 @@ public final class ReflectionUtil {
      * Attempts to return the type of a parameter of a parameterised field. This uses compile-time information only - the
      * type should be obtained from a field with a the generic types bound.
      *
-     * @param type
-     * @param index
      * @return The type of the generic parameter at index for the given type, or null if it cannot be obtained.
      */
     // TODO - Improve parameter lookup to go up the inheritance tree more
@@ -127,17 +126,17 @@ public final class ReflectionUtil {
         return parameterizedType.getActualTypeArguments()[index];
     }
 
-    public static Class<?> getClassOfType(Type type) {
+    public static Class<?> getRawType(Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;
         } else if (type instanceof ParameterizedType) {
             return (Class<?>) ((ParameterizedType) type).getRawType();
         } else if (type instanceof GenericArrayType) {
             GenericArrayType genericArrayType = (GenericArrayType) type;
-            return Array.newInstance(getClassOfType(genericArrayType.getGenericComponentType()), 0).getClass();
+            return Array.newInstance(getRawType(genericArrayType.getGenericComponentType()), 0).getClass();
         } else if (type instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) type;
-            return getClassOfType(wildcardType.getUpperBounds()[0]);
+            return getRawType(wildcardType.getUpperBounds()[0]);
         }
         return Object.class;
     }
@@ -194,8 +193,6 @@ public final class ReflectionUtil {
      * Returns an ordered list of super classes and interfaces for the given class, that have a common base class.
      * The set is ordered with the deepest interface first, through all the interfaces, and then all the super classes.
      *
-     * @param forClass
-     * @param baseClass
      * @return an ordered list of super classes and interfaces for the given class, that have a common base class.
      */
     public static <T> List<Class<? extends T>> getInheritanceTree(Class<? extends T> forClass, Class<T> baseClass) {
@@ -231,7 +228,7 @@ public final class ReflectionUtil {
     }
 
     public static <T> Type getTypeParameterForSuper(Type target, Class<T> superClass, int index) {
-        Class targetClass = getClassOfType(target);
+        Class targetClass = getRawType(target);
         Preconditions.checkArgument(superClass.isAssignableFrom(targetClass), "Target must be a child of superClass");
 
         if (superClass.isInterface()) {
@@ -242,10 +239,10 @@ public final class ReflectionUtil {
     }
 
     private static <T> Type getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
-        for (Class targetClass = getClassOfType(target);
+        for (Class targetClass = getRawType(target);
              !Object.class.equals(targetClass);
              target = resolveType(target, targetClass.getGenericSuperclass()),
-                     targetClass = getClassOfType(target)) {
+                     targetClass = getRawType(target)) {
             if (superClass.equals(targetClass)) {
                 return getTypeParameter(target, index);
             }
@@ -255,7 +252,7 @@ public final class ReflectionUtil {
     }
 
     private static <T> Type getTypeParameterForSuperInterface(Type target, Class<T> superClass, int index) {
-        Class targetClass = getClassOfType(target);
+        Class targetClass = getRawType(target);
 
         if (Object.class.equals(targetClass)) {
             return null;
@@ -287,15 +284,15 @@ public final class ReflectionUtil {
     /**
      * Resolves all {@link TypeVariable}s in {@code type} to concrete types as per the type
      * parameter definitions in {@code contextType}. All {@link TypeVariable}s in {@code type}
-     * should have been declared in {@code contextType} or one of its supertypes, otherwise an error
-     * will be thrown.
+     * should have been declared in {@code contextType} or one of its supertypes, otherwise those
+     * variables will be resolved to {@link Object Object.class}.
      *
      * @param contextType The {@link Type} which contains all type parameter definitions used in {@code type}.
      * @param type        The {@link Type} whose {@link TypeVariable}s are to be resolved.
      * @return A copy of {@code type} with all {@link TypeVariable}s resolved.
      */
     public static Type resolveType(Type contextType, Type type) {
-        Class<?> contextClass = getClassOfType(contextType);
+        Class<?> contextClass = getRawType(contextType);
 
         // T field;
         if (type instanceof TypeVariable<?>) {
@@ -336,7 +333,7 @@ public final class ReflectionUtil {
 
             final Type rawType = parameterizedType.getRawType();
 
-            return new ParameterizedTypeImpl(rawType, resolvedTypeArguments, resolvedOwnerType);
+            return parameterizedTypeOf(resolvedOwnerType, resolvedTypeArguments, rawType);
         }
 
         // T[] field || List<T>[] field;
@@ -379,22 +376,13 @@ public final class ReflectionUtil {
     }
 
     private static Type[] resolveTypes(Type contextType, Type[] types) {
-        boolean changed = false;
+        Type[] resolvedTypes = new Type[types.length];
 
         for (int i = 0; i < types.length; i++) {
-            Type resolvedTypeArgument = resolveType(contextType, types[i]);
-
-            if (resolvedTypeArgument != types[i]) {
-                if (!changed) {
-                    types = types.clone();
-                    changed = true;
-                }
-
-                types[i] = resolvedTypeArgument;
-            }
+            resolvedTypes[i] = resolveType(contextType, types[i]);
         }
 
-        return types;
+        return resolvedTypes;
     }
 
     private static Type resolveTypeVariable(Type contextType, TypeVariable<?> typeVariable, Class<?> contextClass) {
@@ -403,17 +391,64 @@ public final class ReflectionUtil {
             return typeVariable;
         }
 
-        Class<?> declaringClass = (Class<?>) typeVariable.getGenericDeclaration();
+        return getCascadedGenericDeclaration(typeVariable)
+                   .filter(declaration ->
+                               declaration.getKey().isAssignableFrom(contextClass))
+                   .findAny()
+                   .map(declaration ->
+                            getTypeParameterForSuper(contextType,
+                                declaration.getKey(),
+                                declaration.getValue())
+                   )
+                   // If we couldn't find a declaration in the context, we will not be
+                   // able to resolve this type variable, resort to Object.class
+                   .orElse(Object.class);
+    }
 
-        Preconditions.checkArgument(declaringClass.isAssignableFrom(contextClass),
-                "Type variable was not declared in context class " + contextClass);
+    public static Stream<Type> getGenericSupertypes(Class<?> clazz) {
+        return Stream.concat(Stream.of(clazz.getGenericSuperclass()), Stream.of(clazz.getGenericInterfaces()));
+    }
 
-        List<TypeVariable<?>> typeParameters =
-                Arrays.asList(declaringClass.getTypeParameters());
+    /**
+     * Cascades the declaration of the type variable up the inheritance tree and returns the
+     * cascaded declaration classes and the corresponding index of the type variable for that
+     * declaration class.
+     */
+    private static Stream<Map.Entry<Class<?>, Integer>> getCascadedGenericDeclaration(TypeVariable<?> typeVariable) {
+        assert typeVariable.getGenericDeclaration() instanceof Class<?>;
 
-        int typeParameterIndex = typeParameters.indexOf(typeVariable);
+        Class<?> genericDeclaration = (Class<?>) typeVariable.getGenericDeclaration();
 
-        return getTypeParameterForSuper(contextType, declaringClass, typeParameterIndex);
+        int typeVariableIndex = Arrays.asList(genericDeclaration.getTypeParameters())
+                                    .indexOf(typeVariable);
+
+        return cascadeTypeVariableDeclarationToSupertypes(typeVariableIndex, genericDeclaration);
+    }
+
+    private static Stream<Map.Entry<Class<?>, Integer>> cascadeTypeVariableDeclarationToSupertypes(
+            int typeVariableIndex, Class<?> declaration) {
+        TypeVariable<?> typeVariable = declaration.getTypeParameters()[typeVariableIndex];
+
+        return Stream.concat(
+            Stream.of(new AbstractMap.SimpleEntry<>(declaration, typeVariableIndex)),
+            getGenericSupertypes(declaration)
+                .filter(supertype -> supertype instanceof ParameterizedType)
+                .map(supertype -> (ParameterizedType) supertype)
+                .flatMap(supertype -> {
+                        int superTypeVariableIndex =
+                            Arrays.asList(supertype.getActualTypeArguments()).indexOf(typeVariable);
+
+                        if (superTypeVariableIndex == -1) {
+                            return Stream.empty();
+                        }
+
+                        return cascadeTypeVariableDeclarationToSupertypes(
+                            superTypeVariableIndex,
+                            getRawType(supertype)
+                        );
+                    }
+                )
+        );
     }
 
     public static Object readField(Object object, String fieldName) {
@@ -432,6 +467,42 @@ public final class ReflectionUtil {
         }
         throw new IllegalArgumentException(
                 "Cannot find field " + cls.getName() + "." + fieldName);
+    }
+
+    public static ParameterizedTypeImpl parameterizedTypeOf(Type ownerType, Type[] actualTypeArguments, Type rawType) {
+        return new ParameterizedTypeImpl(rawType, actualTypeArguments, ownerType);
+    }
+
+    /**
+     * Returns a parameterized version of the given raw type, if it has generic type parameters.
+     * If it has no generic type parameters, the raw type itself is returned.
+     */
+    public static Type parameterizeRawType(Class<?> rawType) {
+        if (rawType == null) {
+            return null;
+        }
+
+        TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
+
+        if (typeParameters.length == 0) {
+            return rawType;
+        }
+
+        return parameterizedTypeOf(
+                parameterizeRawType(rawType.getEnclosingClass()),
+                typeParameters,
+                rawType
+        );
+    }
+
+    /**
+     * Returns a parameterized version of the given raw type that has been resolved with the given
+     * context type, if it has generic type parameters. If it has no generic type parameters,
+     * the raw type itself is returned.
+     */
+    public static Type parameterizeandResolveRawType(Type contextType, Class<?> rawType) {
+        Type parameterizedType = parameterizeRawType(rawType);
+        return resolveType(contextType, parameterizedType);
     }
 
     private static class WildcardTypeImpl implements WildcardType {

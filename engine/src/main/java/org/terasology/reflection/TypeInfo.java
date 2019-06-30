@@ -55,7 +55,7 @@ public class TypeInfo<T> {
     @SuppressWarnings("unchecked")
     protected TypeInfo() {
         this.type = ReflectionUtil.getTypeParameterForSuper(getClass(), TypeInfo.class, 0);
-        this.rawType = (Class<? super T>) ReflectionUtil.getClassOfType(type);
+        this.rawType = (Class<? super T>) ReflectionUtil.getRawType(type);
         this.hashCode = type.hashCode();
     }
 
@@ -65,7 +65,7 @@ public class TypeInfo<T> {
     @SuppressWarnings("unchecked")
     protected TypeInfo(Type type) {
         this.type = type;
-        this.rawType = (Class<? super T>) ReflectionUtil.getClassOfType(type);
+        this.rawType = (Class<? super T>) ReflectionUtil.getRawType(type);
         this.hashCode = type.hashCode();
     }
 

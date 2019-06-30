@@ -58,6 +58,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         this.reflections = context.getReflections();
     }
 
+    @SuppressWarnings({"unchecked"})
     @Override
     public PersistedData serializeNonNull(T value, PersistedDataSerializer serializer) {
         // If primitive, don't go looking for the runtime type, serialize as is
@@ -71,10 +72,10 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         }
 
         TypeHandler<T> chosenHandler = delegateHandler;
-        Class<?> runtimeClass = getRuntimeTypeIfMoreSpecific(value);
+        Type runtimeType = getRuntimeTypeIfMoreSpecific(value);
 
-        if (!typeInfo.getRawType().equals(runtimeClass)) {
-            Optional<TypeHandler<?>> runtimeTypeHandler = typeHandlerLibrary.getTypeHandler((Type) runtimeClass);
+        if (!typeInfo.getRawType().equals(runtimeType)) {
+            Optional<TypeHandler<?>> runtimeTypeHandler = typeHandlerLibrary.getTypeHandler(runtimeType);
 
             chosenHandler = (TypeHandler<T>) runtimeTypeHandler
                     .map(typeHandler -> {
@@ -97,7 +98,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         }
 
         if (chosenHandler == null) {
-            LOGGER.error("Could not find appropriate TypeHandler for runtime type {}", runtimeClass);
+            LOGGER.error("Could not find appropriate TypeHandler for runtime type {}", runtimeType);
             return serializer.serializeNull();
         }
 
@@ -109,7 +110,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         typeValuePersistedDataMap.put(
                 TYPE_FIELD,
-                serializer.serialize(runtimeClass.getName())
+                serializer.serialize(ReflectionUtil.getRawType(runtimeType).getName())
         );
 
         typeValuePersistedDataMap.put(
@@ -120,26 +121,27 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         return serializer.serialize(typeValuePersistedDataMap);
     }
 
-    private Class<?> getRuntimeTypeIfMoreSpecific(T value) {
+    private Type getRuntimeTypeIfMoreSpecific(T value) {
         if (value == null) {
             return typeInfo.getRawType();
         }
 
-        Class<?> runtimeClass = value.getClass();
+        Type runtimeType =
+                ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), value.getClass());
 
         if (typeInfo.getRawType().isInterface()) {
             // Given type is interface, use runtime type which will be a class and will have data
-            return runtimeClass;
+            return runtimeType;
         } else if (typeInfo.getType() instanceof Class) {
             // If given type is a simple class, use more specific runtime type
-            return runtimeClass;
+            return runtimeType;
         } else if (delegateHandler == null) {
             // If we can't find a handler for the declared type, use the runtime type
-            return runtimeClass;
+            return runtimeType;
         }
 
         // Given type has more information than runtime type, use that
-        return typeInfo.getRawType();
+        return typeInfo.getType();
     }
 
     @SuppressWarnings({"unchecked"})
@@ -157,16 +159,10 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         String runtimeTypeName = valueMap.getAsString(TYPE_FIELD);
 
-        Optional<Class<?>> typeToDeserializeAs = findSubtypeWithName(runtimeTypeName);
+        Optional<Type> typeToDeserializeAs = findSubtypeWithName(runtimeTypeName);
 
         if (!typeToDeserializeAs.isPresent()) {
             LOGGER.error("Cannot find class to deserialize {}", runtimeTypeName);
-            return Optional.empty();
-        }
-
-        if (!typeInfo.getRawType().isAssignableFrom(typeToDeserializeAs.get())) {
-            LOGGER.error("Given type {} is not a sub-type of expected type {}",
-                    typeToDeserializeAs.get(), typeInfo.getType());
             return Optional.empty();
         }
 
@@ -186,7 +182,14 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
     }
 
-    private Optional<Class<?>> findSubtypeWithName(String runtimeTypeName) {
+    private Optional<Type> findSubtypeWithName(String runtimeTypeName) {
+        return findSubclassWithName(runtimeTypeName)
+                .map(runtimeClass ->
+                        ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), runtimeClass)
+                );
+    }
+
+    private Optional<Class<?>> findSubclassWithName(String runtimeTypeName) {
         for (Class<?> clazz : reflections.getSubTypesOf(typeInfo.getRawType())) {
             if (runtimeTypeName.equals(clazz.getSimpleName()) ||
                     runtimeTypeName.equals(clazz.getName())) {
@@ -196,5 +199,4 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         return Optional.empty();
     }
-
 }

@@ -41,18 +41,18 @@ public class TypeSerializerTest {
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));
 
-        INSTANCE.animals.add(new Dog(new Vector3f(3.15f, 54.51f, -0.001f)));
+        INSTANCE.animals.add(new Dog<>(1, new Vector3f(3.15f, 54.51f, -0.001f)));
 
-        INSTANCE.animals.add(new Cheetah(Color.MAGENTA));
+        INSTANCE.animals.add(new Cheetah<>(2, Color.MAGENTA));
     }
 
     public static class Json {
-        private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"content\":{\"tailPosition\":[3.15,54.51,-0.001],\"name\":\"Dog\"}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"content\":{\"spotColor\":[255,0,255,255],\"name\":\"Cheetah\"}}]}";
+        private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"content\":{\"tailPosition\":[3.15,54.51,-0.001],\"data\":1}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"content\":{\"spotColor\":[255,0,255,255],\"data\":2}}]}";
 
         private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
         private final TypeHandlerLibrary typeHandlerLibrary =
-                TypeHandlerLibrary.withDefaultHandlers(reflections);
+            TypeHandlerLibrary.withDefaultHandlers(reflections);
 
         private final GsonSerializer serializer = new GsonSerializer(typeHandlerLibrary);
 
@@ -65,7 +65,7 @@ public class TypeSerializerTest {
         @Test
         public void testDeserialize() {
             SomeClass<Integer> deserialized =
-                    serializer.fromJson(INSTANCE_JSON, new TypeInfo<SomeClass<Integer>>() {});
+                serializer.fromJson(INSTANCE_JSON, new TypeInfo<SomeClass<Integer>>() {});
 
             assertEquals(INSTANCE, deserialized);
         }
@@ -75,7 +75,7 @@ public class TypeSerializerTest {
         private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
         private final TypeHandlerLibrary typeHandlerLibrary =
-                TypeHandlerLibrary.withDefaultHandlers(reflections);
+            TypeHandlerLibrary.withDefaultHandlers(reflections);
 
         private final ProtobufSerializer serializer = new ProtobufSerializer(typeHandlerLibrary);
 
@@ -84,7 +84,7 @@ public class TypeSerializerTest {
             byte[] bytes = serializer.toBytes(INSTANCE, new TypeInfo<SomeClass<Integer>>() {});
 
             SomeClass<Integer> deserializedInstance =
-                    serializer.fromBytes(bytes, new TypeInfo<SomeClass<Integer>>() {});
+                serializer.fromBytes(bytes, new TypeInfo<SomeClass<Integer>>() {});
 
             assertEquals(INSTANCE, deserializedInstance);
         }
@@ -94,7 +94,7 @@ public class TypeSerializerTest {
         @SerializedName("generic-t")
         private T data;
         private List<T> list = Lists.newArrayList();
-        private Set<Animal> animals = Sets.newHashSet();
+        private Set<Animal<T>> animals = Sets.newHashSet();
 
         private SomeClass(T data) {
             this.data = data;
@@ -110,8 +110,8 @@ public class TypeSerializerTest {
             }
             SomeClass<?> someClass = (SomeClass<?>) o;
             return Objects.equals(data, someClass.data) &&
-                    Objects.equals(list, someClass.list) &&
-                    Objects.equals(animals, someClass.animals);
+                       Objects.equals(list, someClass.list) &&
+                       Objects.equals(animals, someClass.animals);
         }
 
         @Override
@@ -122,18 +122,18 @@ public class TypeSerializerTest {
         @Override
         public String toString() {
             return "SomeClass{" +
-                    "data=" + data +
-                    ", list=" + list +
-                    ", animals=" + animals +
-                    '}';
+                       "data=" + data +
+                       ", list=" + list +
+                       ", animals=" + animals +
+                       '}';
         }
     }
 
-    private static abstract class Animal {
-        protected final String name;
+    private static abstract class Animal<T> {
+        protected final T data;
 
-        private Animal(String name) {
-            this.name = name;
+        private Animal(T data) {
+            this.data = data;
         }
 
         @Override
@@ -145,20 +145,20 @@ public class TypeSerializerTest {
                 return false;
             }
             Animal animal = (Animal) o;
-            return Objects.equals(name, animal.name);
+            return Objects.equals(data, animal.data);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(name);
+            return Objects.hash(data);
         }
     }
 
-    private static class Dog extends Animal {
+    private static class Dog<T> extends Animal<T> {
         private final Vector3f tailPosition;
 
-        private Dog(Vector3f tailPosition) {
-            super("Dog");
+        private Dog(T data, Vector3f tailPosition) {
+            super(data);
             this.tailPosition = tailPosition;
         }
 
@@ -180,9 +180,9 @@ public class TypeSerializerTest {
         @Override
         public String toString() {
             return "Dog{" +
-                    "name='" + name + '\'' +
-                    ", tailPosition=" + tailPosition +
-                    '}';
+                       "name='" + data + '\'' +
+                       ", tailPosition=" + tailPosition +
+                       '}';
         }
 
         @Override
@@ -191,11 +191,11 @@ public class TypeSerializerTest {
         }
     }
 
-    private static class Cheetah extends Animal {
+    private static class Cheetah<T> extends Animal<T> {
         private final Color spotColor;
 
-        private Cheetah(Color spotColor) {
-            super("Cheetah");
+        private Cheetah(T data, Color spotColor) {
+            super(data);
             this.spotColor = spotColor;
         }
 
@@ -217,9 +217,9 @@ public class TypeSerializerTest {
         @Override
         public String toString() {
             return "Cheetah{" +
-                    "name='" + name + '\'' +
-                    ", spotColor=" + spotColor +
-                    '}';
+                       "name='" + data + '\'' +
+                       ", spotColor=" + spotColor +
+                       '}';
         }
 
         @Override

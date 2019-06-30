@@ -24,8 +24,8 @@ import org.terasology.reflection.copy.CopyStrategy;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.sql.Struct;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +40,7 @@ public class ReflectionUtilsTest {
         ParameterizedType cType = (ParameterizedType) new TypeInfo<C<?>>() {}.getType();
         Type wildcardType = cType.getActualTypeArguments()[0];
 
-        assertEquals(Object.class, ReflectionUtil.getClassOfType(wildcardType));
+        assertEquals(Object.class, ReflectionUtil.getRawType(wildcardType));
     }
 
     @Test
@@ -216,6 +216,57 @@ public class ReflectionUtilsTest {
 
         assertEquals(Integer.class, resolvedWildcardType.getLowerBounds()[0]);
     }
+
+    @Test
+    public void testResolveThroughGenericSupertypes() {
+        class B<S, T> implements MarkerB<S>, MarkerA<T> {}
+
+        ParameterizedType resolvedTypeForB = (ParameterizedType) ReflectionUtil.resolveType(
+            new TypeInfo<MarkerA<String>>() {}.getType(),
+            ReflectionUtil.parameterizeRawType(B.class)
+        );
+
+        // Could not resolve S
+        assertEquals(Object.class, resolvedTypeForB.getActualTypeArguments()[0]);
+        // Could resolve T
+        assertEquals(String.class, resolvedTypeForB.getActualTypeArguments()[1]);
+    }
+
+    @Test
+    public void testResolveThroughInheritanceTree() {
+        class A<S, T> implements MarkerA<T>, MarkerC<S> {}
+        class B<S, T> extends A<S, T> implements MarkerB<T>, MarkerC<S> {}
+        class C<T> extends B<Integer, T> {}
+
+        final Type typeToResolve = ReflectionUtil.parameterizeRawType(C.class);
+
+        ParameterizedType resolvedThroughMarkerA = (ParameterizedType) ReflectionUtil.resolveType(
+            new TypeInfo<MarkerA<String>>() {}.getType(),
+            typeToResolve
+        );
+
+        assertEquals(String.class, resolvedThroughMarkerA.getActualTypeArguments()[0]);
+
+        ParameterizedType resolvedThroughMarkerB = (ParameterizedType) ReflectionUtil.resolveType(
+            new TypeInfo<MarkerB<String>>() {}.getType(),
+            typeToResolve
+        );
+
+        assertEquals(String.class, resolvedThroughMarkerB.getActualTypeArguments()[0]);
+
+
+        ParameterizedType resolvedThroughAWithIncorrectFirstType =
+            (ParameterizedType) ReflectionUtil.resolveType(
+                new TypeInfo<A<String, String>>() {}.getType(),
+                typeToResolve
+            );
+
+        assertEquals(String.class, resolvedThroughAWithIncorrectFirstType.getActualTypeArguments()[0]);
+    }
+
+    interface MarkerA<T> {}
+    interface MarkerB<T> {}
+    interface MarkerC<T> {}
 
     interface GenericInterfaceSubInterface extends CopyStrategy<Integer> {}
 
