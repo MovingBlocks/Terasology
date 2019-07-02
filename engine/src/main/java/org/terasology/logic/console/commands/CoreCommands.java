@@ -471,30 +471,32 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
             helpText = "Writes entity information out into a file named \"entityDump.txt\"." +
                     " Supports list of component names, which will be used to only save entities that contains" +
-                    " all or some of those components. List of component names must be provided in double quotes" +
-                    " and all names must be separated by spaces.")
-    public String dumpEntities(@CommandParam(value = "componentNames", required = false) String componentNames) throws IOException {
-        int savedEntitiCount = 0;
+                    " one or more of those components. Names should be separated by spaces.")
+    public String dumpEntities(@CommandParam(value = "componentNames", required = false) String... componentNames) throws IOException {
+        int savedEntityCount;
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
         PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
         WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
-        if (componentNames == null) {
-            savedEntitiCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+        if (componentNames.length == 0) {
+            savedEntityCount = worldDumper .save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
         } else {
-            List<String> componentNamesList = new LinkedList<>(Arrays.asList(componentNames.split(" ")));
-            List<Class<? extends Component>> filterComponents = componentNamesList.stream()
-                    .filter(o -> o.trim().length() > 0)
-                    .map(String::trim)
+            List<Class<? extends Component>> filterComponents = Arrays.stream(componentNames)
+                    .map(String::trim) //Trim off whitespace
+                    .filter(o -> !o.isEmpty()) //Remove empty strings
+                    .map(o -> o.toLowerCase().endsWith("component") ? o : o + "component") //All component class names finish with "component"
                     .map(o -> Streams.stream(moduleManager.getEnvironment().getSubtypesOf(Component.class))
-                            .filter(e -> e.getSimpleName().equalsIgnoreCase(o)).findFirst())
+                            .filter(e -> e.getSimpleName().equalsIgnoreCase(o))
+                            .findFirst())
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
             if (!filterComponents.isEmpty()) {
-                savedEntitiCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), filterComponents);
+                savedEntityCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), filterComponents);
+            } else {
+                return "Could not find components matching given names";
             }
         }
-        return "Number of entities saved: " + savedEntitiCount;
+        return "Number of entities saved: " + savedEntityCount;
     }
 
     /**
