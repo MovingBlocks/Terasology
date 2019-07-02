@@ -39,6 +39,7 @@ import java.util.List;
 
 /**
  * A dropdown widget.
+ *
  * @param <T> the list element type
  */
 public class UIDropdown<T> extends ActivatableWidget {
@@ -261,7 +262,9 @@ public class UIDropdown<T> extends ActivatableWidget {
         }
     }
 
-    public boolean isOpened() { return opened; }
+    public boolean isOpened() {
+        return opened;
+    }
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
@@ -283,6 +286,9 @@ public class UIDropdown<T> extends ActivatableWidget {
                     if (opened) {
                         setSelection(getOptions().get(highlighted));
                         setOpenedReverse(false);
+                    } else {
+                        setOpenedReverse(false);
+                        highlighted = getOptions().indexOf(getSelection());
                     }
                     return true;
                 case Keyboard.KeyId.RIGHT:
