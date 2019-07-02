@@ -21,6 +21,8 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.prefab.Prefab;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +47,16 @@ public class EntityStore implements MutableComponentContainer {
     @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return components.keySet().contains(component);
+    }
+
+    @Override
+    public boolean hasAnyComponents(List<Class<? extends Component>> filterComponents) {
+        return !Collections.disjoint(components.keySet(), filterComponents);
+    }
+
+    @Override
+    public boolean hasAllComponents(List<Class<? extends Component>> filterComponents) {
+        return components.keySet().containsAll(filterComponents);
     }
 
     @Override
