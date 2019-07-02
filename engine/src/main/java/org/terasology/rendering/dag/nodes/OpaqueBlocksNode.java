@@ -222,7 +222,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
                         chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
         GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
-        new AABBRenderer(chunk.getAABB()).renderLocally(1f);
+        new AABBRenderer(chunk.getAABB()).renderLocally();
 
         GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
     }
