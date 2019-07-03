@@ -20,6 +20,7 @@ import com.google.common.base.Charsets;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonParseException;
 
 import org.terasology.assets.ResourceUrn;
@@ -63,7 +64,17 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
         private static final long serialVersionUID = -2255189133660408141L;
     };
 
-    private final Gson gson = new GsonBuilder().create();
+    private final JsonDeserializer<String> stringArraySerializer = (json, typeOfSrc, context) -> {
+        if (json.isJsonArray()) {
+            StringBuilder stringFromArray = new StringBuilder();
+            json.getAsJsonArray().forEach(o -> stringFromArray.append(o.getAsString()));
+            return stringFromArray.toString();
+        } else {
+            return json.getAsString();
+        }
+    };
+
+    private final Gson gson = new GsonBuilder().registerTypeAdapter(String.class, stringArraySerializer).create();
 
     @Override
     public PathMatcher getFileMatcher() {
