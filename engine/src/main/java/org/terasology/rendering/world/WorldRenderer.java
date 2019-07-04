@@ -111,7 +111,7 @@ public interface WorldRenderer {
      *
      * @return a Camera object
      */
-    Camera getLightCamera();
+    // Camera getLightCamera();
 
     /**
      * Called potentially multiple times per frame, this method allows the renderer to trigger the update

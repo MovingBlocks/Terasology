@@ -93,10 +93,10 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         return (SubmersibleCamera) noCamera;
     }
 
-    @Override
+    /*@Override
     public Camera getLightCamera() {
         return noCamera;
-    }
+    }*/
 
     @Override
     public void update(float delta) {
