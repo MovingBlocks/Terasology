@@ -21,6 +21,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.RenderGraph;
+import org.terasology.rendering.world.WorldRenderer;
 
 public abstract class ModuleRenderingSystem extends BaseComponentSystem {
 
@@ -28,11 +29,13 @@ public abstract class ModuleRenderingSystem extends BaseComponentSystem {
     protected Context context;
     protected Name providingModule;
     protected RenderGraph renderGraph;
+    protected WorldRenderer worldRenderer;
 
     @Override
     public void initialise() {
         super.initialise();
         renderGraph = context.get(RenderGraph.class);
+        worldRenderer = context.get(WorldRenderer.class);
 
         /* Class implementingClass;
         ModuleManager moduleManager = context.get(ModuleManager.class);
