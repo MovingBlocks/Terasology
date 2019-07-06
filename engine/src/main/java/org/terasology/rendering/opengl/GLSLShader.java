@@ -53,9 +53,6 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_KERNEL_ELEMENTS;
-import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_NOISE_SIZE;
-
 /**
  * GLSL Shader Program Instance class.
  * <p>
@@ -65,6 +62,10 @@ import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_NOISE
 public class GLSLShader extends Shader {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
+
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public int ssaoKernelElements = 32;
+    public static int ssaoNoiseSize = 4;
 
     private static String includedFunctionsVertex = "";
     private static String includedFunctionsFragment = "";
@@ -156,8 +157,8 @@ public class GLSLShader extends Shader {
         preProcessorPreamble += "#define BLOCK_LIGHT_SUN_POW " + WorldRenderer.BLOCK_LIGHT_SUN_POW + "\n";
         preProcessorPreamble += "#define BLOCK_INTENSITY_FACTOR " + WorldRenderer.BLOCK_INTENSITY_FACTOR + "\n";
         preProcessorPreamble += "#define SHADOW_MAP_RESOLUTION " + (float) renderConfig.getShadowMapResolution() + "\n";
-        preProcessorPreamble += "#define SSAO_KERNEL_ELEMENTS " + SSAO_KERNEL_ELEMENTS + "\n";
-        preProcessorPreamble += "#define SSAO_NOISE_SIZE " + SSAO_NOISE_SIZE + "\n";
+        preProcessorPreamble += "#define SSAO_KERNEL_ELEMENTS " + ssaoKernelElements + "\n";
+        preProcessorPreamble += "#define SSAO_NOISE_SIZE " + ssaoNoiseSize + "\n";
         // TODO: This shouldn't be hardcoded
         preProcessorPreamble += "#define TEXTURE_OFFSET_EFFECTS " + 0.0625f + "\n";
 
