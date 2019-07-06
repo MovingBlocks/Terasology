@@ -24,22 +24,13 @@ import java.beans.PropertyChangeListener;
 
 
 /**
- * This node renders refractive/reflective blocks, i.e. water blocks.
- *
- * Reflections always include the sky but may or may not include the landscape,
- * depending on the "Reflections" video setting. Any other object currently
- * reflected is an artifact.
- *
- * Refractions distort the blocks behind the refracting surface, i.e. the bottom
- * of a lake seen from above water or the landscape above water when the player is underwater.
- * Refractions are currently always enabled.
- *
- * Note: a third "Reflections" video setting enables Screen-space Reflections (SSR),
- * an experimental feature. It produces initially appealing reflections but rotating the
- * camera partially spoils the effect showing its limits.
+ * TODO this class is a temporary solution for propagating BasicRendering module's RefractiveReflectiveBlocksNode's values
+ * TODO As more rendering related things move to the basic rendering module, this class should be addressed too and removed
+ * This node proxy is read by RenderingHelper when calulating camera in water. It's water related attributes must be set
+ * by a corresponding node in BasicRendering module named RefractiveReflectiveBlocksNode.
  */
-public class deprecated_RefractiveReflectiveBlocksNode extends NewAbstractNode implements PropertyChangeListener {
- /*  public static final SimpleUri REFRACTIVE_REFLECTIVE_FBO_URI = new SimpleUri("engine:fbo.sceneReflectiveRefractive");
+public class RefractiveReflectiveBlocksNodeProxy extends NewAbstractNode implements PropertyChangeListener {
+   public static final SimpleUri REFRACTIVE_REFLECTIVE_FBO_URI = new SimpleUri("engine:fbo.sceneReflectiveRefractive");
 
     // TODO: rename to more meaningful/precise variable names, like waveAmplitude or waveHeight.
     @SuppressWarnings("FieldCanBeLocal")
@@ -63,12 +54,12 @@ public class deprecated_RefractiveReflectiveBlocksNode extends NewAbstractNode i
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 5.0f)
     public static float waterOffsetY;
-*/
-    public deprecated_RefractiveReflectiveBlocksNode(String nodeUri, Context context) {
-        super(nodeUri, context);
-    }/*
 
-    public void updateWaterAttributes(float waveIntensityModule, float waveIntensityFalloffModule, float waveSizeModule,
+    public RefractiveReflectiveBlocksNodeProxy(String nodeUri, Context context) {
+        super(nodeUri, context);
+    }
+
+    public static void updateWaterAttributes(float waveIntensityModule, float waveIntensityFalloffModule, float waveSizeModule,
                                  float waveSizeFalloffModule, float waveSpeedModule, float waveSpeedFalloffModule, float waterOffsetYModule) {
         waveIntensity = waveIntensityModule;
         waveIntensityFalloff = waveIntensityFalloffModule;
@@ -78,22 +69,12 @@ public class deprecated_RefractiveReflectiveBlocksNode extends NewAbstractNode i
         waveSpeedFalloff = waveSpeedFalloffModule;
         waterOffsetY = waterOffsetYModule;
     }
-*/
+
     @Override
     public void setDependencies(Context context) {
 
     }
 
-    /**
-     * This method is where the actual rendering of refractive/reflective blocks takes place.
-     *
-     * Also takes advantage of the two methods
-     *
-     * - WorldRenderer.increaseTrianglesCount(int)
-     * - WorldRenderer.increaseNotReadyChunkCount(int)
-     *
-     * to publish some statistics over its own activity.
-     */
     @Override
     public void process() {
 

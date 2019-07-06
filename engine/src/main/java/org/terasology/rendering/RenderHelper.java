@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.terasology.rendering;
 
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.dag.nodes.deprecated_RefractiveReflectiveBlocksNode;
+import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNodeProxy;
 
 /**
  */
@@ -70,22 +70,22 @@ public final class RenderHelper {
     public static float evaluateOceanHeightAtPosition(Vector3f position, float days) {
         float height = 0.0f;
 
-        float waveSize = deprecated_RefractiveReflectiveBlocksNode.waveSize;
-        float waveIntensity = deprecated_RefractiveReflectiveBlocksNode.waveIntensity;
-        float timeFactor = deprecated_RefractiveReflectiveBlocksNode.waveSpeed;
+        float waveSize = RefractiveReflectiveBlocksNodeProxy.waveSize;
+        float waveIntensity = RefractiveReflectiveBlocksNodeProxy.waveIntensity;
+        float timeFactor = RefractiveReflectiveBlocksNodeProxy.waveSpeed;
 
         for (int i = 0; i < OCEAN_OCTAVES; ++i) {
             height += (float) (smoothTriangleWave(timeToTick(days,
                     timeFactor) + position.x * OCEAN_WAVE_DIRECTIONS[i].x * waveSize + position.z * OCEAN_WAVE_DIRECTIONS[i].y * waveSize) * 2.0 - 1.0) * waveIntensity;
 
-            waveSize *= deprecated_RefractiveReflectiveBlocksNode.waveSizeFalloff;
-            waveIntensity *= deprecated_RefractiveReflectiveBlocksNode.waveIntensityFalloff;
-            timeFactor *= deprecated_RefractiveReflectiveBlocksNode.waveSpeedFalloff;
+            waveSize *= RefractiveReflectiveBlocksNodeProxy.waveSizeFalloff;
+            waveIntensity *= RefractiveReflectiveBlocksNodeProxy.waveIntensityFalloff;
+            timeFactor *= RefractiveReflectiveBlocksNodeProxy.waveSpeedFalloff;
         }
 
         height /= OCEAN_OCTAVES;
 
-        return height + deprecated_RefractiveReflectiveBlocksNode.waterOffsetY;
+        return height + RefractiveReflectiveBlocksNodeProxy.waterOffsetY;
     }
 
 }
