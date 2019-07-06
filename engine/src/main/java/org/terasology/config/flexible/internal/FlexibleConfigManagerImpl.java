@@ -29,8 +29,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(FlexibleConfigManagerImpl.class);
@@ -54,6 +57,11 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
     @Override
     public FlexibleConfig getConfig(SimpleUri configId) {
         return flexibleConfigs.get(configId);
+    }
+
+    @Override
+    public Collection<Entry<SimpleUri, FlexibleConfig>> getConfigs() {
+        return Collections.unmodifiableCollection(flexibleConfigs.entrySet());
     }
 
     @Override

@@ -38,7 +38,7 @@ public interface FlexibleConfig {
      * @return The {@link SettingEntry} object that can construct a {@link Setting} and
      * then add it to this {@link FlexibleConfig}.
      */
-    <V> SettingEntry<V> newEntry(SimpleUri id, Class<V> valueType);
+    <V> SettingEntry<V> newSetting(SimpleUri id, Class<V> valueType);
 
     /**
      * Returns the {@link Setting<V>} with the given id. Null is returned if a setting with the given id does not

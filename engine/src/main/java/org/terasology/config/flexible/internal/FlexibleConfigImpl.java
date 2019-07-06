@@ -55,7 +55,7 @@ class FlexibleConfigImpl implements FlexibleConfig {
      * {@inheritDoc}
      */
     @Override
-    public <V> SettingEntry<V> newEntry(SimpleUri id, Class<V> valueType) {
+    public <V> SettingEntry<V> newSetting(SimpleUri id, Class<V> valueType) {
         return new SettingImplEntry<>(id);
     }
 

@@ -49,7 +49,7 @@ public class FlexibleConfigImplTest {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting1");
             SimpleUri absentId = new SimpleUri("engine-tests:TestSetting2");
 
-            config.newEntry(id, Integer.class)
+            config.newSetting(id, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig();
 
@@ -64,7 +64,7 @@ public class FlexibleConfigImplTest {
         public void testGetInvalidType() {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.newEntry(id, Integer.class)
+            config.newSetting(id, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig();
 
@@ -84,7 +84,7 @@ public class FlexibleConfigImplTest {
         public void testContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.newEntry(id, Integer.class)
+            config.newSetting(id, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig();
 
@@ -95,7 +95,7 @@ public class FlexibleConfigImplTest {
         public void testNotContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.newEntry(id, Integer.class)
+            config.newSetting(id, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig();
 
@@ -122,7 +122,7 @@ public class FlexibleConfigImplTest {
             final String name = "name";
             final String description = "description";
 
-            assertTrue(config.newEntry(ID, Integer.class)
+            assertTrue(config.newSetting(ID, Integer.class)
                     .setDefaultValue(defaultValue)
                     .setConstraint(constraint)
                     .setHumanReadableName(name)
@@ -140,11 +140,11 @@ public class FlexibleConfigImplTest {
 
         @Test
         public void testAddExisting() throws Exception {
-            assertTrue(config.newEntry(ID, Integer.class)
+            assertTrue(config.newSetting(ID, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig());
 
-            FlexibleConfig.SettingEntry<Integer> entry = config.newEntry(ID, Integer.class);
+            FlexibleConfig.SettingEntry<Integer> entry = config.newSetting(ID, Integer.class);
 
             assertNotNull(entry);
 
@@ -166,10 +166,10 @@ public class FlexibleConfigImplTest {
             SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
             SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
-            config.newEntry(id1, Integer.class)
+            config.newSetting(id1, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig();
-            config.newEntry(id2, Integer.class)
+            config.newSetting(id2, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig();
 
@@ -181,7 +181,7 @@ public class FlexibleConfigImplTest {
         public void testNonexistentRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.newEntry(id, Integer.class)
+            config.newSetting(id, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig();
 
@@ -192,7 +192,7 @@ public class FlexibleConfigImplTest {
         public void testSubscribedRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.newEntry(id, Integer.class)
+            config.newSetting(id, Integer.class)
                     .setDefaultValue(0)
                     .addToConfig();
 
@@ -231,7 +231,7 @@ public class FlexibleConfigImplTest {
         private void setupSettings() {
             SimpleUri testEnumSettingId = new SimpleUri("engine-tests:TestSetting1");
 
-            config.newEntry(testEnumSettingId, TestEnum.class)
+            config.newSetting(testEnumSettingId, TestEnum.class)
                     .setDefaultValue(TestEnum.A1)
                     .addToConfig();
 
@@ -239,7 +239,7 @@ public class FlexibleConfigImplTest {
 
             SimpleUri doubleSettingId = new SimpleUri("engine-tests:TestSetting2");
 
-            config.newEntry(doubleSettingId, Double.class)
+            config.newSetting(doubleSettingId, Double.class)
                     .setDefaultValue(30.0)
                     .addToConfig();
 
@@ -247,7 +247,7 @@ public class FlexibleConfigImplTest {
 
             SimpleUri testClassSettingId = new SimpleUri("engine-tests:TestSetting3");
 
-            config.newEntry(testClassSettingId, TestClass.class)
+            config.newSetting(testClassSettingId, TestClass.class)
                     .setDefaultValue(new TestClass(101))
                     .addToConfig();
 
