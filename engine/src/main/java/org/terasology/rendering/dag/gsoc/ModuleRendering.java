@@ -18,12 +18,14 @@ package org.terasology.rendering.dag.gsoc;
 import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.world.WorldRenderer;
 
-public abstract class ModuleRenderingSystem extends BaseComponentSystem {
+@RegisterSystem
+public abstract class ModuleRendering extends BaseComponentSystem {
 
     @In
     protected Context context;
@@ -31,7 +33,7 @@ public abstract class ModuleRenderingSystem extends BaseComponentSystem {
     protected RenderGraph renderGraph;
     protected WorldRenderer worldRenderer;
 
-    @Override
+    // @Override
     public void initialise() {
         super.initialise();
         renderGraph = context.get(RenderGraph.class);
