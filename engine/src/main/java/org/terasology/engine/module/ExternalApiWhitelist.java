@@ -33,6 +33,7 @@ public final class ExternalApiWhitelist {
             .add("java.lang.invoke")
             .add("java.lang.ref")
             .add("java.math")
+            .add("java.nio")
             .add("java.util")
             .add("java.util.concurrent")
             .add("java.util.concurrent.atomic")
@@ -81,6 +82,8 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl.opengl.GL11")
             .add("org.lwjgl.opengl.GL12")
             .add("org.lwjgl.opengl.GL13")
+            .add("org.lwjgl.util.glu")
+            .add("org.lwjgl")
             .add("org.terasology.jnlua")
             .build();
 
