@@ -1,0 +1,14 @@
+{
+    "type": "FlexibleConfigTestScreen",
+    "skin": "engine:mainMenu",
+    "contents": {
+        "type": "ColumnLayout",
+        "id": "mainContainer",
+        "contents": [
+            {
+                "type": "UILabel",
+                "text": "Some text"
+            }
+        ]
+    }
+}
