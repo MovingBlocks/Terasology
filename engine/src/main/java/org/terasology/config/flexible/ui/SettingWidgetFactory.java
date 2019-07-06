@@ -22,14 +22,14 @@ import org.terasology.utilities.ReflectionUtil;
 
 import java.util.Optional;
 
-public class SettingUIManager {
+public class SettingWidgetFactory {
     private final ModuleEnvironment environment;
 
-    public SettingUIManager(ModuleEnvironment environment) {
+    public SettingWidgetFactory(ModuleEnvironment environment) {
         this.environment = environment;
     }
 
-    public Optional<SettingUIWidget<?>> getWidgetFor(Setting<?> setting) {
+    public Optional<SettingUIWidget<?>> createWidgetFor(Setting<?> setting) {
         SettingConstraint<?> constraint = setting.getConstraint();
 
         for (Class<? extends SettingUIWidget> widgetType : environment.getSubtypesOf(SettingUIWidget.class)) {

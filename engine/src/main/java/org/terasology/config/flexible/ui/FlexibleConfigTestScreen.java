@@ -15,35 +15,25 @@
  */
 package org.terasology.config.flexible.ui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.flexible.FlexibleConfig;
 import org.terasology.config.flexible.FlexibleConfigManager;
-import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.config.flexible.internal.FlexibleConfigManagerImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
-import org.terasology.rendering.nui.layouts.RowLayout;
-import org.terasology.rendering.nui.layouts.RowLayoutHint;
-import org.terasology.rendering.nui.widgets.UILabel;
-
-import java.util.Optional;
 
 public class FlexibleConfigTestScreen extends CoreScreenLayer {
     private static final SimpleUri CONFIG_ID = new SimpleUri("engine:TestConfig");
     private static final SimpleUri SETTING_ID = new SimpleUri("engine:TestSetting");
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigTestScreen.class);
 
     private FlexibleConfigManager flexibleConfigManager = new FlexibleConfigManagerImpl();
     private FlexibleConfig flexibleConfig;
 
-    private SettingUIManager settingUIManager;
+    private FlexibleConfigWidgetFactory configUIManager;
 
     private ColumnLayout mainContainer;
 
@@ -57,36 +47,12 @@ public class FlexibleConfigTestScreen extends CoreScreenLayer {
     public void initialise() {
         setupTestConfig();
 
-        settingUIManager = new SettingUIManager(moduleManager.getEnvironment());
+        configUIManager = new FlexibleConfigWidgetFactory(moduleManager, assetManager);
+
         mainContainer = find("mainContainer", ColumnLayout.class);
+        assert mainContainer != null;
 
-        mainContainer.addWidget(buildFlexibleConfigWidget(flexibleConfig));
-    }
-
-    private UIWidget buildFlexibleConfigWidget(FlexibleConfig flexibleConfig) {
-        ColumnLayout container = new ColumnLayout();
-        container.setVerticalSpacing(8);
-
-        UILabel description = new UILabel(flexibleConfig.getDescription());
-        container.addWidget(description);
-
-        for (Setting<?> setting : flexibleConfig.getSettings()) {
-            Optional<SettingUIWidget<?>> widget = settingUIManager.getWidgetFor(setting);
-
-            if (!widget.isPresent()) {
-                LOGGER.error("Couldn't find a widget for the Setting {}", setting.getId());
-                continue;
-            }
-
-            SettingUIWidget<?> settingWidget = widget.get();
-
-            settingWidget.loadContents(assetManager);
-            settingWidget.bindToSetting(setting);
-
-            container.addWidget(settingWidget);
-        }
-
-        return container;
+        mainContainer.addWidget(configUIManager.buildWidgetFor(flexibleConfig));
     }
 
     private void setupTestConfig() {
