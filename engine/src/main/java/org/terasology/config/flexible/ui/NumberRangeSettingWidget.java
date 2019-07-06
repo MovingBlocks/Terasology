@@ -17,7 +17,7 @@ package org.terasology.config.flexible.ui;
 
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 
-public class NumberRangeSettingWidget extends SettingUIWidget<NumberRangeConstraint<?>> {
+public class NumberRangeSettingWidget extends SettingWidget<NumberRangeConstraint<?>> {
     public NumberRangeSettingWidget() {
         super("engine:numberRangeSettingWidget");
     }

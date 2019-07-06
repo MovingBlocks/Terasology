@@ -30,13 +30,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 
-public abstract class SettingUIWidget<C extends SettingConstraint<?>> extends CoreWidget {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SettingUIWidget.class);
+public abstract class SettingWidget<C extends SettingConstraint<?>> extends CoreWidget {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingWidget.class);
     private final String contentsUri;
     protected UIWidget contents;
     private Setting<?> setting;
 
-    protected SettingUIWidget(String contentsUri) {
+    protected SettingWidget(String contentsUri) {
         this.contentsUri = contentsUri;
     }
 

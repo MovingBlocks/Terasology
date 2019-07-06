@@ -46,14 +46,14 @@ public class FlexibleConfigWidgetFactory {
         addWidgetToContainer(container, description);
 
         for (Setting<?> setting : flexibleConfig.getSettings()) {
-            Optional<SettingUIWidget<?>> widget = settingWidgetFactory.createWidgetFor(setting);
+            Optional<SettingWidget<?>> widget = settingWidgetFactory.createWidgetFor(setting);
 
             if (!widget.isPresent()) {
                 LOGGER.error("Couldn't find a widget for the Setting {}", setting.getId());
                 continue;
             }
 
-            SettingUIWidget<?> settingWidget = widget.get();
+            SettingWidget<?> settingWidget = widget.get();
 
             settingWidget.loadContents(assetManager);
             settingWidget.bindToSetting(setting);
