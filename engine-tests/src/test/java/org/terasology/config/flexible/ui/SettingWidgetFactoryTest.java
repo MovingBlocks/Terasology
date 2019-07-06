@@ -17,7 +17,6 @@ package org.terasology.config.flexible.ui;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.module.ModuleEnvironment;
@@ -29,7 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SettingUIManagerTest {
+public class SettingWidgetFactoryTest {
     @Test
     public void testGetWidgetFor() {
         ModuleEnvironment environment = mock(ModuleEnvironment.class);
@@ -37,14 +36,14 @@ public class SettingUIManagerTest {
         when(environment.getSubtypesOf(eq(SettingUIWidget.class)))
             .thenReturn(Lists.newArrayList(NumberRangeSettingWidget.class));
 
-        SettingUIManager settingUIManager = new SettingUIManager(environment);
+        SettingWidgetFactory settingWidgetFactory = new SettingWidgetFactory(environment);
 
         Setting<?> setting = mock(Setting.class);
 
         when(setting.getConstraint())
             .thenReturn(new NumberRangeConstraint(0, 10, false, false));
 
-        Optional<SettingUIWidget<?>> widget = settingUIManager.getWidgetFor(setting);
+        Optional<SettingUIWidget<?>> widget = settingWidgetFactory.createWidgetFor(setting);
 
         assertTrue(widget.isPresent());
         assertTrue(widget.get() instanceof NumberRangeSettingWidget);
