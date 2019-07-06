@@ -46,22 +46,32 @@ public class FlexibleConfigWidgetFactory {
         addWidgetToContainer(container, description);
 
         for (Setting<?> setting : flexibleConfig.getSettings()) {
-            Optional<SettingWidget<?>> widget = settingWidgetFactory.createWidgetFor(setting);
+            Optional<? extends SettingWidget<?, ?>> settingWidget = buildSettingWidget(setting);
 
-            if (!widget.isPresent()) {
-                LOGGER.error("Couldn't find a widget for the Setting {}", setting.getId());
+            if (!settingWidget.isPresent()) {
                 continue;
             }
 
-            SettingWidget<?> settingWidget = widget.get();
-
-            settingWidget.loadContents(assetManager);
-            settingWidget.bindToSetting(setting);
-
-            addWidgetToContainer(container, settingWidget);
+            addWidgetToContainer(container, settingWidget.get());
         }
 
         return container;
+    }
+
+    private <T> Optional<SettingWidget<T, ?>> buildSettingWidget(Setting<T> setting) {
+        Optional<SettingWidget<T, ?>> widget = settingWidgetFactory.createWidgetFor(setting);
+
+        if (!widget.isPresent()) {
+            LOGGER.error("Couldn't find a widget for the Setting {}", setting.getId());
+            return Optional.empty();
+        }
+
+        SettingWidget<T, ?> settingWidget = widget.get();
+
+        settingWidget.loadContents(assetManager);
+        settingWidget.bindToSetting(setting);
+
+        return widget;
     }
 
     private void addWidgetToContainer(UILayout<?> container, UIWidget widget) {

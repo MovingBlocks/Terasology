@@ -30,11 +30,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 
-public abstract class SettingWidget<C extends SettingConstraint<?>> extends CoreWidget {
+public abstract class SettingWidget<T, C extends SettingConstraint<T>> extends CoreWidget {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingWidget.class);
     private final String contentsUri;
     protected UIWidget contents;
-    private Setting<?> setting;
+    private Setting<T> setting;
 
     protected SettingWidget(String contentsUri) {
         this.contentsUri = contentsUri;
@@ -60,11 +60,11 @@ public abstract class SettingWidget<C extends SettingConstraint<?>> extends Core
         return sizeHint;
     }
 
-    protected Setting<?> getSetting() {
+    protected Setting<T> getSetting() {
         return setting;
     }
 
-    public final void bindToSetting(Setting<?> setting) {
+    public final void bindToSetting(Setting<T> setting) {
         this.setting = setting;
         initialise();
     }

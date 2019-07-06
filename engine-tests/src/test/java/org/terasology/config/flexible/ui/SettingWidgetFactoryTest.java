@@ -38,12 +38,12 @@ public class SettingWidgetFactoryTest {
 
         SettingWidgetFactory settingWidgetFactory = new SettingWidgetFactory(environment);
 
-        Setting<?> setting = mock(Setting.class);
+        Setting<Integer> setting = mock(Setting.class);
 
         when(setting.getConstraint())
-            .thenReturn(new NumberRangeConstraint(0, 10, false, false));
+            .thenReturn(new NumberRangeConstraint<>(0, 10, false, false));
 
-        Optional<SettingWidget<?>> widget = settingWidgetFactory.createWidgetFor(setting);
+        Optional<SettingWidget<Integer, ?>> widget = settingWidgetFactory.createWidgetFor(setting);
 
         assertTrue(widget.isPresent());
         assertTrue(widget.get() instanceof NumberRangeSettingWidget);
