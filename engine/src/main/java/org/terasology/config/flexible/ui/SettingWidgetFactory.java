@@ -29,16 +29,16 @@ public class SettingWidgetFactory {
         this.environment = environment;
     }
 
-    public Optional<SettingWidget<?>> createWidgetFor(Setting<?> setting) {
+    public <T> Optional<SettingWidget<T, ?>> createWidgetFor(Setting<T> setting) {
         SettingConstraint<?> constraint = setting.getConstraint();
 
         for (Class<? extends SettingWidget> widgetType : environment.getSubtypesOf(SettingWidget.class)) {
             Class<?> constraintType =
-                ReflectionUtil.getTypeParameterForSuper(widgetType, SettingWidget.class, 0);
+                ReflectionUtil.getTypeParameterForSuper(widgetType, SettingWidget.class, 1);
 
             if (constraint.getClass().equals(constraintType)) {
                 try {
-                    SettingWidget<?> widget = widgetType.newInstance();
+                    SettingWidget<T, ?> widget = widgetType.newInstance();
 
                     return Optional.of(widget);
                 } catch (InstantiationException | IllegalAccessException ignored) { }
