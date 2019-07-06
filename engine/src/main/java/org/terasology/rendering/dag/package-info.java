@@ -31,10 +31,6 @@
  *
  * This whole package may one day be extracted from the engine and live in its own external module.
  */
-// @API
-// package org.terasology.rendering.dag;
-
-// import org.terasology.module.sandbox.API;
 @API
 package org.terasology.rendering.dag;
 

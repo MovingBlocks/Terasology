@@ -32,6 +32,7 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.MethodCommand;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.InjectionHelper;
@@ -53,6 +54,8 @@ import java.util.Map;
  * After a call of shutdown it should not be used anymore.
  *
  */
+// TODO OpaqueObjectsNode needs this, is there a better way?
+@API
 public class ComponentSystemManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentSystemManager.class);

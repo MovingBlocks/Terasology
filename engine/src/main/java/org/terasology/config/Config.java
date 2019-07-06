@@ -40,6 +40,7 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.Resolution;
 import org.terasology.entitySystem.Component;
 import org.terasology.input.Input;
+import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;
 import org.terasology.naming.gson.NameTypeAdapter;
@@ -68,6 +69,7 @@ import java.util.Set;
  * Terasology user config. Holds the various global configuration information that the user can modify. It can be saved
  * and loaded in a JSON format.
  */
+@API
 public final class Config {
     public static final String PROPERTY_OVERRIDE_DEFAULT_CONFIG = "org.terasology.config.default.override";
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
