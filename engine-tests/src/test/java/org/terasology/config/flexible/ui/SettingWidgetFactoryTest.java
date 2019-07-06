@@ -33,7 +33,7 @@ public class SettingWidgetFactoryTest {
     public void testGetWidgetFor() {
         ModuleEnvironment environment = mock(ModuleEnvironment.class);
 
-        when(environment.getSubtypesOf(eq(SettingUIWidget.class)))
+        when(environment.getSubtypesOf(eq(SettingWidget.class)))
             .thenReturn(Lists.newArrayList(NumberRangeSettingWidget.class));
 
         SettingWidgetFactory settingWidgetFactory = new SettingWidgetFactory(environment);
@@ -43,7 +43,7 @@ public class SettingWidgetFactoryTest {
         when(setting.getConstraint())
             .thenReturn(new NumberRangeConstraint(0, 10, false, false));
 
-        Optional<SettingUIWidget<?>> widget = settingWidgetFactory.createWidgetFor(setting);
+        Optional<SettingWidget<?>> widget = settingWidgetFactory.createWidgetFor(setting);
 
         assertTrue(widget.isPresent());
         assertTrue(widget.get() instanceof NumberRangeSettingWidget);
