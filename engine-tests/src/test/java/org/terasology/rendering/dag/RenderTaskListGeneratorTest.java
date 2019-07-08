@@ -167,12 +167,21 @@ public class RenderTaskListGeneratorTest {
             // ???
         }
 
-        public void resetDesiredStateChanges(){
+        public void resetDesiredStateChanges() {
 
         }
 
-        public void setRenderGraph(RenderGraph renderGraph){
+        public void setRenderGraph(RenderGraph renderGraph) {
 
+        }
+
+        public boolean isDependentOn(NewNode anotherNode) {
+            return false;
+        }
+
+        @Override
+        public boolean addInputConnection(int id, DependencyConnection connection) {
+            return false;
         }
     }
 

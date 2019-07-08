@@ -33,28 +33,28 @@ public class BufferPairConnection extends DependencyConnection<Pair<FBO,FBO>> {
     }
 
     /**
-     *
+     * TODO unify naming/iding with other dep. conns
      * @param name
      * @param type
      * @param data
      * @param parentNode
      */
-    public BufferPairConnection(String name, Type type, Pair<FBO,FBO> data, SimpleUri parentNode) {
+    public BufferPairConnection(String  name, Type type, Pair<FBO,FBO> data, SimpleUri parentNode) {
         super(name, type, parentNode);
         super.setData(data);
     }
 
     /**
      * Return a new instance of BufferPairConnection based on this one with swapped FBOs.
-     * @param newName
+     * @param id TODO Uri
      * @param type
      * @param parentNode
      * @return
      */
-    public BufferPairConnection copySwapped(String newName, Type type, SimpleUri parentNode) {
+    public BufferPairConnection copySwapped(int id, Type type, SimpleUri parentNode) {
         Pair<FBO,FBO> bufferPairToCopy = super.getData();
         Pair<FBO,FBO> newBufferPair =  new Pair<>(bufferPairToCopy.getValue(), bufferPairToCopy.getKey());
-        return new BufferPairConnection(newName, type, newBufferPair, parentNode);
+        return new BufferPairConnection(BufferPairConnection.getConnectionName(id), type, newBufferPair, parentNode);
     }
 
     public FBO getPrimaryFbo() {
@@ -70,7 +70,7 @@ public class BufferPairConnection extends DependencyConnection<Pair<FBO,FBO>> {
     }
 
     public static String getConnectionName(int number) {
-        return new StringBuilder("FBO").append(number).toString();
+        return new StringBuilder("BufferPair").append(number).toString();
     }
 
 }
