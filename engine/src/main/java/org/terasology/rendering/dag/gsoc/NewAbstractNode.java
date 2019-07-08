@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.gsoc;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -114,13 +115,28 @@ public abstract class NewAbstractNode implements NewNode {
         return ((FboConnection) this.outputConnections.get(FboConnection.getConnectionName(number))).getData();
     }
 
-    private boolean addInputConnection(int id, DependencyConnection from) {
-        if (from instanceof FboConnection) {
-            return addInputFboConnection(id, (FboConnection) from);
+    public boolean addInputConnection(int id, DependencyConnection connection) {
+        if (connection instanceof FboConnection) {
+            return addInputFboConnection(id, (FboConnection) connection);
+        }
+        if (connection instanceof BufferPairConnection) {
+            return addInputBufferPairConnection(id, (BufferPairConnection) connection);
         } else {
             throw new RuntimeException("addInputConnection failed on unknown connection type");
         }
     }
+
+    public boolean addInputBufferPairConnection(int id, BufferPairConnection from) {
+        DependencyConnection bufferPairConenction = new BufferPairConnection(BufferPairConnection.getConnectionName(id), DependencyConnection.Type.INPUT, from.getData(), this.getUri());
+        bufferPairConenction.setConnectedConnection(from);
+        return addInputConnection(bufferPairConenction);
+    }
+
+    public boolean addInputBufferPairConnection(int id, Pair<FBO,FBO> fboPair) {
+        BufferPairConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id), DependencyConnection.Type.INPUT, fboPair, this.getUri());
+        return addInputConnection(bufferPairConnection);
+    }
+
     /**
      *
      * @param id
@@ -139,7 +155,7 @@ public abstract class NewAbstractNode implements NewNode {
      * @param fboData
      * @return true if inserted, false otherwise
      */
-    protected boolean addInputFboConnection(int id, FBO fboData) {
+    public boolean addInputFboConnection(int id, FBO fboData) {
         DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id), DependencyConnection.Type.INPUT, fboData, this.getUri());
         return addInputConnection(fboConnection);
     }
@@ -155,39 +171,22 @@ public abstract class NewAbstractNode implements NewNode {
         return addOutputConnection(fboConnection);
     }
 
-    /**
-     *
-     * @param inputFboId Input FBO id is a number of the input connection on this node.
-     *                   Chosen arbitrarily, integers starting by 1 typically.
-     * @param fromConnection FboConnection obtained form another node's output.
-     */
-    public void connectFbo(int inputFboId, DependencyConnection fromConnection) {
-        // TODO this will have to be caught by a try-catch or redone if we were going use gui to tamper with dag
-        // Is not yet connected?
-        if (fromConnection.getConnectedConnection() == null) {
-            // If adding new input goes smoothly
-            // TODO These checks might be redundant if everything is checked in the api
-            if (addInputConnection(inputFboId, fromConnection)) {
-                DependencyConnection localConnection = this.getInputFboConnection(inputFboId);
-                // Upon successful insertion - save connected connection. If node is already connected, throw an exception.
-                localConnection.connectInputToOutput(fromConnection);
 
-            } else { // if adding new input failed, it already existed - check for connections
-                logger.info(this.getUri() + ".connectFbo(" + inputFboId + ", " + fromConnection.getName() + "):" +
-                        " Connection already existed. Testing for its connections..");
-                DependencyConnection localConnection = this.getInputFboConnection(inputFboId);
-                DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnection();
-                // if our input is not connected
-                if (localConnectionConnectedTo == null) {
-                    localConnection.connectInputToOutput(fromConnection);
-                } else {
-                    throw new RuntimeException(" Could not connect node " + this + ", inputConnection with id " + inputFboId
-                            + " already connected to " + localConnection.getConnectedConnection());
+    /**
+     * Is {@code thisNode} dependent on {@param anotherNode}?
+     * @param anotherNode
+     * @return If this node has at least one {@param anotherNode}'s connection on input - true. Otherwise false.
+     */
+    public boolean isDependentOn(NewNode anotherNode) {
+        boolean isDependent = false;
+        for (DependencyConnection connection: inputConnections.values()) {
+            if (connection.getConnectedConnection() != null) {
+                if (connection.getConnectedConnection().getParentNode().equals(anotherNode.getUri())) {
+                    isDependent = true;
                 }
             }
-        } else {
-            throw new RuntimeException("connectFbo(" + inputFboId + ", " + fromConnection.getName() + "): Connection " + fromConnection + " is already connected.");
         }
+        return isDependent;
     }
 
     @Nullable
@@ -269,64 +268,7 @@ public abstract class NewAbstractNode implements NewNode {
         }
     }
 
-    /**
-     * Reconnects dependencies only
-     * @param inputId
-     * @param fromNode
-     * @param fromConnection
-     */// TODO make it reconnectInputToOutput
-    public void reconnectInputFboToOutput(int inputId, NewNode fromNode, DependencyConnection fromConnection) {
-        logger.info("Attempting reconnection of " + this.getUri() + " to " + fromConnection.getParentNode());
-        if (fromConnection.getConnectedConnection() != null) {
-            throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
-                                        + fromConnection.getConnectedConnection() + "). Remove connection first.");
-        } // TODO                                   make it getInputConnection
-        DependencyConnection connectionToReconnect = this.getInputFboConnection(inputId);
-        // If this connection exists
-        if (connectionToReconnect != null) {
-            // if this is connected to something
-            if (connectionToReconnect.getConnectedConnection() != null) {
-                // Save previous input connection source node to check whether we I'm still depending on it after reconnect
-                NewNode previousFromNode = renderGraph.findNode(connectionToReconnect.getConnectedConnection().getParentNode());
-                if (previousFromNode == null) {
-                    throw new RuntimeException("Node uri " + previousFromNode + " not found in renderGraph.");
-                }
-                // Sets data and change toNode's connectedConnection to fromConnection. Sets previous fromConnection's connected node to null.
-                connectionToReconnect.connectInputToOutput(fromConnection);
-                // if not dependent on inputSourceConnection anymore, remove dag connection
 
-                if (!this.isDependentOn(previousFromNode)) {
-                    renderGraph.disconnect(previousFromNode, this);
-                }
-                // setDependencies(this.context); - needed here? probably not..either do this after everything is set up, or in renderGraph.addNode
-                // and when calling these trough api, call resetDesiredStateChanges();
-            } else {
-                logger.info(this + "'s connection " + connectionToReconnect + " was not connected. Attempting new connection...");
-                this.connectFbo(inputId, fromConnection);
-            }
-        } else { //                               TODO make it connectionToReconnect
-            logger.info("No such input connection (" + FboConnection.getConnectionName(inputId) + ") for node " + this.toString() + ". Attempting new connection...");
-            this.connectFbo(inputId, fromConnection);
-        }
-        logger.info("Reconnecting finished."); // TODO return errors...connectFbo-true false
-    }
-
-    /**
-     * Is {@code thisNode} dependent on {@param anotherNode}?
-     * @param anotherNode
-     * @return If this node has at least one {@param anotherNode}'s connection on input - true. Otherwise false.
-     */
-    public boolean isDependentOn(NewNode anotherNode) {
-        boolean isDependent = false;
-        for (DependencyConnection connection: inputConnections.values()) {
-            if (connection.getConnectedConnection() != null) {
-                if (connection.getConnectedConnection().getParentNode().equals(anotherNode.getUri())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * Used by inheriting classes to declare the need for a specific Frame Buffer Object and obtain it.

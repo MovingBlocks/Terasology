@@ -45,6 +45,7 @@ public final class ExternalApiWhitelist {
             .add("java.awt")
             .add("java.awt.geom")
             .add("java.awt.image")
+            .add("javafx.util")
             .add("jdk.internal.reflect")
             .add("com.google.common.annotations")
             .add("com.google.common.cache")

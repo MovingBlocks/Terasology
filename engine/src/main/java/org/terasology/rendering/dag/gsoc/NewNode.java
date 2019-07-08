@@ -118,13 +118,12 @@ public interface NewNode extends RenderPipelineTask {
     void setDependencies(Context context);
 
     /**
-     * This method is to set output DependencyConnection
-     * to input connection of the same type in this node.
-     * @param inputId Input id is a number of the input connection on this node.
-     *                   Chosen arbitrarily, integers starting by 1 typically.
-     * @param from DependencyConnection obtained form another node's output.
+     * Attempt to insert an input Dependency connection. RuntimeException on unknown dependency type.
+     * @param id identificator of the connection TODO simpleuri
+     * @param connection TODO
+     * @return False on fail attempt to insert.
      */
-    void connectFbo(int inputId, DependencyConnection from);
+    boolean addInputConnection(int id, DependencyConnection connection);
 
     /**
      * This method obtains node's output connection by its id.
@@ -143,12 +142,11 @@ public interface NewNode extends RenderPipelineTask {
     DependencyConnection getInputFboConnection(int inputId);
 
     /**
-     *
-     * @param inputId
-     * @param fromNode
-     * @param fromConnection
+     * Is {@code thisNode} dependent on {@param anotherNode}?
+     * @param anotherNode
+     * @return If this node has at least one {@param anotherNode}'s connection on input - true. Otherwise false.
      */
-    void reconnectInputFboToOutput(int inputId, NewNode fromNode, DependencyConnection fromConnection);
+    boolean isDependentOn(NewNode anotherNode);
 
     /**
      * Deletes all desired state changes for the node and add them all again.
