@@ -1,5 +1,6 @@
 {
-    "type": "UILabel",
-    "id": "environmentInfoLabel",
-    "text": "Environment Info"
+    "type": "UISlider",
+    "id": "slider",
+    "increment": 0.01,
+    "precision": 2
 }

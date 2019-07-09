@@ -16,6 +16,8 @@
 package org.terasology.config.flexible.ui;
 
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.widgets.UISlider;
 
 public class NumberRangeSettingWidget<T extends Number & Comparable<? super T>>
     extends SettingWidget<T, NumberRangeConstraint<T>> {
@@ -25,6 +27,84 @@ public class NumberRangeSettingWidget<T extends Number & Comparable<? super T>>
 
     @Override
     public void initialise() {
+        UISlider slider = find("slider", UISlider.class);
+        assert slider != null;
 
+        updateSliderIfInteger(slider);
+
+        setSliderRange(slider);
+
+        slider.bindValue(new Binding<Float>() {
+            @Override
+            public Float get() {
+                return getSetting().getValue().floatValue();
+            }
+
+            @Override
+            public void set(Float value) {
+                setSettingValue(value);
+            }
+        });
+    }
+
+    private void updateSliderIfInteger(UISlider slider) {
+        T settingValue = getSetting().getValue();
+
+        if (settingValue instanceof Float || settingValue instanceof Double) {
+            return;
+        }
+
+        slider.setIncrement(1.0f);
+        slider.setPrecision(0);
+    }
+
+    private void setSettingValue(float value) {
+        getSetting().setValue(getFloatAsT(value));
+    }
+
+    private T getFloatAsT(float value) {
+        T settingValue = getSetting().getValue();
+
+        if (settingValue instanceof Byte) {
+            return castToT((byte) Math.round(value));
+        }
+
+        if (settingValue instanceof Short) {
+            return castToT((short) Math.round(value));
+        }
+
+        if (settingValue instanceof Integer) {
+            return castToT(Math.round(value));
+        }
+
+        if (settingValue instanceof Long) {
+            return castToT(Math.round((double) value));
+        }
+
+        if (settingValue instanceof Double) {
+            return castToT((double) value);
+        }
+
+        return castToT(value);
+    }
+
+    private void setSliderRange(UISlider slider) {
+        NumberRangeConstraint<?> constraint = getConstraint();
+
+        float min = constraint.getMin().floatValue();
+
+        if (!constraint.isMinInclusive()) {
+            min += slider.getIncrement();
+        }
+
+        slider.setMinimum(min);
+
+        float range = constraint.getMax().floatValue() - min;
+
+        if (!constraint.isMaxInclusive()) {
+            range -= slider.getIncrement();
+        }
+
+        slider.setRange(range);
     }
 }

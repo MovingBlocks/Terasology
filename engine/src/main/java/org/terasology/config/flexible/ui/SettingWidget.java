@@ -57,7 +57,7 @@ public abstract class SettingWidget<T, C extends SettingConstraint<T>> extends C
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return sizeHint;
+        return contents.getPreferredContentSize(canvas, sizeHint);
     }
 
     protected Setting<T> getSetting() {
@@ -77,6 +77,10 @@ public abstract class SettingWidget<T, C extends SettingConstraint<T>> extends C
         } else {
             this.contents = uiElement.get().getRootWidget();
         }
+    }
+
+    protected final T castToT(Object value) {
+        return getSetting().getValueClass().cast(value);
     }
 
     @SuppressWarnings({"unchecked"})

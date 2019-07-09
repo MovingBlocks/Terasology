@@ -2,12 +2,17 @@
     "type": "FlexibleConfigTestScreen",
     "skin": "engine:mainMenu",
     "contents": {
-        "type": "ColumnLayout",
-        "id": "mainContainer",
+        "type": "RelativeLayout",
         "contents": [
             {
-                "type": "UILabel",
-                "text": "Some text"
+                "type": "ColumnLayout",
+                "id": "mainContainer",
+                "fillVerticalSpace": false,
+                "layoutInfo": {
+                    "use-content-height": true,
+                    "position-horizontal-center": {}
+                },
+                "contents": []
             }
         ]
     }
