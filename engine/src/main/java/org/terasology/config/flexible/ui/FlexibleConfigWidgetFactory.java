@@ -21,11 +21,12 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.config.flexible.FlexibleConfig;
 import org.terasology.config.flexible.Setting;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.layouts.ColumnLayout;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.properties.Property;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 public class FlexibleConfigWidgetFactory {
@@ -40,10 +41,10 @@ public class FlexibleConfigWidgetFactory {
     }
 
     public UIWidget buildWidgetFor(FlexibleConfig flexibleConfig) {
-        UILayout<?> container = buildContainer();
+        PropertyLayout container = new PropertyLayout();
+        container.setRowConstraints("[min]");
 
-        UILabel description = new UILabel(flexibleConfig.getDescription());
-        addWidgetToContainer(container, description);
+        Collection<Property<?, ?>> widgetProperties = new ArrayList<>();
 
         for (Setting<?> setting : flexibleConfig.getSettings()) {
             Optional<? extends SettingWidget<?, ?>> settingWidget = buildSettingWidget(setting);
@@ -52,8 +53,15 @@ public class FlexibleConfigWidgetFactory {
                 continue;
             }
 
-            addWidgetToContainer(container, settingWidget.get());
+            widgetProperties.add(
+                new Property<>(setting.getHumanReadableName(),
+                    null,
+                    settingWidget.get(),
+                    setting.getDescription())
+            );
         }
+
+        container.addProperties(flexibleConfig.getDescription(), widgetProperties);
 
         return container;
     }
@@ -74,15 +82,4 @@ public class FlexibleConfigWidgetFactory {
         return widget;
     }
 
-    private void addWidgetToContainer(UILayout<?> container, UIWidget widget) {
-        container.addWidget(widget, null);
-    }
-
-    private UILayout<?> buildContainer() {
-        ColumnLayout container = new ColumnLayout();
-
-        container.setVerticalSpacing(8);
-
-        return container;
-    }
 }
