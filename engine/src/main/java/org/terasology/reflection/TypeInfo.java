@@ -45,7 +45,7 @@ import java.lang.reflect.Type;
  * @param <T> The type for which type information is to be generated.
  */
 public class TypeInfo<T> {
-    private final Class<? super T> rawType;
+    private final Class<T> rawType;
     private final Type type;
     private final int hashCode;
 
@@ -55,7 +55,7 @@ public class TypeInfo<T> {
     @SuppressWarnings("unchecked")
     protected TypeInfo() {
         this.type = ReflectionUtil.getTypeParameterForSuper(getClass(), TypeInfo.class, 0);
-        this.rawType = (Class<? super T>) ReflectionUtil.getRawType(type);
+        this.rawType = (Class<T>) ReflectionUtil.getRawType(type);
         this.hashCode = type.hashCode();
     }
 
@@ -65,7 +65,7 @@ public class TypeInfo<T> {
     @SuppressWarnings("unchecked")
     protected TypeInfo(Type type) {
         this.type = type;
-        this.rawType = (Class<? super T>) ReflectionUtil.getRawType(type);
+        this.rawType = (Class<T>) ReflectionUtil.getRawType(type);
         this.hashCode = type.hashCode();
     }
 
@@ -83,7 +83,7 @@ public class TypeInfo<T> {
         return new TypeInfo<>(type);
     }
 
-    public Class<? super T> getRawType() {
+    public Class<T> getRawType() {
         return rawType;
     }
 
