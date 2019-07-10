@@ -47,7 +47,7 @@ public class TypeSerializerTest {
     }
 
     public static class Json {
-        private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"content\":{\"tailPosition\":[3.15,54.51,-0.001],\"data\":1}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"content\":{\"spotColor\":[255,0,255,255],\"data\":2}}]}";
+        private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"data\":1},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":2}]}";
 
         private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
@@ -129,7 +129,7 @@ public class TypeSerializerTest {
         }
     }
 
-    private static abstract class Animal<T> {
+    private static class Animal<T> {
         protected final T data;
 
         private Animal(T data) {

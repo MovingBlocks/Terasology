@@ -25,6 +25,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.terasology.persistence.typeHandling.*;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.inMemory.AbstractPersistedData;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.reflection.TypeInfo;
@@ -69,8 +70,8 @@ public class RuntimeDelegatingTypeHandlerTest {
 
         abstract class SubHandler extends TypeHandler<Sub> {}
 
-        TypeHandler baseTypeHandler = mock(TypeHandler.class);
-        TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);
+        TypeHandler baseTypeHandler = mockTypeHandler();
+        TypeHandler subTypeHandler = mockTypeHandler(SubHandler.class);
 
         when(typeHandlerLibrary.getTypeHandler(eq(baseType)))
                 .thenReturn(Optional.of(baseTypeHandler));
@@ -97,6 +98,23 @@ public class RuntimeDelegatingTypeHandlerTest {
                                 .equals(subType.getName()) &&
                                 argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD))
         );
+    }
+
+    private static TypeHandler<?> mockTypeHandler(Class<? extends TypeHandler> subHandlerClass) {
+        TypeHandler<?> mocked = mock(subHandlerClass);
+
+        when(mocked.serialize(any(), any())).thenReturn(new AbstractPersistedData() {
+            @Override
+            public boolean isNull() {
+                return true;
+            }
+        });
+
+        return mocked;
+    }
+
+    private static TypeHandler<?> mockTypeHandler() {
+        return mockTypeHandler(TypeHandler.class);
     }
 
     @Test

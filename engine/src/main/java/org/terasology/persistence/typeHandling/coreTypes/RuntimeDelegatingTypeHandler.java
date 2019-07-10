@@ -25,12 +25,14 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Delegates serialization of a value to a handler of its runtime type if needed. It is used in
@@ -81,10 +83,12 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
                     .map(typeHandler -> {
                         if (delegateHandler == null) {
                             return typeHandler;
-                        } else if (typeHandler.getClass().equals(delegateHandler.getClass())) {
-                            // Both handlers are of same type, use delegateHandler
-                            return delegateHandler;
                         } else if (!(typeHandler instanceof ObjectFieldMapTypeHandler)) {
+                            if (typeHandler.getClass().equals(delegateHandler.getClass())) {
+                                // Both handlers are of same type, use delegateHandler
+                                return delegateHandler;
+                            }
+
                             // Custom handler for runtime type
                             return typeHandler;
                         } else if (!(delegateHandler instanceof ObjectFieldMapTypeHandler)) {
@@ -113,10 +117,20 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
                 serializer.serialize(ReflectionUtil.getRawType(runtimeType).getName())
         );
 
-        typeValuePersistedDataMap.put(
+        PersistedData serialized = chosenHandler.serialize(value, serializer);
+
+        // If the serialized representation is a Map, flatten it to include the class variable
+        if (serialized.isValueMap()) {
+            for (Map.Entry<String, PersistedData> entry : serialized.getAsValueMap().entrySet()) {
+                typeValuePersistedDataMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+        else {
+            typeValuePersistedDataMap.put(
                 VALUE_FIELD,
-                chosenHandler.serialize(value, serializer)
-        );
+                serialized
+            );
+        }
 
         return serializer.serialize(typeValuePersistedDataMap);
     }
@@ -126,22 +140,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
             return typeInfo.getRawType();
         }
 
-        Type runtimeType =
-                ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), value.getClass());
-
-        if (typeInfo.getRawType().isInterface()) {
-            // Given type is interface, use runtime type which will be a class and will have data
-            return runtimeType;
-        } else if (typeInfo.getType() instanceof Class) {
-            // If given type is a simple class, use more specific runtime type
-            return runtimeType;
-        } else if (delegateHandler == null) {
-            // If we can't find a handler for the declared type, use the runtime type
-            return runtimeType;
-        }
-
-        // Given type has more information than runtime type, use that
-        return typeInfo.getType();
+        return ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), value.getClass());
     }
 
     @SuppressWarnings({"unchecked"})
@@ -153,7 +152,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         PersistedDataMap valueMap = data.getAsValueMap();
 
-        if (!valueMap.has(TYPE_FIELD) || !valueMap.has(VALUE_FIELD)) {
+        if (!valueMap.has(TYPE_FIELD)) {
             return delegateHandler.deserialize(data);
         }
 
@@ -176,7 +175,29 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
                     return delegateHandler;
                 });
 
-        PersistedData valueData = valueMap.get(VALUE_FIELD);
+        PersistedData valueData;
+
+        Set<Map.Entry<String, PersistedData>> valueEntries = valueMap.entrySet();
+
+        if (valueEntries.size() == 2 && valueMap.has(VALUE_FIELD)) {
+            // The runtime value was stored in a separate field only if the two fields stored
+            // are TYPE_FIELD and VALUE_FIELD
+
+            valueData = valueMap.get(VALUE_FIELD);
+        } else {
+            // The value was flattened and stored, every field except TYPE_FIELD describes the
+            // serialized value
+
+            Map<String, PersistedData> valueFields = Maps.newLinkedHashMap();
+
+            for (Map.Entry<String, PersistedData> entry : valueEntries) {
+                valueFields.put(entry.getKey(), entry.getValue());
+            }
+
+            valueFields.remove(TYPE_FIELD);
+
+            valueData = new PersistedMap(valueFields);
+        }
 
         return runtimeTypeHandler.deserialize(valueData);
 
