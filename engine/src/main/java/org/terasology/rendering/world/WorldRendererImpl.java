@@ -300,6 +300,11 @@ public final class WorldRendererImpl implements WorldRenderer {
      */
     @Override
     public void render(RenderingStage renderingStage) {
+        // If no rendering module populated renderGraph, throw an exception.
+        /* if (renderGraph.getNodeMapSize() < 1) {
+            throw new RuntimeException("Render graph is not ready to render. Did you use a rendering module?");
+        } */
+
         preRenderUpdate(renderingStage);
 
         // TODO: Add a method here to check wireframe configuration and regenerate "renderPipelineTask" accordingly.
@@ -311,9 +316,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         glDisable(GL_CULL_FACE);
         FBO lastUpdatedGBuffer = displayResolutionDependentFbo.getGBufferPair().getLastUpdatedFbo();
         glViewport(0, 0, lastUpdatedGBuffer.width(), lastUpdatedGBuffer.height());
-        //glDisable(GL_DEPTH_TEST);
-        //glDisable(GL_NORMALIZE); // currently keeping these as they are, until we find where they are used.
-        //glDepthFunc(GL_LESS);
+        // glDisable(GL_DEPTH_TEST);
+        // glDisable(GL_NORMALIZE); // currently keeping these as they are, until we find where they are used.
+        // glDepthFunc(GL_LESS);
 
         renderPipelineTaskList.forEach(RenderPipelineTask::process);
 
