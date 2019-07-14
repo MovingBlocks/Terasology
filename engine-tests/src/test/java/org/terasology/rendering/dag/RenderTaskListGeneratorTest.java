@@ -16,15 +16,20 @@
 package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import javafx.util.Pair;
 import org.junit.Test;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.rendering.dag.gsoc.BufferPairConnection;
 import org.terasology.rendering.dag.gsoc.DependencyConnection;
 import org.terasology.rendering.dag.gsoc.FboConnection;
 import org.terasology.rendering.dag.gsoc.NewNode;
+import org.terasology.rendering.opengl.FBO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -108,6 +113,8 @@ public class RenderTaskListGeneratorTest {
     private abstract class DummyNode implements NewNode {
         private SimpleUri nodeUri;
         private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
+        private Map<String, DependencyConnection> inputConnections = Maps.newHashMap();
+        private Map<String, DependencyConnection> outputConnections = Maps.newHashMap();
         private boolean enabled;
 
         DummyNode(String nodeUri) {
@@ -182,6 +189,22 @@ public class RenderTaskListGeneratorTest {
         @Override
         public boolean addInputConnection(int id, DependencyConnection connection) {
             return false;
+        }
+
+        public boolean addInputBufferPairConnection(int id, BufferPairConnection from) {
+            return false;
+        }
+
+        public boolean addInputBufferPairConnection(int id, Pair<FBO,FBO> fboPair) {
+            return false;
+        }
+
+        public BufferPairConnection getOutputBufferPairConnection(int outputBufferPairId) {
+            return null;
+        }
+
+        public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId) {
+            return null;
         }
     }
 

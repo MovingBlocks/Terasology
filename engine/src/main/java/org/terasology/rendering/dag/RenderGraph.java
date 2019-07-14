@@ -64,8 +64,6 @@ public class RenderGraph {
             node.setDependencies(context);
         }
 
-        node.setRenderGraph(this);
-
         nodeMap.put(nodeUri, node);
         graph.addNode(node);
     }
@@ -81,8 +79,6 @@ public class RenderGraph {
         if (graph.adjacentNodes(node).size() != 0) {
             throw new RuntimeException("NewNode removal failure: node '" + nodeUri + "' is still connected to other nodes in the render graph!");
         }
-
-        node.setRenderGraph(null);
 
         nodeMap.remove(nodeUri);
         return nodeMap.remove(nodeUri);
@@ -205,6 +201,10 @@ public class RenderGraph {
         shaderManager.addShaderProgram(title, moduleName.toString());
     }
 
+    public int getNodeMapSize() {
+        return this.nodeMap.size();
+    }
+
     /**
      *
      * @param inputFboId Input FBO id is a number of the input connection on this node.
@@ -214,7 +214,7 @@ public class RenderGraph {
     private void connectFbo(NewNode toNode, int inputFboId, DependencyConnection fromConnection) {
         // TODO this will have to be caught by a try-catch or redone if we were going use gui to tamper with dag
         // Is not yet connected?
-        if (fromConnection.getConnectedConnection() == null) {
+        if (fromConnection.getConnectedConnection() != null) {
             logger.info("Warning, " + fromConnection + "connection is already read somewhere else.");
         }
         // If adding new input goes smoothly
@@ -253,6 +253,57 @@ public class RenderGraph {
         if (!areConnected(fromNode, toNode)) {
             connect(fromNode, toNode);
         }
+        logger.info("Connected " + fromNode.getOutputFboConnection(outputId) + " to " + toNode + ".");
+    }
+
+    /**
+     *
+     * @param inputConnectionId Input BufferPairConnection id is a number of the input connection on this node.
+     *                   Chosen arbitrarily, integers starting by 1 typically.
+     * @param fromConnection BufferPairConnection obtained form another node's output.
+     */ // TODO merge with connectFbo()
+    private void connectBufferPair(NewNode toNode, int inputConnectionId, DependencyConnection fromConnection) {
+        // Is not yet connected?
+        if (fromConnection.getConnectedConnection() != null) {
+            logger.info("Warning, " + fromConnection + "connection is already read somewhere else.");
+        }
+        // If adding new input goes smoothly
+        // TODO These checks might be redundant
+        if (toNode.addInputConnection(inputConnectionId, fromConnection)) {
+            DependencyConnection localConnection = toNode.getInputBufferPairConnection(inputConnectionId);
+            // Upon successful insertion - save connected connection. If node is already connected, throw an exception.
+            localConnection.connectInputToOutput(fromConnection);
+
+        } else { // if adding new input failed, it already existed - check for connections
+            //TODO update
+            logger.info(toNode.getUri() + ".connectFbo(" + inputConnectionId + ", " + fromConnection.getName() + "):" +
+                    " Connection already existed. Testing for its connections..");
+            DependencyConnection localConnection = toNode.getInputBufferPairConnection(inputConnectionId);
+            DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnection();
+            // if our input is not connected
+            if (localConnectionConnectedTo == null) {
+                localConnection.connectInputToOutput(fromConnection);
+            } else {
+                throw new RuntimeException(" Could not connect node " + toNode + ", inputConnection with id " + inputConnectionId
+                        + " already connected to " + localConnection.getConnectedConnection());
+            }
+        }
+    }
+
+    /**
+     * Connect BufferPair output of fromNode to toNode's BufferPair input.
+     * @param toNode Input node
+     * @param inputId Number/id of input
+     * @param fromNode Output node
+     * @param outputId Number/id of output
+     */
+    public void connectBufferPair(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+        // TODO for buffer pairs enable new instance with swapped buffers
+        connectBufferPair(toNode, inputId, fromNode.getOutputBufferPairConnection(outputId));
+        if (!areConnected(fromNode, toNode)) {
+            connect(fromNode, toNode);
+        }
+        logger.info("Connected " + fromNode.getOutputBufferPairConnection(outputId) + " to " + toNode + ".");
     }
 
     /**
@@ -287,11 +338,11 @@ public class RenderGraph {
                 // setDependencies(this.context); - needed here? probably not..either do this after everything is set up, or in renderGraph.addNode
                 // and when calling these trough api, call resetDesiredStateChanges();
             } else {
-                logger.info(this + "'s connection " + connectionToReconnect + " was not connected. Attempting new connection...");
+                logger.info(toNode + "'s connection " + connectionToReconnect + " was not connected. Attempting new connection...");
                 this.connectFbo(toNode, inputId, fromConnection);
             }
         } else { //                               TODO make it connectionToReconnect
-            logger.info("No such input connection (" + FboConnection.getConnectionName(inputId) + ") for node " + this.toString() + ". Attempting new connection...");
+            logger.info("No such input connection named " + FboConnection.getConnectionName(inputId, toNode.getUri()) + ". Attempting new connection...");
             this.connectFbo(toNode, inputId, fromConnection);
         }
         logger.info("Reconnecting finished."); // TODO return errors...connectFbo-true false
