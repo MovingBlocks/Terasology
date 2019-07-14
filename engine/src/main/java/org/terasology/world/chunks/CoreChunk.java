@@ -19,7 +19,6 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 
 /**
@@ -78,44 +77,6 @@ public interface CoreChunk {
      * @return Old Block at given position
      */
     Block setBlock(BaseVector3i pos, Block block);
-
-    /**
-     * Sets biome at given position relative to the chunk.
-     *
-     * @param x     X offset from the corner of the chunk
-     * @param y     Y offset from the corner of the chunk
-     * @param z     Z offset from the corner of the chunk
-     * @param biome Biome to set block at given position to
-     * @return Old Biome at given position
-     */
-    Biome setBiome(int x, int y, int z, Biome biome);
-
-    /**
-     * Sets biome at given position relative to the chunk.
-     *
-     * @param pos   Position of the block relative to corner of the chunk
-     * @param biome Biome to set block at given position to
-     * @return Old Biome at given position
-     */
-    Biome setBiome(BaseVector3i pos, Biome biome);
-
-    /**
-     * Returns Biome at given position relative to the chunk.
-     *
-     * @param x X offset from the corner of the chunk
-     * @param y Y offset from the corner of the chunk
-     * @param z Z offset from the corner of the chunk
-     * @return Biome at given position
-     */
-    Biome getBiome(int x, int y, int z);
-
-    /**
-     * Returns Biome at given position relative to the chunk.
-     *
-     * @param pos Position of the block relative to corner of the chunk
-     * @return Biome at given position
-     */
-    Biome getBiome(BaseVector3i pos);
 
     /**
      * Sets one of the per-block custom data values at a given position relative to the chunk.

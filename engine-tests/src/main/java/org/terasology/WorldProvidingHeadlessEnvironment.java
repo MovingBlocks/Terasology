@@ -15,12 +15,10 @@
  */
 package org.terasology;
 
-import org.mockito.Mockito;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.generator.WorldGenerator;
@@ -39,7 +37,7 @@ public class WorldProvidingHeadlessEnvironment extends HeadlessEnvironment {
 
     public void setupWorldProvider(WorldGenerator generator) {
         generator.initialize();
-        WorldProviderCore stub = new MapWorldProvider(generator, context.get(BlockManager.class), Mockito.mock(BiomeManager.class), context.get(ExtraBlockDataManager.class));
+        WorldProviderCore stub = new MapWorldProvider(generator, context.get(BlockManager.class), context.get(ExtraBlockDataManager.class));
         WorldProvider world = new WorldProviderWrapper(stub, context.get(ExtraBlockDataManager.class));
         CoreRegistry.put(WorldProvider.class, world);
         CoreRegistry.put(BlockEntityRegistry.class, new EntityAwareWorldProvider(stub, context));

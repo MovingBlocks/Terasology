@@ -48,12 +48,11 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -90,7 +89,6 @@ public class InitialiseWorld extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         BlockManager blockManager = context.get(BlockManager.class);
-        BiomeManager biomeManager = context.get(BiomeManager.class);
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
@@ -130,8 +128,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus)
-                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, extraDataManager);
+                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus)
+                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, extraDataManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);
             context.get(GameEngine.class).changeState(new StateMainMenu("Unable to create storage manager!"));
@@ -139,7 +137,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         }
         context.put(StorageManager.class, storageManager);
         LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator,
-                blockManager, biomeManager, extraDataManager);
+                blockManager, extraDataManager);
         context.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         Block unloadedBlock = blockManager.getBlock(BlockManager.UNLOADED_ID);
         WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(worldInfo, chunkProvider, unloadedBlock, context);

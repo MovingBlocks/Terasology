@@ -16,15 +16,15 @@
 
 package org.terasology.world.internal;
 
-import java.util.Collection;
-import java.util.Map;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.time.WorldTime;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  */
@@ -104,16 +104,6 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public Block getBlock(int x, int y, int z) {
         return base.getBlock(x, y, z);
-    }
-
-    @Override
-    public Biome setBiome(Vector3i pos, Biome biome) {
-        return base.setBiome(pos, biome);
-    }
-
-    @Override
-    public Biome getBiome(Vector3i pos) {
-        return base.getBiome(pos);
     }
 
     @Override
