@@ -54,7 +54,7 @@ public class BufferPairConnection extends DependencyConnection<Pair<FBO,FBO>> {
     public BufferPairConnection copySwapped(int id, Type type, SimpleUri parentNode) {
         Pair<FBO,FBO> bufferPairToCopy = super.getData();
         Pair<FBO,FBO> newBufferPair =  new Pair<>(bufferPairToCopy.getValue(), bufferPairToCopy.getKey());
-        return new BufferPairConnection(BufferPairConnection.getConnectionName(id), type, newBufferPair, parentNode);
+        return new BufferPairConnection(BufferPairConnection.getConnectionName(id, parentNode), type, newBufferPair, parentNode);
     }
 
     public FBO getPrimaryFbo() {
@@ -69,8 +69,8 @@ public class BufferPairConnection extends DependencyConnection<Pair<FBO,FBO>> {
         return super.toString();
     }
 
-    public static String getConnectionName(int number) {
-        return new StringBuilder("BufferPair").append(number).toString();
+    public static String getConnectionName(int number, SimpleUri nodeUri) {
+        return new StringBuilder(nodeUri.toString()).append(":BufferPair").append(number).toString();
     }
 
 }
