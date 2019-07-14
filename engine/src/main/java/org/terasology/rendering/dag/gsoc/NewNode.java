@@ -19,11 +19,13 @@ package org.terasology.rendering.dag.gsoc;
 
 import java.util.Set;
 
+import javafx.util.Pair;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.opengl.FBO;
 
 /**
  * A node is the processing unit within the Renderer.
@@ -40,12 +42,6 @@ public interface NewNode extends RenderPipelineTask {
      * Called to dispose the Node and any support object it instantiated.
      */
     void dispose();
-
-    /**
-     * RenderGraph tells the node it's its owner now.
-     * @param renderGraph
-     */
-    void setRenderGraph(RenderGraph renderGraph);
 
     /**
      * Used to obtain the set of StateChange objects representing the state changes desired by the node.
@@ -140,6 +136,10 @@ public interface NewNode extends RenderPipelineTask {
      * Otherwise an exception should be thrown.
      */
     DependencyConnection getInputFboConnection(int inputId);
+
+    public BufferPairConnection getOutputBufferPairConnection(int outputBufferPairId);
+
+    public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId);
 
     /**
      * Is {@code thisNode} dependent on {@param anotherNode}?
