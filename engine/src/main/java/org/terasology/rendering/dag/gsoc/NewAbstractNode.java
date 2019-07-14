@@ -56,7 +56,7 @@ public abstract class NewAbstractNode implements NewNode {
     private Map<String, DependencyConnection> outputConnections = Maps.newHashMap();
     private final SimpleUri nodeUri;
     private Context context;
-    private RenderGraph renderGraph;
+
     /**
      * Constructor to be used by inheriting classes.
      * <p>
@@ -73,10 +73,6 @@ public abstract class NewAbstractNode implements NewNode {
 
         this.nodeUri = new SimpleUri(providingModule.toString() + ":" + nodeId);
         //TODO Check for empty list of either in or out
-    }
-
-    public void setRenderGraph(RenderGraph renderGraph) {
-        this.renderGraph = renderGraph;
     }
 
     /**
@@ -108,11 +104,11 @@ public abstract class NewAbstractNode implements NewNode {
      */
 
     protected FBO getInputFboData(int number) {
-        return ((FboConnection) this.inputConnections.get(FboConnection.getConnectionName(number))).getData();
+        return ((FboConnection) this.inputConnections.get(FboConnection.getConnectionName(number, this.nodeUri))).getData();
     }
 
     protected FBO getOutputFboData(int number) {
-        return ((FboConnection) this.outputConnections.get(FboConnection.getConnectionName(number))).getData();
+        return ((FboConnection) this.outputConnections.get(FboConnection.getConnectionName(number, this.nodeUri))).getData();
     }
 
     public boolean addInputConnection(int id, DependencyConnection connection) {
@@ -127,14 +123,25 @@ public abstract class NewAbstractNode implements NewNode {
     }
 
     public boolean addInputBufferPairConnection(int id, BufferPairConnection from) {
-        DependencyConnection bufferPairConenction = new BufferPairConnection(BufferPairConnection.getConnectionName(id), DependencyConnection.Type.INPUT, from.getData(), this.getUri());
+        DependencyConnection bufferPairConenction = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, from.getData(), this.getUri());
         bufferPairConenction.setConnectedConnection(from);
         return addInputConnection(bufferPairConenction);
     }
 
     public boolean addInputBufferPairConnection(int id, Pair<FBO,FBO> fboPair) {
-        BufferPairConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id), DependencyConnection.Type.INPUT, fboPair, this.getUri());
+        BufferPairConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, fboPair, this.getUri());
         return addInputConnection(bufferPairConnection);
+    }
+
+    /**
+     * TODO do something if could not insert
+     * @param id
+     * @param bufferPair
+     * @return true if inserted, false otherwise
+     */
+    public boolean addOutputBufferPairConnection(int id, Pair<FBO,FBO> bufferPair) {
+        DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
+        return addOutputConnection(bufferPairConnection);
     }
 
     /**
@@ -144,7 +151,7 @@ public abstract class NewAbstractNode implements NewNode {
      * @return true if inserted, false otherwise
      */
     protected boolean addInputFboConnection(int id, FboConnection from) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id), DependencyConnection.Type.INPUT, from.getData(), this.getUri());
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, from.getData(), this.getUri());
         fboConnection.setConnectedConnection(from); // must remember where I'm connected from
         return addInputConnection(fboConnection);
     }
@@ -156,7 +163,7 @@ public abstract class NewAbstractNode implements NewNode {
      * @return true if inserted, false otherwise
      */
     public boolean addInputFboConnection(int id, FBO fboData) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id), DependencyConnection.Type.INPUT, fboData, this.getUri());
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, fboData, this.getUri());
         return addInputConnection(fboConnection);
     }
 
@@ -167,7 +174,7 @@ public abstract class NewAbstractNode implements NewNode {
      * @return true if inserted, false otherwise
      */
     protected boolean addOutputFboConnection(int id, FBO fboData) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
         return addOutputConnection(fboConnection);
     }
 
@@ -191,12 +198,22 @@ public abstract class NewAbstractNode implements NewNode {
 
     @Nullable
     public FboConnection getOutputFboConnection(int outputFboId) {
-        return (FboConnection) getOutputConnection(FboConnection.getConnectionName(outputFboId));
+        return (FboConnection) getOutputConnection(FboConnection.getConnectionName(outputFboId, this.nodeUri));
     }
 
     @Nullable
     public FboConnection getInputFboConnection(int inputFboId) {
-        return (FboConnection) getInputConnection(FboConnection.getConnectionName(inputFboId));
+        return (FboConnection) getInputConnection(FboConnection.getConnectionName(inputFboId, this.nodeUri));
+    }
+
+    @Nullable
+    public BufferPairConnection getOutputBufferPairConnection(int outputBufferPairId) {
+        return (BufferPairConnection) getOutputConnection(BufferPairConnection.getConnectionName(outputBufferPairId, this.nodeUri));
+    }
+
+    @Nullable
+    public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId) {
+        return (BufferPairConnection) getInputConnection(BufferPairConnection.getConnectionName(inputBufferPairId, this.nodeUri));
     }
 
     public void removeInputConnection(String name) {
@@ -255,7 +272,7 @@ public abstract class NewAbstractNode implements NewNode {
 
     public void disconnectInputFbo(int inputId) {
         logger.info("Disconnecting" + this.getUri() + " input Fbo number " + inputId);
-            DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId));
+            DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId, this.nodeUri));
         if (connectionToDisconnect != null) {
             // TODO make it reconnectInputToOutput
             if (connectionToDisconnect.getConnectedConnection() != null) {
