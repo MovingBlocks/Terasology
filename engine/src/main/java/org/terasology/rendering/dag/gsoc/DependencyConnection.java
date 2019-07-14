@@ -124,8 +124,8 @@ public abstract class DependencyConnection<T> {
         String connectedConnectionString = (connectedConnection == null) ? "no connection" : connectedConnection.getName();
 
         return (connectionType == Type.OUTPUT)
-                ? String.format("Output:%s([Parent]%s->%s)", connectionName, parentNode, connectedConnectionString)
-                : String.format("Input:%s([Parent]%s<-%s)", connectionName, parentNode, connectedConnectionString);
+                ? String.format("Output:%s(connected to %s)", connectionName, connectedConnectionString)
+                : String.format("Input:%s(connected to %s)", connectionName, connectedConnectionString);
     }
 
     /*
