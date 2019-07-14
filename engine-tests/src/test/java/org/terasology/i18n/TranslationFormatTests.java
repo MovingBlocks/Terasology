@@ -124,7 +124,7 @@ public class TranslationFormatTests {
     private static String createSimpleMultiLineTranslationFile(){
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        sb.append("\"multi-line\": [\"line 1 \n \",\"line 2 \n \",\"line 3 \n \"],");
+        sb.append("\"multi-line\": [\"line 1 \n \",\"line 2 \n \",\"line 3\"],");
         sb.append("\"single-line\": \"line 1 \n line 2 \n line 3\"");
         sb.append("}");
         return sb.toString();
