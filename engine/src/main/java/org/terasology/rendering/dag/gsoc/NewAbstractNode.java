@@ -103,10 +103,12 @@ public abstract class NewAbstractNode implements NewNode {
      * TODO String to SimpleUri or make ConnectionUri and change Strings for names to ConnectionUris
      */
 
+    @Nullable
     protected FBO getInputFboData(int number) {
         return ((FboConnection) this.inputConnections.get(FboConnection.getConnectionName(number, this.nodeUri))).getData();
     }
 
+    @Nullable
     protected FBO getOutputFboData(int number) {
         return ((FboConnection) this.outputConnections.get(FboConnection.getConnectionName(number, this.nodeUri))).getData();
     }
@@ -128,8 +130,8 @@ public abstract class NewAbstractNode implements NewNode {
         return addInputConnection(bufferPairConenction);
     }
 
-    public boolean addInputBufferPairConnection(int id, Pair<FBO,FBO> fboPair) {
-        BufferPairConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, fboPair, this.getUri());
+    public boolean addInputBufferPairConnection(int id, BufferPair bufferPair) {
+        BufferPairConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, bufferPair, this.getUri());
         return addInputConnection(bufferPairConnection);
     }
 
@@ -139,7 +141,7 @@ public abstract class NewAbstractNode implements NewNode {
      * @param bufferPair
      * @return true if inserted, false otherwise
      */
-    public boolean addOutputBufferPairConnection(int id, Pair<FBO,FBO> bufferPair) {
+    public boolean addOutputBufferPairConnection(int id, BufferPair bufferPair) {
         DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
         return addOutputConnection(bufferPairConnection);
     }

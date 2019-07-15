@@ -20,7 +20,7 @@ import javafx.util.Pair;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.FBO;
 
-public class BufferPairConnection extends DependencyConnection<Pair<FBO,FBO>> {
+public class BufferPairConnection extends DependencyConnection<BufferPair> {
 
     /**
      *
@@ -39,7 +39,7 @@ public class BufferPairConnection extends DependencyConnection<Pair<FBO,FBO>> {
      * @param data
      * @param parentNode
      */
-    public BufferPairConnection(String  name, Type type, Pair<FBO,FBO> data, SimpleUri parentNode) {
+    public BufferPairConnection(String  name, Type type, BufferPair data, SimpleUri parentNode) {
         super(name, type, parentNode);
         super.setData(data);
     }
@@ -52,17 +52,13 @@ public class BufferPairConnection extends DependencyConnection<Pair<FBO,FBO>> {
      * @return
      */
     public BufferPairConnection copySwapped(int id, Type type, SimpleUri parentNode) {
-        Pair<FBO,FBO> bufferPairToCopy = super.getData();
-        Pair<FBO,FBO> newBufferPair =  new Pair<>(bufferPairToCopy.getValue(), bufferPairToCopy.getKey());
+        BufferPair bufferPairToCopy = super.getData();
+        BufferPair newBufferPair =  new BufferPair(bufferPairToCopy.getSecondaryFbo(), bufferPairToCopy.getPrimaryFbo());
         return new BufferPairConnection(BufferPairConnection.getConnectionName(id, parentNode), type, newBufferPair, parentNode);
     }
 
-    public FBO getPrimaryFbo() {
-        return super.getData().getKey();
-    }
-
-    public FBO getSecondaryFbo() {
-        return super.getData().getValue();
+    public BufferPair getBufferPair() {
+        return super.getData();
     }
 
     public String toString() {
