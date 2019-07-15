@@ -60,6 +60,8 @@ public class RenderGraph {
             throw new RuntimeException("A node with uri " + nodeUri + " already exists!");
         }
 
+        // TODO this must be moved to a later stage ideally with the improved connecting of nodes which would be based on
+        // TODO on dep connections. So far when creating dep. connections, connections are made and destroyed, which is wrong.
         if (node instanceof NewAbstractNode) {
             node.setDependencies(context);
         }
