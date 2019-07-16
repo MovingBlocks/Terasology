@@ -46,15 +46,14 @@ public class BufferPairConnection extends DependencyConnection<BufferPair> {
 
     /**
      * Return a new instance of BufferPairConnection based on this one with swapped FBOs.
-     * @param id TODO Uri
      * @param type
      * @param parentNode
      * @return
      */
-    public BufferPairConnection copySwapped(int id, Type type, SimpleUri parentNode) {
+    public BufferPairConnection getSwappedCopy(Type type, SimpleUri parentNode) {
         BufferPair bufferPairToCopy = super.getData();
         BufferPair newBufferPair =  new BufferPair(bufferPairToCopy.getSecondaryFbo(), bufferPairToCopy.getPrimaryFbo());
-        return new BufferPairConnection(BufferPairConnection.getConnectionName(id, parentNode), type, newBufferPair, parentNode);
+        return new BufferPairConnection(this.getName(), type, newBufferPair, parentNode);
     }
 
     public BufferPair getBufferPair() {
