@@ -124,14 +124,29 @@ public abstract class NewAbstractNode implements NewNode {
         }
     }
 
+    public boolean addInputRunOrderConnection(RunOrderConnection from, int inputId) {
+        DependencyConnection runOrderconnection = new RunOrderConnection(RunOrderConnection.getConnectionName(inputId, this.nodeUri),
+                DependencyConnection.Type.INPUT, this.getUri());
+        runOrderconnection.setConnectedConnection(from);
+        return addInputConnection(runOrderconnection);
+    }
+
+    public boolean addOutputRunOrderConnection(int outputId) {
+        DependencyConnection runOrderConnection = new RunOrderConnection(RunOrderConnection.getConnectionName(outputId, this.nodeUri),
+                DependencyConnection.Type.OUTPUT, this.getUri());
+        return addOutputConnection(runOrderConnection);
+    }
+
     public boolean addInputBufferPairConnection(int id, BufferPairConnection from) {
-        DependencyConnection bufferPairConenction = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, from.getData(), this.getUri());
+        DependencyConnection bufferPairConenction = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri),
+                DependencyConnection.Type.INPUT, from.getData(), this.getUri());
         bufferPairConenction.setConnectedConnection(from);
         return addInputConnection(bufferPairConenction);
     }
 
     public boolean addInputBufferPairConnection(int id, BufferPair bufferPair) {
-        BufferPairConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, bufferPair, this.getUri());
+        BufferPairConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri),
+                DependencyConnection.Type.INPUT, bufferPair, this.getUri());
         return addInputConnection(bufferPairConnection);
     }
 
@@ -143,6 +158,18 @@ public abstract class NewAbstractNode implements NewNode {
      */
     public boolean addOutputBufferPairConnection(int id, BufferPair bufferPair) {
         DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
+        return addOutputConnection(bufferPairConnection);
+    }
+
+    /**
+     * TODO do something if could not insert
+     * @param id
+     * @param from
+     * @return true if inserted, false otherwise
+     */
+    public boolean addOutputBufferPairConnection(int id, BufferPairConnection from) {
+        DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, from.getData(), this.getUri());
+        bufferPairConnection.setConnectedConnection(from);
         return addOutputConnection(bufferPairConnection);
     }
 
@@ -216,6 +243,16 @@ public abstract class NewAbstractNode implements NewNode {
     @Nullable
     public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId) {
         return (BufferPairConnection) getInputConnection(BufferPairConnection.getConnectionName(inputBufferPairId, this.nodeUri));
+    }
+
+    @Nullable
+    public RunOrderConnection getOutputRunOrderConnection(int outputRunOrderConnectionId) {
+        return (RunOrderConnection) getOutputConnection(RunOrderConnection.getConnectionName(outputRunOrderConnectionId, this.nodeUri));
+    }
+
+    @Nullable
+    public RunOrderConnection getInputRunOrderConnection(int inputRunOrderConnectionId) {
+        return (RunOrderConnection) getInputConnection(RunOrderConnection.getConnectionName(inputRunOrderConnectionId, this.nodeUri));
     }
 
     public void removeInputConnection(String name) {
