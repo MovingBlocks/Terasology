@@ -292,6 +292,24 @@ public class RenderGraph {
         }
     }
 
+
+    public void connectRunOrder(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+        if (fromNode == null || toNode == null) {
+            throw new RuntimeException("Node cannot be null.");
+        }
+        if(fromNode.addOutputRunOrderConnection(outputId)) {
+            if (!toNode.addInputRunOrderConnection(fromNode.getOutputRunOrderConnection(outputId), inputId)) {
+                throw new RuntimeException("Could not add input RunOrder" + inputId + " connection to " + toNode + ". Connection probably already exists.");
+            }
+        } else {
+            throw new RuntimeException("Could not add output RunOrder" + outputId + " connection to " + fromNode + ". Connection probably already exists.");
+        }
+
+        if (!areConnected(fromNode, toNode)) {
+            connect(fromNode, toNode);
+        }
+    }
+
     /**
      * Connect BufferPair output of fromNode to toNode's BufferPair input.
      * @param toNode Input node

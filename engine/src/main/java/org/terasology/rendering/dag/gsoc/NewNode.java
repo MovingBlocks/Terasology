@@ -141,6 +141,14 @@ public interface NewNode extends RenderPipelineTask {
 
     public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId);
 
+    public boolean addInputRunOrderConnection(RunOrderConnection from, int inputId);
+
+    public boolean addOutputRunOrderConnection(int outputId);
+
+    public RunOrderConnection getOutputRunOrderConnection(int outputId);
+
+    public RunOrderConnection getInputRunOrderConnection(int inputId);
+
     /**
      * Is {@code thisNode} dependent on {@param anotherNode}?
      * @param anotherNode

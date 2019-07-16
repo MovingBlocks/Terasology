@@ -26,6 +26,7 @@ import org.terasology.rendering.dag.gsoc.BufferPairConnection;
 import org.terasology.rendering.dag.gsoc.DependencyConnection;
 import org.terasology.rendering.dag.gsoc.FboConnection;
 import org.terasology.rendering.dag.gsoc.NewNode;
+import org.terasology.rendering.dag.gsoc.RunOrderConnection;
 import org.terasology.rendering.opengl.FBO;
 
 import java.util.List;
@@ -204,6 +205,22 @@ public class RenderTaskListGeneratorTest {
         }
 
         public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId) {
+            return null;
+        }
+
+        public boolean addInputRunOrderConnection(RunOrderConnection from, int inputId) {
+            return false;
+        }
+
+        public boolean addOutputRunOrderConnection(int outputId) {
+            return false;
+        }
+
+        public RunOrderConnection getOutputRunOrderConnection(int outputId) {
+            return null;
+        }
+
+        public RunOrderConnection getInputRunOrderConnection(int inputId) {
             return null;
         }
     }
