@@ -54,17 +54,16 @@ public abstract class ModuleRendering extends BaseComponentSystem {
     }
 
     protected BufferPair createBufferPair(String primaryBufferName, String secondaryBufferName,
-                                          ScalingFactors primaryBufferScale, ScalingFactors secondaryBufferScale,
-                                          FBO.Type primaryBufferType, FBO.Type secondaryBufferType, FBO.Dimensions scale) {
+                                          ScalingFactors sharedBufferScale, FBO.Type sharedBufferType, FBO.Dimensions scale) {
 
-        FBO buffer1 = generateWithDimensions(new FboConfig(new SimpleUri(providingModule + ":fbo." + primaryBufferName), primaryBufferScale, primaryBufferType)
+        FBO buffer1 = generateWithDimensions(new FboConfig(new SimpleUri(providingModule + ":fbo." + primaryBufferName), sharedBufferScale, sharedBufferType)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), scale);
-        FBO buffer2 = generateWithDimensions(new FboConfig(new SimpleUri(providingModule + ":fbo." + secondaryBufferName), secondaryBufferScale, secondaryBufferType)
+        FBO buffer2 = generateWithDimensions(new FboConfig(new SimpleUri(providingModule + ":fbo." + secondaryBufferName), sharedBufferScale, sharedBufferType)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), scale);
         return new BufferPair(buffer1, buffer2);
     }
 
-    /**
+    /**TODO UPDATE the javadoc, this method has been taken from abstractfbomanager during DAG Enhancement project
      * Generates and returns an FBO as characterized by the FboConfig and the dimensions arguments.
      *
      * Notice that if the name of the FBO being generated matches the name of an FBO already stored
