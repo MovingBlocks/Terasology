@@ -61,6 +61,9 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
+import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
+import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -70,7 +73,6 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +86,7 @@ import java.util.Optional;
 public class TypeHandlerLibrary {
     private static final Logger logger = LoggerFactory.getLogger(TypeHandlerLibrary.class);
 
-    private Reflections reflections;
+    private SerializationSandbox sandbox;
 
     private List<TypeHandlerFactory> typeHandlerFactories = Lists.newArrayList();
 
@@ -104,12 +106,7 @@ public class TypeHandlerLibrary {
 
     private Map<ClassMetadata<?, ?>, Serializer> serializerMap = Maps.newHashMap();
 
-    /**
-     * @param reflections
-     */
-    public TypeHandlerLibrary(Reflections reflections) {
-        this.reflections = reflections;
-
+    private TypeHandlerLibrary() {
         constructorLibrary = new ConstructorLibrary(instanceCreators);
 
         addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
@@ -137,6 +134,22 @@ public class TypeHandlerLibrary {
         addTypeHandlerFactory(new EnumTypeHandlerFactory());
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new StringMapTypeHandlerFactory());
+
+    }
+
+    /**
+     * @param reflections
+     */
+    public TypeHandlerLibrary(Reflections reflections) {
+        this();
+
+        this.sandbox = new ReflectionsSandbox(reflections);
+    }
+
+    public TypeHandlerLibrary(ModuleEnvironment moduleEnvironment) {
+        this();
+
+        this.sandbox = new ModuleEnvironmentSandbox(moduleEnvironment);
     }
 
     /**
@@ -148,7 +161,7 @@ public class TypeHandlerLibrary {
     public TypeHandlerLibrary(TypeHandlerLibrary original) {
         this.typeHandlerFactories.addAll(original.typeHandlerFactories);
         this.instanceCreators.putAll(original.instanceCreators);
-        this.reflections = original.reflections;
+        this.sandbox = original.sandbox;
     }
 
     public static TypeHandlerLibrary withDefaultHandlers(Reflections reflections) {
@@ -310,7 +323,7 @@ public class TypeHandlerLibrary {
      */
     @SuppressWarnings("unchecked")
     public <T> Optional<TypeHandler<T>> getTypeHandler(TypeInfo<T> type) {
-        TypeHandlerContext context = new TypeHandlerContext(this, reflections);
+        TypeHandlerContext context = new TypeHandlerContext(this, sandbox);
 
         if (typeHandlerCache.containsKey(type)) {
             return Optional.of((TypeHandler<T>) typeHandlerCache.get(type));

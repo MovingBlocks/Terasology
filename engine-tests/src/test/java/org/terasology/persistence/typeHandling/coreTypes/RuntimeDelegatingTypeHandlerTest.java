@@ -28,6 +28,7 @@ import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTyp
 import org.terasology.persistence.typeHandling.inMemory.AbstractPersistedData;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
+import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 
@@ -49,7 +50,7 @@ public class RuntimeDelegatingTypeHandlerTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
 
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeHandlerLibrary, new Reflections(getClass().getClassLoader()));
+            new TypeHandlerContext(typeHandlerLibrary, new ReflectionsSandbox(new Reflections(getClass().getClassLoader())));
 
     private static class Base {
         int x;

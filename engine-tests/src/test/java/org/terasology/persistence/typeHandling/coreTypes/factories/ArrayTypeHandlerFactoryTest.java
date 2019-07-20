@@ -21,6 +21,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ArrayTypeHandler;
+import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class ArrayTypeHandlerFactoryTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
     private final ArrayTypeHandlerFactory typeHandlerFactory = new ArrayTypeHandlerFactory();
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeHandlerLibrary, mock(Reflections.class));
+            new TypeHandlerContext(typeHandlerLibrary, mock(SerializationSandbox.class));
 
     @Test
     public void testArray() {

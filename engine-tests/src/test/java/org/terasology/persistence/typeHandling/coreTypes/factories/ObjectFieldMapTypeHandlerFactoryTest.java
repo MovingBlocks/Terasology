@@ -22,6 +22,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
+import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 
@@ -42,7 +43,7 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
             constructorLibrary);
 
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeHandlerLibrary, mock(Reflections.class));
+            new TypeHandlerContext(typeHandlerLibrary, mock(SerializationSandbox.class));
 
     private static class SomeClass<T> {
         private T t;

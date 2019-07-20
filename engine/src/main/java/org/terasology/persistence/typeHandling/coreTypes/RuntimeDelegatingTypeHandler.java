@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Maps;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
@@ -26,6 +25,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
+import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -51,13 +51,13 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     private TypeHandler<T> delegateHandler;
     private TypeInfo<T> typeInfo;
     private TypeHandlerLibrary typeHandlerLibrary;
-    private Reflections reflections;
+    private SerializationSandbox sandbox;
 
     public RuntimeDelegatingTypeHandler(TypeHandler<T> delegateHandler, TypeInfo<T> typeInfo, TypeHandlerContext context) {
         this.delegateHandler = delegateHandler;
         this.typeInfo = typeInfo;
         this.typeHandlerLibrary = context.getTypeHandlerLibrary();
-        this.reflections = context.getReflections();
+        this.sandbox = context.getSandbox();
     }
 
     @SuppressWarnings({"unchecked"})
@@ -76,7 +76,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         TypeHandler<T> chosenHandler = delegateHandler;
         Type runtimeType = getRuntimeTypeIfMoreSpecific(value);
 
-        if (!typeInfo.getRawType().equals(runtimeType)) {
+        if (!typeInfo.getType().equals(runtimeType)) {
             Optional<TypeHandler<?>> runtimeTypeHandler = typeHandlerLibrary.getTypeHandler(runtimeType);
 
             chosenHandler = (TypeHandler<T>) runtimeTypeHandler
@@ -112,9 +112,12 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         Map<String, PersistedData> typeValuePersistedDataMap = Maps.newLinkedHashMap();
 
+        Class<? extends T> subType = (Class<? extends T>) ReflectionUtil.getRawType(runtimeType);
+        String subTypeIdentifier = sandbox.getSubTypeIdentifier(subType, typeInfo.getRawType());
+
         typeValuePersistedDataMap.put(
                 TYPE_FIELD,
-                serializer.serialize(ReflectionUtil.getRawType(runtimeType).getName())
+                serializer.serialize(subTypeIdentifier)
         );
 
         PersistedData serialized = chosenHandler.serialize(value, serializer);
@@ -137,7 +140,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
     private Type getRuntimeTypeIfMoreSpecific(T value) {
         if (value == null) {
-            return typeInfo.getRawType();
+            return typeInfo.getType();
         }
 
         return ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), value.getClass());
@@ -204,20 +207,10 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     }
 
     private Optional<Type> findSubtypeWithName(String runtimeTypeName) {
-        return findSubclassWithName(runtimeTypeName)
+        return sandbox.findSubTypeOf(runtimeTypeName, typeInfo.getRawType())
                 .map(runtimeClass ->
-                        ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), runtimeClass)
+                         ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), runtimeClass)
                 );
     }
 
-    private Optional<Class<?>> findSubclassWithName(String runtimeTypeName) {
-        for (Class<?> clazz : reflections.getSubTypesOf(typeInfo.getRawType())) {
-            if (runtimeTypeName.equals(clazz.getSimpleName()) ||
-                    runtimeTypeName.equals(clazz.getName())) {
-                return Optional.of(clazz);
-            }
-        }
-
-        return Optional.empty();
-    }
 }

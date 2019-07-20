@@ -16,10 +16,8 @@
 package org.terasology.persistence.typeHandling;
 
 import org.reflections.Reflections;
+import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
-
-import java.lang.reflect.Type;
-import java.util.Optional;
 
 /**
  * Represents the context in which a {@link TypeHandlerFactory} creates {@link TypeHandler} instances.
@@ -29,11 +27,11 @@ import java.util.Optional;
  */
 public class TypeHandlerContext {
     private TypeHandlerLibrary typeHandlerLibrary;
-    private Reflections reflections;
+    private SerializationSandbox sandbox;
 
-    public TypeHandlerContext(TypeHandlerLibrary typeHandlerLibrary, Reflections reflections) {
+    public TypeHandlerContext(TypeHandlerLibrary typeHandlerLibrary, SerializationSandbox sandbox) {
         this.typeHandlerLibrary = typeHandlerLibrary;
-        this.reflections = reflections;
+        this.sandbox = sandbox;
     }
 
     /**
@@ -44,10 +42,10 @@ public class TypeHandlerContext {
     }
 
     /**
-     * Returns the {@link Reflections} to use to load classes in the
+     * Returns the {@link SerializationSandbox} to use to load classes in the
      * {@link TypeHandlerFactory#create(TypeInfo, TypeHandlerContext)} method.
      */
-    public Reflections getReflections() {
-        return reflections;
+    public SerializationSandbox getSandbox() {
+        return sandbox;
     }
 }
