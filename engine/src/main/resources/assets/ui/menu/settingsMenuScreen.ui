@@ -61,6 +61,11 @@
                         "text": "${engine:menu#input-settings}"
                     },
                     {
+                        "type": "UIButton",
+                        "id": "controllers",
+                        "text": "${engine:menu#controller-settings}"
+                    },
+                    {
                         "type": "UISpace",
                         "size": [1, 104]
                     },

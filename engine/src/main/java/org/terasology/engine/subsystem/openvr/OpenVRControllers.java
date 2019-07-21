@@ -17,6 +17,7 @@ package org.terasology.engine.subsystem.openvr;
 
 import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
+import org.terasology.config.ControllerConfig;
 import org.terasology.input.ButtonState;
 import org.terasology.input.ControllerDevice;
 import org.terasology.input.InputType;
@@ -51,6 +52,11 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
         List<String> ids = new ArrayList<>();
         ids.add("OpenVR");
         return ids;
+    }
+
+    @Override
+    public ControllerConfig.ControllerInfo describeController(String name) {
+        return new ControllerConfig.ControllerInfo();
     }
 
     /**

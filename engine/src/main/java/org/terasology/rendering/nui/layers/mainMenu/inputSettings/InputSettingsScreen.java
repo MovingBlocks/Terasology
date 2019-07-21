@@ -170,12 +170,6 @@ public class InputSettingsScreen extends CoreScreenLayer {
                 addInputSection(category, mainLayout, inputsById);
             }
             mainLayout.addWidget(new UISpace(new Vector2i(1, 16)));
-
-            List<String> controllers = inputSystem.getControllerDevice().getControllers();
-            for (String name : controllers) {
-                ControllerInfo cfg = inputDeviceConfiguration.getController(name);
-                addInputSection(mainLayout, name, cfg);
-            }
         }
 
         WidgetUtil.trySubscribe(this, "reset", button -> {

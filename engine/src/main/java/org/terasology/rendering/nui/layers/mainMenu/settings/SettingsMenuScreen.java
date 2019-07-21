@@ -21,6 +21,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.rendering.nui.layers.mainMenu.inputSettings.ControllerSettingsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.inputSettings.InputSettingsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.VideoSettingsScreen;
 
@@ -41,6 +42,7 @@ public class SettingsMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "video", button -> triggerForwardAnimation(VideoSettingsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "audio", button -> triggerForwardAnimation(AudioSettingsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "input", button -> triggerForwardAnimation(InputSettingsScreen.ASSET_URI));
+        WidgetUtil.trySubscribe(this, "controllers", button -> triggerForwardAnimation(ControllerSettingsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "close", button -> {
             config.save();
             triggerBackAnimation();

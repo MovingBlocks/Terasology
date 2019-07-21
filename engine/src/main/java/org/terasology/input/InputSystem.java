@@ -296,10 +296,9 @@ public class InputSystem extends BaseComponentSystem {
         BindableRealAxis axis = bindsManager.getControllerAxisBinds().get(input);
         if (axis != null) {
             ControllerInfo info = inputDeviceConfig.getController(action.getController());
-            boolean isX = action.getInput().getId() == ControllerId.X_AXIS;
-            boolean isY = action.getInput().getId() == ControllerId.Y_AXIS;
-            boolean isZ = action.getInput().getId() == ControllerId.Z_AXIS;
-            float f = (isX && info.isInvertX() || isY && info.isInvertY() || isZ && info.isInvertZ()) ? -1 : 1;
+            int inputId = action.getInput().getId();
+            boolean inverted = info.axisIsInverted(info.findAxisFromControllerId(inputId));
+            float f = inverted ? -1 : 1;
             axis.setTargetValue(action.getAxisValue() * f);
         }
     }

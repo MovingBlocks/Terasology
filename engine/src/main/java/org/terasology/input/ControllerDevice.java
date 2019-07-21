@@ -19,6 +19,7 @@ package org.terasology.input;
 import java.util.List;
 import java.util.Queue;
 
+import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.input.device.ControllerAction;
 import org.terasology.input.device.InputDevice;
 
@@ -36,4 +37,11 @@ public interface ControllerDevice extends InputDevice {
      * @return a list of currently connected controller IDs.
      */
     List<String> getControllers();
+
+    /**
+     * Return a {@link ControllerInfo} with information about the controller's axes, buttons and hat switches.
+     * @param name the name of the device (one of the ones returned by {@link ControllerDevice::getControllers})
+     * @return Information about the controller.
+     */
+    ControllerInfo describeController(String name);
 }

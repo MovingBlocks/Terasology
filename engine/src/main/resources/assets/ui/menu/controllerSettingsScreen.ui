@@ -1,0 +1,72 @@
+{
+    "type": "ControllerSettingsScreen",
+    "skin": "settingsmenu",
+    "contents": {
+        "type": "RelativeLayout",
+        "contents": [
+            {
+                "type": "UILabel",
+                "family": "title",
+                "text": "${engine:menu#controller-settings-title}",
+                "id": "title",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 48
+                    }
+                }
+            },
+            {
+                "type": "ScrollableArea",
+                "id": "area",
+                "layoutInfo": {
+                    "width": 740,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 16,
+                        "widget": "title"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "offset": 32,
+                        "widget": "actionsRow"
+                    }
+                },
+                "contents": [
+                    {
+                        "type": "ColumnLayout",
+                        "id": "main",
+                        "horizontalSpacing": 8,
+                        "verticalSpacing": 8,
+                        "family": "option-grid",
+                        "contents": []
+                    }
+                ]
+            },
+            {
+                "type": "RowLayout",
+                "id": "actionsRow",
+                "horizontalSpacing": 8,
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#back}",
+                        "id": "back"
+                    }
+                ],
+                "layoutInfo": {
+                    "width": 400,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                    }
+                }
+            }
+        ]
+    }
+}

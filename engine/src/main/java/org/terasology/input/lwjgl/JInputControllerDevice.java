@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier;
 import net.java.games.input.Component.Identifier.Button;
+import net.java.games.input.Component.Identifier.Axis;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
@@ -50,6 +51,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Retrieves information on connected controllers through JInput.
+ *
+ * When the config.cfg is empty this will "discover" inputs via JInput. These inputs do not get added to Config
+ * until either an event is received from the input, or the user goes to the settings screen; at which point an empty,
+ * default ControllerInfo will be created and returned.
  */
 public class JInputControllerDevice implements ControllerDevice {
 
@@ -97,7 +102,7 @@ public class JInputControllerDevice implements ControllerDevice {
                 addController(controller);
             }
         });
-
+        logger.info("Discovered {} input devices", env.getControllers().length);
         for (Controller c : env.getControllers()) {
             addController(c);
         }
@@ -110,8 +115,34 @@ public class JInputControllerDevice implements ControllerDevice {
         for (Controller controller : controllers) {
             ids.add(controller.getName());
         }
-
+        logger.info("getControllers returning {}", ids);
         return ids;
+    }
+
+    @Override
+    public ControllerInfo describeController(String name) {
+        Controller controller = controllers.stream()
+                .filter(c -> c.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+        ControllerInfo info = new ControllerInfo();
+        if (controller != null) {
+            Component[] components = controller.getComponents();
+            for (int i = 0; i < components.length; i++) {
+
+                Component c = components[i];
+                Identifier identifier = c.getIdentifier();
+                if (identifier instanceof Axis) {
+                    ControllerConfig.Axis axis =
+                            new ControllerConfig.Axis(c.getName(), identifier.getName(), false, 0.08f);
+                    info.getAxes().add(axis);
+                } else if (identifier instanceof Button) {
+                    ControllerConfig.Button button = new ControllerConfig.Button(c.getName(), identifier.getName());
+                    info.getButtons().add(button);
+                }
+            }
+        }
+        return info;
     }
 
     @Override
@@ -146,6 +177,16 @@ public class JInputControllerDevice implements ControllerDevice {
         Input input;
         ButtonState state = ButtonState.UP;
 
+        ControllerInfo info = config.getController(c.getName());
+        if (info.isEmpty()) {
+            // Controller has not been configured
+            return null;
+        }
+        if (!info.isEnabled()) {
+            // Controller is disabled
+            return null;
+        }
+
         if (id instanceof Identifier.Button) {
             state = event.getValue() != 0 ? ButtonState.DOWN : ButtonState.UP;
             Integer buttonId = buttonMap.get(id);
@@ -154,32 +195,13 @@ public class JInputControllerDevice implements ControllerDevice {
             }
             input = InputType.CONTROLLER_BUTTON.getInput(buttonId);
         } else if (id instanceof Identifier.Axis) {
-            ControllerInfo info = config.getController(c.getName());
-            if (id.equals(Identifier.Axis.X)) {
-                if (Math.abs(axisValue) < info.getMovementDeadZone()) {
+            // TODO ignore event if controller not found
+            if (!id.equals(Identifier.Axis.POV)) {
+                ControllerConfig.Axis axis = info.findAxis(id.getName());
+                if (Math.abs(axisValue) < axis.getDeadZone()) {
                     axisValue = 0;
                 }
-                input = InputType.CONTROLLER_AXIS.getInput(ControllerId.X_AXIS);
-            } else if (id.equals(Identifier.Axis.Y)) {
-                if (Math.abs(axisValue) < info.getMovementDeadZone()) {
-                    axisValue = 0;
-                }
-                input = InputType.CONTROLLER_AXIS.getInput(ControllerId.Y_AXIS);
-            } else if (id.equals(Identifier.Axis.Z)) {
-                if (Math.abs(axisValue) < info.getMovementDeadZone()) {
-                    axisValue = 0;
-                }
-                input = InputType.CONTROLLER_AXIS.getInput(ControllerId.Z_AXIS);
-            } else if (id.equals(Identifier.Axis.RX)) {
-                if (Math.abs(axisValue) < info.getRotationDeadZone()) {
-                    axisValue = 0;
-                }
-                input = InputType.CONTROLLER_AXIS.getInput(ControllerId.RX_AXIS);
-            } else if (id.equals(Identifier.Axis.RY)) {
-                if (Math.abs(axisValue) < info.getRotationDeadZone()) {
-                    axisValue = 0;
-                }
-                input = InputType.CONTROLLER_AXIS.getInput(ControllerId.RY_AXIS);
+                input = InputType.CONTROLLER_AXIS.getInput(findControllerId(axis.getIdName()));
             } else if (id.equals(Identifier.Axis.POV)) {
                 // the poll data float value is actually an ID in this case
                 boolean isX = (axisValue == Component.POV.LEFT) || (axisValue == Component.POV.RIGHT);
@@ -203,6 +225,21 @@ public class JInputControllerDevice implements ControllerDevice {
         }
 
         return new ControllerAction(input, c.getName(), state, axisValue);
+    }
+
+    private int findControllerId(String axisId) {
+        if (axisId.equalsIgnoreCase("x")) {
+            return ControllerId.X_AXIS;
+        } else if (axisId.equalsIgnoreCase("y")) {
+            return ControllerId.Y_AXIS;
+        } else if (axisId.equalsIgnoreCase("z")) {
+            return ControllerId.Z_AXIS;
+        } else if (axisId.equalsIgnoreCase("rx")) {
+            return ControllerId.RX_AXIS;
+        } else if (axisId.equalsIgnoreCase("ry")) {
+            return ControllerId.RY_AXIS;
+        }
+        return ControllerId.NONE;
     }
 
     /**
