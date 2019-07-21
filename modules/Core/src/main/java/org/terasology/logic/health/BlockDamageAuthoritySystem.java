@@ -141,7 +141,7 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
      * @param location the location of the damaged block
      */
     private void createBlockParticleEffect(BlockFamily family, Vector3f location) {
-        EntityBuilder builder = entityManager.newBuilder("core:defaultBlockParticles");
+        EntityBuilder builder = entityManager.newBuilder("CoreAssets:defaultBlockParticles");
         builder.getComponent(LocationComponent.class).setWorldPosition(location);
 
         Optional<Texture> terrainTexture = Assets.getTexture("engine:terrain");

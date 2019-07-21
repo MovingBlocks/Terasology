@@ -94,7 +94,7 @@ public class TunnelAction extends BaseComponentSystem {
 
                     if (currentBlock.isDestructible()) {
                         if (particleEffects < tunnelActionComponent.maxParticalEffects) {
-                            EntityBuilder builder = entityManager.newBuilder("Core:smokeExplosion");
+                            EntityBuilder builder = entityManager.newBuilder("CoreAssets:smokeExplosion");
                             builder.getComponent(LocationComponent.class).setWorldPosition(target);
                             builder.build();
                             particleEffects++;

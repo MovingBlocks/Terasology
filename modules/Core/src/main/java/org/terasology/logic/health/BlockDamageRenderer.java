@@ -48,7 +48,7 @@ public class BlockDamageRenderer extends BaseComponentSystem implements RenderSy
     @Override
     public void renderOverlay() {
         if (blockSelectionRenderer == null) {
-            Texture texture = Assets.getTextureRegion("core:blockdamageeffects#1").get().getTexture();
+            Texture texture = Assets.getTextureRegion("CoreAssets:BlockDamageEffects#1").get().getTexture();
             blockSelectionRenderer = new BlockSelectionRenderer(texture);
         }
         // group the entities into what texture they will use so that there is less recreating meshes (changing a texture region on the BlockSelectionRenderer
@@ -74,11 +74,11 @@ public class BlockDamageRenderer extends BaseComponentSystem implements RenderSy
             }
         }
 
-        // we know that the texture will be the same for each block effect,  just differnt UV coordinates.  Bind the texture already
+        // we know that the texture will be the same for each block effect,  just different UV coordinates.  Bind the texture already
         blockSelectionRenderer.beginRenderOverlay();
 
         for (Integer effectsNumber : groupedEntitiesByEffect.keySet()) {
-            Optional<TextureRegionAsset> texture = Assets.getTextureRegion("core:blockdamageeffects#" + effectsNumber);
+            Optional<TextureRegionAsset> texture = Assets.getTextureRegion("CoreAssets:BlockDamageEffects#" + effectsNumber);
             if (texture.isPresent()) {
                 blockSelectionRenderer.setEffectsTexture(texture.get());
                 for (Vector3i position : groupedEntitiesByEffect.get(effectsNumber)) {

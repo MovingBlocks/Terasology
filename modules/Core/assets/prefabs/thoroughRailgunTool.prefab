@@ -8,16 +8,16 @@
         "usage": "IN_DIRECTION"
     },
     "TunnelAction": {
-        "damageType": "core:DestructiveExplosiveDamage",
+        "damageType": "Core:DestructiveExplosiveDamage",
         "thoroughness": 1
     },
     "PlaySoundAction": {
         "sounds": [
-            "Explode1",
-            "Explode2",
-            "Explode3",
-            "Explode4",
-            "Explode5"
+            "CoreAssets:Explode1",
+            "CoreAssets:Explode2",
+            "CoreAssets:Explode3",
+            "CoreAssets:Explode4",
+            "CoreAssets:Explode5"
         ]
     }
 }

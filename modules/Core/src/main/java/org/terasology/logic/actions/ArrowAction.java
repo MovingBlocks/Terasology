@@ -81,7 +81,7 @@ public class ArrowAction extends BaseComponentSystem {
             Block currentBlock = worldProvider.getBlock(blockPos);
 
             if (currentBlock.isDestructible()) {
-                EntityBuilder builder = entityManager.newBuilder("Core:defaultBlockParticles");
+                EntityBuilder builder = entityManager.newBuilder("CoreAssets:defaultBlockParticles");
                 builder.getComponent(LocationComponent.class).setWorldPosition(target);
                 builder.build();
             }
