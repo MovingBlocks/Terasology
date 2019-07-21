@@ -41,4 +41,9 @@ public class InputDeviceConfigurationImpl implements InputDeviceConfiguration {
         return config.getInput().getControllers().getController(name);
     }
 
+    @Override
+    public ControllerInfo updateController(String name, ControllerInfo info) {
+        return config.getInput().getControllers().addController(name, info);
+    }
+
 }

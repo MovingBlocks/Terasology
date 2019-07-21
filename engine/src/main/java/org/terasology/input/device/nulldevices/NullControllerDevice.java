@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 
+import org.terasology.config.ControllerConfig;
 import org.terasology.input.ControllerDevice;
 import org.terasology.input.device.ControllerAction;
 
@@ -37,5 +38,10 @@ public class NullControllerDevice implements ControllerDevice {
     @Override
     public List<String> getControllers() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public ControllerConfig.ControllerInfo describeController(String name) {
+        return new ControllerConfig.ControllerInfo();
     }
 }

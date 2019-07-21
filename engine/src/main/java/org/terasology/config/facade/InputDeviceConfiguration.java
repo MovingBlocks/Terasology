@@ -37,4 +37,11 @@ public interface InputDeviceConfiguration {
      * Returns the controller info for the controller with the given name.
      */
     ControllerInfo getController(String name);
+
+    /**
+     * Update the controller info for the controller with the given name. Happens when the controller was not already
+     * in the configuration and was "discovered" by the ControllerDevice (either by receiving input or navigating to
+     * the controller settings screen).
+     */
+    ControllerInfo updateController(String name, ControllerInfo info);
 }
