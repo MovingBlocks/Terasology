@@ -17,11 +17,13 @@ package org.terasology.rendering.dag.gsoc;
 
 //TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
 
+import java.util.Map;
 import java.util.Set;
 
 import javafx.util.Pair;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.naming.Name;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
@@ -107,6 +109,19 @@ public interface NewNode extends RenderPipelineTask {
     SimpleUri getUri();
 
     /**
+     *
+     * @return
+     */
+    Name getAka();
+
+    public Map<String, DependencyConnection> getInputConnections();
+
+    public Map<String, DependencyConnection> getOutputConnections();
+
+    public void setInputConnections(Map<String, DependencyConnection> inputConnections);
+
+    public void setOutputConnections(Map<String, DependencyConnection> outputConnections);
+    /**
      * This method is called by RenderGraph.addNode().
      * This method must be called AFTER node has connected all it's dependencies.
      * @param context a context object, to obtain instances of classes such as the rendering config.
@@ -137,6 +152,10 @@ public interface NewNode extends RenderPipelineTask {
      */
     DependencyConnection getInputFboConnection(int inputId);
 
+    public boolean addOutputFboConnection(int id);
+
+    public boolean addOutputBufferPairConnection(int id);
+
     public BufferPairConnection getOutputBufferPairConnection(int outputBufferPairId);
 
     public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId);
@@ -148,6 +167,12 @@ public interface NewNode extends RenderPipelineTask {
     public RunOrderConnection getOutputRunOrderConnection(int outputId);
 
     public RunOrderConnection getInputRunOrderConnection(int inputId);
+
+    public void removeFboConnection(int id, DependencyConnection.Type type);
+
+    public void removeBufferPairConnection(int id, DependencyConnection.Type type);
+
+    public void removeRunOrderConnection(int id, DependencyConnection.Type type);
 
     /**
      * Is {@code thisNode} dependent on {@param anotherNode}?
