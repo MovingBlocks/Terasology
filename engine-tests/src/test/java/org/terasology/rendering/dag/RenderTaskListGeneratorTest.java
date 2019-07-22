@@ -22,6 +22,7 @@ import javafx.util.Pair;
 import org.junit.Test;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.naming.Name;
 import org.terasology.rendering.dag.gsoc.BufferPairConnection;
 import org.terasology.rendering.dag.gsoc.DependencyConnection;
 import org.terasology.rendering.dag.gsoc.FboConnection;
@@ -222,6 +223,46 @@ public class RenderTaskListGeneratorTest {
 
         public RunOrderConnection getInputRunOrderConnection(int inputId) {
             return null;
+        }
+
+        public Name getAka() {
+            return new Name("test");
+        }
+
+        public Map<String, DependencyConnection> getInputConnections() {
+            return Maps.newHashMap();
+        }
+
+        public Map<String, DependencyConnection> getOutputConnections() {
+            return Maps.newHashMap();
+        }
+
+        public void setInputConnections(Map<String, DependencyConnection> inputConnections) {
+
+        }
+
+        public void setOutputConnections(Map<String, DependencyConnection> outputConnections) {
+
+        }
+
+        public boolean addOutputFboConnection(int id) {
+            return false;
+        }
+
+        public boolean addOutputBufferPairConnection(int id) {
+            return false;
+        }
+
+        public void removeFboConnection(int id, DependencyConnection.Type type) {
+
+        }
+
+        public void removeBufferPairConnection(int id, DependencyConnection.Type type) {
+
+        }
+
+        public void removeRunOrderConnection(int id, DependencyConnection.Type type) {
+
         }
     }
 
