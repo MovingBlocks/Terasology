@@ -62,8 +62,8 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
-import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
+import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -106,7 +106,9 @@ public class TypeHandlerLibrary {
 
     private Map<ClassMetadata<?, ?>, Serializer> serializerMap = Maps.newHashMap();
 
-    private TypeHandlerLibrary() {
+    private TypeHandlerLibrary(SerializationSandbox sandbox) {
+        this.sandbox = sandbox;
+
         constructorLibrary = new ConstructorLibrary(instanceCreators);
 
         addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
@@ -138,18 +140,14 @@ public class TypeHandlerLibrary {
     }
 
     /**
-     * @param reflections
+     *
      */
     public TypeHandlerLibrary(Reflections reflections) {
-        this();
-
-        this.sandbox = new ReflectionsSandbox(reflections);
+        this(new ReflectionsSandbox(reflections));
     }
 
     public TypeHandlerLibrary(ModuleEnvironment moduleEnvironment) {
-        this();
-
-        this.sandbox = new ModuleEnvironmentSandbox(moduleEnvironment);
+        this(new ModuleEnvironmentSandbox(moduleEnvironment));
     }
 
     /**
@@ -228,26 +226,39 @@ public class TypeHandlerLibrary {
      * Adds a {@link TypeHandler} for the specified type to this {@link TypeHandlerLibrary} by
      * adding to the library a new {@link TypeHandlerFactory} that returns the {@link TypeHandler}
      * whenever the {@link TypeHandler} for the specified type is requested.
+     * <p>
+     * If the specified {@link SerializationSandbox} does not allow the addition of the given
+     * {@link TypeHandler} for the given type, the {@link TypeHandler} is not added to the
+     * library and false is returned.
      *
      * @param typeClass   The {@link Class} of the type handled by the {@link TypeHandler}.
      * @param typeHandler The {@link TypeHandler} to add to the library.
      * @param <T>         The type handled by the {@link TypeHandler}.
+     * @return True if the {@link TypeHandler} was successfully added, false otherwise.
      */
-    public <T> void addTypeHandler(Class<T> typeClass, TypeHandler<T> typeHandler) {
-        addTypeHandler(TypeInfo.of(typeClass), typeHandler);
+    public <T> boolean addTypeHandler(Class<T> typeClass, TypeHandler<T> typeHandler) {
+        return addTypeHandler(TypeInfo.of(typeClass), typeHandler);
     }
 
     /**
      * Adds a {@link TypeHandler} for the specified type to this {@link TypeHandlerLibrary} by
      * adding to the library a new {@link TypeHandlerFactory} that returns the {@link TypeHandler}
      * whenever the {@link TypeHandler} for the specified type is requested.
+     * <p>
+     * If the specified {@link SerializationSandbox} does not allow the addition of the given
+     * {@link TypeHandler} for the given type, the {@link TypeHandler} is not added to the
+     * library and false is returned.
      *
+     * @param <T>         The type handled by the {@link TypeHandler}.
      * @param type        The {@link TypeInfo} of the type handled by the {@link TypeHandler}.
      * @param typeHandler The {@link TypeHandler} to add to the library.
-     * @param <T>         The type handled by the {@link TypeHandler}.
+     * @return True if the {@link TypeHandler} was successfully added, false otherwise.
      */
+    public <T> boolean addTypeHandler(TypeInfo<T> type, TypeHandler<T> typeHandler) {
+        if (!sandbox.isValidTypeHandlerDeclaration(type, typeHandler)) {
+            return false;
+        }
 
-    public <T> void addTypeHandler(TypeInfo<T> type, TypeHandler<T> typeHandler) {
         TypeHandlerFactory factory = new TypeHandlerFactory() {
             @SuppressWarnings("unchecked")
             @Override
@@ -257,6 +268,8 @@ public class TypeHandlerLibrary {
         };
 
         addTypeHandlerFactory(factory);
+
+        return true;
     }
 
     /**

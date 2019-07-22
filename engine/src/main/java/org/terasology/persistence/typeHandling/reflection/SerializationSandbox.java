@@ -15,6 +15,9 @@
  */
 package org.terasology.persistence.typeHandling.reflection;
 
+import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.reflection.TypeInfo;
+
 import java.util.Optional;
 
 public interface SerializationSandbox {
@@ -28,4 +31,6 @@ public interface SerializationSandbox {
     <T> Optional<Class<? extends T>> findSubTypeOf(String subTypeIdentifier, Class<T> clazz);
 
     <T> String getSubTypeIdentifier(Class<? extends T> subType, Class<T> baseType);
+
+    <T> boolean isValidTypeHandlerDeclaration(TypeInfo<T> type, TypeHandler<T> typeHandler);
 }

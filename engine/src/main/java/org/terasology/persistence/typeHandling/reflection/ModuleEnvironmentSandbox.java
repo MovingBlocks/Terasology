@@ -21,8 +21,11 @@ import com.google.common.collect.Streams;
 import org.terasology.engine.SimpleUri;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
+import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.reflection.TypeInfo;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.collect.Streams.stream;
@@ -95,6 +98,15 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
         }
 
         return subTypeUri.toString();
+    }
+
+    @Override
+    public <T> boolean isValidTypeHandlerDeclaration(TypeInfo<T> type, TypeHandler<T> typeHandler) {
+        Name moduleDeclaringType = moduleEnvironment.getModuleProviding(type.getRawType());
+        Name moduleDeclaringHandler = moduleEnvironment.getModuleProviding(typeHandler.getClass());
+
+        // Both the type and the handler must come from the same module
+        return Objects.equals(moduleDeclaringType, moduleDeclaringHandler);
     }
 
     private SimpleUri getTypeSimpleUri(Class<?> type) {

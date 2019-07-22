@@ -16,6 +16,8 @@
 package org.terasology.persistence.typeHandling.reflection;
 
 import org.reflections.Reflections;
+import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.reflection.TypeInfo;
 
 import java.util.Optional;
 import java.util.Set;
@@ -44,5 +46,10 @@ public class ReflectionsSandbox implements SerializationSandbox {
     @Override
     public <T> String getSubTypeIdentifier(Class<? extends T> subType, Class<T> baseType) {
         return subType.getName();
+    }
+
+    @Override
+    public <T> boolean isValidTypeHandlerDeclaration(TypeInfo<T> type, TypeHandler<T> typeHandler) {
+        return true;
     }
 }
