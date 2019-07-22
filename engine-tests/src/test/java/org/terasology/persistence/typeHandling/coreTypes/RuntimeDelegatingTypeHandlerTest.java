@@ -17,20 +17,17 @@ package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.reflections.Reflections;
-import org.reflections.util.ConfigurationBuilder;
 import org.terasology.persistence.typeHandling.*;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.inMemory.AbstractPersistedData;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.reflect.ConstructorLibrary;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -41,16 +38,16 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 public class RuntimeDelegatingTypeHandlerTest {
-    private final ConstructorLibrary constructorLibrary =
-            new ConstructorLibrary(Maps.newHashMap());
-
-    private final CollectionTypeHandlerFactory collectionHandlerFactory =
-            new CollectionTypeHandlerFactory(constructorLibrary);
-
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
 
     private final TypeHandlerContext context =
-            new TypeHandlerContext(typeHandlerLibrary, new ReflectionsSandbox(new Reflections(getClass().getClassLoader())));
+        new TypeHandlerContext(typeHandlerLibrary, new ReflectionsSandbox(new Reflections(getClass().getClassLoader())));
+
+    private TypeHandler baseTypeHandler;
+    private TypeHandler subTypeHandler;
+    private Class<Sub> subType;
+    private Type baseType;
+    private RuntimeDelegatingTypeHandler<Base> runtimeDelegatingTypeHandler;
 
     private static class Base {
         int x;
@@ -60,45 +57,22 @@ public class RuntimeDelegatingTypeHandlerTest {
         float y;
     }
 
-    @Test
-    public void testSerialize() {
-        PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
-        when(serializer.serialize(any(String.class)))
-                .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
-
-        Class<Sub> subType = Sub.class;
-        Type baseType = TypeInfo.of(Base.class).getType();
+    private void setupHandlers() {
+        subType = Sub.class;
+        baseType = TypeInfo.of(Base.class).getType();
 
         abstract class SubHandler extends TypeHandler<Sub> {}
 
-        TypeHandler baseTypeHandler = mockTypeHandler();
-        TypeHandler subTypeHandler = mockTypeHandler(SubHandler.class);
+        baseTypeHandler = mockTypeHandler();
+        subTypeHandler = mockTypeHandler(SubHandler.class);
 
         when(typeHandlerLibrary.getTypeHandler(eq(baseType)))
-                .thenReturn(Optional.of(baseTypeHandler));
+            .thenReturn(Optional.of(baseTypeHandler));
 
         when(typeHandlerLibrary.getTypeHandler(eq((Type) subType)))
-                .thenReturn(Optional.of(subTypeHandler));
+            .thenReturn(Optional.of(subTypeHandler));
 
-        TypeHandler<List<Base>> listTypeHandler =
-                collectionHandlerFactory.create(new TypeInfo<List<Base>>() {}, context).get();
-
-        ArrayList<Base> bases = Lists.newArrayList(new Sub(), new Base(), new Sub(), new Base(), new Sub());
-        listTypeHandler.serialize(bases, serializer);
-
-        verify(typeHandlerLibrary).getTypeHandler(eq(baseType));
-        verify(typeHandlerLibrary, times(3)).getTypeHandler(eq((Type) subType));
-
-        verify(baseTypeHandler, times(2)).serialize(any(), any());
-        verify(subTypeHandler, times(3)).serialize(any(), any());
-
-        verify(serializer, times(3)).serialize(
-                argThat((ArgumentMatcher<Map<String, PersistedData>>) argument ->
-                        argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD)
-                                .getAsString()
-                                .equals(subType.getName()) &&
-                                argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD))
-        );
+        runtimeDelegatingTypeHandler = new RuntimeDelegatingTypeHandler<Base>(baseTypeHandler, TypeInfo.of(Base.class), context);
     }
 
     private static TypeHandler<?> mockTypeHandler(Class<? extends TypeHandler> subHandlerClass) {
@@ -119,49 +93,113 @@ public class RuntimeDelegatingTypeHandlerTest {
     }
 
     @Test
-    public void testDeserialize() {
-        Type subType = Sub.class;
-        Type baseType = TypeInfo.of(Base.class).getType();
+    public void testSerializeBase() {
+        PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
+        when(serializer.serialize(any(String.class)))
+            .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
 
-        abstract class SubHandler extends TypeHandler<Sub> {}
+        setupHandlers();
 
-        TypeHandler baseTypeHandler = mock(TypeHandler.class);
-        TypeHandler<Sub> subTypeHandler = mock(SubHandler.class);
+        Base base = new Base();
+        runtimeDelegatingTypeHandler.serialize(base, serializer);
 
-        when(typeHandlerLibrary.getTypeHandler(eq(baseType)))
-                .thenReturn(Optional.of(baseTypeHandler));
+        verify(typeHandlerLibrary, never()).getTypeHandler(eq((Type) subType));
 
-        when(typeHandlerLibrary.getTypeHandler(eq(subType)))
-                .thenReturn(Optional.of(subTypeHandler));
+        verify(baseTypeHandler).serialize(any(), any());
+        verify(subTypeHandler, never()).serialize(any(), any());
 
-        TypeHandler<List<Base>> listTypeHandler = collectionHandlerFactory.create(
-                new TypeInfo<List<Base>>() {}, context
-        ).get();
+        verify(serializer, never()).serialize(
+            argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> {
+                return argument.containsKey(RuntimeDelegatingTypeHandler.TYPE_FIELD);
+            })
+        );
+    }
+
+    @Test
+    public void testSerializeSub() {
+        PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
+        when(serializer.serialize(any(String.class)))
+            .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
+
+        setupHandlers();
+
+        Base sub = new Sub();
+        runtimeDelegatingTypeHandler.serialize(sub, serializer);
+
+        verify(typeHandlerLibrary, never()).getTypeHandler(eq(baseType));
+        verify(typeHandlerLibrary).getTypeHandler(eq((Type) subType));
+
+        verify(baseTypeHandler, never()).serialize(any(), any());
+        verify(subTypeHandler).serialize(any(), any());
+
+        verify(serializer).serialize(
+            argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> {
+                return argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD)
+                           .getAsString()
+                           .equals(subType.getName()) &&
+                           argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD);
+            })
+        );
+    }
+
+    @Test
+    public void testDeserializeBase() {
+        setupHandlers();
 
         PersistedData persistedBase = new PersistedMap(ImmutableMap.of());
 
+        runtimeDelegatingTypeHandler.deserialize(persistedBase);
+
+        verify(typeHandlerLibrary, never()).getTypeHandler(eq((Type) subType));
+
+        verify(baseTypeHandler).deserialize(any());
+        verify(subTypeHandler, never()).deserialize(any());
+    }
+
+    @Test
+    public void testDeserializeSub() {
+        setupHandlers();
+
         PersistedData persistedSub = new PersistedMap(
-                ImmutableMap.of(
-                        RuntimeDelegatingTypeHandler.TYPE_FIELD,
-                        new PersistedString(((Class<?>) subType).getName()),
-                        RuntimeDelegatingTypeHandler.VALUE_FIELD,
-                        new PersistedMap(ImmutableMap.of())
-                )
+            ImmutableMap.of(
+                RuntimeDelegatingTypeHandler.TYPE_FIELD,
+                new PersistedString(((Class<?>) subType).getName()),
+                RuntimeDelegatingTypeHandler.VALUE_FIELD,
+                new PersistedMap(ImmutableMap.of())
+            )
         );
 
-        PersistedDataArray persistedBases = mock(PersistedDataArray.class);
-        when(persistedBases.isArray()).thenReturn(true);
-        when(persistedBases.getAsArray()).thenReturn(persistedBases);
-        when(persistedBases.iterator()).thenReturn(
-                Lists.newArrayList(persistedSub, persistedBase, persistedSub, persistedBase, persistedSub).iterator()
+        runtimeDelegatingTypeHandler.deserialize(persistedSub);
+
+        verify(typeHandlerLibrary, never()).getTypeHandler(eq(baseType));
+        verify(typeHandlerLibrary).getTypeHandler(eq((Type) subType));
+
+        verify(baseTypeHandler, never()).deserialize(any());
+        verify(subTypeHandler).deserialize(any());
+    }
+
+    @Test
+    public void testDeserializeNonSub() {
+        setupHandlers();
+
+        PersistedData persistedData = new PersistedMap(
+            ImmutableMap.of(
+                RuntimeDelegatingTypeHandler.TYPE_FIELD,
+                new PersistedString(Integer.class.getName()),
+                RuntimeDelegatingTypeHandler.VALUE_FIELD,
+                new PersistedMap(ImmutableMap.of())
+            )
         );
 
-        listTypeHandler.deserialize(persistedBases);
+        Optional<Base> deserialized = runtimeDelegatingTypeHandler.deserialize(persistedData);
 
-        verify(typeHandlerLibrary).getTypeHandler(eq(baseType));
-        verify(typeHandlerLibrary, times(3)).getTypeHandler(eq(subType));
+        Assert.assertFalse(deserialized.isPresent());
 
-        verify(baseTypeHandler, times(2)).deserialize(any());
-        verify(subTypeHandler, times(3)).deserialize(any());
+        verify(typeHandlerLibrary, never()).getTypeHandler(eq(baseType));
+        verify(typeHandlerLibrary, never()).getTypeHandler(eq((Type) subType));
+        verify(typeHandlerLibrary, never()).getTypeHandler(eq((Type) Integer.class));
+
+        verify(baseTypeHandler, never()).deserialize(any());
+        verify(subTypeHandler, never()).deserialize(any());
     }
 }

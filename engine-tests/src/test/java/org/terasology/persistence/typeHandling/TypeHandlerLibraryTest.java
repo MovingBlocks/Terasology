@@ -20,6 +20,7 @@ import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
@@ -88,5 +89,12 @@ public class TypeHandlerLibraryTest {
                 typeHandlerLibrary.getTypeHandler(new TypeInfo<Map<Integer, Integer>>() {});
 
         assertFalse(handler.isPresent());
+    }
+
+    @Test
+    public void testGetBaseTypeHandler() {
+        TypeHandler<Integer> handler = typeHandlerLibrary.getBaseTypeHandler(TypeInfo.of(Integer.class));
+
+        assertTrue(handler instanceof RuntimeDelegatingTypeHandler);
     }
 }

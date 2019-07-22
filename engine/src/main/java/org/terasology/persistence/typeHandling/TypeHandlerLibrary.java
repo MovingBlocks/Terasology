@@ -40,6 +40,7 @@ import org.terasology.persistence.typeHandling.coreTypes.FloatTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.LongTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.factories.ArrayTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
@@ -386,6 +387,20 @@ public class TypeHandlerLibrary {
                 futureTypeHandlers.remove();
             }
         }
+    }
+
+    /**
+     * Returns a {@link TypeHandler} that can handle all types deriving from {@link T}.
+     *
+     * @param typeInfo The {@link TypeInfo} describing the base type for which to return a
+     *                 {@link TypeHandler}.
+     * @param <T> The base type for which to return a {@link TypeHandler}.
+     */
+    public <T> TypeHandler<T> getBaseTypeHandler(TypeInfo<T> typeInfo) {
+        TypeHandler<T> delegateHandler = getTypeHandler(typeInfo).orElse(null);
+
+        TypeHandlerContext context = new TypeHandlerContext(this, sandbox);
+        return new RuntimeDelegatingTypeHandler<>(delegateHandler, typeInfo, context);
     }
 
     private Map<FieldMetadata<?, ?>, TypeHandler> getFieldHandlerMap(ClassMetadata<?, ?> type) {
