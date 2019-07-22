@@ -40,7 +40,7 @@ public class FutureTypeHandlerTest {
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
     private final TypeHandlerLibrary typeHandlerLibrary =
-            spy(TypeHandlerLibrary.withDefaultHandlers(reflections));
+            spy(TypeHandlerLibrary.withReflections(reflections));
 
     private static class RecursiveType<T> {
         final T data;

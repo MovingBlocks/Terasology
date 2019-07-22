@@ -52,7 +52,7 @@ public class TypeSerializerTest {
         private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
         private final TypeHandlerLibrary typeHandlerLibrary =
-            TypeHandlerLibrary.withDefaultHandlers(reflections);
+            TypeHandlerLibrary.withReflections(reflections);
 
         private final GsonSerializer serializer = new GsonSerializer(typeHandlerLibrary);
 
@@ -75,7 +75,7 @@ public class TypeSerializerTest {
         private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
         private final TypeHandlerLibrary typeHandlerLibrary =
-            TypeHandlerLibrary.withDefaultHandlers(reflections);
+            TypeHandlerLibrary.withReflections(reflections);
 
         private final ProtobufSerializer serializer = new ProtobufSerializer(typeHandlerLibrary);
 

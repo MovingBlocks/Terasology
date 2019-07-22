@@ -48,7 +48,7 @@ public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
     private final TypeHandlerLibrary typeHandlerLibrary =
-            TypeHandlerLibrary.withDefaultHandlers(reflections);
+            TypeHandlerLibrary.withReflections(reflections);
 
     private final Gson gson =
             GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary)

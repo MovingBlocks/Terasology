@@ -162,18 +162,20 @@ public class TypeHandlerLibrary {
         this.sandbox = original.sandbox;
     }
 
-    public static TypeHandlerLibrary withDefaultHandlers(Reflections reflections) {
-        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
+    public static TypeHandlerLibrary withReflections(Reflections reflections) {
+        TypeHandlerLibrary library = new TypeHandlerLibrary(reflections);
 
-        populateWithDefaultHandlers(serializationLibrary);
+        populateWithDefaultHandlers(library);
 
-        return serializationLibrary;
+        return library;
     }
 
     public static TypeHandlerLibrary forModuleEnvironment(ModuleEnvironment moduleEnvironment) {
-        // TODO: Reflection - may break with updates to gestalt-module
-        Reflections reflections = (Reflections) ReflectionUtil.readField(moduleEnvironment, "fullReflections");
-        return withDefaultHandlers(reflections);
+        TypeHandlerLibrary library = new TypeHandlerLibrary(moduleEnvironment);
+
+        populateWithDefaultHandlers(library);
+
+        return library;
     }
 
     private static void populateWithDefaultHandlers(TypeHandlerLibrary serializationLibrary) {
