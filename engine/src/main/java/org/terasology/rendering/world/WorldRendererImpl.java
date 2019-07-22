@@ -38,6 +38,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
+import org.terasology.rendering.dag.gsoc.DummyNode;
 import org.terasology.rendering.dag.gsoc.NewNode;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
@@ -191,9 +192,22 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         context.put(RenderTaskListGenerator.class, renderTaskListGenerator);
+
+        addDummyNodes();
+
         requestTaskListRefresh();
     }
 
+    public void addDummyNodes() {
+        /*
+        NewNode blurredAmbientOcclusionNode = new DummyNode ("blurredAmbientOcclusionNode", context);
+        blurredAmbientOcclusionNode.addOutputFboConnection(1);
+        renderGraph.addNode(blurredAmbientOcclusionNode);
+
+        NewNode prePostCompositeNode = new DummyNode("prePostCompositeNode", context);
+        renderGraph.addNode(prePostCompositeNode);
+        */
+    }
 
 
     @Override
