@@ -17,6 +17,11 @@ package org.terasology.rendering.dag.gsoc;
 
 import org.terasology.engine.SimpleUri;
 
+// TODO examine if we really need this connection type
+
+/**
+ *
+ */
 public class RunOrderConnection extends DependencyConnection {
 
     RunOrderConnection(String name, Type type, SimpleUri parentNode) {
