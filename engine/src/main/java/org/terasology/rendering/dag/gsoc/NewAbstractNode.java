@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.gsoc;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -26,7 +25,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
@@ -34,10 +32,7 @@ import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.utilities.Assets;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class implements a number of default methods for the convenience of classes
@@ -55,6 +50,7 @@ public abstract class NewAbstractNode implements NewNode {
     private Map<String, DependencyConnection> inputConnections = Maps.newHashMap();
     private Map<String, DependencyConnection> outputConnections = Maps.newHashMap();
     private final SimpleUri nodeUri;
+    private final Name nodeAka;
     private Context context;
 
     /**
@@ -66,13 +62,39 @@ public abstract class NewAbstractNode implements NewNode {
      * @param nodeId  a String representing the id of the node, namespace -excluded-: that's added automatically.
      * @param context a Context object.
      */
-    protected NewAbstractNode(String nodeId, Context context) {
+    protected NewAbstractNode(String nodeId, String nodeAka, Context context) {
+        String newNodeAka = nodeAka;
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
+
         this.context = context;
 
-        this.nodeUri = new SimpleUri(providingModule.toString() + ":" + nodeId);
-        //TODO Check for empty list of either in or out
+        this.nodeUri = new SimpleUri(providingModule.toString(), nodeId);
+
+        if (nodeAka.endsWith("Node")) {
+            newNodeAka = nodeAka.substring(0, nodeAka.length() - "Node".length());
+        }
+        this.nodeAka = new Name(newNodeAka);
+    }
+
+    protected NewAbstractNode(String nodeId, Context context) {
+        this(nodeId, nodeId, context);
+    }
+
+    public Map<String, DependencyConnection> getInputConnections() {
+        return inputConnections;
+    }
+
+    public Map<String, DependencyConnection> getOutputConnections() {
+        return outputConnections;
+    }
+
+    public void setInputConnections(Map<String, DependencyConnection> inputConnections) {
+        this.inputConnections = inputConnections;
+    }
+
+    public void setOutputConnections(Map<String, DependencyConnection> outputConnections) {
+        this.outputConnections = outputConnections;
     }
 
     /**
@@ -157,8 +179,23 @@ public abstract class NewAbstractNode implements NewNode {
      * @return true if inserted, false otherwise
      */
     public boolean addOutputBufferPairConnection(int id, BufferPair bufferPair) {
-        DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
-        return addOutputConnection(bufferPairConnection);
+        boolean success = false;
+        String connectionUri = BufferPairConnection.getConnectionName(id, this.nodeUri);
+        if (outputConnections.containsKey(connectionUri)) {
+            BufferPairConnection bufferPairConnection = (BufferPairConnection) outputConnections.get(connectionUri);
+
+            // set data for all connected connections
+            if (!bufferPairConnection.getConnectedConnections().isEmpty()) {
+                bufferPairConnection.getConnectedConnections().forEach((k, v) -> v.setData(bufferPair));
+            }
+
+            bufferPairConnection.setData(bufferPair);
+            success = true;
+        } else {
+            DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
+            success = addOutputConnection(bufferPairConnection);
+        }
+        return success;
     }
 
     /**
@@ -168,8 +205,28 @@ public abstract class NewAbstractNode implements NewNode {
      * @return true if inserted, false otherwise
      */
     public boolean addOutputBufferPairConnection(int id, BufferPairConnection from) {
-        DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, from.getData(), this.getUri());
-        bufferPairConnection.setConnectedConnection(from);
+        boolean success = false;
+        String connectionUri = BufferPairConnection.getConnectionName(id, this.nodeUri);
+        if (outputConnections.containsKey(connectionUri)) {
+            BufferPairConnection bufferPairConnection = (BufferPairConnection) outputConnections.get(connectionUri);
+            bufferPairConnection.setData(from.getData());
+
+            // set data for all connected connections
+            if (!bufferPairConnection.getConnectedConnections().isEmpty()) {
+                bufferPairConnection.getConnectedConnections().forEach((k, v) -> v.setData(from.getData()));
+            }
+
+            bufferPairConnection.setConnectedConnection(from);
+            success = true;
+        } else {
+            DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, from.getData(), this.getUri());
+            success = addOutputConnection(bufferPairConnection);
+        }
+        return success;
+    }
+
+    public boolean addOutputBufferPairConnection(int id) {
+        DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, this.getUri());
         return addOutputConnection(bufferPairConnection);
     }
 
@@ -203,7 +260,25 @@ public abstract class NewAbstractNode implements NewNode {
      * @return true if inserted, false otherwise
      */
     protected boolean addOutputFboConnection(int id, FBO fboData) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
+        boolean success = false;
+        String connectionUri = FboConnection.getConnectionName(id, this.nodeUri);
+        if (outputConnections.containsKey(connectionUri)) {
+            FboConnection fboConnection = (FboConnection) outputConnections.get(connectionUri);
+            fboConnection.setData(fboData);
+
+            if (!fboConnection.getConnectedConnections().isEmpty()) {
+                fboConnection.getConnectedConnections().forEach((k, v) -> v.setData(fboData));
+            }
+            success = true;
+        } else {
+            DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
+            success = addOutputConnection(fboConnection);
+        }
+        return success;
+    }
+
+    public boolean addOutputFboConnection(int id) {
+        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, this.getUri());
         return addOutputConnection(fboConnection);
     }
 
@@ -215,10 +290,17 @@ public abstract class NewAbstractNode implements NewNode {
      */
     public boolean isDependentOn(NewNode anotherNode) {
         boolean isDependent = false;
+        // for all my input connections
         for (DependencyConnection connection: inputConnections.values()) {
-            if (connection.getConnectedConnection() != null) {
-                if (connection.getConnectedConnection().getParentNode().equals(anotherNode.getUri())) {
-                    isDependent = true;
+            if (!connection.getConnectedConnections().isEmpty()) {
+                HashMap<String, DependencyConnection> connectedConnections = connection.getConnectedConnections();
+                SimpleUri anotherNodeUri = anotherNode.getUri();
+                // SimpleUri connectedNodeUri;
+                // for all connection's connected connections get parent node and see if it matches anotherNode
+                for (DependencyConnection connectedConnection: connectedConnections.values()) {
+                    if (connectedConnection.getParentNode().equals(anotherNodeUri)) {
+                        isDependent = true;
+                    }
                 }
             }
         }
@@ -255,14 +337,45 @@ public abstract class NewAbstractNode implements NewNode {
         return (RunOrderConnection) getInputConnection(RunOrderConnection.getConnectionName(inputRunOrderConnectionId, this.nodeUri));
     }
 
-    public void removeInputConnection(String name) {
+    protected void removeInputConnection(String name) {
         // TODO add check - what do if connected
         inputConnections.remove(name);
     }
 
-    public void removeOutputConnection(String name) {
+    protected void removeOutputConnection(String name) {
         // TODO add check - what do if connected
         outputConnections.remove(name);
+    }
+
+    /**
+     * Remove said connection.
+     * @param id
+     * @param type
+     */
+    public void removeFboConnection(int id, DependencyConnection.Type type) {
+        if (type.equals(DependencyConnection.Type.OUTPUT)) {
+            // remove output
+            outputConnections.remove(FboConnection.getConnectionName(id, getUri()));
+        } else if (type.equals(DependencyConnection.Type.INPUT)) {
+            // remove input connection
+            inputConnections.remove(FboConnection.getConnectionName(id, getUri()));
+        }
+    }
+
+    public void removeBufferPairConnection(int id, DependencyConnection.Type type) {
+        if (type.equals(DependencyConnection.Type.OUTPUT)) {
+            outputConnections.remove(BufferPairConnection.getConnectionName(id, getUri()));
+        } else if (type.equals(DependencyConnection.Type.INPUT)) {
+            inputConnections.remove(BufferPairConnection.getConnectionName(id, getUri()));
+        }
+    }
+
+    public void removeRunOrderConnection(int id, DependencyConnection.Type type) {
+        if (type.equals(DependencyConnection.Type.OUTPUT)) {
+            outputConnections.remove(RunOrderConnection.getConnectionName(id, getUri()));
+        } else if (type.equals(DependencyConnection.Type.INPUT)) {
+            inputConnections.remove(RunOrderConnection.getConnectionName(id, getUri()));
+        }
     }
 
     public int getNumberOfInputConnections() {
@@ -297,13 +410,13 @@ public abstract class NewAbstractNode implements NewNode {
         return connection;
     }
 
-    public List<String> getInputConnections() {
+    public List<String> getInputConnectionsList() {
         List<String> inputConnectionNameList = new ArrayList<>();
         this.inputConnections.forEach((name, connection) -> inputConnectionNameList.add(name));
         return inputConnectionNameList;
     }
 
-    public List<String> getOutputConnections() {
+    public List<String> getOutputConnectionsList() {
         List<String> outputConnectionNameList = new ArrayList<>();
         this.inputConnections.forEach((name, connection) -> outputConnectionNameList.add(name));
         return outputConnectionNameList;
@@ -314,7 +427,7 @@ public abstract class NewAbstractNode implements NewNode {
             DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId, this.nodeUri));
         if (connectionToDisconnect != null) {
             // TODO make it reconnectInputToOutput
-            if (connectionToDisconnect.getConnectedConnection() != null) {
+            if (connectionToDisconnect.getConnectedConnections() != null) {
                 connectionToDisconnect.disconnect();
             } else {
                 logger.warn("Connection was not connected, it probably originated in this node. (Support FBOs can be created inside nodes)");
@@ -435,6 +548,11 @@ public abstract class NewAbstractNode implements NewNode {
     @Override
     public SimpleUri getUri() {
         return nodeUri;
+    }
+
+    @Override
+    public Name getAka() {
+        return nodeAka;
     }
 
     /**
