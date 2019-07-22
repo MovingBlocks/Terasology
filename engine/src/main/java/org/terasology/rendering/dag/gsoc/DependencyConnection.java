@@ -16,17 +16,20 @@
 
 package org.terasology.rendering.dag.gsoc;
 
+import com.google.common.collect.Maps;
 import org.terasology.engine.SimpleUri;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class DependencyConnection<T> {
 
     private String connectionName;
     private Type connectionType;
     private SimpleUri parentNode;
-    private DependencyConnection connectedConnection;
+    private HashMap<String, DependencyConnection> connectedConnections;
     private T data;
 
     DependencyConnection(String name, Type type, SimpleUri parentNode) {
@@ -34,7 +37,7 @@ public abstract class DependencyConnection<T> {
         this.connectionType = type;
         this.parentNode = parentNode;
         // connectedNode = null;
-        connectedConnection = null;
+        connectedConnections = Maps.newHashMap();
     }
 
     public T getData() {
@@ -68,8 +71,8 @@ public abstract class DependencyConnection<T> {
      * has not yet been connected.
      */
     @Nullable
-    public DependencyConnection getConnectedConnection() {
-        return this.connectedConnection;
+    public HashMap<String, DependencyConnection> getConnectedConnections() {
+        return connectedConnections;
     }
 
     /**
@@ -77,8 +80,8 @@ public abstract class DependencyConnection<T> {
      * fromNode's output, you set the OUTPUT connection's connectedConnection to the toNode's DependencyConnection which you connect.
      * @param connectedConnection A DependenyConnection connection of connected node.
      */
-    protected void setConnectedConnection(DependencyConnection connectedConnection) {
-        this.connectedConnection = connectedConnection;
+    public void setConnectedConnection(DependencyConnection connectedConnection) {
+        connectedConnections.putIfAbsent(connectedConnection.getName(), connectedConnection);
     }
 
     protected void setParentNode(SimpleUri parentNode) {
@@ -98,20 +101,20 @@ public abstract class DependencyConnection<T> {
      * @param connectToConnection
      */
     public void connectInputToOutput(DependencyConnection<T> connectToConnection) {
-        if (this.connectedConnection != null) {
+        /*if (this.connectedConnection != null) {
             this.connectedConnection.connectedConnection = null;
-        }
-        this.connectedConnection = connectToConnection;
-        this.connectedConnection.connectedConnection = this;
+        }*/
+        this.connectedConnections.putIfAbsent(connectToConnection.getName(), connectToConnection);
+        this.connectedConnections.get(connectToConnection.getName()).getConnectedConnections().putIfAbsent(this.getName(), this);
         this.data = connectToConnection.getData();
     }
 
     /**
-     * Remove connection
+     * Remove connections
      */
     public void disconnect() {
-        this.connectedConnection.connectedConnection = null;
-        this.connectedConnection = null;
+        this.connectedConnections.forEach((k,v)->v.connectedConnections.remove(this));
+        this.connectedConnections = null;
         if (this.connectionType == Type.INPUT) {
             this.data = null;
         }
@@ -121,11 +124,13 @@ public abstract class DependencyConnection<T> {
 
     @Override
     public String toString() {
-        String connectedConnectionString = (connectedConnection == null) ? "no connection" : connectedConnection.getName();
+        StringBuilder connectedConnectionString = new StringBuilder("");
+        connectedConnections.forEach((k,v)->connectedConnectionString.append(k).append(", "));
+        connectedConnectionString.append(";");
 
         return (connectionType == Type.OUTPUT)
-                ? String.format("Output:%s(connected to %s)", connectionName, connectedConnectionString)
-                : String.format("Input:%s(connected to %s)", connectionName, connectedConnectionString);
+                ? String.format("Output:%s(connected to %s)", connectionName, connectedConnectionString.toString())
+                : String.format("Input:%s(connected to %s)", connectionName, connectedConnectionString.toString());
     }
 
     /*
