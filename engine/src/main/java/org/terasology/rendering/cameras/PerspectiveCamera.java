@@ -19,6 +19,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
@@ -147,11 +148,11 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
         projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar());
 
-        viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
-                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+        viewMatrix = JomlUtil.from(MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z));
 
-        normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
-                up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+        normViewMatrix = JomlUtil.from(MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
+                up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z));
 
         reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
         reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight()));
@@ -193,7 +194,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         float aspectRatio = (float) Display.getWidth() / Display.getHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
-        return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
+        return JomlUtil.from(MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar));
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {

@@ -16,6 +16,7 @@
 package org.terasology.rendering.cameras;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
@@ -88,9 +89,9 @@ public class OrthographicCamera extends Camera {
             return;
         }
 
-        projectionMatrix = MatrixUtils.createOrthogonalProjectionMatrix(left, right, top, bottom, zNear, zFar);
-        viewMatrix = MatrixUtils.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
-        normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
+        projectionMatrix = JomlUtil.from(MatrixUtils.createOrthogonalProjectionMatrix(left, right, top, bottom, zNear, zFar));
+        viewMatrix = JomlUtil.from(MatrixUtils.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z));
+        normViewMatrix = JomlUtil.from(MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z));
 
         viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
         inverseViewProjectionMatrix.invert(viewProjectionMatrix);
