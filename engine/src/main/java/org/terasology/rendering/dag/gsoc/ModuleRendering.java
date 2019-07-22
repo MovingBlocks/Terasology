@@ -48,6 +48,12 @@ public abstract class ModuleRendering extends BaseComponentSystem {
         worldRenderer = context.get(WorldRenderer.class);
     }
 
+    @Override
+    public void preBegin() {
+        worldRenderer.requestTaskListRefresh();
+    }
+
+
     protected void setProvidingModule(Class implementingClass) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         this.providingModule = moduleManager.getEnvironment().getModuleProviding(implementingClass);
