@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import org.terasology.naming.Name;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.dag.gsoc.DependencyConnection;
 import org.terasology.rendering.dag.gsoc.FboConnection;
-import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.dag.gsoc.NewNode;
 
 /**
@@ -41,12 +41,14 @@ public class RenderGraph {
     private static final Logger logger = LoggerFactory.getLogger(RenderGraph.class);
 
     private Map<SimpleUri, NewNode> nodeMap;
+    private Map<Name, NewNode> akaNodeMap;
     private MutableGraph<NewNode> graph;
     private Context context;
     private ShaderManager shaderManager;
 
     public RenderGraph(Context context) {
         nodeMap = Maps.newHashMap();
+        akaNodeMap = Maps.newHashMap();
         graph = GraphBuilder.directed().build();
         this.context = context;
         this.shaderManager = context.get(ShaderManager.class);
@@ -56,18 +58,39 @@ public class RenderGraph {
         Preconditions.checkNotNull(node, "node cannot be null!");
 
         SimpleUri nodeUri = node.getUri();
+        Name nodeAka = node.getAka();
+        // TODO how bout aka
         if (nodeMap.containsKey(nodeUri)) {
-            throw new RuntimeException("A node with uri " + nodeUri + " already exists!");
+            throw new RuntimeException("A node with Uri " + nodeUri + " already exists!");
+        }
+        if (akaNodeMap.containsKey(nodeAka)) {
+            NewNode aNode = akaNodeMap.get(nodeAka);
+            logger.info("Node " + nodeUri + " also known as" + nodeAka + " already matches existing node with uri " + aNode.getUri() + " - attempting replacing...");
+            replaceNode(aNode, node);
+        } else {
+            nodeMap.put(nodeUri, node);
+            akaNodeMap.put(nodeAka, node);
+            graph.addNode(node);
         }
 
         // TODO this must be moved to a later stage ideally with the improved connecting of nodes which would be based on
         // TODO on dep connections. So far when creating dep. connections, connections are made and destroyed, which is wrong.
-        if (node instanceof NewAbstractNode) {
-            node.setDependencies(context);
-        }
+        // if (node instanceof NewAbstractNode) {
+        //    node.setDependencies(context);
+        // }
+    }
 
-        nodeMap.put(nodeUri, node);
-        graph.addNode(node);
+    public void replaceNode(NewNode aNode, NewNode byNode) {
+        // Add connections from a node being replaced; This should in theory be sufficient and once we call setDep over
+        // all new nodes again, everything should be set
+         aNode.getInputConnections().forEach((k,v)->byNode.getInputConnections().replace(k,v));
+         aNode.getOutputConnections().forEach((k,v)->byNode.getOutputConnections().replace(k,v));
+
+        nodeMap.replace(aNode.getUri(), byNode);
+        akaNodeMap.replace(aNode.getAka(), byNode);
+
+        graph.removeNode(aNode);
+        graph.addNode(byNode);
     }
 
     public NewNode removeNode(SimpleUri nodeUri) {
@@ -83,6 +106,7 @@ public class RenderGraph {
         }
 
         nodeMap.remove(nodeUri);
+        akaNodeMap.remove(node.getAka());
         return nodeMap.remove(nodeUri);
     }
 
@@ -92,8 +116,19 @@ public class RenderGraph {
         return nodeMap.get(nodeUri);
     }
 
+    public NewNode findAka(Name nodeUriAka) {
+        Preconditions.checkNotNull(nodeUriAka, "nodeUriAka cannot be null!");
+        NewNode node = akaNodeMap.get(nodeUriAka);
+        // TODO search all nodes for substrings in akas or both
+        return node;
+    }
+
     public NewNode findNode(String simpleUri) {
         return findNode(new SimpleUri(simpleUri));
+    }
+
+    public NewNode findAka(String simpleUriAka) {
+        return findAka(new Name(simpleUriAka));
     }
 
     public void connect(NewNode... nodeList) {
@@ -180,6 +215,8 @@ public class RenderGraph {
             throw new RuntimeException("Cycle detected in the DAG: topological sorting not possible!");
         }
 
+        topologicalList.forEach((key)->key.setDependencies(context));
+
         return topologicalList;
     }
 
@@ -189,6 +226,7 @@ public class RenderGraph {
             node.dispose();
         }
         nodeMap.clear();
+        akaNodeMap.clear();
     }
 
     public void resetDesiredStateChanges(NewNode node) {
@@ -216,7 +254,7 @@ public class RenderGraph {
     private void connectFbo(NewNode toNode, int inputFboId, DependencyConnection fromConnection) {
         // TODO this will have to be caught by a try-catch or redone if we were going use gui to tamper with dag
         // Is not yet connected?
-        if (fromConnection.getConnectedConnection() != null) {
+        if (!fromConnection.getConnectedConnections().isEmpty()) {
             logger.info("Warning, " + fromConnection + "connection is already read somewhere else.");
         }
         // If adding new input goes smoothly
@@ -231,13 +269,13 @@ public class RenderGraph {
             logger.info(toNode.getUri() + ".connectFbo(" + inputFboId + ", " + fromConnection.getName() + "):" +
                     " Connection already existed. Testing for its connections..");
             DependencyConnection localConnection = toNode.getInputFboConnection(inputFboId);
-            DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnection();
-            // if our input is not connected
-            if (localConnectionConnectedTo == null) {
+            // DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnections();
+            // if our input is connected
+            if (!localConnection.getConnectedConnections().isEmpty()) {
                 localConnection.connectInputToOutput(fromConnection);
             } else {
                 throw new RuntimeException(" Could not connect node " + toNode + ", inputConnection with id " + inputFboId
-                        + " already connected to " + localConnection.getConnectedConnection());
+                        + " already connected to " + localConnection.getConnectedConnections());
             }
         }
     }
@@ -258,6 +296,25 @@ public class RenderGraph {
         logger.info("Connected " + fromNode.getOutputFboConnection(outputId) + " to " + toNode + ".");
     }
 
+    public void reconnectFbo(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+        // for each output connection connected to input get it's connected inputs, find us and remove ourselves from its list
+        DependencyConnection connectionToReconnect = toNode.getInputFboConnection(inputId);
+        // for each output connected to toNode's input fbo connection(inputId) (should be just one)
+        if (connectionToReconnect != null) {
+            connectionToReconnect.getConnectedConnections().forEach((conUri, outputConnection) -> {
+                HashMap<String, DependencyConnection> previousFromNodesConnectedConnections = ((DependencyConnection) outputConnection).getConnectedConnections();
+                previousFromNodesConnectedConnections.forEach((outsConnectedInsUris, inputConnection) -> {
+                    if (inputConnection.equals(connectionToReconnect)) {
+                        previousFromNodesConnectedConnections.remove(inputConnection);
+                    }
+                });
+            });
+            // connectionToReconnect gets removed and then created again
+            toNode.removeFboConnection(inputId, DependencyConnection.Type.INPUT);
+        }
+        connectFbo(fromNode, outputId, toNode, inputId);
+    }
+
     /**
      *
      * @param inputConnectionId Input BufferPairConnection id is a number of the input connection on this node.
@@ -266,7 +323,7 @@ public class RenderGraph {
      */ // TODO merge with connectFbo()
     private void connectBufferPair(NewNode toNode, int inputConnectionId, DependencyConnection fromConnection) {
         // Is not yet connected?
-        if (fromConnection.getConnectedConnection() != null) {
+        if (!fromConnection.getConnectedConnections().isEmpty()) {
             logger.info("Warning, " + fromConnection + "connection is already read somewhere else.");
         }
         // If adding new input goes smoothly
@@ -281,13 +338,15 @@ public class RenderGraph {
             logger.info(toNode.getUri() + ".connectFbo(" + inputConnectionId + ", " + fromConnection.getName() + "):" +
                     " Connection already existed. Testing for its connections..");
             DependencyConnection localConnection = toNode.getInputBufferPairConnection(inputConnectionId);
-            DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnection();
-            // if our input is not connected
-            if (localConnectionConnectedTo == null) {
-                localConnection.connectInputToOutput(fromConnection);
-            } else {
-                throw new RuntimeException(" Could not connect node " + toNode + ", inputConnection with id " + inputConnectionId
-                        + " already connected to " + localConnection.getConnectedConnection());
+            // DependencyConnection localConnectionConnectedTo = localConnection.getConnectedConnections();
+            // if our input is connected
+            if (!localConnection.getConnectedConnections().isEmpty()) {
+                if (!localConnection.getConnectedConnections().containsKey(fromConnection)) {
+                    localConnection.connectInputToOutput(fromConnection);
+                } else {
+                    throw new RuntimeException(" Could not connect node " + toNode + ", inputConnection with id " + inputConnectionId
+                            + " already connected to " + localConnection.getConnectedConnections());
+                }
             }
         }
     }
@@ -310,6 +369,24 @@ public class RenderGraph {
         }
     }
 
+    public void reconnectRunOrder(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+        DependencyConnection connectionToReconnect = toNode.getInputRunOrderConnection(inputId);
+        // for each output connected to toNode's input fbo connection(inputId) (should be just one)
+        if (connectionToReconnect != null) {
+            connectionToReconnect.getConnectedConnections().forEach((conUri, outputConnection) -> {
+                HashMap<String, DependencyConnection> previousFromNodesConnectedConnections = ((DependencyConnection) outputConnection).getConnectedConnections();
+                previousFromNodesConnectedConnections.forEach((outsConnectedInsUris, inputConnection) -> {
+                    if (inputConnection.equals(connectionToReconnect)) {
+                        previousFromNodesConnectedConnections.remove(inputConnection);
+                    }
+                });
+            });
+            // connectionToReconnect gets removed and then created again
+            toNode.removeRunOrderConnection(inputId, DependencyConnection.Type.INPUT);
+        }
+        connectRunOrder(fromNode, outputId, toNode, inputId);
+    }
+
     /**
      * Connect BufferPair output of fromNode to toNode's BufferPair input.
      * @param toNode Input node
@@ -327,6 +404,32 @@ public class RenderGraph {
     }
 
     /**
+     * Remove previous input connection and connect a new input connection to previous output.
+     * @param fromNode
+     * @param outputId
+     * @param toNode
+     * @param inputId
+     */
+    public void reconnectBufferPair(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+        // for each output connection connected to input get it's connected inputs, find us and remove ourselves from its list
+        DependencyConnection connectionToReconnect = toNode.getInputBufferPairConnection(inputId);
+        // for each output connected to toNode's input fbo connection(inputId) (should be just one)
+        if (connectionToReconnect != null) {
+            connectionToReconnect.getConnectedConnections().forEach((conUri, outputConnection) -> {
+                HashMap<String, DependencyConnection> previousFromNodesConnectedConnections = ((DependencyConnection) outputConnection).getConnectedConnections();
+                previousFromNodesConnectedConnections.forEach((outsConnectedInsUris, inputConnection) -> {
+                    if (inputConnection.equals(connectionToReconnect)) {
+                        previousFromNodesConnectedConnections.remove(inputConnection);
+                    }
+                });
+            });
+            // connectionToReconnect gets removed and then created again
+            toNode.removeBufferPairConnection(inputId, DependencyConnection.Type.INPUT);
+        }
+        connectBufferPair(fromNode, outputId, toNode, inputId);
+    }
+
+    /**
      * Reconnects dependencies only
      * @param inputId
      * @param fromNode
@@ -334,20 +437,28 @@ public class RenderGraph {
      */// TODO make it reconnectInputToOutput
     private void reconnectInputFboToOutput(NewNode toNode, int inputId, NewNode fromNode, DependencyConnection fromConnection) {
         logger.info("Attempting reconnection of " + toNode.getUri() + " to " + fromConnection.getParentNode());
-        if (fromConnection.getConnectedConnection() != null) {
+
+        if (fromConnection.getConnectedConnections() != null) {
+            // TODO update the hashmap to string to be pretty
             throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
-                    + fromConnection.getConnectedConnection() + "). Remove connection first.");
+                    + fromConnection.getConnectedConnections() + "). Remove connection first.");
         } // TODO                                   make it getInputConnection
+
         DependencyConnection connectionToReconnect = toNode.getInputFboConnection(inputId);
+
         // If this connection exists
         if (connectionToReconnect != null) {
+
             // if this is connected to something
-            if (connectionToReconnect.getConnectedConnection() != null) {
-                // Save previous input connection source node to check whether we I'm still depending on it after reconnect
-                NewNode previousFromNode = findNode(connectionToReconnect.getConnectedConnection().getParentNode());
+            if (!connectionToReconnect.getConnectedConnections().isEmpty()) {
+
+                // Save previous input connection source node to check whether if it's still depending on it after reconnect
+                NewNode previousFromNode = findNode(((DependencyConnection)connectionToReconnect.getConnectedConnections().values().iterator().next()).getParentNode());
+
                 if (previousFromNode == null) {
                     throw new RuntimeException("Node uri " + previousFromNode + " not found in renderGraph.");
                 }
+
                 // Sets data and change toNode's connectedConnection to fromConnection. Sets previous fromConnection's connected node to null.
                 connectionToReconnect.connectInputToOutput(fromConnection);
                 // if not dependent on inputSourceConnection anymore, remove dag connection
@@ -471,5 +582,4 @@ public class RenderGraph {
             connect(fromNode, toNode);
         }
     }
-
 }
