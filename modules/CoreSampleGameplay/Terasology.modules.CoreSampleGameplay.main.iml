@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":modules:CoreSampleGameplay:main" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="org.terasology.modules" external.system.module.type="sourceSet" external.system.module.version="2.2.1-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output url="file://$MODULE_DIR$/build/classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/src/main">
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="Terasology.modules.WildAnimalsGenome.main" />
+    <orderEntry type="module" module-name="Terasology.modules.WildAnimals.main" />
+    <orderEntry type="library" name="Gradle: org.terasology.modules:Genome:0.1.2-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="Terasology.modules.Behaviors.main" />
+    <orderEntry type="module" module-name="Terasology.modules.Pathfinding.main" />
+    <orderEntry type="module" module-name="Terasology.modules.NameGenerator.main" />
+    <orderEntry type="library" name="Gradle: org.terasology.modules:AnotherWorld:0.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology.modules:ClimateConditions:0.1.2-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="Terasology.modules.Core.main" />
+    <orderEntry type="library" name="Gradle: org.terasology.modules:Inventory:1.0.0-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="Terasology.modules.BiomesAPI.main" />
+    <orderEntry type="library" name="Gradle: org.terasology.modules:WorldlyTooltipAPI:0.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology.modules:MarkovChains:1.5.1-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="Terasology.engine-tests.main" />
+    <orderEntry type="module" module-name="Terasology.engine.main" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../engine/libs/jopenvr.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Gradle: org.terasology:gestalt-asset-core:5.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology:gestalt-module:5.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.reflections:reflections:0.9.10" level="project" />
+    <orderEntry type="library" name="Gradle: com.snowplowanalytics:snowplow-java-tracker:0.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology:TeraMath:1.4.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology:gestalt-util:5.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology.crashreporter:cr-terasology:4.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology.crashreporter:cr-core:4.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:23.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.6.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.protobuf:protobuf-java:2.6.1" level="project" />
+    <orderEntry type="library" name="Gradle: net.sf.trove4j:trove4j:3.0.3" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty:3.10.5.Final" level="project" />
+    <orderEntry type="library" name="Gradle: net.java.dev.jna:jna-platform:4.2.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.javassist:javassist:3.20.0-GA" level="project" />
+    <orderEntry type="library" name="Gradle: com.esotericsoftware:reflectasm:1.11.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl_util:2.9.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl:2.9.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology.bullet:tera-bullet:1.3.1" level="project" />
+    <orderEntry type="library" name="Gradle: java3d:vecmath:1.3.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.joml:joml:1.8.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.abego.treelayout:org.abego.treelayout.core:1.0.3" level="project" />
+    <orderEntry type="library" name="Gradle: com.miglayout:miglayout-core:5.0" level="project" />
+    <orderEntry type="library" name="Gradle: de.matthiasmann.twl:PNGDecoder:1111" level="project" />
+    <orderEntry type="library" name="Gradle: org.ow2.asm:asm-util:5.0.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.ow2.asm:asm-commons:5.0.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.ow2.asm:asm-tree:5.0.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.ow2.asm:asm:5.0.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.jagrosh:DiscordIPC:0.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology:splash-screen:1.0.2" level="project" />
+    <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.2.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:jul-to-slf4j:1.7.21" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" name="Gradle: com.projectdarkstar.ext.jorbis:jorbis:0.0.17" level="project" />
+    <orderEntry type="library" name="Gradle: ec.util:MersenneTwister:20" level="project" />
+    <orderEntry type="library" name="Gradle: org.eaxy:eaxy:0.1" level="project" />
+    <orderEntry type="library" name="Gradle: net.logstash.logback:logstash-logback-encoder:4.10" level="project" />
+    <orderEntry type="library" name="Gradle: org.terasology.jnlua:JNLua:0.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
+    <orderEntry type="library" name="Gradle: org.mockito:mockito-core:2.7.22" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.apis:google-api-services-drive:v2-rev193-1.20.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.api-client:google-api-client:1.20.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.oauth-client:google-oauth-client:1.20.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.http-client:google-http-client-jackson2:1.20.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.http-client:google-http-client:1.20.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.findbugs:jsr305:1.3.9" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.errorprone:error_prone_annotations:2.0.18" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.j2objc:j2objc-annotations:1.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.codehaus.mojo:animal-sniffer-annotations:1.14" level="project" />
+    <orderEntry type="library" name="Gradle: net.java.dev.jna:jna:4.2.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.findbugs:annotations:2.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: net.java.jinput:jinput:2.0.5" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpasyncclient:4.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpmime:4.5.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpclient:4.5.2" level="project" />
+    <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.9" level="project" />
+    <orderEntry type="library" name="Gradle: commons-net:commons-net:3.3" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.8" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okhttp:okhttp:2.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.2.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.json:json:20171018" level="project" />
+    <orderEntry type="library" name="Gradle: com.kohlschutter.junixsocket:junixsocket-native-common:2.0.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.kohlschutter.junixsocket:junixsocket-common:2.0.4" level="project" />
+    <orderEntry type="library" name="Gradle: dom4j:dom4j:1.6.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-vfs2:2.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" name="Gradle: net.bytebuddy:byte-buddy:1.6.11" level="project" />
+    <orderEntry type="library" name="Gradle: net.bytebuddy:byte-buddy-agent:1.6.11" level="project" />
+    <orderEntry type="library" name="Gradle: org.objenesis:objenesis:2.5" level="project" />
+    <orderEntry type="library" name="Gradle: org.jboss.shrinkwrap:shrinkwrap-impl-nio2:1.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.jboss.shrinkwrap:shrinkwrap-api-nio2:1.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.jboss.shrinkwrap:shrinkwrap-impl-base:1.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.jboss.shrinkwrap:shrinkwrap-spi:1.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.jboss.shrinkwrap:shrinkwrap-api:1.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: net.java.jutils:jutils:1.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpcore-nio:4.3.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpcore:4.4.4" level="project" />
+    <orderEntry type="library" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.8.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.8" level="project" />
+    <orderEntry type="library" name="Gradle: log4j:log4j:1.2.17" level="project" />
+    <orderEntry type="library" name="Gradle: org.scijava:native-lib-loader:2.0.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.googlecode.gentyref:gentyref:1.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: xml-apis:xml-apis:1.0.b2" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.maven.scm:maven-scm-provider-svnexe:1.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.maven.scm:maven-scm-provider-svn-commons:1.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.maven.scm:maven-scm-api:1.4" level="project" />
+    <orderEntry type="library" name="Gradle: brianbb:jpastebin:1.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.codehaus.plexus:plexus-utils:1.5.6" level="project" />
+    <orderEntry type="library" name="Gradle: regexp:regexp:1.3" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava-jdk5:13.0" level="project" />
+  </component>
+</module>
