@@ -41,6 +41,17 @@ public class CollectiveInterpreter {
         this.actors = actors;
     }
 
+    /**
+     * Copy constructor to save BT execution state
+     * @param collectiveInterpreter
+     */
+    public CollectiveInterpreter(CollectiveInterpreter collectiveInterpreter) {
+        this.actors = collectiveInterpreter.actors;
+        this.treeRunner = collectiveInterpreter.treeRunner;
+        this.tree = collectiveInterpreter.tree;
+        this.callback = collectiveInterpreter.callback;
+    }
+
     public void setCallback(Callback callback) {
         this.callback = callback;
         reset();
