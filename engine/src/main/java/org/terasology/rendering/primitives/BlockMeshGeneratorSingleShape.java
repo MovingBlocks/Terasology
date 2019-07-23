@@ -17,6 +17,7 @@ package org.terasology.rendering.primitives;
 
 import com.google.common.collect.Maps;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -44,7 +45,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         // Gather adjacent blocks
         final Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
         for (Side side : Side.getAllSides()) {
-            Vector3i offset = side.getVector3i();
+            Vector3i offset = JomlUtil.from(side.getVector3i());
             Block blockToCheck = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
             adjacentBlocks.put(side, blockToCheck);
         }
@@ -65,7 +66,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                     final Block topBlock = adjacentBlocks.get(Side.TOP);
                     // Draw horizontal sides if visible from below
                     if (topBlock.isLiquid() && Side.horizontalSides().contains(side)) {
-                        final Vector3i offset = side.getVector3i();
+                        final Vector3i offset = JomlUtil.from(side.getVector3i());
                         final Block adjacentAbove = view.getBlock(x + offset.x, y + 1, z + offset.z);
                         final Block adjacent = adjacentBlocks.get(side);
 

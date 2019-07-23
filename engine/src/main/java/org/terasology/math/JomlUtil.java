@@ -22,19 +22,21 @@ import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
-import org.joml.Vector4f;
+import org.joml.Vector3ic;
 import org.joml.Vector4fc;
 import org.terasology.math.geom.BaseMatrix4f;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector2f;
 import org.terasology.math.geom.BaseVector3f;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 
 public class JomlUtil {
     public static org.joml.Vector4f from(BaseVector4f vec) {
-        return new Vector4f(vec.x(), vec.y(), vec.z(), vec.w());
+        return new org.joml.Vector4f(vec.x(), vec.y(), vec.z(), vec.w());
     }
 
     public static org.terasology.math.geom.Vector4f from(Vector4fc vec) {
@@ -46,9 +48,19 @@ public class JomlUtil {
         return new Vector3f(vec.x(), vec.y(), vec.z());
     }
 
-    public static org.joml.Vector3f from(Vector3f vec) {
-        return new org.joml.Vector3f(vec.x, vec.y, vec.z);
+    public static org.joml.Vector3f from(BaseVector3f vec) {
+        return new org.joml.Vector3f(vec.x(), vec.y(), vec.z());
     }
+
+    public static Vector3i from(Vector3ic vec) {
+        return new Vector3i(vec.x(), vec.y(), vec.z());
+    }
+
+    public static org.joml.Vector3i from(BaseVector3i vec) {
+        return new org.joml.Vector3i(vec.x(), vec.y(), vec.z());
+    }
+
+
 
     public static Vector2f from(Vector2fc vec) {
         return new Vector2f(vec.x(), vec.y());

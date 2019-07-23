@@ -23,6 +23,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DestroyEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -104,7 +105,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
     }
 
     private void validateSupportForBlockOnSide(Vector3i replacedBlockPosition, Side side) {
-        final Vector3i blockPosition = side.getAdjacentPos(replacedBlockPosition);
+        final Vector3i blockPosition = JomlUtil.from(side.getAdjacentPos(JomlUtil.from(replacedBlockPosition)));
         if (worldProvider.isBlockRelevant(blockPosition)) {
             final Side sideReverse = side.reverse();
 

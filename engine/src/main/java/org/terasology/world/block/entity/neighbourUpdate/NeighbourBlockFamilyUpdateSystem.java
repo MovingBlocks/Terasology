@@ -24,6 +24,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
@@ -110,7 +111,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
     private void processUpdateForBlockLocation(Vector3i blockLocation) {
         for (Side side : Side.getAllSides()) {
             Vector3i neighborLocation = new Vector3i(blockLocation);
-            neighborLocation.add(side.getVector3i());
+            neighborLocation.add(JomlUtil.from(side.getVector3i()));
             if (worldProvider.isBlockRelevant(neighborLocation)) {
                 Block neighborBlock = worldProvider.getBlock(neighborLocation);
                 final BlockFamily blockFamily = neighborBlock.getBlockFamily();

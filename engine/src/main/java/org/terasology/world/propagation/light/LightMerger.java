@@ -18,6 +18,7 @@ package org.terasology.world.propagation.light;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.Chunk;
@@ -90,7 +91,7 @@ public class LightMerger<T> {
         for (BatchPropagator propagator : propagators) {
             // Propagate Inwards
             for (Side side : Side.getAllSides()) {
-                Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPosition());
+                Vector3i adjChunkPos = JomlUtil.from(side.getAdjacentPos(JomlUtil.from(chunk.getPosition())));
                 LitChunk adjChunk = chunkProvider.getChunkUnready(adjChunkPos);
                 if (adjChunk != null) {
                     propagator.propagateBetween(adjChunk, chunk, side.reverse(), false);
@@ -99,7 +100,7 @@ public class LightMerger<T> {
 
             // Propagate Outwards
             for (Side side : Side.getAllSides()) {
-                Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPosition());
+                Vector3i adjChunkPos = JomlUtil.from(side.getAdjacentPos(JomlUtil.from(chunk.getPosition())));
                 LitChunk adjChunk = chunkProvider.getChunk(adjChunkPos);
                 if (adjChunk != null) {
                     propagator.propagateBetween(chunk, adjChunk, side, true);

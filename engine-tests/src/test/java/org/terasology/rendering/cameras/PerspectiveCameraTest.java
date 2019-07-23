@@ -68,10 +68,10 @@ public class PerspectiveCameraTest {
                 0.0f,0.0f,0.0f,1.0f);
 
 
-        camera.getViewMatrix().epsilonEquals(viewMatrix, 0.5f);
-        camera.getProjectionMatrix().epsilonEquals(projectionMatrix, 0.5f);
-        camera.getNormViewMatrix().epsilonEquals(normViewMatrix,0.5f);
+        camera.getViewMatrix().equals(viewMatrix, 0.5f);
+        camera.getProjectionMatrix().equals(projectionMatrix, 0.5f);
+        camera.getNormViewMatrix().equals(normViewMatrix,0.5f);
         camera.setReflected(true);
-        camera.getNormViewMatrix().epsilonEquals(normViewMatrix,0.5f);
+        camera.getNormViewMatrix().equals(normViewMatrix,0.5f);
     }
 }

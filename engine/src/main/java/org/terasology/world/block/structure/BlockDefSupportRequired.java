@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.structure;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
@@ -34,7 +35,7 @@ public class BlockDefSupportRequired implements BlockStructuralSupport {
     public boolean isSufficientlySupported(Vector3i location, Map<Vector3i, Block> blockOverrides) {
         final Block block = getBlockWithOverrides(location, blockOverrides);
         if (block.isSupportRequired()) {
-            final Vector3i bottomLocation = Side.BOTTOM.getAdjacentPos(location);
+            final Vector3i bottomLocation = JomlUtil.from(Side.BOTTOM.getAdjacentPos(JomlUtil.from(location)));
             return !getWorldProvider().isBlockRelevant(bottomLocation)
                     || getBlockWithOverrides(bottomLocation, blockOverrides).isFullSide(Side.TOP);
         }

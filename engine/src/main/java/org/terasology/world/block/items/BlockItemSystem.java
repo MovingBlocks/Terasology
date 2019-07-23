@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.items;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.telemetry.GamePlayStatsComponent;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
@@ -77,7 +78,7 @@ public class BlockItemSystem extends BaseComponentSystem {
 
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
         BlockFamily type = blockItem.blockFamily;
-        Side surfaceSide = Side.inDirection(event.getHitNormal());
+        Side surfaceSide = Side.inDirection(JomlUtil.from(event.getHitNormal()));
         Side secondaryDirection = ChunkMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
 
         BlockComponent blockComponent = event.getTarget().getComponent(BlockComponent.class);
@@ -88,7 +89,7 @@ public class BlockItemSystem extends BaseComponentSystem {
         }
         Vector3i targetBlock = new Vector3i(blockComponent.position);
         Vector3i placementPos = new Vector3i(targetBlock);
-        placementPos.add(surfaceSide.getVector3i());
+        placementPos.add(JomlUtil.from(surfaceSide.getVector3i()));
 
         Block block = type.getBlockForPlacement(placementPos, surfaceSide, secondaryDirection);
 

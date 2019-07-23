@@ -18,6 +18,7 @@ package org.terasology.world.propagation;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -51,7 +52,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         this.rules = rules;
 
         for (Side side : Side.getAllSides()) {
-            Vector3i delta = new Vector3i(side.getVector3i());
+            Vector3i delta = new Vector3i(JomlUtil.from(side.getVector3i()));
             if (delta.x < 0) {
                 delta.x += ChunkConstants.SIZE_X;
             } else if (delta.x > 0) {
@@ -122,7 +123,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             if (comparison.isRestricting() && existingValue > 0) {
                 /* If the propagation of the new value is going to be lower/reduced */
                 reduce(blockChange.getPosition(), existingValue);
-                Vector3i adjPos = side.getAdjacentPos(blockChange.getPosition());
+                Vector3i adjPos = JomlUtil.from(side.getAdjacentPos(JomlUtil.from(blockChange.getPosition())));
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue == rules.propagateValue(existingValue, side, blockChange.getFrom())) {
                     reduce(adjPos, adjValue);
@@ -135,7 +136,7 @@ public class StandardBatchPropagator implements BatchPropagator {
                     queueSpreadValue(blockChange.getPosition(), existingValue);
                 }
                 /* Spread it out to the block on the side */
-                Vector3i adjPos = side.getAdjacentPos(blockChange.getPosition());
+                Vector3i adjPos = JomlUtil.from(side.getAdjacentPos(JomlUtil.from(blockChange.getPosition())));
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue != PropagatorWorldView.UNAVAILABLE) {
                     queueSpreadValue(adjPos, adjValue);
@@ -167,7 +168,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         for (Side side : Side.getAllSides()) {
             /* Handle this value being reset to the default by updating sides as needed */
             byte expectedValue = rules.propagateValue(oldValue, side, block);
-            Vector3i adjPos = side.getAdjacentPos(pos);
+            Vector3i adjPos = JomlUtil.from(side.getAdjacentPos(JomlUtil.from(pos)));
             if (rules.canSpreadOutOf(block, side)) {
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue == expectedValue) {
@@ -238,7 +239,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             byte propagatedValue = rules.propagateValue(value, side, block);
 
             if (rules.canSpreadOutOf(block, side)) {
-                Vector3i adjPos = side.getAdjacentPos(pos);
+                Vector3i adjPos = JomlUtil.from(side.getAdjacentPos(JomlUtil.from(pos)));
                 byte adjValue = world.getValueAt(adjPos);
 
                 if (adjValue < propagatedValue && adjValue != PropagatorWorldView.UNAVAILABLE) {
@@ -336,7 +337,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             int depthIndex = indexProvider.getIndexFor(pos);
             int adjacentDepth = adjDepth[depthIndex];
             for (int i = adjacentDepth; i < depths[depthIndex]; ++i) {
-                adjPos.set(side.getVector3i());
+                adjPos.set(JomlUtil.from(side.getVector3i()));
                 adjPos.mul(i + 1);
                 adjPos.add(pos);
                 adjPos.add(chunkEdgeDeltas.get(side));
@@ -371,7 +372,7 @@ public class StandardBatchPropagator implements BatchPropagator {
                         lastBlock = adjChunk.getBlock(adjPos);
                         if (rules.canSpreadInto(lastBlock, side.reverse())) {
                             rules.setValue(adjChunk, adjPos, expectedValue);
-                            adjPos.add(side.getVector3i());
+                            adjPos.add(JomlUtil.from(side.getVector3i()));
                             depth++;
                             expectedValue--;
                             adjValue = rules.getValue(adjChunk, adjPos);

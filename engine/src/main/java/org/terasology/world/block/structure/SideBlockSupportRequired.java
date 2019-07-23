@@ -21,6 +21,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.DestroyEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
@@ -126,7 +127,7 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
     }
 
     private boolean hasSupportFromBlockOnSide(Vector3i blockPosition, Side side, Map<Vector3i, Block> blockOverrides) {
-        final Vector3i sideBlockPosition = side.getAdjacentPos(blockPosition);
+        final Vector3i sideBlockPosition = JomlUtil.from(side.getAdjacentPos(JomlUtil.from(blockPosition)));
         if (!getWorldProvider().isBlockRelevant(sideBlockPosition)) {
             return true;
         }

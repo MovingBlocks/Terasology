@@ -32,6 +32,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -469,7 +470,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         final Vector3i centerChunkPosition = chunk.getPosition();
         List<Chunk> adjacentChunks = new ArrayList<>(6);
         for (Side side : Side.getAllSides()) {
-            final Vector3i adjacentChunkPosition = side.getAdjacentPos(centerChunkPosition);
+            final Vector3i adjacentChunkPosition = JomlUtil.from(side.getAdjacentPos(JomlUtil.from(centerChunkPosition)));
             final Chunk adjacentChunk = chunkCache.get(adjacentChunkPosition);
             if (adjacentChunk != null) {
                 adjacentChunks.add(adjacentChunk);

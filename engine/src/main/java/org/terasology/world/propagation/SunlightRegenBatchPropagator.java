@@ -17,6 +17,7 @@ package org.terasology.world.propagation;
 
 import com.google.common.collect.Sets;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
@@ -81,7 +82,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
             byte existingValue = regenWorld.getValueAt(blockChange.getPosition());
             queueSpreadRegen(blockChange.getPosition(), existingValue);
         } else if (comparison.isRestricting()) {
-            Vector3i adjPos = Side.BOTTOM.getAdjacentPos(blockChange.getPosition());
+            Vector3i adjPos = JomlUtil.from(Side.BOTTOM.getAdjacentPos(JomlUtil.from(blockChange.getPosition())));
             byte existingValue = regenWorld.getValueAt(adjPos);
             reduce(adjPos, existingValue);
         }
@@ -90,7 +91,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     private void reviewChangeToTop(BlockChange blockChange) {
         PropagationComparison comparison = regenRules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), Side.TOP);
         if (comparison.isPermitting()) {
-            Vector3i adjPos = Side.TOP.getAdjacentPos(blockChange.getPosition());
+            Vector3i adjPos = JomlUtil.from(Side.TOP.getAdjacentPos(JomlUtil.from(blockChange.getPosition())));
             byte adjValue = regenWorld.getValueAt(adjPos);
             if (adjValue != PropagatorWorldView.UNAVAILABLE) {
                 queueSpreadRegen(adjPos, adjValue);

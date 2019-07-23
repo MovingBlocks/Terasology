@@ -180,8 +180,8 @@ public final class ChunkMath {
 
     // TODO: This doesn't belong in this class, move it.
     public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
-        Side surfaceDir = Side.inDirection(normal);
-        Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
+        Side surfaceDir = Side.inDirection(JomlUtil.from(normal));
+        Vector3f attachDir = JomlUtil.from(surfaceDir.reverse().getVector3i()).toVector3f();
         Vector3f rawDirection = new Vector3f(direction);
         float dot = rawDirection.dot(attachDir);
         rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
@@ -196,7 +196,7 @@ public final class ChunkMath {
      * @return
      */
     public static Region3i getEdgeRegion(Region3i region, Side side) {
-        Vector3i sideDir = side.getVector3i();
+        Vector3i sideDir = JomlUtil.from(side.getVector3i());
         Vector3i min = region.min();
         Vector3i max = region.max();
         Vector3i edgeMin = new Vector3i(min);

@@ -16,6 +16,7 @@
 
 package org.terasology.physics.events;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -67,6 +68,6 @@ public class ImpactEvent extends AbstractConsumableEvent {
     }
 
     public Side getSide() {
-        return Side.inDirection(impactNormal);
+        return Side.inDirection(JomlUtil.from(impactNormal));
     }
 }
