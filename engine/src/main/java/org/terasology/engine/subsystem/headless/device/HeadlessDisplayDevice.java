@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.subsystem.headless.device;
 
+import org.lwjgl.opengl.Display;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.Resolution;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
@@ -65,6 +66,16 @@ public class HeadlessDisplayDevice extends AbstractSubscribable implements Displ
     @Override
     public List<Resolution> getResolutions() {
         return Collections.singletonList(getResolution());
+    }
+
+    @Override
+    public int getDisplayWidth() {
+        return Display.getWidth();
+    }
+
+    @Override
+    public int getDisplayHeight() {
+        return Display.getHeight();
     }
 
     @Override
