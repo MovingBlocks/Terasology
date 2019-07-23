@@ -45,6 +45,16 @@ public interface DisplayDevice extends Subscribable {
     List<Resolution> getResolutions();
 
     /**
+     * @return display width
+     */
+    int getDisplayWidth();
+
+    /**
+     * @return display height
+     */
+    int getDisplayHeight();
+
+    /**
      * Change currently active full-screen resolution.
      *
      * @param resolution resolution to set.
