@@ -16,6 +16,11 @@
 
 package org.terasology.rendering.assets.material;
 
+import org.joml.Matrix3fc;
+import org.joml.Matrix4fc;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.joml.Vector4fc;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
@@ -86,10 +91,23 @@ public abstract class Material extends Asset<MaterialData> {
      *
      * @param name
      * @param value
+     * @deprecated
      */
     public abstract void setFloat2(String name, Vector2f value);
 
+    /**
+     *
+     * @param name
+     * @param value
+     * @param currentOnly
+     * @deprecated
+     */
     public abstract void setFloat2(String name, Vector2f value, boolean currentOnly);
+
+    public abstract void setFloat2(String name, Vector2fc value);
+
+    public abstract void setFloat2(String name, Vector2fc value, boolean currentOnly);
+
 
     /**
      * Sets a float2 uniform parameter (for all feature permutations)
@@ -118,10 +136,23 @@ public abstract class Material extends Asset<MaterialData> {
      *
      * @param name
      * @param value
+     * @deprecated
      */
     public abstract void setFloat3(String name, Vector3f value);
 
+    /**
+     *
+     * @param name
+     * @param value
+     * @param currentOnly
+     * @deprecated
+     */
     public abstract void setFloat3(String name, Vector3f value, boolean currentOnly);
+
+    public abstract void setFloat3(String name, Vector3fc value);
+
+    public abstract void setFloat3(String name, Vector3fc value, boolean currentOnly);
+
 
     /**
      * Sets a float3 uniform parameter (for all feature permutations)
@@ -151,10 +182,23 @@ public abstract class Material extends Asset<MaterialData> {
      *
      * @param name
      * @param value
+     * @deprecated
      */
     public abstract void setFloat4(String name, Vector4f value);
 
+    /**
+     *
+     * @param name
+     * @param value
+     * @param currentOnly
+     * @deprecated
+     */
     public abstract void setFloat4(String name, Vector4f value, boolean currentOnly);
+
+    public abstract void setFloat4(String name, Vector4fc value);
+
+    public abstract void setFloat4(String name, Vector4fc value, boolean currentOnly);
+
 
     /**
      * Sets a float4 uniform parameter (for all feature permutations)
@@ -191,10 +235,36 @@ public abstract class Material extends Asset<MaterialData> {
      *
      * @param name
      * @param matrix
+     * @deprecated
      */
     public abstract void setMatrix3(String name, Matrix3f matrix);
 
+    /**
+     * Sets a matrix3 uniform parameter (for all feature permutations)
+     * @param name
+     * @param matrix
+     * @param currentOnly
+     * @deprecated
+     */
     public abstract void setMatrix3(String name, Matrix3f matrix, boolean currentOnly);
+
+
+    /**
+     * Sets a matrix3 uniform parameter (for all feature permutations)
+     *
+     * @param name
+     * @param matrix
+     */
+    public abstract void setMatrix3(String name, Matrix3fc matrix);
+
+    /**
+     * Sets a matrix3 uniform parameter (for all feature permutations)
+     *
+     * @param name
+     * @param matrix
+     */
+    public abstract void setMatrix3(String name, Matrix3fc matrix, boolean currentOnly);
+
 
     /**
      * Sets a matrix3 uniform parameter (for all feature permutations)
@@ -211,10 +281,29 @@ public abstract class Material extends Asset<MaterialData> {
      *
      * @param name
      * @param matrix
+     * @deprecated
      */
     public abstract void setMatrix4(String name, Matrix4f matrix);
 
     public abstract void setMatrix4(String name, Matrix4f matrix, boolean currentOnly);
+
+    /**
+     * Sets a matrix4 uniform parameter (for all feature permutations)
+     *
+     * @param name
+     * @param matrix
+     * @deprecated
+     */
+    public abstract void setMatrix4(String name, Matrix4fc matrix);
+
+
+    /**
+     * Sets a matrix4 uniform parameter (for all feature permutations)
+     *
+     * @param name
+     * @param matrix
+     */
+    public abstract void setMatrix4(String name, Matrix4fc matrix,boolean currentOnly);
 
     /**
      * Sets a matrix3 uniform parameter (for all feature permutations)

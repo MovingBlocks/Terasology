@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.lwjgl.opengl.Display;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.world.WorldProvider;
 
@@ -51,11 +51,13 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private float bobbingVerticalOffsetFactor;
     private float cachedBobbingRotationOffsetFactor;
     private float cachedBobbingVerticalOffsetFactor;
+    private DisplayDevice displayDevice;
 
     private Vector3f tempRightVector = new Vector3f();
 
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
         super(worldProvider, renderingConfig);
+        this.displayDevice = displayDevice;
         this.cameraSettings = renderingConfig.getCameraSettings();
 
         displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
@@ -142,10 +144,10 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
             return;
         }
 
-        tempRightVector.cross(viewingDirection, up);
-        tempRightVector.scale(bobbingRotationOffsetFactor);
+        viewingDirection.cross(up,tempRightVector);
+        tempRightVector.mul(bobbingRotationOffsetFactor);
 
-        projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar());
+        projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar(),this.displayDevice);
 
         viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
                 viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
@@ -153,19 +155,20 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
                 up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight()));
-        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
-        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
-        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+        reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
+        reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
+        reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+        viewMatrix.mul(reflectionMatrix, viewMatrixReflected);
 
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
-        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
+        normViewMatrix.mul(reflectionMatrix,normViewMatrixReflected);
 
-        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+//        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+        viewProjectionMatrix = new Matrix4f(viewMatrix).mul(projectionMatrix);
 
-        inverseProjectionMatrix.invert(projectionMatrix);
-        inverseViewProjectionMatrix.invert(viewProjectionMatrix);
+        projectionMatrix.invert(inverseProjectionMatrix);
+        viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks
         cachedPosition.set(getPosition());
@@ -189,8 +192,8 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     }
 
     // TODO: Move the dependency on LWJGL (Display) elsewhere
-    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar) {
-        float aspectRatio = (float) Display.getWidth() / Display.getHeight();
+    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar, DisplayDevice displayDevice) {
+        float aspectRatio = (float) displayDevice.getDisplayWidth()/ displayDevice.getDisplayHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
         return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);

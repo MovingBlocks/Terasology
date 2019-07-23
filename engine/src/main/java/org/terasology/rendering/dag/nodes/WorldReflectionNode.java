@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -185,7 +186,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        final Vector3f cameraPosition = activeCamera.getPosition();
+        final Vector3f cameraPosition = JomlUtil.from(activeCamera.getPosition());
 
         while (renderQueues.chunksOpaqueReflection.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksOpaqueReflection.poll();

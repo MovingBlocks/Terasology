@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Quaternionf;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
@@ -61,6 +62,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -148,7 +150,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
 
         processInput(entity, characterMovementComponent);
-        updateCamera(characterMovementComponent, localPlayer.getViewPosition(), localPlayer.getViewRotation());
+        updateCamera(characterMovementComponent, localPlayer.getViewPosition(), JomlUtil.from(localPlayer.getViewRotation()));
     }
 
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
@@ -412,10 +414,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         aabbRenderer = newAABBRender;
     }
 
-    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
-        playerCamera.getPosition().set(position);
+    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quaternionf rotation) {
+        playerCamera.getPosition().set(JomlUtil.from(position));
         Vector3f viewDir = Direction.FORWARD.getVector3f();
-        rotation.rotate(viewDir, playerCamera.getViewingDirection());
+        rotation.transform(JomlUtil.from(viewDir), playerCamera.getViewingDirection());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {

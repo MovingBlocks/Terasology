@@ -16,6 +16,8 @@
 
 package org.terasology.math;
 
+import org.joml.Matrix3fc;
+import org.joml.Matrix4fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -45,6 +47,11 @@ public final class MatrixUtils {
         return buffer;
     }
 
+    public static FloatBuffer matrixToFloatBuffer(Matrix4fc m) {
+        return m.getTransposed(BufferUtils.createFloatBuffer(16));
+    }
+
+
     /**
      * Copies the given matrix into a newly allocated FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).
@@ -56,6 +63,10 @@ public final class MatrixUtils {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(9);
         matrixToFloatBuffer(m, buffer);
         return buffer;
+    }
+
+    public static FloatBuffer matrixToFloatBuffer(Matrix3fc m) {
+        return m.getTransposed(BufferUtils.createFloatBuffer(9));
     }
 
     /**
@@ -111,55 +122,56 @@ public final class MatrixUtils {
         return fb;
     }
 
-    public static Matrix4f createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
-        return createViewMatrix(new Vector3f(eyeX, eyeY, eyeZ), new Vector3f(centerX, centerY, centerZ), new Vector3f(upX, upY, upZ));
+    public static org.joml.Matrix4f createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
+        return createViewMatrix(new org.joml.Vector3f(eyeX, eyeY, eyeZ), new org.joml.Vector3f(centerX, centerY, centerZ), new org.joml.Vector3f(upX, upY, upZ));
     }
 
-    public static Matrix4f createViewMatrix(Vector3f eye, Vector3f center, Vector3f up) {
-        Matrix4f m = new Matrix4f();
+    public static org.joml.Matrix4f createViewMatrix(org.joml.Vector3f eye, org.joml.Vector3f center, org.joml.Vector3f up) {
+        org.joml.Matrix4f m = new org.joml.Matrix4f();
 
-        Vector3f f = new Vector3f();
-        f.sub(center, eye);
+        org.joml.Vector3f f = new org.joml.Vector3f();
+        center.sub(eye,f);
 
         f.normalize();
         up.normalize();
 
-        Vector3f s = new Vector3f();
-        s.cross(f, up);
+        org.joml.Vector3f s = new org.joml.Vector3f();
+        f.cross(up,s);
         s.normalize();
 
-        Vector3f u = new Vector3f();
-        u.cross(s, f);
+        org.joml.Vector3f u = new org.joml.Vector3f();
+        s.cross(f,u);
         u.normalize();
 
-        m.m00 = s.x;
-        m.m10 = s.y;
-        m.m20 = s.z;
-        m.m30 = 0;
-        m.m01 = u.x;
-        m.m11 = u.y;
-        m.m21 = u.z;
-        m.m31 = 0;
-        m.m02 = -f.x;
-        m.m12 = -f.y;
-        m.m22 = -f.z;
-        m.m32 = 0;
-        m.m03 = 0;
-        m.m13 = 0;
-        m.m23 = 0;
-        m.m33 = 1;
+        m.m00(s.x);
+        m.m10(s.y);
+        m.m20(s.z);
+        m.m30(0);
+        m.m01(u.x);
+        m.m11(u.y);
+        m.m21(u.z);
+        m.m31(0);
+        m.m02(-f.x);
+        m.m12(-f.y);
+        m.m22(-f.z);
+        m.m32(0);
+        m.m03(0);
+        m.m13(0);
+        m.m23(0);
+        m.m33(1);
 
-        m.m30 = -eye.x;
-        m.m31 = -eye.y;
-        m.m32 = -eye.z;
+        m.m30(-eye.x);
+        m.m31(-eye.y);
+        m.m32(-eye.z);
 
         m.transpose();
 
         return m;
     }
 
-    public static Matrix4f createOrthogonalProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
-        Matrix4f m = new Matrix4f();
+
+    public static org.joml.Matrix4f createOrthogonalProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
+        org.joml.Matrix4f m = new org.joml.Matrix4f();
 
         float lateral = right - left;
         float vertical = top - bottom;
@@ -168,59 +180,57 @@ public final class MatrixUtils {
         float ty = -(top + bottom) / (top - bottom);
         float tz = -(far + near) / (far - near);
 
-        m.m00 = 2.0f / lateral;
-        m.m10 = 0.0f;
-        m.m20 = 0.0f;
-        m.m30 = tx;
-        m.m01 = 0.0f;
-        m.m11 = 2.0f / vertical;
-        m.m21 = 0.0f;
-        m.m31 = ty;
-        m.m02 = 0.0f;
-        m.m12 = 0.0f;
-        m.m22 = -2.0f / forward;
-        m.m32 = tz;
-        m.m03 = 0.0f;
-        m.m13 = 0.0f;
-        m.m23 = 0.0f;
-        m.m33 = 1.0f;
+        m.m00(2.0f / lateral);
+        m.m10(0.0f);
+        m.m20(0.0f);
+        m.m30(tx);
+        m.m01(0.0f);
+        m.m11(2.0f / vertical);
+        m.m21(0.0f);
+        m.m31(ty);
+        m.m02(0.0f);
+        m.m12(0.0f);
+        m.m22(-2.0f / forward);
+        m.m32(tz);
+        m.m03(0.0f);
+        m.m13(0.0f);
+        m.m23(0.0f);
+        m.m33(1.0f);
 
         m.transpose();
 
         return m;
     }
 
-    public static Matrix4f createPerspectiveProjectionMatrix(float fovY, float aspectRatio, float zNear, float zFar) {
-        Matrix4f m = new Matrix4f();
+    public static org.joml.Matrix4f createPerspectiveProjectionMatrix(float fovY, float aspectRatio, float zNear, float zFar) {
+        org.joml.Matrix4f m = new org.joml.Matrix4f();
 
         float f = 1.0f / (float) Math.tan((double) fovY * 0.5f);
 
-        m.m00 = f / aspectRatio;
-        m.m10 = 0;
-        m.m20 = 0;
-        m.m30 = 0;
-        m.m01 = 0;
-        m.m11 = f;
-        m.m21 = 0;
-        m.m31 = 0;
-        m.m02 = 0;
-        m.m12 = 0;
-        m.m22 = (zFar + zNear) / (zNear - zFar);
-        m.m32 = (2 * zFar * zNear) / (zNear - zFar);
-        m.m03 = 0;
-        m.m13 = 0;
-        m.m23 = -1;
-        m.m33 = 0;
+        m.m00(f / aspectRatio);
+        m.m10(0);
+        m.m20(0);
+        m.m30(0);
+        m.m01(0);
+        m.m11(f);
+        m.m21(0);
+        m.m31(0);
+        m.m02(0);
+        m.m12(0);
+        m.m22((zFar + zNear) / (zNear - zFar));
+        m.m32((2 * zFar * zNear) / (zNear - zFar));
+        m.m03(0);
+        m.m13(0);
+        m.m23(-1);
+        m.m33(0);
 
         m.transpose();
 
         return m;
     }
 
-    public static Matrix4f calcViewProjectionMatrix(Matrix4f vm, Matrix4f p) {
-        Matrix4f result = new Matrix4f();
-        result.mul(p, vm);
-        return result;
+    public static org.joml.Matrix4f calcViewProjectionMatrix(org.joml.Matrix4f vm, org.joml.Matrix4f p) {
+        return new org.joml.Matrix4f(p).mul(vm);
     }
 
     public static Matrix4f calcModelViewMatrix(Matrix4f m, Matrix4f vm) {
