@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Vector4f;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
@@ -150,25 +151,26 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
         projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar(),this.displayDevice);
 
-        viewMatrix = JomlUtil.from(MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
-                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z));
+        viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        normViewMatrix = JomlUtil.from(MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
-                up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z));
+        normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
+                up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight()));
-        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
-        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
-        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+        reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
+        reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
+        reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+        viewMatrix.mul(reflectionMatrix, viewMatrixReflected);
 
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
-        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
+        normViewMatrix.mul(reflectionMatrix,normViewMatrixReflected);
 
-        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+//        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+        viewProjectionMatrix = new org.joml.Matrix4f(viewMatrix).mul(projectionMatrix);
 
-        inverseProjectionMatrix.invert(projectionMatrix);
-        inverseViewProjectionMatrix.invert(viewProjectionMatrix);
+        projectionMatrix.invert(inverseProjectionMatrix);
+        viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks
         cachedPosition.set(getPosition());
@@ -192,11 +194,11 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     }
 
     // TODO: Move the dependency on LWJGL (Display) elsewhere
-    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar, DisplayDevice displayDevice) {
+    private static org.joml.Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar, DisplayDevice displayDevice) {
         float aspectRatio = (float) displayDevice.getDisplayWidth()/ displayDevice.getDisplayHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
-        return JomlUtil.from(MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar));
+        return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {

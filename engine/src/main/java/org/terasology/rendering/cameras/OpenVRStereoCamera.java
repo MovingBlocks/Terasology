@@ -17,6 +17,7 @@ package org.terasology.rendering.cameras;
 
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
@@ -263,23 +264,23 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         }
         jomlMatrix4f(leftEyeProjection, projectionMatrixLeftEye);
         jomlMatrix4f(rightEyeProjection, projectionMatrixRightEye);
-        projectionMatrix = projectionMatrixLeftEye;
+        projectionMatrix = JomlUtil.from(projectionMatrixLeftEye);
 
         jomlMatrix4f(leftEyePose, viewMatrixLeftEye);
         jomlMatrix4f(rightEyePose, viewMatrixRightEye);
 
-        viewMatrix = viewMatrixLeftEye;
-        normViewMatrix = viewMatrixLeftEye;
+        viewMatrix = JomlUtil.from(viewMatrixLeftEye);
+        normViewMatrix = JomlUtil.from(viewMatrixLeftEye);
 
-        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
-        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
-        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
+        reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f)));
+        reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
+        reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
 
-        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+        viewMatrix.mul(reflectionMatrix,viewMatrixReflected);
 
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
         normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
 
         viewTranslationLeftEye.setIdentity();
@@ -289,8 +290,8 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         viewTranslationRightEye.setTranslation(new Vector3f(-halfIPD, 0.0f, 0.0f));
 
 
-        viewMatrixReflectedLeftEye.mul(viewMatrixReflected, viewTranslationLeftEye);
-        viewMatrixReflectedRightEye.mul(viewMatrixReflected, viewTranslationRightEye);
+        viewMatrixReflectedLeftEye.mul(JomlUtil.from(viewMatrixReflected), viewTranslationLeftEye);
+        viewMatrixReflectedRightEye.mul(JomlUtil.from(viewMatrixReflected), viewTranslationRightEye);
 
         viewProjectionMatrixLeftEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);

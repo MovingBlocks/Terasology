@@ -48,7 +48,7 @@ public final class MatrixUtils {
     }
 
     public static FloatBuffer matrixToFloatBuffer(Matrix4fc m) {
-        return m.get(BufferUtils.createFloatBuffer(16));
+        return m.getTransposed(BufferUtils.createFloatBuffer(16));
     }
 
 
@@ -66,7 +66,7 @@ public final class MatrixUtils {
     }
 
     public static FloatBuffer matrixToFloatBuffer(Matrix3fc m) {
-        return m.get(BufferUtils.createFloatBuffer(9));
+        return m.getTransposed(BufferUtils.createFloatBuffer(9));
     }
 
     /**

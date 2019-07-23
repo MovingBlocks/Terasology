@@ -17,6 +17,7 @@ package org.terasology.rendering.cameras;
 
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
@@ -52,17 +53,17 @@ public abstract class Camera {
     protected final ViewFrustum viewFrustumReflected = new ViewFrustum();
 
     /* MATRICES */
-    protected Matrix4f projectionMatrix = new Matrix4f();
-    protected Matrix4f inverseProjectionMatrix = new Matrix4f();
-    protected Matrix4f normViewMatrix = new Matrix4f();
-    protected Matrix4f viewMatrix = new Matrix4f();
-    protected Matrix4f viewProjectionMatrix = new Matrix4f();
-    protected Matrix4f inverseViewProjectionMatrix = new Matrix4f();
-    protected Matrix4f prevViewProjectionMatrix = new Matrix4f();
-    protected Matrix4f reflectionMatrix = new Matrix4f();
+    protected org.joml.Matrix4f projectionMatrix = new org.joml.Matrix4f();
+    protected org.joml.Matrix4f inverseProjectionMatrix = new org.joml.Matrix4f();
+    protected org.joml.Matrix4f normViewMatrix = new org.joml.Matrix4f();
+    protected org.joml.Matrix4f viewMatrix = new org.joml.Matrix4f();
+    protected org.joml.Matrix4f viewProjectionMatrix = new org.joml.Matrix4f();
+    protected org.joml.Matrix4f inverseViewProjectionMatrix = new org.joml.Matrix4f();
+    protected org.joml.Matrix4f prevViewProjectionMatrix = new org.joml.Matrix4f();
+    protected org.joml.Matrix4f reflectionMatrix = new org.joml.Matrix4f();
 
-    protected Matrix4f viewMatrixReflected = new Matrix4f();
-    protected Matrix4f normViewMatrixReflected = new Matrix4f();
+    protected org.joml.Matrix4f viewMatrixReflected = new org.joml.Matrix4f();
+    protected org.joml.Matrix4f normViewMatrixReflected = new org.joml.Matrix4f();
 
     /* USED FOR DIRTY CHECKS */
     protected Vector3f cachedPosition = new Vector3f();
@@ -158,38 +159,38 @@ public abstract class Camera {
 
     public Matrix4f getViewMatrix() {
         if (!reflected) {
-            return viewMatrix;
+            return JomlUtil.from(viewMatrix);
         }
 
-        return viewMatrixReflected;
+        return JomlUtil.from(viewMatrixReflected);
     }
 
     public Matrix4f getNormViewMatrix() {
         if (!reflected) {
-            return normViewMatrix;
+            return JomlUtil.from(normViewMatrix);
         }
 
-        return normViewMatrixReflected;
+        return JomlUtil.from(normViewMatrixReflected);
     }
 
     public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
+        return JomlUtil.from(projectionMatrix);
     }
 
     public Matrix4f getViewProjectionMatrix() {
-        return viewProjectionMatrix;
+        return JomlUtil.from(viewProjectionMatrix);
     }
 
     public Matrix4f getInverseProjectionMatrix() {
-        return inverseProjectionMatrix;
+        return JomlUtil.from(inverseProjectionMatrix);
     }
 
     public Matrix4f getInverseViewProjectionMatrix() {
-        return inverseViewProjectionMatrix;
+        return JomlUtil.from(inverseViewProjectionMatrix);
     }
 
     public Matrix4f getPrevViewProjectionMatrix() {
-        return prevViewProjectionMatrix;
+        return JomlUtil.from(prevViewProjectionMatrix);
     }
 
     public Vector3f getPosition() {
