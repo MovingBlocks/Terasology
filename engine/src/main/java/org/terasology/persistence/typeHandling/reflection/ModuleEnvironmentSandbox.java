@@ -106,7 +106,7 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
 
         if (type.getRawType().getClassLoader() == null) {
             // Modules cannot specify handlers for builtin classes
-            return moduleDeclaringHandler == null;
+            return moduleDeclaringHandler == null || moduleDeclaringHandler.equals(new Name("engine"));
         }
 
         Name moduleDeclaringType = moduleEnvironment.getModuleProviding(type.getRawType());
