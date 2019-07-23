@@ -40,6 +40,7 @@ public final class MatrixUtils {
      *
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
+     * @deprecated used JOML method that uses Matrix4fc
      */
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
@@ -58,6 +59,7 @@ public final class MatrixUtils {
      *
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
+     * @deprecated used JOML method that uses Matrix3fc
      */
     public static FloatBuffer matrixToFloatBuffer(Matrix3f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(9);

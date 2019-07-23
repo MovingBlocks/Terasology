@@ -16,6 +16,7 @@
 package org.terasology.rendering.cameras;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.config.Config;

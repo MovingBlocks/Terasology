@@ -91,7 +91,7 @@ public abstract class Material extends Asset<MaterialData> {
      *
      * @param name
      * @param value
-     * @deprecated
+     * @deprecated use Vector2fc method
      */
     public abstract void setFloat2(String name, Vector2f value);
 
@@ -100,7 +100,7 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name
      * @param value
      * @param currentOnly
-     * @deprecated
+     * @deprecated use Vector2fc method
      */
     public abstract void setFloat2(String name, Vector2f value, boolean currentOnly);
 
@@ -136,7 +136,7 @@ public abstract class Material extends Asset<MaterialData> {
      *
      * @param name
      * @param value
-     * @deprecated
+     * @deprecated use Vector3fc method
      */
     public abstract void setFloat3(String name, Vector3f value);
 
@@ -145,7 +145,7 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name
      * @param value
      * @param currentOnly
-     * @deprecated
+     * @deprecated use Vector3fc method
      */
     public abstract void setFloat3(String name, Vector3f value, boolean currentOnly);
 
@@ -182,7 +182,7 @@ public abstract class Material extends Asset<MaterialData> {
      *
      * @param name
      * @param value
-     * @deprecated
+     * @deprecated use Vector4fc method
      */
     public abstract void setFloat4(String name, Vector4f value);
 
@@ -191,7 +191,7 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name
      * @param value
      * @param currentOnly
-     * @deprecated
+     * @deprecated use Vector4fc method
      */
     public abstract void setFloat4(String name, Vector4f value, boolean currentOnly);
 
