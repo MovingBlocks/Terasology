@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -148,10 +149,10 @@ public class DeferredMainLightNode extends AbstractNode {
 
         // Specific Shader Parameters
 
-        cameraPosition = activeCamera.getPosition();
-        activeCameraToLightSpace.sub(cameraPosition, lightCamera.getPosition());
+        cameraPosition = JomlUtil.from(activeCamera.getPosition());
+        activeCameraToLightSpace.sub(cameraPosition, JomlUtil.from(lightCamera.getPosition()));
         mainLightInViewSpace = backdropProvider.getSunDirection(true);
-        activeCamera.getViewMatrix().transformPoint(mainLightInViewSpace);
+        JomlUtil.from(activeCamera.getViewMatrix()).transformPoint(mainLightInViewSpace);
 
         // TODO: This is necessary right now because activateFeature removes all material parameters.
         // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.

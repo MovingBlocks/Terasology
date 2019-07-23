@@ -20,6 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -178,7 +179,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
         // Actual Node Processing
 
-        final Vector3f cameraPosition = activeCamera.getPosition();
+        final Vector3f cameraPosition = JomlUtil.from(activeCamera.getPosition());
 
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;

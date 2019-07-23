@@ -16,6 +16,7 @@
 package org.terasology.rendering.world.selection;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.math.JomlUtil;
 import org.terasology.utilities.Assets;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector3f;
@@ -136,7 +137,7 @@ public class BlockSelectionRenderer {
     }
 
     private Vector3f getCameraPosition() {
-        return CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        return JomlUtil.from(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
     }
 
 }

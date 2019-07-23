@@ -20,6 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -157,7 +158,7 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
             int numberOfRenderedTriangles = 0;
             int numberOfChunksThatAreNotReadyYet = 0;
 
-            final Vector3f cameraPosition = shadowMapCamera.getPosition();
+            final Vector3f cameraPosition = JomlUtil.from(shadowMapCamera.getPosition());
 
             shadowMapCamera.lookThrough();
 
@@ -189,10 +190,10 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
 
         // The shadow projected onto the ground must move in in light-space texel-steps, to avoid causing flickering.
         // That's why we first convert it to the previous frame's light-space coordinates and then back to world-space.
-        shadowMapCamera.getViewProjectionMatrix().transformPoint(mainLightPosition); // to light-space
+        JomlUtil.from(shadowMapCamera.getViewProjectionMatrix()).transformPoint(mainLightPosition); // to light-space
         mainLightPosition.set(TeraMath.fastFloor(mainLightPosition.x / texelSize) * texelSize, 0.0f,
                               TeraMath.fastFloor(mainLightPosition.z / texelSize) * texelSize);
-        shadowMapCamera.getInverseViewProjectionMatrix().transformPoint(mainLightPosition); // back to world-space
+        JomlUtil.from(shadowMapCamera.getInverseViewProjectionMatrix()).transformPoint(mainLightPosition); // back to world-space
 
         // This is what causes the shadow map to change infrequently, to prevent flickering.
         // Notice that this is different from what is done above, which is about spatial steps
@@ -203,12 +204,12 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
         Vector3f offsetFromPlayer = new Vector3f(quantizedMainLightDirection);
         offsetFromPlayer.scale(256.0f + 64.0f); // these hardcoded numbers are another mystery.
         mainLightPosition.add(offsetFromPlayer);
-        shadowMapCamera.getPosition().set(mainLightPosition);
+        shadowMapCamera.getPosition().set(JomlUtil.from(mainLightPosition));
 
         // Finally, we adjust the shadow map camera to look toward the player
         Vector3f fromLightToPlayerDirection = new Vector3f(quantizedMainLightDirection);
         fromLightToPlayerDirection.scale(-1.0f);
-        shadowMapCamera.getViewingDirection().set(fromLightToPlayerDirection);
+        shadowMapCamera.getViewingDirection().set(JomlUtil.from(fromLightToPlayerDirection));
 
         shadowMapCamera.update(worldRenderer.getSecondsSinceLastFrame());
     }

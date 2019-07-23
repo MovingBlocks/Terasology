@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * Provides global access to fonts.
@@ -53,17 +53,17 @@ public abstract class Camera {
     protected final ViewFrustum viewFrustumReflected = new ViewFrustum();
 
     /* MATRICES */
-    protected org.joml.Matrix4f projectionMatrix = new org.joml.Matrix4f();
-    protected org.joml.Matrix4f inverseProjectionMatrix = new org.joml.Matrix4f();
-    protected org.joml.Matrix4f normViewMatrix = new org.joml.Matrix4f();
-    protected org.joml.Matrix4f viewMatrix = new org.joml.Matrix4f();
-    protected org.joml.Matrix4f viewProjectionMatrix = new org.joml.Matrix4f();
-    protected org.joml.Matrix4f inverseViewProjectionMatrix = new org.joml.Matrix4f();
-    protected org.joml.Matrix4f prevViewProjectionMatrix = new org.joml.Matrix4f();
-    protected org.joml.Matrix4f reflectionMatrix = new org.joml.Matrix4f();
+    protected Matrix4f projectionMatrix = new Matrix4f();
+    protected Matrix4f inverseProjectionMatrix = new Matrix4f();
+    protected Matrix4f normViewMatrix = new Matrix4f();
+    protected Matrix4f viewMatrix = new Matrix4f();
+    protected Matrix4f viewProjectionMatrix = new Matrix4f();
+    protected Matrix4f inverseViewProjectionMatrix = new Matrix4f();
+    protected Matrix4f prevViewProjectionMatrix = new Matrix4f();
+    protected Matrix4f reflectionMatrix = new Matrix4f();
 
-    protected org.joml.Matrix4f viewMatrixReflected = new org.joml.Matrix4f();
-    protected org.joml.Matrix4f normViewMatrixReflected = new org.joml.Matrix4f();
+    protected Matrix4f viewMatrixReflected = new Matrix4f();
+    protected Matrix4f normViewMatrixReflected = new Matrix4f();
 
     /* USED FOR DIRTY CHECKS */
     protected Vector3f cachedPosition = new Vector3f();
@@ -159,38 +159,38 @@ public abstract class Camera {
 
     public Matrix4f getViewMatrix() {
         if (!reflected) {
-            return JomlUtil.from(viewMatrix);
+            return viewMatrix;
         }
 
-        return JomlUtil.from(viewMatrixReflected);
+        return viewMatrixReflected;
     }
 
     public Matrix4f getNormViewMatrix() {
         if (!reflected) {
-            return JomlUtil.from(normViewMatrix);
+            return normViewMatrix;
         }
 
-        return JomlUtil.from(normViewMatrixReflected);
+        return normViewMatrixReflected;
     }
 
     public Matrix4f getProjectionMatrix() {
-        return JomlUtil.from(projectionMatrix);
+        return projectionMatrix;
     }
 
     public Matrix4f getViewProjectionMatrix() {
-        return JomlUtil.from(viewProjectionMatrix);
+        return viewProjectionMatrix;
     }
 
     public Matrix4f getInverseProjectionMatrix() {
-        return JomlUtil.from(inverseProjectionMatrix);
+        return inverseProjectionMatrix;
     }
 
     public Matrix4f getInverseViewProjectionMatrix() {
-        return JomlUtil.from(inverseViewProjectionMatrix);
+        return inverseViewProjectionMatrix;
     }
 
     public Matrix4f getPrevViewProjectionMatrix() {
-        return JomlUtil.from(prevViewProjectionMatrix);
+        return prevViewProjectionMatrix;
     }
 
     public Vector3f getPosition() {
@@ -206,7 +206,7 @@ public abstract class Camera {
      * @return the orientation direction, a quaternion.
      */
     public Quat4f getOrientation() {
-        return new Quat4f(viewingDirection, viewingAngle);
+        return new Quat4f(JomlUtil.from(viewingDirection), viewingAngle);
     }
 
     /**
@@ -214,7 +214,7 @@ public abstract class Camera {
      * @param direction
      */
     public void setOrientation(Quat4f direction) {
-        viewingDirection = direction.getAxis();
+        viewingDirection = new Vector3f(direction.x,direction.y,direction.z);
         viewingAngle = direction.getAngle();
     }
 

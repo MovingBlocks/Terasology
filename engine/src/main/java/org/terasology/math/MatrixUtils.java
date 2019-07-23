@@ -229,10 +229,8 @@ public final class MatrixUtils {
         return m;
     }
 
-    public static Matrix4f calcViewProjectionMatrix(Matrix4f vm, Matrix4f p) {
-        Matrix4f result = new Matrix4f();
-        result.mul(p, vm);
-        return result;
+    public static org.joml.Matrix4f calcViewProjectionMatrix(org.joml.Matrix4f vm, org.joml.Matrix4f p) {
+        return new org.joml.Matrix4f(p).mul(vm);
     }
 
     public static Matrix4f calcModelViewMatrix(Matrix4f m, Matrix4f vm) {
