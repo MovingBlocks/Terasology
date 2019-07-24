@@ -62,10 +62,10 @@ public abstract class NewAbstractNode implements NewNode {
      * @param nodeId  a String representing the id of the node, namespace -excluded-: that's added automatically.
      * @param context a Context object.
      */
-    protected NewAbstractNode(String nodeId, String nodeAka, Context context) {
+    protected NewAbstractNode(String nodeId, String nodeAka, Name providingModule, Context context) {
         String newNodeAka = nodeAka;
         ModuleManager moduleManager = context.get(ModuleManager.class);
-        Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
+        // Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
 
         this.context = context;
 
@@ -77,8 +77,8 @@ public abstract class NewAbstractNode implements NewNode {
         this.nodeAka = new Name(newNodeAka);
     }
 
-    protected NewAbstractNode(String nodeId, Context context) {
-        this(nodeId, nodeId, context);
+    protected NewAbstractNode(String nodeId, Name providingModule, Context context) {
+        this(nodeId, nodeId, providingModule, context);
     }
 
     public Map<String, DependencyConnection> getInputConnections() {

@@ -17,6 +17,7 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
 import org.terasology.context.Context;
+import org.terasology.naming.Name;
 import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -33,8 +34,8 @@ public abstract class ConditionDependentNode extends NewAbstractNode implements 
 
     private List<Supplier<Boolean>> conditions = Lists.newArrayList();
 
-    protected ConditionDependentNode(String nodeUri, Context context) {
-        super(nodeUri, context);
+    protected ConditionDependentNode(String nodeUri, Name providingModule, Context context) {
+        super(nodeUri, providingModule, context);
 
         worldRenderer = context.get(WorldRenderer.class);
     }
