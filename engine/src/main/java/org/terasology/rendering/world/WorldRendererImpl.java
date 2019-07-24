@@ -454,7 +454,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * concerned Nodes, which in turn take care of executing them.
      *
      * Usage:
-     *      dagCommandNode <nodeUri> <command> <parameters>
+     *      dagNodeCommand <nodeUri> <command> <parameters>
      *
      * Example:
      *      dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
@@ -464,8 +464,43 @@ public final class WorldRendererImpl implements WorldRenderer {
                                @CommandParam(value = "arguments") final String... arguments) {
         NewNode node = renderGraph.findNode(nodeUri);
         if (node == null) {
-            throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));
+            node = renderGraph.findAka(nodeUri);
+            if (node == null) {
+                throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));
+            }
         }
         node.handleCommand(command, arguments);
+    }
+
+    /**
+     * Redirect output FBO from one node to another's input
+     *
+     * Usage:
+     *      dagRedirectFbo <fromNodeUri> <outputFboId> <toNodeUri> <inputFboId>
+     *
+     * Example:
+     *      dagRedirectFbo blurredAmbientOcclusion 1 BasicRendering:outputToScreenNode 1
+     */
+    @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void dagRedirectFbo(@CommandParam("fromNodeUri") final String fromNodeUri, @CommandParam("outputFboId") final int outputFboId,
+                            @CommandParam("toNodeUri") final String toNodeUri, @CommandParam(value = "inputFboId") final int inputFboId) {
+        NewNode toNode = renderGraph.findNode(toNodeUri);
+        if (toNode == null) {
+            toNode = renderGraph.findAka(toNodeUri);
+            if (toNode == null) {
+                throw new RuntimeException(("No node is associated with URI '" + toNodeUri + "'"));
+            }
+        }
+
+        NewNode fromNode = renderGraph.findNode(fromNodeUri);
+        if (fromNode == null) {
+            fromNode = renderGraph.findAka(fromNodeUri);
+            if (fromNode == null) {
+                throw new RuntimeException(("No node is associated with URI '" + fromNodeUri + "'"));
+            }
+        }
+    renderGraph.reconnectInputFboToOutput(fromNode, outputFboId, toNode, inputFboId, false);
+    requestTaskListRefresh();
+
     }
 }
