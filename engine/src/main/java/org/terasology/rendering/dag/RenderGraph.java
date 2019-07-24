@@ -435,13 +435,15 @@ public class RenderGraph {
      * @param fromNode
      * @param fromConnection
      */// TODO make it reconnectInputToOutput
-    private void reconnectInputFboToOutput(NewNode toNode, int inputId, NewNode fromNode, DependencyConnection fromConnection) {
+    private void reconnectInputFboToOutput(NewNode toNode, int inputId, NewNode fromNode, DependencyConnection fromConnection, boolean disconnectPrevious) {
         logger.info("Attempting reconnection of " + toNode.getUri() + " to " + fromConnection.getParentNode());
 
         if (fromConnection.getConnectedConnections() != null) {
+            logger.warn("WARNING: destination connection (" + fromConnection + ") is already connected to ("
+                     + fromConnection.getConnectedConnections() + "). Remove connection first.");
             // TODO update the hashmap to string to be pretty
-            throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
-                    + fromConnection.getConnectedConnections() + "). Remove connection first.");
+            // throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
+                    // + fromConnection.getConnectedConnections() + "). Remove connection first.");
         } // TODO                                   make it getInputConnection
 
         DependencyConnection connectionToReconnect = toNode.getInputFboConnection(inputId);
@@ -453,6 +455,7 @@ public class RenderGraph {
             if (!connectionToReconnect.getConnectedConnections().isEmpty()) {
 
                 // Save previous input connection source node to check whether if it's still depending on it after reconnect
+                // should work like this, an input connection should have only one connected connection
                 NewNode previousFromNode = findNode(((DependencyConnection)connectionToReconnect.getConnectedConnections().values().iterator().next()).getParentNode());
 
                 if (previousFromNode == null) {
@@ -463,7 +466,7 @@ public class RenderGraph {
                 connectionToReconnect.connectInputToOutput(fromConnection);
                 // if not dependent on inputSourceConnection anymore, remove dag connection
 
-                if (!toNode.isDependentOn(previousFromNode)) {
+                if (!toNode.isDependentOn(previousFromNode) && disconnectPrevious) {
                     disconnect(previousFromNode, toNode);
                 }
                 // setDependencies(this.context); - needed here? probably not..either do this after everything is set up, or in renderGraph.addNode
@@ -540,15 +543,34 @@ public class RenderGraph {
      * @param fromNodeUri fromNode's SimpleUri name. Node must exist in the renderGraph.
      * @param outputId Id of fromNode's output. Output must exist.
      */
-    public void reconnectInputFboToOutput(String toNodeUri, int inputId, String fromNodeUri, int outputId) {
-        NewNode toNode = findNode(new SimpleUri(toNodeUri));
-        NewNode fromNode = findNode(new SimpleUri(fromNodeUri));
-        reconnectInputFboToOutput(toNode, inputId, fromNode, outputId);
+    public void reconnectInputFboToOutput(String toNodeUri, int inputId, String fromNodeUri, int outputId, boolean disconnectPrevious) {
+        NewNode toNode = findNode(toNodeUri);
+        if (toNode == null) {
+            toNode = findAka(toNodeUri);
+            if (toNode == null) {
+                throw new RuntimeException(("No node is associated with URI '" + toNodeUri + "'"));
+            }
+        }
+
+        NewNode fromNode = findNode(fromNodeUri);
+        if (fromNode == null) {
+            fromNode = findAka(fromNodeUri);
+            if (fromNode == null) {
+                throw new RuntimeException(("No node is associated with URI '" + fromNodeUri + "'"));
+            }
+        }
+        reconnectInputFboToOutput(toNode, inputId, fromNode, outputId, disconnectPrevious);
     }
 
-    public void reconnectInputFboToOutput(NewNode toNode, int inputId, String fromNodeUri, int outputId) {
+    public void reconnectInputFboToOutput(NewNode toNode, int inputId, String fromNodeUri, int outputId, boolean disconnectPrevious) {
         NewNode fromNode = findNode(new SimpleUri(fromNodeUri));
-        reconnectInputFboToOutput(toNode, inputId, fromNode, outputId);
+        if (fromNode == null) {
+            fromNode = findAka(fromNodeUri);
+            if (fromNode == null) {
+                throw new RuntimeException(("No node is associated with URI '" + fromNodeUri + "'"));
+            }
+        }
+        reconnectInputFboToOutput(toNode, inputId, fromNode, outputId, disconnectPrevious);
     }
 
     /**
@@ -564,7 +586,7 @@ public class RenderGraph {
      * @param fromNode fromNode's SimpleUri name. Node must exist in the renderGraph.
      * @param outputId Id of fromNode's output. Output must exist.
      */
-    public void reconnectInputFboToOutput(NewNode toNode, int inputId, NewNode fromNode, int outputId) {
+    public void reconnectInputFboToOutput(NewNode fromNode, int outputId, NewNode toNode, int inputId, boolean disconnectPrevious) {
         // Would use of Preconditions be clearer?
         if (toNode == null || fromNode == null) {
             throw new RuntimeException("Reconnecting FBO dependency failed. One of the nodes not found in the renderGraph."
@@ -576,7 +598,7 @@ public class RenderGraph {
         }
         // TODO REMOVE RENDERGRAPH CONNECTION if needed
 
-        reconnectInputFboToOutput(toNode, inputId, fromNode, fromConnection);
+        reconnectInputFboToOutput(toNode, inputId, fromNode, fromConnection, disconnectPrevious);
 
         if (!areConnected(fromNode, toNode)) {
             connect(fromNode, toNode);
