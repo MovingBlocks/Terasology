@@ -189,6 +189,9 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
 
             result.append(" ");
             result.append(suggestion);
+
+            result.append(" ");
+
             return result.toString();
         }
     }
