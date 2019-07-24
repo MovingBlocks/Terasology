@@ -104,9 +104,17 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
     public <T> boolean isValidTypeHandlerDeclaration(TypeInfo<T> type, TypeHandler<T> typeHandler) {
         Name moduleDeclaringHandler = moduleEnvironment.getModuleProviding(typeHandler.getClass());
 
+        // If handler was declared outside of a module (engine or somewhere else), we allow it
+        // TODO: Possibly find better way to refer to engine module
+        if (moduleDeclaringHandler == null || moduleDeclaringHandler.equals(new Name("engine"))) {
+            return true;
+        }
+
+        // Handler has been declared in a module, proceed accordingly
+
         if (type.getRawType().getClassLoader() == null) {
             // Modules cannot specify handlers for builtin classes
-            return moduleDeclaringHandler == null || moduleDeclaringHandler.equals(new Name("engine"));
+            return false;
         }
 
         Name moduleDeclaringType = moduleEnvironment.getModuleProviding(type.getRawType());
