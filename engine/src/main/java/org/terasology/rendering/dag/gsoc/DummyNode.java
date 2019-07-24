@@ -16,16 +16,17 @@
 package org.terasology.rendering.dag.gsoc;
 
 import org.terasology.context.Context;
+import org.terasology.naming.Name;
 
 public class DummyNode extends NewAbstractNode {
 
 
-    public DummyNode(String nodeId, String nodeAka, Context context) {
-        super(nodeId, nodeAka, context);
+    public DummyNode(String nodeId, String nodeAka, Name providingModule, Context context) {
+        super(nodeId, nodeAka, providingModule, context);
     }
 
-    public DummyNode(String nodeId, Context context) {
-        super(nodeId, nodeId, context);
+    public DummyNode(String nodeId, Name providingModule, Context context) {
+        super(nodeId, nodeId, providingModule, context);
     }
 
     @Override

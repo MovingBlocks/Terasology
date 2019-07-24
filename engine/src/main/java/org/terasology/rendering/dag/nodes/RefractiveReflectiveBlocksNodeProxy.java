@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.naming.Name;
 import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import java.beans.PropertyChangeEvent;
@@ -56,7 +57,7 @@ public class RefractiveReflectiveBlocksNodeProxy extends NewAbstractNode impleme
     public static float waterOffsetY;
 
     public RefractiveReflectiveBlocksNodeProxy(String nodeUri, Context context) {
-        super(nodeUri, context);
+        super(nodeUri,new Name("engine"), context);
     }
 
     public static void updateWaterAttributes(float waveIntensityModule, float waveIntensityFalloffModule, float waveSizeModule,
