@@ -372,6 +372,10 @@ public class TypeHandlerLibrary {
                 if (typeHandler.isPresent()) {
                     TypeHandler<T> handler = typeHandler.get();
 
+                    if (!sandbox.isValidTypeHandlerDeclaration(type, handler)) {
+                        continue;
+                    }
+
                     typeHandlerCache.put(type, handler);
                     future.typeHandler = handler;
 
