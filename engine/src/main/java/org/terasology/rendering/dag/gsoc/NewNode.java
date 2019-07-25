@@ -186,4 +186,6 @@ public interface NewNode extends RenderPipelineTask {
      * Must call after changing dependency connections.
      */
     void resetDesiredStateChanges();
+
+    void clearDesiredStateChanges();
 }
