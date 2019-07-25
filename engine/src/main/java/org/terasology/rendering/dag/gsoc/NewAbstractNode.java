@@ -267,8 +267,13 @@ public abstract class NewAbstractNode implements NewNode {
             fboConnection.setData(fboData);
 
             if (!fboConnection.getConnectedConnections().isEmpty()) {
-                fboConnection.getConnectedConnections().forEach((k, v) -> v.setData(fboData));
+                fboConnection.getConnectedConnections().forEach((k, v) -> {
+                    if(v.getData() == null) {
+                        v.setData(fboData);
+                    }
+                });
             }
+
             success = true;
         } else {
             DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
@@ -524,6 +529,10 @@ public abstract class NewAbstractNode implements NewNode {
     public void resetDesiredStateChanges() {
         desiredStateChanges.clear();
         setDependencies(context);
+    }
+
+    public void clearDesiredStateChanges() {
+        desiredStateChanges.clear();
     }
 
     @Override
