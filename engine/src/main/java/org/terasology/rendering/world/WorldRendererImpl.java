@@ -500,6 +500,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             }
         }
     renderGraph.reconnectInputFboToOutput(fromNode, outputFboId, toNode, inputFboId, false);
+    toNode.clearDesiredStateChanges();
     requestTaskListRefresh();
 
     }
