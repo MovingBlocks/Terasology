@@ -36,7 +36,7 @@ public class FlexibleConfigWidgetFactory {
     private final AssetManager assetManager;
 
     public FlexibleConfigWidgetFactory(ModuleManager moduleManager, AssetManager assetManager) {
-        this.settingWidgetFactory = new SettingWidgetFactory(moduleManager.getEnvironment());
+        this.settingWidgetFactory = new SettingWidgetFactory(moduleManager.getEnvironment(), assetManager);
         this.assetManager = assetManager;
     }
 
@@ -47,7 +47,7 @@ public class FlexibleConfigWidgetFactory {
         Collection<Property<?, ?>> widgetProperties = new ArrayList<>();
 
         for (Setting<?> setting : flexibleConfig.getSettings()) {
-            Optional<? extends SettingWidget<?, ?>> settingWidget = buildSettingWidget(setting);
+            Optional<UIWidget> settingWidget = buildSettingWidget(setting);
 
             if (!settingWidget.isPresent()) {
                 continue;
@@ -66,18 +66,12 @@ public class FlexibleConfigWidgetFactory {
         return container;
     }
 
-    private <T> Optional<SettingWidget<T, ?>> buildSettingWidget(Setting<T> setting) {
-        Optional<SettingWidget<T, ?>> widget = settingWidgetFactory.createWidgetFor(setting);
+    private <T> Optional<UIWidget> buildSettingWidget(Setting<T> setting) {
+        Optional<UIWidget> widget = settingWidgetFactory.createWidgetFor(setting);
 
         if (!widget.isPresent()) {
             LOGGER.error("Couldn't find a widget for the Setting {}", setting.getId());
-            return Optional.empty();
         }
-
-        SettingWidget<T, ?> settingWidget = widget.get();
-
-        settingWidget.loadContents(assetManager);
-        settingWidget.bindToSetting(setting);
 
         return widget;
     }

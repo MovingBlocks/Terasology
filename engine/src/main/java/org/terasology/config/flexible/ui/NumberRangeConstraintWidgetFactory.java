@@ -15,19 +15,33 @@
  */
 package org.terasology.config.flexible.ui;
 
+import org.terasology.assets.management.AssetManager;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UISlider;
 
-public class NumberRangeSettingWidget<T extends Number & Comparable<? super T>>
-    extends SettingWidget<T, NumberRangeConstraint<T>> {
-    public NumberRangeSettingWidget() {
-        super("engine:numberRangeSettingWidget");
-    }
+import java.util.Optional;
+
+public class NumberRangeConstraintWidgetFactory<T extends Number & Comparable<? super T>>
+    extends ConstraintWidgetFactory<T, NumberRangeConstraint<T>> {
+    @In
+    private AssetManager assetManager;
 
     @Override
-    public void initialise() {
-        UISlider slider = find("slider", UISlider.class);
+    protected Optional<UIWidget> buildWidget() {
+        String contentsUri = "engine:numberRangeSettingWidget";
+        Optional<UIElement> uiElement = assetManager.getAsset(contentsUri, UIElement.class);
+
+        if (!uiElement.isPresent()) {
+            return Optional.empty();
+        }
+
+        UIWidget widget = uiElement.get().getRootWidget();
+
+        UISlider slider = widget.find("slider", UISlider.class);
         assert slider != null;
 
         updateSliderIfInteger(slider);
@@ -45,6 +59,8 @@ public class NumberRangeSettingWidget<T extends Number & Comparable<? super T>>
                 setSettingValue(value);
             }
         });
+
+        return Optional.of(widget);
     }
 
     private void updateSliderIfInteger(UISlider slider) {
