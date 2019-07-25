@@ -180,6 +180,10 @@ public class RenderTaskListGeneratorTest {
 
         }
 
+        public void clearDesiredStateChanges() {
+
+        }
+
         public void setRenderGraph(RenderGraph renderGraph) {
 
         }
