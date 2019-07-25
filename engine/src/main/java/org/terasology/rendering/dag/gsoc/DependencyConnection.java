@@ -97,16 +97,16 @@ public abstract class DependencyConnection<T> {
     }
 
     /**
-     * Removes current link for both ends of the connection, set's connected node to connectToConnection and gets its data
-     * @param connectToConnection
+     * Removes current link for both ends of the connection, sets connected node to connectToConnection and gets its data
+     * @param fromConnection
      */
-    public void connectInputToOutput(DependencyConnection<T> connectToConnection) {
+    public void connectInputToOutput(DependencyConnection<T> fromConnection) {
         /*if (this.connectedConnection != null) {
             this.connectedConnection.connectedConnection = null;
         }*/
-        this.connectedConnections.putIfAbsent(connectToConnection.getName(), connectToConnection);
-        this.connectedConnections.get(connectToConnection.getName()).getConnectedConnections().putIfAbsent(this.getName(), this);
-        this.data = connectToConnection.getData();
+        this.connectedConnections.putIfAbsent(fromConnection.getName(), fromConnection);
+        this.connectedConnections.get(fromConnection.getName()).getConnectedConnections().putIfAbsent(this.getName(), this);
+        this.data = fromConnection.getData();
     }
 
     /**
