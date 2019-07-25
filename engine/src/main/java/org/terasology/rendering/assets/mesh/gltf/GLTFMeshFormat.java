@@ -16,6 +16,7 @@
 package org.terasology.rendering.assets.mesh.gltf;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.UnsignedBytes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -59,6 +60,7 @@ import java.util.List;
 public class GLTFMeshFormat extends AbstractAssetFileFormat<MeshData> {
 
     private static final GLTFVersion SUPPORTED_VERSION = new GLTFVersion(2, 0);
+    public static final String DATA_APPLICATION_OCTET_STREAM_BASE_64 = "data:application/octet-stream;base64,";
 
     private Logger logger = LoggerFactory.getLogger(GLTFMeshFormat.class);
 
@@ -98,12 +100,15 @@ public class GLTFMeshFormat extends AbstractAssetFileFormat<MeshData> {
             MeshData mesh = new MeshData();
             for (AttributeSemantic semantic : AttributeSemantic.values()) {
                 GLTFAccessor gltfAccessor = getAccessor(semantic, gltfPrimitive, gltf);
-                if (gltfAccessor != null) {
+                if (gltfAccessor != null && gltfAccessor.getBufferView() != null) {
                     GLTFBufferView bufferView = gltf.getBufferViews().get(gltfAccessor.getBufferView());
                     readBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, semantic.getTargetFloatBuffer(mesh));
                 }
             }
             GLTFAccessor indicesAccessor = getIndicesAccessor(gltfPrimitive, gltf, urn);
+            if (indicesAccessor.getBufferView() == null) {
+                throw new IOException("Missing buffer view for indices accessor in " + urn);
+            }
             GLTFBufferView indicesBuffer = gltf.getBufferViews().get(indicesAccessor.getBufferView());
             checkIndicesBuffer(indicesBuffer);
 
@@ -172,14 +177,23 @@ public class GLTFMeshFormat extends AbstractAssetFileFormat<MeshData> {
         List<byte[]> loadedBuffers = Lists.newArrayList();
         for (GLTFBuffer buffer : gltf.getBuffers()) {
             String uri = buffer.getUri();
-            if (uri.endsWith(".bin")) {
-                uri = uri.substring(0, uri.length() - 4);
+            if (uri.startsWith(DATA_APPLICATION_OCTET_STREAM_BASE_64)) {
+                uri = uri.substring(DATA_APPLICATION_OCTET_STREAM_BASE_64.length());
+                byte[] data = BaseEncoding.base64().decode(uri);
+                if (data.length != buffer.getByteLength()) {
+                    throw new IOException("Byte buffer " + uri + " has incorrect length. Expected (" + buffer.getByteLength() + "), actual (" + data.length + ")");
+                }
+                loadedBuffers.add(data);
+            } else {
+                if (uri.endsWith(".bin")) {
+                    uri = uri.substring(0, uri.length() - 4);
+                }
+                ByteBufferAsset bufferAsset = assetManager.getAsset(uri, ByteBufferAsset.class, urn.getModuleName()).orElseThrow(() -> new IOException("Failed to resolve binary uri " + buffer.getUri() + " for " + urn));
+                if (bufferAsset.getBytes().length != buffer.getByteLength()) {
+                    throw new IOException("Byte buffer " + uri + " has incorrect length. Expected (" + buffer.getByteLength() + "), actual (" + bufferAsset.getBytes().length + ")");
+                }
+                loadedBuffers.add(bufferAsset.getBytes());
             }
-            ByteBufferAsset bufferAsset = assetManager.getAsset(uri, ByteBufferAsset.class, urn.getModuleName()).orElseThrow(() -> new IOException("Failed to resolve binary uri " + buffer.getUri() + " for " + urn));
-            if (bufferAsset.getBytes().length != buffer.getByteLength()) {
-                throw new IOException("Byte buffer " + uri + " has incorrect length. Expected (" + buffer.getByteLength() + "), actual (" + bufferAsset.getBytes().length + ")");
-            }
-            loadedBuffers.add(bufferAsset.getBytes());
         }
         return loadedBuffers;
     }
