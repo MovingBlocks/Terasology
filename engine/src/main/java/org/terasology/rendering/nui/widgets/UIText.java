@@ -101,9 +101,6 @@ public class UIText extends WidgetWithOrder {
     @LayoutConfig
     protected Binding<String> text = new DefaultBinding<>("");
 
-    @LayoutConfig
-    private String[] linesOfText = new String[]{};
-
     /**
      * The interaction listener of the widget. This handles how the widget reacts to different stimuli from the user.
      */
@@ -168,7 +165,6 @@ public class UIText extends WidgetWithOrder {
 
     private TextureRegion cursorTexture;
 
-
     /**
      * Default constructor.
      */
@@ -206,13 +202,11 @@ public class UIText extends WidgetWithOrder {
         drawAll(canvas, canvas.size().x);
     }
 
-
     protected void drawAll(Canvas canvas, int multilineWidth) {
-
         if (text.get() == null) {
             text.set("");
         }
-        if (text.get().equals("") && linesOfText.length > 0) {
+        if (text.get().equals("")) {
             text.set(hintText);
             isShowingHintText = true;
         }
@@ -224,10 +218,9 @@ public class UIText extends WidgetWithOrder {
                 isShowingHintText = false;
             }
         }
-
         lastFont = canvas.getCurrentStyle().getFont();
         correctCursor();
-        String textToDraw = passwordMode ? buildPasswordString() : getText();
+        String textToDraw = passwordMode ? buildPasswordString() : text.get();
         int widthForDraw = (multiline) ? multilineWidth : lastFont.getWidth(textToDraw);
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
              SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
@@ -306,8 +299,8 @@ public class UIText extends WidgetWithOrder {
     protected void drawCursor(Canvas canvas) {
         if (blinkCounter < BLINK_RATE) {
             Font font = canvas.getCurrentStyle().getFont();
-            String beforeCursor = getText();
-            if (getCursorPosition() < getText().length()) {
+            String beforeCursor = text.get();
+            if (getCursorPosition() < text.get().length()) {
                 beforeCursor = beforeCursor.substring(0, getCursorPosition());
             }
             List<String> lines = TextLineBuilder.getLines(font, beforeCursor, canvas.size().x);
@@ -381,7 +374,7 @@ public class UIText extends WidgetWithOrder {
                     }
                     eventHandled = true;
                 } else if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
-                    String fullText = getText();
+                    String fullText = text.get();
                     String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
                     String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
                     setText(before + event.getKeyCharacter() + after);
@@ -389,7 +382,7 @@ public class UIText extends WidgetWithOrder {
                     eventHandled = true;
                 }
             } else {
-                String fullText = getText();
+                String fullText = text.get();
 
                 switch (event.getKey().getId()) {
                     case KeyId.LEFT: {
@@ -671,21 +664,10 @@ public class UIText extends WidgetWithOrder {
     /**
      * Get the text contained by the text box.
      *
-     * @return The text contained by the text box.
-     * If both the linesOfText array and the text string are populated,
-     * return the text concatenated with the array text, else return
-     * contents of linesOfText or text accordingly.
+     * @return The text contained by the text box
      */
     public String getText() {
-        String arrayText = "";
-        if(linesOfText.length > 0) {
-            arrayText = String.join("\n", linesOfText);
-        }
-
-        if(text.get() != "") {
-            return text.get() + "\n" + arrayText;
-        }
-        return text.get() + arrayText;
+        return text.get();
     }
 
     /**
@@ -698,7 +680,6 @@ public class UIText extends WidgetWithOrder {
         boolean callEvent = !prevText.equals(val);
 
         text.set(val != null ? val : "");
-        linesOfText = new String[]{};
         correctCursor();
 
         if (callEvent) {
@@ -706,18 +687,6 @@ public class UIText extends WidgetWithOrder {
                 listener.onTextChange(prevText, val);
             }
         }
-    }
-
-    public void setLinesOfText(String[] arr){
-        String prevText = getText();
-        linesOfText = arr;
-        text.set("");
-        String newText = getText();
-        correctCursor();
-        for (TextChangeEventListener listener : textChangeListeners) {
-            listener.onTextChange(prevText, newText);
-        }
-
     }
 
     /**
