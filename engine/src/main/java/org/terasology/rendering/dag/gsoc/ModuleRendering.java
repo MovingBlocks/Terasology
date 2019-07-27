@@ -22,17 +22,26 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.module.Module;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.RenderGraph;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.rendering.opengl.ScalingFactors;
 import org.terasology.rendering.world.WorldRenderer;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RegisterSystem
 public abstract class ModuleRendering extends BaseComponentSystem {
     protected static final Logger logger = LoggerFactory.getLogger(ModuleRendering.class);
+
+    // private static List<Class> renderingModules = new ArrayList<>();
 
     @In
     protected Context context;
@@ -40,12 +49,35 @@ public abstract class ModuleRendering extends BaseComponentSystem {
     protected RenderGraph renderGraph;
     protected WorldRenderer worldRenderer;
 
+    // Lower number, higher priority. 1 goes first
+    @Range(min = 1, max = 100)
+    protected int initializationPriority = 10;
+
+    public ModuleRendering() {
+     //   renderingModules.add(this.getClass());
+    }
+
+    /* @Override
+    public void finalize() {
+        renderingModules.remove(this.getClass());
+    }
+
+     public static List<Class> getRenderingModules() {
+        return renderingModules;
+    }*/
+
     // @Override
-    public void initialise(Class clazz) {
+    public void initialise(Class clazz, int modulePriority) {
         super.initialise();
+
         setProvidingModule(clazz);
+        initializationPriority = modulePriority;
         renderGraph = context.get(RenderGraph.class);
         worldRenderer = context.get(WorldRenderer.class);
+    }
+
+    public void initialise(Class clazz) {
+        this.initialise(clazz, initializationPriority);
     }
 
     @Override
@@ -53,6 +85,22 @@ public abstract class ModuleRendering extends BaseComponentSystem {
         worldRenderer.requestTaskListRefresh();
     }
 
+    public int getInitPriority() {
+        return initializationPriority;
+    }
+
+    public void setInitPriorit(int initPriority) {
+        initializationPriority = initPriority;
+    }
+
+    private List<ModuleRendering> calculateModuleOrder(ArrayList<ModuleRendering> activeRenderingModules) {
+        // Inplace sorted copy of activeRenderingModules
+        List<ModuleRendering> orderedRenderingModuleList = activeRenderingModules.stream()
+                .sorted(Comparator.comparing(ModuleRendering::getInitPriority)) // sort ascending by initializationPriority attribute
+                .collect(Collectors.toList()); //convert stream to List again
+
+        return orderedRenderingModuleList;
+    }
 
     protected void setProvidingModule(Class implementingClass) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
