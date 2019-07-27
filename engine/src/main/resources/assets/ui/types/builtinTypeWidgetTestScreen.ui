@@ -1,0 +1,19 @@
+{
+    "type": "BuiltinTypeWidgetTestScreen",
+    "skin": "engine:mainMenu",
+    "contents": {
+        "type": "RelativeLayout",
+        "contents": [
+            {
+                "type": "MigLayout",
+                "id": "mainContainer",
+                "fillVerticalSpace": false,
+                "layoutInfo": {
+                    "use-content-height": true,
+                    "position-horizontal-center": {}
+                },
+                "contents": []
+            }
+        ]
+    }
+}
