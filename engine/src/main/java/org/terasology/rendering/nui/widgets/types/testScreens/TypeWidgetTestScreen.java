@@ -30,6 +30,7 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
@@ -71,7 +72,7 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
                                        MessageFormat.format(
                                            "{0} Binding has a value: {1}",
                                            binding.getKey().getSimpleName(),
-                                           binding.getValue().get().toString()
+                                           Objects.toString(binding.getValue().get())
                                        )
                               )
                               .collect(Collectors.joining("\n"));

@@ -28,5 +28,27 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
         newBinding(double.class);
 
         newBinding(String.class);
+
+        newBinding(TestEnum.class);
+    }
+
+    private enum TestEnum {
+        NO_DISPLAY(),
+        DISPLAY_NAME("With Display Name"),
+        TRANSLATED_DISPLAY_NAME("${engine:menu#warning}");
+
+
+        private String displayName;
+
+        TestEnum() {this(null);}
+
+        TestEnum(String displayName) {this.displayName = displayName;}
+
+
+        @Override
+        public String toString() {
+            return displayName != null ? displayName : super.toString();
+
+        }
     }
 }
