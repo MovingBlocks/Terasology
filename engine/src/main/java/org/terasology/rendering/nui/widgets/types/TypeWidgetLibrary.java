@@ -24,6 +24,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.types.builtin.BooleanWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.ByteWidgetFactory;
+import org.terasology.rendering.nui.widgets.types.builtin.CollectionWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.DoubleWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.EnumWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.FloatWidgetFactory;
@@ -32,7 +33,6 @@ import org.terasology.rendering.nui.widgets.types.builtin.LongWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.ShortWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.StringWidgetFactory;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +64,7 @@ public class TypeWidgetLibrary {
         addTypeWidgetFactory(new StringWidgetFactory());
 
         addTypeWidgetFactory(new EnumWidgetFactory());
+        addTypeWidgetFactory(new CollectionWidgetFactory());
     }
 
     public void addTypeWidgetFactory(TypeWidgetFactory typeWidgetFactory) {

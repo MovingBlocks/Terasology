@@ -2,10 +2,11 @@
     "type": "BuiltinTypeWidgetTestScreen",
     "skin": "engine:mainMenu",
     "contents": {
-        "type": "RelativeLayout",
-        "contents": [
-            {
-                "type": "MigLayout",
+        "type": "ScrollableArea",
+        "content": {
+            "type": "UIBox",
+            "content": {
+                "type": "ColumnLayout",
                 "id": "mainContainer",
                 "fillVerticalSpace": false,
                 "layoutInfo": {
@@ -14,6 +15,6 @@
                 },
                 "contents": []
             }
-        ]
+        }
     }
 }
