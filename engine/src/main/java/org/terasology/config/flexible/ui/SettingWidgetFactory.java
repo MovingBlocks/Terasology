@@ -25,6 +25,7 @@ import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.utilities.ReflectionUtil;
 
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 public class SettingWidgetFactory {
@@ -45,10 +46,10 @@ public class SettingWidgetFactory {
         SettingConstraint<?> constraint = setting.getConstraint();
 
         for (Class<? extends ConstraintWidgetFactory> widgetType : environment.getSubtypesOf(ConstraintWidgetFactory.class)) {
-            Class<?> constraintType =
+            Type constraintType =
                 ReflectionUtil.getTypeParameterForSuper(widgetType, ConstraintWidgetFactory.class, 1);
 
-            if (constraint.getClass().equals(constraintType)) {
+            if (constraint.getClass().equals(ReflectionUtil.getRawType(constraintType))) {
                 try {
                     ConstraintWidgetFactory<T, ?> factory = widgetType.newInstance();
                     InjectionHelper.inject(factory, In.class, ImmutableMap.of(AssetManager.class, assetManager));

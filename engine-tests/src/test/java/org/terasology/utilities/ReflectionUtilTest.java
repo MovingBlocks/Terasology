@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
-public class ReflectionUtilsTest {
+public class ReflectionUtilTest {
     @Test
     public void testGetClassOfTypeWildcard() {
         class C<T> {}
@@ -73,17 +73,15 @@ public class ReflectionUtilsTest {
             }
         }
 
-        class SuperClass<T> {}
-
-        class SubClass<T> extends SuperClass<T> {}
+        class SubClass extends SubInterface<String> {}
 
         Type subInterfaceType = new TypeInfo<SubInterface<Integer>>() {}.getType();
 
         assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(subInterfaceType, CopyStrategy.class, 0));
 
-        Type subClassType = new TypeInfo<SubClass<Integer>>() {}.getType();
+        Type subClassType = new TypeInfo<SubClass>() {}.getType();
 
-        assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(subClassType, SuperClass.class, 0));
+        assertEquals(String.class, ReflectionUtil.getTypeParameterForSuper(subClassType, CopyStrategy.class, 0));
     }
 
     @Test
