@@ -30,6 +30,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [AnotherWorldPlants](https://github.com/Terasology/AnotherWorldPlants) - farming and tree growth for AnotherWorld
 * [BasicCrafting](https://github.com/Terasology/BasicCrafting) - a basic crafting system
 * [Behaviors](https://github.com/Terasology/Behaviors) - library module containing various behavior trees for use in our AI system
+* BiomesAPI - library module for basic Biome functionality
 * [BlockDetector](https://github.com/Terasology/BlockDetector) - adds a simple little tool that can detect specific blocks (beeping in proximity)
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
 * [BlockPicker](https://github.com/Terasology/BlockPicker) - allows the player access to an infinite block inventory with the `B` key
