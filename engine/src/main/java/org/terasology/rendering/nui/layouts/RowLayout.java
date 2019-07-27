@@ -180,7 +180,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
                         RowLayoutHint hint = hints.get(contents.get(i));
                         if (hint != null) {
                             if (hint.isUseContentWidth()) {
-                                Vector2i contentSize = contents.get(i).getPreferredContentSize(canvas, new Vector2i(remainingWidthPerElement, canvas.size().y));
+                                Vector2i contentSize = canvas.calculateRestrictedSize(contents.get(i), new Vector2i(remainingWidthPerElement, canvas.size().y));
                                 results.set(i, contentSize.x);
                                 totalWidthUsed += contentSize.x;
                                 unprocessedWidgets--;
