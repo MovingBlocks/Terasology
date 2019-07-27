@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
+ *
  */
 public class ReflectionUtilTest {
     @Test
@@ -48,17 +49,22 @@ public class ReflectionUtilTest {
     }
 
     @Test
-    public void testGetParameterForGenericInterface() throws Exception {
+    public void testGetParameterForGenericInterface() {
         assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(SubInterfaceImplementor.class, CopyStrategy.class, 0));
     }
 
     @Test
-    public void testGetParameterForBuriedGenericInterface() throws Exception {
-        assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(Subclass.class, CopyStrategy.class, 0));
+    public void testGetParameterForBuriedGenericInterface() {
+        class Base<T> {}
+        class Sub extends Base<Integer> implements MarkerA<String> {}
+
+        Type parameter = ReflectionUtil.getTypeParameterForSuper(Sub.class, MarkerA.class, 0);
+
+        assertEquals(String.class, parameter);
     }
 
     @Test
-    public void testGetParameterForUnboundGenericInterface() throws Exception {
+    public void testGetParameterForUnboundGenericInterface() {
         Type parameter = ReflectionUtil.getTypeParameterForSuper(new TypeInfo<UnboundInterfaceImplementor<?>>() {}.getType(), CopyStrategy.class, 0);
 
         assertTrue(parameter instanceof WildcardType);
@@ -94,8 +100,8 @@ public class ReflectionUtilTest {
         };
 
         Type resolvedFieldType = ReflectionUtil.resolveType(
-                typeInfo.getType(),
-                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+            typeInfo.getType(),
+            typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
 
         assertEquals(Float.class, resolvedFieldType);
@@ -111,8 +117,8 @@ public class ReflectionUtilTest {
         };
 
         Type resolvedFieldType = ReflectionUtil.resolveType(
-                typeInfo.getType(),
-                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+            typeInfo.getType(),
+            typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
 
         assertEquals(new TypeInfo<CopyStrategy<Float>>() {}.getType(), resolvedFieldType);
@@ -129,15 +135,15 @@ public class ReflectionUtilTest {
         };
 
         Type resolvedFieldType = ReflectionUtil.resolveType(
-                typeInfo.getType(),
-                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+            typeInfo.getType(),
+            typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
 
         assertEquals(new TypeInfo<CopyStrategy<Object>>() {}.getType(), resolvedFieldType);
 
         resolvedFieldType = ReflectionUtil.resolveType(
-                typeInfo.getType(),
-                typeInfo.getRawType().getDeclaredFields()[1].getGenericType()
+            typeInfo.getType(),
+            typeInfo.getRawType().getDeclaredFields()[1].getGenericType()
         );
 
         assertEquals(TypeInfo.of(Object.class).getType(), resolvedFieldType);
@@ -154,15 +160,15 @@ public class ReflectionUtilTest {
         };
 
         Type resolvedFieldType = ReflectionUtil.resolveType(
-                typeInfo.getType(),
-                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+            typeInfo.getType(),
+            typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
 
         assertEquals(new TypeInfo<CopyStrategy<Integer>>() {}.getType(), resolvedFieldType);
 
         resolvedFieldType = ReflectionUtil.resolveType(
-                typeInfo.getType(),
-                typeInfo.getRawType().getDeclaredFields()[1].getGenericType()
+            typeInfo.getType(),
+            typeInfo.getRawType().getDeclaredFields()[1].getGenericType()
         );
 
         assertEquals(TypeInfo.of(String.class).getType(), resolvedFieldType);
@@ -178,8 +184,8 @@ public class ReflectionUtilTest {
         };
 
         GenericArrayType resolvedFieldType = (GenericArrayType) ReflectionUtil.resolveType(
-                typeInfo.getType(),
-                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+            typeInfo.getType(),
+            typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
 
         assertEquals(Float[].class.getComponentType(), resolvedFieldType.getGenericComponentType());
@@ -196,8 +202,8 @@ public class ReflectionUtilTest {
         };
 
         ParameterizedType resolvedFieldType = (ParameterizedType) ReflectionUtil.resolveType(
-                typeInfo.getType(),
-                typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
+            typeInfo.getType(),
+            typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
 
         WildcardType resolvedWildcardType = (WildcardType) resolvedFieldType.getActualTypeArguments()[0];
@@ -205,8 +211,8 @@ public class ReflectionUtilTest {
         assertEquals(Float.class, resolvedWildcardType.getUpperBounds()[0]);
 
         resolvedFieldType = (ParameterizedType) ReflectionUtil.resolveType(
-                typeInfo.getType(),
-                typeInfo.getRawType().getDeclaredFields()[1].getGenericType()
+            typeInfo.getType(),
+            typeInfo.getRawType().getDeclaredFields()[1].getGenericType()
         );
 
         resolvedWildcardType = (WildcardType) resolvedFieldType.getActualTypeArguments()[0];
@@ -262,33 +268,24 @@ public class ReflectionUtilTest {
     }
 
     interface MarkerA<T> {}
+
     interface MarkerB<T> {}
+
     interface MarkerC<T> {}
 
     interface GenericInterfaceSubInterface extends CopyStrategy<Integer> {}
-
-    class SubInterfaceImplementor implements GenericInterfaceSubInterface {
-        @Override
-        public Integer copy(Integer value) {
-            return null;
-        }
-    }
-
-    public static class ParameterisedInterfaceImplementor implements CopyStrategy<Integer> {
-
-        @Override
-        public Integer copy(Integer value) {
-            return null;
-        }
-    }
-
-    public static class Subclass extends ParameterisedInterfaceImplementor {
-    }
 
     public static class UnboundInterfaceImplementor<T> implements CopyStrategy<T> {
 
         @Override
         public T copy(T value) {
+            return null;
+        }
+    }
+
+    class SubInterfaceImplementor implements GenericInterfaceSubInterface {
+        @Override
+        public Integer copy(Integer value) {
             return null;
         }
     }

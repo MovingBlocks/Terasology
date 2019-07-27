@@ -16,40 +16,48 @@
 package org.terasology.rendering.nui.widgets.types.testScreens;
 
 import org.terasology.context.Context;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.layouts.ColumnLayout;
+import org.terasology.rendering.nui.layouts.RowLayout;
+import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.layouts.miglayout.MigLayout;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 
+import javax.swing.text.html.Option;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
     @In
     private Context context;
 
-    private MigLayout mainContainer;
+    private ColumnLayout mainContainer;
     private TypeWidgetLibrary typeWidgetLibrary;
 
-    private Map<Class<?>, Binding<?>> bindings = new LinkedHashMap<>();
+    private Map<TypeInfo<?>, Binding<?>> bindings = new LinkedHashMap<>();
 
     @Override
     public void initialise() {
         typeWidgetLibrary = new TypeWidgetLibrary(context);
 
-        mainContainer = find("mainContainer", MigLayout.class);
+        mainContainer = find("mainContainer", ColumnLayout.class);
         assert mainContainer != null;
 
-        mainContainer.setRowConstraints("[min!]");
+        mainContainer.setAutoSizeColumns(true);
+        mainContainer.setFillVerticalSpace(false);
+        mainContainer.setVerticalSpacing(5);
 
         addWidgets();
 
@@ -69,44 +77,50 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
                               .stream()
                               .map(
                                   binding ->
-                                       MessageFormat.format(
-                                           "{0} Binding has a value: {1}",
-                                           binding.getKey().getSimpleName(),
-                                           Objects.toString(binding.getValue().get())
-                                       )
+                                      MessageFormat.format(
+                                          "{0} binding has a value {1} of type {2}",
+                                          binding.getKey().getRawType().getSimpleName(),
+                                          Objects.toString(binding.getValue().get()),
+                                          Objects.toString(
+                                              Optional.ofNullable(binding.getValue().get())
+                                                  .map(val -> val.getClass().getSimpleName())
+                                                  .orElse(null)
+                                          )
+                                      )
                               )
                               .collect(Collectors.joining("\n"));
 
             bindingsLog.setText(logs);
         });
 
-        mainContainer.addWidget(
-            bindingsLog,
-            new MigLayout.CCHint("newline, spanx 2, gaptop 10mm")
-        );
-
-        mainContainer.addWidget(
-            logBindingsButton,
-            new MigLayout.CCHint("newline, spanx 2")
-        );
+        mainContainer.addWidget(bindingsLog);
+        mainContainer.addWidget(logBindingsButton);
     }
 
     protected abstract void addWidgets();
 
     protected <T> void newBinding(Class<T> type) {
+        newBinding(TypeInfo.of(type));
+    }
+
+    protected <T> void newBinding(TypeInfo<T> type) {
         Binding<T> binding = new DefaultBinding<>();
 
         bindings.put(type, binding);
 
-        mainContainer.addWidget(
-            new UILabel(type.getSimpleName()),
-            new MigLayout.CCHint("newline")
+        RowLayout row = new RowLayout();
+
+        row.addWidget(
+            new UILabel(type.getRawType().getSimpleName()),
+            new RowLayoutHint().setRelativeWidth(0.35f)
         );
 
-        mainContainer.addWidget(
+        row.addWidget(
             typeWidgetLibrary.getWidget(binding, type).get(),
-            new MigLayout.CCHint("")
+            null
         );
+
+        mainContainer.addWidget(row);
     }
 
 }

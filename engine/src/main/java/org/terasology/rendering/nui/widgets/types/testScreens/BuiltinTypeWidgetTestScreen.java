@@ -15,6 +15,11 @@
  */
 package org.terasology.rendering.nui.widgets.types.testScreens;
 
+import com.google.common.collect.ImmutableList;
+import org.terasology.reflection.TypeInfo;
+
+import java.util.List;
+
 public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
     @Override
     protected void addWidgets() {
@@ -30,6 +35,9 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
         newBinding(String.class);
 
         newBinding(TestEnum.class);
+
+        newBinding(new TypeInfo<List<String>>() {});
+        newBinding(new TypeInfo<ImmutableList<Integer>>() {});
     }
 
     private enum TestEnum {
