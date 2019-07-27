@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.types.builtin;
 
+import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UITextEntry;
@@ -33,8 +34,8 @@ public abstract class NumberWidgetFactory<N extends Number> implements TypeWidge
     }
 
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, Class<T> type, TypeWidgetLibrary library) {
-        if (!wrapperClass.equals(type) && !primitiveClass.equals(type)) {
+    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+        if (!wrapperClass.equals(type.getRawType()) && !primitiveClass.equals(type.getRawType())) {
             return Optional.empty();
         }
 

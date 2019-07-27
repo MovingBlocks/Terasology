@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.types.builtin;
 
+import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UIText;
@@ -27,8 +28,8 @@ public class StringWidgetFactory implements TypeWidgetFactory {
     // TODO: Possibly use I18n prompter
 
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, Class<T> type, TypeWidgetLibrary library) {
-        if (!String.class.equals(type)) {
+    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+        if (!String.class.equals(type.getRawType())) {
             return Optional.empty();
         }
 
