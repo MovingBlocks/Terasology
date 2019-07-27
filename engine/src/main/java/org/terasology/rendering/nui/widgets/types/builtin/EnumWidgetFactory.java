@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.widgets.types.builtin;
 
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -32,15 +33,17 @@ public class EnumWidgetFactory implements TypeWidgetFactory {
     private TranslationSystem translationSystem;
 
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, Class<T> type, TypeWidgetLibrary library) {
-        if (!type.isEnum()) {
+    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+        Class<T> rawType = type.getRawType();
+
+        if (!rawType.isEnum()) {
             return Optional.empty();
         }
 
         UIDropdownScrollable<T> dropdown = new UIDropdownScrollable<>();
 
         dropdown.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
-        dropdown.setOptions(Arrays.asList(type.getEnumConstants()));
+        dropdown.setOptions(Arrays.asList(rawType.getEnumConstants()));
 
         dropdown.bindSelection(binding);
 

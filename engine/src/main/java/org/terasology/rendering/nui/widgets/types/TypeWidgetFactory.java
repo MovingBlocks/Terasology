@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.nui.widgets.types;
 
+import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Creates a {@link UIWidget} for objects sharing similar structure.
@@ -39,31 +39,15 @@ public interface TypeWidgetFactory {
      *
      * TODO: Add must also handle null clause
      *
-     * @param binding  A {@link Binding} to the object to create the {@link UIWidget} for.
-     * @param type    The {@link Class} of the type of the object.
-     * @param library The {@link TypeWidgetLibrary} to create widgets of other types.
      * @param <T>     The type of the object.
+     * @param binding  A {@link Binding} to the object to create the {@link UIWidget} for.
+     * @param type    The {@link TypeInfo} of the type of the object.
+     * @param library The {@link TypeWidgetLibrary} to create widgets of other types.
      * @return An {@link Optional} containing the created {@link UIWidget}, else
      * {@link Optional#empty()} if the factory does not support this type of object.
      */
     // TODO: Use TypeInfo
     // TODO: Split into create and bind, cache results of create (if possible)
     //  to support recursive types
-    <T> Optional<UIWidget> create(Binding<T> binding, Class<T> type, TypeWidgetLibrary library);
-
-    /**
-     * Creates a {@link UIWidget} that can be used to create new objects of the given type. The
-     * generated {@link UIWidget} calls {@code setter} when an object has been instantiated.
-     *
-     * @param type    The {@link Class} of the type of object to instantiate.
-     * @param setter  The {@link Consumer} that is called to set the instantiated object.
-     * @param library The {@link TypeWidgetLibrary} to create widgets of other types.
-     * @param <T>     The type of object to instantiate.
-     * @return An {@link Optional} containing the created {@link UIWidget}, else
-     * {@link Optional#empty()} if the factory does not support this type of object.
-     */
-    // TODO: Use TypeInfo
-    default <T> Optional<UIWidget> createInstantiator(Class<T> type, Consumer<T> setter, TypeWidgetLibrary library) {
-        return Optional.empty();
-    }
+    <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library);
 }
