@@ -25,14 +25,13 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
-import java.sql.Struct;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  */
-public class ReflectionUtilsTest {
+public class ReflectionUtilTest {
     @Test
     public void testGetClassOfTypeWildcard() {
         class C<T> {}
@@ -74,17 +73,15 @@ public class ReflectionUtilsTest {
             }
         }
 
-        class SuperClass<T> {}
-
-        class SubClass<T> extends SuperClass<T> {}
+        class SubClass extends SubInterface<String> {}
 
         Type subInterfaceType = new TypeInfo<SubInterface<Integer>>() {}.getType();
 
         assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(subInterfaceType, CopyStrategy.class, 0));
 
-        Type subClassType = new TypeInfo<SubClass<Integer>>() {}.getType();
+        Type subClassType = new TypeInfo<SubClass>() {}.getType();
 
-        assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(subClassType, SuperClass.class, 0));
+        assertEquals(String.class, ReflectionUtil.getTypeParameterForSuper(subClassType, CopyStrategy.class, 0));
     }
 
     @Test
