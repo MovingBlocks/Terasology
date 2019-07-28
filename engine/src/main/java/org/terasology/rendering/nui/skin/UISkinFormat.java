@@ -29,7 +29,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.persistence.ModuleContext;
+import org.terasology.engine.module.ModuleContext;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.gson.GsonTypeHandlerAdapterFactory;
 import org.terasology.reflection.metadata.ClassLibrary;

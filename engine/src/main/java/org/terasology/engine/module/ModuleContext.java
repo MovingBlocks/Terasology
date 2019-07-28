@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence;
+package org.terasology.engine.module;
 
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
@@ -51,7 +50,7 @@ public final class ModuleContext {
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             context.set(lastContext);
         }
     }

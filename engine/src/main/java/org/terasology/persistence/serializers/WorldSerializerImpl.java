@@ -32,7 +32,7 @@ import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.persistence.ModuleContext;
+import org.terasology.engine.module.ModuleContext;
 import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 
