@@ -20,6 +20,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
+import org.terasology.engine.SimpleUri;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.engine.SimpleUri;
@@ -548,9 +551,46 @@ public final class ReflectionUtil {
 
     public static <T> Set<Class<? extends T>> loadClasses(Iterable<String> subTypes, ClassLoader[] classLoaders) {
         return Lists.newArrayList(subTypes).parallelStream()
-                .map(subtypeName -> (Class<? extends T>) ReflectionUtils.forName(subtypeName, classLoaders))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+                   .map(subtypeName -> (Class<? extends T>) ReflectionUtils.forName(subtypeName, classLoaders))
+                   .filter(Objects::nonNull)
+                   .collect(Collectors.toSet());
+    }
+
+    public static String typeToString(Type type) {
+        return typeToString(type, false);
+    }
+
+    public static String typeToString(Type type, boolean useSimpleName) {
+        if (type instanceof Class) {
+            final Class clazz = (Class) type;
+
+            if (useSimpleName) {
+                return clazz.getSimpleName();
+            }
+
+            return clazz.getTypeName();
+        }
+
+        if (type instanceof WildcardType) {
+            return WildcardTypeImpl.toString((WildcardType) type, useSimpleName);
+        }
+
+        if (type instanceof ParameterizedType) {
+            return ParameterizedTypeImpl.toString((ParameterizedType) type, useSimpleName);
+        }
+
+        if (type instanceof GenericArrayType) {
+            return GenericArrayTypeImpl.toString((GenericArrayType) type, useSimpleName);
+        }
+
+        return null;
+    }
+
+    public static SimpleUri simpleUriOfType(Type type, ModuleEnvironment moduleEnvironment) {
+        Name moduleProvidingType = moduleEnvironment.getModuleProviding(getRawType(type));
+        String typeSimpleName = typeToString(type, true);
+
+        return new SimpleUri(moduleProvidingType, typeSimpleName);
     }
 
     /**
@@ -605,18 +645,12 @@ public final class ReflectionUtil {
             this.lowerBounds = lowerBounds;
         }
 
-        @Override
-        public Type[] getUpperBounds() {
-            return upperBounds;
+        public static String toString(WildcardType wildcardType) {
+            return toString(wildcardType, false);
         }
 
-        @Override
-        public Type[] getLowerBounds() {
-            return lowerBounds;
-        }
-
-        public String toString() {
-            Type[] lowerBounds = this.getLowerBounds();
+        public static String toString(WildcardType wildcardType, boolean useSimpleName) {
+            Type[] lowerBounds = wildcardType.getLowerBounds();
             Type[] bounds = lowerBounds;
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -624,7 +658,7 @@ public final class ReflectionUtil {
             if (lowerBounds.length > 0) {
                 stringBuilder.append("? super ");
             } else {
-                Type[] upperBounds = this.getUpperBounds();
+                Type[] upperBounds = wildcardType.getUpperBounds();
                 if (upperBounds.length <= 0 || upperBounds[0].equals(Object.class)) {
                     return "?";
                 }
@@ -641,10 +675,24 @@ public final class ReflectionUtil {
                 }
 
                 isFirstBound = false;
-                stringBuilder.append(bound.getTypeName());
+                stringBuilder.append(typeToString(bound, useSimpleName));
             }
 
             return stringBuilder.toString();
+        }
+
+        @Override
+        public Type[] getUpperBounds() {
+            return upperBounds;
+        }
+
+        @Override
+        public Type[] getLowerBounds() {
+            return lowerBounds;
+        }
+
+        public String toString() {
+            return toString(this);
         }
 
         public boolean equals(Object var1) {
@@ -670,21 +718,22 @@ public final class ReflectionUtil {
             this.genericComponentType = genericComponentType;
         }
 
+        public static String toString(GenericArrayType type) {
+            return toString(type, false);
+        }
+
+        public static String toString(GenericArrayType type, boolean useSimpleName) {
+            Type genericComponentType = type.getGenericComponentType();
+
+            return typeToString(genericComponentType, useSimpleName) + "[]";
+        }
+
         public Type getGenericComponentType() {
             return this.genericComponentType;
         }
 
         public String toString() {
-            Type genericComponentType = this.getGenericComponentType();
-            StringBuilder stringBuilder = new StringBuilder();
-            if (genericComponentType instanceof Class) {
-                stringBuilder.append(((Class) genericComponentType).getName());
-            } else {
-                stringBuilder.append(genericComponentType.toString());
-            }
-
-            stringBuilder.append("[]");
-            return stringBuilder.toString();
+            return toString(this);
         }
 
         public boolean equals(Object var1) {
@@ -710,6 +759,49 @@ public final class ReflectionUtil {
             this.actualTypeArguments = actualTypeArguments;
             this.rawType = (Class<?>) rawType;
             this.ownerType = ownerType != null ? ownerType : this.rawType.getDeclaringClass();
+        }
+
+        public static String toString(ParameterizedType type) {
+            return toString(type, false);
+        }
+
+        public static String toString(ParameterizedType type, boolean useSimpleName) {
+            StringBuilder var1 = new StringBuilder();
+            if (type.getOwnerType() != null) {
+                var1.append(typeToString(type.getOwnerType(), useSimpleName));
+
+                var1.append("$");
+                if (type.getOwnerType() instanceof ParameterizedTypeImpl) {
+                    final String charSequence = typeToString(((ParameterizedTypeImpl) type.getOwnerType()).rawType, useSimpleName) + "$";
+                    final String rawTypeName = typeToString(type.getRawType(), useSimpleName);
+                    var1.append(rawTypeName.replace(charSequence, ""));
+                } else {
+                    var1.append(typeToString(type.getRawType(), true));
+                }
+            } else {
+                var1.append(typeToString(type.getRawType(), useSimpleName));
+            }
+
+            if (type.getActualTypeArguments() != null && type.getActualTypeArguments().length > 0) {
+                var1.append("<");
+                boolean var2 = true;
+                Type[] var3 = type.getActualTypeArguments();
+                int var4 = var3.length;
+
+                for (int var5 = 0; var5 < var4; ++var5) {
+                    Type var6 = var3[var5];
+                    if (!var2) {
+                        var1.append(", ");
+                    }
+
+                    var1.append(typeToString(var6, useSimpleName));
+                    var2 = false;
+                }
+
+                var1.append(">");
+            }
+
+            return var1.toString();
         }
 
         public Type[] getActualTypeArguments() {
@@ -745,44 +837,7 @@ public final class ReflectionUtil {
         }
 
         public String toString() {
-            StringBuilder var1 = new StringBuilder();
-            if (this.ownerType != null) {
-                if (this.ownerType instanceof Class) {
-                    var1.append(((Class) this.ownerType).getName());
-                } else {
-                    var1.append(this.ownerType.toString());
-                }
-
-                var1.append("$");
-                if (this.ownerType instanceof ParameterizedTypeImpl) {
-                    var1.append(this.rawType.getName().replace(((ParameterizedTypeImpl) this.ownerType).rawType.getName() + "$", ""));
-                } else {
-                    var1.append(this.rawType.getSimpleName());
-                }
-            } else {
-                var1.append(this.rawType.getName());
-            }
-
-            if (this.actualTypeArguments != null && this.actualTypeArguments.length > 0) {
-                var1.append("<");
-                boolean var2 = true;
-                Type[] var3 = this.actualTypeArguments;
-                int var4 = var3.length;
-
-                for (int var5 = 0; var5 < var4; ++var5) {
-                    Type var6 = var3[var5];
-                    if (!var2) {
-                        var1.append(", ");
-                    }
-
-                    var1.append(var6.getTypeName());
-                    var2 = false;
-                }
-
-                var1.append(">");
-            }
-
-            return var1.toString();
+            return toString(this);
         }
     }
 }
