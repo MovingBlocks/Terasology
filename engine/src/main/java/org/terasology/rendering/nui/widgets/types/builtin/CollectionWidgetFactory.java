@@ -36,7 +36,11 @@ import java.util.Set;
 import java.util.SortedSet;
 
 public class CollectionWidgetFactory implements TypeWidgetFactory {
-    private ConstructorLibrary constructorLibrary = new ConstructorLibrary();
+    private ConstructorLibrary constructorLibrary;
+
+    public CollectionWidgetFactory(ConstructorLibrary constructorLibrary) {
+        this.constructorLibrary = constructorLibrary;
+    }
 
     @Override
     public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
