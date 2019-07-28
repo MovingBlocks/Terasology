@@ -20,10 +20,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
+import org.terasology.reflection.TypeInfo;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.engine.SimpleUri;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
-import org.terasology.nui.UIWidget;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -35,6 +36,7 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -237,6 +239,40 @@ public final class ReflectionUtil {
         } else {
             return getTypeParameterForSuperClass(target, superClass, index);
         }
+    }
+
+    /**
+     * Returns the {@link TypeInfo} describing the component type of an array of the given type.
+     *
+     * @param type The {@link TypeInfo} describing the type of the array.
+     * @param <C>  The component type of the array.
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <C> TypeInfo<C> getComponentType(TypeInfo<C[]> type) {
+        if (type.getType() instanceof GenericArrayType) {
+            GenericArrayType arrayType = (GenericArrayType) type.getType();
+
+            Type componentType = arrayType.getGenericComponentType();
+            Type resolvedComponentType = resolveType(arrayType, componentType);
+
+            return (TypeInfo<C>) TypeInfo.of(resolvedComponentType);
+        }
+
+        return TypeInfo.of((Class<C>) type.getRawType().getComponentType());
+    }
+
+    /**
+     * Returns the {@link TypeInfo} describing the element type of a {@link Collection}
+     * of the given type.
+     *
+     * @param type The {@link TypeInfo} describing the type of the {@link Collection}.
+     * @param <E>  The element type of the {@link Collection}.
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <E> TypeInfo<E> getElementType(TypeInfo<? extends Collection<E>> type) {
+        Type elementType = getTypeParameterForSuper(type.getType(), Collection.class, 0);
+
+        return (TypeInfo<E>) TypeInfo.of(elementType);
     }
 
     private static <T> Type getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
