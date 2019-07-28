@@ -31,7 +31,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class ArrayWidgetFactory implements TypeWidgetFactory {
-    private ConstructorLibrary constructorLibrary = new ConstructorLibrary();
+    private ConstructorLibrary constructorLibrary;
+
+    public ArrayWidgetFactory(ConstructorLibrary constructorLibrary) {
+        this.constructorLibrary = constructorLibrary;
+    }
 
     @Override
     public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
