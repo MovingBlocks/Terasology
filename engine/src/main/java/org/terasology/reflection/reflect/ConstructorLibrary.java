@@ -25,16 +25,15 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Multiset;
 import org.terasology.persistence.typeHandling.InstanceCreator;
-import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.internal.UnsafeAllocator;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +43,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -84,7 +82,7 @@ public class ConstructorLibrary {
         };
     }
 
-    public static <T> ObjectConstructor<T> newDefaultConstructor(Class<? super T> rawType) {
+    public static <T> ObjectConstructor<T> newNoArgConstructor(Class<? super T> rawType) {
         @SuppressWarnings("unchecked") // T is the same raw type as is requested
             Constructor<T> constructor = (Constructor<T>) Arrays.stream(rawType.getDeclaredConstructors())
                                                               .min(Comparator.comparingInt(c -> c.getParameterTypes().length))
@@ -124,9 +122,13 @@ public class ConstructorLibrary {
      * subtypes.
      */
     @SuppressWarnings("unchecked") // use runtime checks to guarantee that 'T' is what it is
-    public static <T> ObjectConstructor<T> newDefaultImplementationConstructor(TypeInfo<T> typeInfo) {
+    public static <T> ObjectConstructor<T> newDefaultConstructor(TypeInfo<T> typeInfo) {
         Class<T> rawType = typeInfo.getRawType();
         Type type = typeInfo.getType();
+
+        if (rawType.isArray()) {
+            return () -> (T) Array.newInstance(rawType.getComponentType(), 0);
+        }
 
         if (Collection.class.isAssignableFrom(rawType)) {
             return (ObjectConstructor<T>) getCollectionConstructor((TypeInfo<? extends Collection<?>>) typeInfo);
@@ -216,7 +218,7 @@ public class ConstructorLibrary {
 
     public <T> ObjectConstructor<T> get(TypeInfo<T> typeInfo) {
         final Type type = typeInfo.getType();
-        final Class<? super T> rawType = typeInfo.getRawType();
+        final Class<T> rawType = typeInfo.getRawType();
 
         // first try an instance creator
 
@@ -234,12 +236,12 @@ public class ConstructorLibrary {
             return () -> rawTypeCreator.createInstance(type);
         }
 
-        ObjectConstructor<T> defaultConstructor = newDefaultConstructor(rawType);
+        ObjectConstructor<T> defaultConstructor = newNoArgConstructor(rawType);
         if (defaultConstructor != null) {
             return defaultConstructor;
         }
 
-        ObjectConstructor<T> defaultImplementation = newDefaultImplementationConstructor(typeInfo);
+        ObjectConstructor<T> defaultImplementation = newDefaultConstructor(typeInfo);
         if (defaultImplementation != null) {
             return defaultImplementation;
         }
