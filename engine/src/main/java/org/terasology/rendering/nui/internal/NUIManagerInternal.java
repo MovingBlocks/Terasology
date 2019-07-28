@@ -6,6 +6,7 @@ package org.terasology.rendering.nui.internal;
 import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.joml.Vector2i;
@@ -37,8 +38,10 @@ import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.module.Module;
 import org.terasology.math.JomlUtil;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.nui.AbstractWidget;
 import org.terasology.nui.ControlWidget;
@@ -55,6 +58,7 @@ import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.registry.In;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.assets.texture.Texture;
@@ -65,6 +69,11 @@ import org.terasology.rendering.nui.SortOrderSystem;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetFactoryRegistry;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.rendering.nui.widgets.types.internal.ModuleTypeWidgetLibraryWrapper;
+import org.terasology.rendering.nui.widgets.types.internal.TypeWidgetFactoryRegistryWrapper;
+import org.terasology.rendering.nui.widgets.types.internal.TypeWidgetLibraryImpl;
 import org.terasology.utilities.Assets;
 
 import java.beans.PropertyChangeEvent;
@@ -79,6 +88,7 @@ import java.util.Set;
 /**
  */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, PropertyChangeListener {
+    private final ModuleEnvironment moduleEnvironment;
     private Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private HUDScreenLayer hudScreenLayer;
@@ -98,6 +108,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private Context context;
     private AssetManager assetManager;
     private BindsManager bindsManager;
+    private TypeWidgetLibrary typeWidgetLibrary;
+
 
     public NUIManagerInternal(TerasologyCanvasRenderer renderer, Context context) {
         this.context = context;
@@ -143,6 +155,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             TabbingManager.tabBackInputModifier = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingModifier")).get(0);
             TabbingManager.activateInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:activate")).get(0);
         }
+
+        moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
+        typeWidgetLibrary = new TypeWidgetLibraryImpl(context);
+        context.put(TypeWidgetFactoryRegistry.class, new TypeWidgetFactoryRegistryWrapper(typeWidgetLibrary));
     }
 
     @Override
@@ -389,7 +405,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         InjectionHelper.inject(screen);
         screen.setId(uri.toString());
         screen.setManager(this);
-        screen.initialise();
+
+        initialiseControlWidget(screen, uri);
     }
 
     @Override
@@ -453,7 +470,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             if (expectedType.isInstance(root)) {
                 T overlay = expectedType.cast(root);
                 if (!existsAlready) {
-                    initialiseOverlay(overlay, overlayUri);
+                    initialiseControlWidget(overlay, overlayUri);
                 }
                 addOverlay(overlay, overlayUri);
                 return overlay;
@@ -464,8 +481,14 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         return null;
     }
 
-    private <T extends ControlWidget> void initialiseOverlay(T overlay, ResourceUrn screenUri) {
-        InjectionHelper.inject(overlay);
+    private <T extends ControlWidget> void initialiseControlWidget(T overlay, ResourceUrn screenUri) {
+        InjectionHelper.inject(overlay, context);
+
+        Module declaringModule = moduleEnvironment.get(screenUri.getModuleName());
+        TypeWidgetLibrary moduleLibrary = new ModuleTypeWidgetLibraryWrapper(typeWidgetLibrary, declaringModule);
+
+        InjectionHelper.inject(overlay, In.class, ImmutableMap.of(TypeWidgetLibrary.class, moduleLibrary));
+
         overlay.initialise();
     }
 

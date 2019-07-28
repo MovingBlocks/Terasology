@@ -15,35 +15,18 @@
  */
 package org.terasology.rendering.nui.widgets.types.internal;
 
-import org.terasology.module.Module;
-import org.terasology.engine.module.ModuleContext;
-import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
-import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetFactoryRegistry;
 
-import java.util.Optional;
+public class TypeWidgetFactoryRegistryWrapper implements TypeWidgetFactoryRegistry {
+    private final TypeWidgetFactoryRegistry delegate;
 
-public class ModuleTypeWidgetLibraryWrapper implements TypeWidgetLibrary {
-    private final TypeWidgetLibrary delegate;
-
-    private final Module contextModule;
-
-    public ModuleTypeWidgetLibraryWrapper(TypeWidgetLibrary delegate, Module contextModule) {
+    public TypeWidgetFactoryRegistryWrapper(TypeWidgetFactoryRegistry delegate) {
         this.delegate = delegate;
-        this.contextModule = contextModule;
     }
 
     @Override
     public void addTypeWidgetFactory(TypeWidgetFactory factory) {
         delegate.addTypeWidgetFactory(factory);
-    }
-
-    @Override
-    public <T> Optional<UIWidget> getWidget(Binding<T> binding, TypeInfo<T> type) {
-        try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(contextModule)) {
-            return delegate.getWidget(binding, type);
-        }
     }
 }

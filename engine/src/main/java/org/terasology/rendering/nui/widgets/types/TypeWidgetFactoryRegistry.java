@@ -15,22 +15,10 @@
  */
 package org.terasology.rendering.nui.widgets.types;
 
-import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
-
-import java.util.Optional;
-
 /**
- * Creates {@link UIWidget UIWidgets} to edit objects of various types.
- *
- * Instances can only be accessed via injection (see {@link org.terasology.registry.In}) in
- * screens and overlays.
+ * Registers {@link TypeWidgetFactory} instances that can be used by a {@link TypeWidgetLibrary}
+ * to generate widgets to edit objects of various types.
  */
-public interface TypeWidgetLibrary extends TypeWidgetFactoryRegistry {
-    <T> Optional<UIWidget> getWidget(Binding<T> binding, TypeInfo<T> type);
-
-    default <T> Optional<UIWidget> getWidget(Binding<T> binding, Class<T> type) {
-        return getWidget(binding, TypeInfo.of(type));
-    }
+public interface TypeWidgetFactoryRegistry {
+    void addTypeWidgetFactory(TypeWidgetFactory factory);
 }
