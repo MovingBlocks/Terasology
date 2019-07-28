@@ -24,13 +24,12 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.RowLayoutHint;
-import org.terasology.rendering.nui.layouts.miglayout.MigLayout;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.rendering.nui.widgets.types.internal.TypeWidgetLibraryImpl;
 
-import javax.swing.text.html.Option;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,7 +50,8 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        typeWidgetLibrary = new TypeWidgetLibrary(context);
+        // TODO: Use injection through NUIManagerImpl
+        typeWidgetLibrary = new TypeWidgetLibraryImpl(context);
 
         mainContainer = find("mainContainer", ColumnLayout.class);
         assert mainContainer != null;
