@@ -22,6 +22,7 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.widgets.types.builtin.ArrayWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.BooleanWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.ByteWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.CollectionWidgetFactory;
@@ -65,6 +66,7 @@ public class TypeWidgetLibrary {
 
         addTypeWidgetFactory(new EnumWidgetFactory());
         addTypeWidgetFactory(new CollectionWidgetFactory());
+        addTypeWidgetFactory(new ArrayWidgetFactory());
     }
 
     public void addTypeWidgetFactory(TypeWidgetFactory typeWidgetFactory) {

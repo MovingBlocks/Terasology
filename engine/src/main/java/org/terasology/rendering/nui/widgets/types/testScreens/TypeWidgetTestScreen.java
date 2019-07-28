@@ -32,6 +32,7 @@ import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 
 import javax.swing.text.html.Option;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -80,7 +81,7 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
                                       MessageFormat.format(
                                           "{0} binding has a value {1} of type {2}",
                                           binding.getKey().getRawType().getSimpleName(),
-                                          Objects.toString(binding.getValue().get()),
+                                          toString(binding.getValue().get()),
                                           Objects.toString(
                                               Optional.ofNullable(binding.getValue().get())
                                                   .map(val -> val.getClass().getSimpleName())
@@ -95,6 +96,14 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
 
         mainContainer.addWidget(bindingsLog);
         mainContainer.addWidget(logBindingsButton);
+    }
+
+    public String toString(Object object) {
+        if (object != null && object.getClass().isArray()) {
+            return Arrays.toString((Object[]) object);
+        }
+
+        return Objects.toString(object);
     }
 
     protected abstract void addWidgets();

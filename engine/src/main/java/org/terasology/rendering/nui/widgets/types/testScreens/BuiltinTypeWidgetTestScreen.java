@@ -38,6 +38,7 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
 
         newBinding(new TypeInfo<List<String>>() {});
         newBinding(new TypeInfo<ImmutableList<Integer>>() {});
+        newBinding(Boolean[].class);
     }
 
     private enum TestEnum {

@@ -25,9 +25,7 @@ import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
-import org.terasology.utilities.ReflectionUtil;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,19 +35,16 @@ public abstract class GrowableListWidgetFactory<C, E> {
     protected Binding<C> binding;
     protected TypeInfo<C> type;
     protected TypeWidgetLibrary library;
+    protected TypeInfo<E> elementType;
 
-    public GrowableListWidgetFactory(Binding<C> binding, TypeInfo<C> type, TypeWidgetLibrary library) {
+    public GrowableListWidgetFactory(Binding<C> binding, TypeInfo<C> type, TypeInfo<E> elementType, TypeWidgetLibrary library) {
         this.binding = binding;
         this.type = type;
+        this.elementType = elementType;
         this.library = library;
     }
 
     public UIWidget create() {
-        @SuppressWarnings({"unchecked"})
-        TypeInfo<E> elementType = (TypeInfo<E>) TypeInfo.of(
-            ReflectionUtil.getTypeParameterForSuper(type.getType(), Collection.class, 0)
-        );
-
         List<E> elementList = getBindingCopy();
 
         ColumnLayout mainLayout = new ColumnLayout();
@@ -116,7 +111,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
                 @Override
                 public void set(E value) {
                     elementList.set(elementIndex, value);
-                    updateBindingElements(elementList);
+                    updateBindingWithElements(elementList);
                 }
             },
             elementType
@@ -136,7 +131,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
 
         removeButton.subscribe(widget -> {
             elementList.remove(elementIndex);
-            updateBindingElements(elementList);
+            updateBindingWithElements(elementList);
 
             // Re-add all the widgets because element indices may have to be regenerated
             collectionLayout.removeAllWidgets();
@@ -151,7 +146,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
         return Optional.of(elementLayout);
     }
 
-    protected abstract void updateBindingElements(List<E> elementList);
+    protected abstract void updateBindingWithElements(List<E> elementList);
 
     protected abstract List<E> getBindingCopy();
 }

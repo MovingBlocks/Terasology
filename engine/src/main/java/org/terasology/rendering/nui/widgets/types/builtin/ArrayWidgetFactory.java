@@ -15,9 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets.types.builtin;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
@@ -28,21 +27,17 @@ import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.rendering.nui.widgets.types.builtin.util.GrowableListWidgetFactory;
 import org.terasology.utilities.ReflectionUtil;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
 
-public class CollectionWidgetFactory implements TypeWidgetFactory {
+public class ArrayWidgetFactory implements TypeWidgetFactory {
     private ConstructorLibrary constructorLibrary = new ConstructorLibrary();
 
     @Override
     public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
         Class<T> rawType = type.getRawType();
 
-        if (!Collection.class.isAssignableFrom(rawType)) {
+        if (!rawType.isArray()) {
             return Optional.empty();
         }
 
@@ -53,9 +48,10 @@ public class CollectionWidgetFactory implements TypeWidgetFactory {
             binding.set(constructor.construct());
         }
 
-        UIWidget widget = new GrowableListCollectionWidgetFactory<>(
-            (Binding<Collection<Object>>) binding,
-            (TypeInfo<Collection<Object>>) type,
+
+        UIWidget widget = new GrowableListArrayWidgetFactory<>(
+            (Binding<Object[]>) binding,
+            (TypeInfo<Object[]>) type,
             library
         )
                               .create();
@@ -63,50 +59,23 @@ public class CollectionWidgetFactory implements TypeWidgetFactory {
         return Optional.of(widget);
     }
 
-    private static class GrowableListCollectionWidgetFactory<T extends Collection<E>, E>
-        extends GrowableListWidgetFactory<T, E> {
-
-        public GrowableListCollectionWidgetFactory(
-            Binding<T> binding,
-            TypeInfo<T> type,
+    private static class GrowableListArrayWidgetFactory<E> extends GrowableListWidgetFactory<E[], E> {
+        public GrowableListArrayWidgetFactory(
+            Binding<E[]> binding,
+            TypeInfo<E[]> type,
             TypeWidgetLibrary library
         ) {
-            super(binding, type, ReflectionUtil.getElementType(type), library);
-        }
-
-        private T newImmutableCollection(TypeInfo<T> type, Collection<E> items) {
-            Class<T> rawType = type.getRawType();
-
-            // If the bound collection is unmodifiable, it must either be a standard
-            // Collection or a guava ImmutableCollection, so casts always succeed
-
-            // TODO: Support more Guava types?
-
-            if (SortedSet.class.isAssignableFrom(rawType)) {
-                return (T) ImmutableSortedSet.copyOf(items);
-            }
-
-            if (Set.class.isAssignableFrom(rawType)) {
-                return (T) ImmutableSet.copyOf(items);
-            }
-
-            return (T) ImmutableList.copyOf(items);
+            super(binding, type, ReflectionUtil.getComponentType(type), library);
         }
 
         @Override
         protected void updateBindingWithElements(List<E> elementList) {
-            try {
-                binding.get().clear();
-                binding.get().addAll(elementList);
-            } catch (UnsupportedOperationException e) {
-                // Bound collection is unmodifiable, create new
-                binding.set(newImmutableCollection(type, elementList));
-            }
+            binding.set(Iterables.toArray(elementList, elementType.getRawType()));
         }
 
         @Override
         protected List<E> getBindingCopy() {
-            return new ArrayList<>(binding.get());
+            return Lists.newArrayList(binding.get());
         }
     }
 }
