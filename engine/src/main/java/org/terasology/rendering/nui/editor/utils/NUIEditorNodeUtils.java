@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.editor.utils;
 import com.google.common.collect.Queues;
 import com.google.gson.annotations.SerializedName;
 import org.reflections.ReflectionUtils;
-import org.terasology.persistence.ModuleContext;
+import org.terasology.engine.module.ModuleContext;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.nui.UILayout;
 import org.terasology.nui.UIWidget;
