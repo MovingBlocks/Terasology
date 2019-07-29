@@ -296,6 +296,7 @@
     "remove-confirmation-popup-message": "Are you sure you want to delete it?",
     "remove-binding": "Remove",
     "remove-server": "Remove",
+    "rendering-settings": "Rendering Settings",
     "reset-default": "Reset",
     "re-roll": "Re-Roll",
     "reset-fov-amount": "Reset fov amount",
