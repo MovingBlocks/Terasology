@@ -76,6 +76,10 @@ public abstract class ModuleRendering extends BaseComponentSystem {
         worldRenderer = context.get(WorldRenderer.class);
     }
 
+    public Name getProvidingModule() {
+        return this.providingModule;
+    }
+
     public void initialise(Class clazz) {
         this.initialise(clazz, initializationPriority);
     }
@@ -89,17 +93,8 @@ public abstract class ModuleRendering extends BaseComponentSystem {
         return initializationPriority;
     }
 
-    public void setInitPriorit(int initPriority) {
+    public void setInitPriority(int initPriority) {
         initializationPriority = initPriority;
-    }
-
-    private List<ModuleRendering> calculateModuleOrder(ArrayList<ModuleRendering> activeRenderingModules) {
-        // Inplace sorted copy of activeRenderingModules
-        List<ModuleRendering> orderedRenderingModuleList = activeRenderingModules.stream()
-                .sorted(Comparator.comparing(ModuleRendering::getInitPriority)) // sort ascending by initializationPriority attribute
-                .collect(Collectors.toList()); //convert stream to List again
-
-        return orderedRenderingModuleList;
     }
 
     protected void setProvidingModule(Class implementingClass) {
