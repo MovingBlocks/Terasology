@@ -21,6 +21,33 @@ import org.terasology.reflection.TypeInfo;
 import java.util.List;
 
 public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
+    public static class Base<T> {
+        public T a;
+
+        @Override
+        public String toString() {
+            return "Base{" +
+                       "a=" + a +
+                       '}';
+        }
+    }
+
+    public static class Sub<T> extends Base<T> {
+        public T b;
+
+        public Sub(T b) {
+            this.b = b;
+        }
+
+        @Override
+        public String toString() {
+            return "Sub{" +
+                       "a=" + a +
+                       ", b=" + b +
+                       '}';
+        }
+    }
+
     @Override
     protected void addWidgets() {
         newBinding(Boolean.class);
@@ -39,6 +66,8 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
         newBinding(new TypeInfo<List<String>>() {});
         newBinding(new TypeInfo<ImmutableList<Integer>>() {});
         newBinding(Boolean[].class);
+
+        newBinding(new TypeInfo<Base<Boolean>>() {});
     }
 
     private enum TestEnum {

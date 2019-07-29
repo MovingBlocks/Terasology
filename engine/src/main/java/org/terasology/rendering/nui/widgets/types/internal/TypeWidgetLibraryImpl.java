@@ -17,6 +17,8 @@ package org.terasology.rendering.nui.widgets.types.internal;
 
 import com.google.common.collect.Maps;
 import org.terasology.context.Context;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.InstanceCreator;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
@@ -36,6 +38,7 @@ import org.terasology.rendering.nui.widgets.types.builtin.IntegerWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.LongWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.ShortWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.StringWidgetFactory;
+import org.terasology.rendering.nui.widgets.types.builtin.object.ObjectWidgetFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -58,6 +61,9 @@ public class TypeWidgetLibraryImpl implements TypeWidgetLibrary {
     }
 
     private void addFactoriesForBuiltinTypes() {
+        final ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
+        addTypeWidgetFactory(new ObjectWidgetFactory(environment));
+
         addTypeWidgetFactory(new BooleanWidgetFactory());
 
         addTypeWidgetFactory(new ByteWidgetFactory());
@@ -83,7 +89,7 @@ public class TypeWidgetLibraryImpl implements TypeWidgetLibrary {
 
     @Override
     public <T> Optional<UIWidget> getWidget(Binding<T> binding, TypeInfo<T> type) {
-        // TODO: Explore reversing typeHandlerFactories itself before building object
+        // Iterate in reverse order so that later added factories take priority
         for (int i = widgetFactories.size() - 1; i >= 0; i--) {
             TypeWidgetFactory typeWidgetFactory = widgetFactories.get(i);
             Optional<UIWidget> widget = typeWidgetFactory.create(binding, type, this);
