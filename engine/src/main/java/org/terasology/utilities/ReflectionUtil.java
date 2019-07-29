@@ -30,6 +30,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -544,6 +545,7 @@ public final class ReflectionUtil {
      * context type, if it has generic type parameters. If it has no generic type parameters,
      * the raw type itself is returned.
      */
+    // TODO: Rename
     public static Type parameterizeandResolveRawType(Type contextType, Class<?> rawType) {
         Type parameterizedType = parameterizeRawType(rawType);
         return resolveType(contextType, parameterizedType);
@@ -554,6 +556,74 @@ public final class ReflectionUtil {
                    .map(subtypeName -> (Class<? extends T>) ReflectionUtils.forName(subtypeName, classLoaders))
                    .filter(Objects::nonNull)
                    .collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns a {@link String} that describes the given {@link Executable}. All generic
+     * parameters and return types of the method are first resolved with respect to the
+     * {@code declaringType} before being converted to a {@link String}
+     *
+     * @param declaringType The {@link Type} declaring the given method.
+     * @param method        The {@link Executable} describing the given method.
+     * @param useSimpleName Whether to use simple names of types or not.
+     */
+    public static String resolvedMethodToString(Type declaringType,
+                                                Executable method,
+                                                boolean useSimpleName) {
+        try {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            TypeVariable[] typeParameters = method.getTypeParameters();
+            if (typeParameters.length > 0) {
+                boolean first = true;
+                stringBuilder.append('<');
+
+                for (TypeVariable parameter : typeParameters) {
+                    if (!first) {
+                        stringBuilder.append(',');
+                    }
+
+                    stringBuilder.append(parameter.toString());
+                    first = false;
+                }
+
+                stringBuilder.append("> ");
+            }
+
+            if (method instanceof Method) {
+                Type returnType = resolveType(declaringType, ((Method) method).getGenericReturnType());
+
+                stringBuilder.append(typeToString(returnType, useSimpleName))
+                    .append(' ');
+                stringBuilder.append(method.getName());
+            } else {
+                final Class<?> declaringClass = method.getDeclaringClass();
+                stringBuilder.append(typeToString(declaringClass, useSimpleName));
+            }
+
+            stringBuilder.append('(');
+            Type[] unresolvedParameterTypes = method.getGenericParameterTypes();
+
+            for (int i = 0; i < unresolvedParameterTypes.length; ++i) {
+                final Type parameterType = resolveType(declaringType, unresolvedParameterTypes[i]);
+                String parameterName = typeToString(parameterType, useSimpleName);
+
+                if (method.isVarArgs() && i == unresolvedParameterTypes.length - 1) {
+                    parameterName = parameterName.replaceFirst("\\[\\]$", "...");
+                }
+
+                stringBuilder.append(parameterName);
+                if (i < unresolvedParameterTypes.length - 1) {
+                    stringBuilder.append(',');
+                }
+            }
+
+            stringBuilder.append(')');
+
+            return stringBuilder.toString();
+        } catch (Exception var10) {
+            return "<" + var10 + ">";
+        }
     }
 
     public static String typeToString(Type type) {
