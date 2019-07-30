@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.IntegerRange;
 import org.terasology.math.geom.Quat4f;
@@ -147,8 +148,8 @@ public class TypeHandlerLibrary {
         this(new ReflectionsSandbox(reflections));
     }
 
-    public TypeHandlerLibrary(ModuleEnvironment moduleEnvironment) {
-        this(new ModuleEnvironmentSandbox(moduleEnvironment));
+    public TypeHandlerLibrary(ModuleManager moduleManager) {
+        this(new ModuleEnvironmentSandbox(moduleManager));
     }
 
     /**
@@ -171,8 +172,8 @@ public class TypeHandlerLibrary {
         return library;
     }
 
-    public static TypeHandlerLibrary forModuleEnvironment(ModuleEnvironment moduleEnvironment) {
-        TypeHandlerLibrary library = new TypeHandlerLibrary(moduleEnvironment);
+    public static TypeHandlerLibrary forModuleEnvironment(ModuleManager moduleManager) {
+        TypeHandlerLibrary library = new TypeHandlerLibrary(moduleManager);
 
         populateWithDefaultHandlers(library);
 

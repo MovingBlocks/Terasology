@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.reflections.Reflections;
 import org.terasology.context.internal.ContextImpl;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
@@ -73,9 +74,9 @@ public class EventSystemReplayImplTest {
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        ModuleEnvironment moduleEnvironment = mock(ModuleEnvironment.class);
+        ModuleManager moduleManager = mock(ModuleManager.class);
         RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore,
-                recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleEnvironment);
+                recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager);
         recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAYING);
         entity = entityManager.create();
         Long id = entity.getId();

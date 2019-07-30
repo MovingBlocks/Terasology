@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
@@ -32,17 +33,21 @@ import java.util.Optional;
 import static com.google.common.collect.Streams.stream;
 
 public class ModuleEnvironmentSandbox implements SerializationSandbox {
-    private final ModuleEnvironment moduleEnvironment;
+    private final ModuleManager moduleManager;
 
-    public ModuleEnvironmentSandbox(ModuleEnvironment moduleEnvironment) {
-        this.moduleEnvironment = moduleEnvironment;
+    public ModuleEnvironmentSandbox(ModuleManager moduleManager) {
+        this.moduleManager = moduleManager;
+    }
+
+    private ModuleEnvironment getModuleEnvironment() {
+        return moduleManager.getEnvironment();
     }
 
     @Override
     public <T> Optional<Class<? extends T>> findSubTypeOf(String subTypeIdentifier, Class<T> clazz) {
 
         Iterator<Class<? extends T>> possibilities =
-            moduleEnvironment
+            getModuleEnvironment()
                 .getSubtypesOf(clazz, subclass -> doesSubclassMatch(subclass, subTypeIdentifier))
                 .iterator();
 
@@ -69,7 +74,7 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
         SimpleUri subTypeUri = new SimpleUri(subTypeIdentifier);
         Name subTypeName = subTypeUri.isValid() ? subTypeUri.getObjectName() : new Name(subTypeIdentifier);
 
-        Name providingModule = moduleEnvironment.getModuleProviding(subclass);
+        Name providingModule = getModuleEnvironment().getModuleProviding(subclass);
 
 
         if (subTypeUri.isValid()) {
@@ -93,7 +98,7 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
     public <T> String getSubTypeIdentifier(Class<? extends T> subType, Class<T> baseType) {
         SimpleUri subTypeUri = getTypeSimpleUri(subType);
 
-        long subTypesWithSameUri = Streams.stream(moduleEnvironment.getSubtypesOf(baseType))
+        long subTypesWithSameUri = Streams.stream(getModuleEnvironment().getSubtypesOf(baseType))
                                        .map(this::getTypeSimpleUri)
                                        .filter(subTypeUri::equals)
                                        .count();
@@ -111,7 +116,7 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
 
     @Override
     public <T> boolean isValidTypeHandlerDeclaration(TypeInfo<T> type, TypeHandler<T> typeHandler) {
-        Name moduleDeclaringHandler = moduleEnvironment.getModuleProviding(typeHandler.getClass());
+        Name moduleDeclaringHandler = getModuleEnvironment().getModuleProviding(typeHandler.getClass());
 
         // If handler was declared outside of a module (engine or somewhere else), we allow it
         // TODO: Possibly find better way to refer to engine module
@@ -126,14 +131,14 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
             return false;
         }
 
-        Name moduleDeclaringType = moduleEnvironment.getModuleProviding(type.getRawType());
+        Name moduleDeclaringType = getModuleEnvironment().getModuleProviding(type.getRawType());
 
         // Both the type and the handler must come from the same module
         return Objects.equals(moduleDeclaringType, moduleDeclaringHandler);
     }
 
     private SimpleUri getTypeSimpleUri(Class<?> type) {
-        Name moduleProvidingType = moduleEnvironment.getModuleProviding(type);
+        Name moduleProvidingType = getModuleEnvironment().getModuleProviding(type);
         String typeSimpleName = type.getSimpleName();
 
         return new SimpleUri(moduleProvidingType, typeSimpleName);

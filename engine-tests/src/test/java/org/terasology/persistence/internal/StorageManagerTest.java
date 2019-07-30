@@ -28,6 +28,7 @@ import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -112,11 +113,15 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         blockManager = context.get(BlockManager.class);
         extraDataManager = context.get(ExtraBlockDataManager.class);
 
+        ModuleManager moduleManager = mock(ModuleManager.class);
+
+        when(moduleManager.getEnvironment()).thenReturn(moduleEnvironment);
+
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleEnvironment);
+        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager);
         recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
 

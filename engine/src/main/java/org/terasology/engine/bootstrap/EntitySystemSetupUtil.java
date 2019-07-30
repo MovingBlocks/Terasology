@@ -75,8 +75,8 @@ public final class EntitySystemSetupUtil {
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
 
-        ModuleEnvironment moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleEnvironment);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager);
         context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
@@ -106,7 +106,8 @@ public final class EntitySystemSetupUtil {
      * </ul>
      */
     public static void addEntityManagementRelatedClasses(Context context) {
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        ModuleEnvironment environment = moduleManager.getEnvironment();
         NetworkSystem networkSystem = context.get(NetworkSystem.class);
 
         // Entity Manager
@@ -133,7 +134,7 @@ public final class EntitySystemSetupUtil {
         CharacterStateEventPositionMap characterStateEventPositionMap = context.get(CharacterStateEventPositionMap.class);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = context.get(DirectionAndOriginPosRecorderList.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, environment);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager);
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
 

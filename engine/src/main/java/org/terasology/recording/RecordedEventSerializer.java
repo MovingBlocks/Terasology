@@ -17,6 +17,7 @@ package org.terasology.recording;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -44,8 +45,8 @@ class RecordedEventSerializer {
 
     private GsonSerializer gsonSerializer;
 
-    public RecordedEventSerializer(EntityManager entityManager, ModuleEnvironment moduleEnvironment) {
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleEnvironment);
+    public RecordedEventSerializer(EntityManager entityManager, ModuleManager moduleManager) {
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager);
         typeHandlerLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
 
         gsonSerializer = new GsonSerializer(typeHandlerLibrary);

@@ -23,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.math.geom.Vector3f;
@@ -55,12 +56,12 @@ public final class RecordAndReplaySerializer {
 
     public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store,
                                      RecordAndReplayUtils recordAndReplayUtils, CharacterStateEventPositionMap characterStateEventPositionMap,
-                                     DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList, ModuleEnvironment moduleEnvironment) {
+                                     DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList, ModuleManager moduleManager) {
         this.recordedEventStore = store;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.characterStateEventPositionMap = characterStateEventPositionMap;
         this.directionAndOriginPosRecorderList = directionAndOriginPosRecorderList;
-        this.recordedEventSerializer = new RecordedEventSerializer(manager, moduleEnvironment);
+        this.recordedEventSerializer = new RecordedEventSerializer(manager, moduleManager);
     }
 
     /**
