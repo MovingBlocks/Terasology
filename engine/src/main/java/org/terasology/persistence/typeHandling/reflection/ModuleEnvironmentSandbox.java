@@ -21,6 +21,7 @@ import com.google.common.collect.Streams;
 import org.terasology.engine.SimpleUri;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
+import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.reflection.TypeInfo;
 
@@ -77,7 +78,15 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
             }
         }
 
-        return subTypeName.toString().equals((subclass.getName())) || subTypeName.toString().equals((subclass.getSimpleName()));
+        boolean fullNameEquals = subTypeName.toString().equals((subclass.getName()));
+
+        if (fullNameEquals) {
+            return true;
+        }
+
+        // Assume that the requested subtype is in the context module
+        Name contextModule = ModuleContext.getContext() != null ? ModuleContext.getContext().getId() : null;
+        return Objects.equals(contextModule, providingModule) && subTypeName.toString().equals(subclass.getSimpleName());
     }
 
     @Override
