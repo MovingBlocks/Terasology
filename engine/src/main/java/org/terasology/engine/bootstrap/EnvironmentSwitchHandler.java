@@ -35,7 +35,9 @@ import org.terasology.entitySystem.prefab.internal.PrefabFormat;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.RegisterTypeHandler;
+import org.terasology.persistence.typeHandling.RegisterTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
@@ -187,6 +189,16 @@ public final class EnvironmentSwitchHandler {
                     library.addTypeHandler((Class) opt.get(), instance);
                 }
             }
+        }
+
+        for (Class<? extends TypeHandlerFactory> clazz : environment.getSubtypesOf(TypeHandlerFactory.class)) {
+            if (!clazz.isAnnotationPresent(RegisterTypeHandlerFactory.class)) {
+                continue;
+            }
+
+            TypeHandlerFactory instance = InjectionHelper.createWithConstructorInjection(clazz, context);
+            InjectionHelper.inject(instance, context);
+            library.addTypeHandlerFactory(instance);
         }
     }
 }
