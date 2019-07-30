@@ -74,24 +74,25 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
         SimpleUri subTypeUri = new SimpleUri(subTypeIdentifier);
         Name subTypeName = subTypeUri.isValid() ? subTypeUri.getObjectName() : new Name(subTypeIdentifier);
 
-        Name providingModule = getModuleEnvironment().getModuleProviding(subclass);
-
-
-        if (subTypeUri.isValid()) {
-            if (!subTypeUri.getModuleName().equals(providingModule)) {
-                return false;
-            }
-        }
-
+        // First check full name
         boolean fullNameEquals = subTypeName.toString().equals((subclass.getName()));
 
         if (fullNameEquals) {
             return true;
         }
 
-        // Assume that the requested subtype is in the context module
-        Name contextModule = ModuleContext.getContext() != null ? ModuleContext.getContext().getId() : null;
-        return Objects.equals(contextModule, providingModule) && subTypeName.toString().equals(subclass.getSimpleName());
+        // Now check through module and simple name
+        Name providingModule = getModuleEnvironment().getModuleProviding(subclass);
+        Name givenModuleName;
+
+        if (subTypeUri.isValid()) {
+            givenModuleName = subTypeUri.getModuleName();
+        } else {
+            // Assume that the requested subtype is in the context module
+            givenModuleName = ModuleContext.getContext() != null ? ModuleContext.getContext().getId() : null;
+        }
+
+        return Objects.equals(givenModuleName, providingModule) && subTypeName.toString().equals(subclass.getSimpleName());
     }
 
     @Override
