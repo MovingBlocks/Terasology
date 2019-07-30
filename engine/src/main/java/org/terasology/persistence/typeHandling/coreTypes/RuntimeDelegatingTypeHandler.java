@@ -64,7 +64,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     @Override
     public PersistedData serializeNonNull(T value, PersistedDataSerializer serializer) {
         // If primitive, don't go looking for the runtime type, serialize as is
-        if (typeInfo.getRawType().isPrimitive()) {
+        if (typeInfo.getRawType().isPrimitive() || Number.class.isAssignableFrom(typeInfo.getRawType())) {
             if (delegateHandler != null) {
                 return delegateHandler.serialize(value, serializer);
             }

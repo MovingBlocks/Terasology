@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.reflection;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -97,15 +96,15 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
 
     @Override
     public <T> String getSubTypeIdentifier(Class<? extends T> subType, Class<T> baseType) {
-        SimpleUri subTypeUri = getTypeSimpleUri(subType);
+        String subTypeUri = getTypeUri(subType);
 
         long subTypesWithSameUri = Streams.stream(getModuleEnvironment().getSubtypesOf(baseType))
-                                       .map(this::getTypeSimpleUri)
+                                       .map(this::getTypeUri)
                                        .filter(subTypeUri::equals)
                                        .count();
 
         Preconditions.checkArgument(subTypesWithSameUri > 0,
-            "Subtype was not found in the module environment");
+            "Subtype " + subType + " was not found in the module environment");
 
         if (subTypesWithSameUri > 1) {
             // More than one subType with same SimpleUri, use fully qualified name
@@ -138,10 +137,14 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
         return Objects.equals(moduleDeclaringType, moduleDeclaringHandler);
     }
 
-    private SimpleUri getTypeSimpleUri(Class<?> type) {
+    private String getTypeUri(Class<?> type) {
+        if (type.getClassLoader() == null) {
+            return type.getName();
+        }
+
         Name moduleProvidingType = getModuleEnvironment().getModuleProviding(type);
         String typeSimpleName = type.getSimpleName();
 
-        return new SimpleUri(moduleProvidingType, typeSimpleName);
+        return new SimpleUri(moduleProvidingType, typeSimpleName).toString();
     }
 }
