@@ -69,7 +69,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
                 return delegateHandler.serialize(value, serializer);
             }
 
-            LOGGER.error("Primitive {} does not have a TypeHandler", typeInfo.getRawType().getName());
+            LOGGER.error("Primitive '{}' does not have a TypeHandler", typeInfo);
             return serializer.serializeNull();
         }
 
@@ -102,12 +102,13 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         }
 
         if (chosenHandler == null) {
-            LOGGER.error("Could not find appropriate TypeHandler for runtime type {}", runtimeType);
-            return serializer.serializeNull();
+            LOGGER.warn("Could not find appropriate TypeHandler for runtime type '{}', " +
+                            "serializing as base type '{}'", runtimeType, typeInfo);
+            return serializeViaDelegate(value, serializer);
         }
 
         if (chosenHandler == delegateHandler) {
-            return delegateHandler.serialize(value, serializer);
+            return serializeViaDelegate(value, serializer);
         }
 
         Map<String, PersistedData> typeValuePersistedDataMap = Maps.newLinkedHashMap();
@@ -138,6 +139,15 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         return serializer.serialize(typeValuePersistedDataMap);
     }
 
+    private PersistedData serializeViaDelegate(T value, PersistedDataSerializer serializer) {
+        if (delegateHandler == null) {
+            LOGGER.error("Base type '{}' does not have a handler", typeInfo);
+            return serializer.serializeNull();
+        }
+
+        return delegateHandler.serialize(value, serializer);
+    }
+
     private Type getRuntimeTypeIfMoreSpecific(T value) {
         if (value == null) {
             return typeInfo.getType();
@@ -150,13 +160,13 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     @Override
     public Optional<T> deserialize(PersistedData data) {
         if (!data.isValueMap()) {
-            return delegateHandler.deserialize(data);
+            return deserializeViaDelegate(data);
         }
 
         PersistedDataMap valueMap = data.getAsValueMap();
 
         if (!valueMap.has(TYPE_FIELD)) {
-            return delegateHandler.deserialize(data);
+            return deserializeViaDelegate(data);
         }
 
         String runtimeTypeName = valueMap.getAsString(TYPE_FIELD);
@@ -164,17 +174,21 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         Optional<Type> typeToDeserializeAs = findSubtypeWithName(runtimeTypeName);
 
         if (!typeToDeserializeAs.isPresent()) {
-            LOGGER.error("Cannot find class to deserialize {}", runtimeTypeName);
-            return Optional.empty();
+            LOGGER.warn("Cannot find subtype '{}' to deserialize as, " +
+                            "deserializing as base type '{}'",
+                runtimeTypeName,
+                typeInfo
+            );
+            return deserializeViaDelegate(data);
         }
 
         TypeHandler<T> runtimeTypeHandler = (TypeHandler<T>) typeHandlerLibrary.getTypeHandler(typeToDeserializeAs.get())
                 // To avoid compile errors in the orElseGet
                 .map(typeHandler -> (TypeHandler) typeHandler)
                 .orElseGet(() -> {
-                    LOGGER.warn("Cannot find TypeHandler for runtime class {}, " +
-                                    "deserializing as base class {}",
-                            runtimeTypeName, typeInfo.getRawType().getName());
+                    LOGGER.warn("Cannot find TypeHandler for runtime type '{}', " +
+                                    "deserializing as base type '{}'",
+                            runtimeTypeName, typeInfo);
                     return delegateHandler;
                 });
 
@@ -204,6 +218,16 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
         return runtimeTypeHandler.deserialize(valueData);
 
+    }
+
+    private Optional<T> deserializeViaDelegate(PersistedData data) {
+        if (delegateHandler == null) {
+            LOGGER.error("Base type '{}' does not have a handler and no subtype information " +
+                             "was found in the serialized form {}", typeInfo, data);
+            return Optional.empty();
+        }
+
+        return delegateHandler.deserialize(data);
     }
 
     private Optional<Type> findSubtypeWithName(String runtimeTypeName) {
