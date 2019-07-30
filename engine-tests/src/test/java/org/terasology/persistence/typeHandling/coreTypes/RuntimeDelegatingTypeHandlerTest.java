@@ -199,7 +199,8 @@ public class RuntimeDelegatingTypeHandlerTest {
         verify(typeHandlerLibrary, never()).getTypeHandler(eq((Type) subType));
         verify(typeHandlerLibrary, never()).getTypeHandler(eq((Type) Integer.class));
 
-        verify(baseTypeHandler, never()).deserialize(any());
         verify(subTypeHandler, never()).deserialize(any());
+        // Serializes using base type handler
+        verify(baseTypeHandler).deserialize(any());
     }
 }

@@ -222,8 +222,11 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
     private Optional<T> deserializeViaDelegate(PersistedData data) {
         if (delegateHandler == null) {
-            LOGGER.error("Base type '{}' does not have a handler and no subtype information " +
-                             "was found in the serialized form {}", typeInfo, data);
+            LOGGER.error("Base type '{}' does not have a handler and no \"{}\" field " +
+                             "was found in the serialized form {}",
+                typeInfo,
+                TYPE_FIELD,
+                data);
             return Optional.empty();
         }
 
