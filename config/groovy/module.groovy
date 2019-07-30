@@ -1,9 +1,7 @@
 import groovy.json.JsonSlurper
 
 class module {
-
-    // TODO: Eventually add the Terasology org's site repo to the exclude list
-    def excludedItems = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay", "Index"]
+    def excludedItems = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay", "BiomesAPI", "Index", "terasology.github.io"]
 
     def getGithubDefaultHome(Properties properties) {
         return properties.alternativeGithubHome ?: "Terasology"
