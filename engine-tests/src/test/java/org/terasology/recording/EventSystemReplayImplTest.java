@@ -75,6 +75,7 @@ public class EventSystemReplayImplTest {
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         ModuleManager moduleManager = mock(ModuleManager.class);
+        when(moduleManager.getEnvironment()).thenReturn(mock(ModuleEnvironment.class));
         RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore,
                 recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager);
         recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAYING);

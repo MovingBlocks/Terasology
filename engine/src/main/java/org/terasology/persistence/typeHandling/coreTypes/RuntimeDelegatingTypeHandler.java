@@ -128,8 +128,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
             for (Map.Entry<String, PersistedData> entry : serialized.getAsValueMap().entrySet()) {
                 typeValuePersistedDataMap.put(entry.getKey(), entry.getValue());
             }
-        }
-        else {
+        } else {
             typeValuePersistedDataMap.put(
                 VALUE_FIELD,
                 serialized
