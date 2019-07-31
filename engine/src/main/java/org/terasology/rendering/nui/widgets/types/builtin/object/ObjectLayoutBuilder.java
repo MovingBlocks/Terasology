@@ -25,15 +25,14 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.NotifyingBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
-import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
@@ -51,7 +50,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class ObjectLayoutBuilder<T> {
@@ -171,49 +169,12 @@ class ObjectLayoutBuilder<T> {
         // TODO: Add assign to reference option
 
         // TODO: Translate
-        RowLayout nullLayout = createExpanderLayout(
+        RowLayout nullLayout = WidgetUtil.createExpanderLayout(
             "Object is null.", instantiatorLayout, this::populateInstantiatorLayout
         );
 
         mainLayout.addWidget(nullLayout);
         mainLayout.addWidget(instantiatorLayout);
-    }
-
-    private <L extends UILayout<?>>  RowLayout createExpanderLayout(String label,
-                                                                    L layoutToExpand,
-                                                                    Consumer<L> layoutExpander) {
-        RowLayout nullLayout = new RowLayout();
-
-        UIButton expandButton = createExpanderButton(layoutToExpand, layoutExpander);
-
-        nullLayout.addWidget(expandButton, new RowLayoutHint().setUseContentWidth(true));
-        nullLayout.addWidget(new UILabel(label), new RowLayoutHint());
-        return nullLayout;
-    }
-
-    private <L extends UILayout<?>> UIButton createExpanderButton(L layoutToExpand,
-                                                                  Consumer<L> layoutExpander) {
-        UIButton expandButton = new UIButton();
-
-        expandButton.setText("+");
-        expandButton.subscribe(widget -> {
-            UIButton button = (UIButton) widget;
-            if ("-".equals(button.getText())) {
-                layoutToExpand.removeAllWidgets();
-
-                button.setText("+");
-                // TODO: Translate
-                button.setTooltip("Expand");
-            } else {
-                layoutExpander.accept(layoutToExpand);
-
-                button.setText("-");
-                // TODO: Translate
-                button.setTooltip("Collapse");
-            }
-        });
-
-        return expandButton;
     }
 
     private void populateInstantiatorLayout(ColumnLayout instantiatorLayout) {
@@ -405,7 +366,8 @@ class ObjectLayoutBuilder<T> {
         setToNull.setText("Set to null");
         setToNull.subscribe(widget -> binding.set(null));
 
-        RowLayout fieldsExpanderLayout = createExpanderLayout(
+        RowLayout fieldsExpanderLayout = WidgetUtil.createExpanderLayout(
+            // TODO: Translate
             "Edit Object of type " + getTypeName(editingType),
             fieldsLayout,
             this::populateFieldsLayout
@@ -431,8 +393,9 @@ class ObjectLayoutBuilder<T> {
 
             ColumnLayout fieldLayout = createDefaultLayout();
 
-            RowLayout fieldExpanderLayout = createExpanderLayout(
-                "Edit field " + field.getName(),
+            RowLayout fieldExpanderLayout = WidgetUtil.createExpanderLayout(
+                // TODO: Translate
+                "Field '" + field.getName() + "'",
                 fieldLayout,
                 layout -> layout.addWidget(fieldWidget.get())
             );

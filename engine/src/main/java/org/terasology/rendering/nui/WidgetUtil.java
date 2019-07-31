@@ -18,9 +18,14 @@ package org.terasology.rendering.nui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.layouts.RowLayout;
+import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UICheckbox;
+import org.terasology.rendering.nui.widgets.UILabel;
+
+import java.util.function.Consumer;
 
 /**
  */
@@ -60,5 +65,42 @@ public final class WidgetUtil {
             checkbox.bindChecked(binding);
             checkbox.subscribe(listener);
         }
+    }
+
+    public static <L extends UILayout<?>> RowLayout createExpanderLayout(String label,
+                                                                         L layoutToExpand,
+                                                                         Consumer<L> layoutExpander) {
+        RowLayout rowLayout = new RowLayout();
+
+        UIButton expandButton = createExpanderButton(layoutToExpand, layoutExpander);
+
+        rowLayout.addWidget(expandButton, new RowLayoutHint().setUseContentWidth(true));
+        rowLayout.addWidget(new UILabel(label), new RowLayoutHint());
+        return rowLayout;
+    }
+
+    public static <L extends UILayout<?>> UIButton createExpanderButton(L layoutToExpand,
+                                                                        Consumer<L> layoutExpander) {
+        UIButton expandButton = new UIButton();
+
+        expandButton.setText("+");
+        expandButton.subscribe(widget -> {
+            UIButton button = (UIButton) widget;
+            if ("-".equals(button.getText())) {
+                layoutToExpand.removeAllWidgets();
+
+                button.setText("+");
+                // TODO: Translate
+                button.setTooltip("Expand");
+            } else {
+                layoutExpander.accept(layoutToExpand);
+
+                button.setText("-");
+                // TODO: Translate
+                button.setTooltip("Collapse");
+            }
+        });
+
+        return expandButton;
     }
 }

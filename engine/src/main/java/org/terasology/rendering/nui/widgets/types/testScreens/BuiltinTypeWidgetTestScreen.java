@@ -19,10 +19,62 @@ import com.google.common.collect.ImmutableList;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
+import java.util.Set;
 
 public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
+    @Override
+    protected void addWidgets() {
+        newBinding(Boolean.class);
+
+        newBinding(byte.class);
+        newBinding(short.class);
+        newBinding(int.class);
+        newBinding(long.class);
+        newBinding(float.class);
+        newBinding(double.class);
+
+        newBinding(String.class);
+
+        newBinding(TestEnum.class);
+
+        newBinding(new TypeInfo<Set<String>>() {});
+        newBinding(new TypeInfo<ImmutableList<Integer>>() {});
+        newBinding(Boolean[].class);
+
+        newBinding(new TypeInfo<Container>() {});
+        newBinding(new TypeInfo<List<Base<Integer>>>() {});
+    }
+
+    private enum TestEnum {
+        NO_DISPLAY(),
+        DISPLAY_NAME("With Display Name"),
+        TRANSLATED_DISPLAY_NAME("${engine:menu#warning}");
+
+
+        private String displayName;
+
+        TestEnum() {this(null);}
+
+        TestEnum(String displayName) {this.displayName = displayName;}
+
+
+        @Override
+        public String toString() {
+            return displayName != null ? displayName : super.toString();
+
+        }
+    }
+
     public static class Base<T> {
-        public T a;
+        protected T a;
+
+        public T getA() {
+            return a;
+        }
+
+        public void setA(T a) {
+            this.a = a;
+        }
 
         @Override
         public String toString() {
@@ -48,45 +100,18 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
         }
     }
 
-    @Override
-    protected void addWidgets() {
-        newBinding(Boolean.class);
+    public static class Container {
+        private Base<Boolean> base;
 
-        newBinding(byte.class);
-        newBinding(short.class);
-        newBinding(int.class);
-        newBinding(long.class);
-        newBinding(float.class);
-        newBinding(double.class);
-
-        newBinding(String.class);
-
-        newBinding(TestEnum.class);
-
-        newBinding(new TypeInfo<List<String>>() {});
-        newBinding(new TypeInfo<ImmutableList<Integer>>() {});
-        newBinding(Boolean[].class);
-
-        newBinding(new TypeInfo<Base<Boolean>>() {});
-    }
-
-    private enum TestEnum {
-        NO_DISPLAY(),
-        DISPLAY_NAME("With Display Name"),
-        TRANSLATED_DISPLAY_NAME("${engine:menu#warning}");
-
-
-        private String displayName;
-
-        TestEnum() {this(null);}
-
-        TestEnum(String displayName) {this.displayName = displayName;}
-
+        public Container(Base<Boolean> base) {
+            this.base = base;
+        }
 
         @Override
         public String toString() {
-            return displayName != null ? displayName : super.toString();
-
+            return "Container{" +
+                       "base=" + base +
+                       '}';
         }
     }
 }
