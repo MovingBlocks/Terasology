@@ -17,6 +17,9 @@ package org.terasology.rendering.nui.widgets.types.builtin.object;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleContext;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
@@ -39,7 +42,9 @@ import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -50,6 +55,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class ObjectLayoutBuilder<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectWidgetFactory.class);
+
     private final Binding<T> binding;
     private final TypeInfo<? extends T> type;
     private final TypeWidgetLibrary library;
@@ -161,21 +168,31 @@ class ObjectLayoutBuilder<T> {
     public void buildNullLayout() {
         ColumnLayout instantiatorLayout = createDefaultLayout();
 
-        RowLayout nullLayout = new RowLayout();
-
         // TODO: Add assign to reference option
 
-        UIButton expandButton = createExpanderButton(instantiatorLayout, this::populateInstantiatorLayout);
-
-        nullLayout.addWidget(expandButton, new RowLayoutHint().setUseContentWidth(true));
-        nullLayout.addWidget(new UILabel("Object is null."), new RowLayoutHint());
+        // TODO: Translate
+        RowLayout nullLayout = createExpanderLayout(
+            "Object is null.", instantiatorLayout, this::populateInstantiatorLayout
+        );
 
         mainLayout.addWidget(nullLayout);
         mainLayout.addWidget(instantiatorLayout);
     }
 
-    public <L extends UILayout<?>> UIButton createExpanderButton(L layoutToExpand,
-                                                                 Consumer<L> layoutExpander) {
+    private <L extends UILayout<?>>  RowLayout createExpanderLayout(String label,
+                                                                    L layoutToExpand,
+                                                                    Consumer<L> layoutExpander) {
+        RowLayout nullLayout = new RowLayout();
+
+        UIButton expandButton = createExpanderButton(layoutToExpand, layoutExpander);
+
+        nullLayout.addWidget(expandButton, new RowLayoutHint().setUseContentWidth(true));
+        nullLayout.addWidget(new UILabel(label), new RowLayoutHint());
+        return nullLayout;
+    }
+
+    private <L extends UILayout<?>> UIButton createExpanderButton(L layoutToExpand,
+                                                                  Consumer<L> layoutExpander) {
         UIButton expandButton = new UIButton();
 
         expandButton.setText("+");
@@ -204,7 +221,7 @@ class ObjectLayoutBuilder<T> {
             // TODO: Translate
             UIBox box = buildErrorWidget("No accessible subtypes found");
 
-            mainLayout.addWidget(box);
+            instantiatorLayout.addWidget(box);
 
             return;
         }
@@ -382,28 +399,139 @@ class ObjectLayoutBuilder<T> {
         }
 
         UIButton setToNull = new UIButton();
-        RowLayout fieldsExpanderLayout = new RowLayout();
         ColumnLayout fieldsLayout = createDefaultLayout();
-
-        mainLayout.addWidget(setToNull);
-        mainLayout.addWidget(fieldsExpanderLayout);
-        mainLayout.addWidget(fieldsLayout);
 
         // TODO: Translate
         setToNull.setText("Set to null");
         setToNull.subscribe(widget -> binding.set(null));
 
-        UIButton expandButton = createExpanderButton(fieldsLayout, this::populateFieldsLayout);
+        RowLayout fieldsExpanderLayout = createExpanderLayout(
+            "Edit Object of type " + getTypeName(editingType),
+            fieldsLayout,
+            this::populateFieldsLayout
+        );
 
-        fieldsExpanderLayout.addWidget(expandButton, new RowLayoutHint().setUseContentWidth(true));
-
-        // TODO: Translate
-        UILabel label = new UILabel("Edit Object of type " + getTypeName(editingType));
-
-        fieldsExpanderLayout.addWidget(label, new RowLayoutHint());
+        mainLayout.addWidget(setToNull);
+        mainLayout.addWidget(fieldsExpanderLayout);
+        mainLayout.addWidget(fieldsLayout);
     }
 
     private void populateFieldsLayout(ColumnLayout fieldsLayout) {
-        // TODO: Incomplete
+        for (Field field : ReflectionUtils.getAllFields(editingType.getRawType())) {
+            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+
+            Type resolvedFieldType = ReflectionUtil.resolveType(editingType.getType(), field.getGenericType());
+            Optional<UIWidget> fieldWidget = getFieldWidget(field, TypeInfo.of(resolvedFieldType));
+
+            if (!fieldWidget.isPresent()) {
+                continue;
+            }
+
+            ColumnLayout fieldLayout = createDefaultLayout();
+
+            RowLayout fieldExpanderLayout = createExpanderLayout(
+                "Edit field " + field.getName(),
+                fieldLayout,
+                layout -> layout.addWidget(fieldWidget.get())
+            );
+
+            fieldsLayout.addWidget(fieldExpanderLayout);
+            fieldsLayout.addWidget(fieldLayout);
+        }
     }
+
+    private <F> Optional<UIWidget> getFieldWidget(Field field, TypeInfo<F> fieldType) {
+        Optional<Binding<F>> fieldBinding = getFieldBinding(field, fieldType);
+
+        if (!fieldBinding.isPresent()) {
+            return Optional.empty();
+        }
+
+        Optional<UIWidget> widget = library.getWidget(fieldBinding.get(), fieldType);
+
+        if (!widget.isPresent()) {
+            LOGGER.warn("Could not create a UIWidget for field {}", field);
+            return Optional.empty();
+        }
+
+        return widget;
+    }
+
+    private <F> Optional<Binding<F>> getFieldBinding(Field field, TypeInfo<F> fieldType) {
+        if (Modifier.isPublic(field.getModifiers())) {
+            return Optional.of(
+                getAccessibleFieldBinding(field, fieldType)
+            );
+        }
+
+        return getPropertyBinding(field, fieldType);
+    }
+
+    private <F> Optional<Binding<F>> getPropertyBinding(Field field, TypeInfo<F> fieldType) {
+        Method setter = ReflectionUtil.findSetter(field);
+
+        if (setter == null) {
+            return Optional.empty();
+        }
+
+        Method getter = ReflectionUtil.findGetter(field);
+
+        if (getter == null) {
+            LOGGER.error("Cannot edit field {} with setter {} but no getter", field, setter);
+            return Optional.empty();
+        }
+
+        return Optional.of(
+            new Binding<F>() {
+                @Override
+                public F get() {
+                    try {
+                        return fieldType.getRawType().cast(getter.invoke(binding.get()));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException("Unreachable");
+                    } catch (InvocationTargetException e) {
+                        throw new RuntimeException(e.getCause());
+                    }
+                }
+
+                @Override
+                public void set(F value) {
+                    try {
+                        setter.invoke(binding.get(), value);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException("Unreachable");
+                    } catch (InvocationTargetException e) {
+                        throw new RuntimeException(e.getCause());
+                    }
+                }
+            }
+        );
+    }
+
+    private <F> Binding<F> getAccessibleFieldBinding(Field field, TypeInfo<F> fieldType) {
+        return new Binding<F>() {
+            @Override
+            public F get() {
+                try {
+                    return fieldType.getRawType().cast(field.get(binding.get()));
+                } catch (IllegalAccessException e) {
+                    // Field is public
+                    throw new RuntimeException("Unreachable");
+                }
+            }
+
+            @Override
+            public void set(F value) {
+                try {
+                    field.set(binding.get(), value);
+                } catch (IllegalAccessException e) {
+                    // Field is public
+                    throw new RuntimeException("Unreachable");
+                }
+            }
+        };
+    }
+
 }
