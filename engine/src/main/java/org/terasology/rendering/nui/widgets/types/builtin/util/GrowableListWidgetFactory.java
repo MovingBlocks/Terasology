@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
@@ -47,12 +48,18 @@ public abstract class GrowableListWidgetFactory<C, E> {
     public UIWidget create() {
         List<E> elementList = getBindingCopy();
 
+        ColumnLayout mainLayout = createDefaultLayout();
+
+        populateCollectionLayout(elementType, elementList, mainLayout);
+
+        return mainLayout;
+    }
+
+    private static ColumnLayout createDefaultLayout() {
         ColumnLayout mainLayout = new ColumnLayout();
 
         mainLayout.setFillVerticalSpace(false);
         mainLayout.setAutoSizeColumns(false);
-
-        populateCollectionLayout(elementType, elementList, mainLayout);
 
         return mainLayout;
     }
@@ -127,7 +134,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
 
         UIButton removeButton = new UIButton();
         // TODO: Translate
-        removeButton.setText("-");
+        removeButton.setText("Remove");
 
         removeButton.subscribe(widget -> {
             elementList.remove(elementIndex);
@@ -138,12 +145,26 @@ public abstract class GrowableListWidgetFactory<C, E> {
             populateCollectionLayout(elementType, elementList, collectionLayout);
         });
 
-        RowLayout elementLayout = new RowLayout();
+        ColumnLayout fullElementLayout = createDefaultLayout();
+        ColumnLayout elementLayout = createDefaultLayout();
 
-        elementLayout.addWidget(removeButton, new RowLayoutHint().setUseContentWidth(true));
-        elementLayout.addWidget(elementWidget.get(), new RowLayoutHint().setUseContentWidth(false));
+        RowLayout headerLayout = new RowLayout();
 
-        return Optional.of(elementLayout);
+        // TODO: Translate
+        RowLayout expanderLayout = WidgetUtil.createExpanderLayout(
+            "Element " + elementIndex,
+            elementLayout,
+            layout -> layout.addWidget(elementWidget.get())
+        );
+
+        headerLayout.addWidget(expanderLayout, new RowLayoutHint());
+        headerLayout.addWidget(removeButton, new RowLayoutHint().setUseContentWidth(true));
+
+
+        fullElementLayout.addWidget(headerLayout);
+        fullElementLayout.addWidget(elementLayout);
+
+        return Optional.of(fullElementLayout);
     }
 
     protected abstract void updateBindingWithElements(List<E> elementList);
