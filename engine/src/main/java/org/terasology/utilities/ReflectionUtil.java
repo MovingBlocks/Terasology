@@ -29,11 +29,13 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 
+import java.beans.Introspector;
 import java.lang.reflect.Array;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -161,12 +163,14 @@ public final class ReflectionUtil {
     }
 
     public static Method findGetter(String propertyName, Class<?> beanClass) {
-        Method result = findMethod(beanClass, "get" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
+        String propertyNameSuffix = propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1);
+
+        Method result = findMethod(beanClass, "get" + propertyNameSuffix);
         if (result != null) {
             result.setAccessible(true);
             return result;
         }
-        result = findMethod(beanClass, "is" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
+        result = findMethod(beanClass, "is" + propertyNameSuffix);
         if (result != null) {
             result.setAccessible(true);
             return result;
@@ -179,7 +183,9 @@ public final class ReflectionUtil {
     }
 
     public static Method findSetter(String propertyName, Class<?> beanClass, Class<?> propertyType) {
-        String setterName = "set" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1);
+        String propertyNameSuffix = propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1);
+
+        String setterName = "set" + propertyNameSuffix;
         Method result = findMethod(beanClass, setterName, propertyType);
         if (result != null) {
             result.setAccessible(true);

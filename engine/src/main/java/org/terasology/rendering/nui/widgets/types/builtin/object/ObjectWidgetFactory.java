@@ -15,8 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets.types.builtin.object;
 
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
@@ -26,11 +27,8 @@ import java.lang.reflect.Modifier;
 import java.util.Optional;
 
 public class ObjectWidgetFactory implements TypeWidgetFactory {
-    private final ModuleEnvironment environment;
-
-    public ObjectWidgetFactory(ModuleEnvironment environment) {
-        this.environment = environment;
-    }
+    @In
+    private ModuleManager moduleManager;
 
     @Override
     public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
@@ -42,7 +40,7 @@ public class ObjectWidgetFactory implements TypeWidgetFactory {
             return Optional.empty();
         }
 
-        ObjectLayoutBuilder<T> layoutBuilder = new ObjectLayoutBuilder<>(binding, type, library, environment);
+        ObjectLayoutBuilder<T> layoutBuilder = new ObjectLayoutBuilder<>(binding, type, library, moduleManager);
         layoutBuilder.build();
 
         return Optional.of(layoutBuilder.getLayout());

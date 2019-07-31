@@ -41,7 +41,6 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.Module;
 import org.terasology.math.JomlUtil;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.nui.AbstractWidget;
 import org.terasology.nui.ControlWidget;
@@ -71,9 +70,6 @@ import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactoryRegistry;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
-import org.terasology.rendering.nui.widgets.types.internal.ModuleTypeWidgetLibraryWrapper;
-import org.terasology.rendering.nui.widgets.types.internal.TypeWidgetFactoryRegistryWrapper;
-import org.terasology.rendering.nui.widgets.types.internal.TypeWidgetLibraryImpl;
 import org.terasology.utilities.Assets;
 
 import java.beans.PropertyChangeEvent;
@@ -89,6 +85,7 @@ import java.util.Set;
  */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, PropertyChangeListener {
     private final ModuleEnvironment moduleEnvironment;
+    private final TypeWidgetFactoryRegistry typeWidgetFactoryRegistry;
     private Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private HUDScreenLayer hudScreenLayer;
@@ -157,8 +154,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
 
         moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
-        typeWidgetLibrary = new TypeWidgetLibraryImpl(context);
-        context.put(TypeWidgetFactoryRegistry.class, new TypeWidgetFactoryRegistryWrapper(typeWidgetLibrary));
+        // TODO: Remove and use annotation?
+        typeWidgetFactoryRegistry = new TypeWidgetFactoryRegistry(context);
+        context.put(TypeWidgetFactoryRegistry.class, typeWidgetFactoryRegistry);
     }
 
     @Override
@@ -485,7 +483,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         InjectionHelper.inject(overlay, context);
 
         Module declaringModule = moduleEnvironment.get(screenUri.getModuleName());
-        TypeWidgetLibrary moduleLibrary = new ModuleTypeWidgetLibraryWrapper(typeWidgetLibrary, declaringModule);
+        TypeWidgetLibrary moduleLibrary =
+            new TypeWidgetLibrary(typeWidgetFactoryRegistry, declaringModule);
 
         InjectionHelper.inject(overlay, In.class, ImmutableMap.of(TypeWidgetLibrary.class, moduleLibrary));
 

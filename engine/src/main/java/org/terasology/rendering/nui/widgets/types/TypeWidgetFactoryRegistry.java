@@ -15,10 +15,31 @@
  */
 package org.terasology.rendering.nui.widgets.types;
 
+import org.terasology.context.Context;
+import org.terasology.registry.InjectionHelper;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Registers {@link TypeWidgetFactory} instances that can be used by a {@link TypeWidgetLibrary}
  * to generate widgets to edit objects of various types.
  */
-public interface TypeWidgetFactoryRegistry {
-    void addTypeWidgetFactory(TypeWidgetFactory factory);
+public class TypeWidgetFactoryRegistry {
+    private final Context context;
+    private final List<TypeWidgetFactory> factories = new ArrayList<>();
+
+    public TypeWidgetFactoryRegistry(Context context) {
+        this.context = context;
+    }
+
+    public void add(TypeWidgetFactory factory) {
+        InjectionHelper.inject(factory, context);
+        factories.add(factory);
+    }
+
+    public List<TypeWidgetFactory> getFactories() {
+        return Collections.unmodifiableList(factories);
+    }
 }
