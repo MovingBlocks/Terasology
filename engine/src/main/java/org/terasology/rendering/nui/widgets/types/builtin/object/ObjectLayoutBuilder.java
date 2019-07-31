@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.widgets.types.builtin.object;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import org.terasology.engine.module.ModuleContext;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.reflection.TypeInfo;
@@ -56,14 +57,14 @@ class ObjectLayoutBuilder<T> {
     private final ColumnLayout mainLayout;
 
     private final List<TypeInfo<? extends T>> allowedSubtypes;
-    private final ModuleEnvironment environment;
+    private final ModuleManager moduleManager;
 
     private TypeInfo<? extends T> editingType;
 
     public ObjectLayoutBuilder(Binding<T> binding,
                                TypeInfo<T> type,
                                TypeWidgetLibrary library,
-                               ModuleEnvironment moduleEnvironment) {
+                               ModuleManager moduleManager) {
         this.type = type;
         this.editingType = type;
         this.library = library;
@@ -75,11 +76,13 @@ class ObjectLayoutBuilder<T> {
             }
         };
 
-        this.environment = moduleEnvironment;
+        this.moduleManager = moduleManager;
 
         mainLayout = createDefaultLayout();
 
         final Name contextModule = ModuleContext.getContext().getId();
+
+        ModuleEnvironment environment = moduleManager.getEnvironment();
 
         final Set<Name> allowedProvidingModules =
             ImmutableSet.<Name>builder()
@@ -236,7 +239,7 @@ class ObjectLayoutBuilder<T> {
     }
 
     public String getTypeName(TypeInfo<? extends T> value) {
-        return ReflectionUtil.simpleUriOfType(value.getType(), environment).toString();
+        return ReflectionUtil.simpleUriOfType(value.getType(), moduleManager.getEnvironment()).toString();
     }
 
     private UIBox buildErrorWidget(String errorMessage) {
