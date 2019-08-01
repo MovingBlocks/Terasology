@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.widgets.types.testScreens;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
@@ -26,6 +27,7 @@ import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -112,19 +114,28 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
 
         bindings.put(type, binding);
 
-        RowLayout row = new RowLayout();
+        UIWidget bindingWidget = typeWidgetLibrary.getWidget(binding, type).get();
+        Optional<UILabel> labelWidget = bindingWidget.tryFind(TypeWidgetFactory.LABEL_WIDGET_ID, UILabel.class);
+        String bindingLabelText = typeInfoToString(type);
 
-        row.addWidget(
-            new UILabel(typeInfoToString(type)),
-            new RowLayoutHint().setRelativeWidth(0.5f)
-        );
+        if (labelWidget.isPresent()) {
+            labelWidget.get().setText(bindingLabelText);
+            mainContainer.addWidget(bindingWidget);
+        } else {
+            RowLayout row = new RowLayout();
 
-        row.addWidget(
-            typeWidgetLibrary.getWidget(binding, type).get(),
-            null
-        );
+            row.addWidget(
+                new UILabel(bindingLabelText),
+                new RowLayoutHint().setRelativeWidth(0.5f)
+            );
 
-        mainContainer.addWidget(row);
+            row.addWidget(
+                bindingWidget,
+                null
+            );
+
+            mainContainer.addWidget(row);
+        }
     }
 
     private <T> String typeInfoToString(TypeInfo<T> type) {

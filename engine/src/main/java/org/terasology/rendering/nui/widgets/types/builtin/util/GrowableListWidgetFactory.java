@@ -26,6 +26,7 @@ import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UISpace;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.utilities.ReflectionUtil;
@@ -48,6 +49,16 @@ public abstract class GrowableListWidgetFactory<C, E> {
         this.library = library;
     }
 
+    private static ColumnLayout createDefaultLayout() {
+        ColumnLayout mainLayout = new ColumnLayout();
+
+        mainLayout.setFillVerticalSpace(false);
+        mainLayout.setAutoSizeColumns(false);
+        mainLayout.setVerticalSpacing(5);
+
+        return mainLayout;
+    }
+
     public UIWidget create() {
         List<E> elementList = getBindingCopy();
 
@@ -60,16 +71,6 @@ public abstract class GrowableListWidgetFactory<C, E> {
             collectionLayout -> populateCollectionLayout(elementList, collectionLayout),
             GrowableListWidgetFactory::createDefaultLayout
         );
-    }
-
-    private static ColumnLayout createDefaultLayout() {
-        ColumnLayout mainLayout = new ColumnLayout();
-
-        mainLayout.setFillVerticalSpace(false);
-        mainLayout.setAutoSizeColumns(false);
-        mainLayout.setVerticalSpacing(5);
-
-        return mainLayout;
     }
 
     private void populateCollectionLayout(
@@ -94,16 +95,10 @@ public abstract class GrowableListWidgetFactory<C, E> {
         addElementButton.setText("Add Element");
         addElementButton.subscribe(widget -> {
             elementList.add(null);
+            updateBindingWithElements(elementList);
 
-            Optional<UIWidget> elementLayout = createElementLayout(
-                elementList, elementList.size() - 1, collectionLayout
-            );
-
-            if (!elementLayout.isPresent()) {
-                return;
-            }
-
-            collectionLayout.addWidget(elementLayout.get());
+            collectionLayout.removeAllWidgets();
+            populateCollectionLayout(elementList, collectionLayout);
         });
 
         collectionLayout.addWidget(addElementButton);
@@ -114,7 +109,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
         int elementIndex,
         ColumnLayout collectionLayout
     ) {
-        Optional<UIWidget> elementWidget = library.getWidget(
+        Optional<UIWidget> optionalElementWidget = library.getWidget(
             new Binding<E>() {
                 @Override
                 public E get() {
@@ -130,13 +125,15 @@ public abstract class GrowableListWidgetFactory<C, E> {
             elementType
         );
 
-        if (!elementWidget.isPresent()) {
+        if (!optionalElementWidget.isPresent()) {
             LOGGER.error(
                 "Could not get widget for element {} in collection",
                 elementList.get(elementIndex)
             );
             return Optional.empty();
         }
+
+        UIWidget elementWidget = optionalElementWidget.get();
 
         UIButton removeButton = new UIButton();
         // TODO: Translate
@@ -151,25 +148,36 @@ public abstract class GrowableListWidgetFactory<C, E> {
             populateCollectionLayout(elementList, collectionLayout);
         });
 
-        ColumnLayout fullElementLayout = createDefaultLayout();
-        ColumnLayout elementLayout = createDefaultLayout();
-
-        RowLayout headerLayout = new RowLayout();
-
         // TODO: Translate
-        RowLayout expanderLayout = WidgetUtil.createExpanderWidget(
-            new UILabel("Element " + elementIndex), elementLayout,
-            layout -> layout.addWidget(elementWidget.get())
-        );
+        String elementLabelText = "Element " + elementIndex;
 
-        headerLayout.addWidget(expanderLayout, new RowLayoutHint());
-        headerLayout.addWidget(removeButton, new RowLayoutHint().setUseContentWidth(true));
+        RowLayout elementLayout = new RowLayout();
 
+        ColumnLayout removeButtonLayout = new ColumnLayout();
 
-        fullElementLayout.addWidget(headerLayout);
-        fullElementLayout.addWidget(elementLayout);
+        removeButtonLayout.addWidget(removeButton);
+        removeButtonLayout.addWidget(new UISpace());
 
-        return Optional.of(fullElementLayout);
+        removeButtonLayout.setExtendLast(true);
+        removeButtonLayout.setAutoSizeColumns(true);
+
+        elementLayout.addWidget(removeButtonLayout, new RowLayoutHint().setUseContentWidth(true));
+
+        Optional<UILabel> labelWidget = elementWidget.tryFind(TypeWidgetFactory.LABEL_WIDGET_ID, UILabel.class);
+
+        if (labelWidget.isPresent()) {
+            labelWidget.get().setText(elementLabelText);
+            elementLayout.addWidget(elementWidget, new RowLayoutHint());
+        } else {
+            RowLayout expanderLayout = new RowLayout();
+
+            expanderLayout.addWidget(new UILabel(elementLabelText), new RowLayoutHint().setUseContentWidth(true));
+            expanderLayout.addWidget(elementWidget, new RowLayoutHint());
+
+            elementLayout.addWidget(expanderLayout, new RowLayoutHint());
+        }
+
+        return Optional.of(elementLayout);
     }
 
     protected abstract void updateBindingWithElements(List<E> elementList);
