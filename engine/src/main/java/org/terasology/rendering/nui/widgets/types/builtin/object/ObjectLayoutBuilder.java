@@ -32,8 +32,6 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.NotifyingBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
-import org.terasology.rendering.nui.layouts.RowLayout;
-import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
@@ -47,12 +45,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
 
 class ObjectLayoutBuilder<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObjectWidgetFactory.class);
@@ -65,7 +66,7 @@ class ObjectLayoutBuilder<T> {
 
     private final List<TypeInfo<? extends T>> allowedSubtypes;
     private final ModuleManager moduleManager;
-
+    private final UILabel nameWidget = new UILabel(LABEL_WIDGET_ID, "");
     private TypeInfo<? extends T> editingType;
 
     public ObjectLayoutBuilder(Binding<T> binding,
@@ -171,9 +172,11 @@ class ObjectLayoutBuilder<T> {
         // TODO: Add assign to reference option
 
         // TODO: Translate
-        UILabel nameWidget = new UILabel(TypeWidgetFactory.LABEL_WIDGET_ID, "Object is null.");
+        if ("".equals(nameWidget.getText())) {
+            nameWidget.setText("Object is null.");
+        }
 
-        ColumnLayout instantiatorLayout =  WidgetUtil.createExpandableLayout(
+        ColumnLayout instantiatorLayout = WidgetUtil.createExpandableLayout(
             nameWidget,
             ObjectLayoutBuilder::createDefaultLayout,
             this::populateInstantiatorLayout,
@@ -301,36 +304,55 @@ class ObjectLayoutBuilder<T> {
                                                Binding<Constructor<T>> selectedConstructor) {
         parameterLayout.removeAllWidgets();
 
-        Type[] parameterTypes = selectedConstructor.get().getGenericParameterTypes();
+        Parameter[] parameters = selectedConstructor.get().getParameters();
 
-        String labelText;
-        if (parameterTypes.length == 0) {
+        List<TypeInfo<?>> parameterTypes =
+            Arrays.stream(parameters)
+                .map(Parameter::getParameterizedType)
+                .map(parameterType -> ReflectionUtil.resolveType(selectedType.get().getType(), parameterType))
+                .map(TypeInfo::of)
+                .collect(Collectors.toList());
+
+        if (parameterTypes.isEmpty()) {
             // TODO: Translate
-            labelText = "Constructor has no parameters";
-        } else {
-            // TODO: Translate
-            labelText = "Set Constructor Parameters:";
+            parameterLayout.addWidget(new UILabel("Constructor has no parameters"));
+            return;
         }
 
-        parameterLayout.addWidget(new UILabel(labelText));
-
         List<Binding<?>> argumentBindings =
-            Arrays.stream(parameterTypes)
-                .map(parameterType -> {
-                    Type resolvedParameterType =
-                        ReflectionUtil.resolveType(selectedType.get().getType(), parameterType);
-
-                    DefaultBinding<?> parameterBinding = new DefaultBinding<>();
-
-                    Optional<UIWidget> widget =
-                        library.getWidget((Binding) parameterBinding, TypeInfo.of(resolvedParameterType));
-
-                    // TODO: Handle Optional.empty
-                    parameterLayout.addWidget(widget.get());
-
-                    return parameterBinding;
-                })
+            parameterTypes.stream()
+                .map(parameterType -> new DefaultBinding<>())
                 .collect(Collectors.toList());
+
+        ColumnLayout parametersExpandableLayout = WidgetUtil.createExpandableLayout(
+            // TODO: Translate
+            "Constructor Parameters",
+            ObjectLayoutBuilder::createDefaultLayout,
+            layout -> {
+                for (int i = 0; i < parameterTypes.size(); i++) {
+                    TypeInfo<?> parameterType = parameterTypes.get(i);
+                    Binding<?> argumentBinding = argumentBindings.get(i);
+                    Parameter parameter = parameters[i];
+
+                    Optional<UIWidget> optionalWidget =
+                        library.getWidget((Binding) argumentBinding, parameterType);
+
+                    if (!optionalWidget.isPresent()) {
+                        LOGGER.warn("Could not create widget for parameter {} of constructor {}",
+                            parameter, selectedConstructor.get());
+                        continue;
+                    }
+
+                    UIWidget widget = optionalWidget.get();
+                    String parameterLabelText = ReflectionUtil.typeToString(parameterType.getType(), true);
+
+                    layout.addWidget(WidgetUtil.labelize(widget, parameterLabelText, LABEL_WIDGET_ID));
+                }
+            },
+            ObjectLayoutBuilder::createDefaultLayout
+        );
+
+        parameterLayout.addWidget(parametersExpandableLayout);
 
         createInstanceButton.subscribe(widget -> {
             Object[] arguments = argumentBindings.stream()
@@ -366,7 +388,9 @@ class ObjectLayoutBuilder<T> {
         }
 
         // TODO: Translate
-        UILabel nameWidget = new UILabel(TypeWidgetFactory.LABEL_WIDGET_ID, "Edit Object of type " + getTypeName(editingType));
+        if ("".equals(nameWidget.getText())) {
+            nameWidget.setText("Edit Object of type " + getTypeName(editingType));
+        }
 
         ColumnLayout expandableFieldsLayout = WidgetUtil.createExpandableLayout(
             nameWidget,
@@ -403,20 +427,7 @@ class ObjectLayoutBuilder<T> {
             // TODO: Translate
             String fieldLabel = "Field '" + field.getName() + "'";
 
-            Optional<UILabel> fieldLabelWidget = fieldWidget.tryFind(TypeWidgetFactory.LABEL_WIDGET_ID, UILabel.class);
-
-            if (fieldLabelWidget.isPresent()) {
-                fieldLabelWidget.get().setText(fieldLabel);
-
-                fieldsLayout.addWidget(fieldWidget);
-            } else {
-                RowLayout fieldLayout = new RowLayout();
-
-                fieldLayout.addWidget(new UILabel(fieldLabel), new RowLayoutHint().setUseContentWidth(true));
-                fieldLayout.addWidget(fieldWidget, new RowLayoutHint());
-
-                fieldsLayout.addWidget(fieldLayout);
-            }
+            fieldsLayout.addWidget(WidgetUtil.labelize(fieldWidget, fieldLabel, LABEL_WIDGET_ID));
         }
     }
 

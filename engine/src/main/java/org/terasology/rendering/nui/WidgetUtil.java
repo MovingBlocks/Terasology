@@ -28,6 +28,7 @@ import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISpace;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -162,5 +163,23 @@ public final class WidgetUtil {
         });
 
         return expandButton;
+    }
+
+    public static UIWidget labelize(UIWidget widget, String labelText, String labelWidgetId) {
+        Optional<UILabel> labelWidget = widget.tryFind(labelWidgetId, UILabel.class);
+
+        if (labelWidget.isPresent()) {
+            labelWidget.get().setText(labelText);
+
+            return widget;
+        } else {
+            RowLayout fieldLayout = new RowLayout();
+            fieldLayout.setHorizontalSpacing(5);
+
+            fieldLayout.addWidget(new UILabel(labelText), new RowLayoutHint().setUseContentWidth(true));
+            fieldLayout.addWidget(widget, new RowLayoutHint());
+
+            return fieldLayout;
+        }
     }
 }
