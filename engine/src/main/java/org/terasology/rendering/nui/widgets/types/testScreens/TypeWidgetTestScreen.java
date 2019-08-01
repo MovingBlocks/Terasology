@@ -27,6 +27,7 @@ import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.utilities.ReflectionUtil;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -74,7 +75,7 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
                                   binding ->
                                       MessageFormat.format(
                                           "{0} binding has a value {1} of type {2}",
-                                          binding.getKey().getRawType().getSimpleName(),
+                                          typeInfoToString(binding.getKey()),
                                           toString(binding.getValue().get()),
                                           Objects.toString(
                                               Optional.ofNullable(binding.getValue().get())
@@ -114,8 +115,8 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
         RowLayout row = new RowLayout();
 
         row.addWidget(
-            new UILabel(type.getRawType().getSimpleName()),
-            new RowLayoutHint().setRelativeWidth(0.35f)
+            new UILabel(typeInfoToString(type)),
+            new RowLayoutHint().setRelativeWidth(0.5f)
         );
 
         row.addWidget(
@@ -124,6 +125,10 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
         );
 
         mainContainer.addWidget(row);
+    }
+
+    private <T> String typeInfoToString(TypeInfo<T> type) {
+        return ReflectionUtil.typeToString(type.getType(), true);
     }
 
 }
