@@ -19,6 +19,7 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
@@ -115,27 +116,9 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
         bindings.put(type, binding);
 
         UIWidget bindingWidget = typeWidgetLibrary.getWidget(binding, type).get();
-        Optional<UILabel> labelWidget = bindingWidget.tryFind(TypeWidgetFactory.LABEL_WIDGET_ID, UILabel.class);
         String bindingLabelText = typeInfoToString(type);
 
-        if (labelWidget.isPresent()) {
-            labelWidget.get().setText(bindingLabelText);
-            mainContainer.addWidget(bindingWidget);
-        } else {
-            RowLayout row = new RowLayout();
-
-            row.addWidget(
-                new UILabel(bindingLabelText),
-                new RowLayoutHint().setRelativeWidth(0.5f)
-            );
-
-            row.addWidget(
-                bindingWidget,
-                null
-            );
-
-            mainContainer.addWidget(row);
-        }
+        mainContainer.addWidget(WidgetUtil.labelize(bindingWidget, bindingLabelText, TypeWidgetFactory.LABEL_WIDGET_ID));
     }
 
     private <T> String typeInfoToString(TypeInfo<T> type) {

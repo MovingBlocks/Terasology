@@ -95,7 +95,8 @@ public abstract class GrowableListWidgetFactory<C, E> {
         addElementButton.setText("Add Element");
         addElementButton.subscribe(widget -> {
             elementList.add(null);
-            updateBindingWithElements(elementList);
+            // We won't update the binding just yet since we want an actual value, not null
+            // Some collections like guava's ImmutableCollection don't even allow null elements
 
             collectionLayout.removeAllWidgets();
             populateCollectionLayout(elementList, collectionLayout);
@@ -152,10 +153,13 @@ public abstract class GrowableListWidgetFactory<C, E> {
         String elementLabelText = "Element " + elementIndex;
 
         RowLayout elementLayout = new RowLayout();
+        elementLayout.setHorizontalSpacing(5);
 
         ColumnLayout removeButtonLayout = new ColumnLayout();
 
         removeButtonLayout.addWidget(removeButton);
+
+        // Add space to ensure that button does not stretch vertically
         removeButtonLayout.addWidget(new UISpace());
 
         removeButtonLayout.setExtendLast(true);
@@ -163,19 +167,10 @@ public abstract class GrowableListWidgetFactory<C, E> {
 
         elementLayout.addWidget(removeButtonLayout, new RowLayoutHint().setUseContentWidth(true));
 
-        Optional<UILabel> labelWidget = elementWidget.tryFind(TypeWidgetFactory.LABEL_WIDGET_ID, UILabel.class);
-
-        if (labelWidget.isPresent()) {
-            labelWidget.get().setText(elementLabelText);
-            elementLayout.addWidget(elementWidget, new RowLayoutHint());
-        } else {
-            RowLayout expanderLayout = new RowLayout();
-
-            expanderLayout.addWidget(new UILabel(elementLabelText), new RowLayoutHint().setUseContentWidth(true));
-            expanderLayout.addWidget(elementWidget, new RowLayoutHint());
-
-            elementLayout.addWidget(expanderLayout, new RowLayoutHint());
-        }
+        elementLayout.addWidget(
+            WidgetUtil.labelize(elementWidget, elementLabelText, TypeWidgetFactory.LABEL_WIDGET_ID),
+            new RowLayoutHint()
+        );
 
         return Optional.of(elementLayout);
     }

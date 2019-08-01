@@ -36,7 +36,7 @@ public interface TypeWidgetFactory {
      * having to create a separate widget. If a widget with this ID is missing, it means that the
      * generated widget is simple (like a checkbox or a textbox) and does not have space to label itself.
      */
-    String LABEL_WIDGET_ID = "name";
+    String LABEL_WIDGET_ID = "objectLabelWidget";
 
     /**
      * Creates a {@link UIWidget} bound to an object of the given type. The created widget can
