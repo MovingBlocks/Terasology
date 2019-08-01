@@ -2,19 +2,24 @@
     "type": "BuiltinTypeWidgetTestScreen",
     "skin": "engine:mainMenu",
     "contents": {
-        "type": "ScrollableArea",
-        "content": {
-            "type": "UIBox",
-            "content": {
-                "type": "ColumnLayout",
-                "id": "mainContainer",
-                "fillVerticalSpace": false,
-                "layoutInfo": {
-                    "use-content-height": true,
-                    "position-horizontal-center": {}
+        "type": "RelativeLayout",
+        "contents": [
+            {
+                "type": "ScrollableArea",
+                "content": {
+                    "type": "UIBox",
+                    "content": {
+                        "type": "ColumnLayout",
+                        "id": "mainContainer",
+                        "fillVerticalSpace": false,
+                        "contents": []
+                    }
                 },
-                "contents": []
+                "layoutInfo": {
+                    "width": 600,
+                    "position-horizontal-center": {}
+                }
             }
-        }
+        ]
     }
 }

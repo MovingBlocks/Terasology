@@ -17,6 +17,7 @@ package org.terasology.rendering.nui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
@@ -25,6 +26,7 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UISpace;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -33,6 +35,7 @@ import java.util.function.Supplier;
  *
  */
 public final class WidgetUtil {
+    public static final int INDENT_SIZE = 50;
 
     private static final Logger logger = LoggerFactory.getLogger(WidgetUtil.class);
 
@@ -71,6 +74,15 @@ public final class WidgetUtil {
         }
     }
 
+    public static UIWidget indent(UIWidget widget) {
+        RowLayout layout = new RowLayout();
+
+        layout.addWidget(new UISpace(new Vector2i(INDENT_SIZE, 0)), new RowLayoutHint().setUseContentWidth(true));
+        layout.addWidget(widget, new RowLayoutHint());
+
+        return layout;
+    }
+
     public static <L extends UILayout<?>> ColumnLayout createExpandableLayout(
         String label,
         Supplier<L> layoutSupplier,
@@ -100,7 +112,7 @@ public final class WidgetUtil {
         ColumnLayout columnLayout = columnLayoutSupplier.get();
 
         columnLayout.addWidget(expanderLayout);
-        columnLayout.addWidget(layoutToExpand);
+        columnLayout.addWidget(indent(layoutToExpand));
 
         return columnLayout;
     }

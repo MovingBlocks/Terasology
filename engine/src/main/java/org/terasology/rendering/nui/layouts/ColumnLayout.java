@@ -389,6 +389,10 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         };
     }
 
+    public void setExtendLast(boolean extendLast) {
+        this.extendLast = extendLast;
+    }
+
     private static class RowInfo {
         private int height;
         private List<Vector2i> widgetSizes = Lists.newArrayList();
