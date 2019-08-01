@@ -19,8 +19,10 @@ package org.terasology.math;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
 import org.lwjgl.BufferUtils;
+import org.terasology.math.geom.BaseMatrix4f;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -323,5 +325,11 @@ public final class MatrixUtils {
         result.invert();
         result.transpose();
         return result;
+    }
+
+    public static Quat4f extractRotation(BaseMatrix4f m) {
+        float w = (float) (Math.sqrt(1 + m.getM00() + m.getM11() + m.getM22()) / 2.0f);
+        float denom = 4 * w;
+        return new Quat4f((m.getM21() - m.getM12()) / denom, (m.getM02() - m.getM20()) / denom, (m.getM10() - m.getM01()) / denom, w);
     }
 }
