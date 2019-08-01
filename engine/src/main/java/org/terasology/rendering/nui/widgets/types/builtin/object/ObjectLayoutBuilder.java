@@ -32,11 +32,11 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.NotifyingBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
-import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -141,12 +141,13 @@ class ObjectLayoutBuilder<T> {
     }
 
     private static ColumnLayout createDefaultLayout() {
-        ColumnLayout constructorLayout = new ColumnLayout();
+        ColumnLayout layout = new ColumnLayout();
 
-        constructorLayout.setFillVerticalSpace(false);
-        constructorLayout.setAutoSizeColumns(false);
+        layout.setFillVerticalSpace(false);
+        layout.setAutoSizeColumns(false);
+        layout.setVerticalSpacing(5);
 
-        return constructorLayout;
+        return layout;
     }
 
     public UIWidget getLayout() {
@@ -164,16 +165,19 @@ class ObjectLayoutBuilder<T> {
     }
 
     public void buildNullLayout() {
-        ColumnLayout instantiatorLayout = createDefaultLayout();
 
         // TODO: Add assign to reference option
 
         // TODO: Translate
-        RowLayout nullLayout = WidgetUtil.createExpanderLayout(
-            "Object is null.", instantiatorLayout, this::populateInstantiatorLayout
+        UILabel nameWidget = new UILabel(TypeWidgetFactory.LABEL_WIDGET_ID, "Object is null.");
+
+        ColumnLayout instantiatorLayout =  WidgetUtil.createExpandableLayout(
+            nameWidget,
+            ObjectLayoutBuilder::createDefaultLayout,
+            this::populateInstantiatorLayout,
+            ObjectLayoutBuilder::createDefaultLayout
         );
 
-        mainLayout.addWidget(nullLayout);
         mainLayout.addWidget(instantiatorLayout);
     }
 
@@ -360,21 +364,22 @@ class ObjectLayoutBuilder<T> {
         }
 
         UIButton setToNull = new UIButton();
-        ColumnLayout fieldsLayout = createDefaultLayout();
 
         // TODO: Translate
         setToNull.setText("Set to null");
         setToNull.subscribe(widget -> binding.set(null));
 
-        RowLayout fieldsExpanderLayout = WidgetUtil.createExpanderLayout(
-            // TODO: Translate
-            "Edit Object of type " + getTypeName(editingType),
-            fieldsLayout,
-            this::populateFieldsLayout
+        // TODO: Translate
+        UILabel nameWidget = new UILabel(TypeWidgetFactory.LABEL_WIDGET_ID, "Edit Object of type " + getTypeName(editingType));
+
+        ColumnLayout fieldsLayout = WidgetUtil.createExpandableLayout(
+            nameWidget,
+            ObjectLayoutBuilder::createDefaultLayout,
+            this::populateFieldsLayout,
+            ObjectLayoutBuilder::createDefaultLayout
         );
 
         mainLayout.addWidget(setToNull);
-        mainLayout.addWidget(fieldsExpanderLayout);
         mainLayout.addWidget(fieldsLayout);
     }
 
@@ -385,23 +390,31 @@ class ObjectLayoutBuilder<T> {
             }
 
             Type resolvedFieldType = ReflectionUtil.resolveType(editingType.getType(), field.getGenericType());
-            Optional<UIWidget> fieldWidget = getFieldWidget(field, TypeInfo.of(resolvedFieldType));
+            Optional<UIWidget> optionalFieldWidget = getFieldWidget(field, TypeInfo.of(resolvedFieldType));
 
-            if (!fieldWidget.isPresent()) {
+            if (!optionalFieldWidget.isPresent()) {
                 continue;
             }
 
-            ColumnLayout fieldLayout = createDefaultLayout();
+            UIWidget fieldWidget = optionalFieldWidget.get();
+            String fieldLabel = "Field '" + field.getName() + "'";
 
-            RowLayout fieldExpanderLayout = WidgetUtil.createExpanderLayout(
-                // TODO: Translate
-                "Field '" + field.getName() + "'",
-                fieldLayout,
-                layout -> layout.addWidget(fieldWidget.get())
-            );
+            Optional<UILabel> fieldLabelWidget = fieldWidget.tryFind(TypeWidgetFactory.LABEL_WIDGET_ID, UILabel.class);
 
-            fieldsLayout.addWidget(fieldExpanderLayout);
-            fieldsLayout.addWidget(fieldLayout);
+            if (fieldLabelWidget.isPresent()) {
+                fieldLabelWidget.get().setText(fieldLabel);
+
+                fieldsLayout.addWidget(fieldWidget);
+            } else {
+                ColumnLayout fieldLayout = WidgetUtil.createExpandableLayout(
+                    // TODO: Translate
+                    new UILabel(fieldLabel), ObjectLayoutBuilder::createDefaultLayout,
+                    layout -> layout.addWidget(fieldWidget),
+                    ObjectLayoutBuilder::createDefaultLayout
+                );
+
+                fieldsLayout.addWidget(fieldLayout);
+            }
         }
     }
 

@@ -25,7 +25,10 @@ import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.utilities.ReflectionUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,11 +51,15 @@ public abstract class GrowableListWidgetFactory<C, E> {
     public UIWidget create() {
         List<E> elementList = getBindingCopy();
 
-        ColumnLayout mainLayout = createDefaultLayout();
+        String labelText = "Edit " + ReflectionUtil.typeToString(type.getType(), true);
+        UILabel labelWidget = new UILabel(TypeWidgetFactory.LABEL_WIDGET_ID, labelText);
 
-        populateCollectionLayout(elementType, elementList, mainLayout);
-
-        return mainLayout;
+        return WidgetUtil.createExpandableLayout(
+            labelWidget,
+            GrowableListWidgetFactory::createDefaultLayout,
+            collectionLayout -> populateCollectionLayout(elementList, collectionLayout),
+            GrowableListWidgetFactory::createDefaultLayout
+        );
     }
 
     private static ColumnLayout createDefaultLayout() {
@@ -60,15 +67,27 @@ public abstract class GrowableListWidgetFactory<C, E> {
 
         mainLayout.setFillVerticalSpace(false);
         mainLayout.setAutoSizeColumns(false);
+        mainLayout.setVerticalSpacing(5);
 
         return mainLayout;
     }
 
     private void populateCollectionLayout(
-        TypeInfo<E> elementType,
         List<E> elementList,
         ColumnLayout collectionLayout
     ) {
+        for (int i = 0; i < elementList.size(); i++) {
+            Optional<UIWidget> elementLayout = createElementLayout(
+                elementList, i, collectionLayout
+            );
+
+            if (!elementLayout.isPresent()) {
+                continue;
+            }
+
+            collectionLayout.addWidget(elementLayout.get());
+        }
+
         UIButton addElementButton = new UIButton();
 
         // TODO: Translate
@@ -77,7 +96,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
             elementList.add(null);
 
             Optional<UIWidget> elementLayout = createElementLayout(
-                elementType, elementList, elementList.size() - 1, collectionLayout
+                elementList, elementList.size() - 1, collectionLayout
             );
 
             if (!elementLayout.isPresent()) {
@@ -88,22 +107,9 @@ public abstract class GrowableListWidgetFactory<C, E> {
         });
 
         collectionLayout.addWidget(addElementButton);
-
-        for (int i = 0; i < elementList.size(); i++) {
-            Optional<UIWidget> elementLayout = createElementLayout(
-                elementType, elementList, i, collectionLayout
-            );
-
-            if (!elementLayout.isPresent()) {
-                continue;
-            }
-
-            collectionLayout.addWidget(elementLayout.get());
-        }
     }
 
     private Optional<UIWidget> createElementLayout(
-        TypeInfo<E> elementType,
         List<E> elementList,
         int elementIndex,
         ColumnLayout collectionLayout
@@ -142,7 +148,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
 
             // Re-add all the widgets because element indices may have to be regenerated
             collectionLayout.removeAllWidgets();
-            populateCollectionLayout(elementType, elementList, collectionLayout);
+            populateCollectionLayout(elementList, collectionLayout);
         });
 
         ColumnLayout fullElementLayout = createDefaultLayout();
@@ -151,9 +157,8 @@ public abstract class GrowableListWidgetFactory<C, E> {
         RowLayout headerLayout = new RowLayout();
 
         // TODO: Translate
-        RowLayout expanderLayout = WidgetUtil.createExpanderLayout(
-            "Element " + elementIndex,
-            elementLayout,
+        RowLayout expanderLayout = WidgetUtil.createExpanderWidget(
+            new UILabel("Element " + elementIndex), elementLayout,
             layout -> layout.addWidget(elementWidget.get())
         );
 

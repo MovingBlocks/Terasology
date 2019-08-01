@@ -28,16 +28,29 @@ import java.util.Optional;
  */
 public interface TypeWidgetFactory {
     /**
+     * The ID of the {@link org.terasology.rendering.nui.widgets.UILabel} in the {@link UIWidget} generated
+     * by a {@link TypeWidgetFactory} that can be used to label the object being edited.
+     *
+     * The existence of a widget with this ID in the generated widget means that the generated widget is
+     * usually expandable and takes up a lot of space. It is thus possible to label the widget without
+     * having to create a separate widget. If a widget with this ID is missing, it means that the
+     * generated widget is simple (like a checkbox or a textbox) and does not have space to label itself.
+     */
+    String LABEL_WIDGET_ID = "name";
+
+    /**
      * Creates a {@link UIWidget} bound to an object of the given type. The created widget can
      * be used to edit the object, which must not be null. The object is accessed via an
      * {@link Binding}, so that immutable objects can also be set correctly.
      * <p>
+     * TODO: Update
      * To correctly account for immutability, {@link Binding#get() object.get()} must always be
      * used to retrieve the object, and the result must never be cached. If a {@link Binding}
      * must be created for an object that is contained in {@code object} (like a field, for example),
      * it must be created via {@link Binding#makeChildBinding(Binding) object.makeChildBinding()}.
      *
      * TODO: Add must also handle null clause
+     * TODO: Add "nameable" widget details
      *
      * @param <T>     The type of the object.
      * @param binding  A {@link Binding} to the object to create the {@link UIWidget} for.

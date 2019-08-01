@@ -18,6 +18,7 @@ package org.terasology.rendering.nui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -26,8 +27,10 @@ import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
+ *
  */
 public final class WidgetUtil {
 
@@ -54,9 +57,10 @@ public final class WidgetUtil {
 
     /**
      * Bind a check box and boolean, and a listener will be subscribed to the checkbox.
-     * @param widget the widget.
-     * @param id the id of the checkbox.
-     * @param binding the boolean bound with the checkbox.
+     *
+     * @param widget   the widget.
+     * @param id       the id of the checkbox.
+     * @param binding  the boolean bound with the checkbox.
      * @param listener the listener which will activated when the check box is pressed.
      */
     public static void tryBindCheckBoxWithListener(UIWidget widget, String id, Binding<Boolean> binding, ActivateEventListener listener) {
@@ -67,15 +71,59 @@ public final class WidgetUtil {
         }
     }
 
-    public static <L extends UILayout<?>> RowLayout createExpanderLayout(String label,
-                                                                         L layoutToExpand,
-                                                                         Consumer<L> layoutExpander) {
+    public static <L extends UILayout<?>> ColumnLayout createExpandableLayout(
+        String label,
+        Supplier<L> layoutSupplier,
+        Consumer<L> layoutExpander
+    ) {
+        return createExpandableLayout(new UILabel(label), layoutSupplier, layoutExpander, ColumnLayout::new);
+    }
+
+    public static <L extends UILayout<?>> ColumnLayout createExpandableLayout(
+        String label, Supplier<L> layoutSupplier,
+        Consumer<L> layoutExpander,
+        Supplier<ColumnLayout> columnLayoutSupplier
+    ) {
+        return createExpandableLayout(new UILabel(label), layoutSupplier, layoutExpander, columnLayoutSupplier);
+    }
+
+    public static <L extends UILayout<?>> ColumnLayout createExpandableLayout(
+        UILabel labelWidget,
+        Supplier<L> layoutSupplier,
+        Consumer<L> layoutExpander,
+        Supplier<ColumnLayout> columnLayoutSupplier
+    ) {
+        L layoutToExpand = layoutSupplier.get();
+
+        RowLayout expanderLayout = createExpanderWidget(labelWidget, layoutToExpand, layoutExpander);
+
+        ColumnLayout columnLayout = columnLayoutSupplier.get();
+
+        columnLayout.addWidget(expanderLayout);
+        columnLayout.addWidget(layoutToExpand);
+
+        return columnLayout;
+    }
+
+    public static <L extends UILayout<?>> RowLayout createExpanderWidget(
+        String label,
+        L layoutToExpand,
+        Consumer<L> layoutExpander
+    ) {
+        return createExpanderWidget(new UILabel(label), layoutToExpand, layoutExpander);
+    }
+
+    public static <L extends UILayout<?>> RowLayout createExpanderWidget(
+        UILabel labelWidget,
+        L layoutToExpand,
+        Consumer<L> layoutExpander
+    ) {
         RowLayout rowLayout = new RowLayout();
 
         UIButton expandButton = createExpanderButton(layoutToExpand, layoutExpander);
 
         rowLayout.addWidget(expandButton, new RowLayoutHint().setUseContentWidth(true));
-        rowLayout.addWidget(new UILabel(label), new RowLayoutHint());
+        rowLayout.addWidget(labelWidget, new RowLayoutHint());
         return rowLayout;
     }
 
