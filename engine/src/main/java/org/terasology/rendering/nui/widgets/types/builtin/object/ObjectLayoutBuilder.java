@@ -110,6 +110,7 @@ class ObjectLayoutBuilder<T> {
                 .addAll(environment.getDependencyNamesOf(contextModule))
                 .build();
 
+        // TODO: Check API classes
         List<Class<? extends T>> allowedSubclasses =
             Streams.stream(environment.getSubtypesOf(type.getRawType()))
                 .filter(clazz -> allowedProvidingModules.contains(environment.getModuleProviding(clazz)))
@@ -316,16 +317,31 @@ class ObjectLayoutBuilder<T> {
                 .map(TypeInfo::of)
                 .collect(Collectors.toList());
 
-        if (parameterTypes.isEmpty()) {
-            // TODO: Translate
-            parameterLayout.addWidget(new UILabel("Constructor has no parameters"));
-            return;
-        }
-
         List<Binding<?>> argumentBindings =
             parameterTypes.stream()
                 .map(parameterType -> new DefaultBinding<>())
                 .collect(Collectors.toList());
+
+        createInstanceButton.subscribe(widget -> {
+            Object[] arguments = argumentBindings.stream()
+                                     .map(Binding::get)
+                                     .toArray();
+
+            editingType = selectedType.get();
+
+            try {
+                binding.set(selectedConstructor.get().newInstance(arguments));
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
+        if (argumentBindings.isEmpty()) {
+            // TODO: Translate
+            parameterLayout.addWidget(new UILabel("Constructor has no parameters"));
+            return;
+        }
 
         ColumnLayout parametersExpandableLayout = WidgetUtil.createExpandableLayout(
             // TODO: Translate
@@ -356,20 +372,6 @@ class ObjectLayoutBuilder<T> {
         );
 
         parameterLayout.addWidget(parametersExpandableLayout);
-
-        createInstanceButton.subscribe(widget -> {
-            Object[] arguments = argumentBindings.stream()
-                                     .map(Binding::get)
-                                     .toArray();
-
-            editingType = selectedType.get();
-
-            try {
-                binding.set(selectedConstructor.get().newInstance(arguments));
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     private void buildEditorLayout(ColumnLayout fieldsLayout) {
