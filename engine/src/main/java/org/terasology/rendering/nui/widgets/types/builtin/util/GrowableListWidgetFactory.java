@@ -95,8 +95,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
         addElementButton.setText("Add Element");
         addElementButton.subscribe(widget -> {
             elementList.add(null);
-            // We won't update the binding just yet since we want an actual value, not null
-            // Some collections like guava's ImmutableCollection don't even allow null elements
+            updateBindingWithElements(elementList);
 
             collectionLayout.removeAllWidgets();
             populateCollectionLayout(elementList, collectionLayout);

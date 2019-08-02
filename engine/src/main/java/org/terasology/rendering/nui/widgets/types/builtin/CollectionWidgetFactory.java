@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.widgets.types.builtin;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
@@ -31,9 +32,11 @@ import org.terasology.utilities.ReflectionUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.stream.Collectors;
 
 public class CollectionWidgetFactory implements TypeWidgetFactory {
     private ConstructorLibrary constructorLibrary;
@@ -81,20 +84,24 @@ public class CollectionWidgetFactory implements TypeWidgetFactory {
         private T newImmutableCollection(TypeInfo<T> type, Collection<E> items) {
             Class<T> rawType = type.getRawType();
 
+            // Guava does not support null elements
+
+            Collection<E> nonNullItems = items.stream().filter(Objects::nonNull).collect(Collectors.toList());
+
             // If the bound collection is unmodifiable, it must either be a standard
             // Collection or a guava ImmutableCollection, so casts always succeed
 
             // TODO: Support more Guava types?
 
             if (SortedSet.class.isAssignableFrom(rawType)) {
-                return (T) ImmutableSortedSet.copyOf(items);
+                return (T) ImmutableSortedSet.copyOf(nonNullItems);
             }
 
             if (Set.class.isAssignableFrom(rawType)) {
-                return (T) ImmutableSet.copyOf(items);
+                return (T) ImmutableSet.copyOf(nonNullItems);
             }
 
-            return (T) ImmutableList.copyOf(items);
+            return (T) ImmutableList.copyOf(nonNullItems);
         }
 
         @Override
