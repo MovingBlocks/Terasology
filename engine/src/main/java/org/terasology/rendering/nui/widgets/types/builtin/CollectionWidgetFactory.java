@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.widgets.types.builtin;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
@@ -37,6 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CollectionWidgetFactory implements TypeWidgetFactory {
     private ConstructorLibrary constructorLibrary;
@@ -105,19 +105,19 @@ public class CollectionWidgetFactory implements TypeWidgetFactory {
         }
 
         @Override
-        protected void updateBindingWithElements(List<E> elementList) {
+        protected void updateBindingWithElements(List<E> elements) {
             try {
                 binding.get().clear();
-                binding.get().addAll(elementList);
+                binding.get().addAll(elements);
             } catch (UnsupportedOperationException e) {
                 // Bound collection is unmodifiable, create new
-                binding.set(newImmutableCollection(type, elementList));
+                binding.set(newImmutableCollection(type, elements));
             }
         }
 
         @Override
-        protected List<E> getBindingCopy() {
-            return new ArrayList<>(binding.get());
+        protected Stream<E> getBindingStream() {
+            return binding.get().stream();
         }
     }
 }
