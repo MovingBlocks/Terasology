@@ -167,7 +167,7 @@ class ObjectLayoutBuilder<T> {
         }
     }
 
-    public void buildNullLayout() {
+    private void buildNullLayout() {
 
         // TODO: Add assign to reference option
 
