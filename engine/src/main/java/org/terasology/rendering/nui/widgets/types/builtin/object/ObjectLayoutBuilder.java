@@ -36,7 +36,6 @@ import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -63,10 +62,12 @@ class ObjectLayoutBuilder<T> {
     private final TypeWidgetLibrary library;
 
     private final ColumnLayout mainLayout;
+    private final UILabel nameWidget = new UILabel(LABEL_WIDGET_ID, "");
+    private final ColumnLayout innerExpandableLayout = createDefaultLayout();
 
     private final List<TypeInfo<? extends T>> allowedSubtypes;
     private final ModuleManager moduleManager;
-    private final UILabel nameWidget = new UILabel(LABEL_WIDGET_ID, "");
+
     private TypeInfo<? extends T> editingType;
 
     public ObjectLayoutBuilder(Binding<T> binding,
@@ -80,13 +81,24 @@ class ObjectLayoutBuilder<T> {
         this.binding = new NotifyingBinding<T>(binding) {
             @Override
             protected void onSet() {
-                build();
+                if (!innerExpandableLayout.iterator().hasNext()) {
+                    // If it is empty (collapsed), we don't need to rebuild the inner layout
+                    return;
+                }
+
+                innerExpandableLayout.removeAllWidgets();
+                build(innerExpandableLayout);
             }
         };
 
         this.moduleManager = moduleManager;
 
-        mainLayout = createDefaultLayout();
+        mainLayout = WidgetUtil.createExpandableLayout(
+            nameWidget,
+            () -> innerExpandableLayout,
+            this::build,
+            ObjectLayoutBuilder::createDefaultLayout
+        );
 
         final Name contextModule = ModuleContext.getContext().getId();
 
@@ -157,17 +169,15 @@ class ObjectLayoutBuilder<T> {
         return mainLayout;
     }
 
-    public void build() {
-        mainLayout.removeAllWidgets();
-
+    private void build(ColumnLayout layout) {
         if (binding.get() == null) {
-            buildNullLayout();
+            buildNullLayout(layout);
         } else {
-            buildEditorLayout();
+            buildEditorLayout(layout);
         }
     }
 
-    private void buildNullLayout() {
+    private void buildNullLayout(ColumnLayout instantiatorLayout) {
 
         // TODO: Add assign to reference option
 
@@ -176,14 +186,7 @@ class ObjectLayoutBuilder<T> {
             nameWidget.setText("Object is null.");
         }
 
-        ColumnLayout instantiatorLayout = WidgetUtil.createExpandableLayout(
-            nameWidget,
-            ObjectLayoutBuilder::createDefaultLayout,
-            this::populateInstantiatorLayout,
-            ObjectLayoutBuilder::createDefaultLayout
-        );
-
-        mainLayout.addWidget(instantiatorLayout);
+        populateInstantiatorLayout(instantiatorLayout);
     }
 
     private void populateInstantiatorLayout(ColumnLayout instantiatorLayout) {
@@ -369,7 +372,7 @@ class ObjectLayoutBuilder<T> {
         });
     }
 
-    private void buildEditorLayout() {
+    private void buildEditorLayout(ColumnLayout fieldsLayout) {
         if (!editingType.getRawType().equals(binding.get().getClass())) {
             Type actual = ReflectionUtil.parameterizeandResolveRawType(type.getType(), binding.get().getClass());
             editingType = (TypeInfo<? extends T>) TypeInfo.of(actual);
@@ -392,14 +395,7 @@ class ObjectLayoutBuilder<T> {
             nameWidget.setText("Edit Object of type " + getTypeName(editingType));
         }
 
-        ColumnLayout expandableFieldsLayout = WidgetUtil.createExpandableLayout(
-            nameWidget,
-            ObjectLayoutBuilder::createDefaultLayout,
-            this::populateFieldsLayout,
-            ObjectLayoutBuilder::createDefaultLayout
-        );
-
-        mainLayout.addWidget(expandableFieldsLayout);
+        populateFieldsLayout(fieldsLayout);
     }
 
     private void populateFieldsLayout(ColumnLayout fieldsLayout) {
