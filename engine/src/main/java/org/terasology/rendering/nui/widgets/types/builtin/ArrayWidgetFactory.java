@@ -27,8 +27,10 @@ import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.rendering.nui.widgets.types.builtin.util.GrowableListWidgetFactory;
 import org.terasology.utilities.ReflectionUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class ArrayWidgetFactory implements TypeWidgetFactory {
     private ConstructorLibrary constructorLibrary;
@@ -73,13 +75,13 @@ public class ArrayWidgetFactory implements TypeWidgetFactory {
         }
 
         @Override
-        protected void updateBindingWithElements(List<E> elementList) {
-            binding.set(Iterables.toArray(elementList, elementType.getRawType()));
+        protected void updateBindingWithElements(List<E> elements) {
+            binding.set(Iterables.toArray(elements, elementType.getRawType()));
         }
 
         @Override
-        protected List<E> getBindingCopy() {
-            return Lists.newArrayList(binding.get());
+        protected Stream<E> getBindingStream() {
+            return Arrays.stream(binding.get());
         }
     }
 }

@@ -172,14 +172,14 @@ public final class WidgetUtil {
             labelWidget.get().setText(labelText);
 
             return widget;
-        } else {
-            RowLayout fieldLayout = new RowLayout();
-            fieldLayout.setHorizontalSpacing(5);
-
-            fieldLayout.addWidget(new UILabel(labelText), new RowLayoutHint().setUseContentWidth(true));
-            fieldLayout.addWidget(widget, new RowLayoutHint());
-
-            return fieldLayout;
         }
+
+        RowLayout fieldLayout = new RowLayout();
+        fieldLayout.setHorizontalSpacing(5);
+
+        fieldLayout.addWidget(new UILabel(labelWidgetId, labelText), new RowLayoutHint().setUseContentWidth(true));
+        fieldLayout.addWidget(widget, new RowLayoutHint());
+
+        return fieldLayout;
     }
 }
