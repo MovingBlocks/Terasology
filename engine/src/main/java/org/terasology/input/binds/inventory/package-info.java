@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-@API
 @InputCategory(id = "inventory",
         displayName = "${engine:menu#category-inventory}"
 ) package org.terasology.input.binds.inventory;
