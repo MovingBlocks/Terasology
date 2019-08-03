@@ -104,6 +104,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [MawGooey](https://github.com/Terasology/MawGooey) - Introduces Gooey's 'odd' cousin to the game. Say hi, just don't get too close ..
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [MedievalCities](https://github.com/Terasology/MedievalCities) - a set of building templates for a medieval era city
+* [MetalRenegades](https://github.com/Terasology/MetalRenegades) - gameplay template set in a Wild West style world
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [Minesweeper](https://github.com/Terasology/Minesweeper) - a little game inside a game
 * [Minimap](https://github.com/Terasology/Minimap) - a basic minimap. Show/hide with `M` by default and zoom with numpad `-` and `+`
