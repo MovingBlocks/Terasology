@@ -15,15 +15,15 @@
  */
 package org.terasology.rendering.nui.widgets.types.builtin.object;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleContext;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
+import org.terasology.module.sandbox.PermissionProvider;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -49,7 +49,6 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
@@ -100,20 +99,16 @@ class ObjectLayoutBuilder<T> {
             ObjectLayoutBuilder::createDefaultLayout
         );
 
-        final Name contextModule = ModuleContext.getContext().getId();
+        Module contextModule = ModuleContext.getContext();
 
         ModuleEnvironment environment = moduleManager.getEnvironment();
-
-        final Set<Name> allowedProvidingModules =
-            ImmutableSet.<Name>builder()
-                .add(contextModule)
-                .addAll(environment.getDependencyNamesOf(contextModule))
-                .build();
+        PermissionProvider permissionProvider = moduleManager.getPermissionProvider(contextModule);
 
         // TODO: Check API classes
+        // TODO: Environment does not account for all types, possibly use more comprehensive reflections object
         List<Class<? extends T>> allowedSubclasses =
             Streams.stream(environment.getSubtypesOf(type.getRawType()))
-                .filter(clazz -> allowedProvidingModules.contains(environment.getModuleProviding(clazz)))
+                .filter(permissionProvider::isPermitted)
                 // Filter public, instantiable types
                 .filter(clazz -> {
                     int modifiers = clazz.getModifiers();
@@ -230,7 +225,7 @@ class ObjectLayoutBuilder<T> {
     }
 
     public String getTypeName(TypeInfo<? extends T> value) {
-        return ReflectionUtil.simpleUriOfType(value.getType(), moduleManager.getEnvironment()).toString();
+        return ReflectionUtil.getTypeUri(value.getType(), moduleManager.getEnvironment());
     }
 
     private UIBox buildErrorWidget(String errorMessage) {

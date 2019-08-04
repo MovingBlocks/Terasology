@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
@@ -43,6 +44,9 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
 
         newBinding(new TypeInfo<Container>() {});
         newBinding(new TypeInfo<List<Base<Integer>>>() {});
+
+        newBinding(Object.class);
+        // TODO: Test Queue
     }
 
     private enum TestEnum {

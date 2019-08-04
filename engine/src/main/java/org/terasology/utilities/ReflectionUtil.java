@@ -662,11 +662,20 @@ public final class ReflectionUtil {
         return null;
     }
 
-    public static SimpleUri simpleUriOfType(Type type, ModuleEnvironment moduleEnvironment) {
-        Name moduleProvidingType = moduleEnvironment.getModuleProviding(getRawType(type));
+    public static String getTypeUri(Type type, ModuleEnvironment moduleEnvironment) {
         String typeSimpleName = typeToString(type, true);
 
-        return new SimpleUri(moduleProvidingType, typeSimpleName);
+        if (getRawType(type).getClassLoader() == null) {
+            return typeSimpleName;
+        }
+
+        Name moduleProvidingType = moduleEnvironment.getModuleProviding(getRawType(type));
+
+        if (moduleProvidingType == null) {
+            return typeSimpleName;
+        }
+
+        return new SimpleUri(moduleProvidingType, typeSimpleName).toString();
     }
 
     /**

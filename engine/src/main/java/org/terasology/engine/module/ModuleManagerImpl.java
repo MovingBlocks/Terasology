@@ -38,6 +38,7 @@ import org.terasology.module.sandbox.APIScanner;
 import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
+import org.terasology.module.sandbox.PermissionProvider;
 import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
@@ -240,5 +241,10 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public ModuleMetadataJsonAdapter getModuleMetadataReader() {
         return metadataReader;
+    }
+
+    @Override
+    public PermissionProvider getPermissionProvider(Module module) {
+        return permissionProviderFactory.createPermissionProviderFor(module);
     }
 }
