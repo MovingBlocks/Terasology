@@ -197,10 +197,12 @@ public abstract class GrowableListWidgetFactory<C, E> {
     }
 
     private String getElementLabelText(int index) {
+        // TODO: Say something when element is null and won't be added to the widget
         return "Element " + index;
     }
 
     private void updateBinding() {
+        // TODO: Filter not null
         updateBindingWithElements(elements.stream().map(Binding::get).collect(Collectors.toList()));
     }
 

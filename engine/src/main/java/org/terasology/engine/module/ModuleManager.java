@@ -22,6 +22,7 @@ import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleMetadataJsonAdapter;
 import org.terasology.module.ModuleRegistry;
+import org.terasology.module.sandbox.PermissionProvider;
 
 /**
  * TODO Type description
@@ -37,4 +38,6 @@ public interface ModuleManager {
     ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary);
 
     ModuleMetadataJsonAdapter getModuleMetadataReader();
+
+    PermissionProvider getPermissionProvider(Module module);
 }
