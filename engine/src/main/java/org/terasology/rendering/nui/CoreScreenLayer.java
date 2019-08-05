@@ -16,8 +16,8 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Keyboard;
+import org.terasology.input.binds.general.TabbingUIButton;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Rect2i;
@@ -27,13 +27,15 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
+import org.terasology.rendering.nui.layouts.ScrollableArea;
+import org.terasology.rendering.nui.widgets.UIRadialRing;
+import org.terasology.rendering.nui.widgets.UIRadialSection;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
-/**
- */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 
     private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
@@ -53,6 +55,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     private NUIManager manager;
 
+    private boolean modifyingList;
+
+    private ScrollableArea parentToSet;
+
+    private boolean activateBindEvent;
+
     private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
 
     public CoreScreenLayer() {
@@ -60,6 +68,19 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     public CoreScreenLayer(String id) {
         super(id);
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    /**
+     * Automatically sets the depth of this screen using SortOrderSystem.
+     */
+    public void setDepthAuto() {
+        if (SortOrderSystem.isInitialized()) {
+            depth = SortOrderSystem.getCurrent();
+        }
     }
 
     @Override
@@ -77,8 +98,79 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onOpened() {
+        if (depth == SortOrderSystem.DEFAULT_DEPTH) {
+            setDepthAuto();
+        }
+        if (SortOrderSystem.isInitialized()) {
+            if (!SortOrderSystem.getUsed().contains(depth)) {
+                SortOrderSystem.getUsed().add(depth);
+            }
+        }
+        modifyingList = false;
+        activateBindEvent = false;
+        TabbingManager.setInitialized(false);
+
         animationSystem.triggerFromPrev();
         onScreenOpened();
+    }
+
+    private void iterateThrough(Iterator<UIWidget> widgets) {
+        modifyingList = true;
+        while (widgets.hasNext()) {
+            UIWidget next = widgets.next();
+            boolean setParent = false;
+            if (next instanceof ScrollableArea) {
+                parentToSet = (ScrollableArea) next;
+            }
+
+            if (next instanceof WidgetWithOrder) {
+                TabbingManager.addToWidgetsList((WidgetWithOrder) next);
+                TabbingManager.addToUsedNums(((WidgetWithOrder) next).order);
+                ((WidgetWithOrder) next).setParent(parentToSet);
+            }
+
+            if (next.iterator().hasNext()) {
+                iterateThrough(next.iterator());
+            } else if (next instanceof UIRadialRing) {
+                Iterator<UIRadialSection> iter = ((UIRadialRing) next).getSections().iterator();
+                while (iter.hasNext()) {
+                    next = iter.next();
+                    TabbingManager.addToWidgetsList((WidgetWithOrder) next);
+                    TabbingManager.addToUsedNums(((WidgetWithOrder) next).order);
+                    if (setParent) {
+                        ((WidgetWithOrder) next).setParent(parentToSet);
+                    }
+                }
+            }
+        }
+        modifyingList = false;
+    }
+
+    /**
+     * adds or removes from enabledWidgets based on if the screen is showing or not
+     * @param showing if the screen is visible or not
+     */
+    protected void addOrRemove(boolean showing) {
+        if (SortOrderSystem.getEnabledWidgets() != null) {
+            if (!SortOrderSystem.getEnabledWidgets().contains(this)) {
+                if (showing) {
+                    ArrayList<CoreScreenLayer> enabledWidgets = SortOrderSystem.getEnabledWidgets();
+
+                    enabledWidgets.add(this);
+                    SortOrderSystem.setEnabledWidgets(enabledWidgets);
+
+                    SortOrderSystem.addAnother(depth);
+                }
+            } else {
+                if (!showing) {
+                    ArrayList<CoreScreenLayer> enabledWidgets = SortOrderSystem.getEnabledWidgets();
+                    enabledWidgets.remove(this);
+                    SortOrderSystem.setEnabledWidgets(enabledWidgets);
+
+                    SortOrderSystem.removeOne(depth);
+                }
+            }
+        }
     }
 
     /**
@@ -89,6 +181,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
      * (e.g., a parent menu in the menu system) is returned to (as {@code onShow}).
      */
     public void onScreenOpened() {
+        if (!SortOrderSystem.isInSortOrder()) {
+            addOrRemove(true);
+        }
+        TabbingManager.setOpenScreen(this);
     }
 
     @Override
@@ -119,8 +215,29 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     @Override
     public void update(float delta) {
         if (contents != null) {
+            if (!TabbingManager.isInitialized()) {
+                TabbingManager.init();
+                TabbingManager.setOpenScreen(this);
+
+                Iterator<UIWidget> widgets = contents.iterator();
+                iterateThrough(widgets);
+            }
+
+            if (TabbingManager.getOpenScreen() == null) {
+                TabbingManager.setOpenScreen(this);
+
+                Iterator<UIWidget> widgets = contents.iterator();
+                iterateThrough(widgets);
+
+            }
             contents.update(delta);
             animationSystem.update(delta);
+            if (depth == SortOrderSystem.DEFAULT_DEPTH) {
+                setDepthAuto();
+            }
+            if (activateBindEvent) {
+                onBindEvent(new TabbingUIButton());
+            }
         }
     }
 
@@ -135,6 +252,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onClosed() {
+        if (!SortOrderSystem.isInSortOrder()) {
+            addOrRemove(false);
+        }
+        TabbingManager.setInitialized(false);
     }
 
     @Override
@@ -145,6 +266,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onHide() {
+        if (!SortOrderSystem.isInSortOrder()) {
+            addOrRemove(false);
+        }
+        TabbingManager.setInitialized(false);
     }
 
     @Override
@@ -178,10 +303,6 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     protected boolean isEscapeToCloseAllowed() {
         return true;
-    }
-
-    @Override
-    public void onBindEvent(BindButtonEvent event) {
     }
 
     @Override

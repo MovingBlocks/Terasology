@@ -40,14 +40,14 @@ public class ConsoleTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testAddMessage() {
-        getConsole().addMessage(MESSAGE_TEXT );
+        getConsole().addMessage(MESSAGE_TEXT);
 
         checkMessage(getConsole().getMessages().iterator(), true);
     }
 
     @Test
     public void testAddConsoleMessage() {
-        getConsole().addMessage(new Message(MESSAGE_TEXT ));
+        getConsole().addMessage(new Message(MESSAGE_TEXT));
 
         checkMessage(getConsole().getMessages().iterator(), true);
     }

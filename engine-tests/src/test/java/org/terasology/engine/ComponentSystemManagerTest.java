@@ -88,7 +88,7 @@ public class ComponentSystemManagerTest {
     }
 
     @Test
-    public void shouldRegisterCommand(){
+    public void shouldRegisterCommand() {
         systemUnderTest.register(new SystemWithValidCommand());
         systemUnderTest.initialise();
 
@@ -113,7 +113,7 @@ public class ComponentSystemManagerTest {
     }
 
     @Test
-    public void shouldLogErrorWhenRegisterCommandWithoutSenderAnnotation(){
+    public void shouldLogErrorWhenRegisterCommandWithoutSenderAnnotation() {
         //see https://github.com/MovingBlocks/Terasology/issues/2679
         Appender<ILoggingEvent> appender = mockAppender();
         ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).addAppender(appender);

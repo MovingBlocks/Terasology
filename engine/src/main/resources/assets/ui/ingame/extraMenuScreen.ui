@@ -1,0 +1,83 @@
+{
+    "type": "engine:extraMenuScreen",
+    "skin": "engine:mainmenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIImage",
+                "image": "engine:terasology",
+                "id": "title",
+                "layoutInfo": {
+                    "width": 512,
+                    "height": 128,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 48
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "text": "${engine:menu#extras-label}",
+                "family": "title",
+                "id": "subtitle",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title"
+                    }
+                }
+            },
+            {
+                "type": "engine:columnLayout",
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 16,
+                        "widget": "subtitle"
+                    },
+                    "position-bottom": {
+                        "offset": 32
+                    }
+                },
+                "columns": 1,
+                "verticalSpacing": 8,
+                "family": "menu-options",
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#telemetry-button}",
+                        "id": "telemetry"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "devTools",
+                        "text": "${engine:menu#dev-tools-title}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#crash-reporter}",
+                        "id": "crashReporter"
+                    },
+                    {
+                        "type": "UISpace",
+                        "size": [1, 64]
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "close",
+                        "text": "${engine:menu#back}"
+                    }
+                ]
+            }
+        ]
+    }
+}
+

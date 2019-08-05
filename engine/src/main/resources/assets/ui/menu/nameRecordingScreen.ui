@@ -1,0 +1,84 @@
+{
+  "type": "nameRecordingScreen",
+  "skin": "engine:mainMenu",
+  "contents": {
+    "type": "relativeLayout",
+    "contents": [
+      {
+        "type": "UILabel",
+        "id": "title",
+        "family": "title",
+        "text": "${engine:menu#name-recording-title}",
+        "layoutInfo": {
+          "height": 48,
+          "position-horizontal-center": {},
+          "position-bottom": {
+            "target": "TOP",
+            "widget": "box",
+            "offset": 48
+          }
+        }
+      },
+      {
+        "type": "UIBox",
+        "id": "box",
+        "layoutInfo": {
+          "width": 500,
+          "use-content-height": true,
+          "position-horizontal-center": {},
+          "position-vertical-center": {}
+        },
+        "content": {
+          "type": "ColumnLayout",
+          "columns": 1,
+          "verticalSpacing": 8,
+          "contents": [
+            {
+              "type": "UISpace",
+              "size": [
+                1,
+                16
+              ]
+            },
+            {
+              "type": "UILabel",
+              "id": "description",
+              "text": "${engine:menu#name-recording-description}"
+            },
+            {
+              "type": "UISpace",
+              "size": [
+                1,
+                16
+              ]
+            },
+            {
+              "type": "UIText",
+              "id": "nameInput"
+            },
+            {
+              "type": "RowLayout",
+              "horizontalSpacing": 4,
+              "contents": [
+                {
+                  "type": "UIButton",
+                  "id": "enterButton",
+                  "text": "${engine:menu#dialog-ok}"
+                },
+                {
+                  "type": "UIButton",
+                  "id": "cancelButton",
+                  "text": "${engine:menu#dialog-cancel}"
+                }
+              ],
+              "layoutInfo": {
+                "width": 200,
+                "position-right": {}
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

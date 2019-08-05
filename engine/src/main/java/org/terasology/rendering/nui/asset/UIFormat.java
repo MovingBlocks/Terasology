@@ -17,17 +17,16 @@ package org.terasology.rendering.nui.asset;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonElement;
-import com.google.gson.GsonBuilder;
 import com.google.gson.Gson;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonObject;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -39,7 +38,7 @@ import org.terasology.math.Border;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
-import org.terasology.persistence.typeHandling.gson.JsonTypeHandlerAdapter;
+import org.terasology.persistence.typeHandling.gson.GsonTypeSerializationLibraryAdapterFactory;
 import org.terasology.persistence.typeHandling.mathTypes.BorderTypeHandler;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -102,12 +101,10 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         library.add(Border.class, new BorderTypeHandler());
 
         GsonBuilder gsonBuilder = new GsonBuilder()
-            .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-            .registerTypeAdapter(UIData.class, new UIDataTypeAdapter())
-            .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager));
-        for (Class<?> handledType : library.getCoreTypes()) {
-            gsonBuilder.registerTypeAdapter(handledType, new JsonTypeHandlerAdapter<>(library.getHandlerFor(handledType)));
-        }
+                .registerTypeAdapterFactory(new GsonTypeSerializationLibraryAdapterFactory(library))
+                .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+                .registerTypeAdapter(UIData.class, new UIDataTypeAdapter())
+                .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager));
 
         // override the String TypeAdapter from the serialization library
         gsonBuilder.registerTypeAdapter(String.class, new I18nStringTypeAdapter(translationSystem, otherLocale));

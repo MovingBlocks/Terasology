@@ -1,34 +1,20 @@
 {
     "type": "VideoSettingsScreen",
-    "skin": "mainmenu",
+    "skin": "settingsmenu",
     "contents": {
         "type": "RelativeLayout",
         "contents": [
             {
-                "type": "UIImage",
-                "image": "engine:terasology",
-                "id": "title",
-                "layoutInfo": {
-                    "width": 512,
-                    "height": 128,
-                    "position-horizontal-center": {},
-                    "position-top": {
-                        "target": "TOP",
-                        "offset": 48
-                    }
-                }
-            },
-            {
                 "type": "UILabel",
                 "family": "title",
                 "text": "${engine:menu#video-settings-title}",
-                "id": "subtitle",
+                "id": "title",
                 "layoutInfo": {
                     "height": 48,
                     "position-horizontal-center": {},
                     "position-top": {
-                        "target": "BOTTOM",
-                        "widget": "title"
+                        "target": "TOP",
+                        "offset": 48
                     }
                 }
             },
@@ -104,6 +90,14 @@
                                 {
                                     "type": "UIDropdown",
                                     "id": "displayModeSetting"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#video-resolution-fullscreen}: "
+                                },
+                                {
+                                    "type": "UIDropdownScrollable",
+                                    "id": "resolution"
                                 },
                                 {
                                     "type": "UILabel",
@@ -243,6 +237,31 @@
                                 {
                                     "type": "UISlider",
                                     "id": "fboScale"
+                                },
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#ui-scale}: "
+                                },
+
+                                {
+                                    "type": "RowLayout",
+                                    "contents": [
+                                        {
+                                            "type": "UIButton",
+                                            "text": "-",
+                                            "id": "uiScaleSmaller"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "id": "uiScaleLabel",
+                                            "text": " 100%"
+                                        },
+                                        {
+                                            "type": "UIButton",
+                                            "text": "+",
+                                            "id": "uiScaleLarger"
+                                        }
+                                    ]
                                 },
                                 {
                                     "type": "UILabel",
@@ -401,12 +420,12 @@
                     ]
                 },
                 "layoutInfo": {
-                    "width": 800,
+                    "width": 1024,
                     "position-horizontal-center": {},
                     "position-top": {
                         "target": "BOTTOM",
                         "offset": 16,
-                        "widget": "subtitle"
+                        "widget": "title"
                     },
                     "position-bottom": {
                         "target": "TOP",

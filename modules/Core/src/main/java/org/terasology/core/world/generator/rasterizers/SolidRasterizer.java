@@ -15,13 +15,14 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
+import org.terasology.biomesAPI.Biome;
+import org.terasology.biomesAPI.BiomeRegistry;
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
@@ -32,8 +33,6 @@ import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceDepthFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
-import org.terasology.world.liquid.LiquidData;
-import org.terasology.world.liquid.LiquidType;
 
 public class SolidRasterizer implements WorldRasterizer {
 
@@ -44,10 +43,12 @@ public class SolidRasterizer implements WorldRasterizer {
     private Block grass;
     private Block snow;
     private Block dirt;
+    private BiomeRegistry biomeRegistry;
 
     @Override
     public void initialize() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        biomeRegistry = CoreRegistry.get(BiomeRegistry.class);
         stone = blockManager.getBlock("core:stone");
         water = blockManager.getBlock("core:water");
         ice = blockManager.getBlock("core:Ice");
@@ -59,7 +60,6 @@ public class SolidRasterizer implements WorldRasterizer {
 
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
-        LiquidData waterLiquid = new LiquidData(LiquidType.WATER, LiquidData.MAX_LIQUID_DEPTH);
         DensityFacet solidityFacet = chunkRegion.getFacet(DensityFacet.class);
         SurfaceHeightFacet surfaceFacet = chunkRegion.getFacet(SurfaceHeightFacet.class);
         SurfaceDepthFacet surfaceDepthFacet = chunkRegion.getFacet(SurfaceDepthFacet.class);
@@ -78,7 +78,7 @@ public class SolidRasterizer implements WorldRasterizer {
             }
 
             Biome biome = biomeFacet.get(pos2d);
-            chunk.setBiome(pos.x, pos.y, pos.z, biome);
+            biomeRegistry.setBiome(biome, chunk, pos.x, pos.y, pos.z);
 
             float density = solidityFacet.get(pos);
 
@@ -86,7 +86,9 @@ public class SolidRasterizer implements WorldRasterizer {
                 chunk.setBlock(pos, stone);
             } else if (density >= 0) {
                 int depth = TeraMath.floorToInt(surfaceFacet.get(pos2d)) - posY;
-                Block block = getSurfaceBlock(depth, posY, biome, seaLevel);
+                Block block = getSurfaceBlock(depth, posY,
+                        biome,
+                        seaLevel);
                 chunk.setBlock(pos, block);
             } else {
                 // fill up terrain up to sealevel height with water or ice
@@ -94,13 +96,15 @@ public class SolidRasterizer implements WorldRasterizer {
                     chunk.setBlock(pos, ice);
                 } else if (posY <= seaLevel) {         // either OCEAN or SNOW
                     chunk.setBlock(pos, water);
-                    chunk.setLiquid(pos, waterLiquid);
+//                }
                 }
             }
         }
     }
 
-    private Block getSurfaceBlock(int depth, int height, Biome type, int seaLevel) {
+    private Block getSurfaceBlock(int depth, int height,
+                                  Biome type,
+                                  int seaLevel) {
         if (type instanceof CoreBiome) {
             switch ((CoreBiome) type) {
                 case FOREST:

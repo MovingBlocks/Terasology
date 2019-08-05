@@ -1,9 +1,14 @@
 import groovy.json.JsonSlurper
 
+@Grab(group='org.slf4j', module='slf4j-api', version='1.6.1')
+@Grab(group='org.slf4j', module='slf4j-nop', version='1.6.1')
+
 @GrabResolver(name = 'jcenter', root = 'http://jcenter.bintray.com/')
 @Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
 import org.ajoberstar.grgit.Grgit
+import org.ajoberstar.grgit.exception.GrgitException
 import org.ajoberstar.grgit.Remote
+import org.eclipse.jgit.errors.RepositoryNotFoundException
 
 class common {
 
@@ -30,6 +35,12 @@ class common {
 
     /** The default name of a git remote we might want to work on or keep handy */
     String defaultRemote = "origin"
+
+    /** Should we cache the list of remote items */
+    boolean itemListCached = false
+
+    /** For keeping a list of remote items that can be retrieved */
+    String[] cachedItemList
 
     /**
      * Initialize defaults to match the target item type
@@ -180,27 +191,36 @@ class common {
             println "$itemType \"$itemName\" not found"
             return
         }
-        def itemGit = Grgit.open(dir: targetDir)
+        try {
+            def itemGit = Grgit.open(dir: targetDir)
 
-        // Do a check for the default remote before we attempt to update
-        def remotes = itemGit.remote.list()
-        def targetUrl = remotes.find{
-            it.name == defaultRemote
-        }?.url
-        if (targetUrl == null || !isUrlValid(targetUrl)) {
-            println "While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl"
-            return
-        }
+            // Do a check for the default remote before we attempt to update
+            def remotes = itemGit.remote.list()
+            def targetUrl = remotes.find{
+                it.name == defaultRemote
+            }?.url
+            if (targetUrl == null || !isUrlValid(targetUrl)) {
+                println "While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl"
+                return
+            }
 
-        // At this point we should have a valid remote to pull from. If local repo is clean then pull!
-        def clean = itemGit.status().clean
-        println "Is \"$itemName\" clean? $clean"
-        if (!clean) {
-            println "$itemType has uncommitted changes. Aborting."
-            return
+            // At this point we should have a valid remote to pull from. If local repo is clean then pull!
+            def clean = itemGit.status().clean
+            println "Is \"$itemName\" clean? $clean"
+            if (!clean) {
+                println "$itemType has uncommitted changes. Skipping."
+                return
+            }
+            println "Updating $itemType $itemName"
+
+            try {
+                itemGit.pull remote: defaultRemote
+            } catch (GrgitException exception) {
+                println "Unable to update $itemName, Skipping: ${exception.getMessage()}"
+            }
+        } catch(RepositoryNotFoundException exception) {
+            println "Skipping update for $itemName: no repository found (probably engine module)"
         }
-        println "Updating $itemType $itemName"
-        itemGit.pull remote: defaultRemote
     }
 
     /**
@@ -297,11 +317,14 @@ class common {
      * @return a String[] containing the names of items available for download.
      */
     String[] retrieveAvailableItems() {
+        if (itemListCached) {
+            return cachedItemList
+        }
 
         // TODO: We need better ways to display the result especially when it contains a lot of items
         // However, in some cases heavy filtering could still mean that very few items will actually display ...
         // Another consideration is if we should be more specific in the API request, like only retrieving name + description
-        def githubHomeApiUrl = "https://api.github.com/users/$githubTargetHome/repos?per_page=100"
+        def githubHomeApiUrl = "https://api.github.com/users/$githubTargetHome/repos?per_page=99" //Note: 99 instead of 100  - see TODO below ..
 
         if(!isUrlValid(githubHomeApiUrl)){
             println "Deduced GitHub API URL $githubHomeApiUrl seems inaccessible."
@@ -313,17 +336,66 @@ class common {
         def currentPageUrl = githubHomeApiUrl
         def slurper = new JsonSlurper()
         while (currentPageUrl) {
+            //println "currentPageUrl: $currentPageUrl"
             new URL(currentPageUrl).openConnection().with { connection ->
                 connection.content.withReader { reader ->
                     slurper.parseText(reader.text).each { item ->
                         mappedPossibleItems.put(item.name, item.description)
+                        //println "Want to get item " + item.name
                     }
                 }
                 currentPageUrl = getLink(connection, "next")
+                // TODO: This comparison is vulnerable to a page request size of "100" or anything that starts with a 1, but just using 99 above ..
+                if (currentPageUrl.contains("page=1")) {
+                    //println "The pagination warped back to page 1, we're done!"
+                    currentPageUrl = null
+                }
             }
         }
 
-        return itemTypeScript.filterItemsFromApi(mappedPossibleItems)
+        String[] items = itemTypeScript.filterItemsFromApi(mappedPossibleItems)
+
+        return items;
+    }
+
+    /**
+     * Retrieves all the available items for the target type in the form of a list that match the specified regex.
+     *
+     * Forming the regex:
+     * "\Q" starts an explicit quote (which includes all reserved characters as well)
+     * "\E" ends an explicit quote
+     * "\w*" is equivalent to "*" - it selects anything that has the same characters
+     * (in the range of a-z, A-Z or 1-9) as before and after the asterisk
+     * "." is equivalent to "?" - it selects anything that has the rest of the pattern but any
+     * character in the "?" symbol's position
+     * So, "\Q<INPUT_PART1>\E\w*\Q\<INPUT_PART1>E", selects anything that starts with INPUT_PART1
+     * and ends with INPUT_PART2 - This regex expression is equivalent to the input argument
+     * "INPUT_PART1*INPUT_PART2"
+     *
+     * @return a String[] containing the names of items available for download.
+     * @param regex the regex that the retrieved items should match
+     */
+    String[] retrieveAvailableItemsWithRegexMatch(String regex) {
+        ArrayList<String> selectedItems = new ArrayList<String>()
+        String[] itemList = retrieveAvailableItems()
+        for (String item : itemList) {
+            if (item.matches(regex)) {
+                selectedItems.add(item)
+            }
+        }
+
+        return ((String[]) selectedItems.toArray());
+    }
+
+    /**
+     * Retrieves all the available items for the target type in the form of a list that match the specified regex.
+     *
+     * @param wildcardPattern the wildcard pattern that the retrieved items should match
+     * @return a String[] containing the names of items available for download.
+     */
+    String[] retrieveAvalibleItemsWithWildcardMatch(String wildcardPattern) {
+        String regex = ("\\Q" + wildcardPattern.replace("*", "\\E\\w*\\Q").replace("?", "\\E.\\Q") + "\\E")
+        return retrieveAvailableItemsWithRegexMatch(regex);
     }
 
     /**
@@ -352,5 +424,16 @@ class common {
             }
         }
         return localItems
+    }
+
+    void cacheItemList() {
+        if (!itemListCached) {
+            cachedItemList = retrieveAvailableItems()
+        }
+        itemListCached = true
+    }
+
+    void unCacheItemList() {
+        itemListCached = false
     }
 }

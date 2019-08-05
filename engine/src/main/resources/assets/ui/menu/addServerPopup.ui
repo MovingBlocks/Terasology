@@ -1,6 +1,6 @@
 {
     "type": "addServerPopup",
-    "skin": "popup",
+    "skin": "graypopup",
     "contents": {
         "type": "relativeLayout",
         "contents": [

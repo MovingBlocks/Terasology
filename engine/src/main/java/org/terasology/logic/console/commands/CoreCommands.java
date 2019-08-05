@@ -16,6 +16,7 @@
 package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Streams;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -25,8 +26,10 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -71,8 +74,6 @@ import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.rendering.world.WorldRendererImpl;
 import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -82,14 +83,15 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import java.util.List;
+import java.util.Set;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Arrays;
 
 /**
  * Adds a series of useful commands to the game. Likely these could be moved to more fitting places over time.
@@ -139,14 +141,56 @@ public class CoreCommands extends BaseComponentSystem {
     @In
     private Config config;
 
+    @In
+    private ModuleManager moduleManager;
+
+    /**
+     * Determine if command is matching one of criteria
+     *
+     * @param searchLowercase searched string
+     * @param command         ConsoleCommand to check if matches searched string
+     * @return boolean containing true if command matches searched string else false
+     */
+    private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
+        return command.getName().toLowerCase().contains(searchLowercase)
+                || command.getDescription().toLowerCase().contains(searchLowercase)
+                || command.getHelpText().toLowerCase().contains(searchLowercase)
+                || command.getUsage().toLowerCase().contains(searchLowercase)
+                || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
+    }
+
+    /**
+     * Determine if prefab is matching one of criteria
+     *
+     * @param searchLowercase searched String
+     * @param prefab          Prefab to check if matches searched string
+     * @return boolean containing true if prefab matches searched string else false
+     */
+    private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
+        return prefab.getName().toLowerCase().contains(searchLowercase)
+                || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
+    }
+
+    /**
+     * Determine if block family matches one of criteria
+     *
+     * @param searchLowercase searched string
+     * @param def             BlockFamilyDefinition to be checked
+     * @return boolean containing true if blockFamilyDefinition matches searched string else false
+     */
+    private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
+        return def.getUrn().toString().toLowerCase().contains(searchLowercase);
+    }
+
     /**
      * Search commands/prefabs/assets with matching name, description, help text, usage or required permission
+     *
      * @param searched String which is used to search for match
      * @return String containing result of search
      */
     @Command(shortDescription = "Search commands/prefabs/assets",
             helpText = "Displays commands, prefabs, and assets with matching name, description, "
-                + "help text, usage or required permission")
+                    + "help text, usage or required permission")
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
 
@@ -156,22 +200,22 @@ public class CoreCommands extends BaseComponentSystem {
 
         // String containing numbers of commands, prefabs and block that match searched string
         String result = "Found " + commands.size() + " command matches, " + prefabs.size() +
-            " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
+                " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
 
         // iterate through commands adding them to result
-        if (commands.size() > 0) {
+        if (!commands.isEmpty()) {
             result += "\nCommands:";
             result = commands.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
 
         // iterate through prefabs adding them to result
-        if (prefabs.size() > 0) {
+        if (!prefabs.isEmpty()) {
             result += "\nPrefabs:";
             result = prefabs.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
 
         // iterate through blocks adding them to result
-        if (blocks.size() > 0) {
+        if (!blocks.isEmpty()) {
             result += "\nBlocks:";
             result = blocks.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
@@ -181,75 +225,44 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * List commands that match searched string
+     *
      * @param searchLowercase searched string lowercase
      * @return List of commands that match searched string
      */
     private List<String> findCommandMatches(String searchLowercase) {
         return console.getCommands().stream().filter(command -> matchesSearch(searchLowercase, command))
-            .map(ConsoleCommand::getUsage).collect(Collectors.toList());
-    }
-
-    /**
-     * Determine if command is matching one of criteria
-     * @param searchLowercase searched string
-     * @param command ConsoleCommand to check if matches searched string
-     * @return boolean containing true if command matches searched string else false
-     */
-    private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
-        return command.getName().toLowerCase().contains(searchLowercase)
-            || command.getDescription().toLowerCase().contains(searchLowercase)
-            || command.getHelpText().toLowerCase().contains(searchLowercase)
-            || command.getUsage().toLowerCase().contains(searchLowercase)
-            || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
+                .map(ConsoleCommand::getUsage).collect(Collectors.toList());
     }
 
     /**
      * List prefabs that match searched string
+     *
      * @param searchLowercase searched string
      * @return List of prefabs that match searched string
      */
     private List<String> findPrefabMatches(String searchLowercase) {
         return StreamSupport.stream(prefabManager.listPrefabs().spliterator(), false)
-            .filter(prefab -> matchesSearch(searchLowercase, prefab))
-            .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
-    }
-
-    /**
-     * Determine if prefab is matching one of criteria
-     * @param searchLowercase searched String
-     * @param prefab Prefab to check if matches searched string
-     * @return boolean containing true if prefab matches searched string else false
-     */
-    private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
-        return prefab.getName().toLowerCase().contains(searchLowercase)
-            || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
+                .filter(prefab -> matchesSearch(searchLowercase, prefab))
+                .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
     }
 
     /**
      * List blocks that match searched string
+     *
      * @param searchLowercase searched string
      * @return List of blocks that match searched string
      */
     private List<String> findBlockMatches(String searchLowercase) {
         return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
-            .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
-            .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
-            .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
-    }
-
-    /**
-     * Determine if block family matches one of criteria
-     * @param searchLowercase searched string
-     * @param def BlockFamilyDefinition to be checked
-     * @return boolean containing true if blockFamilyDefinition matches searched string else false
-     */
-    private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
-        return def.getUrn().toString().toLowerCase().contains(searchLowercase);
+                .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
+                .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
+                .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
     }
 
     /**
      * Time dilation slows down the passage of time by affecting how the main game loop runs,
      * with the goal being to handle high-latency situations by spreading out processing over a longer amount of time
+     *
      * @param rate float time dilation
      */
     @Command(shortDescription = "Alter the rate of time")
@@ -259,6 +272,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Change the UI language
+     *
      * @param langTag String containing language code to change
      * @return String containing language or if not recognized error message
      */
@@ -281,6 +295,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Shows a ui screen
+     *
      * @param uri String containing ui screen name
      * @return String containing Success if UI was change or Not found if screen is missing
      */
@@ -291,6 +306,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Reloads ui screen
+     *
      * @param ui String containing ui screen name
      * @return String containing Success if UI was reloaded or No unique resource found if more screens were found
      */
@@ -315,6 +331,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Opens the NUI editor for a ui screen
+     *
      * @param uri String containing ui screen name
      * @return String containing final message
      */
@@ -338,6 +355,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Opens the NUI editor for a ui skin
+     *
      * @param uri String containing name of ui skin
      * @return String containing final message
      */
@@ -361,6 +379,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Switches to fullscreen or to windowed mode
+     *
      * @return String containing final message
      */
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
@@ -375,6 +394,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Removes all entities of the given prefab
+     *
      * @param prefabName String containing prefab name
      */
     @Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
@@ -399,7 +419,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Join a game
-     * @param address String containing address of game server
+     *
+     * @param address   String containing address of game server
      * @param portParam Integer containing game server port
      */
     @Command(shortDescription = "Join a game", requiredPermission = PermissionManager.NO_PERMISSION)
@@ -423,6 +444,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Leaves the current game and returns to main menu
+     *
      * @return String containing final message
      */
     @Command(shortDescription = "Leaves the current game and returns to main menu",
@@ -437,21 +459,50 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     /**
-     * Writes out information on all entities to a text file for debugging
+     * Writes out information on entities having specific components to a text file for debugging
+     * If no component names provided - writes out information on all entities
+     *
+     * @param componentNames string contains one or several component names, if more then one name
+     *                       provided - they must be braced with double quotes and all names separated
+     *                       by space
+     * @return String containing information about number of entities saved
      * @throws IOException thrown when error with saving file occures
      */
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
-            helpText = "Writes entity information out into a file named \"entityDump.txt\".")
-    public void dumpEntities() throws IOException {
+            helpText = "Writes entity information out into a file named \"entityDump.txt\"." +
+                    " Supports list of component names, which will be used to only save entities that contains" +
+                    " one or more of those components. Names should be separated by spaces.")
+    public String dumpEntities(@CommandParam(value = "componentNames", required = false) String... componentNames) throws IOException {
+        int savedEntityCount;
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
         PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
         WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
-        worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+        if (componentNames.length == 0) {
+            savedEntityCount = worldDumper .save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+        } else {
+            List<Class<? extends Component>> filterComponents = Arrays.stream(componentNames)
+                    .map(String::trim) //Trim off whitespace
+                    .filter(o -> !o.isEmpty()) //Remove empty strings
+                    .map(o -> o.toLowerCase().endsWith("component") ? o : o + "component") //All component class names finish with "component"
+                    .map(o -> Streams.stream(moduleManager.getEnvironment().getSubtypesOf(Component.class))
+                            .filter(e -> e.getSimpleName().equalsIgnoreCase(o))
+                            .findFirst())
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+            if (!filterComponents.isEmpty()) {
+                savedEntityCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), filterComponents);
+            } else {
+                return "Could not find components matching given names";
+            }
+        }
+        return "Number of entities saved: " + savedEntityCount;
     }
 
     /**
      * Spawns an instance of a prefab in the world
-     * @param sender Sender of command
+     *
+     * @param sender     Sender of command
      * @param prefabName String containing prefab name
      * @return String containing final message
      */
@@ -487,12 +538,13 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Spawns a block in front of the player
-     * @param sender Sender of command
+     *
+     * @param sender    Sender of command
      * @param blockName String containing name of block to spawn
      * @return String containg final message
      */
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
-        "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+            "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnBlock(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -589,11 +641,12 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Your ping to the server
+     *
      * @param sender Sender of command
      * @return String containing ping or error message
      */
     @Command(shortDescription = "Your ping to the server", helpText = "The time it takes the packet " +
-        "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
+            "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
     public String ping(@Sender EntityRef sender) {
         Server server = networkSystem.getServer();
         if (server == null) {
@@ -606,7 +659,7 @@ public class CoreCommands extends BaseComponentSystem {
         }
         String[] remoteAddress = server.getRemoteAddress().split("-");
         String address = remoteAddress[1];
-        int port = Integer.valueOf(remoteAddress[2]);
+        int port = Integer.parseInt(remoteAddress[2]);
         try {
             PingService pingService = new PingService(address, port);
             long delay = pingService.call();
@@ -620,6 +673,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Prints out short descriptions for all available commands, or a longer help text if a command is provided.
+     *
      * @param commandName String containing command for which will be displayed help
      * @return String containing short description of all commands or longer help text if command is provided
      */

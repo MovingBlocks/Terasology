@@ -21,18 +21,16 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.generation.impl.EntityBufferImpl;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCore;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
 
@@ -49,13 +47,13 @@ public class MapWorldProvider implements WorldProviderCore {
     private Map<Vector3i, Chunk> chunks = Maps.newHashMap();
     private WorldGenerator worldGenerator;
     private BlockManager blockManager;
-    private BiomeManager biomeManager;
+    private ExtraBlockDataManager extraDataManager;
     private EntityBufferImpl entityBuffer;
 
-    public MapWorldProvider(WorldGenerator worldGenerator, BlockManager blockManager, BiomeManager biomeManager) {
+    public MapWorldProvider(WorldGenerator worldGenerator, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this.worldGenerator = worldGenerator;
         this.blockManager = blockManager;
-        this.biomeManager = biomeManager;
+        this.extraDataManager = extraDataManager;
         entityBuffer = new EntityBufferImpl();
     }
 
@@ -92,16 +90,6 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
-    public Biome setBiome(Vector3i pos, Biome biome) {
-        return null;
-    }
-
-    @Override
-    public Biome getBiome(Vector3i pos) {
-        return null;
-    }
-
-    @Override
     public Block getBlock(int x, int y, int z) {
         Vector3i pos = new Vector3i(x, y, z);
         Block block = blocks.get(pos);
@@ -109,11 +97,11 @@ public class MapWorldProvider implements WorldProviderCore {
             return block;
         }
 
-        // TODO block & biome manager
+        // TODO block manager
         Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
         Chunk chunk = chunks.get(chunkPos);
         if (chunk == null && worldGenerator != null) {
-            chunk = new ChunkImpl(chunkPos, blockManager, biomeManager);
+            chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
             worldGenerator.createChunk(chunk, entityBuffer);
             chunks.put(chunkPos, chunk);
         }
@@ -150,16 +138,6 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
-    public boolean setLiquid(int x, int y, int z, LiquidData newData, LiquidData oldData) {
-        return false;
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        return null;
-    }
-
-    @Override
     public byte getLight(int x, int y, int z) {
         return 0;
     }
@@ -171,6 +149,16 @@ public class MapWorldProvider implements WorldProviderCore {
 
     @Override
     public byte getTotalLight(int x, int y, int z) {
+        return 0;
+    }
+    
+    @Override
+    public int setExtraData(int index, Vector3i pos, int value) {
+        return 0;
+    }
+    
+    @Override
+    public int getExtraData(int index, int x, int y, int z) {
         return 0;
     }
 

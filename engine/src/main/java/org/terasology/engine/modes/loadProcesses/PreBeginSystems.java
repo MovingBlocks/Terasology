@@ -35,7 +35,7 @@ public class PreBeginSystems extends StepBasedLoadProcess {
 
     @Override
     public String getMessage() {
-        return "Reticulating Splines";
+        return "${engine:menu#reticulating-splines}";
     }
 
     @Override

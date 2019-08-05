@@ -22,10 +22,10 @@ import org.terasology.math.TeraMath;
  */
 public enum ScreenshotSize {
 
-    DOUBLE_SIZE("${engine:menu#screenshot-size-double}", 2.0F),
-    NORMAL_SIZE("${engine:menu#screenshot-size-normal}", 1.0F),
-    HALF_SIZE("${engine:menu#screenshot-size-half}", 0.5F),
     QUARTER_SIZE("${engine:menu#screenshot-size-quarter}", 0.25F),
+    HALF_SIZE("${engine:menu#screenshot-size-half}", 0.5F),
+    NORMAL_SIZE("${engine:menu#screenshot-size-normal}", 1.0F),
+    DOUBLE_SIZE("${engine:menu#screenshot-size-double}", 2.0F),
     HD720("720p", 1280, 720),
     HD1080("1080p", 1920, 1080),
     UHD_1("4K UHD", 3840, 2160); // see: https://en.wikipedia.org/wiki/4K_resolution

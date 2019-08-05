@@ -1,5 +1,6 @@
 {
     "type": "enterTextPopup",
+    "skin": "graypopup",
     "contents": {
         "type": "relativeLayout",
         "contents": [

@@ -110,6 +110,9 @@ public class BulletPhysics implements PhysicsEngine {
     private final btRigidBody.btRigidBodyConstructionInfo blockConsInf;
     private final btRigidBody.btRigidBodyConstructionInfo liquidConsInfo;
 
+    private final BulletRigidBody rigidBody;
+    private final BulletRigidBody liquidBody;
+
     public BulletPhysics(WorldProvider world) {
 
         broadphase = new btDbvtBroadphase();
@@ -135,14 +138,14 @@ public class BulletPhysics implements PhysicsEngine {
         btDefaultMotionState blockMotionState = new btDefaultMotionState(matrix4f);
 
         blockConsInf = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
-        BulletRigidBody rigidBody = new BulletRigidBody(blockConsInf);
+        rigidBody = new BulletRigidBody(blockConsInf);
         rigidBody.rb.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
         short mask = (short) (~(StandardCollisionGroup.STATIC.getFlag() | StandardCollisionGroup.LIQUID.getFlag()));
         discreteDynamicsWorld.addRigidBody(rigidBody.rb, combineGroups(StandardCollisionGroup.WORLD), mask);
 
 
         liquidConsInfo = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, liquidShape, new Vector3f());
-        BulletRigidBody liquidBody = new BulletRigidBody(liquidConsInfo);
+        liquidBody = new BulletRigidBody(liquidConsInfo);
         liquidBody.rb.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
         discreteDynamicsWorld.addRigidBody(liquidBody.rb, combineGroups(StandardCollisionGroup.LIQUID), StandardCollisionGroup.SENSOR.getFlag());
 

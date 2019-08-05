@@ -32,9 +32,9 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -59,7 +59,7 @@ public abstract class AbstractStorageManager implements StorageManager {
 
     private final StoragePathProvider storagePathProvider;
     private final BlockManager blockManager;
-    private final BiomeManager biomeManager;
+    private final ExtraBlockDataManager extraDataManager;
 
     private final ModuleEnvironment environment;
     private final EngineEntityManager entityManager;
@@ -69,13 +69,13 @@ public abstract class AbstractStorageManager implements StorageManager {
     private boolean storeChunksInZips = true;
 
     public AbstractStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                  BlockManager blockManager, BiomeManager biomeManager, boolean storeChunksInZips) {
+                                  BlockManager blockManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips) {
         this.entityManager = entityManager;
         this.environment = environment;
         this.storeChunksInZips = storeChunksInZips;
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         this.blockManager = blockManager;
-        this.biomeManager = biomeManager;
+        this.extraDataManager = extraDataManager;
 
         this.storagePathProvider = new StoragePathProvider(savePath);
         this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
@@ -110,7 +110,7 @@ public abstract class AbstractStorageManager implements StorageManager {
             ByteArrayInputStream bais = new ByteArrayInputStream(chunkData);
             try (GZIPInputStream gzipIn = new GZIPInputStream(bais)) {
                 EntityData.ChunkStore storeData = EntityData.ChunkStore.parseFrom(gzipIn);
-                store = new ChunkStoreInternal(storeData, entityManager, blockManager, biomeManager);
+                store = new ChunkStoreInternal(storeData, entityManager, blockManager, extraDataManager);
             } catch (IOException e) {
                 logger.error("Failed to read existing saved chunk {}", chunkPos);
             }

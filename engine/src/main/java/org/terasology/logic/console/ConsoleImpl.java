@@ -124,8 +124,7 @@ public class ConsoleImpl implements Console {
      * @param newLine    A boolean: True causes a newline character to be appended at the end of the message. False doesn't.
      */
     @Override
-    public void addMessage(String message, boolean newLine)
-    {
+    public void addMessage(String message, boolean newLine) {
         addMessage(new Message(message, newLine));
     }
 

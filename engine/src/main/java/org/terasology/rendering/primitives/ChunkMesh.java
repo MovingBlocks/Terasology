@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.world.chunks.ChunkConstants;
@@ -34,14 +35,11 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
 import static org.lwjgl.opengl.GL11.glColorPointer;
-import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glDisableClientState;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnableClientState;
 import static org.lwjgl.opengl.GL11.glNormalPointer;
 import static org.lwjgl.opengl.GL11.glTexCoordPointer;
@@ -56,6 +54,7 @@ public class ChunkMesh {
     /**
      * Possible rendering types.
      */
+    @API
     public enum RenderType {
         OPAQUE(0),
         TRANSLUCENT(1),
@@ -82,9 +81,9 @@ public class ChunkMesh {
 
     // some constants
     private static final int SIZE_VERTEX = 3;   // vertices have 3 positional components, x,y,z
-    private static final int SIZE_TEX0 = 3;     // the first texture has 3 color components, r,g,b
-    private static final int SIZE_TEX1 = 3;     // the second texture is the same
-    private static final int SIZE_COLOR = 1;    // the color field has 4 components, r,g,b,a
+    private static final int SIZE_TEX0 = 4;     // the first texture has 4 components, u,v, flags, animation frame count
+    private static final int SIZE_TEX1 = 3;     // the second texture stores lighting, with components: light, block light, ambient occlusion
+    private static final int SIZE_COLOR = 1;    // the color field's 4 components are packed into 1 float-sized field.
     private static final int SIZE_NORMAL = 3;   // normals are 3-dimensional vectors with u,v,t components
 
     // offset to the beginning of each data field, from the start of the data regarding an individual vertex
@@ -371,6 +370,7 @@ public class ChunkMesh {
         public final TFloatList color;
         public final TIntList indices;
         public final TIntList flags;
+        public final TIntList frames;
         public int vertexCount;
 
         public IntBuffer finalVertices;
@@ -384,6 +384,7 @@ public class ChunkMesh {
             color = new TFloatArrayList();
             indices = new TIntArrayList();
             flags = new TIntArrayList();
+            frames = new TIntArrayList();
         }
     }
 }

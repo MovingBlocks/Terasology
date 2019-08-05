@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
@@ -27,7 +26,7 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
- *  A widget to display an image
+ *  A widget to display an image.
  */
 public class UIImage extends CoreWidget {
     @LayoutConfig
@@ -66,7 +65,12 @@ public class UIImage extends CoreWidget {
         if (image.get() != null) {
             if (ignoreAspectRatio) {
                 ScaleMode scaleMode = canvas.getCurrentStyle().getTextureScaleMode();
-                canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.STRETCH);
+
+                if (image.get().getWidth() > (image.get().getHeight() * 2)) {
+                    canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.STRETCH);
+                } else {
+                    canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.SCALE_FILL);
+                }
                 canvas.drawTexture(image.get(), tint.get());
                 canvas.getCurrentStyle().setTextureScaleMode(scaleMode);
             } else {
@@ -118,5 +122,4 @@ public class UIImage extends CoreWidget {
     public void bindTint(Binding<Color> binding) {
         this.tint = binding;
     }
-
 }

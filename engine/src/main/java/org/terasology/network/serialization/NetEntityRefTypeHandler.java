@@ -51,8 +51,7 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
     public PersistedData serialize(EntityRef value, SerializationContext context) {
         BlockComponent blockComponent = value.getComponent(BlockComponent.class);
         if (blockComponent != null) {
-            Vector3i pos = blockComponent.getPosition();
-            return context.create(pos.x, pos.y, pos.z);
+            return context.create(blockComponent.position.x, blockComponent.position.y, blockComponent.position.z);
         }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {

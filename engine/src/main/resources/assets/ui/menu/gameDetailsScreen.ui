@@ -21,255 +21,129 @@
                 "type": "UIBox",
                 "id": "container",
                 "layoutInfo": {
-                    "width": 1005,
+                    "width": 1016,
                     "position-horizontal-center": {},
                     "position-top": {
                         "target": "BOTTOM",
-                        "offset": 30,
+                        "offset": 23,
                         "widget": "title"
                     },
                     "position-bottom": {
                         "target": "TOP",
                         "widget": "actionButtons",
-                        "offset": 8
+                        "offset": 6
                     }
                 }
             },
             {
                 "id": "body",
-                "type":"RelativeLayout",
+                "type": "ColumnLayout",
+                "columns": 2,
+                "family": "option-grid",
+                "column-widths": [
+                    0.5,
+                    0.5
+                ],
+                "verticalSpacing": 8,
+                "horizontalSpacing": 4,
                 "layoutInfo": {
                     "width": 1000,
                     "position-horizontal-center": {},
                     "position-top": {
                         "target": "BOTTOM",
                         "widget": "title",
-                        "offset": 24
+                        "offset": 32
                     },
                     "position-bottom": {
                         "target": "TOP",
                         "widget": "actionButtons",
-                        "offset": 10
+                        "offset": 14
                     }
                 },
                 "contents": [
                     {
-                        "type": "ColumnLayout",
-                        "columns": 2,
-                        "family": "option-grid",
-                        "column-widths": [
-                            0.5,
-                            0.5
-                        ],
-                        "verticalSpacing": 8,
-                        "horizontalSpacing": 0,
+                        "id": "leftSide",
+                        "type":"RelativeLayout",
                         "layoutInfo": {
-
+                            "use-content-height": true,
+                            "position-horizontal-center": {},
                             "position-top": {
                                 "target": "TOP"
                             }
                         },
                         "contents": [
                             {
-                                "id": "leftSide",
-                                "type":"RelativeLayout",
+                                "type": "UIImageSlideshow",
+                                "id": "preview",
+                                "skin": "framed_image",
                                 "layoutInfo": {
-                                    "use-content-height": true,
                                     "position-horizontal-center": {},
                                     "position-top": {
                                         "target": "TOP"
-                                    }
-                                },
+                                    },
+                                    "height": 280
+                                }
+                            },
+                            {
+                                "type": "RowLayout",
+                                "id": "sliderActions",
+                                "horizontalSpacing": 8,
                                 "contents": [
                                     {
-                                        "type": "UITimedImageSlideshow",
-                                        "id": "preview",
-                                        "skin": "framed_image",
-                                        "layoutInfo": {
-                                            "height": 280,
-                                            "position-horizontal-center": {},
-                                            "position-top": {
-                                                "target": "TOP"
-                                            }
-                                        }
+                                        "type": "UIButton",
+                                        "text": "Prev",
+                                        "id": "slideLeft"
                                     },
                                     {
-                                        "type": "UILabel",
-                                        "text": "${engine:menu#game-details-general-info}",
-                                        "id": "generalInfoTitle",
-                                        "layoutInfo": {
-                                            "height": 25,
-                                            "use-content-width": true,
-                                            "position-horizontal-center": {},
-                                            "position-top": {
-                                                "target": "BOTTOM",
-                                                "widget": "preview"
-                                            }
-                                        }
+                                        "type": "UIButton",
+                                        "text": "Pause",
+                                        "id": "slideStop"
                                     },
                                     {
-                                        "type": "ScrollableArea",
-                                        "id": "generalInfo",
-                                        "preferredHeight": 170,
-                                        "layoutInfo": {
-                                            "height": 120,
-                                            "position-top": {
-                                                "target": "BOTTOM",
-                                                "widget": "generalInfoTitle",
-                                                "offset": 1
-                                            }
-                                        },
-                                        "content": {
-                                            "type": "ColumnLayout",
-                                            "columns": 2,
-
-                                            "column-widths": [
-                                                0.17,
-                                                0.8
-                                            ],
-                                            "verticalSpacing": 8,
-                                            "horizontalSpacing": 8,
-                                            "contents": [
-                                                {
-                                                    "type": "UILabel",
-                                                    "text": "${engine:menu#game-details-game-title}"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "id": "gameTitle"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "text": "${engine:menu#game-details-last-play}:"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "id": "lastAccessDate"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "text": "${engine:menu#game-details-game-duration}"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "id": "duration"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "text": "${engine:menu#game-details-game-seed}"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "id": "seed"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "text": "${engine:menu#game-details-world-generator}:"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "id": "gameWorldGenerator"
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "UILabel",
-                                        "id": "descriptionTitle",
-                                        "layoutInfo": {
-                                            "height": 25,
-                                            "use-content-width": true,
-                                            "position-horizontal-center": {},
-                                            "position-top": {
-                                                "target": "BOTTOM",
-                                                "widget": "generalInfo"
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "type": "ScrollableArea",
-                                        "id": "worldDescription",
-                                        "visible": false,
-                                        "layoutInfo": {
-                                            "position-top": {
-                                                "target": "BOTTOM",
-                                                "widget": "descriptionTitle",
-                                                "offset": 1
-                                            },
-                                            "position-bottom": {
-                                                "target": "BOTTOM",
-                                                "widget": "leftSide"
-                                            }
-
-                                        },
-                                        "content": {
-                                            "type": "ColumnLayout",
-                                            "columns": 2,
-                                            "family": "option-grid",
-                                            "column-widths": [
-                                                0.15,
-                                                0.8
-                                            ],
-                                            "verticalSpacing": 8,
-                                            "horizontalSpacing": 8,
-                                            "contents": [
-                                                {
-                                                    "type": "UILabel",
-                                                    "text": "${engine:menu#game-details-game-title}"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "id": "worldTitle"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "text": "${engine:menu#game-details-world-generator}"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "id": "worldGenerator"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "text": "${engine:menu#game-details-game-seed}"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "id": "worldSeed"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "text": "${engine:menu#game-details-game-duration}"
-                                                },
-                                                {
-                                                    "type": "UILabel",
-                                                    "id": "worldTime"
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "ScrollableArea",
-                                        "visible": false,
-                                        "id": "descriptionContainer",
-                                        "content": {
-                                            "type": "UIText",
-                                            "multiline": true,
-                                            "id": "description"
-                                        },
-                                        "layoutInfo": {
-                                            "position-top": {
-                                                "target": "BOTTOM",
-                                                "widget": "descriptionTitle"
-                                            },
-                                            "position-bottom": {
-                                                "target": "BOTTOM",
-                                                "widget": "leftSide"
-                                            }
-                                        }
+                                        "type": "UIButton",
+                                        "text": "Next",
+                                        "id": "slideRight"
                                     }
-                                ]
+                                ],
+                                "layoutInfo": {
+                                    "width": 400,
+                                    "height": 32,
+                                    "position-horizontal-center": {},
+                                    "position-bottom": {
+                                        "target": "BOTTOM",
+                                        "widget": "preview",
+                                        "offset": 3
+                                    }
+                                }
                             },
+                            {
+                                "type": "ScrollableArea",
+                                "content": {
+                                    "type": "UIText",
+                                    "multiline": true,
+                                    "id": "generalInfo"
+                                },
+                                "layoutInfo": {
+                                    "position-top": {
+                                        "target": "BOTTOM",
+                                        "widget": "preview",
+                                        "offset": 3
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "rightSide",
+                        "type":"RelativeLayout",
+                        "layoutInfo": {
+                            "use-content-height": true,
+                            "position-horizontal-center": {},
+                            "position-top": {
+                                "target": "TOP"
+                            }
+                        },
+                        "contents": [
                             {
                                 "type": "UITabBox",
                                 "skin": "solid",
@@ -281,9 +155,8 @@
                                         "target": "TOP"
                                     },
                                     "position-bottom": {
-                                        "target": "TOP",
-                                        "widget": "actionButtons",
-                                        "offset": 10
+                                        "target": "BOTTOM",
+                                        "offset": 200
                                     }
                                 },
                                 "contents": [
@@ -307,7 +180,6 @@
                                                     }
                                                 },
                                                 "content":  {
-                                                    "id": "rightSide",
                                                     "type":"RelativeLayout",
                                                     "layoutInfo": {
                                                         "use-content-height": true,
@@ -349,55 +221,6 @@
                                                             }
                                                         }
                                                     ]
-                                                }
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type":"RelativeLayout",
-                                        "id": "page2",
-                                        "layoutInfo": {
-                                            "use-content-height": true,
-                                            "position-horizontal-center": {},
-                                            "position-top": {
-                                                "target": "TOP"
-                                            }
-                                        },
-                                        "contents": [
-                                            {
-                                                "type": "ScrollableArea",
-                                                "skin": "mainmenu",
-                                                "family": "biome-list",
-                                                "content": {
-                                                    "type": "ColumnLayout",
-                                                    "columns": 1,
-                                                    "layoutInfo": {
-                                                    },
-                                                    "contents": [
-                                                        {
-                                                            "type": "UILabel",
-                                                            "family": "subheading",
-                                                            "text": "${engine:menu#game-details-worlds}"
-                                                        },
-                                                        {
-                                                            "type": "UIList",
-                                                            "id": "worlds"
-                                                        },
-                                                        {
-                                                            "type": "UILabel",
-                                                            "family": "subheading",
-                                                            "text": "${engine:menu#game-details-biomes}"
-                                                        },
-                                                        {
-                                                            "type": "UIList",
-                                                            "id": "biomes"
-                                                        }
-                                                    ]
-                                                },
-                                                "layoutInfo": {
-                                                    "position-top": {
-                                                        "target": "TOP"
-                                                    }
                                                 }
                                             }
                                         ]
@@ -458,6 +281,46 @@
                                         "id": "button3"
                                     }
                                 ]
+                            },
+                            {
+                                "type":"RelativeLayout",
+                                "id": "additionalInfo",
+                                "layoutInfo": {
+                                    "height": 200,
+                                    "position-horizontal-center": {},
+                                    "position-bottom": {
+                                        "target": "BOTTOM"
+                                    }
+                                },
+                                "contents": [
+                                    {
+                                        "type": "UILabel",
+                                        "id": "descriptionTitle",
+                                        "layoutInfo": {
+                                            "height": 21,
+                                            "use-content-width": true,
+                                            "position-horizontal-center": {},
+                                            "position-top": {
+                                                "target": "TOP"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "ScrollableArea",
+                                        "id": "descriptionContainer",
+                                        "content": {
+                                            "type": "UIText",
+                                            "multiline": true,
+                                            "id": "description"
+                                        },
+                                        "layoutInfo": {
+                                            "position-top": {
+                                                "target": "BOTTOM",
+                                                "widget": "descriptionTitle"
+                                            }
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -470,24 +333,39 @@
                 "contents": [
                     {
                         "type": "UIButton",
-                        "text": "${engine:menu#back}",
-                        "id": "close"
-                    },
-                    {
-                        "type": "UIButton",
                         "text": "${engine:menu#game-details-show-errors}",
                         "id": "showErrors",
                         "enabled": false
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#game-details-module-details}",
+                        "id": "openModuleDetails"
                     }
                 ],
                 "layoutInfo": {
-                     "width": 250,
-                     "height": 32,
-                     "position-horizontal-center": {},
-                     "position-bottom": {
-                         "target": "BOTTOM",
-                         "offset": 30
-                     }
+                    "width": 400,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 16
+                    }
+                }
+            },
+            {
+                "type": "UIButton",
+                "text": "${engine:menu#back}",
+                "id": "close",
+                "layoutInfo": {
+                    "width": 128,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                    }
                 }
             }
         ]

@@ -19,7 +19,7 @@ package org.terasology.core.world.viewer.layers;
 import com.google.common.collect.Maps;
 import org.terasology.core.world.CoreBiome;
 import org.terasology.rendering.nui.Color;
-import org.terasology.world.biomes.Biome;
+import org.terasology.biomesAPI.Biome;
 
 import java.util.Map;
 import java.util.function.Function;

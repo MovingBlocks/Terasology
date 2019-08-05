@@ -29,6 +29,7 @@ import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.nullAudio.NullSound;
 import org.terasology.audio.nullAudio.NullStreamingSound;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
@@ -60,6 +61,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.rendering.assets.animation.MeshAnimation;
@@ -78,13 +80,10 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.family.AttachedToSurfaceFamily;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyRegistry;
-import org.terasology.world.block.family.HorizontalFamily;
+import org.terasology.world.block.family.BlockFamilyLibrary;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
@@ -94,6 +93,7 @@ import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.block.tiles.WorldAtlas;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.sun.BasicCelestialModel;
 import org.terasology.world.sun.CelestialSystem;
@@ -133,13 +133,18 @@ public class HeadlessEnvironment extends Environment {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         EngineEntityManager engineEntityManager = context.get(EngineEntityManager.class);
         BlockManager blockManager = context.get(BlockManager.class);
-        BiomeManager biomeManager = context.get(BiomeManager.class);
         RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
         Path savePath = PathManager.getInstance().getSavePath("world1");
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
+        RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
+
+        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
+        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment,context));
+        
+        ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, blockManager, biomeManager, recordAndReplaySerializer, recordAndReplayUtils));
+                engineEntityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
     }
 
     @Override
@@ -171,6 +176,11 @@ public class HeadlessEnvironment extends Environment {
         typeSerializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
         typeSerializationLibrary.add(Block.class, new BlockTypeHandler(blockManager));
     }
+    
+    @Override
+    protected void setupExtraDataManager(Context context) {
+        context.put(ExtraBlockDataManager.class, new ExtraBlockDataManager(context));
+    }
 
     @Override
     protected AssetManager setupEmptyAssetManager() {
@@ -201,11 +211,8 @@ public class HeadlessEnvironment extends Environment {
         assetTypeManager.registerCoreAssetType(StaticSound.class, NullSound::new, "sounds");
         assetTypeManager.registerCoreAssetType(StreamingSound.class, NullStreamingSound::new, "music");
 
-        BlockFamilyRegistry blockFamilyFactoryRegistry = new BlockFamilyRegistry();
-        blockFamilyFactoryRegistry.setBlockFamily("horizontal", HorizontalFamily.class);
-        blockFamilyFactoryRegistry.setBlockFamily("alignToSurface", AttachedToSurfaceFamily.class);
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
-                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), blockFamilyFactoryRegistry));
+                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
 
         assetTypeManager.registerCoreAssetType(UISkin.class,
                 UISkin::new, "skins");

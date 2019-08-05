@@ -44,10 +44,15 @@ public class TileFormat extends AbstractAssetFileFormat<TileData> {
         boolean auto = list.get(0).getPath().contains("auto");
         try (InputStream stream = list.get(0).openStream()) {
             BufferedImage image = ImageIO.read(stream);
-            if (!IntMath.isPowerOfTwo(image.getHeight()) || !(image.getWidth() == image.getHeight())) {
-                throw new IOException("Invalid tile - must be square with power-of-two sides");
+            if (!IntMath.isPowerOfTwo(image.getHeight()) || image.getWidth() % image.getHeight() != 0 || image.getWidth() == 0) {
+                throw new IOException("Invalid tile - must be horizontal row of power-of-two sized squares");
             }
-            return new TileData(image, auto);
+            BufferedImage[] frames = new BufferedImage[image.getWidth()/image.getHeight()];
+            for (int i=0; i<frames.length; i++) {
+                frames[i] = new BufferedImage(image.getHeight(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                frames[i].createGraphics().drawImage(image, -image.getHeight() * i, 0, null);
+            }
+            return new TileData(frames, auto);
         }
     }
 

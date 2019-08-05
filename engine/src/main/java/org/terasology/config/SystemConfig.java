@@ -19,10 +19,9 @@ package org.terasology.config;
 import java.util.Locale;
 import java.util.Locale.Category;
 
-/**
- */
 public class SystemConfig {
     public static final String SAVED_GAMES_ENABLED_PROPERTY = "org.terasology.savedGamesEnabled";
+    public static final String PERMISSIVE_SECURITY_ENABLED_PROPERTY = "org.terasology.permissiveSecurityEnabled";
 
     private long dayNightLengthInMs;
     private int maxThreads;
@@ -31,6 +30,7 @@ public class SystemConfig {
     private boolean debugEnabled;
     private boolean monitoringEnabled;
     private boolean writeSaveGamesEnabled;
+    private long chunkGenerationFailTimeoutInMs;
     private String locale;
 
     public long getDayNightLengthInMs() {
@@ -91,6 +91,14 @@ public class SystemConfig {
 
     public void setWriteSaveGamesEnabled(boolean writeSaveGamesEnabled) {
         this.writeSaveGamesEnabled = writeSaveGamesEnabled;
+    }
+
+    public long getChunkGenerationFailTimeoutInMs() {
+        return chunkGenerationFailTimeoutInMs;
+    }
+
+    public void setChunkGenerationFailTimeoutInMs(long chunkGenerationFailTimeoutInMs) {
+        this.chunkGenerationFailTimeoutInMs = chunkGenerationFailTimeoutInMs;
     }
 
     public Locale getLocale() {

@@ -15,30 +15,30 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import com.google.common.collect.Lists;
-import org.terasology.utilities.Assets;
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.nui.ActivatableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
+import org.terasology.utilities.Assets;
 
 import java.util.List;
 
 /**
  * A widget displaying a clickable button, containing text and an optional image
  */
-public class UIButton extends CoreWidget {
+public class UIButton extends ActivatableWidget {
     public static final String DOWN_MODE = "down";
 
     /**
@@ -71,11 +71,6 @@ public class UIButton extends CoreWidget {
     private boolean down;
 
     /**
-     * A {@link List} of listeners subscribed to this button
-     */
-    private List<ActivateEventListener> listeners = Lists.newArrayList();
-
-    /**
      * An {@link InteractionListener} that listens for mouse interaction with this button
      */
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -93,15 +88,17 @@ public class UIButton extends CoreWidget {
         public void onMouseRelease(NUIMouseReleaseEvent event) {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 if (isMouseOver()) {
-                    if (getClickSound() != null) {
-                        getClickSound().play(getClickVolume());
-                    }
-                    activate();
+                    activateWidget();
                 }
                 down = false;
             }
         }
     };
+
+    /**
+     * The {@code Binding} containing the boolean representing of active status, false by default.
+     */
+    private Binding<Boolean> active = new DefaultBinding<>(false);
 
     /**
      * Creates an empty {@code UIButton}.
@@ -176,7 +173,7 @@ public class UIButton extends CoreWidget {
      * Retrieves the current mode of this {@code UIButton}.
      * <p><ul>
      * <li> DISABLED_MODE - The {@code UIButton} is disabled
-     * <li> DOWN_MODE - The {@code UIButton} is being pressed
+     * <li> DOWN_MODE - The {@code UIButton} is being pressed or active
      * <li> HOVER_MODE - The mouse is hovering over the {@code UIButton}
      * <li> DEFAULT_MODE - The default mode if no other modes are applicable
      * </ul></p>
@@ -187,7 +184,7 @@ public class UIButton extends CoreWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (down) {
+        } else if (down || isActive() || (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this))) {
             return DOWN_MODE;
         } else if (interactionListener.isMouseOver()) {
             return HOVER_MODE;
@@ -195,13 +192,12 @@ public class UIButton extends CoreWidget {
         return DEFAULT_MODE;
     }
 
-    /**
-     * Called when this {@code UIButton} is pressed to activate all subscribed listeners.
-     */
-    private void activate() {
-        for (ActivateEventListener listener : listeners) {
-            listener.onActivated(this);
+    @Override
+    protected void activateWidget() {
+        if (getClickSound() != null) {
+            getClickSound().play(getClickVolume());
         }
+        super.activateWidget();
     }
 
     /**
@@ -328,5 +324,19 @@ public class UIButton extends CoreWidget {
      */
     public void unsubscribe(ActivateEventListener listener) {
         listeners.remove(listener);
+    }
+
+    /**
+     * Sets the active status of this {@code UIButton}.
+     */
+    public void setActive(boolean val) {
+        this.active.set(val);
+    }
+
+    /**
+     * Returns if the button is active or not.
+     */
+    public boolean isActive() {
+        return active.get();
     }
 }

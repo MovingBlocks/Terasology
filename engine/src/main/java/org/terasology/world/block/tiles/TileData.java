@@ -22,16 +22,16 @@ import java.awt.image.BufferedImage;
 /**
  */
 public class TileData implements AssetData {
-    private BufferedImage image;
+    private BufferedImage[] images;
     private boolean autoBlock;
 
-    public TileData(BufferedImage image, boolean autoBlock) {
-        this.image = image;
+    public TileData(BufferedImage[] images, boolean autoBlock) {
+        this.images = images;
         this.autoBlock = autoBlock;
     }
 
-    public BufferedImage getImage() {
-        return image;
+    public BufferedImage[] getImages() {
+        return images;
     }
 
     public boolean isAutoBlock() {

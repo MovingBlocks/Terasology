@@ -32,8 +32,6 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -638,18 +636,6 @@ public final class WorldRendererImpl implements WorldRenderer {
             List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
             renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
             requestedTaskListRefresh = false;
-
-            //Activate record when the preparations are ready
-            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
-                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.RECORDING);
-            }
-
-            //Activate the replay when the preparations are ready
-            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-                RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
-                recordAndReplaySerializer.deserializeRecordAndReplayData();
-                RecordAndReplayStatus.setCurrentStatus(RecordAndReplayStatus.REPLAYING);
-            }
         }
     }
 
@@ -729,13 +715,13 @@ public final class WorldRendererImpl implements WorldRenderer {
         float rawLightValueSun = worldProvider.getSunlight(pos) / 15.0f;
         float rawLightValueBlock = worldProvider.getLight(pos) / 15.0f;
 
-        float lightValueSun = (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0f) * rawLightValueSun;
+        float lightValueSun = (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0) * rawLightValueSun;
         lightValueSun *= backdropProvider.getDaylight();
         // TODO: Hardcoded factor and value to compensate for daylight tint and night brightness
         lightValueSun *= 0.9f;
         lightValueSun += 0.05f;
 
-        float lightValueBlock = (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - rawLightValueBlock) * 16.0f) * rawLightValueBlock * BLOCK_INTENSITY_FACTOR;
+        float lightValueBlock = (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - (double)rawLightValueBlock) * 16.0f) * rawLightValueBlock * BLOCK_INTENSITY_FACTOR;
 
         return Math.max(lightValueBlock, lightValueSun);
     }

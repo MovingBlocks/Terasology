@@ -46,7 +46,7 @@ import java.util.Set;
  * - Fence
  */
 public abstract class MultiConnectFamily extends AbstractBlockFamily implements UpdatesWithNeighboursFamily {
-    private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
+    private static final Logger logger = LoggerFactory.getLogger(MultiConnectFamily.class);
 
     @In
     protected WorldProvider worldProvider;

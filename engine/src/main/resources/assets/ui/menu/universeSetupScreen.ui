@@ -5,12 +5,12 @@
     "type": "relativeLayout",
     "contents": [
       {
-        "type": "UIImage",
-        "image": "engine:terasology",
+        "type": "UILabel",
         "id": "title",
+        "family": "title",
+        "text": "${engine:menu#universe-setup}",
         "layoutInfo": {
-          "width": 512,
-          "height": 128,
+          "height": 48,
           "position-horizontal-center": {},
           "position-top": {
             "target": "TOP",
@@ -20,15 +20,16 @@
       },
       {
         "type": "UILabel",
-        "id": "subtitle",
-        "family": "title",
-        "text": "${engine:menu#universe-setup}",
+        "id": "warning",
+        "text": "${engine:menu#multi-world-warning}",
+        "family": "warning",
         "layoutInfo": {
-          "height": 48,
+          "height": 12,
           "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "widget": "title"
+          "position-bottom": {
+            "target": "TOP",
+            "widget": "mainBox",
+            "offset": 36
           }
         }
       },
@@ -43,7 +44,7 @@
           "contents": [
             {
               "type": "UILabel",
-              "text": "Pick a world generator and add it. Then select and configure worlds from the freshly filled Worlds dropdown"
+              "text": "${engine:menu#universe-setup-description}"
             },
             {
               "type": "UILabel",
@@ -52,7 +53,6 @@
             },
             {
               "type": "RowLayout",
-              "verticalSpacing": 4,
               "horizontalSpacing": 4,
               "contents": [
                 {
@@ -100,7 +100,6 @@
             },
             {
               "type": "RowLayout",
-              "verticalSpacing": 4,
               "horizontalSpacing": 4,
               "contents": [
                 {
@@ -140,36 +139,50 @@
           "width": 500,
           "use-content-height": true,
           "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "offset": 64,
-            "widget": "title"
-          }
+          "position-vertical-center": {}
         }
       },
       {
         "type": "RowLayout",
         "id": "actionsRow",
-        "horizontalSpacing": 4,
+        "horizontalSpacing": 32,
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#continue}",
-            "id": "continue"
+            "text": "${engine:menu#return-main-menu}",
+            "id": "mainMenu"
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#start-game}",
+            "text": "${engine:menu#start-playing}",
             "id": "play",
             "enabled": false
           }
         ],
         "layoutInfo": {
-          "width": 400,
-          "height": 32,
+          "width": 272,
+          "height": 80,
           "position-horizontal-center": {},
           "position-top": {
             "target": "BOTTOM",
+            "widget": "mainBox",
+            "offset": 16
+          }
+        }
+      },
+      {
+        "type": "UIButton",
+        "text": "${engine:menu#return-advanced-setup}",
+        "id": "close",
+        "layoutInfo": {
+          "width": 120,
+          "height": 80,
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "mainBox"
+          },
+          "position-right": {
+            "target": "LEFT",
             "offset": 16,
             "widget": "mainBox"
           }
@@ -177,15 +190,52 @@
       },
       {
         "type": "UIButton",
-        "text": "${engine:menu#back}",
-        "id": "close",
+        "text": "${engine:menu#continue-pregeneration}",
+        "id": "continue",
         "layoutInfo": {
-          "width": 128,
-          "height": 32,
-          "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "offset": 16,
+          "width": 120,
+          "height": 80,
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "mainBox"
+          },
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "mainBox",
+            "offset": 16
+          }
+        }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:happyGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "actionsRow"
+          }
+        }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:angryGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-right": {
+            "target": "LEFT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
             "widget": "actionsRow"
           }
         }

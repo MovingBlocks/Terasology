@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.terasology.config;
 
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
+import org.terasology.engine.subsystem.Resolution;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
@@ -26,8 +27,6 @@ import org.terasology.utilities.subscribables.AbstractSubscribable;
 
 import java.beans.PropertyChangeListener;
 
-/**
- */
 public class RenderingConfig extends AbstractSubscribable {
 
     public static final String PIXEL_FORMAT = "PixelFormat";
@@ -36,6 +35,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String WINDOW_WIDTH = "WindowWidth";
     public static final String WINDOW_HEIGHT = "WindowHeight";
     public static final String DISPLAY_MODE_SETTING = "DisplayModeSetting";
+    public static final String RESOLUTION = "Resolution";
     public static final String ANIMATED_MENU = "AnimatedMenu";
     public static final String VIEW_DISTANCE = "viewDistance";
     public static final String FLICKERING_LIGHT = "FlickeringLight";
@@ -71,6 +71,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String V_SYNC = "VSync";
     public static final String FRAME_LIMIT = "FrameLimit";
     public static final String FBO_SCALE = "FboScale";
+    public static final String UI_SCALE = "UiScale";
     public static final String CLAMP_LIGHTING = "ClampLighting";
     public static final String SCREENSHOT_SIZE = "screenshotSize";
     public static final String SCREENSHOT_FORMAT = "ScreenshotFormat";
@@ -83,6 +84,7 @@ public class RenderingConfig extends AbstractSubscribable {
     private int windowWidth;
     private int windowHeight;
     private DisplayModeSetting displayModeSetting;
+    private Resolution resolution;
     private boolean animatedMenu;
     private ViewDistance viewDistance;
     private boolean flickeringLight;
@@ -119,6 +121,7 @@ public class RenderingConfig extends AbstractSubscribable {
     private boolean vSync;
     private boolean clampLighting;
     private int fboScale;
+    private int uiScale = 100;
     private boolean dumpShaders;
     private boolean volumetricFog;
     private ScreenshotSize screenshotSize;
@@ -235,6 +238,16 @@ public class RenderingConfig extends AbstractSubscribable {
         } else {
             setFullscreen(true);
         }
+    }
+
+    public Resolution getResolution() {
+        return resolution;
+    }
+
+    public void setResolution(Resolution resolution) {
+        Resolution oldValue = this.resolution;
+        this.resolution = resolution;
+        propertyChangeSupport.firePropertyChange(RESOLUTION, oldValue, resolution);
     }
 
     public boolean isAnimatedMenu() {
@@ -595,6 +608,19 @@ public class RenderingConfig extends AbstractSubscribable {
         int oldScale = this.fboScale;
         this.fboScale = fboScale;
         propertyChangeSupport.firePropertyChange(FBO_SCALE, oldScale, this.fboScale);
+    }
+
+    public int getUiScale() {
+        if (uiScale == 0) {
+            return 100;
+        }
+        return uiScale;
+    }
+
+    public void setUiScale(int uiScale) {
+        int oldScale = this.uiScale;
+        this.uiScale = uiScale;
+        propertyChangeSupport.firePropertyChange(UI_SCALE, oldScale, this.uiScale);
     }
 
     public boolean isClampLighting() {

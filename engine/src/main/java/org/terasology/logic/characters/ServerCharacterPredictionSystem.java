@@ -36,6 +36,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.recording.CharacterStateEventPositionMap;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -74,6 +75,9 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     @In
     private CharacterStateEventPositionMap characterStateEventPositionMap;
+
+    @In
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     private CharacterMover characterMover;
     private Map<EntityRef, CircularBuffer<CharacterStateEvent>> characterStates = Maps.newHashMap();
@@ -127,17 +131,17 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
-        float delta = input.getDelta() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW );
-        if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING) {
+        float delta = input.getDeltaMs() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW );
+        if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
             delta -= MAX_INPUT_OVERFLOW_REPLAY_INCREASE;
         }
         if (delta < 0) {
             CharacterStateEvent newState = stepState(input, lastState, entity);
             stateBuffer.add(newState);
 
-            if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.REPLAYING)  {
+            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING)  {
                 characterStateEventPositionMap.updateCharacterStateEvent(newState);
-            } else if (RecordAndReplayStatus.getCurrentStatus() == RecordAndReplayStatus.RECORDING) {
+            } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
                 characterStateEventPositionMap.add(newState.getSequenceNumber(), newState.getPosition(), newState.getVelocity());
             }
 

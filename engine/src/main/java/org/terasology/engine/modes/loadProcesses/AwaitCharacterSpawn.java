@@ -35,7 +35,7 @@ public class AwaitCharacterSpawn implements LoadProcess {
 
     @Override
     public String getMessage() {
-        return "Awaiting Character Spawn...";
+        return  "${engine:menu#awaiting-character-spawn}";
     }
 
     @Override

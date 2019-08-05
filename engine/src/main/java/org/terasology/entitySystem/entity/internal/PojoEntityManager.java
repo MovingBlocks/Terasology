@@ -26,6 +26,7 @@ import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -39,13 +40,16 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.sectors.SectorSimulationComponent;
+import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.world.internal.WorldInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -64,28 +68,20 @@ public class PojoEntityManager implements EngineEntityManager {
     private EngineEntityPool globalPool = new PojoEntityPool(this);
     private PojoSectorManager sectorManager = new PojoSectorManager(this);
     private Map<Long, EngineEntityPool> poolMap = new MapMaker().initialCapacity(1000).makeMap();
+    private List<EngineEntityPool> worldPools = Lists.newArrayList();
+    private Map<EngineEntityPool, Long> poolCounts = new HashMap<EngineEntityPool, Long>();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
     private Set<EntityDestroySubscriber> destroySubscribers = Sets.newLinkedHashSet();
     private EventSystem eventSystem;
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
+    private WorldManager worldManager;
+    private GameManifest gameManifest;
 
     private RefStrategy refStrategy = new DefaultRefStrategy();
 
     private TypeSerializationLibrary typeSerializerLibrary;
-
-    public void setTypeSerializerLibrary(TypeSerializationLibrary serializerLibrary) {
-        this.typeSerializerLibrary = serializerLibrary;
-    }
-
-    public void setComponentLibrary(ComponentLibrary componentLibrary) {
-        this.componentLibrary = componentLibrary;
-    }
-
-    public void setPrefabManager(PrefabManager prefabManager) {
-        this.prefabManager = prefabManager;
-    }
 
     @Override
     public RefStrategy getEntityRefStrategy() {
@@ -93,8 +89,38 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    public void setEntityRefStrategy(RefStrategy strategy) {
+        this.refStrategy = strategy;
+    }
+
+    @Override
     public EngineEntityPool getGlobalPool() {
         return globalPool;
+    }
+
+    /**
+     * Check if world pools have been created and returns them such that subsequent entities are put in them. The global pool
+     * is returned if no world pools have been created.
+     *
+     * @return the pool under consideration.
+     */
+    public EngineEntityPool getCurrentWorldPool() {
+        if (worldManager == null || worldManager.getCurrentWorldPool() == null) {
+            return globalPool;
+        } else {
+            return worldManager.getCurrentWorldPool();
+        }
+    }
+
+    /**
+     * Not all entities are present in the world pools. The world pools are created only
+     * in the {@link org.terasology.engine.modes.loadProcesses.CreateWorldEntity} process, but much before
+     * that some blocks are loaded. Hence those are by default put into the global pool.
+     *
+     * @return if world pools have been formed or not
+     */
+    private boolean isWorldPoolGlobalPool() {
+        return getCurrentWorldPool() == globalPool;
     }
 
     @Override
@@ -107,22 +133,35 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityBuilder newBuilder() {
-        return globalPool.newBuilder();
+        return getCurrentWorldPool().newBuilder();
     }
 
     @Override
     public EntityBuilder newBuilder(String prefabName) {
-        return globalPool.newBuilder(prefabName);
+        return getCurrentWorldPool().newBuilder(prefabName);
     }
 
     @Override
     public EntityBuilder newBuilder(Prefab prefab) {
-        return globalPool.newBuilder(prefab);
+        return getCurrentWorldPool().newBuilder(prefab);
     }
 
     @Override
     public EntityRef create() {
-        return globalPool.create();
+        return getCurrentWorldPool().create();
+    }
+
+    @Override
+    public void createWorldPools(GameManifest game) {
+        this.gameManifest = game;
+        Map<String, WorldInfo> worldInfoMap = gameManifest.getWorldInfoMap();
+        worldManager = new WorldManager(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD));
+        for (Map.Entry<String, WorldInfo> worldInfoEntry : worldInfoMap.entrySet()) {
+            EngineEntityPool pool = new PojoEntityPool(this);
+            //pool.create();
+            worldPools.add(pool);
+            worldManager.addWorldPool(worldInfoEntry.getValue(), pool);
+        }
     }
 
     @Override
@@ -154,47 +193,42 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef create(Component... components) {
-        return globalPool.create(components);
+        return getCurrentWorldPool().create(components);
     }
 
     @Override
     public EntityRef create(Iterable<Component> components) {
-        return globalPool.create(components);
+        return getCurrentWorldPool().create(components);
     }
 
     @Override
     public EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents) {
-        return globalPool.create(components, sendLifecycleEvents);
-    }
-
-    @Override
-    public void setEntityRefStrategy(RefStrategy strategy) {
-        this.refStrategy = strategy;
+        return getCurrentWorldPool().create(components, sendLifecycleEvents);
     }
 
     @Override
     public EntityRef create(String prefabName) {
-        return globalPool.create(prefabName);
+        return getCurrentWorldPool().create(prefabName);
     }
 
     @Override
     public EntityRef create(Prefab prefab, Vector3f position) {
-        return globalPool.create(prefab, position);
+        return getCurrentWorldPool().create(prefab, position);
     }
 
     @Override
     public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        return globalPool.create(prefab, position, rotation);
+        return getCurrentWorldPool().create(prefab, position, rotation);
     }
 
     @Override
     public EntityRef create(String prefab, Vector3f position) {
-        return globalPool.create(prefab, position);
+        return getCurrentWorldPool().create(prefab, position);
     }
 
     @Override
     public EntityRef create(Prefab prefab) {
-        return globalPool.create(prefab);
+        return getCurrentWorldPool().create(prefab);
     }
 
     @Override
@@ -207,7 +241,7 @@ public class PojoEntityManager implements EngineEntityManager {
         for (Component c : other.iterateComponents()) {
             newEntityComponents.add(componentLibrary.copy(c));
         }
-        return globalPool.create(newEntityComponents);
+        return getCurrentWorldPool().create(newEntityComponents);
     }
 
     @Override
@@ -221,24 +255,40 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public Iterable<EntityRef> getAllEntities() {
-        return Iterables.concat(globalPool.getAllEntities(), sectorManager.getAllEntities());
+        if (isWorldPoolGlobalPool()) {
+            return Iterables.concat(globalPool.getAllEntities(), sectorManager.getAllEntities());
+        }
+        return Iterables.concat(globalPool.getAllEntities(), getCurrentWorldPool().getAllEntities(), sectorManager.getAllEntities());
     }
 
     @SafeVarargs
     @Override
     public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
+        if (isWorldPoolGlobalPool()) {
+            return Iterables.concat(globalPool.getEntitiesWith(componentClasses),
+                    sectorManager.getEntitiesWith(componentClasses));
+        }
         return Iterables.concat(globalPool.getEntitiesWith(componentClasses),
-                sectorManager.getEntitiesWith(componentClasses));
+                getCurrentWorldPool().getEntitiesWith(componentClasses), sectorManager.getEntitiesWith(componentClasses));
     }
 
     @Override
     public int getActiveEntityCount() {
-        return globalPool.getActiveEntityCount() + sectorManager.getActiveEntityCount();
+        if (isWorldPoolGlobalPool()) {
+            return globalPool.getActiveEntityCount() + sectorManager.getActiveEntityCount();
+        }
+        return globalPool.getActiveEntityCount() + getCurrentWorldPool().getActiveEntityCount()
+                + sectorManager.getActiveEntityCount();
+
     }
 
     @Override
     public ComponentLibrary getComponentLibrary() {
         return componentLibrary;
+    }
+
+    public void setComponentLibrary(ComponentLibrary componentLibrary) {
+        this.componentLibrary = componentLibrary;
     }
 
     @Override
@@ -247,15 +297,23 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    public void setEventSystem(EventSystem eventSystem) {
+        this.eventSystem = eventSystem;
+    }
+
+    @Override
     public PrefabManager getPrefabManager() {
         return prefabManager;
+    }
+
+    public void setPrefabManager(PrefabManager prefabManager) {
+        this.prefabManager = prefabManager;
     }
 
 
     /*
      * Engine features
      */
-
 
     @Override
     public EntityRef getEntity(long id) {
@@ -264,12 +322,32 @@ public class PojoEntityManager implements EngineEntityManager {
                 .orElse(EntityRef.NULL);
     }
 
+    @Override
+    public List<EngineEntityPool> getWorldPools() {
+        return worldPools;
+    }
+
+    @Override
+    public Map<WorldInfo, EngineEntityPool> getWorldPoolsMap() {
+        return worldManager.getWorldPoolMap();
+    }
+
+    @Override
+    public Map<Long, EngineEntityPool> getPoolMap() {
+        return poolMap;
+    }
+
+    @Override
+    public Map<EngineEntityPool, Long> getPoolCounts() {
+        return poolCounts;
+    }
+
     /**
      * Creates the entity without sending any events. The entity life cycle subscriber will however be informed.
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components) {
-        return globalPool.createEntityWithoutLifecycleEvents(components);
+        return getCurrentWorldPool().createEntityWithoutLifecycleEvents(components);
     }
 
     /**
@@ -277,7 +355,7 @@ public class PojoEntityManager implements EngineEntityManager {
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(String prefabName) {
-        return globalPool.createEntityWithoutLifecycleEvents(prefabName);
+        return getCurrentWorldPool().createEntityWithoutLifecycleEvents(prefabName);
     }
 
     /**
@@ -285,22 +363,22 @@ public class PojoEntityManager implements EngineEntityManager {
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(Prefab prefab) {
-        return globalPool.createEntityWithoutLifecycleEvents(prefab);
+        return getCurrentWorldPool().createEntityWithoutLifecycleEvents(prefab);
     }
 
     @Override
     public void putEntity(long entityId, BaseEntityRef ref) {
-        globalPool.putEntity(entityId, ref);
+        getCurrentWorldPool().putEntity(entityId, ref);
     }
 
     @Override
     public ComponentTable getComponentStore() {
-        return globalPool.getComponentStore();
+        return getCurrentWorldPool().getComponentStore();
     }
 
     @Override
     public void destroyEntityWithoutEvents(EntityRef entity) {
-        globalPool.destroyEntityWithoutEvents(entity);
+        getCurrentWorldPool().destroyEntityWithoutEvents(entity);
     }
 
     @Override
@@ -327,13 +405,12 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public void setEventSystem(EventSystem eventSystem) {
-        this.eventSystem = eventSystem;
-    }
-
-    @Override
     public TypeSerializationLibrary getTypeSerializerLibrary() {
         return typeSerializerLibrary;
+    }
+
+    public void setTypeSerializerLibrary(TypeSerializationLibrary serializerLibrary) {
+        this.typeSerializerLibrary = serializerLibrary;
     }
 
     @Override
@@ -358,7 +435,7 @@ public class PojoEntityManager implements EngineEntityManager {
                         .orElse(Collections.emptyList()));
 
         notifyBeforeDeactivation(entity, components);
-        for (Component component: components) {
+        for (Component component : components) {
             getPool(entityId).ifPresent(pool -> pool.getComponentStore().remove(entityId, component.getClass()));
         }
         loadedIds.remove(entityId);
@@ -387,6 +464,7 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
         return globalPool.getComponentStore().get(entityId, componentClass) != null
+                || getCurrentWorldPool().getComponentStore().get(entityId, componentClass) != null
                 || sectorManager.hasComponent(entityId, componentClass);
     }
 
@@ -550,28 +628,33 @@ public class PojoEntityManager implements EngineEntityManager {
 
     /**
      * Assign the given entity to the given pool.
-     *
+     * <p>
      * If the entity is already assigned to a pool, it will be re-assigned to the given pool.
      * This does not actually move the entity or any of its components.
      * If you want to move an entity to a different pool, {@link #moveToPool(long, EngineEntityPool)} should be used
      * instead.
      *
      * @param entityId the id of the entity to assign
-     * @param pool the pool to assign the entity to
+     * @param pool     the pool to assign the entity to
      */
     @Override
     public void assignToPool(long entityId, EngineEntityPool pool) {
         if (poolMap.get(entityId) != pool) {
             poolMap.put(entityId, pool);
+            if (!poolCounts.containsKey(pool)) {
+                poolCounts.put(pool, 1L);
+            } else {
+                poolCounts.put(pool, poolCounts.get(pool) + 1L);
+            }
         }
     }
 
     /**
      * Remove the assignment of an entity to a pool.
-     *
+     * <p>
      * This does not affect anything else related to the entity, but may lead to the entity or its components being
      * unable to be found.
-     *
+     * <p>
      * When using this method, be sure to properly re-assign the entity to its correct pool afterwards.
      *
      * @param id the id of the entity to remove the assignment for
@@ -580,6 +663,7 @@ public class PojoEntityManager implements EngineEntityManager {
         poolMap.remove(id);
     }
 
+    @Override
     public boolean moveToPool(long id, EngineEntityPool pool) {
 
         if (getPool(id).isPresent() && getPool(id).get().equals(pool)) {
@@ -599,6 +683,8 @@ public class PojoEntityManager implements EngineEntityManager {
 
         //Remove from the existing pool
         Optional<BaseEntityRef> maybeRef = oldPool.remove(id);
+        //Decrease the count of entities in that pool
+        poolCounts.put(oldPool, poolCounts.get(oldPool) - 1);
         if (!maybeRef.isPresent()) {
             return false;
         }
@@ -653,13 +739,23 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     @SafeVarargs
     public final int getCountOfEntitiesWith(Class<? extends Component>... componentClasses) {
+        if (isWorldPoolGlobalPool()) {
+            return globalPool.getCountOfEntitiesWith(componentClasses) +
+                    sectorManager.getCountOfEntitiesWith(componentClasses);
+        }
         return sectorManager.getCountOfEntitiesWith(componentClasses) +
+                getCurrentWorldPool().getCountOfEntitiesWith(componentClasses) +
                 globalPool.getCountOfEntitiesWith(componentClasses);
     }
 
     public <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass) {
         List<TLongObjectIterator<T>> iterators = new ArrayList<>();
-        iterators.add(globalPool.getComponentStore().componentIterator(componentClass));
+        if (isWorldPoolGlobalPool()) {
+            iterators.add(globalPool.getComponentStore().componentIterator(componentClass));
+        } else {
+            iterators.add(globalPool.getComponentStore().componentIterator(componentClass));
+            iterators.add(getCurrentWorldPool().getComponentStore().componentIterator(componentClass));
+        }
         iterators.add(sectorManager.getComponentStore().componentIterator(componentClass));
 
         List<Map.Entry<EntityRef, T>> list = new ArrayList<>();
@@ -672,31 +768,6 @@ public class PojoEntityManager implements EngineEntityManager {
             }
         }
         return list;
-    }
-
-    private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {
-        private EntityRef key;
-        private T value;
-
-        EntityEntry(EntityRef ref, T value) {
-            this.key = ref;
-            this.value = value;
-        }
-
-        @Override
-        public EntityRef getKey() {
-            return key;
-        }
-
-        @Override
-        public T getValue() {
-            return value;
-        }
-
-        @Override
-        public T setValue(T newValue) {
-            throw new UnsupportedOperationException();
-        }
     }
 
     @Override
@@ -736,6 +807,31 @@ public class PojoEntityManager implements EngineEntityManager {
      */
     protected void unregister(long id) {
         loadedIds.remove(id);
+    }
+
+    private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {
+        private EntityRef key;
+        private T value;
+
+        EntityEntry(EntityRef ref, T value) {
+            this.key = ref;
+            this.value = value;
+        }
+
+        @Override
+        public EntityRef getKey() {
+            return key;
+        }
+
+        @Override
+        public T getValue() {
+            return value;
+        }
+
+        @Override
+        public T setValue(T newValue) {
+            throw new UnsupportedOperationException();
+        }
     }
 
 }

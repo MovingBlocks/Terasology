@@ -38,6 +38,7 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.TextLineBuilder;
+import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -58,7 +59,7 @@ import java.util.List;
 /**
  * This class describes a generic text-box widget.
  */
-public class UIText extends CoreWidget {
+public class UIText extends WidgetWithOrder {
 
     private static final Logger logger = LoggerFactory.getLogger(UIText.class);
 

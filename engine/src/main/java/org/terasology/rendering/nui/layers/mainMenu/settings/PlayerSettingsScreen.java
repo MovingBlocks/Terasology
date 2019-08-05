@@ -21,11 +21,18 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
 import org.terasology.context.Context;
+import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
 import org.terasology.rendering.nui.layers.mainMenu.ThreeButtonPopup;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UICheckbox;
+import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
+import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -41,11 +48,6 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.nui.widgets.UIText;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -88,6 +90,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private UISlider heightSlider;
     private UISlider eyeHeightSlider;
     private UIImage img;
+    private UICheckbox discordPresence;
     private UIDropdownScrollable<Locale> language;
 
     private StorageServiceWorkerStatus storageServiceWorkerStatus;
@@ -107,6 +110,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         }
         if (eyeHeightSlider != null) {
             eyeHeightSlider.bindValue(new NotifyingBinding(config.getPlayer().getEyeHeight()));
+        }
+        if (discordPresence != null) {
+            discordPresence.setChecked(config.getPlayer().isDiscordPresence());
         }
         if (language != null) {
             language.setSelection(config.getSystem().getLocale());
@@ -161,6 +167,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             eyeHeightSlider.setRange(1f);
             eyeHeightSlider.setPrecision(1);
         }
+
+        discordPresence = find("discord-presence", UICheckbox.class);
 
         language = find("language", UIDropdownScrollable.class);
         if (language != null) {
@@ -268,7 +276,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     }
 
     private Color findClosestColor(float findex) {
-        int index = DoubleMath.roundToInt(findex * (colors.size() - 1), RoundingMode.HALF_UP);
+        int index = DoubleMath.roundToInt(findex * (double) (colors.size() - 1), RoundingMode.HALF_UP);
         Color color = colors.get(index);
         return color;
     }
@@ -314,9 +322,11 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         config.getPlayer().setHeight(height);
         Float eyeHeight = getEyeHeight();
         config.getPlayer().setEyeHeight(eyeHeight);
+        config.getPlayer().setDiscordPresence(discordPresence.isChecked());
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText().trim());
             config.getPlayer().setHasEnteredUsername(true);
+            DiscordRPCSubSystem.updateState();
         }
         if (!config.getSystem().getLocale().equals(language.getSelection())) {
             config.getSystem().setLocale(language.getSelection());

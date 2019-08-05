@@ -121,7 +121,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
         addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
-        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL_URN, "textureLava"));
         setTerrainNormalsInputTexture = new SetInputTexture2D(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
         setTerrainHeightInputTexture = new SetInputTexture2D(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
 
@@ -223,7 +222,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
                         chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
         GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
-        new AABBRenderer(chunk.getAABB()).renderLocally(1f);
+        new AABBRenderer(chunk.getAABB()).renderLocally();
 
         GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
     }

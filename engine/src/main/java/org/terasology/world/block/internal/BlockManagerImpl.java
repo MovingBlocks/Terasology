@@ -197,7 +197,7 @@ public class BlockManagerImpl extends BlockManager {
             newState.blocksById.put(block.getId(), block);
             newState.idByUri.put(block.getURI(), block.getId());
         } else {
-            logger.info("Failed to register block {} - no id", block, block.getId());
+            logger.info("Failed to register block {} - no id", block);
         }
         newState.blocksByUri.put(block.getURI(), block);
     }

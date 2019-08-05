@@ -214,7 +214,7 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
     }
 
     private Vector3f getQuantizedMainLightDirection(float stepSize) {
-        float mainLightAngle = (float) Math.floor(backdropProvider.getSunPositionAngle() * stepSize) / stepSize + 0.0001f;
+        float mainLightAngle = (float) Math.floor((double) backdropProvider.getSunPositionAngle() * stepSize) / stepSize + 0.0001f;
         Vector3f mainLightDirection = new Vector3f(0.0f, (float) Math.cos(mainLightAngle), (float) Math.sin(mainLightAngle));
 
         // When the sun goes under the horizon we flip the vector, to provide the moon direction, and viceversa.

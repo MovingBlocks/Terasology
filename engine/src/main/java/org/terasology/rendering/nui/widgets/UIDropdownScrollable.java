@@ -47,16 +47,18 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private int visibleOptionsNum = 5;
 
     private Binding<List<T>> options = new DefaultBinding<>(new ArrayList<>());
+    private int itemHeight = 1;
+
     private Binding<T> selection = new DefaultBinding<>();
     private List<InteractionListener> optionListeners = Lists.newArrayList();
     private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
-    private boolean opened;
+
     private InteractionListener mainListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             opened = !opened;
-            optionListeners.clear();
             if (opened) {
+                optionListeners.clear();
                 for (int i = 0; i < getOptions().size(); ++i) {
                     optionListeners.add(new ItemListener(i));
                 }
@@ -105,7 +107,7 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             float optionsSize = options.get().size() <= visibleOptionsNum ? options.get().size() : (visibleOptionsNum + 0.5f);
 
             // Calculate total options height
-            int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
+            itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
             int height = (int) (itemHeight * optionsSize + canvas.getCurrentStyle().getBackgroundBorder().getTotalHeight());
             canvas.addInteractionRegion(mainListener, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, canvas.size().y + height));
 
@@ -178,6 +180,9 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
                 drawItem(canvas, itemMargin, i, itemRegion);
             }
         }
+
+//        canvas.addInteractionRegion(verticalBar.getSliderListener());
+        canvas.addInteractionRegion(verticalBar.getHandleListener(), scrollbarRegion);
     }
 
     /**
@@ -188,6 +193,9 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
      */
     private void readItemMouseOver(Canvas canvas, int i) {
         if (optionListeners.get(i).isMouseOver()) {
+            canvas.setMode(HOVER_MODE);
+            highlighted = i;
+        } else if (i == highlighted) {
             canvas.setMode(HOVER_MODE);
         } else {
             canvas.setMode(DEFAULT_MODE);
@@ -286,9 +294,28 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
+            highlighted = index;
             setSelection(getOptions().get(index));
             opened = false;
             return true;
         }
+    }
+    public void setOpenedReverse(boolean selectionSet) {
+        opened = !opened;
+        if (opened) {
+
+            optionListeners.clear();
+            for (int i = 0; i < getOptions().size(); ++i) {
+                optionListeners.add(new UIDropdownScrollable.ItemListener(i));
+            }
+        } else {
+            if (selectionSet) {
+                setSelection(getOptions().get(highlighted));
+            }
+        }
+    }
+
+    public boolean isOpened() {
+        return opened;
     }
 }

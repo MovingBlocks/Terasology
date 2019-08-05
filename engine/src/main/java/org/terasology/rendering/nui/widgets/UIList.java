@@ -16,17 +16,20 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.rendering.nui.ActivatableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 
@@ -39,9 +42,8 @@ import java.util.Objects;
  *
  * @param <T> the list element type
  */
-public class UIList<T> extends CoreWidget {
+public class UIList<T> extends ActivatableWidget {
 
-    private final List<ItemInteractionListener> itemListeners = Lists.newArrayList();
     private final List<ItemActivateEventListener<T>> activateListeners = Lists.newArrayList();
     private final List<ItemSelectEventListener<T>> selectionListeners = Lists.newArrayList();
     private Binding<Boolean> interactive = new DefaultBinding<>(true);
@@ -50,6 +52,11 @@ public class UIList<T> extends CoreWidget {
     private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
     private Binding<Boolean> canBeFocus = new DefaultBinding<>(true);
+    private int itemSize;
+    private int canvasSize;
+
+    private List<ItemInteractionListener> optionListeners = Lists.newArrayList();
+
 
     public UIList() {
 
@@ -67,12 +74,13 @@ public class UIList<T> extends CoreWidget {
         boolean enabled = isEnabled();
         Border margin = canvas.getCurrentStyle().getMargin();
 
-        int yOffset = 0;
+        double yOffset = 1 / (double) optionListeners.size();
         for (int i = 0; i < list.get().size(); ++i) {
             T item = list.get().get(i);
             Vector2i preferredSize = margin.grow(itemRenderer.getPreferredSize(item, canvas));
-            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
-            ItemInteractionListener listener = itemListeners.get(i);
+
+            Rect2i itemRegion = Rect2i.createFromMinAndSize(0, (int) yOffset, canvas.size().x, preferredSize.y);
+            ItemInteractionListener listener = optionListeners.get(i);
             if (enabled) {
                 if (Objects.equals(item, selection.get())) {
                     canvas.setMode(ACTIVE_MODE);
@@ -87,22 +95,27 @@ public class UIList<T> extends CoreWidget {
             } else {
                 canvas.setMode(DISABLED_MODE);
             }
-
             canvas.drawBackground(itemRegion);
             itemRenderer.draw(item, canvas, margin.shrink(itemRegion));
 
-            yOffset += preferredSize.getY();
+            yOffset += preferredSize.y - 1 / (double) optionListeners.size();
+
+            if (i == list.get().size() - 1) {
+                itemSize = preferredSize.getY();
+                canvasSize = canvas.size().y;
+            }
         }
     }
 
     private void updateItemListeners() {
-        while (itemListeners.size() > list.get().size()) {
-            itemListeners.remove(itemListeners.size() - 1);
+        while (optionListeners.size() > list.get().size()) {
+            optionListeners.remove(optionListeners.size() - 1);
         }
-        while (itemListeners.size() < list.get().size()) {
-            itemListeners.add(new ItemInteractionListener(itemListeners.size()));
+        while (optionListeners.size() < list.get().size()) {
+            optionListeners.add(new ItemInteractionListener(optionListeners.size()));
         }
     }
+
 
     @Override
     public boolean canBeFocus() {
@@ -306,6 +319,49 @@ public class UIList<T> extends CoreWidget {
             }
             return false;
         }
+
+        @Override
+        public void onMouseOver(NUIMouseOverEvent event) {
+            super.onMouseOver(event);
+            if (isMouseOver()) {
+                focusManager.setFocus(UIList.this);
+            }
+        }
     }
 
+    private int getCurrentIndex() {
+        return list.get().indexOf(selection.get());
+    }
+
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown()) {
+            int keyId = event.getKey().getId();
+            int currentIndex = getCurrentIndex();
+
+            if (currentIndex != -1) {
+                if (keyId == Keyboard.KeyId.UP) {
+                    if (getParent() != null) {
+                        getParent().setPosition((currentIndex - 1) / ((double) optionListeners.size() - 1));
+                    }
+
+                    select(currentIndex - 1);
+                    return true;
+                } else if (keyId == Keyboard.KeyId.DOWN) {
+                    if (getParent() != null) {
+                        getParent().setPosition((currentIndex + 1) / ((double) optionListeners.size() - 1));
+                    }
+
+                    select(currentIndex + 1);
+                    return true;
+                } else if (keyId == Keyboard.KeyId.ENTER || keyId == Keyboard.KeyId.SPACE) {
+                    activate(currentIndex);
+                    return true;
+                }
+            } else {
+                select(0);
+            }
+        }
+        return super.onKeyEvent(event);
+    }
 }

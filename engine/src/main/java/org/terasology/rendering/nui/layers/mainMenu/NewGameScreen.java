@@ -28,6 +28,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.input.Keyboard;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
@@ -40,9 +41,10 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
+import org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.AdvancedGameSetupScreen;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -50,13 +52,14 @@ import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class NewGameScreen extends CoreScreenLayer {
 
+    private static final Logger logger = LoggerFactory.getLogger(NewGameScreen.class);
+
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:newGameScreen");
-    private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
     private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
 
     @In
@@ -150,21 +153,30 @@ public class NewGameScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "play", button -> {
             if (gameName.getText().isEmpty()) {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game name cannot be empty");
+                universeWrapper.setGameName(GameProvider.getNextGameName());
+            }
+            universeWrapper.setGameName(gameName.getText());
+            GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
+            if (gameManifest != null) {
+                gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
             } else {
-                GameManifest gameManifest = GameManifestProvider.createDefaultGameManifest(universeWrapper, moduleManager, config);
-                if (gameManifest != null) {
-                    gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
-                } else {
-                    MessagePopup errorPopup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                    errorPopup.setMessage("Error", "Can't create new game!");
-                }
+                MessagePopup errorPopup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                errorPopup.setMessage("Error", "Can't create new game!");
             }
         });
 
-        WidgetUtil.trySubscribe(this, "close", button ->
-                triggerBackAnimation()
-        );
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            if (GameProvider.isSavesFolderEmpty()) {
+                // skip selectGameScreen and get back directly to main screen
+                getManager().pushScreen("engine:mainMenuScreen");
+            } else {
+                triggerBackAnimation();
+            }
+        });
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
+        });
     }
 
     /**
@@ -187,8 +199,7 @@ public class NewGameScreen extends CoreScreenLayer {
                 }
             }
         }
-        Collections.sort(gameplayModules, (o1, o2) ->
-                o1.getMetadata().getDisplayName().value().compareTo(o2.getMetadata().getDisplayName().value()));
+        gameplayModules.sort(Comparator.comparing(o -> o.getMetadata().getDisplayName().value()));
 
         return gameplayModules;
     }
@@ -217,8 +228,6 @@ public class NewGameScreen extends CoreScreenLayer {
 
     // Sets the default generator of the passed in gameplay module. Make sure it's already selected.
     private void setDefaultGeneratorOfGameplayModule(Module module) {
-        ModuleConfig moduleConfig = config.getDefaultModSelection();
-
         // Set the default generator of the selected gameplay module
         SimpleUri defaultWorldGenerator = StandardModuleExtension.getDefaultWorldGenerator(module);
         if (defaultWorldGenerator != null) {
@@ -235,6 +244,8 @@ public class NewGameScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         final UIText gameName = find("gameName", UIText.class);
         setGameName(gameName);
 
@@ -280,5 +291,21 @@ public class NewGameScreen extends CoreScreenLayer {
         this.universeWrapper = wrapper;
     }
 
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
+            if (GameProvider.isSavesFolderEmpty()) {
+                // skip selectGameScreen and get back directly to main screen
+                getManager().pushScreen("engine:mainMenuScreen");
+                return true;
+            }
+        }
+        return super.onKeyEvent(event);
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
 }
 

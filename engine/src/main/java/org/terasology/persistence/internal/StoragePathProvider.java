@@ -26,6 +26,7 @@ import java.nio.file.Path;
 public class StoragePathProvider {
     private static final String PLAYERS_PATH = "players";
     private static final String WORLDS_PATH = "worlds";
+    private static final String PREVIEWS_PATH = "previews";
     private static final String PLAYER_STORE_EXTENSION = ".player";
     private static final String GLOBAL_ENTITY_STORE = "global.dat";
     private static final String UNFINISHED_SAVE_TRANSACTION = "unfinished-save-transaction";
@@ -35,6 +36,7 @@ public class StoragePathProvider {
     private final Path storagePathDirectory;
     private final Path playersPath;
     private final Path worldsPath;
+    private final Path previewsPath;
     private Path worldPath;
     private Path globalEntityStorePath;
     private Path unfinishedSaveTransactionPath;
@@ -45,6 +47,7 @@ public class StoragePathProvider {
         this.storagePathDirectory = storagePathDirectory;
         this.playersPath = storagePathDirectory.resolve(PLAYERS_PATH);
         this.worldsPath = storagePathDirectory.resolve(WORLDS_PATH);
+        this.previewsPath = storagePathDirectory.resolve(PREVIEWS_PATH);
         this.worldPath = worldsPath.resolve(TerasologyConstants.MAIN_WORLD);
         this.globalEntityStorePath = storagePathDirectory.resolve(GLOBAL_ENTITY_STORE);
         this.unfinishedSaveTransactionPath = storagePathDirectory.resolve(UNFINISHED_SAVE_TRANSACTION);
@@ -63,6 +66,10 @@ public class StoragePathProvider {
 
     public Path getWorldsPath() {
         return worldsPath;
+    }
+
+    public Path getPreviewsPath() {
+        return previewsPath;
     }
 
     public Path getPlayerFilePath(String playerId) {

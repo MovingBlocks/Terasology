@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.loadingScreen;
 
+import org.terasology.i18n.TranslationSystem;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UILoadBar;
@@ -26,6 +28,9 @@ public class LoadingScreen extends CoreScreenLayer {
     private UILabel messageLabel;
     private UILoadBar fillBar;
 
+    @In
+    private TranslationSystem translationSystem;
+
     @Override
     public void initialise() {
         messageLabel = find("statusLabel", UILabel.class);
@@ -34,7 +39,7 @@ public class LoadingScreen extends CoreScreenLayer {
 
     public void updateStatus(String message, float v) {
         if (messageLabel != null) {
-            messageLabel.setText(message);
+            messageLabel.setText(translationSystem.translate(message));
         }
         if (fillBar != null) {
             fillBar.setValue(v);

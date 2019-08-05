@@ -112,7 +112,7 @@
                       "family": "description",
                       "contents": [
                           {
-                              "type": "UIImage",
+                              "type": "UIImageSlideshow",
                               "skin": "framed_image",
                               "id": "previewImage",
                               "layoutInfo": {
@@ -206,12 +206,6 @@
                       "type": "UIButton",
                       "id": "delete",
                       "text": "${engine:menu#delete-game}",
-                      "enabled": false
-                  },
-                  {
-                      "type": "UIButton",
-                      "id": "details",
-                      "text": "${engine:menu#save-game-details}",
                       "enabled": false
                   }
               ],

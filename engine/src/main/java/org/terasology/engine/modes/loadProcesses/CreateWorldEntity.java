@@ -22,6 +22,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkComponent;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.chunks.ChunkProvider;
@@ -36,9 +37,11 @@ import java.util.Map;
 public class CreateWorldEntity extends SingleStepLoadProcess {
 
     private final Context context;
+    private final GameManifest gameManifest;
 
-    public CreateWorldEntity(Context context) {
+    public CreateWorldEntity(Context context, GameManifest gameManifest) {
         this.context = context;
+        this.gameManifest = gameManifest;
     }
 
     @Override
@@ -69,7 +72,9 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                 }
             }
         } else {
-            EntityRef worldEntity = entityManager.create();
+            EntityRef worldEntity;
+            entityManager.createWorldPools(gameManifest);
+            worldEntity = entityManager.create();
             worldEntity.addComponent(new WorldComponent());
             NetworkComponent networkComponent = new NetworkComponent();
             networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;

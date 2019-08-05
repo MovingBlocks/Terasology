@@ -53,7 +53,8 @@ public class FilePickerPopup extends CoreScreenLayer {
     private Path currentPath;
     private ScrollableArea directoryContentsScroller;
     private UIList<String> directoryContentsList;
-    private Consumer<Path> okHandler = (path) -> { };
+    private Consumer<Path> okHandler = (path) -> {
+    };
 
     public void setOkHandler(Consumer<Path> okHandler) {
         this.okHandler = okHandler;
@@ -137,7 +138,7 @@ public class FilePickerPopup extends CoreScreenLayer {
         if (s == null || s.length() == 0) {
             return false;
         }
-        for (char c: ILLEGAL_FILENAME_CHARACTERS) {
+        for (char c : ILLEGAL_FILENAME_CHARACTERS) {
             if (s.indexOf(c) != -1) {
                 return false;
             }
@@ -187,9 +188,10 @@ public class FilePickerPopup extends CoreScreenLayer {
         }
     }
 
+    // Set the stream path in a try with resources construct first in order to close the stream.
     private void setCurrentDirectory(Path newPath) {
-        try {
-            loadDirectoryContents(Files.list(newPath));
+        try (Stream<Path> stream = Files.list(newPath)) {
+            loadDirectoryContents(stream);
             currentPath = newPath;
         } catch (AccessDeniedException ex) {
             showDirectoryAccessErrorMessage(translationSystem.translate("${engine:menu#file-picker-access-denied-to}") + newPath);

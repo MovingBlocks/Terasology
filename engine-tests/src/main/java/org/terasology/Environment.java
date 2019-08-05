@@ -23,6 +23,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.naming.Name;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
@@ -54,6 +55,8 @@ public class Environment {
 
     protected void reset(Set<Name> moduleNames) throws Exception {
         this.context = new ContextImpl();
+        RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
+        context.put(RecordAndReplayCurrentStatus.class, recordAndReplayCurrentStatus);
         CoreRegistry.setContext(context);
 
         setupPathManager();
@@ -69,6 +72,8 @@ public class Environment {
         AssetManager assetManager = setupAssetManager();
 
         setupBlockManager(assetManager);
+        
+        setupExtraDataManager(context);
 
         setupCollisionManager();
 
@@ -126,6 +131,10 @@ public class Environment {
     }
 
     protected void setupBlockManager(AssetManager assetManager) {
+        // empty
+    }
+    
+    protected void setupExtraDataManager(Context context) {
         // empty
     }
 

@@ -35,25 +35,25 @@ ext {
         def copyrightManager = iprNode.find { it.@name == 'CopyrightManager' }
         copyrightManager.@default = "TerasologyEngine"
         def copyright = copyrightManager.appendNode("copyright")
-        copyright.appendNode("option", [name : "notice", value : 'Copyright ' + Calendar.getInstance().get(Calendar.YEAR) + ' MovingBlocks\n\nLicensed under the Apache License, Version 2.0 (the "License");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n     http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.'])
-        copyright.appendNode("option", [name : "keyword", value : "Copyright"])
-        copyright.appendNode("option", [name : "allowReplaceKeyword", value : ""])
-        copyright.appendNode("option", [name : "myName", value : "TerasologyEngine"])
-        copyright.appendNode("option", [name : "myLocal", value : "true"])
-        def langOptions = copyrightManager.appendNode("LanguageOptions", [name : "__TEMPLATE__"])
-        langOptions.appendNode("option", [name : "addBlankAfter", value : "false"])
+        copyright.appendNode("option", [name: "notice", value: 'Copyright ' + Calendar.getInstance().get(Calendar.YEAR) + ' MovingBlocks\n\nLicensed under the Apache License, Version 2.0 (the "License");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n     http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.'])
+        copyright.appendNode("option", [name: "keyword", value: "Copyright"])
+        copyright.appendNode("option", [name: "allowReplaceKeyword", value: ""])
+        copyright.appendNode("option", [name: "myName", value: "TerasologyEngine"])
+        copyright.appendNode("option", [name: "myLocal", value: "true"])
+        def langOptions = copyrightManager.appendNode("LanguageOptions", [name: "__TEMPLATE__"])
+        langOptions.appendNode("option", [name: "addBlankAfter", value: "false"])
     }
 
     // Activate special cases for annotations
     ideaActivateAnnotations = { Node iprNode ->
         // Setup knowledge of certain annotations being entry points (so don't mark annotated items as unused)
-        def entryPointsManager = iprNode.appendNode('component', [name : "EntryPointsManager"])
-        def entryPoints = entryPointsManager.appendNode('entry_points', [version : '2.0'])
-        def entryPointsList = entryPointsManager.appendNode('list', [size : '4'])
-        entryPointsList.appendNode('item', [index : '0', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.event.ReceiveEvent'])
-        entryPointsList.appendNode('item', [index : '1', class : 'java.lang.String', itemvalue : 'org.terasology.registry.In'])
-        entryPointsList.appendNode('item', [index : '2', class : 'java.lang.String', itemvalue : 'org.terasology.entitySystem.systems.RegisterSystem'])
-        entryPointsList.appendNode('item', [index : '3', class : 'java.lang.String', itemvalue : 'org.terasology.logic.console.Command'])
+        def entryPointsManager = iprNode.appendNode('component', [name: "EntryPointsManager"])
+        def entryPoints = entryPointsManager.appendNode('entry_points', [version: '2.0'])
+        def entryPointsList = entryPointsManager.appendNode('list', [size: '4'])
+        entryPointsList.appendNode('item', [index: '0', class: 'java.lang.String', itemvalue: 'org.terasology.entitySystem.event.ReceiveEvent'])
+        entryPointsList.appendNode('item', [index: '1', class: 'java.lang.String', itemvalue: 'org.terasology.registry.In'])
+        entryPointsList.appendNode('item', [index: '2', class: 'java.lang.String', itemvalue: 'org.terasology.entitySystem.systems.RegisterSystem'])
+        entryPointsList.appendNode('item', [index: '3', class: 'java.lang.String', itemvalue: 'org.terasology.logic.console.Command'])
         def writeAnnotations = entryPointsManager.appendNode("writeAnnotations")
         writeAnnotations.appendNode("writeAnnotation", [name: "org.terasology.registry.In"])
     }
@@ -68,13 +68,13 @@ ext {
         // Set Terasology "modules" to use Git (also: huh, this works and both prints and does stuff - handy!)
         //println "Each module child project (for Git auto-enable): " +
         rootProject.project(':modules').childProjects.each { child ->
-            if (child.value.path == ':modules:Core' || child.value.path == ':modules:CoreSampleGameplay' || child.value.path == ':modules:BuilderSampleGameplay') {
+            if (child.value.path == ':modules:Core' || child.value.path == ':modules:CoreSampleGameplay' || child.value.path == ':modules:BuilderSampleGameplay' || child.value.path == ":modules:BiomesAPI") {
                 println "Skipping IntelliJ Git setup for internal module: " + child.value.path
             } else {
                 println "Preparing IntelliJ Git setup for module $child.value.name"
                 vcsMappings.appendNode('mapping', [
-                        'directory' : "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
-                        'vcs' : 'Git'
+                        'directory': "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
+                        'vcs'      : 'Git'
                 ])
             }
         }
@@ -87,8 +87,8 @@ ext {
             } else {
                 println "Preparing IntelliJ Git setup for facade $child.value.name"
                 vcsMappings.appendNode('mapping', [
-                        'directory' : "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
-                        'vcs' : 'Git'
+                        'directory': "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
+                        'vcs'      : 'Git'
                 ])
             }
         }
@@ -98,8 +98,8 @@ ext {
 
             println "Preparing IntelliJ Git setup for lib $child.value.name"
             vcsMappings.appendNode('mapping', [
-                    'directory' : "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
-                    'vcs' : 'Git'
+                    'directory': "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
+                    'vcs'      : 'Git'
             ])
         }
 
@@ -108,8 +108,8 @@ ext {
         if (indexLibDir.exists() && indexLibDir.isDirectory()) {
             println "Preparing IntelliJ Git setup for Index lib"
             vcsMappings.appendNode('mapping', [
-                    'directory' : "\$PROJECT_DIR\$" + "/libs/Index",
-                    'vcs' : 'Git'
+                    'directory': "\$PROJECT_DIR\$" + "/libs/Index",
+                    'vcs'      : 'Git'
             ])
         }
 
@@ -118,8 +118,8 @@ ext {
 
             println "Preparing IntelliJ Git setup for meta-module $child.value.name"
             vcsMappings.appendNode('mapping', [
-                    'directory' : "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
-                    'vcs' : 'Git'
+                    'directory': "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
+                    'vcs'      : 'Git'
             ])
         }
     }
@@ -140,7 +140,7 @@ ext {
         // Slowly realizing the XML stuff is smart enough to not insert dupes even without an if, but .. scary!
         if (compilerWsConf == null) {
             compilerWsConf = iwsNode.appendNode('component', [name: 'CompilerWorkspaceConfiguration'])
-            compilerWsConf.appendNode("option", [name : "MAKE_PROJECT_ON_SAVE", value : "true"])
+            compilerWsConf.appendNode("option", [name: "MAKE_PROJECT_ON_SAVE", value: "true"])
         }
     }
 
@@ -191,6 +191,38 @@ ext {
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
               <option name="VM_PARAMETERS" value="-Xms256m -Xmx8192m"/>
+              <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport"/>
+              <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
+              <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
+              <option name="ALTERNATIVE_JRE_PATH" value=""/>
+              <option name="ENABLE_SWING_INSPECTOR" value="false"/>
+              <option name="ENV_VARIABLES"/>
+              <option name="PASS_PARENT_ENVS" value="true"/>
+              <module name="PC"/>
+              <envs/>
+              <RunnerSettings RunnerId="Debug">
+                <option name="DEBUG_PORT" value=""/>
+                <option name="TRANSPORT" value="0"/>
+                <option name="LOCAL" value="true"/>
+              </RunnerSettings>
+              <RunnerSettings RunnerId="Run"/>
+              <ConfigurationWrapper RunnerId="Debug"/>
+              <ConfigurationWrapper RunnerId="Run"/>
+              <method/>
+            </configuration>
+        '''))
+
+        // Run config for a client with activated Java FlightRecorder recording. Recording will be dumped when the application is closed
+        runManager.append(new XmlParser().parseText('''
+            <configuration default="false" name="TerasologyPC (Java FlightRecorder)" type="Application" factoryName="Application">
+              <extension name="coverage" enabled="false" merge="false" runner="idea">
+                <pattern>
+                  <option name="PATTERN" value="org.terasology.engine.*"/>
+                  <option name="ENABLED" value="true"/>
+                </pattern>
+              </extension>
+              <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"/>
               <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
@@ -548,6 +580,38 @@ ext {
               <envs />
               <patterns />
               <method />
+            </configuration>
+        '''))
+
+        // Run config for running with security set to permissive mode (don't block unsecure usages from within sandbox, just notify)
+        runManager.append(new XmlParser().parseText('''
+            <configuration default="false" name="TerasologyPC (permissive security)" type="Application" factoryName="Application">
+              <extension name="coverage" enabled="false" merge="false" runner="idea">
+                <pattern>
+                  <option name="PATTERN" value="org.terasology.engine.*"/>
+                  <option name="ENABLED" value="true"/>
+                </pattern>
+              </extension>
+              <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
+              <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport -permissiveSecurity"/>
+              <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
+              <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
+              <option name="ALTERNATIVE_JRE_PATH" value=""/>
+              <option name="ENABLE_SWING_INSPECTOR" value="false"/>
+              <option name="ENV_VARIABLES"/>
+              <option name="PASS_PARENT_ENVS" value="true"/>
+              <module name="PC"/>
+              <envs/>
+              <RunnerSettings RunnerId="Debug">
+                <option name="DEBUG_PORT" value=""/>
+                <option name="TRANSPORT" value="0"/>
+                <option name="LOCAL" value="true"/>
+              </RunnerSettings>
+              <RunnerSettings RunnerId="Run"/>
+              <ConfigurationWrapper RunnerId="Debug"/>
+              <ConfigurationWrapper RunnerId="Run"/>
+              <method/>
             </configuration>
         '''))
 

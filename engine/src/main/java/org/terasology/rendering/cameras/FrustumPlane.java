@@ -48,7 +48,7 @@ public class FrustumPlane {
      * Normalizes this plane.
      */
     public void normalize() {
-        double t = Math.sqrt(a * a + b * b + c * c);
+        double t = Math.sqrt((double) a * a + (double) b * b + (double) c * c);
         a /= t;
         b /= t;
         c /= t;

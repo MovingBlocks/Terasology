@@ -19,7 +19,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.WorldProviderCore;
-import org.terasology.world.liquid.LiquidData;
 
 /**
  * Provides the basic interface for all world providers.
@@ -36,22 +35,6 @@ public interface WorldProvider extends WorldProviderCore {
     boolean isBlockRelevant(Vector3i pos);
 
     boolean isBlockRelevant(Vector3f pos);
-
-    /**
-     * @param pos
-     * @param state    The new value of the liquid state
-     * @param oldState The expected previous value of the liquid state
-     * @return Whether the liquid change was made successfully. Will fail of oldState != the current state, or if the underlying chunk is not available
-     */
-    boolean setLiquid(Vector3i pos, LiquidData state, LiquidData oldState);
-
-    /**
-     * Returns the liquid state at the given position.
-     *
-     * @param blockPos
-     * @return The state of the block
-     */
-    LiquidData getLiquid(Vector3i blockPos);
 
     /**
      * Returns the block value at the given position.
@@ -104,5 +87,67 @@ public interface WorldProvider extends WorldProviderCore {
     byte getSunlight(Vector3i pos);
 
     byte getTotalLight(Vector3i pos);
-
+    
+    /**
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
+     *
+     * @param index The index of the extra data field
+     * @param pos
+     * @return The (index)th extra-data value at the given position
+     */
+    int getExtraData(int index, Vector3i pos);
+    
+    /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param index The index of the extra data field
+     * @param x
+     * @param y
+     * @param z
+     * @param value
+     * @return The replaced value
+     */
+    int setExtraData(int index, int x, int y, int z, int value);
+    
+    /**
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
+     *
+     * @param fieldName The name of the extra-data field
+     * @param x
+     * @param y
+     * @param z
+     * @return The named extra-data value at the given position
+     */
+    int getExtraData(String fieldName, int x, int y, int z);
+    
+    /**
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
+     *
+     * @param fieldName The name of the extra-data field
+     * @param pos
+     * @return The named extra-data value at the given position
+     */
+    int getExtraData(String fieldName, Vector3i pos);
+    
+    /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param fieldName The name of the extra-data field
+     * @param x
+     * @param y
+     * @param z
+     * @param value
+     * @return The replaced value
+     */
+    int setExtraData(String fieldName, int x, int y, int z, int value);
+    
+    /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param fieldName The name of the extra-data field
+     * @param pos
+     * @param value
+     * @return The replaced value
+     */
+    int setExtraData(String fieldName, Vector3i pos, int value);
 }

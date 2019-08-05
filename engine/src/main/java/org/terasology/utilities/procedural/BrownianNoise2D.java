@@ -58,10 +58,10 @@ public class BrownianNoise2D extends BrownianNoiseOld implements Noise2D {
         float workingX = x;
         float workingY = y;
         for (int i = 0; i < getOctaves(); i++) {
-            result += other.noise(workingX, workingY) * getSpectralWeight(i);
+            result += other.noise(workingX, workingY) * (float) getSpectralWeight(i);
 
-            workingX *= getLacunarity();
-            workingY *= getLacunarity();
+            workingX *= (float) getLacunarity();
+            workingY *= (float) getLacunarity();
         }
 
         return result;

@@ -80,8 +80,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
             return;
         }
 
-        Vector3i targetBlock = blockComponent.getPosition();
-        processUpdateForBlockLocation(targetBlock);
+        processUpdateForBlockLocation(blockComponent.position);
     }
 
     private void notifyNeighboursOfChangedBlocks() {
@@ -109,7 +108,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
     }
 
     private void processUpdateForBlockLocation(Vector3i blockLocation) {
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             Vector3i neighborLocation = new Vector3i(blockLocation);
             neighborLocation.add(side.getVector3i());
             if (worldProvider.isBlockRelevant(neighborLocation)) {

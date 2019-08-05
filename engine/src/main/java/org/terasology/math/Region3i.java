@@ -28,7 +28,14 @@ import java.util.Iterator;
  *
  */
 public final class Region3i implements Iterable<Vector3i> {
-    public static final Region3i EMPTY = new Region3i();
+
+    /**
+     * @deprecated As of 24 sep 2018, because it is error prone.
+     * Everyone can change this instance and destroy the invariant properties.
+     * Some methods used to return this instance silently on special cases.
+     */
+    @Deprecated
+    public static final Region3i EMPTY = Region3i.empty();
 
     private final Vector3i min = new Vector3i();
     private final Vector3i size = new Vector3i();
@@ -45,13 +52,21 @@ public final class Region3i implements Iterable<Vector3i> {
     }
 
     /**
+     * An empty Region with size (0,0,0).
+     * @return An empty Region3i
+     */
+    public static Region3i empty() {
+        return new Region3i();
+    }
+
+    /**
      * @param min the min point of the region
      * @param size the size of the region
      * @return a new region base on the min point and region size, empty if the size is negative
      */
     public static Region3i createFromMinAndSize(BaseVector3i min, BaseVector3i size) {
         if (size.x() <= 0 || size.y() <= 0 || size.z() <= 0) {
-            return EMPTY;
+            return empty();
         }
         return new Region3i(min, size);
     }
@@ -86,7 +101,7 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * Create a region with center point and extents size
      * @param center the center point of region
-     * @param extents the extents size of region
+     * @param extent the extents size of region
      * @return a new region base on the center point and extents size
      */
     public static Region3i createFromCenterExtents(BaseVector3i center, int extent) {
@@ -118,7 +133,7 @@ public final class Region3i implements Iterable<Vector3i> {
     public static Region3i createFromMinMax(BaseVector3i min, BaseVector3i max) {
         Vector3i size = new Vector3i(max.x() - min.x() + 1, max.y() - min.y() + 1, max.z() - min.z() + 1);
         if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
-            return EMPTY;
+            return empty();
         }
         return new Region3i(min, size);
     }

@@ -28,9 +28,9 @@ import java.util.function.Supplier;
  * TODO: Add javadocs
  */
 public abstract class ConditionDependentNode extends AbstractNode implements PropertyChangeListener {
-    private List<Supplier<Boolean>> conditions = Lists.newArrayList();
-
     protected WorldRenderer worldRenderer;
+
+    private List<Supplier<Boolean>> conditions = Lists.newArrayList();
 
     protected ConditionDependentNode(String nodeUri, Context context) {
         super(nodeUri, context);

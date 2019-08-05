@@ -15,6 +15,8 @@
  */
 package org.terasology.engine.subsystem.headless.mode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.WorldGenerationConfig;
 import org.terasology.context.Context;
@@ -42,7 +44,8 @@ import org.terasology.module.Module;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
-import org.terasology.recording.EntityIdMap;
+import org.terasology.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
@@ -59,6 +62,8 @@ import java.util.List;
  *
  */
 public class StateHeadlessSetup implements GameState {
+
+    private static final Logger logger = LoggerFactory.getLogger(StateHeadlessSetup.class);
 
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
@@ -92,7 +97,7 @@ public class StateHeadlessSetup implements GameState {
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setEntityIdMap(context.get(EntityIdMap.class));
+        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class), context.get(RecordAndReplayCurrentStatus.class));
         context.put(LocalPlayer.class, localPlayer);
         localPlayer.setClientEntity(localPlayerEntity);
 
@@ -105,6 +110,13 @@ public class StateHeadlessSetup implements GameState {
         } else {
             gameManifest = createGameManifest();
         }
+
+        Config config = context.get(Config.class);
+        WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
+        config.getUniverseConfig().addWorldManager(worldInfo);
+        config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
+        config.getUniverseConfig().setUniverseSeed(gameManifest.getSeed());
+
         gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
     }
 
@@ -117,6 +129,8 @@ public class StateHeadlessSetup implements GameState {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
             if (module != null) {
                 gameManifest.addModule(module.getId(), module.getVersion());
+            } else {
+                logger.warn("ModuleRegistry has no latest version for module {}", moduleName);
             }
         }
 
@@ -139,9 +153,8 @@ public class StateHeadlessSetup implements GameState {
 
         gameManifest.setTitle(worldGenConfig.getWorldTitle());
         gameManifest.setSeed(worldGenConfig.getDefaultSeed());
-
-        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorUri);
+        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, worldGenConfig.getWorldTitle(), gameManifest.getSeed(),
+                (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), worldGeneratorUri);
         gameManifest.addWorld(worldInfo);
         return gameManifest;
     }

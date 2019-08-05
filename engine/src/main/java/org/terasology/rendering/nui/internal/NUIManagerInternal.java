@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -47,17 +49,23 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.registry.InjectionHelper;
+import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
+import org.terasology.rendering.nui.SortOrderSystem;
+import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
+import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.utilities.Assets;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -67,7 +75,7 @@ import java.util.Set;
 
 /**
  */
-public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
+public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, PropertyChangeListener {
     private Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private HUDScreenLayer hudScreenLayer;
@@ -79,6 +87,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private MouseDevice mouse;
     private DisplayDevice display;
     private boolean forceReleaseMouse;
+    private boolean updateFrozen;
+    private RenderingConfig renderingConfig;
+    private float uiScale = 1f;
 
     private Map<ResourceUrn, ControlWidget> overlays = Maps.newLinkedHashMap();
     private Context context;
@@ -91,6 +102,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         this.canvas = new CanvasImpl(this, context, renderer);
         this.keyboard = context.get(InputSystem.class).getKeyboard();
         this.mouse = context.get(InputSystem.class).getMouseDevice();
+
+        this.renderingConfig = context.get(Config.class).getRendering();
+        this.uiScale = this.renderingConfig.getUiScale() / 100f;
+        this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
+
         this.display = context.get(DisplayDevice.class);
         this.assetManager = context.get(AssetManager.class);
         refreshWidgetsLibrary();
@@ -103,6 +119,16 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         // and UI screens should be created on demand anyway.
         ModuleAwareAssetTypeManager maaTypeManager = context.get(ModuleAwareAssetTypeManager.class);
         maaTypeManager.getAssetType(UIElement.class).ifPresent(type -> type.disposeAll());
+    }
+
+    @Override
+    public Deque<UIScreenLayer> getScreens() {
+        return screens;
+    }
+
+    @Override
+    public void setScreens(Deque<UIScreenLayer> toSet) {
+        screens = toSet;
     }
 
     public void refreshWidgetsLibrary() {
@@ -185,6 +211,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         closeScreen(screenUri, sendEvents);
     }
 
+    @Override
+    public ResourceUrn getUri(UIScreenLayer screen) {
+        BiMap<ResourceUrn, UIScreenLayer> lookup =  HashBiMap.create(screenLookup);
+        return lookup.inverse().remove(screen);
+    }
     @Override
     public void closeScreen(UIScreenLayer screen) {
         if (screens.remove(screen)) {
@@ -339,6 +370,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void pushScreen(UIScreenLayer screen) {
+        TabbingManager.setInitialized(false);
         if (!screen.isLowerLayerVisible()) {
             UIScreenLayer current = screens.peek();
             if (current != null) {
@@ -424,8 +456,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void addOverlay(ControlWidget overlay, ResourceUrn uri) {
-        overlay.onOpened();
-        overlays.put(uri, overlay);
+        if (!AbstractWidget.getShiftPressed() || !SortOrderSystem.getControlPressed() || !overlay.getClass().equals(OnlinePlayersOverlay.class)) {
+            overlay.onOpened();
+            overlays.put(uri, overlay);
+        }
     }
 
     @Override
@@ -595,6 +629,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 return;
             }
         }
+
+
+
         if (canvas.processMouseWheel(event.getWheelTurns(), mouse.getPosition())) {
             event.consume();
         }
@@ -678,5 +715,15 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             setHUDVisible(true);
         }
     }
+    @Override
+    public CanvasControl getCanvas() {
+        return canvas;
+    }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(RenderingConfig.UI_SCALE)) {
+            this.uiScale = this.renderingConfig.getUiScale() / 100f;
+        }
+    }
 }

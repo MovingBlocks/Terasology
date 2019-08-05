@@ -86,7 +86,7 @@ public class BlockItemSystem extends BaseComponentSystem {
             event.consume();
             return;
         }
-        Vector3i targetBlock = blockComponent.getPosition();
+        Vector3i targetBlock = new Vector3i(blockComponent.position);
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
 
@@ -98,7 +98,7 @@ public class BlockItemSystem extends BaseComponentSystem {
                 PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
                 worldProvider.getWorldEntity().send(placeBlocks);
                 if (!placeBlocks.isConsumed()) {
-                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos)));
+                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
                 } else {
                     event.consume();
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,22 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.math.TeraMath;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
@@ -58,6 +62,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldPreGenerationScreen");
 
+    private static final Logger logger = LoggerFactory.getLogger(WorldPreGenerationScreen.class);
+
     @In
     private ModuleManager moduleManager;
 
@@ -73,7 +79,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
     private List<WorldSetupWrapper> worldList;
     private String selectedWorld;
     private List<String> worldNames;
-    private int seedNumber = 0;
+    private int seedNumber;
     private UISlider zoomSlider;
 
     /**
@@ -91,14 +97,10 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         worldList = context.get(UniverseSetupScreen.class).getWorldsList();
         selectedWorld = context.get(UniverseSetupScreen.class).getSelectedWorld();
         worldNames = context.get(UniverseSetupScreen.class).worldNames();
-        if (findWorldByName().getWorldGenerator() == null) {
-            worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
-            findWorldByName().setWorldGenerator(worldGenerator);
-        } else {
-            worldGenerator = findWorldByName().getWorldGenerator();
-        }
 
-        worldGenerator.setWorldSeed(createSeed(selectedWorld));
+        setWorldGenerators();
+
+        worldGenerator = findWorldByName(selectedWorld).getWorldGenerator();
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
         worldsDropdown.setOptions(worldNames);
         genTexture();
@@ -114,6 +116,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         zoomSlider = find("zoomSlider", UISlider.class);
         if (zoomSlider != null) {
@@ -133,11 +136,11 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
             public void set(String value) {
                 selectedWorld = value;
                 try {
-                    if (findWorldByName().getWorldGenerator() == null) {
-                        worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
-                        findWorldByName().setWorldGenerator(worldGenerator);
+                    if (findWorldByName(selectedWorld).getWorldGenerator() == null) {
+                        worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld).getWorldGeneratorInfo().getUri(), context, environment);
+                        findWorldByName(selectedWorld).setWorldGenerator(worldGenerator);
                     } else {
-                        worldGenerator = findWorldByName().getWorldGenerator();
+                        worldGenerator = findWorldByName(selectedWorld).getWorldGenerator();
                     }
                     if (worldGenerator.getWorldSeed() == null) {
                         worldGenerator.setWorldSeed(createSeed(selectedWorld));
@@ -157,7 +160,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
         StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button -> {
-            startPlayingScreen.setTargetWorld(findWorldByName(), texture, context);
+            startPlayingScreen.setTargetWorld(worldList, findWorldByName(selectedWorld), texture, context);
             triggerForwardAnimation(startPlayingScreen);
         });
 
@@ -165,7 +168,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         WidgetUtil.trySubscribe(this, "config", button -> {
             try {
                 if (!selectedWorld.isEmpty()) {
-                    worldSetupScreen.setWorld(context, findWorldByName());
+                    worldSetupScreen.setWorld(context, findWorldByName(selectedWorld), worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
@@ -175,19 +178,28 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
             }
         });
 
-        WidgetUtil.trySubscribe(this, "close", button ->
-                triggerBackAnimation()
-        );
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+            UIDropdownScrollable worldsDropdownOfUniverse = universeSetupScreen.find("worlds", UIDropdownScrollable.class);
+            universeSetupScreen.refreshWorldDropdown(worldsDropdownOfUniverse);
+            triggerBackAnimation();
+        });
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
+        });
     }
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         try {
-            if (findWorldByName().getWorldGenerator() == null) {
-                worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName().getWorldGeneratorInfo().getUri(), context, environment);
-                findWorldByName().setWorldGenerator(worldGenerator);
+            if (findWorldByName(selectedWorld).getWorldGenerator() == null) {
+                worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld).getWorldGeneratorInfo().getUri(), context, environment);
+                findWorldByName(selectedWorld).setWorldGenerator(worldGenerator);
             } else {
-                worldGenerator = findWorldByName().getWorldGenerator();
+                worldGenerator = findWorldByName(selectedWorld).getWorldGenerator();
             }
             if (worldGenerator.getWorldSeed().isEmpty()) {
                 worldGenerator.setWorldSeed(createSeed(selectedWorld));
@@ -197,6 +209,14 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         } catch (UnresolvedWorldGeneratorException e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Set seletedWorld when configure from WorldPreGenerationScreen
+     * @param newNameToSet
+     */
+    public void setName(Name newNameToSet) {
+        selectedWorld = newNameToSet.toString();
     }
 
     /**
@@ -247,9 +267,9 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
      *
      * @return {@link WorldSetupWrapper} object of the selected world.
      */
-    private WorldSetupWrapper findWorldByName() {
+    private WorldSetupWrapper findWorldByName(String searchWorld) {
         for (WorldSetupWrapper world : worldList) {
-            if (world.getWorldName().toString().equals(selectedWorld)) {
+            if (world.getWorldName().toString().equals(searchWorld)) {
                 return world;
             }
         }
@@ -257,13 +277,28 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
     }
 
     /**
-     * Sets a unique seed by simply appending the world name with an incrementing number.
+     * Creates a unique world seed by appending the world name with an incrementing number, on top of the universe seed.
      *
      * @param world {@link WorldSetupWrapper} object whose seed is to be set.
      * @return The seed as a string.
      */
     private String createSeed(String world) {
-        return world + seedNumber++;
+        String seed = context.get(UniverseWrapper.class).getSeed();
+        return seed + world + seedNumber++;
+    }
+
+    private void setWorldGenerators() {
+        for (WorldSetupWrapper worldSetupWrapper : worldList) {
+            if (worldSetupWrapper.getWorldGenerator() == null) {
+                try {
+                    worldSetupWrapper.setWorldGenerator(WorldGeneratorManager.createWorldGenerator(findWorldByName(
+                            worldSetupWrapper.getWorldName().toString()).getWorldGeneratorInfo().getUri(), context, environment));
+                } catch (UnresolvedWorldGeneratorException e) {
+                    e.printStackTrace();
+                }
+            }
+            worldSetupWrapper.getWorldGenerator().setWorldSeed(createSeed(worldSetupWrapper.getWorldName().toString()));
+        }
     }
 
     @Override
@@ -271,4 +306,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         updatePreview();
     }
 
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
 }

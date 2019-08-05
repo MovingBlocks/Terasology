@@ -41,13 +41,15 @@ public class BlockBuilder implements BlockBuilderHelper {
     private WorldAtlas worldAtlas;
 
     private BlockShape cubeShape;
-    private BlockShape loweredShape;
+    private BlockShape lowShape;
+    private BlockShape topShape;
 
     public BlockBuilder(WorldAtlas worldAtlas) {
         this.worldAtlas = worldAtlas;
 
         cubeShape = Assets.get("engine:cube", BlockShape.class).get();
-        loweredShape = Assets.get("engine:loweredCube", BlockShape.class).get();
+        lowShape = Assets.get("engine:trimmedLoweredCube", BlockShape.class).get();
+        topShape = Assets.get("engine:trimmedRaisedCube",  BlockShape.class).get();
     }
 
     @Override
@@ -57,13 +59,7 @@ public class BlockBuilder implements BlockBuilderHelper {
             shape = cubeShape;
         }
 
-        Block block = constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getBaseSection(), uri, blockFamily);
-
-        // Lowered mesh for liquids
-        if (block.isLiquid()) {
-            applyLoweredShape(block, loweredShape, definition.getData().getBaseSection().getBlockTiles());
-        }
-        return block;
+        return constructCustomBlock(definition.getUrn().getResourceName().toString(), shape, Rotation.none(), definition.getData().getBaseSection(), uri, blockFamily);
     }
 
     @Override
@@ -124,13 +120,13 @@ public class BlockBuilder implements BlockBuilderHelper {
         setBlockFullSides(block, shape, rotation);
         block.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation));
 
-        for (BlockPart part : BlockPart.values()) {
-            block.setColorSource(part, section.getColorSources().get(part));
-            block.setColorOffset(part, section.getColorOffsets().get(part));
-        }
-
         block.setUri(uri);
         block.setBlockFamily(blockFamily);
+
+        // Lowered mesh for liquids
+        if (block.isLiquid()) {
+            applyLiquidShapes(block, section.getBlockTiles());
+        }
 
         return block;
     }
@@ -139,7 +135,6 @@ public class BlockBuilder implements BlockBuilderHelper {
         Block block = new Block();
         block.setLiquid(def.isLiquid());
         block.setWater(def.isWater());
-        block.setLava(def.isLava());
         block.setGrass(def.isGrass());
         block.setIce(def.isIce());
         block.setHardness(def.getHardness());
@@ -186,37 +181,44 @@ public class BlockBuilder implements BlockBuilderHelper {
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             Vector2f atlasPos;
-            if (tiles.get(part) == null) {
+            int frameCount;
+            BlockTile tile = tiles.get(part);
+            if (tile == null) {
                 atlasPos = new Vector2f();
+                frameCount = 1;
             } else {
-                atlasPos = worldAtlas.getTexCoords(tiles.get(part), shape.getMeshPart(part) != null);
+                atlasPos = worldAtlas.getTexCoords(tile, shape.getMeshPart(part) != null);
+                frameCount = tile.getLength();
             }
             BlockPart targetPart = part.rotate(rot);
             textureAtlasPositions.put(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize()));
+                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize(), frameCount));
             }
         }
         return new BlockAppearance(meshParts, textureAtlasPositions);
     }
 
     private void setBlockFullSides(Block block, BlockShape shape, Rotation rot) {
-        for (Side side : Side.values()) {
+        for (Side side : Side.getAllSides()) {
             BlockPart targetPart = BlockPart.fromSide(rot.rotate(side));
             block.setFullSide(targetPart.getSide(), shape.isBlockingSide(side));
         }
     }
 
-    private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, BlockTile> tiles) {
-        for (Side side : Side.values()) {
+    private void applyLiquidShapes(Block block, Map<BlockPart, BlockTile> tiles) {
+        for (Side side : Side.getAllSides()) {
             BlockPart part = BlockPart.fromSide(side);
             BlockTile blockTile = tiles.get(part);
             if (blockTile != null) {
-                BlockMeshPart meshPart = shape
+                BlockMeshPart lowMeshPart = lowShape
                         .getMeshPart(part)
-                        .rotate(Rotation.none().getQuat4f())
-                        .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize());
-                block.setLoweredLiquidMesh(part.getSide(), meshPart);
+                        .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize(), blockTile.getLength());
+                block.setLowLiquidMesh(part.getSide(), lowMeshPart);
+                BlockMeshPart topMeshPart = topShape
+                        .getMeshPart(part)
+                        .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize(), blockTile.getLength());
+                block.setTopLiquidMesh(part.getSide(), topMeshPart);
             }
         }
     }

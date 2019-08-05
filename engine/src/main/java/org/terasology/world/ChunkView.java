@@ -17,9 +17,7 @@ package org.terasology.world;
 
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.liquid.LiquidData;
 
 /**
  * A chunk view is a way of accessing multiple chunks for modification in a performant manner.
@@ -51,28 +49,6 @@ public interface ChunkView {
      * @return The block at the given coordinates. If this is outside of the view then the air block is returned
      */
     Block getBlock(int x, int y, int z);
-
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @return The biome at the given coordinates. If this is outside of the view then the default biome is returned
-     */
-    Biome getBiome(float x, float y, float z);
-
-    /**
-     * @param pos
-     * @return The biome at the given coordinates. If this is outside of the view then the default biome is returned
-     */
-    Biome getBiome(Vector3i pos);
-
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @return The biome at the given coordinates. If this is outside of the view then the default biome is returned
-     */
-    Biome getBiome(int x, int y, int z);
 
     /**
      * @param x
@@ -137,54 +113,44 @@ public interface ChunkView {
     void setBlock(int x, int y, int z, Block type);
 
     /**
-     * Sets the biome at the given position, if it is within the view.
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
-     * @param pos
-     * @param biome
-     */
-    void setBiome(Vector3i pos, Biome biome);
-
-    /**
-     * Sets the biome at the given coordinates, if it is within the view.
-     *
+     * @param index The index of the extra data field
      * @param x
      * @param y
      * @param z
-     * @param biome
+     * @return The (index)th extra-data value at the given position
      */
-    void setBiome(int x, int y, int z, Biome biome);
-
+    int getExtraData(int index, int x, int y, int z);
+    
     /**
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
+     *
+     * @param index The index of the extra data field
      * @param pos
-     * @return The state of liquid at the given position. This will be no liquid outside the view.
+     * @return The (index)th extra-data value at the given position
      */
-    LiquidData getLiquid(Vector3i pos);
-
+    int getExtraData(int index, Vector3i pos);
+    
     /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param index The index of the extra data field
      * @param x
      * @param y
      * @param z
-     * @return The state of liquid at the given position. This will be no liquid outside the view.
+     * @param value
      */
-    LiquidData getLiquid(int x, int y, int z);
-
+    void setExtraData(int index, int x, int y, int z, int value);
+    
     /**
-     * Sets the liquid state at the given position, if it is within the view
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
+     * @param index The index of the extra data field
      * @param pos
-     * @param newState
+     * @param value
      */
-    void setLiquid(Vector3i pos, LiquidData newState);
-
-    /**
-     * Sets the liquid state at the given position, if it is within the view
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @param newState
-     */
-    void setLiquid(int x, int y, int z, LiquidData newState);
+    void setExtraData(int index, Vector3i pos, int value);
 
     /**
      * Converts a coordinate from view-space to world space.

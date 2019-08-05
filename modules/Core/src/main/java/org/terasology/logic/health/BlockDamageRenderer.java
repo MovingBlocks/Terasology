@@ -61,7 +61,7 @@ public class BlockDamageRenderer extends BaseComponentSystem implements RenderSy
                 continue;
             }
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
-            groupedEntitiesByEffect.put(getEffectsNumber(health), blockComponent.getPosition());
+            groupedEntitiesByEffect.put(getEffectsNumber(health), blockComponent.position);
         }
         for (EntityRef entity : entityManager.getEntitiesWith(BlockRegionComponent.class, HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);

@@ -51,11 +51,14 @@ public class SwapGBuffers implements StateChange {
         return defaultInstance;
     }
 
-    // TODO: Add .hashCode()
-
     @Override
     public boolean equals(Object obj) {
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return SwapGBuffers.class.hashCode();
     }
 
     @Override

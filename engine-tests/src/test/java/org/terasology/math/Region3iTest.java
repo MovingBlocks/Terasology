@@ -33,10 +33,9 @@ import static org.junit.Assert.assertTrue;
 public class Region3iTest {
 
     @Test
-    public void testEmptyConstructor() {
-        Region3i region = Region3i.EMPTY;
-        assertEquals(new Vector3i(), region.size());
-        assertTrue(region.isEmpty());
+    public void testEmptyRegion() {
+        assertEquals(Region3i.empty().size(), Vector3i.zero());
+        assertTrue(Region3i.empty().isEmpty());
     }
 
     @Test
@@ -127,7 +126,7 @@ public class Region3iTest {
     public void testNonTouchingIntersect() {
         Region3i region1 = Region3i.createFromMinMax(new Vector3i(), new Vector3i(32, 32, 32));
         Region3i region2 = Region3i.createFromMinMax(new Vector3i(103, 103, 103), new Vector3i(170, 170, 170));
-        assertEquals(Region3i.EMPTY, region1.intersect(region2));
+        assertEquals(Region3i.empty(), region1.intersect(region2));
     }
 
     @Test

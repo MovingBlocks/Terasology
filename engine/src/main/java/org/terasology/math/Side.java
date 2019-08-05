@@ -21,6 +21,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.EnumMap;
+import java.util.EnumSet;
 
 /**
  * The six sides of a block and a slew of related utility.
@@ -36,6 +37,8 @@ public enum Side {
     RIGHT(new Vector3i(1, 0, 0), false, true, true),
     FRONT(new Vector3i(0, 0, -1), true, true, false),
     BACK(new Vector3i(0, 0, 1), true, true, false);
+
+    private static final EnumSet<Side> ALL_SIDES = EnumSet.allOf(Side.class);
 
     private static final EnumMap<Side, Side> reverseMap;
     private static final ImmutableList<Side> horizontalSides;
@@ -183,6 +186,17 @@ public enum Side {
             return (x > 0) ? RIGHT : LEFT;
         }
         return (z > 0) ? BACK : FRONT;
+    }
+
+    /**
+     * This provides a static EnumSet of all Sides defined in the enumeration. The result contains the same values as
+     * calling {@code Side#values} but this does not create a new copy on every call.
+     * <br/>
+     * <b>Warning:</b> Do not change the content of the returned enum set! It will be reflected on all calls to this method.
+     * @return All available sides
+     */
+    public static EnumSet<Side> getAllSides() {
+        return ALL_SIDES;
     }
 
     /**

@@ -62,7 +62,7 @@ public class AttachSupportRequired implements BlockStructuralSupport {
         final AttachSupportRequiredComponent component = getComponent(location, blockOverrides);
         if (component != null) {
             final Block block = getBlockWithOverrides(location, blockOverrides);
-            for (Side side : Side.values()) {
+            for (Side side : Side.getAllSides()) {
                 if (hasRequiredSupportOnSideForBlock(location, side, block)) {
                     return true;
                 }

@@ -33,7 +33,7 @@ public class CacheBlocks extends StepBasedLoadProcess {
 
     @Override
     public String getMessage() {
-        return "Caching Blocks...";
+        return "${engine:menu#caching-blocks}";
     }
 
     @Override

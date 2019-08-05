@@ -36,6 +36,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -58,15 +59,19 @@ public class LightShaftsNode extends ConditionDependentNode {
 
     private BackdropProvider backdropProvider;
     private SubmersibleCamera activeCamera;
-
+    private WorldProvider worldProvider;
     private Material lightShaftsMaterial;
+    private float exposure;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float density = 1.0f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.01f)
-    private float exposure = 0.0075f;
+    private float exposureDay = 0.0075f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 0.01f)
+    private float exposureNight = 0.00375f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float weight = 8.0f;
@@ -84,6 +89,7 @@ public class LightShaftsNode extends ConditionDependentNode {
     public LightShaftsNode(String nodeUri, Context context) {
         super(nodeUri, context);
 
+        worldProvider = context.get(WorldProvider.class);
         backdropProvider = context.get(BackdropProvider.class);
         activeCamera = context.get(WorldRenderer.class).getActiveCamera();
 
@@ -101,7 +107,8 @@ public class LightShaftsNode extends ConditionDependentNode {
         lightShaftsMaterial = getMaterial(LIGHT_SHAFTS_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL_URN, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(),
+                                    ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL_URN, "texScene"));
     }
 
     /**
@@ -113,6 +120,22 @@ public class LightShaftsNode extends ConditionDependentNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/" + getUri());
 
+        // Get time of day from midnight to midnight <0, 1>, 0.5 being noon.
+
+        float days = worldProvider.getTime().getDays();
+        days = days - (int) days;
+
+        // If sun is down and moon is up, do lightshafts from moon.
+        // This is a temporary solution to sun causing light shafts even at night.
+
+        if (days < 0.25f || days > 0.75f) {
+            sunDirection = backdropProvider.getSunDirection(true);
+            exposure = exposureNight;
+        } else {
+            sunDirection = backdropProvider.getSunDirection(false);
+            exposure = exposureDay;
+        }
+
         // Shader Parameters
 
         lightShaftsMaterial.setFloat("density", density, true);
@@ -120,7 +143,6 @@ public class LightShaftsNode extends ConditionDependentNode {
         lightShaftsMaterial.setFloat("weight", weight, true);
         lightShaftsMaterial.setFloat("decay", decay, true);
 
-        sunDirection = backdropProvider.getSunDirection(false);
         sunPositionWorldSpace4.set(sunDirection.x * 10000.0f, sunDirection.y * 10000.0f, sunDirection.z * 10000.0f, 1.0f);
         sunPositionScreenSpace.set(sunPositionWorldSpace4);
         activeCamera.getViewProjectionMatrix().transform(sunPositionScreenSpace);
@@ -141,4 +163,6 @@ public class LightShaftsNode extends ConditionDependentNode {
 
         PerformanceMonitor.endActivity();
     }
+
+
 }

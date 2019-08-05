@@ -28,7 +28,7 @@ public class CacheTextures extends StepBasedLoadProcess {
 
     @Override
     public String getMessage() {
-        return "Caching Textures...";
+        return "${engine:menu#caching-textures}";
     }
 
     @Override

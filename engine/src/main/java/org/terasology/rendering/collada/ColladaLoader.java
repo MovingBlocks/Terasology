@@ -29,10 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
-import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 
@@ -118,7 +116,7 @@ public class ColladaLoader {
     }
 
     private void createMd5JointForElementAndParent(Map<String, MD5Joint> md5JointBySidMap,
-                                                   Element element, MD5Joint parentMD5Joint) throws ColladaParseException {
+            Element element, MD5Joint parentMD5Joint) throws ColladaParseException {
         MD5Joint joint = createMD5Joint(element);
         joint.element = element;
         joint.parent = parentMD5Joint;
@@ -141,7 +139,6 @@ public class ColladaLoader {
     protected void parseSkeletalMeshData(Element rootElement) throws ColladaParseException {
 
         List<MD5Joint> md5JointList = new ArrayList<>();
-        List<MD5Mesh> md5MeshList = new ArrayList<>();
 
         skeletonBuilder = new SkeletalMeshDataBuilder();
 
@@ -180,7 +177,7 @@ public class ColladaLoader {
             String vertexWeightsCountString = vertexWeights.attr("count");
             int vertexWeightsCount = Integer.parseInt(vertexWeightsCountString);
 
-            String[] jointNameArray = null;
+            String[] jointNameArray = {};
             float[] inverseBindMatrixArray;
             Quat4f[] rotationArray;
             ElementSet jointsInputSet = joints.find("input");
@@ -202,7 +199,7 @@ public class ColladaLoader {
 
             List<MD5Weight> md5WeightList = Lists.newArrayList();
 
-            float[] weightsArray = null;
+            float[] weightsArray = {};
 
             ElementSet vertexWeightsInputSet = vertexWeights.find("input");
             List<Input> vertexWeightsInputList = parseInputs(vertexWeightsInputSet);
@@ -233,7 +230,7 @@ public class ColladaLoader {
             ElementSet vertexWeightsVCountDataSet = vertexWeights.find("vcount");
             if (1 != vertexWeightsVCountDataSet.size()) {
                 throw new ColladaParseException("Found " + vertexWeightsVCountDataSet.size()
-                        + " vertex weights vcount sets for controller id=" + controller.id() + " name=" + controller.name());
+                + " vertex weights vcount sets for controller id=" + controller.id() + " name=" + controller.name());
             }
             Element vertexWeightsVCountData = vertexWeightsVCountDataSet.first();
             String vertexWeightsVCountString = vertexWeightsVCountData.text();
@@ -246,7 +243,7 @@ public class ColladaLoader {
             ElementSet vertexWeightsVDataSet = vertexWeights.find("v");
             if (1 != vertexWeightsVDataSet.size()) {
                 throw new ColladaParseException("Found " + vertexWeightsVDataSet.size()
-                        + " vertex weights v sets for controller id=" + controller.id() + " name=" + controller.name());
+                + " vertex weights v sets for controller id=" + controller.id() + " name=" + controller.name());
             }
             Element vertexWeightsVData = vertexWeightsVDataSet.first();
             String vertexWeightsVDataString = vertexWeightsVData.text();
@@ -288,8 +285,15 @@ public class ColladaLoader {
                         if ("JOINT".equals(vertexWeightsInput.semantic)) {
                             md5Weight.jointIndex = index;
                             vertexWeightsJointNameArray[vertexWeightsIndex] = jointNameArray[index];
-                            // logger.debug(String.valueOf(vertexWeightsVDataIndex) + ": " + "jointName=" + vertexWeightsJointNameArray[vertexWeightsIndex]);
+                            if (vertexWeightsJointNameArray[vertexWeightsIndex] == null){
+                                logger.debug("No jointNameArray in index: " + index);
+                                throw new ColladaParseException("No jointNameArray in index: " + index);
+                            }
                         } else if ("WEIGHT".equals(vertexWeightsInput.semantic)) {
+                            if (weightsArray == null) {
+                                logger.debug("No weights in weightsArray");
+                                throw new ColladaParseException("No weights in weightsArray");
+                            }
                             md5Weight.bias = weightsArray[index];
                             vertexWeightsArray[vertexWeightsIndex] = weightsArray[index];
                             // logger.debug(String.valueOf(vertexWeightsVDataIndex) + ": " + "weight=" + vertexWeightsArray[vertexWeightsIndex]);
@@ -303,6 +307,10 @@ public class ColladaLoader {
 
             MD5Mesh md5Mesh = new MD5Mesh();
             md5Mesh.weightList = md5WeightList;
+
+            if (jointNameArray == null) {
+                throw new ColladaParseException("a jointName is null in jointNmaeArray");
+            }
 
             // Find a node with sid="joint-name"
             for (String jointName : jointNameArray) {
@@ -343,42 +351,11 @@ public class ColladaLoader {
         for (MD5Joint joint : md5JointList) {
             // We can probably skip unused end nodes
             joint.childList.stream().filter(childJoint -> childJoint.bone != null).forEach(childJoint ->
-                    joint.bone.addChild(childJoint.bone));
+            joint.bone.addChild(childJoint.bone));
         }
 
         for (MD5Joint joint : md5JointList) {
             skeletonBuilder.addBone(joint.bone);
-        }
-
-        if (md5MeshList.size() > 0) {
-            // TODO: Support multiple mesh somehow?
-            MD5Mesh mesh = md5MeshList.get(0);
-            for (MD5Weight weight : mesh.weightList) {
-                skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
-            }
-
-            List<Vector2f> uvs = Lists.newArrayList();
-
-            TIntList vertexStartWeight = new TIntArrayList(vertices.size() / 3);
-            TIntList vertexWeightCount = new TIntArrayList(vertices.size() / 3);
-            //            for (MD5Vertex vert : mesh.vertexList) {
-            //                uvs.add(vert.uv);
-            //                vertexStartWeight.add(vert.startWeight);
-            //                vertexWeightCount.add(vert.countWeight);
-            //            }
-
-            for (int i = 0; i < vertices.size() / 3; i++) {
-                vertexStartWeight.add(i);
-                vertexWeightCount.add(1);
-            }
-
-            skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
-
-            for (int i = 0; i < normals.size() / 2; i++) {
-                uvs.add(new Vector2f(normals.get(i * 2 + 0), normals.get(i * 2 + 1)));
-            }
-            skeletonBuilder.setUvs(uvs);
-            skeletonBuilder.setIndices(indices);
         }
 
         // Now if you have come this far, you should be able to read the geometry data,
@@ -599,9 +576,9 @@ public class ColladaLoader {
     }
 
     private int parseTriangles(Element rootElement, TFloatList verticesParam, TFloatList texCoord0Param,
-                               TFloatList normalsParam, TIntList indicesParam, TFloatList colorsParam,
-                               int vertCountParam, Element geometry, Element mesh,
-                               Element triangles, boolean yUp, boolean zUp) throws ColladaParseException {
+            TFloatList normalsParam, TIntList indicesParam, TFloatList colorsParam,
+            int vertCountParam, Element geometry, Element mesh,
+            Element triangles, boolean yUp, boolean zUp) throws ColladaParseException {
         return parseFaces(rootElement, null, verticesParam, texCoord0Param,
                 normalsParam, indicesParam, colorsParam,
                 vertCountParam, geometry, mesh, triangles,
@@ -609,9 +586,9 @@ public class ColladaLoader {
     }
 
     private int parseFaces(Element rootElement, TIntList vcountList, TFloatList verticesParam, TFloatList texCoord0Param,
-                           TFloatList normalsParam, TIntList indicesParam, TFloatList colorsParam,
-                           int vertCountParam, Element geometry, Element mesh, Element faces,
-                           boolean yUp, boolean zUp) throws ColladaParseException {
+            TFloatList normalsParam, TIntList indicesParam, TFloatList colorsParam,
+            int vertCountParam, Element geometry, Element mesh, Element faces,
+            boolean yUp, boolean zUp) throws ColladaParseException {
         int vertCount = vertCountParam;
         String faceCountString = faces.attr("count");
         int faceCount = Integer.parseInt(faceCountString);
@@ -739,7 +716,7 @@ public class ColladaLoader {
             Input input = faceInputs.get(i);
             if (input.offset != i) {
                 throw new ColladaParseException("Triangle input list offset does not match list index for triangle input " + input + " for geometry id=" + geometry.id()
-                        + " name=" + geometry.name());
+                + " name=" + geometry.name());
             }
         }
 
@@ -931,8 +908,8 @@ public class ColladaLoader {
             String[] floatStrings = getItemsInString(objectArrayDataString);
             if (floatStrings.length != arraySize) {
                 throw new ColladaParseException("Expected float array size " + arraySize + " but was " + floatStrings.length + " for sourceElement id=" + sourceElement.id()
-                        + " name="
-                        + sourceElement.name());
+                + " name="
+                + sourceElement.name());
             }
             for (int i = 0; i < floatStrings.length; i++) {
                 String floatString = floatStrings[i];
@@ -943,8 +920,8 @@ public class ColladaLoader {
             String[] nameStrings = getItemsInString(objectArrayDataString);
             if (nameStrings.length != arraySize) {
                 throw new ColladaParseException("Expected name array size " + arraySize + " but was " + nameStrings.length + " for sourceElement id=" + sourceElement.id()
-                        + " name="
-                        + sourceElement.name());
+                + " name="
+                + sourceElement.name());
             }
             for (int i = 0; i < nameStrings.length; i++) {
                 source.nameValues[i] = nameStrings[i];

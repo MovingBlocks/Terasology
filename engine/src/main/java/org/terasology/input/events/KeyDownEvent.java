@@ -32,4 +32,8 @@ public final class KeyDownEvent extends KeyEvent {
         event.setKey(key, keyChar);
         return event;
     }
+
+    public static KeyDownEvent createCopy(KeyDownEvent toBeCopied) {
+        return new KeyDownEvent(toBeCopied.getKey(), toBeCopied.getKeyCharacter(), toBeCopied.getDelta());
+    }
 }

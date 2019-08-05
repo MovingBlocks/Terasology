@@ -83,10 +83,10 @@ public class DoorSystem extends BaseComponentSystem {
         }
 
         Vector3f offset = new Vector3f(event.getHitPosition());
-        offset.sub(targetBlockComp.getPosition().toVector3f());
+        offset.sub(targetBlockComp.position.toVector3f());
         Side offsetDir = Side.inDirection(offset);
 
-        Vector3i primePos = new Vector3i(targetBlockComp.getPosition());
+        Vector3i primePos = new Vector3i(targetBlockComp.position);
         primePos.add(offsetDir.getVector3i());
         Block primeBlock = worldProvider.getBlock(primePos);
         if (!primeBlock.isReplacementAllowed()) {

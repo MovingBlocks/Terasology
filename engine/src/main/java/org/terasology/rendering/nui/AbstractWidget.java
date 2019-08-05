@@ -16,18 +16,24 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.collect.Lists;
+import org.terasology.engine.SimpleUri;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.ButtonState;
+import org.terasology.input.MouseInput;
+import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.rendering.nui.widgets.UIRadialSection;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-/**
- */
 public abstract class AbstractWidget implements UIWidget {
 
     @LayoutConfig
@@ -48,7 +54,11 @@ public abstract class AbstractWidget implements UIWidget {
     @LayoutConfig
     private float tooltipDelay = 0.5f;
 
+    protected int depth = new DefaultBinding<Integer>(SortOrderSystem.DEFAULT_DEPTH).get();
+
     private boolean focused;
+
+    private static boolean shiftPressed;
 
     @LayoutConfig
     private Binding<Boolean> enabled = new DefaultBinding<>(true);
@@ -190,11 +200,16 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public void onGainFocus() {
         focused = true;
+        this.onMouseButtonEvent(new MouseButtonEvent(MouseInput.MOUSE_LEFT, ButtonState.UP, 0));
     }
 
     @Override
     public void onLoseFocus() {
         focused = false;
+
+        if (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
+            TabbingManager.unfocusWidget();
+        }
     }
 
     public final boolean isFocused() {
@@ -271,5 +286,70 @@ public abstract class AbstractWidget implements UIWidget {
             }
             return tooltipLabel;
         }
+    }
+
+    @Override
+    public void onBindEvent(BindButtonEvent event) {
+        if (event.getState().equals(ButtonState.DOWN) && !SortOrderSystem.containsConsole()) {
+
+            if (event.getId().equals(new SimpleUri("engine:tabbingModifier"))) {
+                shiftPressed = true;
+            }
+
+            if (event.getId().equals(new SimpleUri("engine:tabbingUI"))) {
+                if (!TabbingManager.isInitialized()) {
+                    TabbingManager.init();
+                }
+                if (TabbingManager.getOpenScreen().getManager().getFocus() == null) {
+                    if (TabbingManager.getWidgetsList().size() > 0) {
+                        TabbingManager.resetCurrentNum();
+                        TabbingManager.focusedWidget = TabbingManager.getWidgetsList().get(0);
+                    }
+                }
+                TabbingManager.focusSetThrough = true;
+                TabbingManager.changeCurrentNum(!shiftPressed);
+
+                for (WidgetWithOrder widget : TabbingManager.getWidgetsList()) {
+                    if (widget.getOrder() == TabbingManager.getCurrentNum()) {
+                        if (!widget.isEnabled()) {
+                            TabbingManager.changeCurrentNum(true);
+                        } else {
+                            widget.onGainFocus();
+                            TabbingManager.focusedWidget = widget;
+                            TabbingManager.getOpenScreen().getManager().setFocus(widget);
+                        }
+                    } else {
+                        widget.onLoseFocus();
+
+                        if (widget instanceof UIRadialSection) {
+                            ((UIRadialSection) widget).setSelected(false);
+                        }
+                    }
+                }
+
+                event.prepare(new SimpleUri("engine:tabbingUI"), ButtonState.UP, event.getDelta());
+            } else if (event.getId().equals(new SimpleUri("engine:activate"))) {
+                if (TabbingManager.focusedWidget instanceof UIDropdown) {
+                    UIDropdown dropdown = ((UIDropdown) TabbingManager.focusedWidget);
+                    if (dropdown.isOpened()) {
+                        dropdown.setOpenedReverse(true);
+                    }
+                } else if  (TabbingManager.focusedWidget instanceof ActivatableWidget) {
+                    ((ActivatableWidget) TabbingManager.focusedWidget).activateWidget();
+                }
+
+                event.prepare(new SimpleUri("engine:activate"), ButtonState.UP, event.getDelta());
+            }
+        }
+        if (event.getState().equals(ButtonState.UP) && !SortOrderSystem.containsConsole()) {
+
+            if (event.getId().equals(new SimpleUri("engine:tabbingModifier"))) {
+                shiftPressed = false;
+            }
+        }
+    }
+
+    public static boolean getShiftPressed() {
+        return shiftPressed;
     }
 }

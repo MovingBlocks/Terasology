@@ -21,6 +21,7 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
 
 /**
+ * Provides a view over a single chunk using a given propagation rule.
  */
 public class SingleChunkView implements PropagatorWorldView {
 

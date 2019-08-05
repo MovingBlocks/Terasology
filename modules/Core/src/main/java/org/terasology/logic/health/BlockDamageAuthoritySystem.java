@@ -78,7 +78,7 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void beforeDamaged(BeforeDamagedEvent event, EntityRef blockEntity, BlockComponent blockComp) {
-        if (!blockComp.getBlock().isDestructible()) {
+        if (!blockComp.block.isDestructible()) {
             event.consume();
         }
     }
@@ -97,7 +97,7 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onDamaged(OnDamagedEvent event, EntityRef entity, BlockComponent blockComponent, LocationComponent locComp) {
-        onDamagedCommon(event, blockComponent.getBlock().getBlockFamily(), locComp.getWorldPosition(), entity);
+        onDamagedCommon(event, blockComponent.block.getBlockFamily(), locComp.getWorldPosition(), entity);
         if (!entity.hasComponent(BlockDamagedComponent.class)) {
             entity.addComponent(new BlockDamagedComponent());
         }
@@ -191,7 +191,7 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void beforeDamage(BeforeDamagedEvent event, EntityRef entity, BlockComponent blockComp) {
-        beforeDamageCommon(event, blockComp.getBlock());
+        beforeDamageCommon(event, blockComp.block);
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
@@ -232,7 +232,7 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void beforeDamagedEnsureHealthPresent(BeforeDamagedEvent event, EntityRef blockEntity, BlockComponent blockComponent) {
         if (!blockEntity.hasComponent(HealthComponent.class)) {
-            Block type = blockComponent.getBlock();
+            Block type = blockComponent.block;
             if (type.isDestructible()) {
                 HealthComponent healthComponent = new HealthComponent(type.getHardness(), type.getHardness() / BLOCK_REGEN_SECONDS, 1.0f);
                 healthComponent.destroyEntityOnNoHealth = true;

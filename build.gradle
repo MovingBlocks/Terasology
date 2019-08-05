@@ -79,9 +79,13 @@ dependencies {
 
     // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
     codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '1.2.0', ext: 'zip'
+
+    // Natives for JNLua (Kallisti, KComputers)
+    natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
+    natives group: 'org.terasology', name: 'native-bullet', version: '0.0.3-20190805.052754-1', ext: 'zip'
 }
 
-task extractWindowsNatives(type:Sync) {
+task extractWindowsNatives(type:Copy) {
     description = "Extracts the Windows natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
@@ -90,7 +94,7 @@ task extractWindowsNatives(type:Sync) {
     exclude ('META-INF/**')
 }
 
-task extractMacOSXNatives(type:Sync) {
+task extractMacOSXNatives(type:Copy) {
     description = "Extracts the OSX natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
@@ -99,7 +103,7 @@ task extractMacOSXNatives(type:Sync) {
     exclude ('META-INF/**')
 }
 
-task extractLinuxNatives(type:Sync) {
+task extractLinuxNatives(type:Copy) {
     description = "Extracts the Linux natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
@@ -108,11 +112,30 @@ task extractLinuxNatives(type:Sync) {
     exclude ('META-INF/**')
 }
 
+task extractJNLuaNatives(type:Copy) {
+    description = "Extracts the JNLua natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('jnlua') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives")
+}
+
+task extractNativeBulletNatives(type:Copy) {
+    description = "Extracts the JNLua natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('native-bullet') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives")
+}
+
+
 task extractNatives {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
     dependsOn extractWindowsNatives
     dependsOn extractLinuxNatives
     dependsOn extractMacOSXNatives
+    dependsOn extractJNLuaNatives
+    dependsOn extractNativeBulletNatives
 }
 
 // TODO: Test meta modules and other libs - not that there's really much to test other than being able to Git via Gradle

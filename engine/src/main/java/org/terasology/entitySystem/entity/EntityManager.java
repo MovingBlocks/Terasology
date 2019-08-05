@@ -17,12 +17,14 @@ package org.terasology.entitySystem.entity;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.internal.EngineEntityPool;
-import org.terasology.entitySystem.entity.internal.EngineSectorManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.sectors.SectorSimulationComponent;
+import org.terasology.game.GameManifest;
+import org.terasology.world.internal.WorldInfo;
 
+import java.util.List;
 import java.util.Map;
 
 public interface EntityManager extends EntityPool {
@@ -36,6 +38,22 @@ public interface EntityManager extends EntityPool {
      * @return the newly created EntityRef
      */
     EntityRef createSectorEntity(long maxDelta);
+
+    /**
+     * Takes the {@link GameManifest}, gets {@link WorldInfo} of different worlds from it and
+     * creates pool for each world.
+     *
+     * @param gameManifest The game for which multiple pools will be needed.
+     */
+    void createWorldPools(GameManifest gameManifest);
+
+    List<EngineEntityPool> getWorldPools();
+
+    Map<WorldInfo, EngineEntityPool> getWorldPoolsMap();
+
+    Map<Long, EngineEntityPool> getPoolMap();
+
+    Map<EngineEntityPool, Long> getPoolCounts();
 
     /**
      * Creates a new EntityRef in sector-scope
@@ -77,5 +95,7 @@ public interface EntityManager extends EntityPool {
      * @return The component library being used by the entity manager
      */
     ComponentLibrary getComponentLibrary();
+
+    boolean moveToPool(long id, EngineEntityPool pool);
 
 }

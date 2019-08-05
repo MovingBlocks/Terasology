@@ -1,0 +1,359 @@
+{
+    "type": "engine:moduleDetailsScreen",
+    "skin": "engine:mainMenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UILabel",
+                "id": "title",
+                "family": "subtitle",
+                "text": "${engine:menu#module-details-title}",
+                "layoutInfo": {
+                    "height": 30,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                       "target": "TOP",
+                       "offset": 30
+                    }
+                }
+            },
+            {
+                "type": "UIBox",
+                "id": "container",
+                "layoutInfo": {
+                    "width": 1016,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 23,
+                        "widget": "title"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 6
+                    }
+                }
+            },
+            {
+                "id": "body",
+                "type":"RelativeLayout",
+                "layoutInfo": {
+                    "width": 1000,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title",
+                        "offset": 32
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 14
+                    }
+                },
+                "contents": [
+                    {
+                        "type": "ColumnLayout",
+                        "columns": 2,
+                        "column-widths": [0.35, 0.65],
+                        "horizontalSpacing": 4,
+                        "layoutInfo": {
+                            "position-top": {
+                                "target": "TOP"
+                            }
+                        },
+                        "contents": [
+                            {
+                                "id": "firstColumn",
+                                "type": "RelativeLayout",
+                                "layoutInfo": {
+                                    "position-top": {
+                                        "target": "TOP"
+                                    }
+                                },
+                                "contents": [
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#game-details-modules}",
+                                        "id": "modulesTitle",
+                                        "layoutInfo": {
+                                            "height": 8,
+                                            "position-top": {
+                                                "target": "TOP"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "ScrollableArea",
+                                        "family": "module-list",
+                                        "content": {
+                                            "type": "UIList",
+                                            "id": "modules"
+                                        },
+                                        "layoutInfo": {
+                                            "position-top": {
+                                                "target": "BOTTOM",
+                                                "widget": "modulesTitle",
+                                                "offset": 12
+                                            }
+                                        }
+                                    },
+                                ]
+                            },
+                            {
+                                "type": "RelativeLayout",
+                                "id": "secondColumn",
+                                "skin": "mainmenu",
+                                "layoutInfo": {
+                                    "position-horizontal-center": {},
+                                    "position-top": {
+                                        "target": "TOP"
+                                    }
+                                },
+                                "contents": [
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#game-details-module-description}",
+                                        "id": "moduleDescriptionTitle",
+                                        "layoutInfo": {
+                                            "height": 8,
+                                            "position-top": {
+                                                "target": "TOP"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "RelativeLayout",
+                                        "id": "descriptionContainer",
+                                        "layoutInfo": {
+                                            "height": 275,
+                                            "position-top": {
+                                                "target": "BOTTOM",
+                                                "widget": "moduleDescriptionTitle"
+                                            }
+                                        },
+                                        "contents": [
+                                            {
+                                                "type": "ScrollableArea",
+                                                "content": {
+                                                    "type": "UIText",
+                                                    "multiline": true,
+                                                    "id": "description"
+                                                },
+                                                "layoutInfo": {
+                                                    "position-top": {
+                                                        "target": "TOP",
+                                                        "widget": "moduleDescriptionTitle",
+                                                        "offset": 12
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "UIButtonWebBrowser",
+                                                "text": "${engine:menu#open-in-browser}",
+                                                "id": "openInBrowser",
+                                                "enabled": false,
+                                                "layoutInfo": {
+                                                    "width": 150,
+                                                    "height": 32,
+                                                    "position-bottom": {
+                                                        "target": "BOTTOM",
+                                                        "widget": "descriptionContainer",
+                                                        "offset": 7
+                                                    },
+                                                    "position-right": {
+                                                        "offset": 7
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "RelativeLayout",
+                                        "layoutInfo": {
+                                            "position-top": {
+                                                "target": "BOTTOM",
+                                                "widget": "descriptionContainer"
+                                            }
+                                        },
+                                        "contents": [
+                                            {
+                                                "type": "ColumnLayout",
+                                                "columns": 2,
+                                                "column-widths": [0.4, 0.6],
+                                                "verticalSpacing": 8,
+                                                "layoutInfo": {
+                                                    "position-top": {
+                                                        "target": "TOP"
+                                                    }
+                                                },
+                                                "contents": [
+                                                    {
+                                                        "type": "RelativeLayout",
+                                                        "layoutInfo": {
+                                                            "position-top": {
+                                                                "target": "TOP"
+                                                            }
+                                                        },
+                                                        "contents": [
+                                                            {
+                                                                "type": "UILabel",
+                                                                "text": "${engine:menu#game-details-module-dependencies}",
+                                                                "id": "moduleDependenciesTitle",
+                                                                "layoutInfo": {
+                                                                    "height": 8,
+                                                                    "position-top": {
+                                                                        "target": "TOP"
+                                                                    }
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": "ScrollableArea",
+                                                                "family": "module-list",
+                                                                "content": {
+                                                                    "type": "UIList",
+                                                                    "id": "dependencies"
+                                                                },
+                                                                "layoutInfo": {
+                                                                    "position-top": {
+                                                                        "target": "BOTTOM",
+                                                                        "widget": "moduleDependenciesTitle",
+                                                                        "offset": 12
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "type": "RelativeLayout",
+                                                        "layoutInfo": {
+                                                            "height": 300,
+                                                            "position-top": {
+                                                                "target": "BOTTOM",
+                                                                "widget": "descriptionContainer"
+                                                            }
+                                                        },
+                                                        "contents": [
+                                                            {
+                                                                "type": "ColumnLayout",
+                                                                "columns": 2,
+                                                                "column-widths": [0.5, 0.5],
+                                                                "verticalSpacing": 1,
+                                                                "contents": [
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "text": "${engine:menu#module-name}: "
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "id": "moduleName",
+                                                                        "text": "Module Name Goes Here"
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "text": "${engine:menu#game-details-min-supported-version}: "
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "id": "minSupportedVersion",
+                                                                        "text": "Min Module Version Goes Here"
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "text": "${engine:menu#game-details-max-supported-version}: "
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "id": "maxSupportedVersion",
+                                                                        "text": "Max Module Version Goes Here"
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "text": "${engine:menu#module-version-installed}: "
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "id": "installedVersion",
+                                                                        "text": "Module Version Goes Here"
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "text": "${engine:menu#module-version-available}: "
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "id": "onlineVersion",
+                                                                        "text": "Module Version Goes Here"
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "text": "${engine:menu#game-details-required}: "
+                                                                    },
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "id": "required",
+                                                                        "text": "Is module required?"
+                                                                    }
+                                                                ],
+                                                                "layoutInfo": {
+                                                                    "height": 200,
+                                                                    "position-horizontal-center": {},
+                                                                    "position-top": {
+                                                                        "target": "TOP"
+                                                                    }
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": "UIButton",
+                                                                "text": "${engine:menu#update-module}",
+                                                                "id": "update",
+                                                                "enabled": false,
+                                                                "layoutInfo": {
+                                                                     "width": 150,
+                                                                     "height": 32,
+                                                                     "position-bottom": {
+                                                                         "target": "BOTTOM",
+                                                                         "widget": "descriptionContainer"
+                                                                     },
+                                                                     "position-right": {}
+                                                                }
+                                                            },
+                                                        ]
+                                                    }
+
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "layoutInfo": {
+                            "position-top": {
+                                "target": "TOP",
+                                "widget": "body",
+                                "offset": 2
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "UIButton",
+                "text": "${engine:menu#back}",
+                "id": "close",
+                "layoutInfo": {
+                    "width": 128,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                       "target": "BOTTOM",
+                       "offset": 48
+                    }
+                }
+            }
+        ]
+    }
+}

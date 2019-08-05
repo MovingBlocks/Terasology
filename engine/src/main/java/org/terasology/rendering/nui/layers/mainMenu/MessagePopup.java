@@ -29,7 +29,7 @@ public class MessagePopup extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:messagePopup!instance");
 
-    public final ActivateEventListener defaultCloseAction = button -> getManager().popScreen();
+    private final ActivateEventListener defaultCloseAction = button -> getManager().popScreen();
 
     @Override
     public void initialise() {
@@ -48,4 +48,9 @@ public class MessagePopup extends CoreScreenLayer {
         }
     }
 
+    public void subscribeButton(ActivateEventListener eventListener) {
+        if (eventListener != null) {
+            WidgetUtil.trySubscribe(this, "ok", eventListener);
+        }
+    }
 }

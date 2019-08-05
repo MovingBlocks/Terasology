@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
-import org.terasology.config.ModuleConfig;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
@@ -46,6 +47,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -55,7 +57,7 @@ import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.world.WorldSetupWrapper;
-import org.terasology.world.block.family.BlockFamilyRegistry;
+import org.terasology.world.block.family.BlockFamilyLibrary;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
@@ -72,17 +74,18 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Sets up the Universe for a user. Displays a list of {@link org.terasology.world.generator.WorldGenerator}
  * for a particular game template.
  */
 public class UniverseSetupScreen extends CoreScreenLayer {
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
+
+    private static final Logger logger = LoggerFactory.getLogger(UniverseSetupScreen.class);
 
     @In
     private WorldGeneratorManager worldGeneratorManager;
@@ -99,12 +102,12 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     private Context context;
     private int worldNumber;
     private String selectedWorld = "";
+    private int indexOfSelectedWorld;
+    private WorldSetupWrapper copyOfSelectedWorld;
 
     @Override
     public void initialise() {
-
-        ModuleConfig moduleConfig = config.getDefaultModSelection();
-
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         final UIDropdownScrollable<WorldGeneratorInfo> worldGenerator = find("worldGenerators", UIDropdownScrollable.class);
         if (worldGenerator != null) {
@@ -113,8 +116,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 public List<WorldGeneratorInfo> get() {
                     // grab all the module names and their dependencies
                     // This grabs modules from `config.getDefaultModSelection()` which is updated in AdvancedGameSetupScreen
-                    Set<Name> enabledModuleNames = getAllEnabledModuleNames().stream().collect(Collectors.toSet());
-                    List<WorldGeneratorInfo> result = Lists.newArrayList();
+                    final Set<Name> enabledModuleNames = new HashSet<>(getAllEnabledModuleNames());
+                    final List<WorldGeneratorInfo> result = Lists.newArrayList();
                     for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
                         if (enabledModuleNames.contains(option.getUri().getModuleName())) {
                             result.add(option);
@@ -172,6 +175,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             @Override
             public void set(String value) {
                 selectedWorld = value;
+                indexOfSelectedWorld = findIndex(worlds, selectedWorld);
             }
         });
 
@@ -179,59 +183,77 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 triggerBackAnimation()
         );
 
-        WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
         WidgetUtil.trySubscribe(this, "worldConfig", button -> {
+            final WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
             try {
                 if (!worlds.isEmpty() || !selectedWorld.isEmpty()) {
-                    worldSetupScreen.setWorld(context, findWorldByName());
+                    worldSetupScreen.setWorld(context, findWorldByName(), worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
                 }
             } catch (UnresolvedWorldGeneratorException e) {
-                e.printStackTrace();
+                logger.error("Can't configure the world! due to {}", e.getMessage());
             }
         });
 
         WidgetUtil.trySubscribe(this, "addGenerator", button -> {
             if (worldGenerator.getSelection().getUri().toString().equals("Core:heightMap")) {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("HeightMap not supported", "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
-
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(
+                        "HeightMap not supported", "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
             } else {
                 addNewWorld(worldGenerator.getSelection());
-                List<WorldSetupWrapper> worldOptions = worlds;
                 worldsDropdown.setOptions(worldNames());
             }
-            //triggerForwardAnimation(worldSetupScreen);
         });
 
-        WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button -> {
+            final WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
             if (!worlds.isEmpty()) {
-                try {
-                    worldPreGenerationScreen.setEnvironment(context);
-                    triggerForwardAnimation(worldPreGenerationScreen);
-                } catch (UnresolvedWorldGeneratorException e) {
-                    e.printStackTrace();
-                }
+                final WaitPopup<Boolean> loadPopup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+                loadPopup.setMessage("Loading", "please wait ...");
+                loadPopup.onSuccess(result -> {
+                    if (result != null && result) {
+                        triggerForwardAnimation(worldPreGenerationScreen);
+                    } else {
+                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't load world pre generation screen! Please, try again!");
+                    }
+                });
+                loadPopup.startOperation(() -> {
+                    try {
+                        worldPreGenerationScreen.setEnvironment(context);
+                    } catch (UnresolvedWorldGeneratorException e) {
+                        return false;
+                    }
+                    return true;
+                }, true);
             } else {
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(
+                        "Worlds List Empty!", "Please select a world generator and add words to the dropdown!");
             }
+        });
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
         });
     }
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         worlds.clear();
         worldNumber = 0;
         final UIDropdownScrollable worldsDropdown = find("worlds", UIDropdownScrollable.class);
-        List<WorldSetupWrapper> worldOptions = worlds;
-        worldsDropdown.setOptions(worldNames());
+        if (worldsDropdown != null) {
+            worldsDropdown.setOptions(worldNames());
+        }
         selectedWorld = "";
+        indexOfSelectedWorld = findIndex(worlds, selectedWorld);
     }
 
     private Set<Name> getAllEnabledModuleNames() {
-        Set<Name> enabledModules = Sets.newHashSet();
+        final Set<Name> enabledModules = Sets.newHashSet();
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
             enabledModules.add(moduleName);
             recursivelyAddModuleDependencies(enabledModules, moduleName);
@@ -252,20 +274,54 @@ public class UniverseSetupScreen extends CoreScreenLayer {
     }
 
     /**
+     * returns true if 'name' matches (case-insensitive) with another world already present
+     * @param name The world name to be checked
+     */
+    public boolean worldNameMatchesAnother(String name) {
+        boolean taken = false;
+
+        for (WorldSetupWrapper worldTaken: worlds) {
+            if (worldTaken.getWorldName().toString().equalsIgnoreCase(name)) {
+                taken = true;
+                break;
+            }
+        }
+
+        return taken;
+    }
+
+    /**
      * Called whenever the user decides to add a new world.
      * @param worldGeneratorInfo The {@link WorldGeneratorInfo} object for the new world.
      */
     private void addNewWorld(WorldGeneratorInfo worldGeneratorInfo) {
+        String selectedWorldName = worldGeneratorInfo.getDisplayName();
+
+        while (worldNameMatchesAnother(selectedWorldName + "-" + worldNumber)) {
+            ++worldNumber;
+        }
+
         selectedWorld = worldGeneratorInfo.getDisplayName() + '-' + worldNumber;
         worlds.add(new WorldSetupWrapper(new Name(worldGeneratorInfo.getDisplayName() + '-' + worldNumber), worldGeneratorInfo));
-        worldNumber++;
+        indexOfSelectedWorld = findIndex(worlds, selectedWorld);
+        ++worldNumber;
+    }
+
+    /**
+     * This method refreshes the worlds drop-down menu when world name is changed and updates variable selectedWorld.
+     * @param worldsDropdown the drop-down to work on
+     */
+    public void refreshWorldDropdown(UIDropdownScrollable worldsDropdown) {
+        worldsDropdown.setOptions(worldNames());
+        copyOfSelectedWorld = worlds.get(indexOfSelectedWorld);
+        selectedWorld = copyOfSelectedWorld.getWorldName().toString();
     }
 
     /**
      * This method switches the environment of the game to a temporary one needed for
      * creating a game. It creates a new {@link Context} and only puts the minimum classes
      * needed for successful game creation.
-     * @param wrapper takes the {@link org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.AdvancedGameSetupScreen} and pushes it into the new context.
+     * @param wrapper takes the {@link org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen} and pushes it into the new context.
      */
     public void setEnvironment(UniverseWrapper wrapper) {
         context = new ContextImpl();
@@ -280,10 +336,10 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(ModuleManager.class, moduleManager);
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         context.put(UniverseWrapper.class, wrapper);
-        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
 
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
         if (result.isSuccess()) {
             environment = moduleManager.loadEnvironment(result.getModules(), false);
             context.put(ModuleEnvironment.class, environment);
@@ -297,9 +353,27 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         }
     }
 
+    /**
+     * Looks for the index of a selected world from the given list.
+     * @param worldsList the list to search
+     * @param worldName the name of the world to find
+     * @return the found index value or -1 if not found
+     */
+    private int findIndex(List<WorldSetupWrapper> worldsList, String worldName) {
+        for (int i = 0; i < worldsList.size(); i++) {
+            WorldSetupWrapper currentWorldFromList = worldsList.get(i);
+            Name customName = currentWorldFromList.getWorldName();
+            if (customName.toString().equals(worldName)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private void initAssets() {
-        BlockFamilyRegistry familyFactoryRegistry = new BlockFamilyRegistry();
-        context.put(BlockFamilyRegistry.class, familyFactoryRegistry);
+
+        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
+        BlockFamilyLibrary library =  new BlockFamilyLibrary(environment, context);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.registerCoreAssetType(Prefab.class,
@@ -313,7 +387,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
                 (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
-                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), familyFactoryRegistry));
+                new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
         assetTypeManager.registerCoreAssetType(UISkin.class,
                 (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");
         assetTypeManager.registerCoreAssetType(BehaviorTree.class,
@@ -328,7 +402,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      * @return A list of world names encoded as a String
      */
     public List<String> worldNames() {
-        List<String> worldNamesList = Lists.newArrayList();
+        final List<String> worldNamesList = Lists.newArrayList();
         for (WorldSetupWrapper world : worlds) {
             worldNamesList.add(world.getWorldName().toString());
         }
@@ -360,5 +434,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         return selectedWorld;
     }
 
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
 }
 

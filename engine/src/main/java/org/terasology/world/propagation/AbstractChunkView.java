@@ -20,6 +20,11 @@ import org.terasology.world.block.Block;
 import org.terasology.world.internal.ChunkViewCore;
 
 /**
+ * Intermediate abstract class for the propagater world view that handles common functionality.
+ * <p>
+ * Only provides a view for a single chunk
+ *
+ * @see AbstractFullWorldView
  */
 public abstract class AbstractChunkView implements PropagatorWorldView {
 
@@ -37,6 +42,13 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
         return UNAVAILABLE;
     }
 
+    /**
+     * Equivalent to {@link #getValueAt(Vector3i)}
+     *
+     * @param view The chunk the position is within
+     * @param pos  The position of to get the value at
+     * @return The value of the propagating data at the given position
+     */
     protected abstract byte getValueAt(ChunkViewCore view, Vector3i pos);
 
     @Override
@@ -44,6 +56,13 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
         setValueAt(chunkView, pos, value);
     }
 
+    /**
+     * Equivalent to {@link #setValueAt(Vector3i, byte)}
+     *
+     * @param view  The chunk the position is in
+     * @param pos   The position to set the value at
+     * @param value The value to set the position to
+     */
     protected abstract void setValueAt(ChunkViewCore view, Vector3i pos, byte value);
 
     @Override
@@ -54,6 +73,11 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
         return null;
     }
 
+    /**
+     * Checks if the position is within the boundaries of the chunk represented by this class
+     *
+     * @param pos The position to check, in world coordinates
+     */
     public boolean isInBounds(Vector3i pos) {
         return chunkView.getWorldRegion().encompasses(pos);
     }

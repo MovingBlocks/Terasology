@@ -15,15 +15,32 @@
  */
 package org.terasology.entitySystem;
 
+import java.util.List;
+
 /**
  */
 public interface ComponentContainer {
 
     /**
-     * @param component
+     * Check existence of component in container
+     * @param component component class to check
      * @return If this has a component of the given type
      */
     boolean hasComponent(Class<? extends Component> component);
+
+    /**
+     * Check existence of any of provided components in container
+     * @param filterComponents list of Component classes to check
+     * @return If this has at least one component from the list of components
+     */
+    boolean hasAnyComponents(List<Class<? extends Component>> filterComponents);
+
+    /**
+     * Check existence of all provided components in container
+     * @param filterComponents list of Component classes to check
+     * @return If this has all components from the list of components
+     */
+    boolean hasAllComponents(List<Class<? extends Component>> filterComponents);
 
     /**
      * @param componentClass
