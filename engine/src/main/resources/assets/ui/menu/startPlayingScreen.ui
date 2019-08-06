@@ -99,12 +99,17 @@
           },
           {
             "type": "UIButton",
+            "text": "${engine:menu#rendering-settings}",
+            "id": "renderingSettings"
+          },
+          {
+            "type": "UIButton",
             "text": "${engine:menu#start-playing}",
             "id": "play"
           }
         ],
         "layoutInfo": {
-          "width": 272,
+          "width": 350,
           "height": 80,
           "position-horizontal-center": {},
           "position-top": {
