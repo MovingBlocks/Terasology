@@ -113,7 +113,17 @@ public class BulletPhysics implements PhysicsEngine {
     private final BulletRigidBody rigidBody;
     private final BulletRigidBody liquidBody;
 
+    private final btGhostPairCallback callback;
+
+    private final btVoxelShape worldShape;
+    private final btVoxelShape liquidShape;
+
+    private final PhysicsWorldWrapper wrapper;
+    private final PhysicsLiquidWrapper liquidWrapper;
+
     public BulletPhysics(WorldProvider world) {
+
+        callback = new btGhostPairCallback();
 
         broadphase = new btDbvtBroadphase();
         defaultCollisionConfiguration = new btDefaultCollisionConfiguration();
@@ -123,15 +133,15 @@ public class BulletPhysics implements PhysicsEngine {
         discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
 
-        discreteDynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(new btGhostPairCallback());
+        discreteDynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(callback);
 
         //TODO: reimplement wrapper
 
-        PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(world);
-        btVoxelShape worldShape = new btVoxelShape(wrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));
+        wrapper = new PhysicsWorldWrapper(world);
+        worldShape = new btVoxelShape(wrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));
 
-        PhysicsLiquidWrapper liquidWrapper = new PhysicsLiquidWrapper(world);
-        btVoxelShape liquidShape = new btVoxelShape(liquidWrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));//liquidWrapper);*/
+        liquidWrapper = new PhysicsLiquidWrapper(world);
+        liquidShape = new btVoxelShape(liquidWrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));//liquidWrapper);*/
 
         Matrix4f matrix4f = new Matrix4f();
         matrix4f.setIdentity();
