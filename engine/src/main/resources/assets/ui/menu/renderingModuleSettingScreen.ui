@@ -1,0 +1,86 @@
+{
+  "type": "engine:RenderingModuleSettingScreen",
+  "skin": "engine:mainMenu",
+  "contents": {
+    "fillVerticalSpace": false,
+    "type": "ColumnLayout",
+    "columns": 2,
+    "column-widths": [0.075, 0.5],
+    "verticalSpacing": 8,
+    "horizontalSpacing": 64,
+    "id": "settingPage",
+    "contents": [
+      {
+        "type": "UIButton",
+        "text": "${engine:menu#return}",
+        "id": "return",
+        "layoutInfo": {
+          "position-vertical-center": {},
+          "position-left": {
+            "target": "LEFT"
+          },
+          "position-right": {
+            "target": "LEFT",
+            "widget": "configContainer"
+          }
+        }
+      },
+      {
+        "type": "relativeLayout",
+        "verticalSpacing": 16,
+        "horizontalSpacing": 16,
+        "id": "configContainer",
+        "layoutInfo": {
+          "position-horizontal-center": {},
+          "position-right": {
+            "target": "RIGHT"
+          },
+          "position-vertical-center": {}
+        },
+        "contents": [
+          {
+            "type": "UILabel",
+            "id": "title",
+            "family": "title",
+            "text": "${engine:menu#rendering-settings}",
+            "layoutInfo": {
+              "height": 48,
+              "position-horizontal-center": {},
+              "position-bottom": {
+                "target": "TOP",
+                "widget": "modulesInfo",
+                "offset": 48
+              }
+            }
+          },
+          {
+            "type": "UIText",
+            "text": "empty",
+            "id": "modulesInfo",
+            "layoutInfo": {
+              "position-vertical-center": {},
+              "height": 300
+            },
+            "multiline": true,
+            "readOnly": true
+          },
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#update-module}",
+            "id": "update",
+            "layoutInfo": {
+              "width": 120,
+              "height": 80,
+              "position-horizontal-center": {},
+              "position-top": {
+                "widget": "modulesInfo",
+                "target": "BOTTOM",
+                "offset": 16
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
