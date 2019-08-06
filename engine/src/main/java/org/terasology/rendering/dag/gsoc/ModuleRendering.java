@@ -38,55 +38,44 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RegisterSystem
-public abstract class ModuleRendering extends BaseComponentSystem {
+public abstract class ModuleRendering {
     protected static final Logger logger = LoggerFactory.getLogger(ModuleRendering.class);
 
     // private static List<Class> renderingModules = new ArrayList<>();
 
-    @In
+    // @In
     protected Context context;
+    protected ModuleManager moduleManager;
     protected Name providingModule;
     protected RenderGraph renderGraph;
     protected WorldRenderer worldRenderer;
 
     // Lower number, higher priority. 1 goes first
     @Range(min = 1, max = 100)
-    protected int initializationPriority = 10;
+    public int initializationPriority = 2;
 
-    public ModuleRendering() {
-     //   renderingModules.add(this.getClass());
+    public ModuleRendering(Context context) {
+        this.context = context;
+        moduleManager = context.get(ModuleManager.class);
+        providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
     }
 
-    /* @Override
-    public void finalize() {
-        renderingModules.remove(this.getClass());
+    public void setProvidingModule(Name providingModule) {
+        this.providingModule = providingModule;
     }
 
-     public static List<Class> getRenderingModules() {
-        return renderingModules;
-    }*/
+    public void setInitializationPriority(int initPriority) {
+        initializationPriority = initPriority;
+    }
 
-    // @Override
-    public void initialise(Class clazz, int modulePriority) {
-        super.initialise();
-
-        setProvidingModule(clazz);
-        initializationPriority = modulePriority;
+    public void initialise() {
+        context.put(ModuleRendering.class, this);
         renderGraph = context.get(RenderGraph.class);
         worldRenderer = context.get(WorldRenderer.class);
     }
 
     public Name getProvidingModule() {
         return this.providingModule;
-    }
-
-    public void initialise(Class clazz) {
-        this.initialise(clazz, initializationPriority);
-    }
-
-    @Override
-    public void preBegin() {
-        worldRenderer.requestTaskListRefresh();
     }
 
     public int getInitPriority() {
