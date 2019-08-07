@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.engine.module.rendering;
 
 import org.terasology.context.Context;
 import org.terasology.module.Module;
@@ -21,6 +21,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.rendering.dag.gsoc.ModuleRendering;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -40,17 +41,63 @@ public class RenderingModuleRegistry {
     }
 
     /**
-     * For use everywhere to get last order
+     * Return {@link ModuleRendering} instance by classtype
+     * @param moduleRenderingClass Class extending {@link ModuleRendering}
      * @return
      */
+    @Nullable
+    public ModuleRendering getModuleRenderingByClass(Class<? extends ModuleRendering> moduleRenderingClass) {
+        // TODO HashMap for storing
+        ModuleRendering moduleRenderingInstance = null;
+        for (ModuleRendering moduleRendering : orderedModuleRenderingInstances) {
+            if (moduleRendering.getClass().equals(moduleRenderingClass)) {
+                moduleRenderingInstance = moduleRendering;
+            }
+        }
+        return moduleRenderingInstance;
+    }
+
+    public ModuleRendering getModuleRenderingByModuleId(Name renderingModuleId) {
+        // TODO HashMap for storing
+        ModuleRendering moduleRenderingInstance = null;
+        for (ModuleRendering moduleRendering : orderedModuleRenderingInstances) {
+            if (moduleRenderingInstance.getProvidingModule().equals(renderingModuleId)) {
+                moduleRenderingInstance = moduleRendering;
+            }
+        }
+        return moduleRenderingInstance;
+    }
+
+    /**
+     * For use everywhere to get last ordered list of {@link ModuleRendering} instances.
+     * @return list of {@link ModuleRendering} instances
+     */
+    @Nullable
     public List<ModuleRendering> getOrderedRenderingModules() {
         return this.orderedModuleRenderingInstances;
     }
 
-    
-    public List<ModuleRendering> updateRenderingModulesOrder(ModuleEnvironment moduleEnvironment, Context preloadedSubContext) {
-        this.orderedModuleRenderingInstances = calculateModuleOrder(fetchRenderingModules(moduleEnvironment, preloadedSubContext));
+    /**
+     * Fetches list of {@link ModuleRendering} instances from given {@link ModuleEnvironment} and returns ordered
+     * list based on their {@code ModuleRendering.initializationPriority} attribute.
+     * @param moduleEnvironment Current module environment
+     * @param context Current context
+     * @return list of ordered {@link ModuleRendering} instances
+     */
+    public List<ModuleRendering> updateRenderingModulesOrder(ModuleEnvironment moduleEnvironment, Context context) {
+        this.orderedModuleRenderingInstances = calculateModuleOrder(fetchRenderingModules(moduleEnvironment, context));
         return this.orderedModuleRenderingInstances;
+    }
+
+    /**
+     * Sets new context for each ModuleRendering instance
+     * @param context
+     */
+    public void updateModulesContext(Context context) {
+        for (ModuleRendering moduleRendering : orderedModuleRenderingInstances) {
+            moduleRendering.setContext(context);
+            context.put(ModuleRendering.class, moduleRendering);
+        }
     }
 
     public void setRenderingModulePriority(ModuleRendering module, int initializationPriority) {
@@ -65,6 +112,11 @@ public class RenderingModuleRegistry {
         return module.getProvidingModule();
     }
 
+    /**
+     * Sorts given list of {@link ModuleRendering} instances by {@code ModuleRendering.initializationPriority} attribute, saves and returns it.
+     * @param activeModuleRenderingInstances List of {@link ModuleRendering} instances
+     * @return Ordered list of {@link ModuleRendering} instances
+     */
     private List<ModuleRendering> calculateModuleOrder(List<ModuleRendering> activeModuleRenderingInstances) {
         // Sorted copy of activeRenderingModules
         orderedModuleRenderingInstances = activeModuleRenderingInstances.stream()
@@ -73,10 +125,14 @@ public class RenderingModuleRegistry {
         return orderedModuleRenderingInstances;
     }
 
-    // TODO the getSubtypesOf approach might in the future be changed for Annotations @RenderingModule when the ModuleRendering.java
-    // TODO gets deprecated by being merged into module management itself. Another option is for renderingModules to register themselves in the
-    // TODO module management (at this stage equivalently register themselves in the ModuleRendering upon instantiaion (pre ECS system init) )
-    private List<ModuleRendering> fetchRenderingModules(ModuleEnvironment moduleEnvironment, Context preloadedSubContext) {
+    /**
+     * Fetches all loaded {@link ModuleRendering} classes from the given {@link ModuleEnvironment}
+     * and instantiatest them with current context.
+     * @param moduleEnvironment
+     * @param context
+     * @return list of {@link ModuleRendering} instances
+     */
+    private List<ModuleRendering> fetchRenderingModules(ModuleEnvironment moduleEnvironment, Context context) {
         List<ModuleRendering> moduleList = new ArrayList<>();
 
         for (Class<? extends ModuleRendering> renderingClass : moduleEnvironment.getSubtypesOf(ModuleRendering.class)) {
@@ -84,7 +140,7 @@ public class RenderingModuleRegistry {
                 ModuleRendering moduleRendering = null;
                 try {
                     Constructor<?> constructor = renderingClass.getConstructor(Context.class);
-                    moduleRendering = (ModuleRendering) constructor.newInstance(preloadedSubContext);
+                    moduleRendering = (ModuleRendering) constructor.newInstance(context);
                 } catch (InstantiationException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
