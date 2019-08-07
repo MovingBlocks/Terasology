@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module;
+package org.terasology.engine.module.rendering;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.rendering.dag.RenderingModuleRegistry;
+import org.terasology.module.sandbox.API;
 
+@API
 public class RenderingModuleManager {
     private static final Logger logger = LoggerFactory.getLogger(RenderingModuleManager.class);
 
