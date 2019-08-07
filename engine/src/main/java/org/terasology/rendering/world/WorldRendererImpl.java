@@ -19,11 +19,11 @@ import java.util.List;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.module.RenderingModuleManager;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.rendering.RenderingModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
-import org.terasology.engine.subsystem.rendering.ModuleRenderingSubsystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.MethodCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -33,7 +33,6 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -41,8 +40,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.RenderingModuleRegistry;
-import org.terasology.rendering.dag.gsoc.DummyNode;
+import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.rendering.dag.gsoc.ModuleRendering;
 import org.terasology.rendering.dag.gsoc.NewNode;
 import org.terasology.rendering.dag.RenderGraph;
@@ -84,6 +82,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      */
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
     private RenderGraph renderGraph;
+    private RenderingModuleRegistry renderingModuleRegistry;
 
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
@@ -202,15 +201,24 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(RenderTaskListGenerator.class, renderTaskListGenerator);
 
         addDummyNodes();
-
-        requestTaskListRefresh();
     }
 
     private void initRenderingModules() {
-        RenderingModuleRegistry renderingModuleRegistry = context.get(RenderingModuleManager.class).getRegistry();
+        renderingModuleRegistry = context.get(RenderingModuleManager.class).getRegistry();
+
+        // registry not populated by new ModuleRendering instances in UI, populate now
+        if (renderingModuleRegistry.getOrderedRenderingModules().isEmpty()) {
+            renderingModuleRegistry.updateRenderingModulesOrder(context.get(ModuleManager.class).getEnvironment(), context);
+        } else { // registry populated by new ModuleRendering instances in UI
+            // Switch module's context from gamecreation subcontext to gamerunning context
+            renderingModuleRegistry.updateModulesContext(context);
+        }
+
         for (ModuleRendering moduleRenderingInstance : renderingModuleRegistry.getOrderedRenderingModules()) {
             moduleRenderingInstance.initialise();
         }
+
+        requestTaskListRefresh();
     }
 
     public void addDummyNodes() {
