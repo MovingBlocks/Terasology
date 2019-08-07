@@ -22,7 +22,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
-import org.terasology.engine.module.RenderingModuleManager;
+import org.terasology.engine.module.rendering.RenderingModuleManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
 
 public class ModuleRenderingSubsystem implements EngineSubsystem {
