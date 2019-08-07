@@ -7,5 +7,5 @@
         {"id": "Core", "minVersion": "2.0.0"}
     ],
     "isGameplay" : "true",
-    "defaultWorldGenerator" : "Core:FacetedPerlin"
+    "defaultWorldGenerator" : "Core:FacetedSimplex"
 }
