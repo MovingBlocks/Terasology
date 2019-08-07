@@ -96,7 +96,7 @@ public class RenderingModuleRegistry {
     public void updateModulesContext(Context context) {
         for (ModuleRendering moduleRendering : orderedModuleRenderingInstances) {
             moduleRendering.setContext(context);
-            context.put(ModuleRendering.class, moduleRendering);
+            // context.put(ModuleRendering.class, moduleRendering);
         }
     }
 
