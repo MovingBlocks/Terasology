@@ -16,6 +16,7 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Sets;
+import org.mockito.Mockito;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
@@ -23,6 +24,7 @@ import org.terasology.module.ClasspathModule;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataReader;
 import org.terasology.naming.Name;
+import org.terasology.reflection.internal.TypeRegistryImpl;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -34,7 +36,7 @@ public final class ModuleManagerFactory {
     }
 
     public static ModuleManager create() throws Exception {
-        ModuleManager moduleManager = new ModuleManagerImpl("");
+        ModuleManager moduleManager = new ModuleManagerImpl("", Mockito.mock(TypeRegistryImpl.class));
         try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
             moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));
