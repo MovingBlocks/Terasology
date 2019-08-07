@@ -56,8 +56,13 @@ public abstract class ModuleRendering {
 
     public ModuleRendering(Context context) {
         this.context = context;
+        // context.put(ModuleRendering.class, this);
         moduleManager = context.get(ModuleManager.class);
         providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
+    }
+
+    public void setContext(Context newContext) {
+        this.context = newContext;
     }
 
     public void setProvidingModule(Name providingModule) {
@@ -69,7 +74,6 @@ public abstract class ModuleRendering {
     }
 
     public void initialise() {
-        context.put(ModuleRendering.class, this);
         renderGraph = context.get(RenderGraph.class);
         worldRenderer = context.get(WorldRenderer.class);
     }
