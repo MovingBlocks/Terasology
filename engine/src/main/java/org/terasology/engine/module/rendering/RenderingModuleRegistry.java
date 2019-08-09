@@ -136,22 +136,25 @@ public class RenderingModuleRegistry {
         List<ModuleRendering> moduleList = new ArrayList<>();
 
         for (Class<? extends ModuleRendering> renderingClass : moduleEnvironment.getSubtypesOf(ModuleRendering.class)) {
-            if (!orderedModuleRenderingInstances.contains(renderingClass)) {
-                ModuleRendering moduleRendering = null;
+            ModuleRendering moduleRenderingInstance = null;
+            for (ModuleRendering moduleRendering : orderedModuleRenderingInstances) {
+                if (renderingClass.isInstance(moduleRendering)) {
+                    moduleRenderingInstance = moduleRendering;
+                    // TODO there's marginal scenarios where you could have more instances of same class moduleRendering
+                    if (!moduleList.contains(moduleRenderingInstance)) {
+                        moduleList.add(moduleRenderingInstance);
+                    }
+                }
+            }
+            if (moduleRenderingInstance == null) {
                 try {
                     Constructor<?> constructor = renderingClass.getConstructor(Context.class);
-                    moduleRendering = (ModuleRendering) constructor.newInstance(context);
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
+                    moduleRenderingInstance = (ModuleRendering) constructor.newInstance(context);
+                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                if (moduleRendering != null) {
-                    moduleList.add(moduleRendering);
+                if (moduleRenderingInstance != null) {
+                    moduleList.add(moduleRenderingInstance);
                 }
             }
         }
