@@ -104,8 +104,12 @@ public class StartPlayingScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "renderingSettings", button -> {
-            final RenderingModuleSettingScreen renderingModuleSettingScreen = getManager().createScreen(RenderingModuleSettingScreen.ASSET_URI, RenderingModuleSettingScreen.class);
-            renderingModuleSettingScreen.setSubContext(this.subContext);
+            RenderingModuleSettingScreen renderingModuleSettingScreen = (RenderingModuleSettingScreen) getManager().getScreen(RenderingModuleSettingScreen.ASSET_URI);
+            if (renderingModuleSettingScreen == null) {
+                renderingModuleSettingScreen = getManager().createScreen(RenderingModuleSettingScreen.ASSET_URI, RenderingModuleSettingScreen.class);
+                renderingModuleSettingScreen.setSubContext(this.subContext);
+                renderingModuleSettingScreen.postInit();
+            }
             triggerForwardAnimation(renderingModuleSettingScreen);
         });
     }
