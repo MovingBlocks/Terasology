@@ -52,7 +52,7 @@ public abstract class ModuleRendering {
 
     // Lower number, higher priority. 1 goes first
     @Range(min = 1, max = 100)
-    public int initializationPriority = 2;
+    protected int initializationPriority = 2;
 
     public ModuleRendering(Context context) {
         this.context = context;
