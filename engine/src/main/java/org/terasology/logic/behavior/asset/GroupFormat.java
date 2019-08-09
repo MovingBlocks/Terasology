@@ -25,6 +25,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * This class is responsible for
+ * associating the correct file extensions
+ * (.group) with the Group asset class.
+ * It is also the actual responsible
+ * for invoking the serialization method
+ * from the builder class.
+ * @see Group
+ * @see GroupBuilder
+ */
 @RegisterAssetFileFormat
 public class GroupFormat extends AbstractAssetFileFormat<GroupData> {
 
@@ -39,12 +49,7 @@ public class GroupFormat extends AbstractAssetFileFormat<GroupData> {
             builder = new GroupBuilder();
             CoreRegistry.put(GroupBuilder.class, builder);
         }
-        try (InputStream stream = list.get(0).openStream()) {
-            return builder.loadFromJson(stream);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new GroupData("ERROR",false,"none");
-        }
 
+        return builder.loadFromJson(list.get(0).openStream());
     }
 }

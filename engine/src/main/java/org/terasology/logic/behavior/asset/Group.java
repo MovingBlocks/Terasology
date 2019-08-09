@@ -21,8 +21,16 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.annotations.RegisterAssetType;
 import org.terasology.module.sandbox.API;
 
+/**
+ * The main Group asset class. This is the reference type
+ * used by the asset manager to find all groups loaded
+ * from .group files. The annotation below indicates that
+ * all .group files will be under the assets/groups folder.
+ * A factory class is used to assist the asset creation.
+ * Using the Group asset is illustrated in the
+ * WildAnimalsMadness module.
+ */
 @RegisterAssetType(folderName = "groups", factoryClass = GroupFactory.class)
-@API
 public class Group extends Asset<GroupData> {
 
     private GroupData groupData;

@@ -19,6 +19,11 @@ import org.terasology.assets.AssetFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 
+/**
+ * Factory class used to assist the creation
+ * of new Group assets.
+ * @see Group
+ */
 public class GroupFactory implements AssetFactory<Group, GroupData> {
 
     @Override

@@ -16,12 +16,21 @@
 package org.terasology.logic.behavior.asset;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import org.terasology.module.sandbox.API;
 import org.terasology.registry.In;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+/**
+ * This class is responsible for implementing the
+ * serialization functionality required by the Group
+ * asset class to load group information from .group
+ * asset files.
+ * @see Group
+ */
 @API
 public class GroupBuilder {
 
@@ -36,8 +45,11 @@ public class GroupBuilder {
         try {
             gson = new Gson();
             groupFromFile = gson.fromJson(new InputStreamReader(json), GroupData.class);
-        } catch (Exception e) {
-            groupFromFile.setGroupLabel("ERROR");
+        } catch (JsonSyntaxException e) {
+            groupFromFile.setGroupLabel("ERROR - Syntax");
+            e.printStackTrace();
+        } catch (JsonIOException e) {
+            groupFromFile.setGroupLabel("ERROR - IO");
             e.printStackTrace();
         }
         return groupFromFile;

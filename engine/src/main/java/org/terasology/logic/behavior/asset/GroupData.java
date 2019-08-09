@@ -20,12 +20,30 @@ import org.terasology.assets.AssetData;
 import java.util.List;
 
 /**
- * Every group is described by a GroupData asset.
+ * Every Group asset is described by a GroupData class.
+ * @see Group
  */
 public class GroupData implements AssetData {
 
+    /**
+     * The unique group identifier
+     */
     public String groupLabel;
+
+    /**
+     * Flags the need for a hivemind
+     * structure (when group members
+     * need to behave in unison)
+     */
     public Boolean needsHive;
+
+    /**
+     * The name of the behavior tree
+     * used by the group (trees
+     * from other modules can be used as
+     * long as they are listed as
+     * dependencies)
+     */
     public String behavior;
 
     public GroupData() {
