@@ -15,6 +15,7 @@
  */
 package org.terasology.reflection.internal;
 
+import com.google.common.collect.Lists;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -23,7 +24,6 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -36,11 +36,11 @@ public class TypeRegistryImpl implements TypeRegistry {
 
     public void reload(ModuleEnvironment environment) {
         // FIXME: Reflection -- may break with updates to gestalt-module
-        initializeReflections((ClassLoader) ReflectionUtil.readField(environment,"finalClassLoader"));
+        initializeReflections((ClassLoader) ReflectionUtil.readField(environment, "finalClassLoader"));
     }
 
     private void initializeReflections(ClassLoader classLoader) {
-        List<ClassLoader> allClassLoaders = new ArrayList<>();
+        List<ClassLoader> allClassLoaders = Lists.newArrayList();
 
         while (classLoader != null) {
             allClassLoaders.add(classLoader);
@@ -48,10 +48,12 @@ public class TypeRegistryImpl implements TypeRegistry {
         }
 
         reflections = new Reflections(
-                allClassLoaders,
-                new SubTypesScanner(),
-                // TODO: Add string-based scanner that scans all objects (== getSubtypesOf(Object.class))
-                new TypeAnnotationsScanner()
+            // Reversed so that classes are loaded using the originally declaring/loading class loader,
+            // not a child class loader (like a ModuleClassLoader, for example)
+            Lists.reverse(allClassLoaders),
+            new SubTypesScanner(),
+            // TODO: Add string-based scanner that scans all objects (== getSubtypesOf(Object.class))
+            new TypeAnnotationsScanner()
         );
     }
 

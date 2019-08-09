@@ -15,26 +15,43 @@
  */
 package org.terasology.reflection.internal;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.reflections.Reflections;
+import org.terasology.ModuleEnvironmentTest;
+import org.terasology.entitySystem.Component;
+import org.terasology.naming.Name;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
-public class TypeRegistryImplTest {
+public class TypeRegistryImplTest extends ModuleEnvironmentTest {
+    static {
+        Reflections.log = null;
+    }
+
     private TypeRegistryImpl typeRegistry = new TypeRegistryImpl();
 
-    @Before
-    public void setup() {
-        Reflections.log = null;
+    @Override
+    protected TypeRegistryImpl getTypeRegistry() {
+        return typeRegistry;
     }
 
     @Test
     public void testRegistry() {
         assertTrue(typeRegistry.getSubtypesOf(Collection.class).contains(TreeSet.class));
+
+        Set<Name> modulesDeclaringComponents =
+            typeRegistry.getSubtypesOf(Component.class).stream()
+                .map(componentClass -> moduleManager.getEnvironment().getModuleProviding(componentClass))
+                .collect(Collectors.toSet());
+
+        assertTrue(modulesDeclaringComponents.size() > 2);
+
+        assertTrue(modulesDeclaringComponents.contains(new Name("engine")));
+        assertTrue(modulesDeclaringComponents.contains(new Name("Core")));
     }
 }

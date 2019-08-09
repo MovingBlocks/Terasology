@@ -24,6 +24,7 @@ import org.terasology.module.ClasspathModule;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataReader;
 import org.terasology.naming.Name;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.internal.TypeRegistryImpl;
 
 import java.io.InputStreamReader;
@@ -36,7 +37,11 @@ public final class ModuleManagerFactory {
     }
 
     public static ModuleManager create() throws Exception {
-        ModuleManager moduleManager = new ModuleManagerImpl("", Mockito.mock(TypeRegistryImpl.class));
+        return create(Mockito.mock(TypeRegistryImpl.class));
+    }
+
+    public static ModuleManager create(TypeRegistryImpl typeRegistry) throws Exception {
+        ModuleManager moduleManager = new ModuleManagerImpl("", typeRegistry);
         try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
             moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));
