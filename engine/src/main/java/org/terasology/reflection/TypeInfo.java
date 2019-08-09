@@ -46,7 +46,7 @@ import java.lang.reflect.Type;
  * @param <T> The type for which type information is to be generated.
  */
 @API
-public class TypeInfo<T> {
+public abstract class TypeInfo<T> {
     private final Class<T> rawType;
     private final Type type;
     private final int hashCode;
@@ -75,21 +75,21 @@ public class TypeInfo<T> {
      * Creates a {@link TypeInfo} for the given type.
      */
     public static TypeInfo<?> of(Type type) {
-        return new TypeInfo(type);
+        return new TypeInfo<Object>(type) {};
     }
 
     /**
      * Creates a {@link TypeInfo} for the given {@link Class}.
      */
     public static <T> TypeInfo<T> of(Class<T> type) {
-        return new TypeInfo<>(type);
+        return new TypeInfo<T>(type) {};
     }
 
-    public Class<T> getRawType() {
+    public final Class<T> getRawType() {
         return rawType;
     }
 
-    public Type getType() {
+    public final Type getType() {
         return type;
     }
 
@@ -99,14 +99,14 @@ public class TypeInfo<T> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
         return o instanceof TypeInfo<?>
                 && ReflectionUtil.typeEquals(type, ((TypeInfo<?>) o).type);
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return type.toString();
     }
 }
