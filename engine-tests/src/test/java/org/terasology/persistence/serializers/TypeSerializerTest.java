@@ -17,26 +17,37 @@ package org.terasology.persistence.serializers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-import org.reflections.Reflections;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.DependencyResolver;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ResolutionResult;
+import org.terasology.naming.Name;
+import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.Color;
+import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
-@RunWith(Enclosed.class)
 public class TypeSerializerTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
+    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"data\":1},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":2}]}";
 
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));
@@ -46,55 +57,65 @@ public class TypeSerializerTest {
         INSTANCE.animals.add(new Cheetah<>(2, Color.MAGENTA));
     }
 
-    public static class Json {
-        private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"data\":1},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":2}]}";
+    private TypeHandlerLibrary typeHandlerLibrary;
+    private ProtobufSerializer protobufSerializer;
+    private GsonSerializer gsonSerializer;
 
-        private final Reflections reflections = new Reflections(getClass().getClassLoader());
+    @Before
+    public void setup() throws Exception {
+        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
+        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
+        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
 
-        private final TypeHandlerLibrary typeHandlerLibrary =
-            TypeHandlerLibrary.withReflections(reflections);
+        ModuleManager moduleManager = ModuleManagerFactory.create();
 
-        private final GsonSerializer serializer = new GsonSerializer(typeHandlerLibrary);
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult result = resolver.resolve(moduleManager.getRegistry().getModuleIds());
 
-        @Test
-        public void testJsonSerialize() {
-            String serializedJson = serializer.toJson(INSTANCE, new TypeInfo<SomeClass<Integer>>() {});
-            assertEquals(INSTANCE_JSON, serializedJson);
-        }
+        assumeTrue(result.isSuccess());
 
-        @Test
-        public void testDeserialize() {
-            SomeClass<Integer> deserialized =
-                serializer.fromJson(INSTANCE_JSON, new TypeInfo<SomeClass<Integer>>() {});
+        ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
+        ModuleContext.setContext(environment.get(new Name("unittest")));
 
-            assertEquals(INSTANCE, deserialized);
-        }
+        typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager);
+
+        protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
+        gsonSerializer = new GsonSerializer(typeHandlerLibrary);
     }
 
-    public static class Protobuf {
-        private final Reflections reflections = new Reflections(getClass().getClassLoader());
+    @Test
+    public void testJsonSerialize() {
+        String serializedJson = gsonSerializer.toJson(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
+        });
+        assertEquals(INSTANCE_JSON, serializedJson);
+    }
 
-        private final TypeHandlerLibrary typeHandlerLibrary =
-            TypeHandlerLibrary.withReflections(reflections);
+    @Test
+    public void testDeserialize() {
+        SomeClass<Integer> deserialized =
+                gsonSerializer.fromJson(INSTANCE_JSON, new TypeInfo<SomeClass<Integer>>() {
+                });
 
-        private final ProtobufSerializer serializer = new ProtobufSerializer(typeHandlerLibrary);
+        assertEquals(INSTANCE, deserialized);
+    }
 
-        @Test
-        public void testSerializeDeserialize() throws IOException {
-            byte[] bytes = serializer.toBytes(INSTANCE, new TypeInfo<SomeClass<Integer>>() {});
+    @Test
+    public void testSerializeDeserialize() throws IOException {
+        byte[] bytes = protobufSerializer.toBytes(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
+        });
 
-            SomeClass<Integer> deserializedInstance =
-                serializer.fromBytes(bytes, new TypeInfo<SomeClass<Integer>>() {});
+        SomeClass<Integer> deserializedInstance =
+                protobufSerializer.fromBytes(bytes, new TypeInfo<SomeClass<Integer>>() {
+                });
 
-            assertEquals(INSTANCE, deserializedInstance);
-        }
+        assertEquals(INSTANCE, deserializedInstance);
     }
 
     private static class SomeClass<T> {
         @SerializedName("generic-t")
         private T data;
         private List<T> list = Lists.newArrayList();
-        private Set<Animal<T>> animals = Sets.newHashSet();
+        private Set<Animal<?>> animals = Sets.newHashSet();
 
         private SomeClass(T data) {
             this.data = data;
@@ -110,8 +131,8 @@ public class TypeSerializerTest {
             }
             SomeClass<?> someClass = (SomeClass<?>) o;
             return Objects.equals(data, someClass.data) &&
-                       Objects.equals(list, someClass.list) &&
-                       Objects.equals(animals, someClass.animals);
+                    Objects.equals(list, someClass.list) &&
+                    Objects.equals(animals, someClass.animals);
         }
 
         @Override
@@ -122,10 +143,10 @@ public class TypeSerializerTest {
         @Override
         public String toString() {
             return "SomeClass{" +
-                       "data=" + data +
-                       ", list=" + list +
-                       ", animals=" + animals +
-                       '}';
+                    "data=" + data +
+                    ", list=" + list +
+                    ", animals=" + animals +
+                    '}';
         }
     }
 
@@ -180,9 +201,9 @@ public class TypeSerializerTest {
         @Override
         public String toString() {
             return "Dog{" +
-                       "name='" + data + '\'' +
-                       ", tailPosition=" + tailPosition +
-                       '}';
+                    "name='" + data + '\'' +
+                    ", tailPosition=" + tailPosition +
+                    '}';
         }
 
         @Override
@@ -217,9 +238,9 @@ public class TypeSerializerTest {
         @Override
         public String toString() {
             return "Cheetah{" +
-                       "name='" + data + '\'' +
-                       ", spotColor=" + spotColor +
-                       '}';
+                    "name='" + data + '\'' +
+                    ", spotColor=" + spotColor +
+                    '}';
         }
 
         @Override

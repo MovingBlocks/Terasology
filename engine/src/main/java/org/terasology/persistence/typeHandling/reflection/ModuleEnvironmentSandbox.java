@@ -32,6 +32,8 @@ import java.util.Optional;
 import static com.google.common.collect.Streams.stream;
 
 public class ModuleEnvironmentSandbox implements SerializationSandbox {
+    // TODO: Use TypeRegistry
+
     private final ModuleManager moduleManager;
 
     public ModuleEnvironmentSandbox(ModuleManager moduleManager) {
@@ -143,6 +145,11 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
         }
 
         Name moduleProvidingType = getModuleEnvironment().getModuleProviding(type);
+
+        if (moduleProvidingType == null || moduleProvidingType.isEmpty()) {
+            return type.getName();
+        }
+
         String typeSimpleName = type.getSimpleName();
 
         return new SimpleUri(moduleProvidingType, typeSimpleName).toString();

@@ -229,6 +229,7 @@ public class ModuleManagerImpl implements ModuleManager {
         }
         if (asPrimary) {
             environment = newEnvironment;
+            typeRegistry.reload(environment);
         }
         return newEnvironment;
     }

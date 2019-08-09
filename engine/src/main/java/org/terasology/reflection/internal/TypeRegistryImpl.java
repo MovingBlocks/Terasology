@@ -18,32 +18,39 @@ package org.terasology.reflection.internal;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
-import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.TypeRegistry;
+import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class TypeRegistryImpl implements TypeRegistry {
     private Reflections reflections;
 
     public TypeRegistryImpl() {
-        initializeReflections();
+        initializeReflections(TypeRegistryImpl.class.getClassLoader());
     }
 
     public void reload(ModuleEnvironment environment) {
-        initializeReflections();
-
-        for (Module module : environment.getModulesOrderedByDependencies()) {
-            reflections.merge(module.getReflectionsFragment());
-        }
+        // FIXME: Reflection -- may break with updates to gestalt-module
+        initializeReflections((ClassLoader) ReflectionUtil.readField(environment,"finalClassLoader"));
     }
 
-    private void initializeReflections() {
+    private void initializeReflections(ClassLoader classLoader) {
+        List<ClassLoader> allClassLoaders = new ArrayList<>();
+
+        while (classLoader != null) {
+            allClassLoaders.add(classLoader);
+            classLoader = classLoader.getParent();
+        }
+
         reflections = new Reflections(
-                TypeRegistryImpl.class.getClassLoader(),
-                new SubTypesScanner(false),
+                allClassLoaders,
+                new SubTypesScanner(),
+                // TODO: Add string-based scanner that scans all objects (== getSubtypesOf(Object.class))
                 new TypeAnnotationsScanner()
         );
     }

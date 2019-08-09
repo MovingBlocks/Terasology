@@ -15,8 +15,11 @@
  */
 package org.terasology.reflection.internal;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.reflections.Reflections;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -25,9 +28,13 @@ import static org.junit.Assert.assertTrue;
 public class TypeRegistryImplTest {
     private TypeRegistryImpl typeRegistry = new TypeRegistryImpl();
 
+    @Before
+    public void setup() {
+        Reflections.log = null;
+    }
+
     @Test
     public void testRegistry() {
-        assertTrue(typeRegistry.getSubtypesOf(Object.class).size() > 0);
-        assertTrue(typeRegistry.getSubtypesOf(Set.class).contains(TreeSet.class));
+        assertTrue(typeRegistry.getSubtypesOf(Collection.class).contains(TreeSet.class));
     }
 }
