@@ -30,8 +30,14 @@ import java.util.Set;
 public class TypeRegistryImpl implements TypeRegistry {
     private Reflections reflections;
 
-    public TypeRegistryImpl() {
-        initializeReflections(TypeRegistryImpl.class.getClassLoader());
+    /**
+     * Creates an empty {@link TypeRegistryImpl}. No types are loaded when this constructor
+     * is called -- to populate the registry use one of the other parameterized constructors.
+     */
+    public TypeRegistryImpl() {}
+
+    public TypeRegistryImpl(ClassLoader classLoader) {
+        initializeReflections(classLoader);
     }
 
     public void reload(ModuleEnvironment environment) {
