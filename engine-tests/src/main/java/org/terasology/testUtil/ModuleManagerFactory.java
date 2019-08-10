@@ -16,6 +16,7 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Sets;
+import org.mockito.Mockito;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
@@ -23,9 +24,11 @@ import org.terasology.module.ClasspathModule;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataReader;
 import org.terasology.naming.Name;
+import org.terasology.reflection.internal.TypeRegistryImpl;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Set;
 
 /**
  */
@@ -33,13 +36,23 @@ public final class ModuleManagerFactory {
     private ModuleManagerFactory() {
     }
 
+    // Named "create" for legacy reasons, but does more than create
     public static ModuleManager create() throws Exception {
-        ModuleManager moduleManager = new ModuleManagerImpl("");
+        ModuleManager manager = create(Mockito.mock(TypeRegistryImpl.class));
+        manager.loadEnvironment(Sets.newHashSet(manager.getRegistry().getLatestModuleVersion(new Name("engine"))), true);
+        return manager;
+    }
+
+    /**
+     * Creates a new {@link ModuleManager} instance, but does not
+     * {@link ModuleManager#loadEnvironment(Set, boolean) load it's environment}.
+     */
+    public static ModuleManager create(TypeRegistryImpl typeRegistry) throws Exception {
+        ModuleManager moduleManager = new ModuleManagerImpl("", typeRegistry);
         try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
             moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));
         }
-        moduleManager.loadEnvironment(Sets.newHashSet(moduleManager.getRegistry().getLatestModuleVersion(new Name("engine"))), true);
         return moduleManager;
     }
 }

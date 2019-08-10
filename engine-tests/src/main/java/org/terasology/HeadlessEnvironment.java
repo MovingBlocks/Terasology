@@ -55,7 +55,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
@@ -64,6 +64,8 @@ import org.terasology.physics.CollisionGroupManager;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
+import org.terasology.reflection.TypeRegistry;
+import org.terasology.reflection.internal.TypeRegistryImpl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
@@ -164,7 +166,7 @@ public class HeadlessEnvironment extends Environment {
     protected void setupCollisionManager() {
         CollisionGroupManager collisionGroupManager = new CollisionGroupManager();
         context.put(CollisionGroupManager.class, collisionGroupManager);
-        context.get(TypeSerializationLibrary.class).add(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
+        context.get(TypeHandlerLibrary.class).addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
     }
 
     @Override
@@ -172,9 +174,9 @@ public class HeadlessEnvironment extends Environment {
         WorldAtlas worldAtlas = new NullWorldAtlas();
         BlockManagerImpl blockManager = new BlockManagerImpl(worldAtlas, assetManager);
         context.put(BlockManager.class, blockManager);
-        TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
-        typeSerializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
-        typeSerializationLibrary.add(Block.class, new BlockTypeHandler(blockManager));
+        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        typeHandlerLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
+        typeHandlerLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
     }
     
     @Override
@@ -267,7 +269,10 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
-        ModuleManager moduleManager = ModuleManagerFactory.create();
+        TypeRegistryImpl typeRegistry = new TypeRegistryImpl();
+        context.put(TypeRegistry.class, typeRegistry);
+
+        ModuleManager moduleManager = ModuleManagerFactory.create(typeRegistry);
         ModuleRegistry registry = moduleManager.getRegistry();
 
         DependencyResolver resolver = new DependencyResolver(registry);

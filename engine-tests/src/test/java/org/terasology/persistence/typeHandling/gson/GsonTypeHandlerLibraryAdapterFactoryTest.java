@@ -20,18 +20,17 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import org.junit.Assert;
 import org.junit.Test;
+import org.reflections.Reflections;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector4f;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.rendering.nui.Color;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class GsonTypeSerializationLibraryAdapterFactoryTest {
+public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static final TestClass OBJECT = new TestClass(
             new Color(0xDEADBEEF),
             ImmutableSet.of(Vector4f.zero(), Vector4f.one()),
@@ -46,13 +45,13 @@ public class GsonTypeSerializationLibraryAdapterFactoryTest {
     private static final String OBJECT_JSON = "{\"color\":[222,173,190,239],\"vector4fs\":[[0.0,0.0,0.0,0.0]," +
             "[1.0,1.0,1.0,1.0]],\"rect2iMap\":{\"someRect\":{\"min\":[-3,-3],\"size\":[10,10]}},\"i\":-912559}";
 
-    private final ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-    private final CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-    private final TypeSerializationLibrary typeSerializationLibrary =
-            TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
+    private final Reflections reflections = new Reflections(getClass().getClassLoader());
+
+    private final TypeHandlerLibrary typeHandlerLibrary =
+            TypeHandlerLibrary.withReflections(reflections);
 
     private final Gson gson =
-            GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeSerializationLibrary)
+            GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary)
             .create();
 
     @Test

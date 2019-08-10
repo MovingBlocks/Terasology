@@ -41,6 +41,7 @@ import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.naming.Name;
+import org.terasology.reflection.internal.TypeRegistryImpl;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -70,11 +71,14 @@ public class ModuleManagerImpl implements ModuleManager {
     private ModuleMetadataJsonAdapter metadataReader;
     private ModuleInstallManager installManager;
 
-    public ModuleManagerImpl(String masterServerAddress) {
-        this(masterServerAddress, Collections.emptyList());
+    private final TypeRegistryImpl typeRegistry;
+
+    public ModuleManagerImpl(String masterServerAddress, TypeRegistryImpl typeRegistry) {
+        this(masterServerAddress, Collections.emptyList(), typeRegistry);
     }
 
-    public ModuleManagerImpl(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
+    public ModuleManagerImpl(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine, TypeRegistryImpl typeRegistry) {
+        this.typeRegistry = typeRegistry;
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -119,12 +123,12 @@ public class ModuleManagerImpl implements ModuleManager {
         installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
-    public ModuleManagerImpl(Config config) {
-        this(config, Collections.emptyList());
+    public ModuleManagerImpl(Config config, TypeRegistryImpl typeRegistry) {
+        this(config, Collections.emptyList(), typeRegistry);
     }
 
-    public ModuleManagerImpl(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
-        this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
+    public ModuleManagerImpl(Config config, List<Class<?>> classesOnClasspathsToAddToEngine, TypeRegistryImpl typeRegistry) {
+        this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine, typeRegistry);
     }
 
     /**
@@ -225,6 +229,7 @@ public class ModuleManagerImpl implements ModuleManager {
         }
         if (asPrimary) {
             environment = newEnvironment;
+            typeRegistry.reload(environment);
         }
         return newEnvironment;
     }
