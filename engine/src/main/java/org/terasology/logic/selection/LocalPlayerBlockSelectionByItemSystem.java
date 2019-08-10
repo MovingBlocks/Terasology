@@ -88,6 +88,11 @@ public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
 
         EntityRef target = event.getNewTarget();
         LocationComponent locationComponent = target.getComponent(LocationComponent.class);
+
+        if (locationComponent == null) {
+            return;
+        }
+
         Vector3f targetLocation = locationComponent.getWorldPosition();
 
         if (blockSelectionComponent.isMovable) {
@@ -125,9 +130,8 @@ public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
      */
     @ReceiveEvent
     public void onLeftMouseButtonDown(LeftMouseDownButtonEvent event, EntityRef entity) {
-        if (this.blockSelectionComponentEntity != EntityRef.NULL) {
+        if (this.blockSelectionComponentEntity != null && this.blockSelectionComponentEntity != EntityRef.NULL) {
             BlockSelectionComponent blockSelectionComponent = blockSelectionComponentEntity.getComponent(BlockSelectionComponent.class);
-
             if (blockSelectionComponent != null && blockSelectionComponent.isMovable) {
                 blockSelectionComponentEntity.send(new MovableSelectionEndEvent(blockSelectionComponent.currentSelection));
 
