@@ -50,9 +50,9 @@ public class TypeRegistryImplTest extends ModuleEnvironmentTest {
                 .map(componentClass -> moduleManager.getEnvironment().getModuleProviding(componentClass))
                 .collect(Collectors.toSet());
 
-        assertTrue(modulesDeclaringComponents.size() > 2);
+        assertTrue(modulesDeclaringComponents.size() >= 2);
 
         assertTrue(modulesDeclaringComponents.contains(new Name("engine")));
-        assertTrue(modulesDeclaringComponents.contains(new Name("Core")));
+        assertTrue(modulesDeclaringComponents.contains(new Name("unittest")));
     }
 }
