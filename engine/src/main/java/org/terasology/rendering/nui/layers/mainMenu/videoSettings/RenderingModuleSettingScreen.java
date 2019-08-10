@@ -107,7 +107,10 @@ public class RenderingModuleSettingScreen extends CoreScreenLayer implements UIS
                 @Override
                 public String getString(ModuleRendering value) {
                     if (value != null) {
-                        return value.getProvidingModule().toString();
+                        StringBuilder stringBuilder = new StringBuilder()
+                                .append(String.format("%s",value.getClass().getSimpleName(),
+                                value.getProvidingModule()));
+                        return stringBuilder.toString();
                     }
                     return "";
                 }
@@ -153,8 +156,8 @@ public class RenderingModuleSettingScreen extends CoreScreenLayer implements UIS
         StringBuilder infoText = new StringBuilder("");
         int[] idx = {1};
         orderedModuleRenderingInstances.forEach(
-                (module)-> infoText.append(String.format("%d. %s (Priority: %d)\n",
-                        idx[0]++, module.getProvidingModule(), module.getInitPriority()))
+                (module)-> infoText.append(String.format("%d. %s - in %s module (Priority: %d)\n",
+                        idx[0]++, module.getClass().getSimpleName(), module.getProvidingModule(), module.getInitPriority()))
         );
         renderingModuleInfo.setText(infoText.toString());
     }
