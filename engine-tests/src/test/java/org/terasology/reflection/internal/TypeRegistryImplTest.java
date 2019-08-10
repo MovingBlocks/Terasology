@@ -22,11 +22,14 @@ import org.terasology.entitySystem.Component;
 import org.terasology.naming.Name;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 public class TypeRegistryImplTest extends ModuleEnvironmentTest {
     static {
@@ -34,9 +37,14 @@ public class TypeRegistryImplTest extends ModuleEnvironmentTest {
     }
 
     @Test
-    public void testRegistry() {
-        assertTrue(typeRegistry.getSubtypesOf(Collection.class).contains(TreeSet.class));
+    public void testNonModuleTypes() {
+        assumeTrue(typeRegistry.getSubtypesOf(Collection.class).contains(TreeSet.class));
 
+        assertTrue(typeRegistry.getSubtypesOf(Map.class).contains(LinkedHashMap.class));
+    }
+
+    @Test
+    public void testModuleTypes() {
         Set<Name> modulesDeclaringComponents =
             typeRegistry.getSubtypesOf(Component.class).stream()
                 .map(componentClass -> moduleManager.getEnvironment().getModuleProviding(componentClass))
