@@ -212,7 +212,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
             valueFields.remove(TYPE_FIELD);
 
-            valueData = new PersistedMap(valueFields);
+            valueData = PersistedDataMap.of(valueFields);
         }
 
         return runtimeTypeHandler.deserialize(valueData);
