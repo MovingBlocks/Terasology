@@ -17,27 +17,18 @@ package org.terasology.persistence.serializers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.ModuleEnvironmentTest;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.Color;
-import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -45,9 +36,9 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeTrue;
 
-public class TypeSerializerTest {
+public class TypeSerializerTest extends ModuleEnvironmentTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
-    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"data\":1},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":2}]}";
+    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"data\":{\"class\":\"java.lang.Integer\",\"content\":1}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\",\"content\":2}}]}";
 
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));
@@ -61,23 +52,11 @@ public class TypeSerializerTest {
     private ProtobufSerializer protobufSerializer;
     private GsonSerializer gsonSerializer;
 
-    @Before
-    public void setup() throws Exception {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+    @Override
+    public void setup() {
+        ModuleContext.setContext(moduleManager.getEnvironment().get(new Name("unittest")));
 
-        ModuleManager moduleManager = ModuleManagerFactory.create();
-
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        ResolutionResult result = resolver.resolve(moduleManager.getRegistry().getModuleIds());
-
-        assumeTrue(result.isSuccess());
-
-        ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
-        ModuleContext.setContext(environment.get(new Name("unittest")));
-
-        typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager);
+        typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
 
         protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
         gsonSerializer = new GsonSerializer(typeHandlerLibrary);

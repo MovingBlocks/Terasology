@@ -15,7 +15,9 @@
  */
 package org.terasology.reflection.internal;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -24,11 +26,14 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class TypeRegistryImpl implements TypeRegistry {
     private Reflections reflections;
+    private ClassLoader[] classLoaders;
 
     /**
      * Creates an empty {@link TypeRegistryImpl}. No types are loaded when this constructor
@@ -53,23 +58,34 @@ public class TypeRegistryImpl implements TypeRegistry {
             classLoader = classLoader.getParent();
         }
 
+        // Here allClassLoaders contains child class loaders followed by their parent. The list is
+        // reversed so that classes are loaded using the originally declaring/loading class loader,
+        // not a child class loader (like a ModuleClassLoader, for example)
+        Collections.reverse(allClassLoaders);
+
+        classLoaders = allClassLoaders.toArray(new ClassLoader[0]);
+
         reflections = new Reflections(
-            // Reversed so that classes are loaded using the originally declaring/loading class loader,
-            // not a child class loader (like a ModuleClassLoader, for example)
-            Lists.reverse(allClassLoaders),
-            new SubTypesScanner(),
-            // TODO: Add string-based scanner that scans all objects (== getSubtypesOf(Object.class))
+            allClassLoaders,
+            new SubTypesScanner(false),
             new TypeAnnotationsScanner()
         );
     }
 
     @Override
     public <T> Set<Class<? extends T>> getSubtypesOf(Class<T> type) {
+        Preconditions.checkArgument(!Object.class.equals(type));
+
         return reflections.getSubTypesOf(type);
     }
 
     @Override
     public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotationType) {
         return reflections.getTypesAnnotatedWith(annotationType);
+    }
+
+    @Override
+    public Optional<Class<?>> load(String name) {
+        return Optional.ofNullable(ReflectionUtils.forName(name, classLoaders));
     }
 }

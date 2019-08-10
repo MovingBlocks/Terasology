@@ -24,6 +24,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ResolutionResult;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.internal.TypeRegistryImpl;
 import org.terasology.testUtil.ModuleManagerFactory;
 
@@ -33,14 +34,16 @@ import static org.junit.Assume.assumeTrue;
 
 public abstract class ModuleEnvironmentTest {
     protected ModuleManager moduleManager;
+    protected TypeRegistry typeRegistry;
 
     @Before
-    public void setup() throws Exception {
+    public void before() throws Exception {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
 
-        moduleManager = ModuleManagerFactory.create(getTypeRegistry());
+        typeRegistry = new TypeRegistryImpl();
+        moduleManager = ModuleManagerFactory.create((TypeRegistryImpl) typeRegistry);
 
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         ResolutionResult result = resolver.resolve(moduleManager.getRegistry().getModuleIds());
@@ -48,9 +51,11 @@ public abstract class ModuleEnvironmentTest {
         assumeTrue(result.isSuccess());
 
         moduleManager.loadEnvironment(result.getModules(), true);
+
+        setup();
     }
 
-    protected TypeRegistryImpl getTypeRegistry() {
-        return Mockito.mock(TypeRegistryImpl.class);
+    protected void setup() {
+
     }
 }

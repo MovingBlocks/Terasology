@@ -16,10 +16,13 @@
 package org.terasology.reflection;
 
 import java.lang.annotation.Annotation;
+import java.util.Optional;
 import java.util.Set;
 
 public interface TypeRegistry {
     <T> Set<Class<? extends T>> getSubtypesOf(Class<T> type);
 
     Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotationType);
+
+    Optional<Class<?>> load(String name);
 }

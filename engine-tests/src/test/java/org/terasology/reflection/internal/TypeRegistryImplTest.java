@@ -33,13 +33,6 @@ public class TypeRegistryImplTest extends ModuleEnvironmentTest {
         Reflections.log = null;
     }
 
-    private TypeRegistryImpl typeRegistry = new TypeRegistryImpl();
-
-    @Override
-    protected TypeRegistryImpl getTypeRegistry() {
-        return typeRegistry;
-    }
-
     @Test
     public void testRegistry() {
         assertTrue(typeRegistry.getSubtypesOf(Collection.class).contains(TreeSet.class));

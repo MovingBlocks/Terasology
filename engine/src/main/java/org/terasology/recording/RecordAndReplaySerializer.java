@@ -27,7 +27,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.reflection.TypeRegistry;
 
 import java.io.FileWriter;
 import java.io.FileReader;
@@ -55,13 +55,15 @@ public final class RecordAndReplaySerializer {
     private RecordedEventSerializer recordedEventSerializer;
 
     public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store,
-                                     RecordAndReplayUtils recordAndReplayUtils, CharacterStateEventPositionMap characterStateEventPositionMap,
-                                     DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList, ModuleManager moduleManager) {
+                                     RecordAndReplayUtils recordAndReplayUtils,
+                                     CharacterStateEventPositionMap characterStateEventPositionMap,
+                                     DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList,
+                                     ModuleManager moduleManager, TypeRegistry typeRegistry) {
         this.recordedEventStore = store;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.characterStateEventPositionMap = characterStateEventPositionMap;
         this.directionAndOriginPosRecorderList = directionAndOriginPosRecorderList;
-        this.recordedEventSerializer = new RecordedEventSerializer(manager, moduleManager);
+        this.recordedEventSerializer = new RecordedEventSerializer(manager, moduleManager, typeRegistry);
     }
 
     /**

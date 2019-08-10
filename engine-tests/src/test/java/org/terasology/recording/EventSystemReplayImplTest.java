@@ -37,6 +37,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.registry.CoreRegistry;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class EventSystemReplayImplTest {
         ModuleManager moduleManager = mock(ModuleManager.class);
         when(moduleManager.getEnvironment()).thenReturn(mock(ModuleEnvironment.class));
         RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore,
-                recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager);
+                recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, mock(TypeRegistry.class));
         recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAYING);
         entity = entityManager.create();
         Long id = entity.getId();

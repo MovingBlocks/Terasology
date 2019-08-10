@@ -51,6 +51,7 @@ import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -76,7 +77,8 @@ public final class EntitySystemSetupUtil {
         context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
 
         ModuleManager moduleManager = context.get(ModuleManager.class);
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager);
+        TypeRegistry typeRegistry = context.get(TypeRegistry.class);
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
         context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
@@ -134,7 +136,7 @@ public final class EntitySystemSetupUtil {
         CharacterStateEventPositionMap characterStateEventPositionMap = context.get(CharacterStateEventPositionMap.class);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = context.get(DirectionAndOriginPosRecorderList.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager);
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
 

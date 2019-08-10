@@ -21,20 +21,17 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.serializers.GsonSerializer;
-import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationException;
-import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.TypeRegistry;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Serializes and deserializes RecordedEvents.
@@ -45,8 +42,8 @@ class RecordedEventSerializer {
 
     private GsonSerializer gsonSerializer;
 
-    public RecordedEventSerializer(EntityManager entityManager, ModuleManager moduleManager) {
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager);
+    public RecordedEventSerializer(EntityManager entityManager, ModuleManager moduleManager, TypeRegistry typeRegistry) {
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
         typeHandlerLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
 
         gsonSerializer = new GsonSerializer(typeHandlerLibrary);

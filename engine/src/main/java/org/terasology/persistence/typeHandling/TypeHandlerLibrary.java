@@ -30,7 +30,6 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteArrayTypeHandler;
@@ -67,12 +66,12 @@ import org.terasology.persistence.typeHandling.reflection.ModuleEnvironmentSandb
 import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
-import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -148,8 +147,8 @@ public class TypeHandlerLibrary {
         this(new ReflectionsSandbox(reflections));
     }
 
-    public TypeHandlerLibrary(ModuleManager moduleManager) {
-        this(new ModuleEnvironmentSandbox(moduleManager));
+    public TypeHandlerLibrary(ModuleManager moduleManager, TypeRegistry typeRegistry) {
+        this(new ModuleEnvironmentSandbox(moduleManager, typeRegistry));
     }
 
     /**
@@ -172,8 +171,8 @@ public class TypeHandlerLibrary {
         return library;
     }
 
-    public static TypeHandlerLibrary forModuleEnvironment(ModuleManager moduleManager) {
-        TypeHandlerLibrary library = new TypeHandlerLibrary(moduleManager);
+    public static TypeHandlerLibrary forModuleEnvironment(ModuleManager moduleManager, TypeRegistry typeRegistry) {
+        TypeHandlerLibrary library = new TypeHandlerLibrary(moduleManager, typeRegistry);
 
         populateWithDefaultHandlers(library);
 
