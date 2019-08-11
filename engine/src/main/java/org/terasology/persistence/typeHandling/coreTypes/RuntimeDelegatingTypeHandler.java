@@ -24,7 +24,6 @@ import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.utilities.ReflectionUtil;
@@ -79,26 +78,33 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         if (!typeInfo.getType().equals(runtimeType)) {
             Optional<TypeHandler<?>> runtimeTypeHandler = typeHandlerLibrary.getTypeHandler(runtimeType);
 
-            chosenHandler = (TypeHandler<T>) runtimeTypeHandler
-                    .map(typeHandler -> {
-                        if (delegateHandler == null) {
-                            return typeHandler;
-                        } else if (!(typeHandler instanceof ObjectFieldMapTypeHandler)) {
-                            if (typeHandler.getClass().equals(delegateHandler.getClass())) {
-                                // Both handlers are of same type, use delegateHandler
+            chosenHandler =
+                (TypeHandler<T>)
+                    runtimeTypeHandler
+                        .map(typeHandler -> {
+                            if (delegateHandler == null) {
+                                return typeHandler;
+                            }
+
+                            if (!isDefaultTypeHandler(typeHandler)) {
+                                if (typeHandler.getClass().equals(delegateHandler.getClass())) {
+                                    // Both handlers are of same type, use delegateHandler which
+                                    // might have more info
+                                    return delegateHandler;
+                                }
+
+                                // Custom handler for runtime type
+                                return typeHandler;
+                            }
+
+                            if (!isDefaultTypeHandler(delegateHandler)) {
+                                // Custom handler for specified type
                                 return delegateHandler;
                             }
 
-                            // Custom handler for runtime type
                             return typeHandler;
-                        } else if (!(delegateHandler instanceof ObjectFieldMapTypeHandler)) {
-                            // Custom handler for specified type
-                            return delegateHandler;
-                        }
-
-                        return typeHandler;
-                    })
-                    .orElse(delegateHandler);
+                        })
+                        .orElse(delegateHandler);
         }
 
         if (chosenHandler == null) {
@@ -117,8 +123,8 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         String subTypeIdentifier = sandbox.getSubTypeIdentifier(subType, typeInfo.getRawType());
 
         typeValuePersistedDataMap.put(
-                TYPE_FIELD,
-                serializer.serialize(subTypeIdentifier)
+            TYPE_FIELD,
+            serializer.serialize(subTypeIdentifier)
         );
 
         PersistedData serialized = chosenHandler.serialize(value, serializer);
@@ -136,6 +142,14 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         }
 
         return serializer.serialize(typeValuePersistedDataMap);
+    }
+
+    private boolean isDefaultTypeHandler(TypeHandler<?> typeHandler) {
+        return typeHandler instanceof ObjectFieldMapTypeHandler ||
+                   typeHandler instanceof EnumTypeHandler ||
+                   typeHandler instanceof CollectionTypeHandler ||
+                   typeHandler instanceof StringMapTypeHandler ||
+                   typeHandler instanceof ArrayTypeHandler;
     }
 
     private PersistedData serializeViaDelegate(T value, PersistedDataSerializer serializer) {
@@ -181,15 +195,16 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
             return deserializeViaDelegate(data);
         }
 
-        TypeHandler<T> runtimeTypeHandler = (TypeHandler<T>) typeHandlerLibrary.getTypeHandler(typeToDeserializeAs.get())
-                // To avoid compile errors in the orElseGet
-                .map(typeHandler -> (TypeHandler) typeHandler)
-                .orElseGet(() -> {
-                    LOGGER.warn("Cannot find TypeHandler for runtime type '{}', " +
-                                    "deserializing as base type '{}'",
-                            runtimeTypeName, typeInfo);
-                    return delegateHandler;
-                });
+        TypeHandler<T> runtimeTypeHandler =
+            (TypeHandler<T>) typeHandlerLibrary.getTypeHandler(typeToDeserializeAs.get())
+                                 // To avoid compile errors in the orElseGet
+                                 .map(typeHandler -> (TypeHandler) typeHandler)
+                                 .orElseGet(() -> {
+                                     LOGGER.warn("Cannot find TypeHandler for runtime type '{}', " +
+                                                     "deserializing as base type '{}'",
+                                         runtimeTypeName, typeInfo);
+                                     return delegateHandler;
+                                 });
 
         PersistedData valueData;
 
@@ -234,9 +249,9 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
 
     private Optional<Type> findSubtypeWithName(String runtimeTypeName) {
         return sandbox.findSubTypeOf(runtimeTypeName, typeInfo.getRawType())
-                .map(runtimeClass ->
-                         ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), runtimeClass)
-                );
+                   .map(runtimeClass ->
+                            ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), runtimeClass)
+                   );
     }
 
 }
