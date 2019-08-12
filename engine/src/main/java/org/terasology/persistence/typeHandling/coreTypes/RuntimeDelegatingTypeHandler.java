@@ -86,13 +86,14 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
                                 return typeHandler;
                             }
 
-                            if (!isDefaultTypeHandler(typeHandler)) {
-                                if (typeHandler.getClass().equals(delegateHandler.getClass())) {
-                                    // Both handlers are of same type, use delegateHandler which
-                                    // might have more info
-                                    return delegateHandler;
-                                }
+                            if (!(typeHandler instanceof ObjectFieldMapTypeHandler) &&
+                                    typeHandler.getClass().equals(delegateHandler.getClass())) {
+                                // Both handlers are of same type and will do the same thing,
+                                // use delegateHandler which might have more info
+                                return delegateHandler;
+                            }
 
+                            if (!isDefaultTypeHandler(typeHandler)) {
                                 // Custom handler for runtime type
                                 return typeHandler;
                             }
