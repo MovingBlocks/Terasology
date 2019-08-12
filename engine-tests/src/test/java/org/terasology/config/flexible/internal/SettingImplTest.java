@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.engine.SimpleUri;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
@@ -41,7 +42,7 @@ public class SettingImplTest {
         @Before
         public void setUp() {
             setting = new SettingImpl<>(SETTING_ID,
-                    50,
+                TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
                     "", "");
 
@@ -75,7 +76,7 @@ public class SettingImplTest {
         @Before
         public void setUp() {
             setting = new SettingImpl<>(SETTING_ID,
-                    50,
+                TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
                     "", "");
 

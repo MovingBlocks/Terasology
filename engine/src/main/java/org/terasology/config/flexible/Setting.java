@@ -19,6 +19,7 @@ import com.google.gson.JsonElement;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 import org.terasology.module.sandbox.API;
+import org.terasology.reflection.TypeInfo;
 
 import java.beans.PropertyChangeListener;
 
@@ -36,10 +37,10 @@ public interface Setting<T> {
     SimpleUri getId();
 
     /**
-     * Returns a {@link Class} representing the type of values that can be stored in this
+     * Returns a {@link TypeInfo} representing the type of values that can be stored in this
      * {@link Setting}.
      */
-    Class<T> getValueClass();
+    TypeInfo<T> getValueType();
 
     /**
      * Returns the {@link SettingConstraint} used by this {@link Setting}, if present.

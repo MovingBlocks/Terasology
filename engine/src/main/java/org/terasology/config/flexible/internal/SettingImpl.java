@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
+import org.terasology.reflection.TypeInfo;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -44,7 +45,7 @@ class SettingImpl<T> implements Setting<T> {
     private final String warningFormatString;
 
     private final T defaultValue;
-    private final Class<T> valueClass;
+    private final TypeInfo<T> valueType;
 
     private final String humanReadableName;
     private final String description;
@@ -56,17 +57,17 @@ class SettingImpl<T> implements Setting<T> {
 
     /**
      * Creates a new {@link SettingImpl} with the given id, default value and constraint.
-     *
-     * @param id                The id of the setting.
+     *  @param id                The id of the setting.
+     * @param valueType
      * @param defaultValue      The default value of the setting.
      * @param constraint        The constraint that the setting values must satisfy.
      * @param humanReadableName The human readable name of the setting.
      * @param description       A description of the setting.
      */
-    @SuppressWarnings("unchecked")
-    SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint,
+    SettingImpl(SimpleUri id, TypeInfo<T> valueType, T defaultValue, SettingConstraint<T> constraint,
                 String humanReadableName, String description) {
         this.id = id;
+        this.valueType = valueType;
         this.humanReadableName = humanReadableName;
         this.description = description;
 
@@ -83,7 +84,6 @@ class SettingImpl<T> implements Setting<T> {
 
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
-        this.valueClass = (Class<T>) defaultValue.getClass();
     }
 
     private String formatWarning(String s) {
@@ -157,8 +157,8 @@ class SettingImpl<T> implements Setting<T> {
     }
 
     @Override
-    public Class<T> getValueClass() {
-        return valueClass;
+    public TypeInfo<T> getValueType() {
+        return valueType;
     }
 
     /**
@@ -221,7 +221,7 @@ class SettingImpl<T> implements Setting<T> {
 
     @Override
     public void setValueFromJson(String json) {
-        value = GSON.fromJson(json, valueClass);
+        value = GSON.fromJson(json, valueType.getRawType());
     }
 
     @Override
