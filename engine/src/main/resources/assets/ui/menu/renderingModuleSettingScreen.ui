@@ -7,11 +7,11 @@
     "columns": 3,
     "column-widths": [
       0.2,
-      0.325,
-      0.4
+      0.4,
+      0.325
     ],
     "verticalSpacing": 8,
-    "horizontalSpacing": 64,
+    "horizontalSpacing": 32,
     "id": "settingPage",
     "contents": [
       {
@@ -93,7 +93,7 @@
         ]
       },
       {
-        "type": "RowLayout",
+        "type": "ColumnLayout",
         "id": "moduleSelectionLayout",
         "contents": [
           {
@@ -125,6 +125,21 @@
               },
               "relativeWidth": 0.5
             }
+          },
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#disable-rendering-class}",
+            "id": "setEnabledRenderingClassButton",
+            "layoutInfo": {
+              "position-horizontal-center": {},
+              "width": 80,
+              "height": 40,
+              "position-top": {
+                "target": "BOTTOM",
+                "widget": "moduleInitPrioritySlider",
+                "offset": 8
+              }
+            }
           }
         ],
         "layoutInfo": {
@@ -132,10 +147,10 @@
           "position-left": {
             "target": "RIGHT",
             "widget": "modulesInfo",
-            "offset": 8
+            "offset": 16
           }
         },
-        "horizontalSpacing": 8
+        "verticalSpacing": 16
       }
     ],
     "autoSizeColumns": false,
