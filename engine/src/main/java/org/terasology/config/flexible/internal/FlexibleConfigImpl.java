@@ -27,6 +27,7 @@ import org.terasology.config.flexible.FlexibleConfig;
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
+import org.terasology.reflection.TypeInfo;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -56,7 +57,7 @@ class FlexibleConfigImpl implements FlexibleConfig {
      */
     @Override
     public <V> SettingEntry<V> newSetting(SimpleUri id, Class<V> valueType) {
-        return new SettingImplEntry<>(id);
+        return new SettingImplEntry<>(id, TypeInfo.of(valueType));
     }
 
     /**
@@ -90,7 +91,7 @@ class FlexibleConfigImpl implements FlexibleConfig {
             return null;
         }
 
-        Class settingValueClass = setting.getValueClass();
+        Class settingValueClass = setting.getValueType().getRawType();
 
         if (!settingValueClass.equals(valueType)) {
             throw new ClassCastException(
@@ -173,9 +174,11 @@ class FlexibleConfigImpl implements FlexibleConfig {
         private SettingConstraint<T> constraint;
         private String humanReadableName = "";
         private String description = "";
+        private TypeInfo<T> valueType;
 
-        private SettingImplEntry(SimpleUri id) {
+        private SettingImplEntry(SimpleUri id, TypeInfo<T> valueType) {
             this.id = id;
+            this.valueType = valueType;
         }
 
         @Override
@@ -209,7 +212,7 @@ class FlexibleConfigImpl implements FlexibleConfig {
         @Override
         public boolean addToConfig() {
             SettingImpl<T> setting = new SettingImpl<>(
-                    id, defaultValue, constraint, humanReadableName, description
+                    id, valueType, defaultValue, constraint, humanReadableName, description
             );
 
             if (id == null) {
