@@ -113,7 +113,7 @@ public abstract class DependencyConnection<T> {
      * Remove connections
      */
     public void disconnect() {
-        this.connectedConnections.forEach((k,v)->v.connectedConnections.remove(this));
+        this.connectedConnections.forEach((k, v)->v.connectedConnections.remove(this));
         this.connectedConnections = null;
         if (this.connectionType == Type.INPUT) {
             this.data = null;
