@@ -49,6 +49,7 @@ public abstract class ModuleRendering {
     protected Name providingModule;
     protected RenderGraph renderGraph;
     protected WorldRenderer worldRenderer;
+    protected Boolean isEnabled = true;
 
     // Lower number, higher priority. 1 goes first
     @Range(min = 1, max = 100)
@@ -56,9 +57,12 @@ public abstract class ModuleRendering {
 
     public ModuleRendering(Context context) {
         this.context = context;
-        // context.put(ModuleRendering.class, this);
         moduleManager = context.get(ModuleManager.class);
         providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
     }
 
     public void setContext(Context newContext) {
@@ -71,6 +75,10 @@ public abstract class ModuleRendering {
 
     public void setInitializationPriority(int initPriority) {
         initializationPriority = initPriority;
+    }
+
+    public void toggleEnabled() {
+        isEnabled = !isEnabled;
     }
 
     public void initialise() {
