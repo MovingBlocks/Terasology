@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
 import org.terasology.config.flexible.internal.SettingBuilder;
 import org.terasology.config.flexible.internal.SettingImplBuilder;
+import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.TypeInfo;
 
 import java.lang.reflect.Field;
@@ -26,6 +27,8 @@ import java.lang.reflect.Modifier;
 import java.util.Set;
 
 public abstract class AutoConfig {
+    private SimpleUri id;
+
     protected AutoConfig() { }
 
     static Set<Field> getSettingFieldsIn(Class<? extends AutoConfig> configType) {
@@ -58,5 +61,14 @@ public abstract class AutoConfig {
                 .add(arguments)
                 .build()
         );
+    }
+
+    public SimpleUri getId() {
+        return id;
+    }
+
+    void setId(SimpleUri id) {
+        this.id = id;
+        // TODO: Set Setting ids
     }
 }

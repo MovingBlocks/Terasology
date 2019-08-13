@@ -23,17 +23,21 @@ import org.terasology.config.facade.BindsConfiguration;
 import org.terasology.config.facade.BindsConfigurationImpl;
 import org.terasology.config.facade.InputDeviceConfiguration;
 import org.terasology.config.facade.InputDeviceConfigurationImpl;
+import org.terasology.config.flexible.AutoConfigManager;
 import org.terasology.config.flexible.FlexibleConfigManager;
 import org.terasology.config.flexible.internal.FlexibleConfigManagerImpl;
 import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 /**
  * The configuration subsystem manages Terasology's configuration
@@ -41,7 +45,9 @@ import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 public class ConfigurationSubsystem implements EngineSubsystem {
     public static final String SERVER_PORT_PROPERTY = "org.terasology.serverPort";
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationSubsystem.class);
+
     private Config config;
+    private AutoConfigManager autoConfigManager;
 
     @Override
     public String getName() {
@@ -87,6 +93,16 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     }
 
     @Override
+    public void initialise(GameEngine engine, Context rootContext) {
+        // TODO: Put here because of TypeHandlerLibrary dependency,
+        //  might need to move to preInitialise or elsewhere
+        autoConfigManager = new AutoConfigManager(rootContext.get(TypeHandlerLibrary.class));
+        rootContext.put(AutoConfigManager.class, autoConfigManager);
+
+        autoConfigManager.loadConfigsIn(rootContext);
+    }
+
+    @Override
     public void postInitialise(Context rootContext) {
         StorageServiceWorker storageServiceWorker = new StorageServiceWorker(rootContext);
         storageServiceWorker.initializeFromConfig();
@@ -122,6 +138,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     @Override
     public void shutdown() {
         config.save();
+        autoConfigManager.saveConfigsToDisk();
     }
 
 }

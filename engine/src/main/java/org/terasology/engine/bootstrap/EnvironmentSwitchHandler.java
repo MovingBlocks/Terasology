@@ -18,6 +18,7 @@ package org.terasology.engine.bootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.config.flexible.AutoConfigManager;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -97,6 +98,10 @@ public final class EnvironmentSwitchHandler {
 
         registerComponents(componentLibrary, environment);
         registerTypeHandlers(context, typeHandlerLibrary, environment);
+
+        // Load configs for the new environment
+        AutoConfigManager autoConfigManager = context.get(AutoConfigManager.class);
+        autoConfigManager.loadConfigsIn(context);
 
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
 
