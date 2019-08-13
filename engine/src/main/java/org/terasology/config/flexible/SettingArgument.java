@@ -35,11 +35,11 @@ public class SettingArgument<P, V> {
         return new SettingArgument<>(defaultValue, SettingBuilder::defaultValue);
     }
 
-    public static <V> SettingArgument<TypeInfo<V>, V> valueType(Class<V> valueClass) {
-        return valueType(TypeInfo.of(valueClass));
+    public static <V> SettingArgument<TypeInfo<V>, V> type(Class<V> valueClass) {
+        return type(TypeInfo.of(valueClass));
     }
 
-    public static <V> SettingArgument<TypeInfo<V>, V> valueType(TypeInfo<V> valueType) {
+    public static <V> SettingArgument<TypeInfo<V>, V> type(TypeInfo<V> valueType) {
         return new SettingArgument<>(valueType, SettingBuilder::valueType);
     }
 
@@ -47,7 +47,7 @@ public class SettingArgument<P, V> {
         return new SettingArgument<>(constraint, SettingBuilder::constraint);
     }
 
-    public static <V> SettingArgument<String, V> humanReadableName(String humanReadableName) {
+    public static <V> SettingArgument<String, V> name(String humanReadableName) {
         return new SettingArgument<>(humanReadableName, SettingBuilder::humanReadableName);
     }
 

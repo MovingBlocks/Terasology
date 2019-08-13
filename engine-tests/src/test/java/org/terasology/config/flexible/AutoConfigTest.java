@@ -25,7 +25,6 @@ import java.lang.reflect.Field;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 import static org.terasology.config.flexible.SettingArgument.*;
 
@@ -53,10 +52,10 @@ public class AutoConfigTest {
         String description = "description";
 
         Setting<Double> setting = AutoConfig.setting(
-            valueType(Double.class),
+            type(Double.class),
             defaultValue(defaultValue),
             constraint(constraint),
-            humanReadableName(name),
+            name(name),
             description(description)
         );
 

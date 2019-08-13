@@ -22,13 +22,13 @@ import static org.terasology.config.flexible.SettingArgument.*;
 
 public class TestAutoConfig extends AutoConfig {
     public final Setting<String> stringSetting = setting(
-        valueType(String.class),
+        type(String.class),
         defaultValue(""),
-        humanReadableName("Human Readable Name")
+        name("Human Readable Name")
     );
 
     public final Setting<ImmutableList<Integer>> integerListSetting = setting(
-        valueType(new TypeInfo<ImmutableList<Integer>>() {}),
+        type(new TypeInfo<ImmutableList<Integer>>() {}),
         defaultValue(ImmutableList.of())
     );
 }
