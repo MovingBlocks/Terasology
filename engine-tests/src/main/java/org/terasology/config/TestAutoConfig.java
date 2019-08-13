@@ -18,8 +18,8 @@ package org.terasology.config;
 import org.terasology.config.flexible.AutoConfig;
 import org.terasology.config.flexible.Setting;
 
-import static org.terasology.config.flexible.SettingArguments.defaultValue;
-import static org.terasology.config.flexible.SettingArguments.valueType;
+import static org.terasology.config.flexible.SettingArgument.defaultValue;
+import static org.terasology.config.flexible.SettingArgument.valueType;
 
 public class TestAutoConfig extends AutoConfig {
     public final Setting<String> stringSetting = setting(
