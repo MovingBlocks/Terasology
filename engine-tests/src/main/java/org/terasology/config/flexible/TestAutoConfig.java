@@ -18,13 +18,13 @@ package org.terasology.config.flexible;
 import com.google.common.collect.ImmutableList;
 import org.terasology.reflection.TypeInfo;
 
-import static org.terasology.config.flexible.SettingArgument.defaultValue;
-import static org.terasology.config.flexible.SettingArgument.valueType;
+import static org.terasology.config.flexible.SettingArgument.*;
 
 public class TestAutoConfig extends AutoConfig {
     public final Setting<String> stringSetting = setting(
         valueType(String.class),
-        defaultValue("")
+        defaultValue(""),
+        humanReadableName("Human Readable Name")
     );
 
     public final Setting<ImmutableList<Integer>> integerListSetting = setting(

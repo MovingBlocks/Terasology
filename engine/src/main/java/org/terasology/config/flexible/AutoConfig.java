@@ -26,13 +26,7 @@ import java.lang.reflect.Modifier;
 import java.util.Set;
 
 public abstract class AutoConfig {
-    private final Set<Field> settingFields;
-    private final Class<? extends AutoConfig> thisType;
-
-    protected AutoConfig() {
-        thisType = getClass();
-        settingFields = getSettingFieldsIn(thisType);
-    }
+    protected AutoConfig() { }
 
     static Set<Field> getSettingFieldsIn(Class<? extends AutoConfig> configType) {
         return ReflectionUtils.getFields(
