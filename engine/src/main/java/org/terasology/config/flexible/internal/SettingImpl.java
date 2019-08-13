@@ -196,6 +196,10 @@ class SettingImpl<T> implements Setting<T> {
             return false;
         }
 
+        if (newValue.equals(this.value)) {
+            return false;
+        }
+
         PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, newValue);
         this.value = newValue;
         dispatchChangedEvent(event);

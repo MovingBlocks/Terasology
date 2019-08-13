@@ -30,7 +30,7 @@ public class SettingImplBuilder<T> implements SettingBuilder<T> {
 
     public SettingImplBuilder() {
         // TODO: Add id parameter or remove from Setting entirely
-        this.id = null;
+        this.id = new SimpleUri();
     }
 
     @Override
