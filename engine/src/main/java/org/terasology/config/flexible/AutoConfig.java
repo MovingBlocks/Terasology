@@ -15,24 +15,54 @@
  */
 package org.terasology.config.flexible;
 
+import com.google.common.collect.ImmutableList;
+import org.reflections.ReflectionUtils;
 import org.terasology.config.flexible.internal.SettingBuilder;
 import org.terasology.config.flexible.internal.SettingImplBuilder;
 import org.terasology.reflection.TypeInfo;
 
-public abstract class AutoConfig {
-    @SafeVarargs
-    protected static <T> Setting<T> setting(SettingArgument<TypeInfo<T>, T> valueType,
-                                            SettingArgument<T, T> defaultValue,
-                                            SettingArgument<?, T>... arguments) {
-        SettingBuilder<T> builder = new SettingImplBuilder<>();
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Set;
 
-        valueType.setInBuilder(builder);
-        defaultValue.setInBuilder(builder);
+public abstract class AutoConfig {
+    private final Set<Field> settingFields;
+    private final Class<? extends AutoConfig> thisType;
+
+    protected AutoConfig() {
+        thisType = getClass();
+        settingFields = getSettingFieldsIn(thisType);
+    }
+
+    static Set<Field> getSettingFieldsIn(Class<? extends AutoConfig> configType) {
+        return ReflectionUtils.getFields(
+            configType,
+            ReflectionUtils.withModifier(Modifier.PUBLIC),
+            ReflectionUtils.withModifier(Modifier.FINAL),
+            ReflectionUtils.withType(Setting.class)
+        );
+    }
+
+    private static <T> Setting<T> setting(Iterable<SettingArgument<?, T>> arguments) {
+        SettingBuilder<T> builder = new SettingImplBuilder<>();
 
         for (SettingArgument<?, T> argument : arguments) {
             argument.setInBuilder(builder);
         }
 
         return builder.build();
+    }
+
+    @SafeVarargs
+    protected static <T> Setting<T> setting(SettingArgument<TypeInfo<T>, T> valueType,
+                                            SettingArgument<T, T> defaultValue,
+                                            SettingArgument<?, T>... arguments) {
+        return setting(
+            ImmutableList.<SettingArgument<?, T>>builder()
+                .add(valueType)
+                .add(defaultValue)
+                .add(arguments)
+                .build()
+        );
     }
 }

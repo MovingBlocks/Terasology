@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.config.flexible;
 
-import org.terasology.config.flexible.AutoConfig;
-import org.terasology.config.flexible.Setting;
+import com.google.common.collect.ImmutableList;
+import org.terasology.reflection.TypeInfo;
 
 import static org.terasology.config.flexible.SettingArgument.defaultValue;
 import static org.terasology.config.flexible.SettingArgument.valueType;
@@ -25,5 +25,10 @@ public class TestAutoConfig extends AutoConfig {
     public final Setting<String> stringSetting = setting(
         valueType(String.class),
         defaultValue("")
+    );
+
+    public final Setting<ImmutableList<Integer>> integerListSetting = setting(
+        valueType(new TypeInfo<ImmutableList<Integer>>() {}),
+        defaultValue(ImmutableList.of())
     );
 }
