@@ -126,7 +126,7 @@ public class AutoConfigSerializer<C extends AutoConfig> {
                 LOGGER.warn(
                     "Could not find setting with name {} in config {}",
                     persistedSetting.getKey(),
-                    configType.getSimpleName()
+                    config.getId()
                 );
                 continue;
             }
@@ -138,7 +138,7 @@ public class AutoConfigSerializer<C extends AutoConfig> {
                 LOGGER.error(
                     "Could not deserialize value of setting {} in config {} from {}",
                     persistedSetting.getKey(),
-                    configType.getSimpleName(),
+                    config.getId(),
                     persistedSetting.getValue()
                 );
                 continue;
@@ -151,7 +151,7 @@ public class AutoConfigSerializer<C extends AutoConfig> {
                     "Could not store deserialized value {} in setting {} in config {}",
                     settingValue.get(),
                     persistedSetting.getKey(),
-                    configType.getSimpleName()
+                    config.getId()
                 );
             }
         }

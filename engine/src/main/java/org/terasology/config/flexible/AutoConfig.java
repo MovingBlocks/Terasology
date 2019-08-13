@@ -69,6 +69,5 @@ public abstract class AutoConfig {
 
     void setId(SimpleUri id) {
         this.id = id;
-        // TODO: Set Setting ids
     }
 }
