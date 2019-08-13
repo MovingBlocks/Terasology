@@ -302,7 +302,7 @@ public final class PathManager {
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
         Files.createDirectories(screenshotPath);
         nativesPath = installPath.resolve(NATIVES_DIR);
-        configsPath = installPath.resolve(CONFIGS_DIR);
+        configsPath = homePath.resolve(CONFIGS_DIR);
         if (currentWorldPath == null) {
             currentWorldPath = homePath;
         }
