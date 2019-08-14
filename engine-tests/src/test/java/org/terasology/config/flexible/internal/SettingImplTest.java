@@ -28,9 +28,7 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
-import java.beans.PropertyChangeListener;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 import static org.junit.Assert.*;
 
@@ -45,7 +43,7 @@ public class SettingImplTest {
 
         @Before
         public void setUp() {
-            setting = new SettingImpl<>(SETTING_ID,
+            setting = new SettingImpl<>(
                 TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
                     "", "");
@@ -79,7 +77,7 @@ public class SettingImplTest {
 
         @Before
         public void setUp() {
-            setting = new SettingImpl<>(SETTING_ID,
+            setting = new SettingImpl<>(
                 TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
                     "", "");

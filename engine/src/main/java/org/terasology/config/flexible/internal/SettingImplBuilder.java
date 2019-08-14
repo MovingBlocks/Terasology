@@ -70,6 +70,6 @@ public class SettingImplBuilder<T> implements SettingBuilder<T> {
 
     @Override
     public Setting<T> build() {
-        return new SettingImpl<>(id, valueType, defaultValue, constraint, humanReadableName, description);
+        return new SettingImpl<>(valueType, defaultValue, constraint, humanReadableName, description);
     }
 }

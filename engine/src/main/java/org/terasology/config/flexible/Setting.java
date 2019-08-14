@@ -15,9 +15,7 @@
  */
 package org.terasology.config.flexible;
 
-import com.google.gson.JsonElement;
 import org.terasology.config.flexible.constraints.SettingConstraint;
-import org.terasology.engine.SimpleUri;
 import org.terasology.module.sandbox.API;
 import org.terasology.reflection.TypeInfo;
 
@@ -29,11 +27,6 @@ import org.terasology.reflection.TypeInfo;
  */
 @API
 public interface Setting<T> {
-    /**
-     * Returns the id of this {@link Setting}.
-     */
-    SimpleUri getId();
-
     /**
      * Returns a {@link TypeInfo} representing the type of values that can be stored in this
      * {@link Setting}.
@@ -109,14 +102,4 @@ public interface Setting<T> {
      * Returns a boolean stating whether this {@link Setting} has any subscribers.
      */
     boolean hasSubscribers();
-
-    /**
-     * Sets the value of this {@link Setting} from a JSON representation encoded in a string.
-     */
-    void setValueFromJson(String json);
-
-    /**
-     * Returns a JSON representation of the value stored in this {@link Setting}.
-     */
-    JsonElement getValueAsJson();
 }
