@@ -32,7 +32,6 @@ import com.google.gson.JsonSerializer;
 import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.FlexibleConfigManager;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -161,8 +160,6 @@ public final class Config {
         } catch (IOException e) {
             logger.error("Failed to save config", e);
         }
-
-        context.get(FlexibleConfigManager.class).saveAllConfigs();
     }
 
     public void loadDefaults() {
