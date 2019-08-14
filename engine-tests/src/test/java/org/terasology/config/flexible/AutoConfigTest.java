@@ -65,6 +65,6 @@ public class AutoConfigTest {
         assertEquals(description, setting.getDescription());
 
         // The value should also be set to the default initially
-        assertEquals(defaultValue, setting.getValue());
+        assertEquals(defaultValue, setting.get());
     }
 }

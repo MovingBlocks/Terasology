@@ -20,8 +20,9 @@ import org.terasology.module.sandbox.API;
 import org.terasology.reflection.TypeInfo;
 
 /**
- * Represents a setting uniquely identified by an id. Contains a value that may be constrained by a
- * {@link SettingConstraint} and notifies subscribers when the stored value is changed.
+ * Represents a setting containing a value that can be stored in a config and notifies
+ * subscribers when the stored value is changed. The contained  value may be
+ * constrained by a {@link SettingConstraint}.
  *
  * @param <T> The type of the value this {@link Setting} contains.
  */
@@ -47,7 +48,7 @@ public interface Setting<T> {
     /**
      * Returns the value stored in this {@link Setting}.
      */
-    T getValue();
+    T get();
 
     /**
      * Sets the value stored in this {@link Setting<T>}. When no {@link SettingConstraint} is
@@ -61,13 +62,13 @@ public interface Setting<T> {
      * @param newValue The new value to store.
      * @return True if the value was stored successfully, false otherwise.
      */
-    boolean setValue(T newValue);
+    boolean set(T newValue);
 
     /**
      * Resets the value stored in this {@link Setting<T>} to the default value.
      */
     default void resetValue() {
-        setValue(getDefaultValue());
+        set(getDefaultValue());
     }
 
     /**

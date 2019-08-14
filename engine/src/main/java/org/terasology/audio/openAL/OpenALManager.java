@@ -69,8 +69,8 @@ public class OpenALManager implements AudioManager {
     public OpenALManager(AudioConfig config) throws OpenALException, LWJGLException {
         logger.info("Initializing OpenAL audio manager");
 
-        config.musicVolume.subscribe((setting, oldValue) -> setMusicVolume(setting.getValue()));
-        config.soundVolume.subscribe((setting, oldValue) -> setSoundVolume(setting.getValue()));
+        config.musicVolume.subscribe((setting, oldValue) -> setMusicVolume(setting.get()));
+        config.soundVolume.subscribe((setting, oldValue) -> setSoundVolume(setting.get()));
 
         AL.create();
 
@@ -104,8 +104,8 @@ public class OpenALManager implements AudioManager {
         // Initialize sound pools
         pools.put("sfx", new OpenALSoundPool(30)); // effects pool
         pools.put("music", new OpenALStreamingSoundPool(2)); // music pool
-        pools.get("sfx").setVolume(config.soundVolume.getValue());
-        pools.get("music").setVolume(config.musicVolume.getValue());
+        pools.get("sfx").setVolume(config.soundVolume.get());
+        pools.get("music").setVolume(config.musicVolume.get());
     }
 
     @Override

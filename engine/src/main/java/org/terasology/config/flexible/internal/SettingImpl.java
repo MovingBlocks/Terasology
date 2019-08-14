@@ -136,12 +136,12 @@ class SettingImpl<T> implements Setting<T> {
     }
 
     @Override
-    public T getValue() {
+    public T get() {
         return value;
     }
 
     @Override
-    public boolean setValue(T newValue) {
+    public boolean set(T newValue) {
         Preconditions.checkNotNull(newValue, "The value of a setting cannot be null.");
 
         if (isConstraintUnsatisfiedBy(newValue)) {

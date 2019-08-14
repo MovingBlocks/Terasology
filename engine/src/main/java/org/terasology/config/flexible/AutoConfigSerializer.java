@@ -82,9 +82,9 @@ public class AutoConfigSerializer<C extends AutoConfig> {
                 continue;
             }
 
-            if (!setting.getValue().equals(setting.getDefaultValue())) {
+            if (!setting.get().equals(setting.getDefaultValue())) {
                 TypeHandler typeHandler = fieldHandlerEntry.getValue();
-                PersistedData persistedSetting = typeHandler.serialize(setting.getValue(), serializer);
+                PersistedData persistedSetting = typeHandler.serialize(setting.get(), serializer);
 
                 persistedSettings.put(getSettingPropertyName(settingField, setting), persistedSetting);
             }
@@ -146,7 +146,7 @@ public class AutoConfigSerializer<C extends AutoConfig> {
 
             Setting setting = getSettingInField(config, field);
 
-            if (!setting.setValue(settingValue.get())) {
+            if (!setting.set(settingValue.get())) {
                 LOGGER.warn(
                     "Could not store deserialized value {} in setting {} in config {}",
                     settingValue.get(),

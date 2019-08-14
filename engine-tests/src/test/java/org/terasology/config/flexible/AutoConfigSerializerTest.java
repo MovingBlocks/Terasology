@@ -48,8 +48,8 @@ public class AutoConfigSerializerTest {
 
     @Test
     public void testSerializeNonDefault() {
-        config.integerListSetting.setValue(ImmutableList.of(1, 2, 3));
-        config.stringSetting.setValue("xyz");
+        config.integerListSetting.set(ImmutableList.of(1, 2, 3));
+        config.stringSetting.set("xyz");
 
         assertEquals(NON_DEFAULT_JSON, serialize());
     }
@@ -62,16 +62,16 @@ public class AutoConfigSerializerTest {
     public void testDeserializeAllDefault() {
         deserializeOnto(DEFAULT_JSON);
 
-        assertEquals(config.stringSetting.getDefaultValue(), config.stringSetting.getValue());
-        assertEquals(config.integerListSetting.getDefaultValue(), config.integerListSetting.getValue());
+        assertEquals(config.stringSetting.getDefaultValue(), config.stringSetting.get());
+        assertEquals(config.integerListSetting.getDefaultValue(), config.integerListSetting.get());
     }
 
     @Test
     public void testDeserializeNonDefault() {
         deserializeOnto(NON_DEFAULT_JSON);
 
-        assertEquals("xyz", config.stringSetting.getValue());
-        assertEquals(ImmutableList.of(1, 2, 3), config.integerListSetting.getValue());
+        assertEquals("xyz", config.stringSetting.get());
+        assertEquals(ImmutableList.of(1, 2, 3), config.integerListSetting.get());
     }
 
     private void deserializeOnto(String json) {

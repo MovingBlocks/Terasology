@@ -50,19 +50,19 @@ public class SettingImplTest {
 
             eventResult = -1;
 
-            setting.subscribe((setting1, oldValue) -> eventResult = setting1.getValue());
+            setting.subscribe((setting1, oldValue) -> eventResult = setting1.get());
         }
 
         @Test
         public void testSetsValue() {
-            assertTrue(setting.setValue(25));
+            assertTrue(setting.set(25));
 
             assertEquals(25, eventResult);
         }
 
         @Test
         public void testDoesNotSetValue() {
-            assertFalse(setting.setValue(101));
+            assertFalse(setting.set(101));
 
             assertEquals(-1, eventResult);
         }
@@ -109,7 +109,7 @@ public class SettingImplTest {
 
             for (int i = 0; i < maxSetValueCount; i++) {
                 int randomInt = random.nextInt(-50, 150);
-                expectedEventCallCount += setting.setValue(randomInt) ? 1 : 0;
+                expectedEventCallCount += setting.set(randomInt) ? 1 : 0;
             }
 
             assertEquals(expectedEventCallCount, eventCallCount);
@@ -123,7 +123,7 @@ public class SettingImplTest {
                 setting.subscribe((setting1, oldValue) -> eventCallCount++);
             }
 
-            setting.setValue(30);
+            setting.set(30);
 
             assertEquals(subscriberCount, eventCallCount);
         }
@@ -145,7 +145,7 @@ public class SettingImplTest {
                 subscriberCount--;
             }
 
-            setting.setValue(30);
+            setting.set(30);
 
             assertEquals(subscriberCount, eventCallCount);
         }
