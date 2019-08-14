@@ -103,10 +103,6 @@ public final class Config {
         return config.getPlayer();
     }
 
-    public AudioConfig getAudio() {
-        return config.getAudio();
-    }
-
     public SystemConfig getSystem() {
         return config.getSystem();
     }
