@@ -196,10 +196,9 @@ public class FlexibleConfigImplTest {
                     .setDefaultValue(0)
                     .addToConfig();
 
-            Setting setting = config.get(id, Integer.class);
+            Setting<Integer> integerSetting = config.get(id, Integer.class);
 
-            setting.subscribe(propertyChangeEvent -> {
-            });
+            integerSetting.subscribe((setting, oldValue) -> {});
 
             assertFalse(config.remove(id));
         }

@@ -15,11 +15,13 @@
  */
 package org.terasology.config.flexible.internal;
 
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.SettingChangeListener;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.TypeInfo;
@@ -27,6 +29,8 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 import static org.junit.Assert.*;
 
@@ -48,7 +52,7 @@ public class SettingImplTest {
 
             eventResult = -1;
 
-            setting.subscribe(propertyChangeEvent -> eventResult = (int) propertyChangeEvent.getNewValue());
+            setting.subscribe((setting1, oldValue) -> eventResult = setting1.getValue());
         }
 
         @Test
@@ -69,7 +73,7 @@ public class SettingImplTest {
     public static class Subscribers {
         private Setting<Integer> setting;
 
-        private PropertyChangeListener listener;
+        private SettingChangeListener<Integer> listener;
 
         private int eventCallCount;
 
@@ -82,7 +86,7 @@ public class SettingImplTest {
 
             eventCallCount = 0;
 
-            listener = propertyChangeEvent -> eventCallCount++;
+            listener = (setting, oldValue) -> eventCallCount++;
         }
 
         @Test
@@ -118,7 +122,7 @@ public class SettingImplTest {
             final int subscriberCount = 10;
 
             for (int i = 0; i < subscriberCount; i++) {
-                setting.subscribe(propertyChangeEvent -> eventCallCount++);
+                setting.subscribe((setting1, oldValue) -> eventCallCount++);
             }
 
             setting.setValue(30);
@@ -130,15 +134,16 @@ public class SettingImplTest {
         public void testUnsubscribe() {
             int subscriberCount = 10;
 
-            PropertyChangeListener[] listeners = new PropertyChangeListener[subscriberCount];
+            List<SettingChangeListener<Integer>> listeners = Lists.newArrayListWithCapacity(subscriberCount);
 
             for (int i = 0; i < subscriberCount; i++) {
-                listeners[i] = propertyChangeEvent -> eventCallCount++;
-                setting.subscribe(listeners[i]);
+                SettingChangeListener<Integer> listener = (setting1, oldValue) -> eventCallCount++;
+                listeners.add(listener);
+                setting.subscribe(listener);
             }
 
             for (int i = 0; i < new FastRandom().nextInt(subscriberCount / 2); i++) {
-                setting.unsubscribe(listeners[i]);
+                setting.unsubscribe(listeners.get(i));
                 subscriberCount--;
             }
 

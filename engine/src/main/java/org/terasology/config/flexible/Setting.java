@@ -21,8 +21,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.module.sandbox.API;
 import org.terasology.reflection.TypeInfo;
 
-import java.beans.PropertyChangeListener;
-
 /**
  * Represents a setting uniquely identified by an id. Contains a value that may be constrained by a
  * {@link SettingConstraint} and notifies subscribers when the stored value is changed.
@@ -90,22 +88,22 @@ public interface Setting<T> {
     String getDescription();
 
     /**
-     * Subscribe a {@link PropertyChangeListener} that will be notified when the value stored in the setting
+     * Subscribe a {@link SettingChangeListener} that will be notified when the value stored in the setting
      * changes. In case of failure warnings will be issued through the logger detailing the exact nature of the failure.
      *
-     * @param listener The {@link PropertyChangeListener} to subscribe.
-     * @return True if the {@link PropertyChangeListener} was subscribed, false otherwise.
+     * @param listener The {@link SettingChangeListener} to subscribe.
+     * @return True if the {@link SettingChangeListener} was subscribed, false otherwise.
      */
-    boolean subscribe(PropertyChangeListener listener);
+    boolean subscribe(SettingChangeListener<T> listener);
 
     /**
-     * Unsubscribe a {@link PropertyChangeListener} that will be notified when the value stored in the setting
+     * Unsubscribe a {@link SettingChangeListener} that will be notified when the value stored in the setting
      * changes. In case of failure warnings will be issued through the logger detailing the exact nature of the failure.
      *
-     * @param listener The {@link PropertyChangeListener} to unsubscribe.
-     * @return True if the {@link PropertyChangeListener} was unsubscribed, false otherwise.
+     * @param listener The {@link SettingChangeListener} to unsubscribe.
+     * @return True if the {@link SettingChangeListener} was unsubscribed, false otherwise.
      */
-    boolean unsubscribe(PropertyChangeListener listener);
+    boolean unsubscribe(SettingChangeListener<T> listener);
 
     /**
      * Returns a boolean stating whether this {@link Setting} has any subscribers.

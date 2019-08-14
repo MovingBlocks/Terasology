@@ -23,12 +23,11 @@ import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.SettingChangeListener;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.TypeInfo;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.MessageFormat;
 import java.util.Set;
 
@@ -51,7 +50,7 @@ class SettingImpl<T> implements Setting<T> {
     private final String description;
 
     private final SettingConstraint<T> constraint;
-    private final Set<PropertyChangeListener> subscribers = Sets.newHashSet();
+    private final Set<SettingChangeListener<T>> subscribers = Sets.newHashSet();
 
     protected T value;
 
@@ -75,12 +74,12 @@ class SettingImpl<T> implements Setting<T> {
 
         this.constraint = constraint;
 
+        Preconditions.checkNotNull(defaultValue, formatWarning("The default value cannot be null."));
+
         if (isConstraintUnsatisfiedBy(defaultValue)) {
             throw new IllegalArgumentException("The default value must be a valid value. " +
-                    "Check the logs for more information.");
+                                                   "Check the logs for more information.");
         }
-
-        Preconditions.checkNotNull(defaultValue, formatWarning("The default value cannot be null."));
 
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
@@ -90,9 +89,9 @@ class SettingImpl<T> implements Setting<T> {
         return MessageFormat.format(warningFormatString, s);
     }
 
-    private void dispatchChangedEvent(PropertyChangeEvent event) {
-        for (PropertyChangeListener subscriber : subscribers) {
-            subscriber.propertyChange(event);
+    private void dispatchChangedEvent(T oldValue) {
+        for (SettingChangeListener<T> subscriber : subscribers) {
+            subscriber.onValueChanged(this, oldValue);
         }
     }
 
@@ -107,9 +106,10 @@ class SettingImpl<T> implements Setting<T> {
 
     /**
      * {@inheritDoc}
+     * @param listener
      */
     @Override
-    public boolean subscribe(PropertyChangeListener listener) {
+    public boolean subscribe(SettingChangeListener<T> listener) {
         if (listener == null) {
             LOGGER.warn(formatWarning("A null subscriber cannot be added."));
             return false;
@@ -127,9 +127,10 @@ class SettingImpl<T> implements Setting<T> {
 
     /**
      * {@inheritDoc}
+     * @param listener
      */
     @Override
-    public boolean unsubscribe(PropertyChangeListener listener) {
+    public boolean unsubscribe(SettingChangeListener<T> listener) {
         if (!subscribers.contains(listener)) {
             LOGGER.warn(formatWarning("The listener does not exist in the subscriber list."));
             return false;
@@ -200,9 +201,11 @@ class SettingImpl<T> implements Setting<T> {
             return false;
         }
 
-        PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, newValue);
+        T oldValue = this.value;
+
         this.value = newValue;
-        dispatchChangedEvent(event);
+
+        dispatchChangedEvent(oldValue);
 
         return true;
     }
