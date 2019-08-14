@@ -129,8 +129,6 @@ public class AutoConfigManager {
     private Path getConfigPath(SimpleUri configId) {
         Path filePath = PathManager.getInstance()
                             .getConfigsPath()
-                            // Fixme: Temporary, to avoid clashes with FCs
-                            .resolve("autoconfig")
                             .resolve(configId.getModuleName().toString())
                             .resolve(configId.getObjectName().toString() + ".cfg");
 
