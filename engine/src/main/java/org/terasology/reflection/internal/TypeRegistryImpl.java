@@ -17,11 +17,16 @@ package org.terasology.reflection.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.sandbox.ModuleClassLoader;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -50,11 +55,17 @@ public class TypeRegistryImpl implements TypeRegistry {
         initializeReflections((ClassLoader) ReflectionUtil.readField(environment, "finalClassLoader"));
     }
 
-    private void initializeReflections(ClassLoader classLoader) {
+    private Set<ModuleClassLoader> initializeReflections(ClassLoader classLoader) {
         List<ClassLoader> allClassLoaders = Lists.newArrayList();
+        Set<ModuleClassLoader> moduleClassLoaders = Sets.newHashSet();
 
         while (classLoader != null) {
             allClassLoaders.add(classLoader);
+
+            if (classLoader instanceof ModuleClassLoader) {
+                moduleClassLoaders.add((ModuleClassLoader) classLoader);
+            }
+
             classLoader = classLoader.getParent();
         }
 
@@ -66,10 +77,29 @@ public class TypeRegistryImpl implements TypeRegistry {
         classLoaders = allClassLoaders.toArray(new ClassLoader[0]);
 
         reflections = new Reflections(
-            allClassLoaders,
-            new SubTypesScanner(false),
-            new TypeAnnotationsScanner()
+            new ConfigurationBuilder()
+                .setScanners(
+                    new SubTypesScanner(false),
+                    new TypeAnnotationsScanner()
+                )
+                .addClassLoaders(allClassLoaders)
+                .addUrls(ClasspathHelper.forClassLoader(
+                    allClassLoaders.stream()
+                        .filter(loader -> !(loader instanceof ModuleClassLoader))
+                        .toArray(ClassLoader[]::new)
+                ))
         );
+
+        return moduleClassLoaders;
+    }
+
+    private void initializeReflections(ClassLoader classLoader, ModuleEnvironment environment) {
+        Set<ModuleClassLoader> moduleClassLoaders = initializeReflections(classLoader);
+
+        for (ModuleClassLoader loader : moduleClassLoaders) {
+            Module module = environment.get(loader.getModuleId());
+            reflections.merge(module.getReflectionsFragment());
+        }
     }
 
     @Override
