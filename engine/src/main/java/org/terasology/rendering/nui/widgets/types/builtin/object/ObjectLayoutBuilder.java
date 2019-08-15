@@ -25,6 +25,7 @@ import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.PermissionProvider;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -72,7 +73,8 @@ class ObjectLayoutBuilder<T> {
     public ObjectLayoutBuilder(Binding<T> binding,
                                TypeInfo<T> type,
                                TypeWidgetLibrary library,
-                               ModuleManager moduleManager) {
+                               ModuleManager moduleManager,
+                               TypeRegistry typeRegistry) {
         this.type = type;
         this.editingType = type;
         this.library = library;
@@ -101,13 +103,13 @@ class ObjectLayoutBuilder<T> {
 
         Module contextModule = ModuleContext.getContext();
 
-        ModuleEnvironment environment = moduleManager.getEnvironment();
         PermissionProvider permissionProvider = moduleManager.getPermissionProvider(contextModule);
 
         // TODO: Check API classes
         // TODO: Environment does not account for all types, possibly use more comprehensive reflections object
         List<Class<? extends T>> allowedSubclasses =
-            Streams.stream(environment.getSubtypesOf(type.getRawType()))
+            typeRegistry.getSubtypesOf(type.getRawType())
+                .stream()
                 .filter(permissionProvider::isPermitted)
                 // Filter public, instantiable types
                 .filter(clazz -> {
