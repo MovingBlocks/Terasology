@@ -25,7 +25,7 @@ public abstract class ConstraintWidgetFactory<T, C extends SettingConstraint<T>>
     private Setting<T> setting;
 
     protected final T castToT(Object value) {
-        return getSetting().getValueClass().cast(value);
+        return getSetting().getValueType().getRawType().cast(value);
     }
 
     protected final Setting<T> getSetting() {
