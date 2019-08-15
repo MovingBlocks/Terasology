@@ -39,7 +39,8 @@ public class ObjectWidgetFactory implements TypeWidgetFactory {
         Class<T> rawType = type.getRawType();
 
         // If the class is a local class or a non-static member class, we don't want to handle it
-        if (rawType.isLocalClass() ||
+        // We do not handle the object class either because there are too many types to deal with
+        if (rawType.isLocalClass() || Object.class.equals(rawType) ||
                 (rawType.isMemberClass() && !Modifier.isStatic(rawType.getModifiers()))) {
             return Optional.empty();
         }
