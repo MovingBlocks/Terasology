@@ -45,7 +45,8 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
         newBinding(new TypeInfo<Container>() {});
         newBinding(new TypeInfo<List<Base<Integer>>>() {});
 
-        newBinding(Object.class);
+        // TODO: Uncomment only after support implemented
+        //newBinding(Object.class);
         // TODO: Test Queue
     }
 

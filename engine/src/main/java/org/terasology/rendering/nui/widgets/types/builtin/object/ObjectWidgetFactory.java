@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets.types.builtin.object;
 
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -30,6 +31,9 @@ public class ObjectWidgetFactory implements TypeWidgetFactory {
     @In
     private ModuleManager moduleManager;
 
+    @In
+    private TypeRegistry typeRegistry;
+
     @Override
     public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
         Class<T> rawType = type.getRawType();
@@ -40,7 +44,7 @@ public class ObjectWidgetFactory implements TypeWidgetFactory {
             return Optional.empty();
         }
 
-        ObjectLayoutBuilder<T> layoutBuilder = new ObjectLayoutBuilder<>(binding, type, library, moduleManager);
+        ObjectLayoutBuilder<T> layoutBuilder = new ObjectLayoutBuilder<>(binding, type, library, moduleManager, typeRegistry);
 
         return Optional.of(layoutBuilder.getLayout());
     }
