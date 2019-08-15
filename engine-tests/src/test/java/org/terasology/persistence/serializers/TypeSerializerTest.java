@@ -17,12 +17,13 @@ package org.terasology.persistence.serializers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.ModuleEnvironmentTest;
+import org.terasology.engine.module.ModuleContext;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
 import org.terasology.nui.Color;
-import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
