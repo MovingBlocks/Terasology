@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.types.builtin.object;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.PermissionProvider;
+import org.terasology.naming.Name;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.rendering.nui.UIWidget;
@@ -50,6 +52,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
@@ -105,12 +108,20 @@ class ObjectLayoutBuilder<T> {
 
         PermissionProvider permissionProvider = moduleManager.getPermissionProvider(contextModule);
 
-        // TODO: Check API classes
-        // TODO: Environment does not account for all types, possibly use more comprehensive reflections object
+        ModuleEnvironment environment = moduleManager.getEnvironment();
+
+        Set<Name> allowedProvidingModules =
+            ImmutableSet.<Name>builder()
+                .add(contextModule.getId())
+                .addAll(environment.getDependencyNamesOf(contextModule.getId()))
+                .build();
+
         List<Class<? extends T>> allowedSubclasses =
             typeRegistry.getSubtypesOf(type.getRawType())
                 .stream()
-                .filter(permissionProvider::isPermitted)
+                // Type must come from an allowed module or be in the whitelist
+                .filter(clazz -> allowedProvidingModules.contains(getModuleProviding(clazz)) ||
+                                     permissionProvider.isPermitted(clazz))
                 // Filter public, instantiable types
                 .filter(clazz -> {
                     int modifiers = clazz.getModifiers();
@@ -151,6 +162,14 @@ class ObjectLayoutBuilder<T> {
                     return (TypeInfo<? extends T>) TypeInfo.of(parameterized);
                 })
                 .collect(Collectors.toList());
+    }
+
+    private Name getModuleProviding(Class<?> type) {
+        if (type.getClassLoader() == null) {
+            return null;
+        }
+
+        return moduleManager.getEnvironment().getModuleProviding(type);
     }
 
     private static ColumnLayout createDefaultLayout() {
