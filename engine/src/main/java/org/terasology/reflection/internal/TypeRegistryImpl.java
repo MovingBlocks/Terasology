@@ -15,7 +15,6 @@
  */
 package org.terasology.reflection.internal;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
@@ -36,8 +35,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TypeRegistryImpl implements TypeRegistry {
+    private static final Set<String> WHITELISTED_CLASSES =
+        ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+
     private Reflections reflections;
     private ClassLoader[] classLoaders;
 
@@ -50,6 +53,23 @@ public class TypeRegistryImpl implements TypeRegistry {
     public TypeRegistryImpl(ClassLoader classLoader) {
         this();
         initializeReflections(classLoader);
+    }
+
+    private static boolean filterWhitelistedTypes(String typeName) {
+        if (typeName == null) {
+            return false;
+        }
+
+        typeName = typeName.replace(".class", "");
+
+        int i = typeName.lastIndexOf('.');
+        if (i == -1) {
+            return false;
+        }
+
+        String packageName = typeName.substring(0, i);
+
+        return ExternalApiWhitelist.PACKAGES.contains(packageName) || WHITELISTED_CLASSES.contains(typeName);
     }
 
     public void reload(ModuleEnvironment environment) {
@@ -91,25 +111,7 @@ public class TypeRegistryImpl implements TypeRegistry {
                         .filter(loader -> !(loader instanceof ModuleClassLoader))
                         .toArray(ClassLoader[]::new)
                 ))
-                .filterInputsBy(typeName -> {
-                    if (typeName == null) {
-                        return false;
-                    }
-
-                    int i = typeName.lastIndexOf('.');
-                    if (i == -1) {
-                        return false;
-                    }
-
-                    String packageName = typeName.substring(0, i);
-
-                    // TODO: Check whitelist classes
-                    if (!ExternalApiWhitelist.PACKAGES.contains(packageName)) {
-                        return false;
-                    }
-
-                    return true;
-                })
+                .filterInputsBy(TypeRegistryImpl::filterWhitelistedTypes)
                 .useParallelExecutor()
         );
 
@@ -127,8 +129,6 @@ public class TypeRegistryImpl implements TypeRegistry {
 
     @Override
     public <T> Set<Class<? extends T>> getSubtypesOf(Class<T> type) {
-        Preconditions.checkArgument(!Object.class.equals(type));
-
         return reflections.getSubTypesOf(type);
     }
 
