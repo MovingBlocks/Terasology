@@ -129,7 +129,8 @@ public class TypeRegistryImpl implements TypeRegistry {
 
     @Override
     public <T> Set<Class<? extends T>> getSubtypesOf(Class<T> type) {
-        return reflections.getSubTypesOf(type);
+        Iterable<String> subTypes = reflections.getStore().getAll(SubTypesScanner.class.getSimpleName(), type.getName());
+        return ReflectionUtil.loadClasses(subTypes, reflections.getConfiguration().getClassLoaders());
     }
 
     @Override

@@ -19,6 +19,7 @@ package org.terasology.utilities;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.reflections.ReflectionUtils;
 import org.terasology.rendering.nui.UIWidget;
 
 import java.lang.reflect.Array;
@@ -36,6 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -503,6 +505,13 @@ public final class ReflectionUtil {
     public static Type parameterizeandResolveRawType(Type contextType, Class<?> rawType) {
         Type parameterizedType = parameterizeRawType(rawType);
         return resolveType(contextType, parameterizedType);
+    }
+
+    public static <T> Set<Class<? extends T>> loadClasses(Iterable<String> subTypes, ClassLoader[] classLoaders) {
+        return Lists.newArrayList(subTypes).parallelStream()
+            .map(subtypeName -> (Class<? extends T>) ReflectionUtils.forName(subtypeName, classLoaders))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
     }
 
     private static class WildcardTypeImpl implements WildcardType {
