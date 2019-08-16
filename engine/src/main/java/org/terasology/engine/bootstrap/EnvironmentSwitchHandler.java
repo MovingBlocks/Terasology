@@ -42,9 +42,11 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
+import org.terasology.reflection.internal.TypeRegistryImpl;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.GenericsUtil;
@@ -65,10 +67,14 @@ public final class EnvironmentSwitchHandler {
     @SuppressWarnings("unchecked")
     public void handleSwitchToGameEnvironment(Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
+        ModuleEnvironment environment = moduleManager.getEnvironment();
+
+        TypeRegistryImpl typeRegistry = (TypeRegistryImpl) context.get(TypeRegistry.class);
+        typeRegistry.reload(environment);
 
         CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
         copyStrategyLibrary.clear();
-        for (Class<? extends CopyStrategy> copyStrategy : moduleManager.getEnvironment().getSubtypesOf(CopyStrategy.class)) {
+        for (Class<? extends CopyStrategy> copyStrategy : environment.getSubtypesOf(CopyStrategy.class)) {
             if (copyStrategy.getAnnotation(RegisterCopyStrategy.class) == null) {
                 continue;
             }
@@ -91,8 +97,8 @@ public final class EnvironmentSwitchHandler {
         context.put(EventLibrary.class, library.getEventLibrary());
         context.put(ClassMetaLibrary.class, new ClassMetaLibraryImpl(context));
 
-        registerComponents(componentLibrary, moduleManager.getEnvironment());
-        registerTypeHandlers(context, typeHandlerLibrary, moduleManager.getEnvironment());
+        registerComponents(componentLibrary, environment);
+        registerTypeHandlers(context, typeHandlerLibrary, environment);
 
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
 
@@ -109,7 +115,7 @@ public final class EnvironmentSwitchHandler {
         registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.registerCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
 
-        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+        assetTypeManager.switchEnvironment(environment);
 
     }
 

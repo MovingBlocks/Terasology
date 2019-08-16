@@ -71,14 +71,11 @@ public class ModuleManagerImpl implements ModuleManager {
     private ModuleMetadataJsonAdapter metadataReader;
     private ModuleInstallManager installManager;
 
-    private final TypeRegistryImpl typeRegistry;
-
-    public ModuleManagerImpl(String masterServerAddress, TypeRegistryImpl typeRegistry) {
-        this(masterServerAddress, Collections.emptyList(), typeRegistry);
+    public ModuleManagerImpl(String masterServerAddress) {
+        this(masterServerAddress, Collections.emptyList());
     }
 
-    public ModuleManagerImpl(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine, TypeRegistryImpl typeRegistry) {
-        this.typeRegistry = typeRegistry;
+    public ModuleManagerImpl(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -128,7 +125,7 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     public ModuleManagerImpl(Config config, List<Class<?>> classesOnClasspathsToAddToEngine, TypeRegistryImpl typeRegistry) {
-        this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine, typeRegistry);
+        this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 
     /**
@@ -229,7 +226,6 @@ public class ModuleManagerImpl implements ModuleManager {
         }
         if (asPrimary) {
             environment = newEnvironment;
-            typeRegistry.reload(environment);
         }
         return newEnvironment;
     }

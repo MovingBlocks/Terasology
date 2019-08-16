@@ -272,7 +272,7 @@ public class HeadlessEnvironment extends Environment {
         TypeRegistryImpl typeRegistry = new TypeRegistryImpl();
         context.put(TypeRegistry.class, typeRegistry);
 
-        ModuleManager moduleManager = ModuleManagerFactory.create(typeRegistry);
+        ModuleManager moduleManager = ModuleManagerFactory.create();
         ModuleRegistry registry = moduleManager.getRegistry();
 
         DependencyResolver resolver = new DependencyResolver(registry);
@@ -280,6 +280,7 @@ public class HeadlessEnvironment extends Environment {
 
         if (result.isSuccess()) {
             ModuleEnvironment modEnv = moduleManager.loadEnvironment(result.getModules(), true);
+            typeRegistry.reload(modEnv);
             logger.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
         } else {
             logger.error("Could not resolve module dependencies for " + moduleNames);

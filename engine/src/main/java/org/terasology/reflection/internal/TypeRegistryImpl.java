@@ -55,6 +55,11 @@ public class TypeRegistryImpl implements TypeRegistry {
         initializeReflections(classLoader);
     }
 
+    public TypeRegistryImpl(ModuleEnvironment environment) {
+        this();
+        reload(environment);
+    }
+
     private static boolean filterWhitelistedTypes(String typeName) {
         if (typeName == null) {
             return false;

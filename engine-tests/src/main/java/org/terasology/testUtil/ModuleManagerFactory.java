@@ -36,23 +36,13 @@ public final class ModuleManagerFactory {
     private ModuleManagerFactory() {
     }
 
-    // Named "create" for legacy reasons, but does more than create
     public static ModuleManager create() throws Exception {
-        ModuleManager manager = create(Mockito.mock(TypeRegistryImpl.class));
-        manager.loadEnvironment(Sets.newHashSet(manager.getRegistry().getLatestModuleVersion(new Name("engine"))), true);
-        return manager;
-    }
-
-    /**
-     * Creates a new {@link ModuleManager} instance, but does not
-     * {@link ModuleManager#loadEnvironment(Set, boolean) load it's environment}.
-     */
-    public static ModuleManager create(TypeRegistryImpl typeRegistry) throws Exception {
-        ModuleManager moduleManager = new ModuleManagerImpl("", typeRegistry);
+        ModuleManager moduleManager = new ModuleManagerImpl("");
         try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
             moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));
         }
+        moduleManager.loadEnvironment(Sets.newHashSet(moduleManager.getRegistry().getLatestModuleVersion(new Name("engine"))), true);
         return moduleManager;
     }
 }
