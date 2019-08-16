@@ -110,6 +110,7 @@ public class TypeRegistryImpl implements TypeRegistry {
 
                     return true;
                 })
+                .useParallelExecutor()
         );
 
         return moduleClassLoaders;
