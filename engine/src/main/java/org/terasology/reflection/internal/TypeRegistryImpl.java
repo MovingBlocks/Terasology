@@ -83,17 +83,11 @@ public class TypeRegistryImpl implements TypeRegistry {
         initializeReflections(finalClassLoader, environment);
     }
 
-    private Set<ModuleClassLoader> initializeReflections(ClassLoader classLoader) {
+    private void initializeReflections(ClassLoader classLoader) {
         List<ClassLoader> allClassLoaders = Lists.newArrayList();
-        Set<ModuleClassLoader> moduleClassLoaders = Sets.newHashSet();
 
         while (classLoader != null) {
             allClassLoaders.add(classLoader);
-
-            if (classLoader instanceof ModuleClassLoader) {
-                moduleClassLoaders.add((ModuleClassLoader) classLoader);
-            }
-
             classLoader = classLoader.getParent();
         }
 
@@ -120,14 +114,12 @@ public class TypeRegistryImpl implements TypeRegistry {
                 .useParallelExecutor()
         );
 
-        return moduleClassLoaders;
     }
 
     private void initializeReflections(ClassLoader classLoader, ModuleEnvironment environment) {
-        Set<ModuleClassLoader> moduleClassLoaders = initializeReflections(classLoader);
+        initializeReflections(classLoader);
 
-        for (ModuleClassLoader loader : moduleClassLoaders) {
-            Module module = environment.get(loader.getModuleId());
+        for (Module module : environment.getModulesOrderedByDependencies()) {
             reflections.merge(module.getReflectionsFragment());
         }
     }
