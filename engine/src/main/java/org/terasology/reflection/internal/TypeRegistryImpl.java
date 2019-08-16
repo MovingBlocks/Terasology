@@ -24,6 +24,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.ModuleClassLoader;
@@ -47,12 +48,14 @@ public class TypeRegistryImpl implements TypeRegistry {
     public TypeRegistryImpl() {}
 
     public TypeRegistryImpl(ClassLoader classLoader) {
+        this();
         initializeReflections(classLoader);
     }
 
     public void reload(ModuleEnvironment environment) {
         // FIXME: Reflection -- may break with updates to gestalt-module
-        initializeReflections((ClassLoader) ReflectionUtil.readField(environment, "finalClassLoader"));
+        ClassLoader finalClassLoader = (ClassLoader) ReflectionUtil.readField(environment, "finalClassLoader");
+        initializeReflections(finalClassLoader, environment);
     }
 
     private Set<ModuleClassLoader> initializeReflections(ClassLoader classLoader) {
@@ -88,6 +91,25 @@ public class TypeRegistryImpl implements TypeRegistry {
                         .filter(loader -> !(loader instanceof ModuleClassLoader))
                         .toArray(ClassLoader[]::new)
                 ))
+                .filterInputsBy(typeName -> {
+                    if (typeName == null) {
+                        return false;
+                    }
+
+                    int i = typeName.lastIndexOf('.');
+                    if (i == -1) {
+                        return false;
+                    }
+
+                    String packageName = typeName.substring(0, i);
+
+                    // TODO: Check whitelist classes
+                    if (!ExternalApiWhitelist.PACKAGES.contains(packageName)) {
+                        return false;
+                    }
+
+                    return true;
+                })
         );
 
         return moduleClassLoaders;
