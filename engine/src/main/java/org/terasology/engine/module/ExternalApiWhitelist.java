@@ -89,7 +89,9 @@ public final class ExternalApiWhitelist {
             .add(Logger.class)
             .add(java.awt.datatransfer.UnsupportedFlavorException.class)
             .add(java.nio.ByteBuffer.class)
+            .add(java.nio.ShortBuffer.class)
             .add(java.nio.IntBuffer.class)
+            .add(java.nio.FloatBuffer.class)
             .add(java.nio.file.attribute.FileTime.class) // java.util.zip dependency
             // This class only operates on Class<?> or Object instances,
             // effectively adding a way to access arrays without knowing their type
