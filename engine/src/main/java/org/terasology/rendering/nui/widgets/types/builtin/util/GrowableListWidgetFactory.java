@@ -95,12 +95,14 @@ public abstract class GrowableListWidgetFactory<C, E> {
     }
 
     private Binding<E> getBindingForElement(E element) {
-        return new NotifyingBinding<E>(element) {
-            @Override
-            protected void onSet() {
-                updateBinding();
+        return binding.makeChildBinding(
+            new NotifyingBinding<E>(element) {
+                @Override
+                protected void onSet() {
+                    updateBinding();
+                }
             }
-        };
+        );
     }
 
     private void populateCollectionLayout(ColumnLayout collectionLayout) {

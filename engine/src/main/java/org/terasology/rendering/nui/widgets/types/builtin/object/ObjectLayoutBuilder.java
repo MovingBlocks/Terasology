@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
@@ -449,7 +450,7 @@ class ObjectLayoutBuilder<T> {
             return Optional.empty();
         }
 
-        Optional<UIWidget> widget = library.getWidget(fieldBinding.get(), fieldType);
+        Optional<UIWidget> widget = library.getWidget(binding.makeChildBinding(fieldBinding.get()), fieldType);
 
         if (!widget.isPresent()) {
             LOGGER.warn("Could not create a UIWidget for field {}", field);

@@ -49,7 +49,7 @@ public abstract class NotifyingBinding<T> implements Binding<T> {
     protected void onGet() { }
 
     @Override
-    public void set(T value) {
+    public final void set(T value) {
         delegate.set(value);
         onSet();
     }

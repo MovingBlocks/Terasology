@@ -41,13 +41,13 @@ public interface TypeWidgetFactory {
     /**
      * Creates a {@link UIWidget} bound to an object of the given type. The created widget can
      * be used to edit the object, which must not be null. The object is accessed via an
-     * {@link Binding}, so that immutable objects can also be set correctly.
+     * {@link Binding}, so that it can be set at the source.
      * <p>
-     * TODO: Update
-     * To correctly account for immutability, {@link Binding#get() object.get()} must always be
-     * used to retrieve the object, and the result must never be cached. If a {@link Binding}
-     * must be created for an object that is contained in {@code object} (like a field, for example),
-     * it must be created via {@link Binding#makeChildBinding(Binding) object.makeChildBinding()}.
+     * <li>To correctly account for changes in the object, {@link Binding#get() binding.get()} must always be
+     * used to retrieve the object, and the result must never be cached.</li>
+     * <li>If a {@link Binding} must be created for an object that is contained in {@code binding}
+     * (like a field, for example), it must be created via
+     * {@link Binding#makeChildBinding(Binding) binding.makeChildBinding()}.</li>
      *
      * TODO: Add must also handle null clause
      * TODO: Add "nameable" widget details
@@ -59,7 +59,6 @@ public interface TypeWidgetFactory {
      * @return An {@link Optional} containing the created {@link UIWidget}, else
      * {@link Optional#empty()} if the factory does not support this type of object.
      */
-    // TODO: Use TypeInfo
     // TODO: Split into create and bind, cache results of create (if possible)
     //  to support recursive types
     <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library);
