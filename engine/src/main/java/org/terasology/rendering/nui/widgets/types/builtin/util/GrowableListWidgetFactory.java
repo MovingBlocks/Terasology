@@ -143,40 +143,42 @@ public abstract class GrowableListWidgetFactory<C, E> {
     }
 
     private Optional<UIWidget> createElementLayout(int elementIndex, ColumnLayout collectionLayout) {
+        Binding<E> elementBinding = elements.get(elementIndex);
+
         Optional<UIWidget> optionalElementWidget = library.getWidget(
-            elements.get(elementIndex),
+            elementBinding,
             elementType
         );
 
         if (!optionalElementWidget.isPresent()) {
             LOGGER.error(
                 "Could not get widget for element {} in collection",
-                elements.get(elementIndex)
+                elementBinding
             );
             return Optional.empty();
         }
 
         UIWidget elementWidget = optionalElementWidget.get();
 
+        RowLayout elementLayout = new RowLayout();
+        elementLayout.setHorizontalSpacing(5);
+
         UIButton removeButton = new UIButton();
         // TODO: Translate
         removeButton.setText("Remove");
 
         removeButton.subscribe(widget -> {
-            elements.remove(elementIndex);
+            elements.remove(elementBinding);
             updateBinding();
 
-            Optional<UIWidget> elementLayout = elementLayouts.remove(elementIndex);
-            elementLayout.ifPresent(collectionLayout::removeWidget);
+            collectionLayout.removeWidget(elementLayout);
+            elementLayouts.remove(Optional.of(elementLayout));
 
             updateElementLabels();
         });
 
         // TODO: Translate
         String elementLabelText = getElementLabelText(elementIndex);
-
-        RowLayout elementLayout = new RowLayout();
-        elementLayout.setHorizontalSpacing(5);
 
         ColumnLayout removeButtonLayout = new ColumnLayout();
 
