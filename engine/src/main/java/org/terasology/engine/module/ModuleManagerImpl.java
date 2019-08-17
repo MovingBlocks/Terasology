@@ -41,7 +41,6 @@ import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.naming.Name;
-import org.terasology.reflection.internal.TypeRegistryImpl;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -120,11 +119,11 @@ public class ModuleManagerImpl implements ModuleManager {
         installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
-    public ModuleManagerImpl(Config config, TypeRegistryImpl typeRegistry) {
-        this(config, Collections.emptyList(), typeRegistry);
+    public ModuleManagerImpl(Config config) {
+        this(config, Collections.emptyList());
     }
 
-    public ModuleManagerImpl(Config config, List<Class<?>> classesOnClasspathsToAddToEngine, TypeRegistryImpl typeRegistry) {
+    public ModuleManagerImpl(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 

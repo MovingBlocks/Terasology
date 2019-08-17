@@ -65,7 +65,6 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.reflection.internal.TypeRegistryImpl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
@@ -269,7 +268,7 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
-        TypeRegistryImpl typeRegistry = new TypeRegistryImpl();
+        TypeRegistry typeRegistry = new TypeRegistry();
         context.put(TypeRegistry.class, typeRegistry);
 
         ModuleManager moduleManager = ModuleManagerFactory.create();

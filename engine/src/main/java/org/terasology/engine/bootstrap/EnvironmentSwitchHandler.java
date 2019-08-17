@@ -15,9 +15,6 @@
  */
 package org.terasology.engine.bootstrap;
 
-import java.lang.reflect.Type;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -46,11 +43,12 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
-import org.terasology.reflection.internal.TypeRegistryImpl;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.GenericsUtil;
 import org.terasology.utilities.ReflectionUtil;
+
+import java.lang.reflect.Type;
+import java.util.Optional;
 
 /**
  * Handles an environment switch by updating the asset manager, component library, and other context objects.
@@ -69,7 +67,7 @@ public final class EnvironmentSwitchHandler {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         ModuleEnvironment environment = moduleManager.getEnvironment();
 
-        TypeRegistryImpl typeRegistry = (TypeRegistryImpl) context.get(TypeRegistry.class);
+        TypeRegistry typeRegistry = context.get(TypeRegistry.class);
         typeRegistry.reload(environment);
 
         CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);

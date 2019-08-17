@@ -25,7 +25,6 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.reflection.internal.TypeRegistryImpl;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.nio.file.FileSystem;
@@ -50,7 +49,7 @@ public abstract class ModuleEnvironmentTest {
         assumeTrue(result.isSuccess());
 
         ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
-        typeRegistry = new TypeRegistryImpl(environment);
+        typeRegistry = new TypeRegistry(environment);
 
         setup();
     }

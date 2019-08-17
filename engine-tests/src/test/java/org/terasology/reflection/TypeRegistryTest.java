@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.reflection.internal;
+package org.terasology.reflection;
 
 import org.junit.Test;
 import org.reflections.Reflections;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-public class TypeRegistryImplTest extends ModuleEnvironmentTest {
+public class TypeRegistryTest extends ModuleEnvironmentTest {
     static {
         Reflections.log = null;
     }
