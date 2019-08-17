@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets.types.builtin.object;
 
+import com.google.common.base.Defaults;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Streams;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -313,9 +313,6 @@ class ObjectLayoutBuilder<T> {
         constructorLayout.addWidget(constructorSelection);
         constructorLayout.addWidget(parameterLayout);
         constructorLayout.addWidget(createInstanceButton);
-
-        populateConstructorParameters(parameterLayout, createInstanceButton,
-            selectedType, selectedConstructor);
     }
 
     private void populateConstructorParameters(ColumnLayout parameterLayout,
@@ -335,7 +332,7 @@ class ObjectLayoutBuilder<T> {
 
         List<Binding<?>> argumentBindings =
             parameterTypes.stream()
-                .map(parameterType -> new DefaultBinding<>())
+                .map(parameterType -> new DefaultBinding<>(Defaults.defaultValue(parameterType.getRawType())))
                 .collect(Collectors.toList());
 
         createInstanceButton.subscribe(widget -> {
@@ -439,14 +436,14 @@ class ObjectLayoutBuilder<T> {
 
             UIWidget fieldWidget = optionalFieldWidget.get();
             // TODO: Translate
-            String fieldLabel = "Field '" + field.getName() + "'";
+            String fieldLabel = field.getName();
 
             fieldsLayout.addWidget(WidgetUtil.labelize(fieldWidget, fieldLabel, LABEL_WIDGET_ID));
         }
     }
 
     private <F> Optional<UIWidget> getFieldWidget(Field field, TypeInfo<F> fieldType) {
-        Optional<Binding<F>> fieldBinding = getFieldBinding(field, fieldType);
+        Optional<Binding<F>> fieldBinding = getFieldBinding(field);
 
         if (!fieldBinding.isPresent()) {
             return Optional.empty();
@@ -462,17 +459,17 @@ class ObjectLayoutBuilder<T> {
         return widget;
     }
 
-    private <F> Optional<Binding<F>> getFieldBinding(Field field, TypeInfo<F> fieldType) {
+    private <F> Optional<Binding<F>> getFieldBinding(Field field) {
         if (Modifier.isPublic(field.getModifiers())) {
             return Optional.of(
-                getAccessibleFieldBinding(field, fieldType)
+                getAccessibleFieldBinding(field)
             );
         }
 
-        return getPropertyBinding(field, fieldType);
+        return getPropertyBinding(field);
     }
 
-    private <F> Optional<Binding<F>> getPropertyBinding(Field field, TypeInfo<F> fieldType) {
+    private <F> Optional<Binding<F>> getPropertyBinding(Field field) {
         Method setter = ReflectionUtil.findSetter(field);
 
         if (setter == null) {
@@ -491,7 +488,7 @@ class ObjectLayoutBuilder<T> {
                 @Override
                 public F get() {
                     try {
-                        return fieldType.getRawType().cast(getter.invoke(binding.get()));
+                        return (F) getter.invoke(binding.get());
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException("Unreachable");
                     } catch (InvocationTargetException e) {
@@ -513,12 +510,15 @@ class ObjectLayoutBuilder<T> {
         );
     }
 
-    private <F> Binding<F> getAccessibleFieldBinding(Field field, TypeInfo<F> fieldType) {
+    private <F> Binding<F> getAccessibleFieldBinding(Field field) {
+        // For final fields
+        field.setAccessible(true);
+
         return new Binding<F>() {
             @Override
             public F get() {
                 try {
-                    return fieldType.getRawType().cast(field.get(binding.get()));
+                    return (F) field.get(binding.get());
                 } catch (IllegalAccessException e) {
                     // Field is public
                     throw new RuntimeException("Unreachable");

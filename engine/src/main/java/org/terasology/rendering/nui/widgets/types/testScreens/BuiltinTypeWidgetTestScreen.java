@@ -16,10 +16,10 @@
 package org.terasology.rendering.nui.widgets.types.testScreens;
 
 import com.google.common.collect.ImmutableList;
+import org.terasology.entitySystem.Component;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
@@ -44,6 +44,8 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
 
         newBinding(new TypeInfo<Container>() {});
         newBinding(new TypeInfo<List<Base<Integer>>>() {});
+
+        newBinding(WithFinalFields.class);
 
         // TODO: Test Queue
     }
@@ -114,6 +116,24 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
         public String toString() {
             return "Container{" +
                        "base=" + base +
+                       '}';
+        }
+    }
+
+    public static class WithFinalFields {
+        public final int finalInt;
+        public final float finalFloat;
+
+        public WithFinalFields(int finalInt, float finalFloat) {
+            this.finalInt = finalInt;
+            this.finalFloat = finalFloat;
+        }
+
+        @Override
+        public String toString() {
+            return "WithFinalFields{" +
+                       "finalInt=" + finalInt +
+                       ", finalFloat=" + finalFloat +
                        '}';
         }
     }
