@@ -120,6 +120,10 @@ public class TypeRegistryImpl implements TypeRegistry {
         initializeReflections(classLoader);
 
         for (Module module : environment.getModulesOrderedByDependencies()) {
+            if (!module.isCodeModule()) {
+                continue;
+            }
+
             reflections.merge(module.getReflectionsFragment());
         }
     }
