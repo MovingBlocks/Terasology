@@ -22,6 +22,8 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.databinding.InteriorMutationNotifyingBinding;
+import org.terasology.rendering.nui.databinding.NotifyingBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.RowLayoutHint;
@@ -48,6 +50,7 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
     private TypeWidgetLibrary typeWidgetLibrary;
 
     private Map<TypeInfo<?>, Binding<?>> bindings = new LinkedHashMap<>();
+    private UIText bindingsLog;
 
     @Override
     public void initialise() {
@@ -58,42 +61,35 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
         mainContainer.setFillVerticalSpace(false);
         mainContainer.setVerticalSpacing(5);
 
-        addWidgets();
-
-        UIText bindingsLog = new UIText();
+        bindingsLog = new UIText();
 
         bindingsLog.setReadOnly(true);
         bindingsLog.setMultiline(true);
 
-        bindingsLog.setText(String.join("", Collections.nCopies(bindings.size() - 1, "\n")));
-
-        UIButton logBindingsButton = new UIButton();
-
-        logBindingsButton.setText("Print Binding Values");
-
-        logBindingsButton.subscribe(widget -> {
-            String logs = bindings.entrySet()
-                              .stream()
-                              .map(
-                                  binding ->
-                                      MessageFormat.format(
-                                          "{0} binding has a value {1} of type {2}",
-                                          typeInfoToString(binding.getKey()),
-                                          toString(binding.getValue().get()),
-                                          Objects.toString(
-                                              Optional.ofNullable(binding.getValue().get())
-                                                  .map(val -> val.getClass().getSimpleName())
-                                                  .orElse(null)
-                                          )
-                                      )
-                              )
-                              .collect(Collectors.joining("\n"));
-
-            bindingsLog.setText(logs);
-        });
+        addWidgets();
 
         mainContainer.addWidget(bindingsLog);
-        mainContainer.addWidget(logBindingsButton);
+    }
+
+    private void dumpBindings() {
+        String logs = bindings.entrySet()
+                          .stream()
+                          .map(
+                              binding ->
+                                  MessageFormat.format(
+                                      "{0} binding has a value {1} of type {2}",
+                                      typeInfoToString(binding.getKey()),
+                                      toString(binding.getValue().get()),
+                                      Objects.toString(
+                                          Optional.ofNullable(binding.getValue().get())
+                                              .map(val -> val.getClass().getSimpleName())
+                                              .orElse(null)
+                                      )
+                                  )
+                          )
+                          .collect(Collectors.joining("\n"));
+
+        bindingsLog.setText(logs);
     }
 
     public String toString(Object object) {
@@ -111,7 +107,15 @@ public abstract class TypeWidgetTestScreen extends CoreScreenLayer {
     }
 
     protected <T> void newBinding(TypeInfo<T> type) {
-        Binding<T> binding = new DefaultBinding<>();
+        Binding<T> binding = new InteriorMutationNotifyingBinding<>(
+            new NotifyingBinding<T>() {
+                @Override
+                protected void onSet() {
+                    dumpBindings();
+                }
+            },
+            this::dumpBindings
+        );
 
         bindings.put(type, binding);
 
