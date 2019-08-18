@@ -40,7 +40,7 @@ import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
-import org.terasology.rendering.nui.widgets.types.builtin.util.ObjectWidgetUtil;
+import org.terasology.rendering.nui.widgets.types.builtin.util.FieldsWidgetBuilder;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
@@ -61,17 +61,17 @@ class ObjectLayoutBuilder<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObjectWidgetFactory.class);
 
     private final Binding<T> binding;
-    private final TypeInfo<? extends T> type;
+    private final TypeInfo<T> type;
     private final TypeWidgetLibrary library;
 
     private final ColumnLayout mainLayout;
     private final UILabel nameWidget = new UILabel(LABEL_WIDGET_ID, "");
     private final ColumnLayout innerExpandableLayout = createDefaultLayout();
 
-    private final List<TypeInfo<? extends T>> allowedSubtypes;
+    private final List<TypeInfo<T>> allowedSubtypes;
     private final ModuleManager moduleManager;
 
-    private TypeInfo<? extends T> editingType;
+    private TypeInfo<T> editingType;
 
     public ObjectLayoutBuilder(Binding<T> binding,
                                TypeInfo<T> type,
@@ -159,7 +159,7 @@ class ObjectLayoutBuilder<T> {
                 .stream()
                 .map(clazz -> {
                     Type parameterized = ReflectionUtil.parameterizeandResolveRawType(type.getType(), clazz);
-                    return (TypeInfo<? extends T>) TypeInfo.of(parameterized);
+                    return (TypeInfo<T>) TypeInfo.of(parameterized);
                 })
                 .collect(Collectors.toList());
     }
@@ -218,8 +218,8 @@ class ObjectLayoutBuilder<T> {
 
         ColumnLayout constructorLayout = createDefaultLayout();
 
-        Binding<TypeInfo<? extends T>> selectedType =
-            new NotifyingBinding<TypeInfo<? extends T>>(allowedSubtypes.get(0)) {
+        Binding<TypeInfo<T>> selectedType =
+            new NotifyingBinding<TypeInfo<T>>(allowedSubtypes.get(0)) {
                 @Override
                 protected void onSet() {
                     // TODO: Check if we already can create a UIWidget for the selected type
@@ -227,13 +227,13 @@ class ObjectLayoutBuilder<T> {
                 }
             };
 
-        UIDropdownScrollable<TypeInfo<? extends T>> typeSelection = new UIDropdownScrollable<>();
+        UIDropdownScrollable<TypeInfo<T>> typeSelection = new UIDropdownScrollable<>();
 
         typeSelection.setOptions(allowedSubtypes);
         typeSelection.bindSelection(selectedType);
-        typeSelection.setOptionRenderer(new StringTextRenderer<TypeInfo<? extends T>>() {
+        typeSelection.setOptionRenderer(new StringTextRenderer<TypeInfo<T>>() {
             @Override
-            public String getString(TypeInfo<? extends T> value) {
+            public String getString(TypeInfo<T> value) {
                 return getTypeName(value);
             }
         });
@@ -245,7 +245,7 @@ class ObjectLayoutBuilder<T> {
         instantiatorLayout.addWidget(constructorLayout);
     }
 
-    public String getTypeName(TypeInfo<? extends T> value) {
+    public String getTypeName(TypeInfo<?> value) {
         return ReflectionUtil.getTypeUri(value.getType(), moduleManager.getEnvironment());
     }
 
@@ -258,7 +258,7 @@ class ObjectLayoutBuilder<T> {
     }
 
     private void populateConstructorLayout(ColumnLayout constructorLayout,
-                                           Binding<TypeInfo<? extends T>> selectedType) {
+                                           Binding<TypeInfo<T>> selectedType) {
         constructorLayout.removeAllWidgets();
 
         List<Constructor<T>> constructors =
@@ -317,7 +317,7 @@ class ObjectLayoutBuilder<T> {
 
     private void populateConstructorParameters(ColumnLayout parameterLayout,
                                                UIButton createInstanceButton,
-                                               Binding<TypeInfo<? extends T>> selectedType,
+                                               Binding<TypeInfo<T>> selectedType,
                                                Binding<Constructor<T>> selectedConstructor) {
         parameterLayout.removeAllWidgets();
 
@@ -390,11 +390,11 @@ class ObjectLayoutBuilder<T> {
     private void buildEditorLayout(ColumnLayout fieldsLayout) {
         if (!editingType.getRawType().equals(binding.get().getClass())) {
             Type actual = ReflectionUtil.parameterizeandResolveRawType(type.getType(), binding.get().getClass());
-            editingType = (TypeInfo<? extends T>) TypeInfo.of(actual);
+            editingType = (TypeInfo<T>) TypeInfo.of(actual);
         }
 
         if (!allowedSubtypes.contains(editingType)) {
-            Optional<TypeInfo<? extends T>> closestMatch =
+            Optional<TypeInfo<T>> closestMatch =
                 allowedSubtypes.stream()
                     .filter(subtype -> subtype.getRawType().isAssignableFrom(editingType.getRawType()))
                     .findFirst();
@@ -422,41 +422,8 @@ class ObjectLayoutBuilder<T> {
 
         fieldsLayout.addWidget(setToNull);
 
-        for (Field field : ReflectionUtils.getAllFields(editingType.getRawType())) {
-            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
+        FieldsWidgetBuilder<T> fieldsWidgetBuilder = new FieldsWidgetBuilder<>(binding, editingType, library);
 
-            Type resolvedFieldType = ReflectionUtil.resolveType(editingType.getType(), field.getGenericType());
-            Optional<UIWidget> optionalFieldWidget = getFieldWidget(field, TypeInfo.of(resolvedFieldType));
-
-            if (!optionalFieldWidget.isPresent()) {
-                continue;
-            }
-
-            UIWidget fieldWidget = optionalFieldWidget.get();
-            // TODO: Translate
-            String fieldLabel = field.getName();
-
-            fieldsLayout.addWidget(WidgetUtil.labelize(fieldWidget, fieldLabel, LABEL_WIDGET_ID));
-        }
+        fieldsWidgetBuilder.getFieldWidgets().forEach(fieldsLayout::addWidget);
     }
-
-    private <F> Optional<UIWidget> getFieldWidget(Field field, TypeInfo<F> fieldType) {
-        Optional<Binding<F>> fieldBinding = ObjectWidgetUtil.getFieldBinding(binding, field);
-
-        if (!fieldBinding.isPresent()) {
-            return Optional.empty();
-        }
-
-        Optional<UIWidget> widget = library.getWidget(fieldBinding.get(), fieldType);
-
-        if (!widget.isPresent()) {
-            LOGGER.warn("Could not create a UIWidget for field {}", field);
-            return Optional.empty();
-        }
-
-        return widget;
-    }
-
 }
