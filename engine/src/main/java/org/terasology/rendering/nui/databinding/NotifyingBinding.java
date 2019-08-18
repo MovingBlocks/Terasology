@@ -38,6 +38,9 @@ public abstract class NotifyingBinding<T> implements Binding<T> {
     }
 
     @Override
+    public <C> Binding<C> makeChildBinding(Binding<C> binding) {return delegate.makeChildBinding(binding);}
+
+    @Override
     public final T get() {
         onGet();
         return delegate.get();
