@@ -40,12 +40,12 @@ import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.rendering.nui.widgets.types.builtin.util.ObjectWidgetUtil;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
@@ -53,7 +53,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
@@ -165,14 +164,6 @@ class ObjectLayoutBuilder<T> {
                 .collect(Collectors.toList());
     }
 
-    private Name getModuleProviding(Class<?> type) {
-        if (type.getClassLoader() == null) {
-            return null;
-        }
-
-        return moduleManager.getEnvironment().getModuleProviding(type);
-    }
-
     private static ColumnLayout createDefaultLayout() {
         ColumnLayout layout = new ColumnLayout();
 
@@ -181,6 +172,14 @@ class ObjectLayoutBuilder<T> {
         layout.setVerticalSpacing(5);
 
         return layout;
+    }
+
+    private Name getModuleProviding(Class<?> type) {
+        if (type.getClassLoader() == null) {
+            return null;
+        }
+
+        return moduleManager.getEnvironment().getModuleProviding(type);
     }
 
     public UIWidget getLayout() {
@@ -444,13 +443,13 @@ class ObjectLayoutBuilder<T> {
     }
 
     private <F> Optional<UIWidget> getFieldWidget(Field field, TypeInfo<F> fieldType) {
-        Optional<Binding<F>> fieldBinding = getFieldBinding(field);
+        Optional<Binding<F>> fieldBinding = ObjectWidgetUtil.getFieldBinding(binding, field);
 
         if (!fieldBinding.isPresent()) {
             return Optional.empty();
         }
 
-        Optional<UIWidget> widget = library.getWidget(binding.makeChildBinding(fieldBinding.get()), fieldType);
+        Optional<UIWidget> widget = library.getWidget(fieldBinding.get(), fieldType);
 
         if (!widget.isPresent()) {
             LOGGER.warn("Could not create a UIWidget for field {}", field);
@@ -458,84 +457,6 @@ class ObjectLayoutBuilder<T> {
         }
 
         return widget;
-    }
-
-    private <F> Optional<Binding<F>> getFieldBinding(Field field) {
-        if (Modifier.isPublic(field.getModifiers())) {
-            return Optional.of(
-                getAccessibleFieldBinding(field)
-            );
-        }
-
-        return getPropertyBinding(field);
-    }
-
-    private <F> Optional<Binding<F>> getPropertyBinding(Field field) {
-        Method setter = ReflectionUtil.findSetter(field);
-
-        if (setter == null) {
-            return Optional.empty();
-        }
-
-        Method getter = ReflectionUtil.findGetter(field);
-
-        if (getter == null) {
-            LOGGER.error("Cannot edit field {} with setter {} but no getter", field, setter);
-            return Optional.empty();
-        }
-
-        return Optional.of(
-            new Binding<F>() {
-                @Override
-                public F get() {
-                    try {
-                        return (F) getter.invoke(binding.get());
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException("Unreachable");
-                    } catch (InvocationTargetException e) {
-                        throw new RuntimeException(e.getCause());
-                    }
-                }
-
-                @Override
-                public void set(F value) {
-                    try {
-                        setter.invoke(binding.get(), value);
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException("Unreachable");
-                    } catch (InvocationTargetException e) {
-                        throw new RuntimeException(e.getCause());
-                    }
-                }
-            }
-        );
-    }
-
-    private <F> Binding<F> getAccessibleFieldBinding(Field field) {
-        // For final fields
-        field.setAccessible(true);
-
-        return new Binding<F>() {
-            @Override
-            public F get() {
-                try {
-                    return (F) field.get(binding.get());
-                } catch (IllegalAccessException e) {
-                    // Field is public
-                    throw new RuntimeException("Unreachable");
-                }
-            }
-
-            @Override
-            public void set(F value) {
-                try {
-                    field.set(binding.get(), value);
-                } catch (IllegalAccessException e) {
-                    // Field is public
-                    throw new RuntimeException("Unreachable");
-                }
-            }
-        };
     }
 
 }
