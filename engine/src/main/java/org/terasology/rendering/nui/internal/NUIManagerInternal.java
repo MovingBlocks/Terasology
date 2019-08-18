@@ -484,7 +484,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         Module declaringModule = moduleEnvironment.get(screenUri.getModuleName());
         TypeWidgetLibrary moduleLibrary =
-            new TypeWidgetLibrary(typeWidgetFactoryRegistry, declaringModule);
+            new TypeWidgetLibraryImpl(typeWidgetFactoryRegistry, declaringModule);
 
         InjectionHelper.inject(overlay, In.class, ImmutableMap.of(TypeWidgetLibrary.class, moduleLibrary));
 
