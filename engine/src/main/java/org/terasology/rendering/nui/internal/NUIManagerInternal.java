@@ -68,6 +68,8 @@ import org.terasology.rendering.nui.SortOrderSystem;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
+import org.terasology.rendering.nui.widgets.types.RegisterTypeWidgetFactory;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactoryRegistry;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.utilities.Assets;
@@ -154,9 +156,23 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
 
         moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
-        // TODO: Remove and use annotation?
+
         typeWidgetFactoryRegistry = new TypeWidgetFactoryRegistry(context);
         context.put(TypeWidgetFactoryRegistry.class, typeWidgetFactoryRegistry);
+
+        registerTypeWidgetFactories();
+    }
+
+    private void registerTypeWidgetFactories() {
+        for (Class<? extends TypeWidgetFactory> clazz : moduleEnvironment.getSubtypesOf(TypeWidgetFactory.class)) {
+            if (!clazz.isAnnotationPresent(RegisterTypeWidgetFactory.class)) {
+                continue;
+            }
+
+            TypeWidgetFactory instance = InjectionHelper.createWithConstructorInjection(clazz, context);
+            InjectionHelper.inject(instance, context);
+            typeWidgetFactoryRegistry.add(instance);
+        }
     }
 
     @Override

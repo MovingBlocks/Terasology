@@ -15,21 +15,11 @@
  */
 package org.terasology.rendering.nui.widgets.types;
 
-import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.Optional;
-
-/**
- * Creates {@link UIWidget UIWidgets} to edit objects of various types.
- *
- * Instances can only be accessed via injection (see {@link org.terasology.registry.In}) in
- * screens and overlays.
- */
-public interface TypeWidgetLibrary {
-
-    <T> Optional<UIWidget> getWidget(Binding<T> binding, TypeInfo<T> type);
-
-    <T> Optional<UIWidget> getWidget(Binding<T> binding, Class<T> type);
-}
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface RegisterTypeWidgetFactory {}
