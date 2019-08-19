@@ -45,9 +45,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class TypeWidgetLibraryImpl implements TypeWidgetLibrary {
-    private final Map<Type, InstanceCreator<?>> instanceCreators = Maps.newHashMap();
-    private final ConstructorLibrary constructorLibrary = new ConstructorLibrary(instanceCreators);
-
     private final TypeWidgetFactoryRegistry widgetFactories;
     private final Module contextModule;
 
@@ -55,32 +52,6 @@ public class TypeWidgetLibraryImpl implements TypeWidgetLibrary {
                                  Module contextModule) {
         this.widgetFactories = widgetFactories;
         this.contextModule = contextModule;
-
-        addFactoriesForBuiltinTypes();
-    }
-
-    private void addFactoriesForBuiltinTypes() {
-        addTypeWidgetFactory(new ObjectWidgetFactory());
-
-        addTypeWidgetFactory(new BooleanWidgetFactory());
-
-        addTypeWidgetFactory(new ByteWidgetFactory());
-        addTypeWidgetFactory(new ShortWidgetFactory());
-        addTypeWidgetFactory(new IntegerWidgetFactory());
-        addTypeWidgetFactory(new LongWidgetFactory());
-        addTypeWidgetFactory(new FloatWidgetFactory());
-        addTypeWidgetFactory(new DoubleWidgetFactory());
-
-        addTypeWidgetFactory(new StringWidgetFactory());
-
-        addTypeWidgetFactory(new EnumWidgetFactory());
-        addTypeWidgetFactory(new CollectionWidgetFactory(constructorLibrary));
-        addTypeWidgetFactory(new ArrayWidgetFactory(constructorLibrary));
-    }
-
-    @Override
-    public void addTypeWidgetFactory(TypeWidgetFactory typeWidgetFactory) {
-        widgetFactories.add(typeWidgetFactory);
     }
 
     @Override
