@@ -74,17 +74,17 @@ public class FieldsWidgetBuilder<T> {
         }
     }
 
-    private <F> Optional<Binding<F>> getFieldBinding(Field field) {
+    public static <F> Optional<Binding<F>> getFieldBinding(Binding<?> binding, Field field) {
         if (Modifier.isPublic(field.getModifiers())) {
             return Optional.of(
-                getAccessibleFieldBinding(field)
+                getAccessibleFieldBinding(binding, field)
             );
         }
 
-        return getPropertyBinding(field);
+        return getPropertyBinding(binding, field);
     }
 
-    private <F> Optional<Binding<F>> getPropertyBinding(Field field) {
+    private static <F> Optional<Binding<F>> getPropertyBinding(Binding<?> binding, Field field) {
         Method setter = ReflectionUtil.findSetter(field);
 
         if (setter == null) {
@@ -125,7 +125,7 @@ public class FieldsWidgetBuilder<T> {
         return Optional.of(binding.makeChildBinding(fieldBinding));
     }
 
-    private <F> Binding<F> getAccessibleFieldBinding(Field field) {
+    private static <F> Binding<F> getAccessibleFieldBinding(Binding<?> binding, Field field) {
         // For final fields
         field.setAccessible(true);
 
@@ -174,7 +174,7 @@ public class FieldsWidgetBuilder<T> {
     }
 
     private <F> Optional<UIWidget> getFieldWidget(Field field, TypeInfo<F> fieldType) {
-        Optional<Binding<F>> fieldBinding = getFieldBinding(field);
+        Optional<Binding<F>> fieldBinding = getFieldBinding(binding, field);
 
         if (!fieldBinding.isPresent()) {
             return Optional.empty();
