@@ -21,6 +21,7 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.NotifyingBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
@@ -96,7 +97,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
 
     private Binding<E> getBindingForElement(E element) {
         return binding.makeChildBinding(
-            new NotifyingBinding<E>(element) {
+            new NotifyingBinding<E>(new DefaultBinding<>(element)) {
                 @Override
                 protected void onSet() {
                     updateBinding();
