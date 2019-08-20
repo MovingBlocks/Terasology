@@ -20,7 +20,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.BrownianNoise;
-import org.terasology.utilities.procedural.PerlinNoise;
+import org.terasology.utilities.procedural.SimplexNoise;
 import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.ConfigurableFacetProvider;
@@ -30,11 +30,9 @@ import org.terasology.world.generation.facets.SurfaceHumidityFacet;
 
 /**
  * Defines surface humidity in the range [0..1] based on random noise.
- * @deprecated Prefer using {@link SimplexHumidityProvider}.
  */
-@Deprecated
 @Produces(SurfaceHumidityFacet.class)
-public class PerlinHumidityProvider implements ConfigurableFacetProvider {
+public class SimplexHumidityProvider implements ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;
 
     private SubSampledNoise humidityNoise;
@@ -43,14 +41,14 @@ public class PerlinHumidityProvider implements ConfigurableFacetProvider {
 
     private long seed;
 
-    public PerlinHumidityProvider() {
+    public SimplexHumidityProvider() {
         // use default values
     }
 
     /**
      * @param config the config to use
      */
-    public PerlinHumidityProvider(Configuration config) {
+    public SimplexHumidityProvider(Configuration config) {
         this.config = config;
     }
 
@@ -92,7 +90,7 @@ public class PerlinHumidityProvider implements ConfigurableFacetProvider {
     private void reload() {
         float realScale = config.scale * 0.01f;
         Vector2f scale = new Vector2f(realScale, realScale);
-        BrownianNoise brown = new BrownianNoise(new PerlinNoise(seed + 6), config.octaves);
+        BrownianNoise brown = new BrownianNoise(new SimplexNoise(seed + 6), config.octaves);
         humidityNoise = new SubSampledNoise(brown, scale, SAMPLE_RATE);
     }
 

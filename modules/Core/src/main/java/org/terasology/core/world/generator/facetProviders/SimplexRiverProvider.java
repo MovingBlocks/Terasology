@@ -20,45 +20,44 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.BrownianNoise;
-import org.terasology.utilities.procedural.PerlinNoise;
+import org.terasology.utilities.procedural.SimplexNoise;
 import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
+import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Updates;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
- * Applies an amount of the max depth for regions that are oceans
- * @deprecated Prefer using {@link SimplexOceanProvider}.
+ * Applies an amount of the max depth for regions that are rivers
  */
-@Deprecated
 @Updates(@Facet(SurfaceHeightFacet.class))
-public class PerlinOceanProvider implements ConfigurableFacetProvider {
+public class SimplexRiverProvider implements FacetProvider, ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;
 
-    private SubSampledNoise oceanNoise;
-    private PerlinOceanConfiguration configuration = new PerlinOceanConfiguration();
+    private SubSampledNoise riverNoise;
+    private SimplexRiverProviderConfiguration configuration = new SimplexRiverProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
-        oceanNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 1), 8), new Vector2f(0.0009f, 0.0009f), SAMPLE_RATE);
+        riverNoise = new SubSampledNoise(new BrownianNoise(new SimplexNoise(seed + 2), 8), new Vector2f(0.0008f, 0.0008f), SAMPLE_RATE);
     }
 
     @Override
     public void process(GeneratingRegion region) {
         SurfaceHeightFacet facet = region.getRegionFacet(SurfaceHeightFacet.class);
-        float[] noise = oceanNoise.noise(facet.getWorldRegion());
+        float[] noise = riverNoise.noise(facet.getWorldRegion());
 
         float[] surfaceHeights = facet.getInternal();
         for (int i = 0; i < noise.length; ++i) {
-            surfaceHeights[i] -= configuration.maxDepth * TeraMath.clamp(noise[i] * 8.0f * 2.11f + 0.25f);
+            surfaceHeights[i] += configuration.maxDepth * TeraMath.clamp(7f * (TeraMath.sqrt(Math.abs(noise[i] * 2.11f)) - 0.1f) + 0.25f);
         }
     }
 
     @Override
     public String getConfigurationName() {
-        return "Oceans";
+        return "Rivers";
     }
 
     @Override
@@ -68,11 +67,11 @@ public class PerlinOceanProvider implements ConfigurableFacetProvider {
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (PerlinOceanConfiguration) configuration;
+        this.configuration = (SimplexRiverProviderConfiguration) configuration;
     }
 
-    private static class PerlinOceanConfiguration implements Component {
-        @Range(min = 0, max = 128f, increment = 1f, precision = 0, description = "Ocean Depth")
-        public float maxDepth = 32;
+    private static class SimplexRiverProviderConfiguration implements Component {
+        @Range(min = 0, max = 64f, increment = 1f, precision = 0, description = "River Depth")
+        public float maxDepth = 16;
     }
 }

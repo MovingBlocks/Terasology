@@ -23,7 +23,7 @@ import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.BrownianNoise;
-import org.terasology.utilities.procedural.PerlinNoise;
+import org.terasology.utilities.procedural.SimplexNoise;
 import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
@@ -36,22 +36,20 @@ import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 /**
  * Adds surface height for hill and mountain regions. Mountain and hill regions are based off of temperature and humidity.
- * @deprecated Prefer using {@link SimplexHillsAndMountainsProvider}.
  */
-@Deprecated
 @Requires({@Facet(SurfaceTemperatureFacet.class), @Facet(SurfaceHumidityFacet.class)})
 @Updates(@Facet(SurfaceHeightFacet.class))
-public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvider {
+public class SimplexHillsAndMountainsProvider implements ConfigurableFacetProvider {
 
     private SubSampledNoise mountainNoise;
     private SubSampledNoise hillNoise;
-    private PerlinHillsAndMountainsProviderConfiguration configuration = new PerlinHillsAndMountainsProviderConfiguration();
+    private SimplexHillsAndMountainsProviderConfiguration configuration = new SimplexHillsAndMountainsProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
         // TODO: reduce the number of octaves in BrownianNoise
-        mountainNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 3)), new Vector2f(0.0002f, 0.0002f), 4);
-        hillNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 4)), new Vector2f(0.0008f, 0.0008f), 4);
+        mountainNoise = new SubSampledNoise(new BrownianNoise(new SimplexNoise(seed + 3)), new Vector2f(0.0002f, 0.0002f), 4);
+        hillNoise = new SubSampledNoise(new BrownianNoise(new SimplexNoise(seed + 4)), new Vector2f(0.0008f, 0.0008f), 4);
     }
 
     @Override
@@ -90,10 +88,10 @@ public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvide
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (PerlinHillsAndMountainsProviderConfiguration) configuration;
+        this.configuration = (SimplexHillsAndMountainsProviderConfiguration) configuration;
     }
 
-    private static class PerlinHillsAndMountainsProviderConfiguration implements Component {
+    private static class SimplexHillsAndMountainsProviderConfiguration implements Component {
 
         @Range(min = 0, max = 3f, increment = 0.01f, precision = 2, description = "Mountain Amplitude")
         public float mountainAmplitude = 1f;

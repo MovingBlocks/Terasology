@@ -18,7 +18,7 @@ package org.terasology.core.world.generator.facetProviders;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.utilities.procedural.BrownianNoise;
-import org.terasology.utilities.procedural.PerlinNoise;
+import org.terasology.utilities.procedural.SimplexNoise;
 import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
@@ -26,18 +26,16 @@ import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 /**
- * @deprecated Prefer using {@link SimplexSurfaceTemperatureProvider}.
  */
-@Deprecated
 @Produces(SurfaceTemperatureFacet.class)
-public class PerlinSurfaceTemperatureProvider implements FacetProvider {
+public class SimplexSurfaceTemperatureProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;
 
     private SubSampledNoise temperatureNoise;
 
     @Override
     public void setSeed(long seed) {
-        temperatureNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 5), 8), new Vector2f(0.0005f, 0.0005f), SAMPLE_RATE);
+        temperatureNoise = new SubSampledNoise(new BrownianNoise(new SimplexNoise(seed + 5), 8), new Vector2f(0.0005f, 0.0005f), SAMPLE_RATE);
     }
 
     @Override
