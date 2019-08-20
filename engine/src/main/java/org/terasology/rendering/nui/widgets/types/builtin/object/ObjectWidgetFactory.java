@@ -45,7 +45,7 @@ public class ObjectWidgetFactory implements TypeWidgetFactory {
             return Optional.empty();
         }
 
-        ObjectLayoutBuilder<T> layoutBuilder = new ObjectLayoutBuilder<>(binding, type, library, moduleManager, typeRegistry);
+        ObjectLayoutBuilder<T> layoutBuilder = new ObjectLayoutBuilder<>(binding, type, library);
 
         return Optional.of(layoutBuilder.getLayout());
     }

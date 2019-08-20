@@ -16,18 +16,9 @@
 package org.terasology.rendering.nui.widgets.types.builtin.object;
 
 import com.google.common.base.Defaults;
-import com.google.common.collect.ImmutableSet;
-import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.module.ModuleContext;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.sandbox.PermissionProvider;
-import org.terasology.naming.Name;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.TypeRegistry;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -40,229 +31,78 @@ import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.rendering.nui.widgets.types.builtin.util.ExpandableLayoutBuilder;
 import org.terasology.rendering.nui.widgets.types.builtin.util.FieldsWidgetBuilder;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
 
-class ObjectLayoutBuilder<T> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectWidgetFactory.class);
+public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectLayoutBuilder.class);
+    private static final String NULL_LABEL = "Object is null.";
+    private static final String MODIFY_LABEL = "Modify Object";
 
-    private final Binding<T> binding;
     private final TypeInfo<T> type;
     private final TypeWidgetLibrary library;
 
-    private final ColumnLayout mainLayout;
-    private final UILabel nameWidget = new UILabel(LABEL_WIDGET_ID, "");
-    private final ColumnLayout innerExpandableLayout = createDefaultLayout();
-
-    private final List<TypeInfo<T>> allowedSubtypes;
-    private final ModuleManager moduleManager;
-
-    private TypeInfo<T> editingType;
-
-    public ObjectLayoutBuilder(Binding<T> binding,
-                               TypeInfo<T> type,
-                               TypeWidgetLibrary library,
-                               ModuleManager moduleManager,
-                               TypeRegistry typeRegistry) {
+    public ObjectLayoutBuilder(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+        super(binding);
         this.type = type;
-        this.editingType = type;
         this.library = library;
-
-        this.binding = new NotifyingBinding<T>(binding) {
-            @Override
-            protected void onSet() {
-                if (!innerExpandableLayout.iterator().hasNext()) {
-                    // If it is empty (collapsed), we don't need to rebuild the inner layout
-                    return;
-                }
-
-                innerExpandableLayout.removeAllWidgets();
-                build(innerExpandableLayout);
-            }
-        };
-
-        this.moduleManager = moduleManager;
-
-        mainLayout = WidgetUtil.createExpandableLayout(
-            nameWidget,
-            () -> innerExpandableLayout,
-            this::build,
-            ObjectLayoutBuilder::createDefaultLayout
-        );
-
-        Module contextModule = ModuleContext.getContext();
-
-        PermissionProvider permissionProvider = moduleManager.getPermissionProvider(contextModule);
-
-        ModuleEnvironment environment = moduleManager.getEnvironment();
-
-        Set<Name> allowedProvidingModules =
-            ImmutableSet.<Name>builder()
-                .add(contextModule.getId())
-                .addAll(environment.getDependencyNamesOf(contextModule.getId()))
-                .build();
-
-        List<Class<? extends T>> allowedSubclasses =
-            typeRegistry.getSubtypesOf(type.getRawType())
-                .stream()
-                // Type must come from an allowed module or be in the whitelist
-                .filter(clazz -> allowedProvidingModules.contains(getModuleProviding(clazz)) ||
-                                     permissionProvider.isPermitted(clazz))
-                // Filter public, instantiable types
-                .filter(clazz -> {
-                    int modifiers = clazz.getModifiers();
-                    return Modifier.isPublic(modifiers) && !Modifier.isAbstract(modifiers) && !clazz.isInterface();
-                })
-                // Filter non-local, static inner classes
-                .filter(clazz -> {
-                    if (clazz.isLocalClass()) {
-                        return false;
-                    }
-                    return !clazz.isMemberClass() || Modifier.isStatic(clazz.getModifiers());
-                })
-                .collect(Collectors.toList());
-
-        allowedSubclasses.add(type.getRawType());
-
-        // Sort the subclasses so that the ones at the bottom of the inheritance tree are
-        // near the beginning -- useful when finding the closest parent in inheritance tree
-        for (int i = 0; i < allowedSubclasses.size() - 1; i++) {
-            Class<? extends T> a = allowedSubclasses.get(i);
-            for (int j = i + 1; j < allowedSubclasses.size(); j++) {
-                Class<? extends T> b = allowedSubclasses.get(j);
-
-                if (!a.isAssignableFrom(b)) {
-                    continue;
-                }
-
-                allowedSubclasses.set(i, b);
-                allowedSubclasses.set(j, a);
-            }
-        }
-
-        allowedSubtypes =
-            allowedSubclasses
-                .stream()
-                .map(clazz -> {
-                    Type parameterized = ReflectionUtil.parameterizeandResolveRawType(type.getType(), clazz);
-                    return (TypeInfo<T>) TypeInfo.of(parameterized);
-                })
-                .collect(Collectors.toList());
-    }
-
-    private static ColumnLayout createDefaultLayout() {
-        ColumnLayout layout = new ColumnLayout();
-
-        layout.setFillVerticalSpace(false);
-        layout.setAutoSizeColumns(false);
-        layout.setVerticalSpacing(5);
-
-        return layout;
-    }
-
-    private Name getModuleProviding(Class<?> type) {
-        if (type.getClassLoader() == null) {
-            return null;
-        }
-
-        return moduleManager.getEnvironment().getModuleProviding(type);
     }
 
     public UIWidget getLayout() {
         return mainLayout;
     }
 
-    private void build(ColumnLayout layout) {
+    @Override
+    protected void populate(ColumnLayout layout) {
+        layout.removeAllWidgets();
+
         if (binding.get() == null) {
-            buildNullLayout(layout);
+            populateNullLayout(layout);
         } else {
             buildEditorLayout(layout);
         }
     }
 
-    private void buildNullLayout(ColumnLayout instantiatorLayout) {
+    private void buildEditorLayout(ColumnLayout layout) {
+        // TODO: Translate
+        if (NULL_LABEL.equals(nameWidget.getText())) {
+            nameWidget.setText(MODIFY_LABEL);
+        }
 
+        UIButton setToNull = new UIButton();
+
+        // TODO: Translate
+        setToNull.setText("Set to null");
+        setToNull.subscribe(widget -> binding.set(null));
+
+        layout.addWidget(setToNull);
+
+        FieldsWidgetBuilder<T> fieldsWidgetBuilder = new FieldsWidgetBuilder<>(binding, type, library);
+
+        fieldsWidgetBuilder.getFieldWidgets().forEach(layout::addWidget);
+    }
+
+    private void populateNullLayout(ColumnLayout layout) {
         // TODO: Add assign to reference option
 
         // TODO: Translate
-        if ("".equals(nameWidget.getText())) {
-            nameWidget.setText("Object is null.");
+        if (MODIFY_LABEL.equals(nameWidget.getText())) {
+            nameWidget.setText(NULL_LABEL);
         }
-
-        populateInstantiatorLayout(instantiatorLayout);
-    }
-
-    private void populateInstantiatorLayout(ColumnLayout instantiatorLayout) {
-        if (allowedSubtypes.isEmpty()) {
-            // TODO: Translate
-            UIBox box = buildErrorWidget("No accessible subtypes found");
-
-            instantiatorLayout.addWidget(box);
-
-            return;
-        }
-
-        ColumnLayout constructorLayout = createDefaultLayout();
-
-        Binding<TypeInfo<T>> selectedType =
-            new NotifyingBinding<TypeInfo<T>>(allowedSubtypes.get(0)) {
-                @Override
-                protected void onSet() {
-                    // TODO: Check if we already can create a UIWidget for the selected type
-                    populateConstructorLayout(constructorLayout, this);
-                }
-            };
-
-        UIDropdownScrollable<TypeInfo<T>> typeSelection = new UIDropdownScrollable<>();
-
-        typeSelection.setOptions(allowedSubtypes);
-        typeSelection.bindSelection(selectedType);
-        typeSelection.setOptionRenderer(new StringTextRenderer<TypeInfo<T>>() {
-            @Override
-            public String getString(TypeInfo<T> value) {
-                return getTypeName(value);
-            }
-        });
-
-        // TODO: Translate
-        typeSelection.setTooltip("Select the type for the new object");
-
-        instantiatorLayout.addWidget(typeSelection);
-        instantiatorLayout.addWidget(constructorLayout);
-    }
-
-    public String getTypeName(TypeInfo<?> value) {
-        return ReflectionUtil.getTypeUri(value.getType(), moduleManager.getEnvironment());
-    }
-
-    private UIBox buildErrorWidget(String errorMessage) {
-        UIBox box = new UIBox();
-
-        // TODO: Translate
-        box.setContent(new UILabel(errorMessage + ", cannot instantiate object from UI"));
-        return box;
-    }
-
-    private void populateConstructorLayout(ColumnLayout constructorLayout,
-                                           Binding<TypeInfo<T>> selectedType) {
-        constructorLayout.removeAllWidgets();
 
         List<Constructor<T>> constructors =
-            Arrays.stream(selectedType.get().getRawType().getConstructors())
+            Arrays.stream(type.getRawType().getConstructors())
                 .map(constructor -> (Constructor<T>) constructor)
                 .collect(Collectors.toList());
 
@@ -270,7 +110,7 @@ class ObjectLayoutBuilder<T> {
             // TODO: Translate
             UIBox box = buildErrorWidget("No accessible constructors found");
 
-            constructorLayout.addWidget(box);
+            layout.addWidget(box);
 
             return;
         }
@@ -288,8 +128,7 @@ class ObjectLayoutBuilder<T> {
             new NotifyingBinding<Constructor<T>>(constructors.get(0)) {
                 @Override
                 protected void onSet() {
-                    populateConstructorParameters(parameterLayout, createInstanceButton,
-                        selectedType, this);
+                    populateConstructorParameters(parameterLayout, createInstanceButton, this);
                 }
             };
 
@@ -300,7 +139,7 @@ class ObjectLayoutBuilder<T> {
             @Override
             public String getString(Constructor<T> value) {
                 return ReflectionUtil.resolvedMethodToString(
-                    selectedType.get().getType(),
+                    type.getType(),
                     value,
                     true
                 );
@@ -310,14 +149,13 @@ class ObjectLayoutBuilder<T> {
         // TODO: Translate
         constructorSelection.setTooltip("Select the constructor to use to create the new object");
 
-        constructorLayout.addWidget(constructorSelection);
-        constructorLayout.addWidget(parameterLayout);
-        constructorLayout.addWidget(createInstanceButton);
+        layout.addWidget(constructorSelection);
+        layout.addWidget(parameterLayout);
+        layout.addWidget(createInstanceButton);
     }
 
     private void populateConstructorParameters(ColumnLayout parameterLayout,
                                                UIButton createInstanceButton,
-                                               Binding<TypeInfo<T>> selectedType,
                                                Binding<Constructor<T>> selectedConstructor) {
         parameterLayout.removeAllWidgets();
 
@@ -326,7 +164,7 @@ class ObjectLayoutBuilder<T> {
         List<TypeInfo<?>> parameterTypes =
             Arrays.stream(parameters)
                 .map(Parameter::getParameterizedType)
-                .map(parameterType -> ReflectionUtil.resolveType(selectedType.get().getType(), parameterType))
+                .map(parameterType -> ReflectionUtil.resolveType(type.getType(), parameterType))
                 .map(TypeInfo::of)
                 .collect(Collectors.toList());
 
@@ -339,8 +177,6 @@ class ObjectLayoutBuilder<T> {
             Object[] arguments = argumentBindings.stream()
                                      .map(Binding::get)
                                      .toArray();
-
-            editingType = selectedType.get();
 
             try {
                 binding.set(selectedConstructor.get().newInstance(arguments));
@@ -359,7 +195,7 @@ class ObjectLayoutBuilder<T> {
         ColumnLayout parametersExpandableLayout = WidgetUtil.createExpandableLayout(
             // TODO: Translate
             "Constructor Parameters",
-            ObjectLayoutBuilder::createDefaultLayout,
+            this::createDefaultLayout,
             layout -> {
                 for (int i = 0; i < parameterTypes.size(); i++) {
                     TypeInfo<?> parameterType = parameterTypes.get(i);
@@ -370,7 +206,7 @@ class ObjectLayoutBuilder<T> {
                         library.getWidget((Binding) argumentBinding, parameterType);
 
                     if (!optionalWidget.isPresent()) {
-                        LOGGER.warn("Could not create widget for parameter {} of constructor {}",
+                        LOGGER.warn("Could not create widget for parameter of type {} of constructor {}",
                             parameter, selectedConstructor.get());
                         continue;
                     }
@@ -381,49 +217,9 @@ class ObjectLayoutBuilder<T> {
                     layout.addWidget(WidgetUtil.labelize(widget, parameterLabelText, LABEL_WIDGET_ID));
                 }
             },
-            ObjectLayoutBuilder::createDefaultLayout
+            this::createDefaultLayout
         );
 
         parameterLayout.addWidget(parametersExpandableLayout);
-    }
-
-    private void buildEditorLayout(ColumnLayout fieldsLayout) {
-        if (!editingType.getRawType().equals(binding.get().getClass())) {
-            Type actual = ReflectionUtil.parameterizeandResolveRawType(type.getType(), binding.get().getClass());
-            editingType = (TypeInfo<T>) TypeInfo.of(actual);
-        }
-
-        if (!allowedSubtypes.contains(editingType)) {
-            Optional<TypeInfo<T>> closestMatch =
-                allowedSubtypes.stream()
-                    .filter(subtype -> subtype.getRawType().isAssignableFrom(editingType.getRawType()))
-                    .findFirst();
-
-            // closestMatch is always present since editingType is guaranteed to be a subtype of T
-            assert closestMatch.isPresent();
-
-            editingType = closestMatch.get();
-        }
-
-        // TODO: Translate
-        if ("".equals(nameWidget.getText())) {
-            nameWidget.setText("Edit Object of type " + getTypeName(editingType));
-        }
-
-        populateFieldsLayout(fieldsLayout);
-    }
-
-    private void populateFieldsLayout(ColumnLayout fieldsLayout) {
-        UIButton setToNull = new UIButton();
-
-        // TODO: Translate
-        setToNull.setText("Set to null");
-        setToNull.subscribe(widget -> binding.set(null));
-
-        fieldsLayout.addWidget(setToNull);
-
-        FieldsWidgetBuilder<T> fieldsWidgetBuilder = new FieldsWidgetBuilder<>(binding, editingType, library);
-
-        fieldsWidgetBuilder.getFieldWidgets().forEach(fieldsLayout::addWidget);
     }
 }
