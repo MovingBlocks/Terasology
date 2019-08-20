@@ -19,12 +19,12 @@ import org.terasology.core.world.generator.facetProviders.BiomeProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultFloraProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultTreeProvider;
 import org.terasology.core.world.generator.facetProviders.PlateauProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinBaseSurfaceProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinHillsAndMountainsProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinOceanProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinRiverProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
+import org.terasology.core.world.generator.facetProviders.SimplexBaseSurfaceProvider;
+import org.terasology.core.world.generator.facetProviders.SimplexHillsAndMountainsProvider;
+import org.terasology.core.world.generator.facetProviders.SimplexHumidityProvider;
+import org.terasology.core.world.generator.facetProviders.SimplexOceanProvider;
+import org.terasology.core.world.generator.facetProviders.SimplexRiverProvider;
+import org.terasology.core.world.generator.facetProviders.SimplexSurfaceTemperatureProvider;
 import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
 import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
@@ -43,15 +43,15 @@ import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 /**
  */
-@RegisterWorldGenerator(id = "facetedperlin", displayName = "Perlin", description = "Faceted world generator using perlin")
-public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
+@RegisterWorldGenerator(id = "facetedSimplex", displayName = "Simplex", description = "Faceted world generator using simplex")
+public class SimplexFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
     private final FixedSpawner spawner = new FixedSpawner(0, 0);
 
     @In
     private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
 
-    public PerlinFacetedWorldGenerator(SimpleUri uri) {
+    public SimplexFacetedWorldGenerator(SimpleUri uri) {
         super(uri);
     }
 
@@ -68,12 +68,12 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
         return new WorldBuilder(worldGeneratorPluginLibrary)
                 .setSeaLevel(seaLevel)
                 .addProvider(new SeaLevelProvider(seaLevel))
-                .addProvider(new PerlinHumidityProvider())
-                .addProvider(new PerlinSurfaceTemperatureProvider())
-                .addProvider(new PerlinBaseSurfaceProvider())
-                .addProvider(new PerlinRiverProvider())
-                .addProvider(new PerlinOceanProvider())
-                .addProvider(new PerlinHillsAndMountainsProvider())
+                .addProvider(new SimplexHumidityProvider())
+                .addProvider(new SimplexSurfaceTemperatureProvider())
+                .addProvider(new SimplexBaseSurfaceProvider())
+                .addProvider(new SimplexRiverProvider())
+                .addProvider(new SimplexOceanProvider())
+                .addProvider(new SimplexHillsAndMountainsProvider())
                 .addProvider(new BiomeProvider())
                 .addProvider(new SurfaceToDensityProvider())
                 .addProvider(new DefaultFloraProvider())
