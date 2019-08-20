@@ -43,7 +43,7 @@ import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 /**
  */
-@RegisterWorldGenerator(id = "facetedSimplex", displayName = "Simplex", description = "Faceted world generator using simplex")
+@RegisterWorldGenerator(id = "facetedsimplex", displayName = "Simplex", description = "Experimental world generator based on Simplex noise")
 public class SimplexFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
     private final FixedSpawner spawner = new FixedSpawner(0, 0);
