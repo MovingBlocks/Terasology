@@ -180,7 +180,7 @@ public class FieldsWidgetBuilder<T> {
             return Optional.empty();
         }
 
-        Optional<UIWidget> widget = library.getWidget(fieldBinding.get(), fieldType);
+        Optional<UIWidget> widget = library.getBaseTypeWidget(fieldBinding.get(), fieldType);
 
         if (!widget.isPresent()) {
             LOGGER.warn("Could not create a UIWidget for field {}", field);

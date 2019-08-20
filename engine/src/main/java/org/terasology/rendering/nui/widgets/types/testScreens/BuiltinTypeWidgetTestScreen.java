@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.widgets.types.testScreens;
 
 import com.google.common.collect.ImmutableList;
-import org.terasology.entitySystem.Component;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
@@ -123,10 +122,12 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
     public static class WithFinalFields {
         public final int finalInt;
         public final float finalFloat;
+        public final String finalString;
 
-        public WithFinalFields(int finalInt, float finalFloat) {
+        public WithFinalFields(int finalInt, float finalFloat, String finalString) {
             this.finalInt = finalInt;
             this.finalFloat = finalFloat;
+            this.finalString = finalString;
         }
 
         @Override
@@ -134,6 +135,7 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
             return "WithFinalFields{" +
                        "finalInt=" + finalInt +
                        ", finalFloat=" + finalFloat +
+                       ", finalString='" + finalString + '\'' +
                        '}';
         }
     }

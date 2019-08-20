@@ -28,7 +28,6 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.NotifyingBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
@@ -44,7 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
+public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObjectWidgetFactory.class);
 
     private final TypeInfo<T> baseType;
@@ -53,35 +52,37 @@ class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
     private final List<TypeInfo<T>> allowedSubtypes;
     private final ModuleManager moduleManager;
 
-    private final ColumnLayout container = new ColumnLayout();
+    private final ColumnLayout widgetContainer = new ColumnLayout();
 
     private final Binding<TypeInfo<T>> editingType;
 
     public SubtypeLayoutBuilder(Binding<T> binding,
-                               TypeInfo<T> baseType,
-                               TypeWidgetLibrary library,
-                               ModuleManager moduleManager,
-                               TypeRegistry typeRegistry) {
+                                TypeInfo<T> baseType,
+                                TypeWidgetLibrary library,
+                                ModuleManager moduleManager,
+                                TypeRegistry typeRegistry) {
         super(binding);
 
+        this.library = library;
+
         this.baseType = baseType;
-        this.editingType = new NotifyingBinding<TypeInfo<T>>(new DefaultBinding<>(baseType)) {
+        this.editingType = new NotifyingBinding<TypeInfo<T>>(baseType) {
             @Override
             protected void onSet() {
-                container.removeAllWidgets();
+                widgetContainer.removeAllWidgets();
 
-                Optional<UIWidget> widget = library.getWidget(SubtypeLayoutBuilder.this.binding, get());
+                Optional<UIWidget> widget = SubtypeLayoutBuilder.this.library
+                                                .getWidget(SubtypeLayoutBuilder.this.binding, get());
 
                 if (!widget.isPresent()) {
                     LOGGER.error("Could not find widget for type {}", get());
                     return;
                 }
 
-                container.addWidget(widget.get());
+                widgetContainer.addWidget(widget.get());
             }
         };
 
-        this.library = library;
         this.moduleManager = moduleManager;
 
         Module contextModule = ModuleContext.getContext();
@@ -153,7 +154,12 @@ class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
     }
 
     public UIWidget getLayout() {
+        if (allowedSubtypes.size() <= 1) {
+            return widgetContainer;
+        }
+
         return mainLayout;
+
     }
 
     @Override
@@ -190,7 +196,7 @@ class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
         typeSelection.setTooltip("Select the type for the new object");
 
         layout.addWidget(typeSelection);
-        layout.addWidget(container);
+        layout.addWidget(widgetContainer);
     }
 
     private String getTypeName(TypeInfo<?> value) {
