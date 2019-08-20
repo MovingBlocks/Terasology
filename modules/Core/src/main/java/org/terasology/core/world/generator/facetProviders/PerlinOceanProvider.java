@@ -20,7 +20,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.BrownianNoise;
-import org.terasology.utilities.procedural.SimplexNoise;
+import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
@@ -32,15 +32,15 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  * Applies an amount of the max depth for regions that are oceans
  */
 @Updates(@Facet(SurfaceHeightFacet.class))
-public class SimplexOceanProvider implements ConfigurableFacetProvider {
+public class PerlinOceanProvider implements ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;
 
     private SubSampledNoise oceanNoise;
-    private SimplexOceanConfiguration configuration = new SimplexOceanConfiguration();
+    private PerlinOceanConfiguration configuration = new PerlinOceanConfiguration();
 
     @Override
     public void setSeed(long seed) {
-        oceanNoise = new SubSampledNoise(new BrownianNoise(new SimplexNoise(seed + 1), 8), new Vector2f(0.0009f, 0.0009f), SAMPLE_RATE);
+        oceanNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 1), 8), new Vector2f(0.0009f, 0.0009f), SAMPLE_RATE);
     }
 
     @Override
@@ -66,10 +66,10 @@ public class SimplexOceanProvider implements ConfigurableFacetProvider {
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (SimplexOceanConfiguration) configuration;
+        this.configuration = (PerlinOceanConfiguration) configuration;
     }
 
-    private static class SimplexOceanConfiguration implements Component {
+    private static class PerlinOceanConfiguration implements Component {
         @Range(min = 0, max = 128f, increment = 1f, precision = 0, description = "Ocean Depth")
         public float maxDepth = 32;
     }

@@ -20,7 +20,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.BrownianNoise;
-import org.terasology.utilities.procedural.SimplexNoise;
+import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
@@ -33,15 +33,15 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  * Applies an amount of the max depth for regions that are rivers
  */
 @Updates(@Facet(SurfaceHeightFacet.class))
-public class SimplexRiverProvider implements FacetProvider, ConfigurableFacetProvider {
+public class PerlinRiverProvider implements FacetProvider, ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;
 
     private SubSampledNoise riverNoise;
-    private SimplexRiverProviderConfiguration configuration = new SimplexRiverProviderConfiguration();
+    private PerlinRiverProviderConfiguration configuration = new PerlinRiverProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
-        riverNoise = new SubSampledNoise(new BrownianNoise(new SimplexNoise(seed + 2), 8), new Vector2f(0.0008f, 0.0008f), SAMPLE_RATE);
+        riverNoise = new SubSampledNoise(new BrownianNoise(new PerlinNoise(seed + 2), 8), new Vector2f(0.0008f, 0.0008f), SAMPLE_RATE);
     }
 
     @Override
@@ -67,10 +67,10 @@ public class SimplexRiverProvider implements FacetProvider, ConfigurableFacetPro
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (SimplexRiverProviderConfiguration) configuration;
+        this.configuration = (PerlinRiverProviderConfiguration) configuration;
     }
 
-    private static class SimplexRiverProviderConfiguration implements Component {
+    private static class PerlinRiverProviderConfiguration implements Component {
         @Range(min = 0, max = 64f, increment = 1f, precision = 0, description = "River Depth")
         public float maxDepth = 16;
     }

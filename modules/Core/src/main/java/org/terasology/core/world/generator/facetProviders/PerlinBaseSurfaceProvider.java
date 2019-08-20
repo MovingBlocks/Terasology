@@ -18,7 +18,7 @@ package org.terasology.core.world.generator.facetProviders;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.utilities.procedural.BrownianNoise;
-import org.terasology.utilities.procedural.SimplexNoise;
+import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.Facet;
@@ -33,14 +33,14 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  */
 @Produces(SurfaceHeightFacet.class)
 @Requires(@Facet(SeaLevelFacet.class))
-public class SimplexBaseSurfaceProvider implements FacetProvider {
+public class PerlinBaseSurfaceProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;
 
     private SubSampledNoise surfaceNoise;
 
     @Override
     public void setSeed(long seed) {
-        BrownianNoise source = new BrownianNoise(new SimplexNoise(seed), 8);
+        BrownianNoise source = new BrownianNoise(new PerlinNoise(seed), 8);
         surfaceNoise = new SubSampledNoise(source, new Vector2f(0.004f, 0.004f), SAMPLE_RATE);
     }
 

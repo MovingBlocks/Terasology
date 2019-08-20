@@ -19,8 +19,8 @@ import org.terasology.core.world.generator.facetProviders.BiomeProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultFloraProvider;
 import org.terasology.core.world.generator.facetProviders.DefaultTreeProvider;
 import org.terasology.core.world.generator.facetProviders.HeightMapSurfaceHeightProvider;
-import org.terasology.core.world.generator.facetProviders.SimplexHumidityProvider;
-import org.terasology.core.world.generator.facetProviders.SimplexSurfaceTemperatureProvider;
+import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
+import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
 import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
 import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
@@ -51,8 +51,8 @@ public class HeightMapWorldGenerator extends BaseFacetedWorldGenerator {
                 .setSeaLevel(16)
                 .addProvider(new SeaLevelProvider(16))
                 .addProvider(new HeightMapSurfaceHeightProvider())
-                .addProvider(new SimplexHumidityProvider())
-                .addProvider(new SimplexSurfaceTemperatureProvider())
+                .addProvider(new PerlinHumidityProvider())
+                .addProvider(new PerlinSurfaceTemperatureProvider())
                 .addProvider(new BiomeProvider())
                 .addProvider(new SurfaceToDensityProvider())
                 .addProvider(new DefaultFloraProvider())

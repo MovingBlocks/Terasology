@@ -20,10 +20,8 @@ import org.terasology.utilities.random.FastRandom;
 
 /**
  * Improved Perlin noise based on the reference implementation by Ken Perlin.
- * @deprecated Prefer using {@link SimplexNoise}, it is comparable to Perlin noise (fewer directional artifacts, lower computational overhead for higher dimensions).
  *
  */
-@Deprecated
 public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
 
     private final int[] noisePermutations;
