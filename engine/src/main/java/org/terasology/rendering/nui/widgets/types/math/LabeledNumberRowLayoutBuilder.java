@@ -63,8 +63,12 @@ public class LabeledNumberRowLayoutBuilder<N extends Number> {
             return this;
         }
 
-        labels.add(fieldName);
-        bindings.add(fieldBinding.get());
+        return add(fieldName, fieldBinding.get());
+    }
+
+    public LabeledNumberRowLayoutBuilder<N> add(String label, Binding<N> binding) {
+        labels.add(label);
+        bindings.add(binding);
 
         return this;
     }

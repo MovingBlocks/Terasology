@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui.widgets.types.testScreens;
 
 import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Rect2f;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
@@ -32,5 +34,8 @@ public class MathTypeWidgetTestScreen extends TypeWidgetTestScreen {
         newBinding(Vector4f.class);
 
         newBinding(Quat4f.class);
+
+        newBinding(Rect2f.class);
+        newBinding(Rect2i.class);
     }
 }
