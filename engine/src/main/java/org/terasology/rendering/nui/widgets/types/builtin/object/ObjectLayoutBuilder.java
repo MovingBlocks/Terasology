@@ -203,7 +203,7 @@ public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
                     Parameter parameter = parameters[i];
 
                     Optional<UIWidget> optionalWidget =
-                        library.getWidget((Binding) argumentBinding, parameterType);
+                        library.getBaseTypeWidget((Binding) argumentBinding, parameterType);
 
                     if (!optionalWidget.isPresent()) {
                         LOGGER.warn("Could not create widget for parameter of type {} of constructor {}",
