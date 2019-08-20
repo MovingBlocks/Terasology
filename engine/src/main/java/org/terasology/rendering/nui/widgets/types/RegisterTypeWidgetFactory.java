@@ -20,6 +20,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * If a {@link TypeWidgetFactory} is annotated with this annotation, it is automatically added
+ * to the {@link TypeWidgetFactoryRegistry}.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RegisterTypeWidgetFactory {}
