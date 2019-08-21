@@ -52,10 +52,12 @@ public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
 
     private final TypeInfo<T> type;
     private final TypeWidgetLibrary library;
+    private final FieldsWidgetBuilder<T> fieldsWidgetBuilder;
 
     public ObjectLayoutBuilder(TypeInfo<T> type, TypeWidgetLibrary library) {
         this.type = type;
         this.library = library;
+        fieldsWidgetBuilder = new FieldsWidgetBuilder<>(type, library);
     }
 
     @Override
@@ -86,9 +88,7 @@ public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
 
         layout.addWidget(setToNull);
 
-        FieldsWidgetBuilder<T> fieldsWidgetBuilder = new FieldsWidgetBuilder<>(binding, type, library);
-
-        fieldsWidgetBuilder.getFieldWidgets().forEach(layout::addWidget);
+        fieldsWidgetBuilder.getFieldWidgets(binding).forEach(layout::addWidget);
     }
 
     private void populateNullLayout(Binding<T> binding, ColumnLayout layout, UILabel nameWidget) {
