@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.widgets.types;
 
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -62,7 +61,6 @@ public interface TypeWidgetFactory {
      * of that {@link UILabel} must be {@link #LABEL_WIDGET_ID}.
      *
      * @param <T>     The type of the object.
-     * @param binding A {@link Binding} to the object to create the {@link UIWidget} for.
      * @param type    The {@link TypeInfo} of the type of the object.
      * @param library The {@link TypeWidgetLibrary} to create widgets of other types.
      * @return An {@link Optional} containing the created {@link UIWidget}, else
@@ -70,5 +68,5 @@ public interface TypeWidgetFactory {
      */
     // TODO: Split into create and bind, cache results of create (if possible)
     //  to support recursive types
-    <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library);
+    <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library);
 }

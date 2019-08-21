@@ -48,4 +48,6 @@ public interface TypeWidgetLibrary {
     <T> Optional<UIWidget> getWidget(Binding<T> binding, Class<T> type);
 
     <T> Optional<UIWidget> getBaseTypeWidget(Binding<T> binding, TypeInfo<T> baseType);
+
+    <T> Optional<TypeWidgetBuilder<T>> getBuilder(TypeInfo<T> type);
 }

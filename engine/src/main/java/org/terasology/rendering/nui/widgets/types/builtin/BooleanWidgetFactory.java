@@ -19,6 +19,7 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UICheckbox;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 
@@ -27,15 +28,16 @@ import java.util.Optional;
 public class BooleanWidgetFactory implements TypeWidgetFactory {
     @SuppressWarnings({"unchecked"})
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+    public <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library) {
         if (!Boolean.class.equals(type.getRawType()) && !Boolean.TYPE.equals(type.getRawType())) {
             return Optional.empty();
         }
 
-        return createBooleanWidget((Binding<Boolean>) binding);
+        TypeWidgetBuilder<Boolean> createBooleanWidget = BooleanWidgetFactory::createBooleanWidget;
+        return Optional.of((TypeWidgetBuilder<T>) createBooleanWidget);
     }
 
-    private Optional<UIWidget> createBooleanWidget(Binding<Boolean> binding) {
+    private static UIWidget createBooleanWidget(Binding<Boolean> binding) {
         if (binding.get() == null) {
             binding.set(false);
         }
@@ -44,6 +46,6 @@ public class BooleanWidgetFactory implements TypeWidgetFactory {
 
         widget.bindChecked(binding);
 
-        return Optional.of(widget);
+        return widget;
     }
 }

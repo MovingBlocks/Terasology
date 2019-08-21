@@ -18,10 +18,10 @@ package org.terasology.rendering.nui.widgets.types.builtin;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 
@@ -33,21 +33,24 @@ public class EnumWidgetFactory implements TypeWidgetFactory {
     private TranslationSystem translationSystem;
 
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+    public <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library) {
         Class<T> rawType = type.getRawType();
 
         if (!rawType.isEnum()) {
             return Optional.empty();
         }
 
+        return Optional.of(binding -> createDropdown(binding, rawType));
+    }
+
+    private <T> UIDropdownScrollable<T> createDropdown(Binding<T> binding, Class<T> rawType) {
         UIDropdownScrollable<T> dropdown = new UIDropdownScrollable<>();
 
         dropdown.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
         dropdown.setOptions(Arrays.asList(rawType.getEnumConstants()));
 
         dropdown.bindSelection(binding);
-
-        return Optional.of(dropdown);
+        return dropdown;
     }
 
 }
