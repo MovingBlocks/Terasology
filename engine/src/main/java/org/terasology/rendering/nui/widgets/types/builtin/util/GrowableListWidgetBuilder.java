@@ -157,7 +157,7 @@ public abstract class GrowableListWidgetBuilder<C, E> implements TypeWidgetBuild
     private Optional<UIWidget> createElementLayout(Binding<C> binding, int elementIndex, ColumnLayout collectionLayout) {
         Binding<E> elementBinding = elements.get(elementIndex);
 
-        Optional<UIWidget> optionalElementWidget = library.getWidget(
+        Optional<UIWidget> optionalElementWidget = library.getBaseTypeWidget(
             elementBinding,
             elementType
         );
