@@ -18,6 +18,8 @@ package org.terasology.physics;
 
 import com.google.common.collect.Maps;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
@@ -40,5 +42,9 @@ public class CollisionGroupManager {
         for (CollisionGroup group : StandardCollisionGroup.values()) {
             collisionGroupMap.put(group.getName().toLowerCase(Locale.ENGLISH), group);
         }
+    }
+
+    public Collection<CollisionGroup> getAllGroups() {
+        return Collections.unmodifiableCollection(collisionGroupMap.values());
     }
 }
