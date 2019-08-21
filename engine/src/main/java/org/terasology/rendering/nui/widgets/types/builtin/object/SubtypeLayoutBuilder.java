@@ -52,37 +52,12 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
     private final List<TypeInfo<T>> allowedSubtypes;
     private final ModuleManager moduleManager;
 
-    private final ColumnLayout widgetContainer = new ColumnLayout();
-
-    private final Binding<TypeInfo<T>> editingType;
-
-    public SubtypeLayoutBuilder(Binding<T> binding,
-                                TypeInfo<T> baseType,
+    public SubtypeLayoutBuilder(TypeInfo<T> baseType,
                                 TypeWidgetLibrary library,
                                 ModuleManager moduleManager,
                                 TypeRegistry typeRegistry) {
-        super(binding);
-
         this.library = library;
-
         this.baseType = baseType;
-        this.editingType = new NotifyingBinding<TypeInfo<T>>(baseType) {
-            @Override
-            protected void onSet() {
-                widgetContainer.removeAllWidgets();
-
-                Optional<UIWidget> widget = SubtypeLayoutBuilder.this.library
-                                                .getWidget(SubtypeLayoutBuilder.this.binding, get());
-
-                if (!widget.isPresent()) {
-                    LOGGER.error("Could not find widget for type {}", get());
-                    return;
-                }
-
-                widgetContainer.addWidget(widget.get());
-            }
-        };
-
         this.moduleManager = moduleManager;
 
         Module contextModule = ModuleContext.getContext();
@@ -153,32 +128,64 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
         return moduleManager.getEnvironment().getModuleProviding(type);
     }
 
-    public UIWidget getLayout() {
-        if (allowedSubtypes.size() <= 1) {
-            return widgetContainer;
+    @Override
+    protected void postInitialize(Binding<T> binding, ColumnLayout mainLayout) {
+        if (allowedSubtypes.size() > 1) {
+            return;
         }
 
-        return mainLayout;
+        assert allowedSubtypes.contains(baseType);
 
+        Optional<UIWidget> widget = SubtypeLayoutBuilder.this.library
+                                        .getWidget(binding, baseType);
+
+        if (!widget.isPresent()) {
+            LOGGER.error("Could not find widget for type {}", baseType);
+            return;
+        }
+
+        mainLayout.removeAllWidgets();
+        mainLayout.addWidget(widget.get());
     }
 
     @Override
-    protected void populate(ColumnLayout layout) {
+    protected void populate(Binding<T> binding, ColumnLayout layout, ColumnLayout mainLayout) {
+        ColumnLayout widgetContainer = new ColumnLayout();
+
+        Binding<TypeInfo<T>> editingType = new NotifyingBinding<TypeInfo<T>>(baseType) {
+            @Override
+            protected void onSet() {
+                widgetContainer.removeAllWidgets();
+
+                Optional<UIWidget> widget = SubtypeLayoutBuilder.this.library
+                                                .getWidget(binding, get());
+
+                if (!widget.isPresent()) {
+                    LOGGER.error("Could not find widget for type {}", get());
+                    return;
+                }
+
+                widgetContainer.addWidget(widget.get());
+            }
+        };
+
         if (binding.get() != null && !editingType.get().getRawType().equals(binding.get().getClass())) {
             Type actual = ReflectionUtil.parameterizeandResolveRawType(baseType.getType(), binding.get().getClass());
-            editingType.set((TypeInfo<T>) TypeInfo.of(actual));
-        }
+            TypeInfo<T> actualType = (TypeInfo<T>) TypeInfo.of(actual);
 
-        if (!allowedSubtypes.contains(editingType.get())) {
-            Optional<TypeInfo<T>> closestMatch =
-                allowedSubtypes.stream()
-                    .filter(subtype -> subtype.getRawType().isAssignableFrom(editingType.get().getRawType()))
-                    .findFirst();
+            if (!allowedSubtypes.contains(actualType)) {
+                Optional<TypeInfo<T>> closestMatch =
+                    allowedSubtypes.stream()
+                        .filter(subtype -> subtype.getRawType().isAssignableFrom(actualType.getRawType()))
+                        .findFirst();
 
-            // closestMatch is always present since editingType is guaranteed to be a subtype of T
-            assert closestMatch.isPresent();
+                // closestMatch is always present since editingType is guaranteed to be a subtype of T
+                assert closestMatch.isPresent();
 
-            editingType.set(closestMatch.get());
+                editingType.set(closestMatch.get());
+            } else {
+                editingType.set(actualType);
+            }
         }
 
         UIDropdownScrollable<TypeInfo<T>> typeSelection = new UIDropdownScrollable<>();

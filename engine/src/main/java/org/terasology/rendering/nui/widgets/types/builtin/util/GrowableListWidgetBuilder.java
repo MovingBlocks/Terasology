@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.widgets.types.builtin.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.reflect.ObjectConstructor;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -29,6 +30,7 @@ import org.terasology.rendering.nui.layouts.RowLayoutHint;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISpace;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -40,22 +42,26 @@ import java.util.stream.Stream;
 
 import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
 
-public abstract class GrowableListWidgetFactory<C, E> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GrowableListWidgetFactory.class);
+public abstract class GrowableListWidgetBuilder<C, E> implements TypeWidgetBuilder<C> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrowableListWidgetBuilder.class);
 
-    protected Binding<C> binding;
     protected TypeInfo<C> type;
     protected TypeWidgetLibrary library;
     protected TypeInfo<E> elementType;
 
+    private final ObjectConstructor<C> constructor;
+
     private List<Binding<E>> elements;
     private List<Optional<UIWidget>> elementLayouts;
 
-    public GrowableListWidgetFactory(Binding<C> binding, TypeInfo<C> type, TypeInfo<E> elementType, TypeWidgetLibrary library) {
-        this.binding = binding;
+    public GrowableListWidgetBuilder(TypeInfo<C> type,
+                                     TypeInfo<E> elementType,
+                                     TypeWidgetLibrary library,
+                                     ObjectConstructor<C> objectConstructor) {
         this.type = type;
         this.elementType = elementType;
         this.library = library;
+        this.constructor = objectConstructor;
     }
 
     private static ColumnLayout createDefaultLayout() {
@@ -68,9 +74,14 @@ public abstract class GrowableListWidgetFactory<C, E> {
         return mainLayout;
     }
 
-    public UIWidget create() {
-        elements = getBindingStream()
-                          .map(this::getBindingForElement)
+    @Override
+    public UIWidget build(Binding<C> binding) {
+        if (binding.get() == null) {
+            binding.set(constructor.construct());
+        }
+
+        elements = getBindingStream(binding)
+                          .map(element -> getBindingForElement(binding, element))
                           .collect(Collectors.toList());
 
         String labelText = "Edit " + ReflectionUtil.typeToString(type.getType(), true);
@@ -81,7 +92,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
 
         for (int i = 0; i < elements.size(); i++) {
             Optional<UIWidget> elementLayout = createElementLayout(
-                i, collectionLayout
+                binding, i, collectionLayout
             );
 
             elementLayouts.add(elementLayout);
@@ -90,23 +101,23 @@ public abstract class GrowableListWidgetFactory<C, E> {
         return WidgetUtil.createExpandableLayout(
             labelWidget,
             () -> collectionLayout,
-            this::populateCollectionLayout,
-            GrowableListWidgetFactory::createDefaultLayout
+            layout -> populateCollectionLayout(layout, binding),
+            GrowableListWidgetBuilder::createDefaultLayout
         );
     }
 
-    private Binding<E> getBindingForElement(E element) {
+    private Binding<E> getBindingForElement(Binding<C> binding, E element) {
         return binding.makeChildBinding(
             new NotifyingBinding<E>(new DefaultBinding<>(element)) {
                 @Override
                 protected void onSet() {
-                    updateBinding();
+                    updateBinding(binding);
                 }
             }
         );
     }
 
-    private void populateCollectionLayout(ColumnLayout collectionLayout) {
+    private void populateCollectionLayout(ColumnLayout collectionLayout, Binding<C> binding) {
         for (Optional<UIWidget> elementWidget : elementLayouts) {
             elementWidget.ifPresent(collectionLayout::addWidget);
         }
@@ -116,10 +127,10 @@ public abstract class GrowableListWidgetFactory<C, E> {
         // TODO: Translate
         addElementButton.setText("Add Element");
         addElementButton.subscribe(widget -> {
-            elements.add(getBindingForElement(null));
-            updateBinding();
+            elements.add(getBindingForElement(binding, null));
+            updateBinding(binding);
 
-            Optional<UIWidget> elementLayout = createElementLayout(elements.size() - 1, collectionLayout);
+            Optional<UIWidget> elementLayout = createElementLayout(binding, elements.size() - 1, collectionLayout);
             elementLayouts.add(elementLayout);
             elementLayout.ifPresent(collectionLayout::addWidget);
         });
@@ -143,7 +154,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
         }
     }
 
-    private Optional<UIWidget> createElementLayout(int elementIndex, ColumnLayout collectionLayout) {
+    private Optional<UIWidget> createElementLayout(Binding<C> binding, int elementIndex, ColumnLayout collectionLayout) {
         Binding<E> elementBinding = elements.get(elementIndex);
 
         Optional<UIWidget> optionalElementWidget = library.getWidget(
@@ -170,7 +181,7 @@ public abstract class GrowableListWidgetFactory<C, E> {
 
         removeButton.subscribe(widget -> {
             elements.remove(elementBinding);
-            updateBinding();
+            updateBinding(binding);
 
             collectionLayout.removeWidget(elementLayout);
             elementLayouts.remove(Optional.of(elementLayout));
@@ -206,12 +217,12 @@ public abstract class GrowableListWidgetFactory<C, E> {
         return "Element " + index;
     }
 
-    private void updateBinding() {
+    private void updateBinding(Binding<C> binding) {
         // TODO: Filter not null
-        updateBindingWithElements(elements.stream().map(Binding::get).collect(Collectors.toList()));
+        updateBindingWithElements(binding, elements.stream().map(Binding::get).collect(Collectors.toList()));
     }
 
-    protected abstract void updateBindingWithElements(List<E> elements);
+    protected abstract void updateBindingWithElements(Binding<C> binding, List<E> elements);
 
-    protected abstract Stream<E> getBindingStream();
+    protected abstract Stream<E> getBindingStream(Binding<C> binding);
 }

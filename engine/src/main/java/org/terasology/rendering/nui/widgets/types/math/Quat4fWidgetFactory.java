@@ -17,9 +17,8 @@ package org.terasology.rendering.nui.widgets.types.math;
 
 import org.terasology.math.geom.Quat4f;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.types.RegisterTypeWidgetFactory;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 
@@ -28,22 +27,26 @@ import java.util.Optional;
 @RegisterTypeWidgetFactory
 public class Quat4fWidgetFactory implements TypeWidgetFactory {
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+    public <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library) {
         if (!Quat4f.class.equals(type.getRawType())) {
             return Optional.empty();
         }
 
-        if (binding.get() == null) {
-            binding.set((T) new Quat4f(Quat4f.IDENTITY));
+        // TODO: Possibly use euler angles or another easier-to-use format
+        TypeWidgetBuilder<Quat4f> builder = new Quat4fWidgetBuilder(library)
+                                                           .addAllFields();
+
+        return Optional.of((TypeWidgetBuilder<T>) builder);
+    }
+
+    private static class Quat4fWidgetBuilder extends LabeledNumberFieldRowBuilder<Quat4f, Float> {
+        public Quat4fWidgetBuilder(TypeWidgetLibrary library) {
+            super(Quat4f.class, float.class, library);
         }
 
-        // TODO: Possibly use euler angles or another easier-to-use format
-        LabeledNumberRowLayoutBuilder<Float> builder = new LabeledNumberRowLayoutBuilder<>(float.class, library)
-                                                           .addField("x", binding)
-                                                           .addField("y", binding)
-                                                           .addField("z", binding)
-                                                           .addField("w", binding);
-
-        return Optional.of(builder.build());
+        @Override
+        protected Quat4f getDefaultValue() {
+            return new Quat4f(Quat4f.IDENTITY);
+        }
     }
 }

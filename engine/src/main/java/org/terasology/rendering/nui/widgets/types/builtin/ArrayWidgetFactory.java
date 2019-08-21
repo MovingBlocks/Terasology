@@ -16,15 +16,14 @@
 package org.terasology.rendering.nui.widgets.types.builtin;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
-import org.terasology.rendering.nui.widgets.types.builtin.util.GrowableListWidgetFactory;
+import org.terasology.rendering.nui.widgets.types.builtin.util.GrowableListWidgetBuilder;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.util.Arrays;
@@ -40,47 +39,40 @@ public class ArrayWidgetFactory implements TypeWidgetFactory {
     }
 
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+    public <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library) {
         Class<T> rawType = type.getRawType();
 
         if (!rawType.isArray()) {
             return Optional.empty();
         }
 
-        if (binding.get() == null) {
-            ObjectConstructor<T> constructor = constructorLibrary.get(type);
-            assert constructor != null;
+        TypeInfo<Object[]> arrayType = (TypeInfo<Object[]>) type;
 
-            binding.set(constructor.construct());
-        }
+        TypeWidgetBuilder<Object[]> widget = new GrowableListArrayWidgetBuilder<>(
+            arrayType,
+            library,
+            constructorLibrary.get(arrayType)
+        );
 
-
-        UIWidget widget = new GrowableListArrayWidgetFactory<>(
-            (Binding<Object[]>) binding,
-            (TypeInfo<Object[]>) type,
-            library
-        )
-                              .create();
-
-        return Optional.of(widget);
+        return Optional.of((TypeWidgetBuilder<T>) widget);
     }
 
-    private static class GrowableListArrayWidgetFactory<E> extends GrowableListWidgetFactory<E[], E> {
-        public GrowableListArrayWidgetFactory(
-            Binding<E[]> binding,
+    private static class GrowableListArrayWidgetBuilder<E> extends GrowableListWidgetBuilder<E[], E> {
+        public GrowableListArrayWidgetBuilder(
             TypeInfo<E[]> type,
-            TypeWidgetLibrary library
+            TypeWidgetLibrary library,
+            ObjectConstructor<E[]> constructor
         ) {
-            super(binding, type, ReflectionUtil.getComponentType(type), library);
+            super(type, ReflectionUtil.getComponentType(type), library, constructor);
         }
 
         @Override
-        protected void updateBindingWithElements(List<E> elements) {
+        protected void updateBindingWithElements(Binding<E[]> binding, List<E> elements) {
             binding.set(Iterables.toArray(elements, elementType.getRawType()));
         }
 
         @Override
-        protected Stream<E> getBindingStream() {
+        protected Stream<E> getBindingStream(Binding<E[]> binding) {
             return Arrays.stream(binding.get());
         }
     }

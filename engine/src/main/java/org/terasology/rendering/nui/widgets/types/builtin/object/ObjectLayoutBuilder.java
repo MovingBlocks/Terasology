@@ -53,28 +53,26 @@ public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
     private final TypeInfo<T> type;
     private final TypeWidgetLibrary library;
 
-    public ObjectLayoutBuilder(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
-        super(binding);
+    public ObjectLayoutBuilder(TypeInfo<T> type, TypeWidgetLibrary library) {
         this.type = type;
         this.library = library;
     }
 
-    public UIWidget getLayout() {
-        return mainLayout;
-    }
-
     @Override
-    protected void populate(ColumnLayout layout) {
+    protected void populate(Binding<T> binding, ColumnLayout layout, ColumnLayout mainLayout) {
         layout.removeAllWidgets();
 
+        UILabel nameWidget = mainLayout.find(LABEL_WIDGET_ID, UILabel.class);
+        assert nameWidget != null;
+
         if (binding.get() == null) {
-            populateNullLayout(layout);
+            populateNullLayout(binding, layout, nameWidget);
         } else {
-            buildEditorLayout(layout);
+            buildEditorLayout(binding, layout, nameWidget);
         }
     }
 
-    private void buildEditorLayout(ColumnLayout layout) {
+    private void buildEditorLayout(Binding<T> binding, ColumnLayout layout, UILabel nameWidget) {
         // TODO: Translate
         if (NULL_LABEL.equals(nameWidget.getText())) {
             nameWidget.setText(MODIFY_LABEL);
@@ -93,7 +91,7 @@ public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
         fieldsWidgetBuilder.getFieldWidgets().forEach(layout::addWidget);
     }
 
-    private void populateNullLayout(ColumnLayout layout) {
+    private void populateNullLayout(Binding<T> binding, ColumnLayout layout, UILabel nameWidget) {
         // TODO: Add assign to reference option
 
         // TODO: Translate
@@ -128,7 +126,7 @@ public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
             new NotifyingBinding<Constructor<T>>(constructors.get(0)) {
                 @Override
                 protected void onSet() {
-                    populateConstructorParameters(parameterLayout, createInstanceButton, this);
+                    populateConstructorParameters(binding, parameterLayout, createInstanceButton, this);
                 }
             };
 
@@ -154,7 +152,8 @@ public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
         layout.addWidget(createInstanceButton);
     }
 
-    private void populateConstructorParameters(ColumnLayout parameterLayout,
+    private void populateConstructorParameters(Binding<T> binding,
+                                               ColumnLayout parameterLayout,
                                                UIButton createInstanceButton,
                                                Binding<Constructor<T>> selectedConstructor) {
         parameterLayout.removeAllWidgets();

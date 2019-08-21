@@ -15,24 +15,24 @@
  */
 package org.terasology.rendering.nui.widgets.types.builtin.util;
 
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.NotifyingBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 
 import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
 
-public abstract class ExpandableLayoutBuilder<T> {
-    protected final ColumnLayout mainLayout;
-    protected final ColumnLayout innerExpandableLayout = createDefaultLayout();
-    protected final UILabel nameWidget = new UILabel(LABEL_WIDGET_ID, "");
+public abstract class ExpandableLayoutBuilder<T> implements TypeWidgetBuilder<T> {
+    @Override
+    public UIWidget build(Binding<T> binding) {
+        ColumnLayout innerExpandableLayout = createDefaultLayout();
+        ColumnLayout mainLayout = createDefaultLayout();
 
-    protected final Binding<T> binding;
-
-    protected ExpandableLayoutBuilder(Binding<T> binding) {
-        this.binding = new NotifyingBinding<T>(binding) {
+        Binding<T> wrappedBinding = new NotifyingBinding<T>(binding) {
             @Override
             protected void onSet() {
                 if (!innerExpandableLayout.iterator().hasNext()) {
@@ -40,17 +40,23 @@ public abstract class ExpandableLayoutBuilder<T> {
                     return;
                 }
 
-                clearAndPopulate(innerExpandableLayout);
+                clearAndPopulate(this, innerExpandableLayout, mainLayout);
             }
         };
 
-        mainLayout = WidgetUtil.createExpandableLayout(
-            nameWidget,
+        WidgetUtil.createExpandableLayout(
+            new UILabel(LABEL_WIDGET_ID, ""),
             () -> innerExpandableLayout,
-            this::clearAndPopulate,
-            this::createDefaultLayout
+            layout -> clearAndPopulate(wrappedBinding, layout, mainLayout),
+            () -> mainLayout
         );
+
+        postInitialize(binding, mainLayout);
+
+        return mainLayout;
     }
+
+    protected void postInitialize(Binding<T> binding, ColumnLayout mainLayout) {}
 
     protected ColumnLayout createDefaultLayout() {
         ColumnLayout layout = new ColumnLayout();
@@ -70,11 +76,11 @@ public abstract class ExpandableLayoutBuilder<T> {
         return box;
     }
 
-    private void clearAndPopulate(ColumnLayout layout) {
+    private void clearAndPopulate(Binding<T> binding, ColumnLayout layout, ColumnLayout mainLayout) {
         layout.removeAllWidgets();
 
-        populate(layout);
+        populate(binding, layout, mainLayout);
     }
 
-    protected abstract void populate(ColumnLayout layout);
+    protected abstract void populate(Binding<T> binding, ColumnLayout layout, ColumnLayout mainLayout);
 }

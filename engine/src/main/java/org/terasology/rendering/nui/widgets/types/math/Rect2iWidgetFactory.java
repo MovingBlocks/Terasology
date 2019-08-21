@@ -16,11 +16,10 @@
 package org.terasology.rendering.nui.widgets.types.math;
 
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.types.RegisterTypeWidgetFactory;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 
@@ -29,72 +28,81 @@ import java.util.Optional;
 @RegisterTypeWidgetFactory
 public class Rect2iWidgetFactory implements TypeWidgetFactory {
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+    public <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library) {
         if (!Rect2i.class.equals(type.getRawType())) {
             return Optional.empty();
         }
 
-        Binding<Rect2i> rectBinding = (Binding<Rect2i>) binding;
+        TypeWidgetBuilder<Rect2i> builder =
+            new Rect2iWidgetBuilder(library)
+                .add("x",
+                    rectBinding -> new Binding<Integer>() {
+                        @Override
+                        public Integer get() {
+                            return rectBinding.get().minX();
+                        }
 
-        if (rectBinding.get() == null || rectBinding.get().isEmpty()) {
+                        @Override
+                        public void set(Integer value) {
+                            Rect2i old = rectBinding.get();
+                            rectBinding.set(Rect2i.createFromMinAndSize(value, old.minY(), old.width(), old.height()));
+                        }
+                    })
+                .add("y",
+                    rectBinding -> new Binding<Integer>() {
+                        @Override
+                        public Integer get() {
+                            return rectBinding.get().minY();
+                        }
+
+                        @Override
+                        public void set(Integer value) {
+                            Rect2i old = rectBinding.get();
+                            rectBinding.set(Rect2i.createFromMinAndSize(old.minX(), value, old.width(), old.height()));
+                        }
+                    })
+                .add("w",
+                    rectBinding -> new Binding<Integer>() {
+                        @Override
+                        public Integer get() {
+                            return rectBinding.get().width();
+                        }
+
+                        @Override
+                        public void set(Integer value) {
+                            Rect2i old = rectBinding.get();
+                            rectBinding.set(Rect2i.createFromMinAndSize(old.minX(), old.minY(), value, old.height()));
+                        }
+                    })
+                .add("h",
+                    rectBinding -> new Binding<Integer>() {
+                        @Override
+                        public Integer get() {
+                            return rectBinding.get().height();
+                        }
+
+                        @Override
+                        public void set(Integer value) {
+                            Rect2i old = rectBinding.get();
+                            rectBinding.set(Rect2i.createFromMinAndSize(old.minX(), old.minY(), old.width(), value));
+                        }
+                    });
+
+        return Optional.of((TypeWidgetBuilder<T>) builder);
+    }
+
+    private static class Rect2iWidgetBuilder extends LabeledNumberFieldRowBuilder<Rect2i, Integer> {
+        public Rect2iWidgetBuilder(TypeWidgetLibrary library) {
+            super(Rect2i.class, int.class, library);
+        }
+
+        @Override
+        protected Rect2i getDefaultValue() {
             // Make non-empty so that editing works as intended
             // When the initial rect is empty, editing any of the components will make no difference
             // since one of the size components will always be zero, making the factory methods always
             // return the empty rect
-            rectBinding.set(Rect2i.createFromMinAndSize(0, 0, 1, 1));
+            return Rect2i.createFromMinAndSize(0, 0, 1, 1);
         }
-
-        LabeledNumberRowLayoutBuilder<Integer> builder =
-            new LabeledNumberRowLayoutBuilder<>(int.class, library)
-                .add("x", new Binding<Integer>() {
-                    @Override
-                    public Integer get() {
-                        return rectBinding.get().minX();
-                    }
-
-                    @Override
-                    public void set(Integer value) {
-                        Rect2i old = rectBinding.get();
-                        rectBinding.set(Rect2i.createFromMinAndSize(value, old.minY(), old.width(), old.height()));
-                    }
-                })
-                .add("y", new Binding<Integer>() {
-                    @Override
-                    public Integer get() {
-                        return rectBinding.get().minY();
-                    }
-
-                    @Override
-                    public void set(Integer value) {
-                        Rect2i old = rectBinding.get();
-                        rectBinding.set(Rect2i.createFromMinAndSize(old.minX(), value, old.width(), old.height()));
-                    }
-                })
-                .add("w", new Binding<Integer>() {
-                    @Override
-                    public Integer get() {
-                        return rectBinding.get().width();
-                    }
-
-                    @Override
-                    public void set(Integer value) {
-                        Rect2i old = rectBinding.get();
-                        rectBinding.set(Rect2i.createFromMinAndSize(old.minX(), old.minY(), value, old.height()));
-                    }
-                })
-                .add("h", new Binding<Integer>() {
-                    @Override
-                    public Integer get() {
-                        return rectBinding.get().height();
-                    }
-
-                    @Override
-                    public void set(Integer value) {
-                        Rect2i old = rectBinding.get();
-                        rectBinding.set(Rect2i.createFromMinAndSize(old.minX(), old.minY(), old.width(), value));
-                    }
-                });
-
-        return Optional.of(builder.build());
     }
 }

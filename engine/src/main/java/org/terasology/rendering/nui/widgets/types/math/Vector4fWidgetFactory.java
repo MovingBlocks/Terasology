@@ -17,9 +17,8 @@ package org.terasology.rendering.nui.widgets.types.math;
 
 import org.terasology.math.geom.Vector4f;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.types.RegisterTypeWidgetFactory;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 
@@ -28,21 +27,25 @@ import java.util.Optional;
 @RegisterTypeWidgetFactory
 public class Vector4fWidgetFactory implements TypeWidgetFactory {
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+    public <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library) {
         if (!Vector4f.class.equals(type.getRawType())) {
             return Optional.empty();
         }
 
-        if (binding.get() == null) {
-            binding.set((T) Vector4f.zero());
+        TypeWidgetBuilder<Vector4f> builder = new Vector4fWidgetBuilder(library)
+                                                  .addAllFields();
+
+        return Optional.of((TypeWidgetBuilder<T>) builder);
+    }
+
+    private static class Vector4fWidgetBuilder extends LabeledNumberFieldRowBuilder<Vector4f, Float> {
+        public Vector4fWidgetBuilder(TypeWidgetLibrary library) {
+            super(Vector4f.class, float.class, library);
         }
 
-        LabeledNumberRowLayoutBuilder<Float> builder = new LabeledNumberRowLayoutBuilder<>(float.class, library)
-                                                           .addField("x", binding)
-                                                           .addField("y", binding)
-                                                           .addField("z", binding)
-                                                           .addField("w", binding);
-
-        return Optional.of(builder.build());
+        @Override
+        protected Vector4f getDefaultValue() {
+            return Vector4f.zero();
+        }
     }
 }

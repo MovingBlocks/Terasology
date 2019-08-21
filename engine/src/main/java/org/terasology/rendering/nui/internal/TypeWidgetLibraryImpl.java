@@ -25,6 +25,7 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactoryRegistry;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
@@ -47,11 +48,16 @@ public class TypeWidgetLibraryImpl implements TypeWidgetLibrary {
 
     @Override
     public <T> Optional<UIWidget> getWidget(Binding<T> binding, TypeInfo<T> type) {
+        return getBuilder(type).map(builder -> builder.build(binding));
+    }
+
+    @Override
+    public <T> Optional<TypeWidgetBuilder<T>> getBuilder(TypeInfo<T> type) {
         try(ModuleContext.ContextSpan ignored = ModuleContext.setContext(contextModule)) {
 
             // Iterate in reverse order so that later added factories take priority
             for (TypeWidgetFactory factory : Lists.reverse(widgetFactories.getFactories())) {
-                Optional<UIWidget> widget = factory.create(binding, type, this);
+                Optional<TypeWidgetBuilder<T>> widget = factory.create(type, this);
 
                 if (widget.isPresent()) {
                     return widget;
@@ -78,10 +84,10 @@ public class TypeWidgetLibraryImpl implements TypeWidgetLibrary {
             TypeRegistry typeRegistry = context.get(TypeRegistry.class);
 
             SubtypeLayoutBuilder<T> builder = new SubtypeLayoutBuilder<>(
-                binding, baseType, this, moduleManager, typeRegistry
+                baseType, this, moduleManager, typeRegistry
             );
 
-            return Optional.of(builder.getLayout());
+            return Optional.of(builder.build(binding));
         }
     }
 }

@@ -19,6 +19,7 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UITextEntry;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 
@@ -34,14 +35,18 @@ public abstract class NumberWidgetFactory<N extends Number> implements TypeWidge
     }
 
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+    public <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library) {
         if (!wrapperClass.equals(type.getRawType()) && !primitiveClass.equals(type.getRawType())) {
             return Optional.empty();
         }
 
-        Binding<N> numberBinding = (Binding<N>) binding;
+        TypeWidgetBuilder<N> createTextEntry = this::createTextEntry;
+        return Optional.of((TypeWidgetBuilder<T>) createTextEntry);
+    }
 
+    private UIWidget createTextEntry(Binding<N> numberBinding) {
         if (numberBinding.get() == null) {
+            // TODO: Replace with call to guava Defaults
             setToDefaultValue(numberBinding);
         }
 
@@ -57,7 +62,7 @@ public abstract class NumberWidgetFactory<N extends Number> implements TypeWidge
             }
         });
 
-        return Optional.of(widget);
+        return widget;
     }
 
     protected abstract void setToDefaultValue(Binding<N> binding);

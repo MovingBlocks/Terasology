@@ -17,9 +17,8 @@ package org.terasology.rendering.nui.widgets.types.math;
 
 import org.terasology.math.geom.Vector2i;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.types.RegisterTypeWidgetFactory;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 
@@ -28,19 +27,25 @@ import java.util.Optional;
 @RegisterTypeWidgetFactory
 public class Vector2iWidgetFactory implements TypeWidgetFactory {
     @Override
-    public <T> Optional<UIWidget> create(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
+    public <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library) {
         if (!Vector2i.class.equals(type.getRawType())) {
             return Optional.empty();
         }
 
-        if (binding.get() == null) {
-            binding.set((T) Vector2i.zero());
+        TypeWidgetBuilder<Vector2i> builder = new Vector2iWidgetBuilder(library)
+                                                  .addAllFields();
+
+        return Optional.of((TypeWidgetBuilder<T>) builder);
+    }
+
+    private static class Vector2iWidgetBuilder extends LabeledNumberFieldRowBuilder<Vector2i, Integer> {
+        public Vector2iWidgetBuilder(TypeWidgetLibrary library) {
+            super(Vector2i.class, int.class, library);
         }
 
-        LabeledNumberRowLayoutBuilder<Integer> builder = new LabeledNumberRowLayoutBuilder<>(int.class, library)
-                                                           .addField("x", binding)
-                                                           .addField("y", binding);
-
-        return Optional.of(builder.build());
+        @Override
+        protected Vector2i getDefaultValue() {
+            return Vector2i.zero();
+        }
     }
 }
