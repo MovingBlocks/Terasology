@@ -32,7 +32,9 @@ import org.terasology.rendering.nui.databinding.NotifyingBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
+import org.terasology.rendering.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.rendering.nui.widgets.types.builtin.EnumWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.builtin.util.ExpandableLayoutBuilder;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -51,6 +53,7 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
 
     private final List<TypeInfo<T>> allowedSubtypes;
     private final ModuleManager moduleManager;
+    private final TypeWidgetBuilder<T> baseTypeWidgetBuilder;
 
     public SubtypeLayoutBuilder(TypeInfo<T> baseType,
                                 TypeWidgetLibrary library,
@@ -59,6 +62,8 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
         this.library = library;
         this.baseType = baseType;
         this.moduleManager = moduleManager;
+
+        baseTypeWidgetBuilder = library.getBuilder(baseType).orElse(null);
 
         Module contextModule = ModuleContext.getContext();
 
@@ -130,22 +135,18 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
 
     @Override
     protected void postInitialize(Binding<T> binding, ColumnLayout mainLayout) {
-        if (allowedSubtypes.size() > 1) {
+        // If we have a custom widget for the base type, just use that
+        if (allowedSubtypes.size() > 1 && baseTypeWidgetBuilder instanceof ObjectLayoutBuilder) {
             return;
         }
 
-        assert allowedSubtypes.contains(baseType);
-
-        Optional<UIWidget> widget = SubtypeLayoutBuilder.this.library
-                                        .getWidget(binding, baseType);
-
-        if (!widget.isPresent()) {
+        if (baseTypeWidgetBuilder == null) {
             LOGGER.error("Could not find widget for type {}", baseType);
             return;
         }
 
         mainLayout.removeAllWidgets();
-        mainLayout.addWidget(widget.get());
+        mainLayout.addWidget(baseTypeWidgetBuilder.build(binding));
     }
 
     @Override
@@ -157,15 +158,14 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
             protected void onSet() {
                 widgetContainer.removeAllWidgets();
 
-                Optional<UIWidget> widget = SubtypeLayoutBuilder.this.library
-                                                .getWidget(binding, get());
+                TypeWidgetBuilder<T> builder = SubtypeLayoutBuilder.this.library.getBuilder(get())
+                                                   .orElse(baseTypeWidgetBuilder);
 
-                if (!widget.isPresent()) {
-                    LOGGER.error("Could not find widget for type {}", get());
-                    return;
+                if (builder == null) {
+                    LOGGER.error("Could not find widget for type {}, editing as base type {}", get(), baseType);
                 }
 
-                widgetContainer.addWidget(widget.get());
+                widgetContainer.addWidget(builder.build(binding));
             }
         };
 
