@@ -96,6 +96,7 @@ public class TypeRegistry {
 
         classLoaders = allClassLoaders.toArray(new ClassLoader[0]);
 
+        // TODO: Use caches if possible since scanning does not work on Android
         reflections = new Reflections(
             new ConfigurationBuilder()
                 .setScanners(
