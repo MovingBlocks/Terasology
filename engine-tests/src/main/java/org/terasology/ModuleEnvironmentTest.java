@@ -19,13 +19,12 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
-import org.mockito.Mockito;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.DependencyResolver;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.reflection.internal.TypeRegistryImpl;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.nio.file.FileSystem;
@@ -42,15 +41,15 @@ public abstract class ModuleEnvironmentTest {
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
 
-        typeRegistry = new TypeRegistryImpl();
-        moduleManager = ModuleManagerFactory.create((TypeRegistryImpl) typeRegistry);
+        moduleManager = ModuleManagerFactory.create();
 
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         ResolutionResult result = resolver.resolve(moduleManager.getRegistry().getModuleIds());
 
         assumeTrue(result.isSuccess());
 
-        moduleManager.loadEnvironment(result.getModules(), true);
+        ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
+        typeRegistry = new TypeRegistry(environment);
 
         setup();
     }

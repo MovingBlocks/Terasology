@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.reflection.internal;
+package org.terasology.reflection;
 
 import org.junit.Test;
 import org.reflections.Reflections;
 import org.terasology.ModuleEnvironmentTest;
+import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.entitySystem.Component;
 import org.terasology.naming.Name;
 
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-public class TypeRegistryImplTest extends ModuleEnvironmentTest {
+public class TypeRegistryTest extends ModuleEnvironmentTest {
     static {
         Reflections.log = null;
     }
@@ -50,9 +51,14 @@ public class TypeRegistryImplTest extends ModuleEnvironmentTest {
                 .map(componentClass -> moduleManager.getEnvironment().getModuleProviding(componentClass))
                 .collect(Collectors.toSet());
 
-        assertTrue(modulesDeclaringComponents.size() >= 2);
+        assertTrue(modulesDeclaringComponents.toString(), modulesDeclaringComponents.contains(new Name("engine")));
+    }
 
-        assertTrue(modulesDeclaringComponents.contains(new Name("engine")));
-        assertTrue(modulesDeclaringComponents.contains(new Name("unittest")));
+    @Test
+    public void testWhitelistedTypes() {
+        Set<Class<?>> allTypes = typeRegistry.getSubtypesOf(Object.class);
+        for (Class<?> whitelisted : ExternalApiWhitelist.CLASSES) {
+            assumeTrue(allTypes.toString() + " should contain " + whitelisted.getName(), allTypes.contains(whitelisted));
+        }
     }
 }

@@ -65,7 +65,6 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.reflection.internal.TypeRegistryImpl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
@@ -269,10 +268,10 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
-        TypeRegistryImpl typeRegistry = new TypeRegistryImpl();
+        TypeRegistry typeRegistry = new TypeRegistry();
         context.put(TypeRegistry.class, typeRegistry);
 
-        ModuleManager moduleManager = ModuleManagerFactory.create(typeRegistry);
+        ModuleManager moduleManager = ModuleManagerFactory.create();
         ModuleRegistry registry = moduleManager.getRegistry();
 
         DependencyResolver resolver = new DependencyResolver(registry);
@@ -280,6 +279,7 @@ public class HeadlessEnvironment extends Environment {
 
         if (result.isSuccess()) {
             ModuleEnvironment modEnv = moduleManager.loadEnvironment(result.getModules(), true);
+            typeRegistry.reload(modEnv);
             logger.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
         } else {
             logger.error("Could not resolve module dependencies for " + moduleNames);
