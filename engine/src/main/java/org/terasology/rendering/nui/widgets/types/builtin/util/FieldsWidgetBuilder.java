@@ -43,19 +43,17 @@ import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL
 public class FieldsWidgetBuilder<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldsWidgetBuilder.class);
 
-    private Binding<T> binding;
     private TypeInfo<T> type;
     private TypeWidgetLibrary library;
 
     private Map<Field, TypeInfo<?>> fields = Maps.newLinkedHashMap();
 
-    public FieldsWidgetBuilder(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library) {
-        this(binding, type, library, field -> true);
+    public FieldsWidgetBuilder(TypeInfo<T> type, TypeWidgetLibrary library) {
+        this(type, library, field -> true);
     }
 
-    public FieldsWidgetBuilder(Binding<T> binding, TypeInfo<T> type, TypeWidgetLibrary library,
+    public FieldsWidgetBuilder(TypeInfo<T> type, TypeWidgetLibrary library,
                                Predicate<Field> fieldPredicate) {
-        this.binding = binding;
         this.type = type;
         this.library = library;
 
@@ -154,11 +152,11 @@ public class FieldsWidgetBuilder<T> {
         return binding.makeChildBinding(fieldBinding);
     }
 
-    public List<UIWidget> getFieldWidgets() {
+    public List<UIWidget> getFieldWidgets(Binding<T> binding) {
         return fields.entrySet().stream()
                    .map(entry -> {
                        Field field = entry.getKey();
-                       Optional<UIWidget> optionalFieldWidget = getFieldWidget(field, entry.getValue());
+                       Optional<UIWidget> optionalFieldWidget = getFieldWidget(binding, field, entry.getValue());
 
                        if (!optionalFieldWidget.isPresent()) {
                            return null;
@@ -173,7 +171,7 @@ public class FieldsWidgetBuilder<T> {
                    .collect(Collectors.toList());
     }
 
-    private <F> Optional<UIWidget> getFieldWidget(Field field, TypeInfo<F> fieldType) {
+    private <F> Optional<UIWidget> getFieldWidget(Binding<T> binding, Field field, TypeInfo<F> fieldType) {
         Optional<Binding<F>> fieldBinding = getFieldBinding(binding, field);
 
         if (!fieldBinding.isPresent()) {
