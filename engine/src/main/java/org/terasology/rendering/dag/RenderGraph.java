@@ -378,9 +378,9 @@ public class RenderGraph {
             throw new RuntimeException("Could not add output RunOrder" + outputId + " connection to " + fromNode + ". Connection probably already exists.");
         }
 
-        if (!areConnected(fromNode, toNode)) {
-            connect(fromNode, toNode);
-        }
+//        if (!areConnected(fromNode, toNode)) {
+//            connect(fromNode, toNode);
+//        }
     }
 
     public void reconnectRunOrder(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
@@ -406,9 +406,9 @@ public class RenderGraph {
     public void connectBufferPair(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
         // TODO for buffer pairs enable new instance with swapped buffers
         connectBufferPair(toNode, inputId, fromNode.getOutputBufferPairConnection(outputId));
-        if (!areConnected(fromNode, toNode)) {
-            connect(fromNode, toNode);
-        }
+//        if (!areConnected(fromNode, toNode)) {
+//            connect(fromNode, toNode);
+//        }
         logger.info("Connected " + fromNode.getOutputBufferPairConnection(outputId) + " to " + toNode + ".");
     }
 
@@ -705,9 +705,9 @@ public class RenderGraph {
 
         reconnectInputToOutput(toNode, inputId, fromConnection, connectionType, disconnectPrevious);
 
-        if (!areConnected(fromNode, toNode)) {
-            connect(fromNode, toNode);
-        }
+//        if (!areConnected(fromNode, toNode)) {
+//            connect(fromNode, toNode);
+//        }
     }
 
     /**
