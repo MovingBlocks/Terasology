@@ -630,6 +630,10 @@ public class RenderGraph {
         connectFbo(toNode, inputId, fromNode, outputId);
     }
 
+    @Deprecated
+    public void disconnectOutputFboConnection(NewNode node, int connectionId) {
+        logger.info("Attempting disconnection of " + node + "'s output fbo number " + connectionId + "..");
+
     public void disconnectOutputFbo(String nodeUri, int connectionId) {
         logger.info("Attempting disconnection of " + nodeUri + "'s output fbo number " + connectionId + "..");
         NewNode node = findNode(new SimpleUri(nodeUri));
@@ -639,25 +643,25 @@ public class RenderGraph {
                 outputConnection.disconnect();
                 logger.info("..disconnecting complete.");
             } else {
-                logger.warn("Could not find output Fbo connection number " + connectionId + "within " + nodeUri + ".");
+                logger.warn("Could not find output Fbo connection number " + connectionId + "within " + node + ".");
             }
         } else {
-            throw new RuntimeException("Could not find node named " + nodeUri + " within renderGraph.");
+            throw new RuntimeException("Could not find node named " + node + " within renderGraph.");
         }
         //TODO disconnect from rendergraph if needed
+    }
+
+    @Deprecated
+    public void disconnectOutputFboConnection(String nodeUri, int connectionId) {
+        NewNode node = findNode(new SimpleUri(nodeUri));
+        disconnectOutputFboConnection(node, connectionId);
     }
 
     public void disconnectInputFbo(String nodeUri, int connectionId) {
         logger.info("Attempting disconnection of " + nodeUri + "'s input fbo number " + connectionId);
         NewNode node = findNode(new SimpleUri(nodeUri));
         if (node != null) {
-            DependencyConnection inputConnection = node.getInputFboConnection(connectionId);
-            if (inputConnection != null) {
-                inputConnection.disconnect();
-                logger.info("..disconnecting complete.");
-            } else {
-                logger.warn("Could not find input Fbo connection number " + connectionId + "within " + nodeUri + ".");
-            }
+            ((NewAbstractNode) node).disconnectInputFbo(connectionId);
         } else {
             throw new RuntimeException("Could not find node named " + nodeUri + " within renderGraph.");
         }
@@ -678,22 +682,88 @@ public class RenderGraph {
      * @param fromNode fromNode's SimpleUri name. Node must exist in the renderGraph.
      * @param outputId Id of fromNode's output. Output must exist.
      */
-    public void reconnectInputFboToOutput(NewNode fromNode, int outputId, NewNode toNode, int inputId, boolean disconnectPrevious) {
+    public void reconnectInputToOutput(NewNode fromNode, int outputId, NewNode toNode, int inputId, ConnectionType connectionType, boolean disconnectPrevious) {
         // Would use of Preconditions be clearer?
         if (toNode == null || fromNode == null) {
-            throw new RuntimeException("Reconnecting FBO dependency failed. One of the nodes not found in the renderGraph."
+            throw new RuntimeException("Reconnecting dependency failed. One of the nodes not found in the renderGraph."
                     + "\n toNode: " + toNode + ". fromNode: " + fromNode);
         }
-        DependencyConnection fromConnection = fromNode.getOutputFboConnection(outputId);
+        DependencyConnection fromConnection;
+        switch (connectionType) {
+            case FBO:
+                fromConnection = fromNode.getOutputFboConnection(outputId);
+                break;
+            case BUFFER_PAIR:
+                fromConnection = fromNode.getOutputBufferPairConnection(outputId);
+                break;
+            default:
+                logger.error("Unknown type of output connection: ");
+                throw new RuntimeException("Unknown type of output connection: ");
+        }
+
         if (fromConnection == null) {
-            throw new RuntimeException("Reconnecting FBO dependency failed. Could not find output connection.");
+            throw new RuntimeException("Reconnecting dependency failed. Could not find output connection.");
         }
         // TODO REMOVE RENDERGRAPH CONNECTION if needed
 
-        reconnectInputFboToOutput(fromNode, toNode, inputId, fromConnection, disconnectPrevious);
+        reconnectInputToOutput(toNode, inputId, fromConnection, connectionType, disconnectPrevious);
 
         if (!areConnected(fromNode, toNode)) {
             connect(fromNode, toNode);
         }
     }
+
+    /**
+     * Insert node's connection after a specific node's connection and reconnect the other previously connected nodes's connections
+     * to the new one. Simple approach, maintain structure 1 to N. For M to N output do manually.
+     */
+    public void reconnectAllConnectedInputsTo(DependencyConnection connectionToReplace, DependencyConnection newOutputConnection) {
+        NewNode fromNode = findNode(connectionToReplace.getParentNode());
+        NewNode newFromNode = findNode(newOutputConnection.getParentNode());
+        ConnectionType connectionType;
+
+        if (newOutputConnection instanceof FboConnection) {
+            connectionType = ConnectionType.FBO;
+        } else if (newOutputConnection instanceof BufferPairConnection) {
+            connectionType = ConnectionType.BUFFER_PAIR;
+        } else {
+            logger.error("Unknown connection type: " + newOutputConnection + " .\n");
+            throw new RuntimeException("Unknown connection type: " + newOutputConnection + " .\n");
+        }
+
+        connectionToReplace.getConnectedConnections().forEach(
+                (k, connectedConnection) -> {
+                    DependencyConnection toConnection = (DependencyConnection) connectedConnection;
+                    if(! toConnection.getParentNode().equals(fromNode.getUri())) {
+                        reconnectInputToOutput(findNode(toConnection.getParentNode()), DependencyConnection.getIdFromConnectionName(toConnection.getName()), newOutputConnection, connectionType, true);
+                        NewNode toNode = findNode(toConnection.getParentNode());
+                        if (!areConnected(fromNode, toNode)) {
+                            connect(fromNode, toNode);
+                        }
+                    }
+                }
+        );
+
+    }
+
+   /* public void reconnectAllConnectedInputsTo(DependencyConnection connectionToReplace, DependencyConnection newOutputConnection) {
+        NewNode fromNode = findNode(connectionToReplace.getParentNode());
+        NewNode newFromNode = findNode(newOutputConnection.getParentNode());
+        connectionToReplace.getConnectedConnections().forEach(
+                (k, connectedConnection)-> {
+                    DependencyConnection toConnection = (DependencyConnection) connectedConnection;
+                    if (!(toConnection.getParentNode().equals(newOutputConnection.getParentNode()))) {
+                        toConnection.disconnect();
+
+                        toConnection.connectInputToOutput(newOutputConnection);
+
+                        NewNode toNode = findNode(toConnection.getParentNode());
+                        if (areConnected(fromNode, toNode)) {
+                            disconnect(fromNode, toNode);
+                        }
+                        connect(newFromNode, toNode);
+                    }
+                }
+        );
+    }*/
 }
