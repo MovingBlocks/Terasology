@@ -121,8 +121,10 @@ public interface NewNode extends RenderPipelineTask {
     public void setInputConnections(Map<String, DependencyConnection> inputConnections);
 
     public void setOutputConnections(Map<String, DependencyConnection> outputConnections);
-    /**
-     * This method is called by RenderGraph.addNode().
+
+    public void postInit(Context context);
+
+    /**.
      * This method must be called AFTER node has connected all it's dependencies.
      * @param context a context object, to obtain instances of classes such as the rendering config.
      */
@@ -155,6 +157,10 @@ public interface NewNode extends RenderPipelineTask {
     public boolean addOutputFboConnection(int id);
 
     public boolean addOutputBufferPairConnection(int id);
+
+    public boolean addOutputBufferPairConnection(int id, BufferPair bufferPair);
+
+    public boolean addOutputBufferPairConnection(int id, BufferPairConnection from);
 
     public BufferPairConnection getOutputBufferPairConnection(int outputBufferPairId);
 

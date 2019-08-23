@@ -75,6 +75,7 @@ public abstract class NewAbstractNode implements NewNode {
             newNodeAka = nodeAka.substring(0, nodeAka.length() - "Node".length());
         }
         this.nodeAka = new Name(newNodeAka);
+        addOutputBufferPairConnection(1);
     }
 
     protected NewAbstractNode(String nodeId, Name providingModule, Context context) {
@@ -95,6 +96,20 @@ public abstract class NewAbstractNode implements NewNode {
 
     public void setOutputConnections(Map<String, DependencyConnection> outputConnections) {
         this.outputConnections = outputConnections;
+    }
+
+    public final void postInit(Context context) {
+        tryBufferPairPass();
+        setDependencies(context);
+    }
+
+    public void tryBufferPairPass() {
+        BufferPairConnection bufferPairConnection = getInputBufferPairConnection(1);
+        if (bufferPairConnection != null) {
+            if (bufferPairConnection.getData() != null) {
+                addOutputBufferPairConnection(1, bufferPairConnection);
+            }
+        }
     }
 
     /**
