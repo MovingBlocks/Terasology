@@ -634,9 +634,6 @@ public class RenderGraph {
     public void disconnectOutputFboConnection(NewNode node, int connectionId) {
         logger.info("Attempting disconnection of " + node + "'s output fbo number " + connectionId + "..");
 
-    public void disconnectOutputFbo(String nodeUri, int connectionId) {
-        logger.info("Attempting disconnection of " + nodeUri + "'s output fbo number " + connectionId + "..");
-        NewNode node = findNode(new SimpleUri(nodeUri));
         if (node != null) {
             DependencyConnection outputConnection = node.getOutputFboConnection(connectionId);
             if (outputConnection != null) {
