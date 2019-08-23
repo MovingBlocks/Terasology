@@ -131,6 +131,22 @@ public class RenderGraph {
         return findAka(new Name(simpleUriAka));
     }
 
+    public void postConnectAll() {
+        // for each node in the graph
+        for(NewNode fromNode : nodeMap.values()) {
+            // for each of node's output connection
+            for (DependencyConnection outputConnection : fromNode.getOutputConnections().values()) {
+                // get connections other ends (multiple, relationship 1 to N) and their parent nodes as toNode and call connect
+                for (Object connectedConnection: outputConnection.getConnectedConnections().values()) {
+                    NewNode toNode = findNode(((DependencyConnection)connectedConnection).getParentNode());
+                    if (fromNode != toNode) {
+                        connect(fromNode, toNode);
+                    }
+                }
+            }
+        }
+    }
+
     public void connect(NewNode... nodeList) {
         Preconditions.checkArgument(nodeList.length > 1, "Expected at least 2 nodes as arguments to connect() - found " + nodeList.length);
 
@@ -179,6 +195,9 @@ public class RenderGraph {
 
         List<NewNode> topologicalList = new ArrayList<>();
 
+        // Connect all nodes based on dependencies
+        postConnectAll();
+
         // In-degree (or incoming-degree) is the number of incoming edges of a particular node.
         Map<NewNode, Integer> inDegreeMap = Maps.newHashMap();
         List<NewNode> nodesToExamine = Lists.newArrayList();
@@ -215,7 +234,7 @@ public class RenderGraph {
             throw new RuntimeException("Cycle detected in the DAG: topological sorting not possible!");
         }
 
-        topologicalList.forEach((key)->key.setDependencies(context));
+        topologicalList.forEach((key)->key.postInit(context));
 
         return topologicalList;
     }
