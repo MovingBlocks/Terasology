@@ -321,12 +321,7 @@ public class RenderGraph {
         // for each output connected to toNode's input fbo connection(inputId) (should be just one)
         if (connectionToReconnect != null) {
             connectionToReconnect.getConnectedConnections().forEach((conUri, outputConnection) -> {
-                HashMap<String, DependencyConnection> previousFromNodesConnectedConnections = ((DependencyConnection) outputConnection).getConnectedConnections();
-                previousFromNodesConnectedConnections.forEach((outsConnectedInsUris, inputConnection) -> {
-                    if (inputConnection.equals(connectionToReconnect)) {
-                        previousFromNodesConnectedConnections.remove(inputConnection);
-                    }
-                });
+                ((DependencyConnection) outputConnection).getConnectedConnections().remove(connectionToReconnect.getName());
             });
             // connectionToReconnect gets removed and then created again
             toNode.removeFboConnection(inputId, DependencyConnection.Type.INPUT);
@@ -393,12 +388,7 @@ public class RenderGraph {
         // for each output connected to toNode's input fbo connection(inputId) (should be just one)
         if (connectionToReconnect != null) {
             connectionToReconnect.getConnectedConnections().forEach((conUri, outputConnection) -> {
-                HashMap<String, DependencyConnection> previousFromNodesConnectedConnections = ((DependencyConnection) outputConnection).getConnectedConnections();
-                previousFromNodesConnectedConnections.forEach((outsConnectedInsUris, inputConnection) -> {
-                    if (inputConnection.equals(connectionToReconnect)) {
-                        previousFromNodesConnectedConnections.remove(inputConnection);
-                    }
-                });
+                ((DependencyConnection) outputConnection).getConnectedConnections().remove(connectionToReconnect.getName());
             });
             // connectionToReconnect gets removed and then created again
             toNode.removeRunOrderConnection(inputId, DependencyConnection.Type.INPUT);
