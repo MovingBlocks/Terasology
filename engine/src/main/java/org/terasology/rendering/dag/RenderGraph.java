@@ -309,9 +309,9 @@ public class RenderGraph {
     public void connectFbo(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
         // TODO for buffer pairs enable new instance with swapped buffers
         connectFbo(toNode, inputId, fromNode.getOutputFboConnection(outputId));
-        if (!areConnected(fromNode, toNode)) {
-            connect(fromNode, toNode);
-        }
+//        if (!areConnected(fromNode, toNode)) {
+//            connect(fromNode, toNode);
+//        }
         logger.info("Connected " + fromNode.getOutputFboConnection(outputId) + " to " + toNode + ".");
     }
 
