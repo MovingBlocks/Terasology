@@ -45,6 +45,7 @@ public abstract class NewAbstractNode implements NewNode {
     protected static final Logger logger = LoggerFactory.getLogger(NewAbstractNode.class);
 
     protected boolean enabled = true;
+//    protected BufferPairConnection bufferPairConnection;
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFboManager> fboUsages = Maps.newHashMap();
     private Map<String, DependencyConnection> inputConnections = Maps.newHashMap();
@@ -75,6 +76,7 @@ public abstract class NewAbstractNode implements NewNode {
             newNodeAka = nodeAka.substring(0, nodeAka.length() - "Node".length());
         }
         this.nodeAka = new Name(newNodeAka);
+
         addOutputBufferPairConnection(1);
     }
 
@@ -197,18 +199,26 @@ public abstract class NewAbstractNode implements NewNode {
         boolean success = false;
         String connectionUri = BufferPairConnection.getConnectionName(id, this.nodeUri);
         if (outputConnections.containsKey(connectionUri)) {
-            BufferPairConnection bufferPairConnection = (BufferPairConnection) outputConnections.get(connectionUri);
+            BufferPairConnection localBufferPairConnection = (BufferPairConnection) outputConnections.get(connectionUri);
 
             // set data for all connected connections
-            if (!bufferPairConnection.getConnectedConnections().isEmpty()) {
-                bufferPairConnection.getConnectedConnections().forEach((k, v) -> v.setData(bufferPair));
+            if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
+                logger.info("Propagating bufferPair data to all connected connections of " + localBufferPairConnection + ": ");
+                localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
+                    v.setData(bufferPair);
+                });
+                logger.info("data propagated.\n");
             }
 
-            bufferPairConnection.setData(bufferPair);
+            if(localBufferPairConnection.getData() != null) {
+                logger.warn("Adding output buffer pair to slot id " + id
+                        + " of " + this.nodeUri + "node overwrites data of existing connection: " + localBufferPairConnection.toString());
+            }
+            localBufferPairConnection.setData(bufferPair);
             success = true;
         } else {
-            DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
-            success = addOutputConnection(bufferPairConnection);
+            DependencyConnection localBufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
+            success = addOutputConnection(localBufferPairConnection);
         }
         return success;
     }
@@ -223,26 +233,35 @@ public abstract class NewAbstractNode implements NewNode {
         boolean success = false;
         String connectionUri = BufferPairConnection.getConnectionName(id, this.nodeUri);
         if (outputConnections.containsKey(connectionUri)) {
-            BufferPairConnection bufferPairConnection = (BufferPairConnection) outputConnections.get(connectionUri);
-            bufferPairConnection.setData(from.getData());
+            BufferPairConnection localBufferPairConnection = (BufferPairConnection) outputConnections.get(connectionUri);
 
             // set data for all connected connections
-            if (!bufferPairConnection.getConnectedConnections().isEmpty()) {
-                bufferPairConnection.getConnectedConnections().forEach((k, v) -> v.setData(from.getData()));
+            if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
+                logger.info("Propagating data from " + from.toString() + " to all connected connections of " + localBufferPairConnection + ": ");
+                localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
+                    logger.info("setting data for: " + v.toString() + " ,");
+                    v.setData(from.getData());
+                });
+                logger.info("data propagated.\n");
             }
 
-            bufferPairConnection.setConnectedConnection(from);
+            if(localBufferPairConnection.getData() != null) {
+                logger.warn("Adding output buffer pair connection " + from.toString() + "\n to slot id " + id
+                        + " of " + this.nodeUri + "node overwrites data of existing connection: " + localBufferPairConnection.toString());
+            }
+            localBufferPairConnection.setData(from.getData());
+
             success = true;
         } else {
-            DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, from.getData(), this.getUri());
-            success = addOutputConnection(bufferPairConnection);
+            DependencyConnection localBufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, from.getData(), this.getUri());
+            success = addOutputConnection(localBufferPairConnection);
         }
         return success;
     }
 
     public boolean addOutputBufferPairConnection(int id) {
-        DependencyConnection bufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, this.getUri());
-        return addOutputConnection(bufferPairConnection);
+        DependencyConnection localBufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, this.getUri());
+        return addOutputConnection(localBufferPairConnection);
     }
 
     /**
@@ -279,14 +298,20 @@ public abstract class NewAbstractNode implements NewNode {
         String connectionUri = FboConnection.getConnectionName(id, this.nodeUri);
         if (outputConnections.containsKey(connectionUri)) {
             FboConnection fboConnection = (FboConnection) outputConnections.get(connectionUri);
+
+            if(fboConnection.getData() != null) {
+                logger.warn("Adding output fbo data to slot id " + id
+                        + " of " + this.nodeUri + "node overwrites data of existing connection: " + fboConnection.toString());
+            }
             fboConnection.setData(fboData);
 
+            // set data for all connected connections
             if (!fboConnection.getConnectedConnections().isEmpty()) {
+                logger.info("Propagating fbo data to all connected connections of " + fboConnection + ": ");
                 fboConnection.getConnectedConnections().forEach((k, v) -> {
-                    if(v.getData() == null) {
-                        v.setData(fboData);
-                    }
+                    v.setData(fboData);
                 });
+                logger.info("data propagated.\n");
             }
 
             success = true;
@@ -446,8 +471,8 @@ public abstract class NewAbstractNode implements NewNode {
         logger.info("Disconnecting" + this.getUri() + " input Fbo number " + inputId);
             DependencyConnection connectionToDisconnect = this.inputConnections.get(FboConnection.getConnectionName(inputId, this.nodeUri));
         if (connectionToDisconnect != null) {
-            // TODO make it reconnectInputToOutput
-            if (connectionToDisconnect.getConnectedConnections() != null) {
+            // TODO make it reconnectInputFboToOutput
+            if (!connectionToDisconnect.getConnectedConnections().isEmpty()) {
                 connectionToDisconnect.disconnect();
             } else {
                 logger.warn("Connection was not connected, it probably originated in this node. (Support FBOs can be created inside nodes)");
