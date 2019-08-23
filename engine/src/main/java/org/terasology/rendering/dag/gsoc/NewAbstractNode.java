@@ -205,6 +205,7 @@ public abstract class NewAbstractNode implements NewNode {
             if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
                 logger.info("Propagating bufferPair data to all connected connections of " + localBufferPairConnection + ": ");
                 localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
+                    logger.info("setting data for: " + v.toString() + " ,");
                     v.setData(bufferPair);
                 });
                 logger.info("data propagated.\n");
@@ -309,6 +310,7 @@ public abstract class NewAbstractNode implements NewNode {
             if (!fboConnection.getConnectedConnections().isEmpty()) {
                 logger.info("Propagating fbo data to all connected connections of " + fboConnection + ": ");
                 fboConnection.getConnectedConnections().forEach((k, v) -> {
+                    logger.info("setting data for: " + v.toString() + " ,");
                     v.setData(fboData);
                 });
                 logger.info("data propagated.\n");
