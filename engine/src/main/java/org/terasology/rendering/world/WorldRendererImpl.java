@@ -16,6 +16,9 @@
 package org.terasology.rendering.world;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -80,6 +83,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * Presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
      * It's not, so for now, we use this factor to adjust for the disparity.
      */
+    private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
     private RenderGraph renderGraph;
     private RenderingModuleRegistry renderingModuleRegistry;
@@ -216,6 +220,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         for (ModuleRendering moduleRenderingInstance : renderingModuleRegistry.getOrderedRenderingModules()) {
             if (moduleRenderingInstance.isEnabled()) {
+                logger.info(String.format("\nInitialising rendering class %s from %s module.\n",
+                                            moduleRenderingInstance.getClass().getSimpleName(),
+                                            moduleRenderingInstance.getProvidingModule()));
                 moduleRenderingInstance.initialise();
             }
         }
