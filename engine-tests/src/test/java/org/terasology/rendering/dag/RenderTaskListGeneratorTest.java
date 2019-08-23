@@ -24,6 +24,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
 import org.terasology.rendering.dag.gsoc.BufferPairConnection;
+import org.terasology.rendering.dag.gsoc.BufferPair;
 import org.terasology.rendering.dag.gsoc.DependencyConnection;
 import org.terasology.rendering.dag.gsoc.FboConnection;
 import org.terasology.rendering.dag.gsoc.NewNode;
