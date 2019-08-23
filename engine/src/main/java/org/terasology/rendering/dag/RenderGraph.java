@@ -30,9 +30,11 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
 import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.dag.gsoc.BufferPairConnection;
 import org.terasology.rendering.dag.gsoc.DependencyConnection;
 import org.terasology.rendering.dag.gsoc.FboConnection;
 import org.terasology.rendering.dag.gsoc.NewNode;
+import org.terasology.rendering.dag.gsoc.NewAbstractNode;
 
 /**
  * TODO: Add javadocs
@@ -728,19 +730,22 @@ public class RenderGraph {
             throw new RuntimeException("Unknown connection type: " + newOutputConnection + " .\n");
         }
 
-        connectionToReplace.getConnectedConnections().forEach(
-                (k, connectedConnection) -> {
-                    DependencyConnection toConnection = (DependencyConnection) connectedConnection;
-                    if(! toConnection.getParentNode().equals(fromNode.getUri())) {
-                        reconnectInputToOutput(findNode(toConnection.getParentNode()), DependencyConnection.getIdFromConnectionName(toConnection.getName()), newOutputConnection, connectionType, true);
-                        NewNode toNode = findNode(toConnection.getParentNode());
-                        if (!areConnected(fromNode, toNode)) {
-                            connect(fromNode, toNode);
-                        }
-                    }
+        if (!connectionToReplace.getConnectedConnections().isEmpty()) {
+            // Hard to deal with concurency problems, iterate copy, edit original
+            final HashMap<String, DependencyConnection> connectedConnections = connectionToReplace.getConnectedConnections();
+            final HashMap<String, DependencyConnection> connectedConnectionsCopy = Maps.newHashMap(connectionToReplace.getConnectedConnections());
+            for (DependencyConnection connectedConnectionCopy : connectedConnectionsCopy.values()) {
+                DependencyConnection toConnection = connectedConnections.get(connectedConnectionCopy.getName());
+                if (!toConnection.getParentNode().equals(fromNode.getUri())) {
+                    // TODO potteintionally harmful ID guesswork
+                    reconnectInputToOutput(findNode(toConnection.getParentNode()), DependencyConnection.getIdFromConnectionName(toConnection.getName()), newOutputConnection, connectionType, true);
+                    NewNode toNode = findNode(toConnection.getParentNode());
+//                    if (!areConnected(fromNode, toNode)) {
+//                        connect(fromNode, toNode);
+//                    }
                 }
-        );
-
+            }
+        }
     }
 
    /* public void reconnectAllConnectedInputsTo(DependencyConnection connectionToReplace, DependencyConnection newOutputConnection) {
