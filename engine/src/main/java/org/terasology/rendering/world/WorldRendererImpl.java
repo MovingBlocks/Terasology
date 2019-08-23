@@ -508,14 +508,24 @@ public final class WorldRendererImpl implements WorldRenderer {
      * Redirect output FBO from one node to another's input
      *
      * Usage:
-     *      dagRedirectFbo <fromNodeUri> <outputFboId> <toNodeUri> <inputFboId>
+     *      dagRedirect <connectionTypeString> <fromNodeUri> <outputFboId> <toNodeUri> <inputFboId>
      *
      * Example:
-     *      dagRedirectFbo blurredAmbientOcclusion 1 BasicRendering:outputToScreenNode 1
+     *      dagRedirect fbo blurredAmbientOcclusion 1 BasicRendering:outputToScreenNode 1
+     *      dagRedirect bufferpair backdrop 1 AdvancedRendering:intermediateHazeNode 1
      */
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagRedirectFbo(@CommandParam("fromNodeUri") final String fromNodeUri, @CommandParam("outputFboId") final int outputFboId,
+    public void dagRedirect(@CommandParam("fromNodeUri") final String connectionTypeString, @CommandParam("fromNodeUri") final String fromNodeUri, @CommandParam("outputFboId") final int outputFboId,
                             @CommandParam("toNodeUri") final String toNodeUri, @CommandParam(value = "inputFboId") final int inputFboId) {
+        RenderGraph.ConnectionType connectionType;
+        if(connectionTypeString.equalsIgnoreCase("fbo")) {
+            connectionType = RenderGraph.ConnectionType.FBO;
+        } else if (connectionTypeString.equalsIgnoreCase("bufferpair")) {
+            connectionType = RenderGraph.ConnectionType.BUFFER_PAIR;
+        } else {
+            throw new RuntimeException(("Unsupported connection type: '" + connectionTypeString + "'. Expected 'fbo' or 'bufferpair'.\n"));
+        }
+
         NewNode toNode = renderGraph.findNode(toNodeUri);
         if (toNode == null) {
             toNode = renderGraph.findAka(toNodeUri);
@@ -531,7 +541,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                 throw new RuntimeException(("No node is associated with URI '" + fromNodeUri + "'"));
             }
         }
-    renderGraph.reconnectInputFboToOutput(fromNode, outputFboId, toNode, inputFboId, false);
+    renderGraph.reconnectInputToOutput(fromNode, outputFboId, toNode, inputFboId, connectionType, true);
     toNode.clearDesiredStateChanges();
     requestTaskListRefresh();
 
