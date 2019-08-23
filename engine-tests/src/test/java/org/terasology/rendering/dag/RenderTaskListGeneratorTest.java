@@ -249,11 +249,23 @@ public class RenderTaskListGeneratorTest {
 
         }
 
+        public void postInit(Context context) {
+            setDependencies(context);
+        }
+
         public boolean addOutputFboConnection(int id) {
             return false;
         }
 
         public boolean addOutputBufferPairConnection(int id) {
+            return false;
+        }
+
+        public boolean addOutputBufferPairConnection(int id, BufferPairConnection bufferPairConnection) {
+            return false;
+        }
+
+        public boolean addOutputBufferPairConnection(int id, BufferPair bufferPair) {
             return false;
         }
 
