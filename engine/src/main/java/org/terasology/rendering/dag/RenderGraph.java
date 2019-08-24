@@ -30,7 +30,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
 import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.dag.gsoc.*;
+import org.terasology.rendering.dag.dependencyConnections.*;
 
 /**
  * TODO: Add javadocs

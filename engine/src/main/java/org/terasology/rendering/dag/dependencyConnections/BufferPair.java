@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.gsoc;
+package org.terasology.rendering.dag.dependencyConnections;
 
 import javafx.util.Pair;
 import org.terasology.rendering.opengl.FBO;

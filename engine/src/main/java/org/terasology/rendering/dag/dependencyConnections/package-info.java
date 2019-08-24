@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 @API
- package org.terasology.rendering.dag.gsoc;
+ package org.terasology.rendering.dag.dependencyConnections;
 
  import org.terasology.module.sandbox.API;

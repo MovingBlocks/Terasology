@@ -23,11 +23,11 @@ import org.junit.Test;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
-import org.terasology.rendering.dag.gsoc.BufferPairConnection;
-import org.terasology.rendering.dag.gsoc.BufferPair;
-import org.terasology.rendering.dag.gsoc.DependencyConnection;
-import org.terasology.rendering.dag.gsoc.FboConnection;
-import org.terasology.rendering.dag.gsoc.RunOrderConnection;
+import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.rendering.dag.dependencyConnections.BufferPair;
+import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
+import org.terasology.rendering.dag.dependencyConnections.FboConnection;
+import org.terasology.rendering.dag.dependencyConnections.RunOrderConnection;
 import org.terasology.rendering.opengl.FBO;
 
 import java.util.List;

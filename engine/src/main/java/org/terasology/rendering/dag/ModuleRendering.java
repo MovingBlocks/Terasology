@@ -22,7 +22,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.naming.Name;
-import org.terasology.rendering.dag.gsoc.BufferPair;
+import org.terasology.rendering.dag.dependencyConnections.BufferPair;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
