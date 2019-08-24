@@ -45,7 +45,7 @@ import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.rendering.dag.Node;
-import org.terasology.rendering.dag.gsoc.ModuleRendering;
+import org.terasology.rendering.dag.ModuleRendering;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
