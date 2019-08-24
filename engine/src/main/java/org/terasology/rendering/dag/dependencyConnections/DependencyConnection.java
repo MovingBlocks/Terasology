@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.dag.gsoc;
+package org.terasology.rendering.dag.dependencyConnections;
 
 import com.google.common.collect.Maps;
 import org.terasology.engine.SimpleUri;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

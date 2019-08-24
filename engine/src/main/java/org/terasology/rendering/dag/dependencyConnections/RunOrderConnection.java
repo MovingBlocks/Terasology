@@ -13,42 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.rendering.dag.gsoc;
+package org.terasology.rendering.dag.dependencyConnections;
 
 import org.terasology.engine.SimpleUri;
-import org.terasology.rendering.opengl.FBO;
 
-public class FboConnection extends DependencyConnection<FBO> {
+// TODO examine if we really need this connection type
 
-    /**
-     *
-     * @param name
-     * @param type
-     * @param parentNode
-     */
-    public FboConnection(String name, Type type, SimpleUri parentNode) {
+/**
+ *
+ */
+public class RunOrderConnection extends DependencyConnection {
+
+    public RunOrderConnection(String name, Type type, SimpleUri parentNode) {
         super(name, type, parentNode);
-    }
-
-    /**
-     *
-     * @param name
-     * @param type
-     * @param data
-     * @param parentNode
-     */
-    public FboConnection(String name, Type type, FBO data, SimpleUri parentNode) {
-        super(name, type, parentNode);
-        super.setData(data);
     }
 
     public String toString() {
         return super.toString();
     }
 
-    public static String getConnectionName(int number, SimpleUri nodeUri) {
-        return new StringBuilder(nodeUri.toString()).append(":FBO").append(number).toString();
+    public static String getConnectionName(int id, SimpleUri nodeUri) {
+        return new StringBuilder(nodeUri.toString()).append(":RunOrder").append(id).toString();
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.dag.gsoc;
+package org.terasology.rendering.dag.dependencyConnections;
 
-import javafx.util.Pair;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.FBO;
 
-public class BufferPairConnection extends DependencyConnection<BufferPair> {
+public class FboConnection extends DependencyConnection<FBO> {
 
     /**
      *
@@ -28,36 +27,20 @@ public class BufferPairConnection extends DependencyConnection<BufferPair> {
      * @param type
      * @param parentNode
      */
-    public BufferPairConnection(String name, Type type, SimpleUri parentNode) {
+    public FboConnection(String name, Type type, SimpleUri parentNode) {
         super(name, type, parentNode);
     }
 
     /**
-     * TODO unify naming/iding with other dep. conns
+     *
      * @param name
      * @param type
      * @param data
      * @param parentNode
      */
-    public BufferPairConnection(String  name, Type type, BufferPair data, SimpleUri parentNode) {
+    public FboConnection(String name, Type type, FBO data, SimpleUri parentNode) {
         super(name, type, parentNode);
         super.setData(data);
-    }
-
-    /**
-     * Return a new instance of BufferPairConnection based on this one with swapped FBOs.
-     * @param type
-     * @param parentNode
-     * @return
-     */
-    public BufferPairConnection getSwappedCopy(Type type, SimpleUri parentNode) {
-        BufferPair bufferPairToCopy = super.getData();
-        BufferPair newBufferPair =  new BufferPair(bufferPairToCopy.getSecondaryFbo(), bufferPairToCopy.getPrimaryFbo());
-        return new BufferPairConnection(this.getName(), type, newBufferPair, parentNode);
-    }
-
-    public BufferPair getBufferPair() {
-        return super.getData();
     }
 
     public String toString() {
@@ -65,7 +48,7 @@ public class BufferPairConnection extends DependencyConnection<BufferPair> {
     }
 
     public static String getConnectionName(int number, SimpleUri nodeUri) {
-        return new StringBuilder(nodeUri.toString()).append(":BufferPair").append(number).toString();
+        return new StringBuilder(nodeUri.toString()).append(":FBO").append(number).toString();
     }
 
 }

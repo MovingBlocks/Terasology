@@ -25,7 +25,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.gsoc.*;
+import org.terasology.rendering.dag.dependencyConnections.*;
 import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
