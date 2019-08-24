@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.gsoc;
+package org.terasology.rendering.dag.nodes;
 
 import org.terasology.context.Context;
 import org.terasology.naming.Name;
