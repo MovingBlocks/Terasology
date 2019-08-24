@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.gsoc;
+package org.terasology.rendering.dag;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -25,7 +25,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.dag.gsoc.*;
 import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;

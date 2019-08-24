@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.gsoc;
 
 import org.terasology.context.Context;
 import org.terasology.naming.Name;
+import org.terasology.rendering.dag.AbstractNode;
 
 public class DummyNode extends AbstractNode {
 

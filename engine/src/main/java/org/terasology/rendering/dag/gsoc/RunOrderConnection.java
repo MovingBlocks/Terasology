@@ -24,7 +24,7 @@ import org.terasology.engine.SimpleUri;
  */
 public class RunOrderConnection extends DependencyConnection {
 
-    RunOrderConnection(String name, Type type, SimpleUri parentNode) {
+    public RunOrderConnection(String name, Type type, SimpleUri parentNode) {
         super(name, type, parentNode);
     }
 
