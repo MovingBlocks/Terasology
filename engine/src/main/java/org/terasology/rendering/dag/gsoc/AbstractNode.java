@@ -41,8 +41,8 @@ import java.util.*;
  * It provides the default functionality to identify a node, handle its status (enabled/disabled),
  * deal with StateChange objects and Frame Buffer objects.
  */
-public abstract class NewAbstractNode implements NewNode {
-    protected static final Logger logger = LoggerFactory.getLogger(NewAbstractNode.class);
+public abstract class AbstractNode implements NewNode {
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
     protected boolean enabled = true;
 //    protected BufferPairConnection bufferPairConnection;
@@ -63,7 +63,7 @@ public abstract class NewAbstractNode implements NewNode {
      * @param nodeId  a String representing the id of the node, namespace -excluded-: that's added automatically.
      * @param context a Context object.
      */
-    protected NewAbstractNode(String nodeId, String nodeAka, Name providingModule, Context context) {
+    protected AbstractNode(String nodeId, String nodeAka, Name providingModule, Context context) {
         String newNodeAka = nodeAka;
         ModuleManager moduleManager = context.get(ModuleManager.class);
         // Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
@@ -80,7 +80,7 @@ public abstract class NewAbstractNode implements NewNode {
         addOutputBufferPairConnection(1);
     }
 
-    protected NewAbstractNode(String nodeId, Name providingModule, Context context) {
+    protected AbstractNode(String nodeId, Name providingModule, Context context) {
         this(nodeId, nodeId, providingModule, context);
     }
 

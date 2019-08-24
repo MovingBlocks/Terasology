@@ -30,11 +30,8 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
 import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.dag.gsoc.BufferPairConnection;
-import org.terasology.rendering.dag.gsoc.DependencyConnection;
-import org.terasology.rendering.dag.gsoc.FboConnection;
-import org.terasology.rendering.dag.gsoc.NewNode;
-import org.terasology.rendering.dag.gsoc.NewAbstractNode;
+import org.terasology.rendering.dag.gsoc.*;
+import org.terasology.rendering.dag.gsoc.AbstractNode;
 
 /**
  * TODO: Add javadocs
@@ -77,7 +74,7 @@ public class RenderGraph {
 
         // TODO this must be moved to a later stage ideally with the improved connecting of nodes which would be based on
         // TODO on dep connections. So far when creating dep. connections, connections are made and destroyed, which is wrong.
-        // if (node instanceof NewAbstractNode) {
+        // if (node instanceof AbstractNode) {
         //    node.setDependencies(context);
         // }
     }
@@ -660,7 +657,7 @@ public class RenderGraph {
         logger.info("Attempting disconnection of " + nodeUri + "'s input fbo number " + connectionId);
         NewNode node = findNode(new SimpleUri(nodeUri));
         if (node != null) {
-            ((NewAbstractNode) node).disconnectInputFbo(connectionId);
+            ((AbstractNode) node).disconnectInputFbo(connectionId);
         } else {
             throw new RuntimeException("Could not find node named " + nodeUri + " within renderGraph.");
         }

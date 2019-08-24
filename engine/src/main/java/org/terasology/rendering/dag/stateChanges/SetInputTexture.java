@@ -27,7 +27,7 @@ import java.util.Optional;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.terasology.rendering.dag.AbstractNode.getMaterial;
+import static org.terasology.rendering.dag.gsoc.AbstractNode.getMaterial;
 
 // TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
 
