@@ -19,7 +19,7 @@ import org.terasology.context.Context;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
-import org.terasology.rendering.dag.gsoc.ModuleRendering;
+import org.terasology.rendering.dag.ModuleRendering;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
