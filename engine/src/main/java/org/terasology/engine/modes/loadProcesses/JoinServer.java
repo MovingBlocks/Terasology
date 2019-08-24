@@ -102,18 +102,8 @@ public class JoinServer implements LoadProcess {
                     logger.warn("Overwriting Id {} for {} with Id {}", oldId, name, id);
                 }
             }
-            Map<String, Short> biomeMap = Maps.newHashMap();
-            for (Entry<Short, String> entry : serverInfo.getBiomeIds().entrySet()) {
-                String name = entry.getValue();
-                short id = entry.getKey();
-                Short oldId = biomeMap.put(name, id);
-                if (oldId != null && oldId != id) {
-                    logger.warn("Overwriting Biome Id {} for {} with Id {}", oldId, name, id);
-                }
-            }
             gameManifest.setRegisteredBlockFamilies(serverInfo.getRegisterBlockFamilyList());
             gameManifest.setBlockIdMap(blockMap);
-            gameManifest.setBiomeIdMap(biomeMap);
             gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
             ModuleManager moduleManager = context.get(ModuleManager.class);

@@ -151,7 +151,14 @@ public class InputSystem extends BaseComponentSystem {
      * Updates the client and input entities of the local player, to be used in input events against the local player.
      */
     private void updateInputEntities() {
-        inputEntities = new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
+        if (inputEntities == null
+                || inputEntities.length != 2
+                || inputEntities[0] == null
+                || inputEntities[1] == null
+                || !inputEntities[0].equals(localPlayer.getClientEntity())
+                || !inputEntities[1].equals(localPlayer.getCharacterEntity())) {
+            inputEntities = new EntityRef[]{localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
+        }
     }
 
     /**

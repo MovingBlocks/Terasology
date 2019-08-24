@@ -30,7 +30,9 @@ import org.terasology.world.generation.facets.SurfaceHumidityFacet;
 
 /**
  * Defines surface humidity in the range [0..1] based on random noise.
+ * @deprecated Prefer using {@link SimplexHumidityProvider}.
  */
+@Deprecated
 @Produces(SurfaceHumidityFacet.class)
 public class PerlinHumidityProvider implements ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;

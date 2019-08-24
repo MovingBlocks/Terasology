@@ -97,6 +97,17 @@ public class TranslationFormatTests {
         Assert.assertEquals("Einzelspieler", data.getTranslations().get("engine:mainMenuScreen#singleplayer#text"));
     }
 
+    @Test
+    public void testMultiLine() throws IOException, InvalidAssetFilenameException{
+        byte[] resource = createSimpleMultiLineTranslationFile().getBytes(StandardCharsets.UTF_8);
+        AssetDataFile assetDataFile = mockAssetDataFile("game.lang", resource);
+        ResourceUrn urn = createUrnFromFile(format, assetDataFile);
+
+        TranslationData data = format.load(urn, Collections.singletonList(assetDataFile));
+        Assert.assertEquals("line 1 \n line 2 \n line 3", data.getTranslations().get("multi-line"));
+        Assert.assertEquals("line 1 \n line 2 \n line 3", data.getTranslations().get("single-line"));
+    }
+
     // TODO: consider making this available to other test classes
     private static AssetDataFile mockAssetDataFile(String fname, byte[] resource) throws IOException {
         AssetDataFile assetDataFile = mock(AssetDataFile.class);
@@ -109,6 +120,16 @@ public class TranslationFormatTests {
         Name assetName = format.getAssetName(file.getFilename());
         return new ResourceUrn("engine:" + assetName.toString());
     }
+
+    private static String createSimpleMultiLineTranslationFile(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("\"multi-line\": [\"line 1 \n \",\"line 2 \n \",\"line 3\"],");
+        sb.append("\"single-line\": \"line 1 \n line 2 \n line 3\"");
+        sb.append("}");
+        return sb.toString();
+    }
+
 
     private static String createSimpleTranslationFile() {
         StringBuilder sb = new StringBuilder();

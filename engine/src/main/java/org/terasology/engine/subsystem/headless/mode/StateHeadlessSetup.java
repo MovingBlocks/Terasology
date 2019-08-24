@@ -15,6 +15,8 @@
  */
 package org.terasology.engine.subsystem.headless.mode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.WorldGenerationConfig;
 import org.terasology.context.Context;
@@ -60,6 +62,8 @@ import java.util.List;
  *
  */
 public class StateHeadlessSetup implements GameState {
+
+    private static final Logger logger = LoggerFactory.getLogger(StateHeadlessSetup.class);
 
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
@@ -125,6 +129,8 @@ public class StateHeadlessSetup implements GameState {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
             if (module != null) {
                 gameManifest.addModule(module.getId(), module.getVersion());
+            } else {
+                logger.warn("ModuleRegistry has no latest version for module {}", moduleName);
             }
         }
 

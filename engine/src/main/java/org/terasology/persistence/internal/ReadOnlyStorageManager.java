@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
@@ -36,13 +35,13 @@ import java.util.Collection;
 public final class ReadOnlyStorageManager extends AbstractStorageManager {
 
     public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                  BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
-        this(savePath, environment, entityManager, blockManager, biomeManager, extraDataManager, true);
+                                  BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
+        this(savePath, environment, entityManager, blockManager, extraDataManager, true);
     }
 
     public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                  BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips) {
-        super(savePath, environment, entityManager, blockManager, biomeManager, extraDataManager, storeChunksInZips);
+                                  BlockManager blockManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips) {
+        super(savePath, environment, entityManager, blockManager, extraDataManager, storeChunksInZips);
     }
 
     @Override

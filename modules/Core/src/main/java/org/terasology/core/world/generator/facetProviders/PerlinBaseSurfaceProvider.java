@@ -30,7 +30,9 @@ import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
+ * @deprecated Prefer using {@link SimplexBaseSurfaceProvider}.
  */
+@Deprecated
 @Produces(SurfaceHeightFacet.class)
 @Requires(@Facet(SeaLevelFacet.class))
 public class PerlinBaseSurfaceProvider implements FacetProvider {

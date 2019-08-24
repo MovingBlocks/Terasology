@@ -23,11 +23,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +60,6 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
@@ -93,7 +89,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private EventSerializer eventSerializer;
     private EventLibrary eventLibrary;
     private NetMetricSource metricSource;
-    private BiomeManager biomeManager;
 
     // Relevance
     private Set<Vector3i> relevantChunks = Sets.newHashSet();
@@ -118,7 +113,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
-    private BlockingQueue<NetData.BiomeChangeMessage> queuedOutgoingBiomeChanges = Queues.newLinkedBlockingQueue();
     private BlockingQueue<NetData.ExtraDataChangeMessage> queuedOutgoingExtraDataChanges = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private final List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
@@ -149,7 +143,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         this.networkSystem = networkSystem;
         this.time = CoreRegistry.get(Time.class);
         this.identity = identity;
-        this.biomeManager = CoreRegistry.get(BiomeManager.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
             worldProvider.registerListener(this);
@@ -409,17 +402,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     @Override
-    public void onBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
-        if (relevantChunks.contains(chunkPos)) {
-            queuedOutgoingBiomeChanges.add(NetData.BiomeChangeMessage.newBuilder()
-                    .setPos(NetMessageUtil.convert(pos))
-                    .setNewBiome(biomeManager.getBiomeShortId(newBiome))
-                    .build());
-        }
-    }
-
-    @Override
     public void onExtraDataChanged(int i, Vector3i pos, int newData, int oldData) {
         Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
         if (relevantChunks.contains(chunkPos)) {
@@ -448,10 +430,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         List<NetData.BlockChangeMessage> blockChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBlockChanges.size());
         queuedOutgoingBlockChanges.drainTo(blockChanges);
         message.addAllBlockChange(blockChanges);
-
-        List<NetData.BiomeChangeMessage> biomeChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBiomeChanges.size());
-        queuedOutgoingBiomeChanges.drainTo(biomeChanges);
-        message.addAllBiomeChange(biomeChanges);
         
         List<NetData.ExtraDataChangeMessage> extraDataChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingExtraDataChanges.size());
         queuedOutgoingExtraDataChanges.drainTo(extraDataChanges);

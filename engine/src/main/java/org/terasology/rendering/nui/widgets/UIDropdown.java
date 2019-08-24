@@ -39,6 +39,7 @@ import java.util.List;
 
 /**
  * A dropdown widget.
+ *
  * @param <T> the list element type
  */
 public class UIDropdown<T> extends ActivatableWidget {
@@ -110,7 +111,8 @@ public class UIDropdown<T> extends ActivatableWidget {
             for (int i = 0; i < optionListeners.size(); ++i) {
                 if (optionListeners.get(i).isMouseOver()) {
                     canvas.setMode(HOVER_MODE);
-                } else if (i==highlighted && TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
+                    highlighted = i;
+                } else if (i == highlighted) {
                     canvas.setMode(HOVER_MODE);
                 } else {
                     canvas.setMode(DEFAULT_MODE);
@@ -137,7 +139,7 @@ public class UIDropdown<T> extends ActivatableWidget {
     public String getMode() {
         if (!isEnabled()) {
             return DISABLED_MODE;
-        } else if (opened || (TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this))) {
+        } else if (opened || this.equals(TabbingManager.focusedWidget)) {
             return ACTIVE_MODE;
         }
         return DEFAULT_MODE;
@@ -251,7 +253,7 @@ public class UIDropdown<T> extends ActivatableWidget {
         } else {
             highlighted--;
             if (highlighted < 0) {
-                highlighted = getOptions().size()-1;
+                highlighted = getOptions().size() - 1;
             }
         }
 
@@ -260,35 +262,40 @@ public class UIDropdown<T> extends ActivatableWidget {
         }
     }
 
-    public boolean isOpened() { return opened; }
+    public boolean isOpened() {
+        return opened;
+    }
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown() && TabbingManager.focusedWidget.equals(this)) {
-            if (opened) {
-                TabbingManager.setWidgetIsOpen(true);
-            } else {
-                TabbingManager.setWidgetIsOpen(false);
-            }
-
+        if (event.isDown()) {
             int keyId = event.getKey().getId();
-            if (keyId == Keyboard.KeyId.UP) {
-                this.changeHighlighted(false);
-                return true;
-            } else if (keyId == Keyboard.KeyId.DOWN) {
-                this.changeHighlighted(true);
-                return true;
-            }
-            if (keyId == Keyboard.KeyId.LEFT) {
-                if (opened) {
-                    setOpenedReverse(false);
-                }
-                return true;
-            } else if (keyId == Keyboard.KeyId.RIGHT) {
-                if (!opened) {
-                    setOpenedReverse(false);
-                }
-                return true;
+            switch (keyId) {
+                case Keyboard.KeyId.UP:
+                    this.changeHighlighted(false);
+                    return false;
+                case Keyboard.KeyId.DOWN:
+                    this.changeHighlighted(true);
+                    return false;
+                case Keyboard.KeyId.LEFT:
+                    if (opened) {
+                        setOpenedReverse(false);
+                    }
+                    return true;
+                case Keyboard.KeyId.ENTER:
+                    if (opened) {
+                        setSelection(getOptions().get(highlighted));
+                        setOpenedReverse(false);
+                    } else {
+                        setOpenedReverse(false);
+                        highlighted = getOptions().indexOf(getSelection());
+                    }
+                    return true;
+                case Keyboard.KeyId.RIGHT:
+                    if (!opened) {
+                        setOpenedReverse(false);
+                    }
+                    return true;
             }
         }
         return super.onKeyEvent(event);

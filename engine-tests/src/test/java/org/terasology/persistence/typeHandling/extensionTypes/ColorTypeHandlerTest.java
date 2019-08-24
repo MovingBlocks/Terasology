@@ -21,9 +21,8 @@ import com.google.gson.JsonArray;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.rendering.nui.Color;
@@ -34,19 +33,18 @@ import org.terasology.rendering.nui.Color;
 public class ColorTypeHandlerTest {
 
     private final ColorTypeHandler handler = new ColorTypeHandler();
-    private final DeserializationContext deserializationContext = Mockito.mock(DeserializationContext.class);
 
     @Test
     public void testSerialize() {
-        SerializationContext serializationContext = Mockito.mock(SerializationContext.class);
-        handler.serialize(new Color(0x010380FF), serializationContext);
-        Mockito.verify(serializationContext).create(1, 3, 128, 255);
+        PersistedDataSerializer persistedDataSerializer = Mockito.mock(PersistedDataSerializer.class);
+        handler.serialize(new Color(0x010380FF), persistedDataSerializer);
+        Mockito.verify(persistedDataSerializer).serialize(1, 3, 128, 255);
     }
 
     @Test
     public void testDeserializeHex() {
         PersistedData data = new PersistedString("DEADBEEF");
-        Color color = handler.deserialize(data, deserializationContext);
+        Color color = handler.deserialize(data).get();
         Assert.assertEquals(0xDEADBEEF, color.rgba());
     }
 
@@ -54,7 +52,7 @@ public class ColorTypeHandlerTest {
     public void testDeserializeArray() {
         JsonArray array = new Gson().fromJson("[12, 34, 56, 78]", JsonArray.class);
         PersistedData data = new GsonPersistedDataArray(array);
-        Color color = handler.deserialize(data, deserializationContext);
+        Color color = handler.deserialize(data).get();
         Assert.assertEquals(12, color.r());
         Assert.assertEquals(34, color.g());
         Assert.assertEquals(56, color.b());

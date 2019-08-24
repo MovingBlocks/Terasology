@@ -137,7 +137,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
                         ParameterizedType parameterizedType = (ParameterizedType) fieldType;
                         Type[] typeArguments = parameterizedType.getActualTypeArguments();
                         if (typeArguments.length == 1) {
-                            Class<?> typeClass = ReflectionUtil.getClassOfType(typeArguments[0]);
+                            Class<?> typeClass = ReflectionUtil.getRawType(typeArguments[0]);
                             if (typeClass.isAssignableFrom(MeshAnimation.class)) {
                                 animationSetUris.add(new ComponentFieldUri(uri, fieldMetadata.getName()));
                             }

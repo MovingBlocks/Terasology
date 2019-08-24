@@ -24,7 +24,6 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
@@ -195,7 +194,8 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     private void readItemMouseOver(Canvas canvas, int i) {
         if (optionListeners.get(i).isMouseOver()) {
             canvas.setMode(HOVER_MODE);
-        } else if (i == highlighted && TabbingManager.focusedWidget != null && TabbingManager.focusedWidget.equals(this)) {
+            highlighted = i;
+        } else if (i == highlighted) {
             canvas.setMode(HOVER_MODE);
         } else {
             canvas.setMode(DEFAULT_MODE);
@@ -312,44 +312,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
             if (selectionSet) {
                 setSelection(getOptions().get(highlighted));
             }
-        }
-    }
-
-    public void changeHighlighted(boolean increase) {
-        if (!opened) {
-            highlighted = getOptions().indexOf(getSelection());
-        }
-
-        if (increase) {
-            highlighted++;
-            if (highlighted >= getOptions().size()) {
-                highlighted = 0;
-                if (opened) {
-                    verticalBar.setValue(verticalBar.getMinimum());
-                }
-            } else {
-                if (opened) {
-                    int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
-                    verticalBar.setValue(verticalBar.getValue() - scrollMultiplier);
-                }
-            }
-        } else {
-            highlighted--;
-            if (highlighted < 0) {
-                highlighted = getOptions().size() - 1;
-                if (opened) {
-                    verticalBar.setValue(verticalBar.getRange() - verticalBar.getMinimum());
-                }
-            } else {
-                if (opened) {
-                    int scrollMultiplier = 0 - (verticalBar.getRange() * visibleOptionsNum) / (itemHeight * (optionListeners.size() / visibleOptionsNum));
-                    verticalBar.setValue(verticalBar.getValue() + scrollMultiplier);
-                }
-            }
-        }
-
-        if (!opened) {
-            setSelection(getOptions().get(highlighted));
         }
     }
 

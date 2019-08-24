@@ -8,6 +8,7 @@ import groovy.json.JsonSlurper
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.exception.GrgitException
 import org.ajoberstar.grgit.Remote
+import org.eclipse.jgit.errors.RepositoryNotFoundException
 
 class common {
 
@@ -190,31 +191,35 @@ class common {
             println "$itemType \"$itemName\" not found"
             return
         }
-        def itemGit = Grgit.open(dir: targetDir)
-
-        // Do a check for the default remote before we attempt to update
-        def remotes = itemGit.remote.list()
-        def targetUrl = remotes.find{
-            it.name == defaultRemote
-        }?.url
-        if (targetUrl == null || !isUrlValid(targetUrl)) {
-            println "While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl"
-            return
-        }
-
-        // At this point we should have a valid remote to pull from. If local repo is clean then pull!
-        def clean = itemGit.status().clean
-        println "Is \"$itemName\" clean? $clean"
-        if (!clean) {
-            println "$itemType has uncommitted changes. Skipping."
-            return
-        }
-        println "Updating $itemType $itemName"
-
         try {
-            itemGit.pull remote: defaultRemote
-        } catch (GrgitException exception) {
-            println "Unable to update $itemName, Skipping: ${exception.getMessage()}"
+            def itemGit = Grgit.open(dir: targetDir)
+
+            // Do a check for the default remote before we attempt to update
+            def remotes = itemGit.remote.list()
+            def targetUrl = remotes.find{
+                it.name == defaultRemote
+            }?.url
+            if (targetUrl == null || !isUrlValid(targetUrl)) {
+                println "While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl"
+                return
+            }
+
+            // At this point we should have a valid remote to pull from. If local repo is clean then pull!
+            def clean = itemGit.status().clean
+            println "Is \"$itemName\" clean? $clean"
+            if (!clean) {
+                println "$itemType has uncommitted changes. Skipping."
+                return
+            }
+            println "Updating $itemType $itemName"
+
+            try {
+                itemGit.pull remote: defaultRemote
+            } catch (GrgitException exception) {
+                println "Unable to update $itemName, Skipping: ${exception.getMessage()}"
+            }
+        } catch(RepositoryNotFoundException exception) {
+            println "Skipping update for $itemName: no repository found (probably engine module)"
         }
     }
 

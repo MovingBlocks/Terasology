@@ -21,13 +21,13 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
-import org.terasology.logic.characters.events.OnEnterBiomeEvent;
 import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
+import org.terasology.math.geom.ImmutableVector3f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -36,7 +36,6 @@ import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 
 import java.math.RoundingMode;
@@ -134,11 +133,6 @@ public class KinematicCharacterMover implements CharacterMover {
         // TODO: This will only work for tall mobs/players and single block mobs
         // is this a different position than previously
         if (!oldPosition.equals(newPosition)) {
-            Biome oldBiome = worldProvider.getBiome(oldPosition);
-            Biome newBiome = worldProvider.getBiome(newPosition);
-            if (oldBiome != newBiome) {
-                entity.send(new OnEnterBiomeEvent(oldPosition, newPosition, oldBiome, newBiome));
-            }
             // get the old position's blocks
             Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
             Vector3i currentPosition = new Vector3i(oldPosition);
@@ -642,7 +636,7 @@ public class KinematicCharacterMover implements CharacterMover {
         distanceMoved.sub(state.getPosition());
         state.getPosition().set(moveResult.getFinalPosition());
         if (input.isFirstRun() && distanceMoved.length() > 0) {
-            entity.send(new MovedEvent(distanceMoved, state.getPosition()));
+            entity.send(new MovedEvent(new ImmutableVector3f(distanceMoved), new ImmutableVector3f(state.getPosition())));
         }
 
         // Upon hitting solid ground, reset the number of jumps back to the maximum value.

@@ -45,7 +45,7 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
-import org.terasology.world.biomes.BiomeManager;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
@@ -97,7 +97,6 @@ public abstract class TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         engineEntityManager = context.get(EngineEntityManager.class);
         BlockManager mockBlockManager = context.get(BlockManager.class); // 'mock' added to avoid hiding a field
-        BiomeManager biomeManager = context.get(BiomeManager.class);
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
@@ -106,12 +105,12 @@ public abstract class TerasologyTestingEnvironment {
         context.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         context.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager.getEnvironment());
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, mockBlockManager, biomeManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+                engineEntityManager, mockBlockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);

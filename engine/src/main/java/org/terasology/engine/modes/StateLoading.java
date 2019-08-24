@@ -50,7 +50,6 @@ import org.terasology.engine.modes.loadProcesses.PostBeginSystems;
 import org.terasology.engine.modes.loadProcesses.PreBeginSystems;
 import org.terasology.engine.modes.loadProcesses.PrepareWorld;
 import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
-import org.terasology.engine.modes.loadProcesses.RegisterBiomes;
 import org.terasology.engine.modes.loadProcesses.RegisterBlockFamilies;
 import org.terasology.engine.modes.loadProcesses.RegisterBlocks;
 import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
@@ -157,7 +156,6 @@ public class StateLoading implements GameState {
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
-        loadProcesses.add(new RegisterBiomes(context, gameManifest));
         loadProcesses.add(new InitialiseGraphics(context));
         loadProcesses.add(new CacheBlocks(context));
         loadProcesses.add(new LoadPrefabs(context));
@@ -184,7 +182,6 @@ public class StateLoading implements GameState {
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
-        loadProcesses.add(new RegisterBiomes(context, gameManifest));
         loadProcesses.add(new InitialiseGraphics(context));
         loadProcesses.add(new CacheBlocks(context));
         loadProcesses.add(new LoadPrefabs(context));

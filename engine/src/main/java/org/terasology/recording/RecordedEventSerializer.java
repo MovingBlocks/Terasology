@@ -15,67 +15,23 @@
  */
 package org.terasology.recording;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonWriter;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.array.TFloatArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
-import org.terasology.logic.characters.CharacterMoveInputEvent;
-import org.terasology.logic.characters.GetMaxSpeedEvent;
-import org.terasology.logic.characters.MovementMode;
-import org.terasology.logic.characters.events.AttackEvent;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
+import org.terasology.persistence.serializers.GsonSerializer;
+import org.terasology.persistence.typeHandling.SerializationException;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
-import org.terasology.persistence.typeHandling.gson.GsonDeserializationContext;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedData;
-import org.terasology.persistence.typeHandling.gson.GsonSerializationContext;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.naming.Name;
-import org.terasology.input.BindAxisEvent;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.events.InputEvent;
-import org.terasology.input.events.KeyUpEvent;
-import org.terasology.input.events.KeyRepeatEvent;
-import org.terasology.input.events.KeyDownEvent;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseAxisEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.input.ButtonState;
-import org.terasology.input.Keyboard;
-import org.terasology.input.MouseInput;
+import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.TypeRegistry;
 
-
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Serializes and deserializes RecordedEvents.
@@ -83,441 +39,46 @@ import java.util.Map;
 class RecordedEventSerializer {
 
     private static final Logger logger = LoggerFactory.getLogger(RecordedEventSerializer.class);
-    private static final double DEFAULT_DOUBLE_VALUE = 0.0;
-    private TypeSerializationLibrary typeSerializationLibrary;
-    private EntityManager entityManager;
-    private ModuleEnvironment moduleEnvironment;
-    private Map<String, Class<? extends InputEvent>> inputEventClassMap;
 
+    private GsonSerializer gsonSerializer;
 
-    RecordedEventSerializer(EntityManager entityManager, ModuleEnvironment moduleEnvironment) {
-        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-        this.typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
-        typeSerializationLibrary.add(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
-        typeSerializationLibrary.add(MouseAxisEvent.MouseAxis.class, new EnumTypeHandler<>(MouseAxisEvent.MouseAxis.class));
-        typeSerializationLibrary.add(ButtonState.class, new EnumTypeHandler<>(ButtonState.class));
-        typeSerializationLibrary.add(Keyboard.Key.class, new EnumTypeHandler<>(Keyboard.Key.class));
-        typeSerializationLibrary.add(MouseInput.class, new EnumTypeHandler<>(MouseInput.class));
-        typeSerializationLibrary.add(MovementMode.class, new EnumTypeHandler<>(MovementMode.class));
-        this.entityManager = entityManager;
-        this.moduleEnvironment = moduleEnvironment;
+    public RecordedEventSerializer(EntityManager entityManager, ModuleManager moduleManager, TypeRegistry typeRegistry) {
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
+        typeHandlerLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
+
+        gsonSerializer = new GsonSerializer(typeHandlerLibrary);
     }
 
-    void serializeRecordedEvents(List<RecordedEvent> events, String filePath) {
+    /**
+     * Serializes RecordedEvent's list.
+     *
+     * @param events RecordedEvent's list.
+     * @param filePath path where the data should be saved.
+     */
+    public void serializeRecordedEvents(List<RecordedEvent> events, String filePath) {
         try {
-            JsonWriter writer = new JsonWriter(new FileWriter(filePath));
-            writer.beginObject();
-            writer.name("events");
-            writer.beginArray();
-            for (RecordedEvent event : events) {
-                writer.beginObject();
-                writer.name("entityRef_ID").value(event.getEntityId());
-                writer.name("timestamp").value(event.getTimestamp());
-                writer.name("index").value(event.getIndex());
-                writer.name("event_class").value(event.getEvent().getClass().getName());
-                writer.name("event_data");
-                writer.beginObject();
-                writeSpecificEventData(writer, event.getEvent());
-                writer.endObject();
-                writer.endObject();
-            }
-            writer.endArray();
-            writer.endObject();
-            writer.close();
-        } catch (Exception e) {
-            logger.error("Error while serializing events:", e);
-        }
-
-
-    }
-
-    private void writeSpecificEventData(JsonWriter writer, Event event) {
-        try {
-            GsonSerializationContext serializationContext = new GsonSerializationContext(null);
-            Gson gson = new GsonBuilder().create();
-            if (event instanceof InputEvent) {
-                InputEvent e = (InputEvent) event;
-                writer.name("delta").value(e.getDelta());
-                writer.name("consumed").value(e.isConsumed());
-                writer.name("target").value(e.getTarget().getId());
-
-                writeVector3fData(writer, serializationContext, e);
-                writeInputEventInstanceData(writer, event, serializationContext);
-
-
-            } else if (event instanceof CameraTargetChangedEvent) {
-                CameraTargetChangedEvent e = (CameraTargetChangedEvent) event;
-                writer.name("OldTarget").value(e.getOldTarget().getId());
-                writer.name("NewTarget").value(e.getNewTarget().getId());
-            } else if (event instanceof PlaySoundEvent) {
-                PlaySoundEvent e = (PlaySoundEvent) event;
-                writer.name("volume").value(e.getVolume());
-                TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(StaticSound.class);
-                PersistedData data = handler.serialize(e.getSound(), serializationContext);
-                writer.name("sound").value(data.getAsString());
-
-            } else if (event instanceof CharacterMoveInputEvent) {
-                CharacterMoveInputEvent e = (CharacterMoveInputEvent) event;
-                writer.name("delta").value(e.getDeltaMs());
-                writer.name("pitch").value(e.getPitch());
-                writer.name("yaw").value(e.getYaw());
-                writer.name("running").value(e.isRunning());
-                writer.name("crouching").value(e.isCrouching());
-                writer.name("jumpRequested").value(e.isJumpRequested());
-                writer.name("sequeceNumber").value(e.getSequenceNumber());
-                writer.name("firstRun").value(e.isFirstRun());
-                TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3f.class);
-                GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getMovementDirection(), serializationContext);
-                writer.name("movementDirection");
-                writer.beginObject();
-                JsonArray array = data.getElement().getAsJsonArray();
-                writer.name("x").value(array.get(0).getAsFloat());
-                writer.name("y").value(array.get(1).getAsFloat());
-                writer.name("z").value(array.get(2).getAsFloat());
-                writer.endObject();
-
-            } else if (event instanceof GetMaxSpeedEvent) {
-                GetMaxSpeedEvent e = (GetMaxSpeedEvent) event;
-                writer.name("baseValue").value(e.getBaseValue());
-                TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(MovementMode.class);
-                GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getMovementMode(), serializationContext);
-                writer.name("movementMode").value(data.getAsString());
-                writer.name("modifiers");
-                gson.toJson(e.getModifiers(), TFloatArrayList.class, writer);
-                writer.name("multipliers");
-                gson.toJson(e.getMultipliers(), TFloatArrayList.class, writer);
-                writer.name("postModifiers");
-                gson.toJson(e.getPostModifiers(), TFloatArrayList.class, writer);
-            } else if (event instanceof AttackEvent) {
-                AttackEvent e = (AttackEvent) event;
-                writer.name("instigator").value(e.getInstigator().getId());
-                writer.name("directCause").value(e.getDirectCause().getId());
-            } else {
-                logger.error("ERROR: EVENT NOT SUPPORTED FOR SERIALIZATION");
-            }
-        } catch (Exception e) {
-            logger.error("Could not serialize this event: " + event.toString(), e);
+            gsonSerializer.writeJson(events, new TypeInfo<List<RecordedEvent>>() {}, filePath);
+        } catch (IOException | SerializationException e) {
+            logger.error("Error while serializing recorded events", e);
         }
     }
 
-    private void writeVector3fData(JsonWriter writer, GsonSerializationContext serializationContext, InputEvent e) throws IOException {
-        if (e.getHitNormal() == null) {
-            writeDefaultVector3fData(writer);
-        } else {
-            writeRealVector3fData(writer, serializationContext, e);
-        }
-    }
-
-    private void writeRealVector3fData(JsonWriter writer, GsonSerializationContext serializationContext, InputEvent e) throws IOException {
-        TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3f.class);
-        GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getHitNormal(), serializationContext);
-        writer.name("hitNormal");
-        writer.beginObject();
-        JsonArray array = data.getElement().getAsJsonArray();
-        writer.name("x").value(array.get(0).getAsFloat());
-        writer.name("y").value(array.get(1).getAsFloat());
-        writer.name("z").value(array.get(2).getAsFloat());
-        writer.endObject();
-
-        data = (GsonPersistedData) handler.serialize(e.getHitPosition(), serializationContext);
-        writer.name("hitPosition");
-        writer.beginObject();
-        array = data.getElement().getAsJsonArray();
-        writer.name("x").value(array.get(0).getAsFloat());
-        writer.name("y").value(array.get(1).getAsFloat());
-        writer.name("z").value(array.get(2).getAsFloat());
-        writer.endObject();
-
-        handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector3i.class);
-        data = (GsonPersistedData) handler.serialize(e.getTargetBlockPosition(), serializationContext);
-        writer.name("targetBlockPosition");
-        writer.beginObject();
-        array = data.getElement().getAsJsonArray();
-        writer.name("x").value(array.get(0).getAsInt());
-        writer.name("y").value(array.get(1).getAsInt());
-        writer.name("z").value(array.get(2).getAsInt());
-        writer.endObject();
-    }
-
-    private void writeDefaultVector3fData(JsonWriter writer) throws IOException {
-        writer.name("hitNormal");
-        writer.beginObject();
-        writer.name("x").value(DEFAULT_DOUBLE_VALUE);
-        writer.name("y").value(DEFAULT_DOUBLE_VALUE);
-        writer.name("z").value(DEFAULT_DOUBLE_VALUE);
-        writer.endObject();
-
-        writer.name("hitPosition");
-        writer.beginObject();
-        writer.name("x").value(DEFAULT_DOUBLE_VALUE);
-        writer.name("y").value(DEFAULT_DOUBLE_VALUE);
-        writer.name("z").value(DEFAULT_DOUBLE_VALUE);
-        writer.endObject();
-
-        writer.name("targetBlockPosition");
-        writer.beginObject();
-        writer.name("x").value(DEFAULT_DOUBLE_VALUE);
-        writer.name("y").value(DEFAULT_DOUBLE_VALUE);
-        writer.name("z").value(DEFAULT_DOUBLE_VALUE);
-        writer.endObject();
-    }
-
-    private void writeInputEventInstanceData(JsonWriter writer, Event event, GsonSerializationContext serializationContext) throws Exception {
-        if (event instanceof MouseWheelEvent) {
-            MouseWheelEvent e = (MouseWheelEvent) event;
-            writer.name("wheelTurns").value(e.getWheelTurns());
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector2i.class);
-            GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getMousePosition(), serializationContext);
-            writer.name("mousePosition");
-            writer.beginObject();
-            JsonArray array = data.getElement().getAsJsonArray();
-            writer.name("x").value(array.get(0).getAsInt());
-            writer.name("y").value(array.get(1).getAsInt());
-            writer.endObject();
-        } else if (event instanceof MouseAxisEvent) {
-            MouseAxisEvent e = (MouseAxisEvent) event;
-            writer.name("value").value(e.getValue());
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(MouseAxisEvent.MouseAxis.class);
-            GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getMouseAxis(), serializationContext);
-            writer.name("mouseAxis").value(data.getAsString());
-        } else if (event instanceof BindAxisEvent) {
-            BindAxisEvent e = (BindAxisEvent) event;
-            writer.name("id").value(e.getId());
-            writer.name("value").value(e.getValue());
-        } else if (event instanceof BindButtonEvent) {
-            BindButtonEvent e = (BindButtonEvent) event;
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(ButtonState.class);
-            GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getState(), serializationContext);
-            writer.name("state").value(data.getAsString());
-            writer.name("id");
-            writer.beginObject();
-            handler = typeSerializationLibrary.getTypeHandlerFromClass(Name.class);
-            data = (GsonPersistedData) handler.serialize(e.getId().getModuleName(), serializationContext);
-            writer.name("moduleName").value(data.getAsString());
-            data = (GsonPersistedData) handler.serialize(e.getId().getObjectName(), serializationContext);
-            writer.name("objectName").value(data.getAsString());
-            writer.endObject();
-        } else if (event instanceof KeyEvent) {
-            KeyEvent e = (KeyEvent) event;
-            writer.name("keychar").value(e.getKeyCharacter());
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(ButtonState.class);
-            GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getState(), serializationContext);
-            writer.name("state").value(data.getAsString());
-            handler = typeSerializationLibrary.getTypeHandlerFromClass(Keyboard.Key.class); // might need to add some things to key
-            data = (GsonPersistedData) handler.serialize(e.getKey(), serializationContext);
-            writer.name("input").value(data.getAsString());
-        } else if (event instanceof MouseButtonEvent) {
-            MouseButtonEvent e = (MouseButtonEvent) event;
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(ButtonState.class);
-            GsonPersistedData data = (GsonPersistedData) handler.serialize(e.getState(), serializationContext);
-            writer.name("state").value(data.getAsString());
-            handler = typeSerializationLibrary.getTypeHandlerFromClass(MouseInput.class);
-            data = (GsonPersistedData) handler.serialize(e.getButton(), serializationContext);
-            writer.name("button").value(data.getAsString());
-            handler = typeSerializationLibrary.getTypeHandlerFromClass(Vector2i.class);
-            data = (GsonPersistedData) handler.serialize(e.getMousePosition(), serializationContext);
-            writer.name("mousePosition");
-            writer.beginObject();
-            JsonArray array = data.getElement().getAsJsonArray();
-            writer.name("x").value(array.get(0).getAsInt());
-            writer.name("y").value(array.get(1).getAsInt());
-            writer.endObject();
-        } else {
-            logger.error("ERROR, EVENT NOT COMPATIBLE");
-        }
-    }
-
-    List<RecordedEvent> deserializeRecordedEvents(String path) {
+    /**
+     * Deserializes RecordedEvent's list.
+     *
+     * @param filePath path where the data should be saved.
+     */
+    public List<RecordedEvent> deserializeRecordedEvents(String filePath) {
         List<RecordedEvent> events = new ArrayList<>();
-        createInputEventClassMap();
-        JsonObject jsonObject;
-        try (FileReader fileReader = new FileReader(path)) {
-            JsonParser parser = new JsonParser();
-            JsonElement jsonElement = parser.parse(fileReader);
-            jsonObject = jsonElement.getAsJsonObject();
-            JsonArray jsonEvents = jsonObject.getAsJsonArray("events");
-            for (JsonElement element : jsonEvents) {
-                jsonObject = element.getAsJsonObject();
-                String className = jsonObject.get("event_class").getAsString();
-                long refId = jsonObject.get("entityRef_ID").getAsLong();
-                long index = jsonObject.get("index").getAsLong();
-                long timestamp = jsonObject.get("timestamp").getAsLong();
-                Event event = deserializeSpecificEventData(jsonObject.get("event_data").getAsJsonObject(), className);
-                RecordedEvent re = new RecordedEvent(refId, event, timestamp, index);
-                events.add(re);
-            }
-        } catch (Exception e) {
-            logger.error("Error while deserializing event:", e);
+
+        try {
+            List<RecordedEvent> recordedEvents =
+                    gsonSerializer.fromJson(new File(filePath), new TypeInfo<List<RecordedEvent>>() {});
+            events.addAll(recordedEvents);
+        } catch (SerializationException | IOException e) {
+            logger.error("Error while serializing recorded events", e);
         }
 
         return events;
-    }
-
-    private void createInputEventClassMap() {
-        this.inputEventClassMap = new HashMap<>();
-        Iterable<Class<? extends InputEvent>> classes = moduleEnvironment.getSubtypesOf(InputEvent.class);
-        for (Class<? extends InputEvent> c : classes) {
-            this.inputEventClassMap.put(c.getName(), c);
-        }
-    }
-
-    private Event deserializeSpecificEventData(JsonObject jsonObject, String className) {
-        Event result = null;
-        Gson gson = new GsonBuilder().create();
-        GsonDeserializationContext deserializationContext = new GsonDeserializationContext(null);
-        if (className.equals(CameraTargetChangedEvent.class.getName())) {
-            EntityRef oldTarget = new RecordedEntityRef(jsonObject.get("OldTarget").getAsLong(), (LowLevelEntityManager) this.entityManager);
-            EntityRef newTarget =  new RecordedEntityRef(jsonObject.get("NewTarget").getAsLong(), (LowLevelEntityManager) this.entityManager);
-            result = new CameraTargetChangedEvent(oldTarget, newTarget);
-        } else if (className.equals(PlaySoundEvent.class.getName())) {
-            float volume = jsonObject.get("volume").getAsFloat();
-            GsonPersistedData data = new GsonPersistedData(jsonObject.get("sound"));
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(StaticSound.class);
-            StaticSound sound = (StaticSound) handler.deserialize(data, deserializationContext);
-            result = new PlaySoundEvent(sound, volume);
-        } else if (className.equals(CharacterMoveInputEvent.class.getName())) {
-            long delta = jsonObject.get("delta").getAsLong();
-            float pitch = jsonObject.get("pitch").getAsFloat();
-            float yaw = jsonObject.get("yaw").getAsFloat();
-            boolean running = jsonObject.get("running").getAsBoolean();
-            boolean crouching = jsonObject.get("crouching").getAsBoolean();
-            boolean jumpRequested = jsonObject.get("jumpRequested").getAsBoolean();
-            int sequenceNumber = jsonObject.get("sequeceNumber").getAsInt();
-            boolean firstRun = jsonObject.get("firstRun").getAsBoolean();
-            JsonObject objMoveDirection = jsonObject.get("movementDirection").getAsJsonObject();
-            Vector3f movementDirection = new Vector3f(objMoveDirection.get("x").getAsFloat(),
-                    objMoveDirection.get("y").getAsFloat(),
-                    objMoveDirection.get("z").getAsFloat());
-            result = new CharacterMoveInputEvent(sequenceNumber, pitch, yaw, movementDirection, running, crouching, jumpRequested, delta);
-        } else if (className.equals(GetMaxSpeedEvent.class.getName())) {
-            float baseValue = jsonObject.get("baseValue").getAsFloat();
-            TypeHandler handler = typeSerializationLibrary.getTypeHandlerFromClass(MovementMode.class);
-            GsonPersistedData data = new GsonPersistedData(jsonObject.get("movementMode"));
-            MovementMode movementMode = (MovementMode) handler.deserialize(data, deserializationContext);
-            TFloatList modifiers = gson.fromJson(jsonObject.get("modifiers"), TFloatArrayList.class);
-            TFloatList multipliers = gson.fromJson(jsonObject.get("multipliers"), TFloatArrayList.class);
-            TFloatList postModifiers = gson.fromJson(jsonObject.get("postModifiers"), TFloatArrayList.class);
-            GetMaxSpeedEvent event = new GetMaxSpeedEvent(baseValue, movementMode);
-            event.setPostModifiers(postModifiers);
-            event.setMultipliers(multipliers);
-            event.setModifiers(modifiers);
-            result = event;
-        } else if (className.equals(AttackEvent.class.getName())) {
-            EntityRef instigator = new RecordedEntityRef(jsonObject.get("instigator").getAsLong(), (LowLevelEntityManager) this.entityManager);
-            EntityRef directCause = new RecordedEntityRef(jsonObject.get("directCause").getAsLong(), (LowLevelEntityManager) this.entityManager);
-            result = new AttackEvent(instigator, directCause);
-        } else if (getInputEventSpecificType(jsonObject, className, deserializationContext) != null) { //input events
-            result = getInputEventSpecificType(jsonObject, className, deserializationContext);
-        }
-
-        return result;
-    }
-
-    private InputEvent getInputEventSpecificType(JsonObject jsonObject, String className, GsonDeserializationContext deserializationContext) {
-        InputEvent newEvent = null;
-        try {
-            Class clazz = this.inputEventClassMap.get(className);
-            if (BindButtonEvent.class.isAssignableFrom(clazz) || BindAxisEvent.class.isAssignableFrom(clazz)) {
-                newEvent = (InputEvent) clazz.getConstructor().newInstance();
-            } else if (clazz.equals(KeyDownEvent.class) || clazz.equals(KeyRepeatEvent.class) || clazz.equals(KeyUpEvent.class)) { //KeyEvent
-                GsonPersistedData data = new GsonPersistedData(jsonObject.get("input"));
-                TypeHandler typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(Keyboard.Key.class);
-                Keyboard.Key input = (Keyboard.Key) typeHandler.deserialize(data, deserializationContext);
-                data = new GsonPersistedData(jsonObject.get("state"));
-                typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(ButtonState.class);
-                ButtonState state = (ButtonState) typeHandler.deserialize(data, deserializationContext);
-                char keychar = jsonObject.get("keychar").getAsCharacter();
-                float delta = jsonObject.get("delta").getAsFloat();
-                KeyEvent aux;
-                if (clazz.equals(KeyDownEvent.class)) {
-                    aux = KeyDownEvent.create(input, keychar, delta); // The instance created here is static
-                    aux = KeyDownEvent.createCopy((KeyDownEvent) aux); // This copies the static value so each KeyEvent does not have the same value
-                } else if (clazz.equals(KeyRepeatEvent.class)) {
-                    aux = KeyRepeatEvent.create(input, keychar, delta);
-                    aux = KeyRepeatEvent.createCopy((KeyRepeatEvent) aux);
-                } else {
-                    aux = KeyUpEvent.create(input, keychar, delta);
-                    aux = KeyUpEvent.createCopy((KeyUpEvent) aux);
-                }
-                newEvent = aux;
-            } else if (clazz.equals(MouseButtonEvent.class)) {
-                GsonPersistedData data = new GsonPersistedData(jsonObject.get("button"));
-                TypeHandler typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(MouseInput.class);
-                MouseInput button = (MouseInput) typeHandler.deserialize(data, deserializationContext);
-                data = new GsonPersistedData(jsonObject.get("state"));
-                typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(ButtonState.class);
-                ButtonState state = (ButtonState) typeHandler.deserialize(data, deserializationContext);
-                JsonObject aux = jsonObject.get("mousePosition").getAsJsonObject();
-                Vector2i mousePosition = new Vector2i(aux.get("x").getAsInt(), aux.get("y").getAsInt());
-                float delta = jsonObject.get("delta").getAsFloat();
-                MouseButtonEvent event = new MouseButtonEvent(button, state, delta);
-                event.setMousePosition(mousePosition);
-                newEvent = event;
-            } else if (clazz.equals(MouseAxisEvent.class)) {
-                GsonPersistedData data = new GsonPersistedData(jsonObject.get("mouseAxis"));
-                TypeHandler typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(MouseAxisEvent.MouseAxis.class);
-                MouseAxisEvent.MouseAxis mouseAxis = (MouseAxisEvent.MouseAxis) typeHandler.deserialize(data, deserializationContext);
-                float value = jsonObject.get("value").getAsFloat();
-                float delta = jsonObject.get("delta").getAsFloat();
-                MouseAxisEvent aux = MouseAxisEvent.create(mouseAxis, value, delta);
-                newEvent = MouseAxisEvent.createCopy(aux);
-            } else if (clazz.equals(MouseWheelEvent.class)) {
-                JsonObject aux = jsonObject.get("mousePosition").getAsJsonObject();
-                Vector2i mousePosition = new Vector2i(aux.get("x").getAsInt(), aux.get("y").getAsInt());
-                int wheelTurns = jsonObject.get("wheelTurns").getAsInt();
-                float delta = jsonObject.get("delta").getAsFloat();
-                newEvent = new MouseWheelEvent(mousePosition, wheelTurns, delta);
-            } else {
-                logger.error("Not an Input Event");
-                return null;
-            }
-
-            if (newEvent instanceof BindButtonEvent) {
-                bindButtonEventSetup((BindButtonEvent) newEvent, jsonObject, deserializationContext);
-            } else if (newEvent instanceof BindAxisEvent) {
-                bindAxisEvent((BindAxisEvent) newEvent, jsonObject);
-            }
-
-            inputEventSetup(newEvent, jsonObject);
-        } catch (Exception e) {
-            logger.error("Error while deserializing event. Could not find class " + className, e);
-        }
-        return newEvent;
-    }
-
-    private void bindButtonEventSetup(BindButtonEvent event, JsonObject jsonObject, GsonDeserializationContext deserializationContext) {
-        GsonPersistedData data = new GsonPersistedData(jsonObject.get("state"));
-        TypeHandler typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(ButtonState.class);
-        ButtonState state = (ButtonState) typeHandler.deserialize(data, deserializationContext);
-        float delta = jsonObject.get("delta").getAsFloat();
-        typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(Name.class);
-        JsonObject aux = jsonObject.get("id").getAsJsonObject();
-        data = new GsonPersistedData(aux.get("moduleName"));
-        Name moduleName = (Name) typeHandler.deserialize(data, deserializationContext);
-        data = new GsonPersistedData(aux.get("objectName"));
-        Name objectName = (Name) typeHandler.deserialize(data, deserializationContext);
-        SimpleUri id = new SimpleUri(moduleName, objectName);
-        event.prepare(id, state, delta);
-    }
-
-    private void bindAxisEvent(BindAxisEvent event, JsonObject jsonObject) {
-        String id = jsonObject.get("id").getAsString();
-        float value = jsonObject.get("value").getAsFloat();
-        float delta = jsonObject.get("delta").getAsFloat();
-        event.prepare(id, value, delta);
-    }
-
-    private void inputEventSetup(InputEvent event, JsonObject jsonObject) {
-        float delta = jsonObject.get("delta").getAsFloat();
-        boolean consumed = jsonObject.get("consumed").getAsBoolean();
-        EntityRef target =  new RecordedEntityRef(jsonObject.get("target").getAsLong(), (LowLevelEntityManager) this.entityManager);
-        JsonObject aux = jsonObject.get("hitNormal").getAsJsonObject();
-        Vector3f hitNormal = new Vector3f(aux.get("x").getAsFloat(), aux.get("y").getAsFloat(), aux.get("z").getAsFloat());
-        aux = jsonObject.get("hitPosition").getAsJsonObject();
-        Vector3f hitPosition = new Vector3f(aux.get("x").getAsFloat(), aux.get("y").getAsFloat(), aux.get("z").getAsFloat());
-        aux = jsonObject.get("targetBlockPosition").getAsJsonObject();
-        Vector3i targetBlockPosition = new Vector3i(aux.get("x").getAsInt(), aux.get("y").getAsInt(), aux.get("z").getAsInt());
-        event.setTargetInfo(target, targetBlockPosition, hitPosition, hitNormal);
     }
 }

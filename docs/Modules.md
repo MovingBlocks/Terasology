@@ -21,6 +21,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [AdditionalRails](https://github.com/Terasology/AdditionalRails) - container module for more rails
 * [AdditionalVegetables](https://github.com/Terasology/AdditionalVegetables) - container module for more vegetables
 * [AdditionalWorlds](https://github.com/Terasology/AdditionalWorlds) - container module for more worlds
+* [AdvancedRails](https://github.com/Terasology/AdvancedRails) - more advanced content for rail systems
 * [AdventureAssets](https://github.com/Terasology/AdventureAssets) - a set of assets for adventure time!
 * [Alchemy](https://github.com/Terasology/Alchemy) - create alchemical potions!
 * [AlchemyPlantGenerator](https://github.com/Terasology/AlchemyPlantGenerator) - a world plugin that'll seed the plants used by Alchemy into a given plugin-capable world
@@ -30,6 +31,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [AnotherWorldPlants](https://github.com/Terasology/AnotherWorldPlants) - farming and tree growth for AnotherWorld
 * [BasicCrafting](https://github.com/Terasology/BasicCrafting) - a basic crafting system
 * [Behaviors](https://github.com/Terasology/Behaviors) - library module containing various behavior trees for use in our AI system
+* BiomesAPI - library module for basic Biome functionality
 * [BlockDetector](https://github.com/Terasology/BlockDetector) - adds a simple little tool that can detect specific blocks (beeping in proximity)
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
 * [BlockPicker](https://github.com/Terasology/BlockPicker) - allows the player access to an infinite block inventory with the `B` key
@@ -103,6 +105,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [MawGooey](https://github.com/Terasology/MawGooey) - Introduces Gooey's 'odd' cousin to the game. Say hi, just don't get too close ..
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [MedievalCities](https://github.com/Terasology/MedievalCities) - a set of building templates for a medieval era city
+* [MetalRenegades](https://github.com/Terasology/MetalRenegades) - gameplay template set in a Wild West style world
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [Minesweeper](https://github.com/Terasology/Minesweeper) - a little game inside a game
 * [Minimap](https://github.com/Terasology/Minimap) - a basic minimap. Show/hide with `M` by default and zoom with numpad `-` and `+`
@@ -154,6 +157,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [WeatherManager](https://github.com/Terasology/WeatherManager) - simple weather foundation, tracks whether, maintains a single cloud layer, and so on 
 * [WildAnimals](https://github.com/Terasology/WildAnimals) - a module containing animals, initially a deer you can spawn in-world via console with `spawnPrefab deer` then watch wander idly
 * [WildAnimalsGenome](https://github.com/Terasology/WildAnimalsGenome) - bridge module using Genome to bring more advanced features to WildAnimals
+* [WildAnimalsMadness](https://github.com/Terasology/WildAnimalsMadness) - these wild animals have acquired some sort of madness! Or at least they seem to be thinking, somehow ..
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big content module including "from scratch" crafting, starting with wood here
 * [WoodAndStoneCraftingJournal](https://github.com/Terasology/WoodAndStoneCraftingJournal) - a Journal bridging module for WoodCrafting and StoneCrafting (no direct relation with the WoodAndStone module)
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes

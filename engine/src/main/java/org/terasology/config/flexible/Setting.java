@@ -16,16 +16,20 @@
 package org.terasology.config.flexible;
 
 import com.google.gson.JsonElement;
-import org.terasology.config.flexible.validators.SettingValueValidator;
+import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.SimpleUri;
+import org.terasology.module.sandbox.API;
+import org.terasology.reflection.TypeInfo;
 
 import java.beans.PropertyChangeListener;
 
 /**
- * Represents a setting uniquely identified by an id. Contains a value that may be validated by a
- * {@link SettingValueValidator<T>} and notifies subscribers when the stored value is changed.
+ * Represents a setting uniquely identified by an id. Contains a value that may be constrained by a
+ * {@link SettingConstraint} and notifies subscribers when the stored value is changed.
+ *
  * @param <T> The type of the value this {@link Setting} contains.
  */
+@API
 public interface Setting<T> {
     /**
      * Returns the id of this {@link Setting}.
@@ -33,10 +37,16 @@ public interface Setting<T> {
     SimpleUri getId();
 
     /**
-     * Returns the {@link SettingValueValidator<T>} used by this {@link Setting<T>}, if present.
+     * Returns a {@link TypeInfo} representing the type of values that can be stored in this
+     * {@link Setting}.
+     */
+    TypeInfo<T> getValueType();
+
+    /**
+     * Returns the {@link SettingConstraint} used by this {@link Setting}, if present.
      * Returns null otherwise.
      */
-    SettingValueValidator<T> getValidator();
+    SettingConstraint<T> getConstraint();
 
     /**
      * Returns the default value of this {@link Setting}.
@@ -49,10 +59,14 @@ public interface Setting<T> {
     T getValue();
 
     /**
-     * Sets the value stored in this {@link Setting<T>}. When no Validator is
-     * present the new value immediately replaces the stored one and any subscriber is notified of the change.
-     * If a Validator is present, the value is first validated. Only if the value is valid it replaces the
+     * Sets the value stored in this {@link Setting<T>}. When no {@link SettingConstraint} is
+     * present the new value immediately replaces the stored one and any subscriber is notified
+     * of the change.
+     *
+     * If a {@link SettingConstraint} is present, the constraint must be satisfied by
+     * the new value. If the constraint is satisfied, the new value replaces the
      * stored one and subscribers are notified.
+     *
      * @param newValue The new value to store.
      * @return True if the value was stored successfully, false otherwise.
      */
