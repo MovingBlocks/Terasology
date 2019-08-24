@@ -22,7 +22,7 @@ import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.StateChange;
 
-import static org.terasology.rendering.dag.AbstractNode.getMaterial;
+import static org.terasology.rendering.dag.gsoc.AbstractNode.getMaterial;
 
 /**
  * TODO: Add javadocs

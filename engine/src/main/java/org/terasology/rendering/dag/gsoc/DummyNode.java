@@ -18,7 +18,7 @@ package org.terasology.rendering.dag.gsoc;
 import org.terasology.context.Context;
 import org.terasology.naming.Name;
 
-public class DummyNode extends NewAbstractNode {
+public class DummyNode extends AbstractNode {
 
 
     public DummyNode(String nodeId, String nodeAka, Name providingModule, Context context) {

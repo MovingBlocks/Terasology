@@ -18,7 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
-import org.terasology.rendering.dag.gsoc.NewAbstractNode;
+import org.terasology.rendering.dag.gsoc.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -30,7 +30,7 @@ import java.beans.PropertyChangeListener;
  * This node proxy is read by RenderingHelper when calulating camera in water. It's water related attributes must be set
  * by a corresponding node in BasicRendering module named RefractiveReflectiveBlocksNode.
  */
-public class RefractiveReflectiveBlocksNodeProxy extends NewAbstractNode implements PropertyChangeListener {
+public class RefractiveReflectiveBlocksNodeProxy extends AbstractNode implements PropertyChangeListener {
    public static final SimpleUri REFRACTIVE_REFLECTIVE_FBO_URI = new SimpleUri("engine:fbo.sceneReflectiveRefractive");
 
     // TODO: rename to more meaningful/precise variable names, like waveAmplitude or waveHeight.

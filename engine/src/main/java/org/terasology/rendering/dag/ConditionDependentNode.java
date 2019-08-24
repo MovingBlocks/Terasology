@@ -18,7 +18,7 @@ package org.terasology.rendering.dag;
 import com.google.common.collect.Lists;
 import org.terasology.context.Context;
 import org.terasology.naming.Name;
-import org.terasology.rendering.dag.gsoc.NewAbstractNode;
+import org.terasology.rendering.dag.gsoc.AbstractNode;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.beans.PropertyChangeEvent;
@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 /**
  * TODO: Add javadocs
  */
-public abstract class ConditionDependentNode extends NewAbstractNode implements PropertyChangeListener {
+public abstract class ConditionDependentNode extends AbstractNode implements PropertyChangeListener {
     protected WorldRenderer worldRenderer;
 
     private List<Supplier<Boolean>> conditions = Lists.newArrayList();
