@@ -41,7 +41,7 @@ import java.util.*;
  * It provides the default functionality to identify a node, handle its status (enabled/disabled),
  * deal with StateChange objects and Frame Buffer objects.
  */
-public abstract class AbstractNode implements NewNode {
+public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
     protected boolean enabled = true;
@@ -335,7 +335,7 @@ public abstract class AbstractNode implements NewNode {
      * @param anotherNode
      * @return If this node has at least one {@param anotherNode}'s connection on input - true. Otherwise false.
      */
-    public boolean isDependentOn(NewNode anotherNode) {
+    public boolean isDependentOn(Node anotherNode) {
         boolean isDependent = false;
         // for all my input connections
         for (DependencyConnection connection: inputConnections.values()) {

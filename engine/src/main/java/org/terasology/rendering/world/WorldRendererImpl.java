@@ -44,8 +44,8 @@ import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.engine.module.rendering.RenderingModuleRegistry;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.gsoc.ModuleRendering;
-import org.terasology.rendering.dag.gsoc.NewNode;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
@@ -232,11 +232,11 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     public void addDummyNodes() {
         /*
-        NewNode blurredAmbientOcclusionNode = new DummyNode ("blurredAmbientOcclusionNode", context);
+        Node blurredAmbientOcclusionNode = new DummyNode ("blurredAmbientOcclusionNode", context);
         blurredAmbientOcclusionNode.addOutputFboConnection(1);
         renderGraph.addNode(blurredAmbientOcclusionNode);
 
-        NewNode prePostCompositeNode = new DummyNode("prePostCompositeNode", context);
+        Node prePostCompositeNode = new DummyNode("prePostCompositeNode", context);
         renderGraph.addNode(prePostCompositeNode);
         */
     }
@@ -324,7 +324,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
 
         if (requestedTaskListRefresh) {
-            List<NewNode> orderedNodes = renderGraph.getNodesInTopologicalOrder();
+            List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
             renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
             requestedTaskListRefresh = false;
         }
@@ -494,7 +494,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command,
                                @CommandParam(value = "arguments") final String... arguments) {
-        NewNode node = renderGraph.findNode(nodeUri);
+        Node node = renderGraph.findNode(nodeUri);
         if (node == null) {
             node = renderGraph.findAka(nodeUri);
             if (node == null) {
@@ -526,7 +526,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             throw new RuntimeException(("Unsupported connection type: '" + connectionTypeString + "'. Expected 'fbo' or 'bufferpair'.\n"));
         }
 
-        NewNode toNode = renderGraph.findNode(toNodeUri);
+        Node toNode = renderGraph.findNode(toNodeUri);
         if (toNode == null) {
             toNode = renderGraph.findAka(toNodeUri);
             if (toNode == null) {
@@ -534,7 +534,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             }
         }
 
-        NewNode fromNode = renderGraph.findNode(fromNodeUri);
+        Node fromNode = renderGraph.findNode(fromNodeUri);
         if (fromNode == null) {
             fromNode = renderGraph.findAka(fromNodeUri);
             if (fromNode == null) {

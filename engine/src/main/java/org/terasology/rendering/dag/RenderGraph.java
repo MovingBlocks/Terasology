@@ -38,9 +38,9 @@ import org.terasology.rendering.dag.gsoc.*;
 public class RenderGraph {
     private static final Logger logger = LoggerFactory.getLogger(RenderGraph.class);
 
-    private Map<SimpleUri, NewNode> nodeMap;
-    private Map<Name, NewNode> akaNodeMap;
-    private MutableGraph<NewNode> graph;
+    private Map<SimpleUri, Node> nodeMap;
+    private Map<Name, Node> akaNodeMap;
+    private MutableGraph<Node> graph;
     private Context context;
     private ShaderManager shaderManager;
 
@@ -52,7 +52,7 @@ public class RenderGraph {
         this.shaderManager = context.get(ShaderManager.class);
     }
 
-    public void addNode(NewNode node) {
+    public void addNode(Node node) {
         Preconditions.checkNotNull(node, "node cannot be null!");
 
         SimpleUri nodeUri = node.getUri();
@@ -62,7 +62,7 @@ public class RenderGraph {
             throw new RuntimeException("A node with Uri " + nodeUri + " already exists!");
         }
         if (akaNodeMap.containsKey(nodeAka)) {
-            NewNode aNode = akaNodeMap.get(nodeAka);
+            Node aNode = akaNodeMap.get(nodeAka);
             logger.info("Node " + nodeUri + " also known as" + nodeAka + " already matches existing node with uri " + aNode.getUri() + " - attempting replacing...");
             replaceNode(aNode, node);
         } else {
@@ -78,7 +78,7 @@ public class RenderGraph {
         // }
     }
 
-    public void replaceNode(NewNode aNode, NewNode byNode) {
+    public void replaceNode(Node aNode, Node byNode) {
         // Add connections from a node being replaced; This should in theory be sufficient and once we call setDep over
         // all new nodes again, everything should be set
          aNode.getInputConnections().forEach((k,v)->byNode.getInputConnections().replace(k,v));
@@ -91,16 +91,16 @@ public class RenderGraph {
         graph.addNode(byNode);
     }
 
-    public NewNode removeNode(SimpleUri nodeUri) {
+    public Node removeNode(SimpleUri nodeUri) {
         Preconditions.checkNotNull(nodeUri, "nodeUri cannot be null!");
 
-        NewNode node = findNode(nodeUri);
+        Node node = findNode(nodeUri);
         if (node == null) {
-            throw new RuntimeException("NewNode removal failure: there is no '" + nodeUri + "' in the render graph!");
+            throw new RuntimeException("Node removal failure: there is no '" + nodeUri + "' in the render graph!");
         }
 
         if (graph.adjacentNodes(node).size() != 0) {
-            throw new RuntimeException("NewNode removal failure: node '" + nodeUri + "' is still connected to other nodes in the render graph!");
+            throw new RuntimeException("Node removal failure: node '" + nodeUri + "' is still connected to other nodes in the render graph!");
         }
 
         nodeMap.remove(nodeUri);
@@ -108,35 +108,35 @@ public class RenderGraph {
         return nodeMap.remove(nodeUri);
     }
 
-    public NewNode findNode(SimpleUri nodeUri) {
+    public Node findNode(SimpleUri nodeUri) {
         Preconditions.checkNotNull(nodeUri, "nodeUri cannot be null!");
 
         return nodeMap.get(nodeUri);
     }
 
-    public NewNode findAka(Name nodeUriAka) {
+    public Node findAka(Name nodeUriAka) {
         Preconditions.checkNotNull(nodeUriAka, "nodeUriAka cannot be null!");
-        NewNode node = akaNodeMap.get(nodeUriAka);
+        Node node = akaNodeMap.get(nodeUriAka);
         // TODO search all nodes for substrings in akas or both
         return node;
     }
 
-    public NewNode findNode(String simpleUri) {
+    public Node findNode(String simpleUri) {
         return findNode(new SimpleUri(simpleUri));
     }
 
-    public NewNode findAka(String simpleUriAka) {
+    public Node findAka(String simpleUriAka) {
         return findAka(new Name(simpleUriAka));
     }
 
     public void postConnectAll() {
         // for each node in the graph
-        for(NewNode fromNode : nodeMap.values()) {
+        for(Node fromNode : nodeMap.values()) {
             // for each of node's output connection
             for (DependencyConnection outputConnection : fromNode.getOutputConnections().values()) {
                 // get connections other ends (multiple, relationship 1 to N) and their parent nodes as toNode and call connect
                 for (Object connectedConnection: outputConnection.getConnectedConnections().values()) {
-                    NewNode toNode = findNode(((DependencyConnection)connectedConnection).getParentNode());
+                    Node toNode = findNode(((DependencyConnection)connectedConnection).getParentNode());
                     if (fromNode != toNode) {
                         connect(fromNode, toNode);
                     }
@@ -145,12 +145,12 @@ public class RenderGraph {
         }
     }
 
-    public void connect(NewNode... nodeList) {
+    public void connect(Node... nodeList) {
         Preconditions.checkArgument(nodeList.length > 1, "Expected at least 2 nodes as arguments to connect() - found " + nodeList.length);
 
-        NewNode fromNode = null;
+        Node fromNode = null;
 
-        for (NewNode toNode : nodeList) {
+        for (Node toNode : nodeList) {
             Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
             if (fromNode != null) {
@@ -165,14 +165,14 @@ public class RenderGraph {
         }
     }
 
-    public boolean areConnected(NewNode fromNode, NewNode toNode) {
+    public boolean areConnected(Node fromNode, Node toNode) {
         Preconditions.checkNotNull(fromNode, "fromNode cannot be null!");
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
         return graph.hasEdgeConnecting(fromNode, toNode);
     }
 
-    public void disconnect(NewNode fromNode, NewNode toNode) {
+    public void disconnect(Node fromNode, Node toNode) {
         Preconditions.checkNotNull(fromNode, "fromNode cannot be null!");
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
@@ -183,26 +183,26 @@ public class RenderGraph {
         graph.removeEdge(fromNode, toNode);
     }
 
-    // TODO: Add `boolean isFullyFunctional(NewNode node)`
+    // TODO: Add `boolean isFullyFunctional(Node node)`
 
     // TODO: Add handler methods which the graph uses to communicate changes to a node.
 
-    public List<NewNode> getNodesInTopologicalOrder() {
+    public List<Node> getNodesInTopologicalOrder() {
         // This implementation of Kahn's Algorithm is adapted from the algorithm described at
         // https://www.geeksforgeeks.org/topological-sorting-indegree-based-solution/
 
-        List<NewNode> topologicalList = new ArrayList<>();
+        List<Node> topologicalList = new ArrayList<>();
 
         // Connect all nodes based on dependencies
         postConnectAll();
 
         // In-degree (or incoming-degree) is the number of incoming edges of a particular node.
-        Map<NewNode, Integer> inDegreeMap = Maps.newHashMap();
-        List<NewNode> nodesToExamine = Lists.newArrayList();
+        Map<Node, Integer> inDegreeMap = Maps.newHashMap();
+        List<Node> nodesToExamine = Lists.newArrayList();
         int visitedNodes = 0;
 
         // Calculate the in-degree for each node, and mark all nodes with no incoming edges for examination.
-        for (NewNode node : graph.nodes()) {
+        for (Node node : graph.nodes()) {
             int inDegree = graph.inDegree(node);
             inDegreeMap.put(node, inDegree);
 
@@ -212,9 +212,9 @@ public class RenderGraph {
         }
 
         while (!nodesToExamine.isEmpty()) {
-            NewNode currentNode = nodesToExamine.remove(0);
+            Node currentNode = nodesToExamine.remove(0);
 
-            for (NewNode adjacentNode : graph.successors(currentNode)) {
+            for (Node adjacentNode : graph.successors(currentNode)) {
                 int updatedInDegree = inDegreeMap.get(adjacentNode) - 1;
                 inDegreeMap.put(adjacentNode, updatedInDegree);
 
@@ -238,7 +238,7 @@ public class RenderGraph {
     }
 
     public void dispose() {
-        for (NewNode node : nodeMap.values()) {
+        for (Node node : nodeMap.values()) {
             graph.removeNode(node);
             node.dispose();
         }
@@ -246,7 +246,7 @@ public class RenderGraph {
         akaNodeMap.clear();
     }
 
-    public void resetDesiredStateChanges(NewNode node) {
+    public void resetDesiredStateChanges(Node node) {
         node.resetDesiredStateChanges();
     }
 
@@ -268,7 +268,7 @@ public class RenderGraph {
      *                   Chosen arbitrarily, integers starting by 1 typically.
      * @param fromConnection FboConnection obtained form another node's output.
      */ // TODO simpleuri
-    private void connectFbo(NewNode toNode, int inputFboId, DependencyConnection fromConnection) {
+    private void connectFbo(Node toNode, int inputFboId, DependencyConnection fromConnection) {
         // TODO this will have to be caught by a try-catch or redone if we were going use gui to tamper with dag
         // Is not yet connected?
         if (!fromConnection.getConnectedConnections().isEmpty()) {
@@ -304,7 +304,7 @@ public class RenderGraph {
      * @param fromNode Output node
      * @param outputId Number/id of output
      */
-    public void connectFbo(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+    public void connectFbo(Node fromNode, int outputId, Node toNode, int inputId) {
         // TODO for buffer pairs enable new instance with swapped buffers
         connectFbo(toNode, inputId, fromNode.getOutputFboConnection(outputId));
 //        if (!areConnected(fromNode, toNode)) {
@@ -313,7 +313,7 @@ public class RenderGraph {
         logger.info("Connected " + fromNode.getOutputFboConnection(outputId) + " to " + toNode + ".");
     }
 
-    public void reconnectFbo(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+    public void reconnectFbo(Node fromNode, int outputId, Node toNode, int inputId) {
         // for each output connection connected to input get it's connected inputs, find us and remove ourselves from its list
         DependencyConnection connectionToReconnect = toNode.getInputFboConnection(inputId);
         // for each output connected to toNode's input fbo connection(inputId) (should be just one)
@@ -333,7 +333,7 @@ public class RenderGraph {
      *                   Chosen arbitrarily, integers starting by 1 typically.
      * @param fromConnection BufferPairConnection obtained form another node's output.
      */ // TODO merge with connectFbo()
-    private void connectBufferPair(NewNode toNode, int inputConnectionId, DependencyConnection fromConnection) {
+    private void connectBufferPair(Node toNode, int inputConnectionId, DependencyConnection fromConnection) {
         // Is not yet connected?
         if (!fromConnection.getConnectedConnections().isEmpty()) {
             logger.info("Warning, " + fromConnection + "connection is already read somewhere else.");
@@ -364,7 +364,7 @@ public class RenderGraph {
     }
 
 
-    public void connectRunOrder(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+    public void connectRunOrder(Node fromNode, int outputId, Node toNode, int inputId) {
         if (fromNode == null || toNode == null) {
             throw new RuntimeException("Node cannot be null.");
         }
@@ -381,7 +381,7 @@ public class RenderGraph {
 //        }
     }
 
-    public void reconnectRunOrder(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+    public void reconnectRunOrder(Node fromNode, int outputId, Node toNode, int inputId) {
         DependencyConnection connectionToReconnect = toNode.getInputRunOrderConnection(inputId);
         // for each output connected to toNode's input fbo connection(inputId) (should be just one)
         if (connectionToReconnect != null) {
@@ -401,7 +401,7 @@ public class RenderGraph {
      * @param fromNode Output node
      * @param outputId Number/id of output
      */
-    public void connectBufferPair(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+    public void connectBufferPair(Node fromNode, int outputId, Node toNode, int inputId) {
         // TODO for buffer pairs enable new instance with swapped buffers
         connectBufferPair(toNode, inputId, fromNode.getOutputBufferPairConnection(outputId));
 //        if (!areConnected(fromNode, toNode)) {
@@ -417,7 +417,7 @@ public class RenderGraph {
      * @param toNode
      * @param inputId
 
-    /*public void reconnectInputBufferPairToOutput(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+    /*public void reconnectInputBufferPairToOutput(Node fromNode, int outputId, Node toNode, int inputId) {
         // for each output connection connected to input get it's connected inputs, find us and remove ourselves from its list
         DependencyConnection connectionToReconnect = toNode.getInputBufferPairConnection(inputId);
         // for each output connected to toNode's input fbo connection(inputId) (should be just one)
@@ -455,7 +455,7 @@ public class RenderGraph {
      * @param outputId Id of fromNode's output. Output must exist.
      */
     public void reconnectInputToOutput(String fromNodeUri, int outputId, String toNodeUri, int inputId, boolean disconnectPrevious) {
-        NewNode toNode = findNode(toNodeUri);
+        Node toNode = findNode(toNodeUri);
         if (toNode == null) {
             toNode = findAka(toNodeUri);
             if (toNode == null) {
@@ -463,7 +463,7 @@ public class RenderGraph {
             }
         }
 
-        NewNode fromNode = findNode(fromNodeUri);
+        Node fromNode = findNode(fromNodeUri);
         if (fromNode == null) {
             fromNode = findAka(fromNodeUri);
             if (fromNode == null) {
@@ -473,8 +473,8 @@ public class RenderGraph {
         reconnectInputToOutput(fromNode, outputId, toNode, inputId, ConnectionType.FBO, disconnectPrevious);
     }
 
-    public void reconnectInputFboToOutput(String fromNodeUri, int outputId, NewNode toNode, int inputId, boolean disconnectPrevious) {
-        NewNode fromNode = findNode(new SimpleUri(fromNodeUri));
+    public void reconnectInputFboToOutput(String fromNodeUri, int outputId, Node toNode, int inputId, boolean disconnectPrevious) {
+        Node fromNode = findNode(new SimpleUri(fromNodeUri));
         if (fromNode == null) {
             fromNode = findAka(fromNodeUri);
             if (fromNode == null) {
@@ -489,15 +489,15 @@ public class RenderGraph {
         }*/
     }
 
-    public void reconnectInputBufferPairToOutput(NewNode fromNode, int outputId, NewNode toNode, int inputId) {
+    public void reconnectInputBufferPairToOutput(Node fromNode, int outputId, Node toNode, int inputId) {
         reconnectInputToOutput(fromNode, outputId, toNode, inputId, ConnectionType.BUFFER_PAIR, true);
         /*if (!areConnected(fromNode, toNode)) {
             connect(fromNode, toNode);
         }*/
     }
 
-    public void reconnectInputBufferPairToOutput(String fromNodeUri, int outputId, NewNode toNode, int inputId, boolean disconnectPrevious) {
-        NewNode fromNode = findNode(new SimpleUri(fromNodeUri));
+    public void reconnectInputBufferPairToOutput(String fromNodeUri, int outputId, Node toNode, int inputId, boolean disconnectPrevious) {
+        Node fromNode = findNode(new SimpleUri(fromNodeUri));
         if (fromNode == null) {
             fromNode = findAka(fromNodeUri);
             if (fromNode == null) {
@@ -508,8 +508,8 @@ public class RenderGraph {
         reconnectInputToOutput(fromNodeUri, outputId, toNode, inputId, ConnectionType.BUFFER_PAIR, disconnectPrevious);
     }
 
-    public void reconnectInputToOutput(String fromNodeUri, int outputId, NewNode toNode, int inputId, ConnectionType connectionType, boolean disconnectPrevious) {
-        NewNode fromNode = findNode(new SimpleUri(fromNodeUri));
+    public void reconnectInputToOutput(String fromNodeUri, int outputId, Node toNode, int inputId, ConnectionType connectionType, boolean disconnectPrevious) {
+        Node fromNode = findNode(new SimpleUri(fromNodeUri));
         if (fromNode == null) {
             fromNode = findAka(fromNodeUri);
             if (fromNode == null) {
@@ -524,9 +524,9 @@ public class RenderGraph {
      * @param inputId
      * @param fromConnection
      */// TODO make it reconnectInputFboToOutput
-    private void reconnectInputToOutput(NewNode toNode, int inputId, DependencyConnection fromConnection, ConnectionType connectionType, boolean disconnectPrevious) {
+    private void reconnectInputToOutput(Node toNode, int inputId, DependencyConnection fromConnection, ConnectionType connectionType, boolean disconnectPrevious) {
         logger.info("Attempting reconnection of " + toNode.getUri() + " to " + fromConnection.getParentNode() + "'s output.");
-        NewNode fromNode;
+        Node fromNode;
 
         if (fromConnection != null) {
             fromNode = findNode(fromConnection.getParentNode());
@@ -563,7 +563,7 @@ public class RenderGraph {
                 // Save previous input connection source node to check whether if it's still depending on it after reconnect
                 // should work like this, an input connection should have only one connected connection
                 DependencyConnection previousFromConnection = (DependencyConnection)connectionToReconnect.getConnectedConnections().values().iterator().next();
-                NewNode previousFromNode = findNode((previousFromConnection).getParentNode());
+                Node previousFromNode = findNode((previousFromConnection).getParentNode());
 
                 connectionToReconnect.getConnectedConnections().clear();
 
@@ -623,13 +623,13 @@ public class RenderGraph {
      * @param fromNodeUri Output node's Uri (already added to graph)
      * @param outputId Number/id of output
      */
-    public void connectFbo(String fromNodeUri, int outputId, NewNode toNode, int inputId) {
-        NewNode fromNode = findNode(new SimpleUri(fromNodeUri));
+    public void connectFbo(String fromNodeUri, int outputId, Node toNode, int inputId) {
+        Node fromNode = findNode(new SimpleUri(fromNodeUri));
         connectFbo(toNode, inputId, fromNode, outputId);
     }
 
     @Deprecated
-    public void disconnectOutputFboConnection(NewNode node, int connectionId) {
+    public void disconnectOutputFboConnection(Node node, int connectionId) {
         logger.info("Attempting disconnection of " + node + "'s output fbo number " + connectionId + "..");
 
         if (node != null) {
@@ -648,13 +648,13 @@ public class RenderGraph {
 
     @Deprecated
     public void disconnectOutputFboConnection(String nodeUri, int connectionId) {
-        NewNode node = findNode(new SimpleUri(nodeUri));
+        Node node = findNode(new SimpleUri(nodeUri));
         disconnectOutputFboConnection(node, connectionId);
     }
 
     public void disconnectInputFbo(String nodeUri, int connectionId) {
         logger.info("Attempting disconnection of " + nodeUri + "'s input fbo number " + connectionId);
-        NewNode node = findNode(new SimpleUri(nodeUri));
+        Node node = findNode(new SimpleUri(nodeUri));
         if (node != null) {
             ((AbstractNode) node).disconnectInputFbo(connectionId);
         } else {
@@ -677,7 +677,7 @@ public class RenderGraph {
      * @param fromNode fromNode's SimpleUri name. Node must exist in the renderGraph.
      * @param outputId Id of fromNode's output. Output must exist.
      */
-    public void reconnectInputToOutput(NewNode fromNode, int outputId, NewNode toNode, int inputId, ConnectionType connectionType, boolean disconnectPrevious) {
+    public void reconnectInputToOutput(Node fromNode, int outputId, Node toNode, int inputId, ConnectionType connectionType, boolean disconnectPrevious) {
         // Would use of Preconditions be clearer?
         if (toNode == null || fromNode == null) {
             throw new RuntimeException("Reconnecting dependency failed. One of the nodes not found in the renderGraph."
@@ -713,8 +713,8 @@ public class RenderGraph {
      * to the new one. Simple approach, maintain structure 1 to N. For M to N output do manually.
      */
     public void reconnectAllConnectedInputsTo(DependencyConnection connectionToReplace, DependencyConnection newOutputConnection) {
-        NewNode fromNode = findNode(connectionToReplace.getParentNode());
-        NewNode newFromNode = findNode(newOutputConnection.getParentNode());
+        Node fromNode = findNode(connectionToReplace.getParentNode());
+        Node newFromNode = findNode(newOutputConnection.getParentNode());
         ConnectionType connectionType;
 
         if (newOutputConnection instanceof FboConnection) {
@@ -735,7 +735,7 @@ public class RenderGraph {
                 if (!toConnection.getParentNode().equals(fromNode.getUri())) {
                     // TODO potteintionally harmful ID guesswork
                     reconnectInputToOutput(findNode(toConnection.getParentNode()), DependencyConnection.getIdFromConnectionName(toConnection.getName()), newOutputConnection, connectionType, true);
-                    NewNode toNode = findNode(toConnection.getParentNode());
+                    Node toNode = findNode(toConnection.getParentNode());
 //                    if (!areConnected(fromNode, toNode)) {
 //                        connect(fromNode, toNode);
 //                    }
@@ -745,8 +745,8 @@ public class RenderGraph {
     }
 
    /* public void reconnectAllConnectedInputsTo(DependencyConnection connectionToReplace, DependencyConnection newOutputConnection) {
-        NewNode fromNode = findNode(connectionToReplace.getParentNode());
-        NewNode newFromNode = findNode(newOutputConnection.getParentNode());
+        Node fromNode = findNode(connectionToReplace.getParentNode());
+        Node newFromNode = findNode(newOutputConnection.getParentNode());
         connectionToReplace.getConnectedConnections().forEach(
                 (k, connectedConnection)-> {
                     DependencyConnection toConnection = (DependencyConnection) connectedConnection;
@@ -755,7 +755,7 @@ public class RenderGraph {
 
                         toConnection.connectInputToOutput(newOutputConnection);
 
-                        NewNode toNode = findNode(toConnection.getParentNode());
+                        Node toNode = findNode(toConnection.getParentNode());
                         if (areConnected(fromNode, toNode)) {
                             disconnect(fromNode, toNode);
                         }

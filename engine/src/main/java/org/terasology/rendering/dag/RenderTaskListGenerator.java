@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.rendering.dag.gsoc.NewNode;
 
 import java.util.Iterator;
 import java.util.List;
@@ -50,15 +49,15 @@ public final class RenderTaskListGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
     private List<RenderPipelineTask> taskList;
-    private List<NewNode> nodeList;
+    private List<Node> nodeList;
 
     public RenderTaskListGenerator() {
         taskList = Lists.newArrayList();
     }
 
-    private void logIntermediateRendererListForDebugging(List<NewNode> orderedNodes) {
+    private void logIntermediateRendererListForDebugging(List<Node> orderedNodes) {
 
-        for (NewNode node : orderedNodes) {
+        for (Node node : orderedNodes) {
             if (node.isEnabled()) {
 
                 // printing out node name
@@ -83,7 +82,7 @@ public final class RenderTaskListGenerator {
      * @return an optimized list of RenderPipelineTask instances,
      *         ready to be iterated over to execute a frame worth of rendering
      */
-    public List<RenderPipelineTask> generateFrom(List<NewNode> orderedNodes) {
+    public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
 
         long startTimeInNanoSeconds = System.nanoTime();
 
@@ -110,7 +109,7 @@ public final class RenderTaskListGenerator {
         int enabledNodes = 0;
         int potentialTasks = 0;
 
-        for (NewNode node : orderedNodes) {
+        for (Node node : orderedNodes) {
             if (node.isEnabled()) {
                  if (logger.isDebugEnabled()) {
                     // Marker tasks just add a dividing line to the logger output
