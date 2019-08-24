@@ -18,7 +18,6 @@ package org.terasology.rendering.dag;
 import com.google.common.collect.Lists;
 import org.terasology.context.Context;
 import org.terasology.naming.Name;
-import org.terasology.rendering.dag.gsoc.AbstractNode;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.beans.PropertyChangeEvent;

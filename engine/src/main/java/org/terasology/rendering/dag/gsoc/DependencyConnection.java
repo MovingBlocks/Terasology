@@ -46,7 +46,7 @@ public abstract class DependencyConnection<T> {
         return this.data;
     }
 
-    protected void setData(T data) {
+    public void setData(T data) {
         this.data = data;
     }
 
