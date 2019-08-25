@@ -19,14 +19,16 @@ import javafx.util.Pair;
 import org.terasology.rendering.opengl.FBO;
 
 /**
- *
+ * This class represents BufferPair, a pair of FBO buffers, which represent a main render target.
+ * A pair so you can read from one while you write into the other.
+ * BufferPair is used as Data type for DependencyConnection extending class - BufferPairConnection.
  */
 public class BufferPair {
 
-    private Pair<FBO,FBO> bufferPair;
+    private Pair<FBO, FBO> bufferPair;
 
     public BufferPair(FBO primaryBuffer, FBO secondaryBuffer) {
-        this.bufferPair = new Pair(primaryBuffer,secondaryBuffer);
+        this.bufferPair = new Pair(primaryBuffer, secondaryBuffer);
     }
 
     public FBO getPrimaryFbo() {
