@@ -21,7 +21,7 @@ import org.terasology.engine.SimpleUri;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +30,7 @@ public abstract class DependencyConnection<T> {
     private String connectionName;
     private Type connectionType;
     private SimpleUri parentNode;
-    private HashMap<String, DependencyConnection> connectedConnections;
+    private Map<String, DependencyConnection> connectedConnections;
     private T data;
 
     DependencyConnection(String name, Type type, SimpleUri parentNode) {
@@ -72,7 +72,7 @@ public abstract class DependencyConnection<T> {
      * has not yet been connected.
      */
     @Nullable
-    public HashMap<String, DependencyConnection> getConnectedConnections() {
+    public Map<String, DependencyConnection> getConnectedConnections() {
         return connectedConnections;
     }
 
@@ -105,7 +105,7 @@ public abstract class DependencyConnection<T> {
         /*if (this.connectedConnection != null) {
             this.connectedConnection.connectedConnection = null;
         }*/
-        if(this.connectionType == Type.INPUT) {
+        if (this.connectionType == Type.INPUT) {
             connectedConnections.clear();
         }
         this.connectedConnections.putIfAbsent(fromConnection.getName(), fromConnection);

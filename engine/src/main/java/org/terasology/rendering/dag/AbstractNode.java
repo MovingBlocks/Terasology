@@ -340,7 +340,7 @@ public abstract class AbstractNode implements Node {
         // for all my input connections
         for (DependencyConnection connection: inputConnections.values()) {
             if (!connection.getConnectedConnections().isEmpty()) {
-                HashMap<String, DependencyConnection> connectedConnections = connection.getConnectedConnections();
+                Map<String, DependencyConnection> connectedConnections = connection.getConnectedConnections();
                 SimpleUri anotherNodeUri = anotherNode.getUri();
                 // SimpleUri connectedNodeUri;
                 // for all connection's connected connections get parent node and see if it matches anotherNode
