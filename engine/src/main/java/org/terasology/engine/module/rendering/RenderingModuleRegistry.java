@@ -61,7 +61,7 @@ public class RenderingModuleRegistry {
         // TODO HashMap for storing
         ModuleRendering moduleRenderingInstance = null;
         for (ModuleRendering moduleRendering : orderedModuleRenderingInstances) {
-            if (moduleRenderingInstance.getProvidingModule().equals(renderingModuleId)) {
+            if (moduleRendering.getProvidingModule().equals(renderingModuleId)) {
                 moduleRenderingInstance = moduleRendering;
             }
         }
