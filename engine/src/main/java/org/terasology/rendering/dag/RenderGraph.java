@@ -489,6 +489,10 @@ public class RenderGraph {
         }*/
     }
 
+    public void reconnectInputFboToOutput(Node fromNode, int outputId, Node toNode, int inputId) {
+        reconnectInputToOutput(fromNode, outputId, toNode, inputId, ConnectionType.FBO, true);
+    }
+
     public void reconnectInputBufferPairToOutput(Node fromNode, int outputId, Node toNode, int inputId) {
         reconnectInputToOutput(fromNode, outputId, toNode, inputId, ConnectionType.BUFFER_PAIR, true);
         /*if (!areConnected(fromNode, toNode)) {
@@ -714,7 +718,6 @@ public class RenderGraph {
      */
     public void reconnectAllConnectedInputsTo(DependencyConnection connectionToReplace, DependencyConnection newOutputConnection) {
         Node fromNode = findNode(connectionToReplace.getParentNode());
-        Node newFromNode = findNode(newOutputConnection.getParentNode());
         ConnectionType connectionType;
 
         if (newOutputConnection instanceof FboConnection) {
@@ -735,7 +738,7 @@ public class RenderGraph {
                 if (!toConnection.getParentNode().equals(fromNode.getUri())) {
                     // TODO potteintionally harmful ID guesswork
                     reconnectInputToOutput(findNode(toConnection.getParentNode()), DependencyConnection.getIdFromConnectionName(toConnection.getName()), newOutputConnection, connectionType, true);
-                    Node toNode = findNode(toConnection.getParentNode());
+//                    Node toNode = findNode(toConnection.getParentNode());
 //                    if (!areConnected(fromNode, toNode)) {
 //                        connect(fromNode, toNode);
 //                    }
