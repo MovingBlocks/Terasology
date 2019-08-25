@@ -20,10 +20,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.module.rendering.RenderingModuleManager;
+import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.registry.In;
-import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.rendering.dag.ModuleRendering;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -32,9 +32,14 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.StartPlayingScreen;
-import org.terasology.rendering.nui.widgets.*;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
+import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.rendering.nui.widgets.UISliderOnChangeTriggeredListener;
+import org.terasology.rendering.nui.widgets.UIText;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RenderingModuleSettingScreen extends CoreScreenLayer implements UISliderOnChangeTriggeredListener {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:renderingModuleSettingScreen");
@@ -74,7 +79,7 @@ public class RenderingModuleSettingScreen extends CoreScreenLayer implements UIS
 
         renderingModuleInfo = find("modulesInfo", UIText.class);
         recalculateOrder = find("update", UIButton.class);
-        setEnabledRenderingClassButton = find ("setEnabledRenderingClassButton", UIButton.class);
+        setEnabledRenderingClassButton = find("setEnabledRenderingClassButton", UIButton.class);
 
         // List<Name> orderedModuleNames = new ArrayList<>();
         // orderedModuleRenderingInstances.forEach(module->orderedModuleNames.add(module.getProvidingModule()));
@@ -106,14 +111,15 @@ public class RenderingModuleSettingScreen extends CoreScreenLayer implements UIS
             moduleList.setOptions(orderedModuleRenderingInstances);
             moduleList.setVisibleOptions(5);
             moduleList.setSelection(orderedModuleRenderingInstances.get(0));
-            initPrioritySlider.setValue(moduleList.getSelection().getInitPriority());
+            if (initPrioritySlider != null) {
+                initPrioritySlider.setValue(moduleList.getSelection().getInitPriority());
+            }
             moduleList.setOptionRenderer(new StringTextRenderer<ModuleRendering>() {
                 @Override
                 public String getString(ModuleRendering value) {
                     if (value != null) {
                         StringBuilder stringBuilder = new StringBuilder()
-                                .append(String.format("%s",value.getClass().getSimpleName(),
-                                value.getProvidingModule()));
+                                .append(String.format("%s", value.getClass().getSimpleName()));
                         return stringBuilder.toString();
                     }
                     return "";
