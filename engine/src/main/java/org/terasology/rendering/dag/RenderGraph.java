@@ -525,10 +525,16 @@ public class RenderGraph {
     }
 
     /**
-     * Reconnects dependencies only. BufferPairConnection or FboConnection types supported so far.
-     * @param inputId
-     * @param fromConnection
-     */// TODO make it reconnectInputFboToOutput
+     * API for reconnecting input dependency to another output.
+     *
+     * Attempts to connectFbo or reconnect toNode's input (inputId)
+     * to fromNode's (fromNodeUri) output (outputId).
+     * @param toNode toNode's SimpleUri name. Node must exist in the renderGraph.
+     * @param inputId Id of toNode's input. Input does NOT have to exist beforehand.
+     * @param fromConnection Id of fromNode's output connection. Connection must exist.
+     * @param connectionType {@link ConnectionType} saying whether the dependency is Fbo, BufferPair or something else
+     * @param disconnectPrevious  TO DEPRECATE; Whether to disconnect previous connection. This should now be always true.
+     */
     private void reconnectInputToOutput(Node toNode, int inputId, DependencyConnection fromConnection, ConnectionType connectionType, boolean disconnectPrevious) {
         logger.info("Attempting reconnection of " + toNode.getUri() + " to " + fromConnection.getParentNode() + "'s output.");
         Node fromNode;
