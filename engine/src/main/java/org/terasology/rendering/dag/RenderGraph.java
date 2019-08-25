@@ -21,7 +21,6 @@ import com.google.common.collect.Maps;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -30,7 +29,9 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
 import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.dag.dependencyConnections.*;
+import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
+import org.terasology.rendering.dag.dependencyConnections.FboConnection;
 
 /**
  * TODO: Add javadocs
@@ -81,8 +82,8 @@ public class RenderGraph {
     public void replaceNode(Node aNode, Node byNode) {
         // Add connections from a node being replaced; This should in theory be sufficient and once we call setDep over
         // all new nodes again, everything should be set
-         aNode.getInputConnections().forEach((k,v)->byNode.getInputConnections().replace(k,v));
-         aNode.getOutputConnections().forEach((k,v)->byNode.getOutputConnections().replace(k,v));
+         aNode.getInputConnections().forEach((k, v)->byNode.getInputConnections().replace(k, v));
+         aNode.getOutputConnections().forEach((k, v)->byNode.getOutputConnections().replace(k, v));
 
         nodeMap.replace(aNode.getUri(), byNode);
         akaNodeMap.replace(aNode.getAka(), byNode);
@@ -129,14 +130,14 @@ public class RenderGraph {
         return findAka(new Name(simpleUriAka));
     }
 
-    public void postConnectAll() {
+    private void postConnectAll() {
         // for each node in the graph
-        for(Node fromNode : nodeMap.values()) {
+        for (Node fromNode : nodeMap.values()) {
             // for each of node's output connection
             for (DependencyConnection outputConnection : fromNode.getOutputConnections().values()) {
                 // get connections other ends (multiple, relationship 1 to N) and their parent nodes as toNode and call connect
                 for (Object connectedConnection: outputConnection.getConnectedConnections().values()) {
-                    Node toNode = findNode(((DependencyConnection)connectedConnection).getParentNode());
+                    Node toNode = findNode(((DependencyConnection) connectedConnection).getParentNode());
                     if (fromNode != toNode) {
                         connect(fromNode, toNode);
                     }
@@ -145,7 +146,7 @@ public class RenderGraph {
         }
     }
 
-    public void connect(Node... nodeList) {
+    private void connect(Node... nodeList) {
         Preconditions.checkArgument(nodeList.length > 1, "Expected at least 2 nodes as arguments to connect() - found " + nodeList.length);
 
         Node fromNode = null;
@@ -368,7 +369,7 @@ public class RenderGraph {
         if (fromNode == null || toNode == null) {
             throw new RuntimeException("Node cannot be null.");
         }
-        if(fromNode.addOutputRunOrderConnection(outputId)) {
+        if (fromNode.addOutputRunOrderConnection(outputId)) {
             if (!toNode.addInputRunOrderConnection(fromNode.getOutputRunOrderConnection(outputId), inputId)) {
                 throw new RuntimeException("Could not add input RunOrder" + inputId + " connection to " + toNode + ". Connection probably already exists.");
             }
@@ -566,7 +567,7 @@ public class RenderGraph {
 
                 // Save previous input connection source node to check whether if it's still depending on it after reconnect
                 // should work like this, an input connection should have only one connected connection
-                DependencyConnection previousFromConnection = (DependencyConnection)connectionToReconnect.getConnectedConnections().values().iterator().next();
+                DependencyConnection previousFromConnection = (DependencyConnection) connectionToReconnect.getConnectedConnections().values().iterator().next();
                 Node previousFromNode = findNode((previousFromConnection).getParentNode());
 
                 connectionToReconnect.getConnectedConnections().clear();
@@ -731,13 +732,14 @@ public class RenderGraph {
 
         if (!connectionToReplace.getConnectedConnections().isEmpty()) {
             // Hard to deal with concurency problems, iterate copy, edit original
-            final HashMap<String, DependencyConnection> connectedConnections = connectionToReplace.getConnectedConnections();
-            final HashMap<String, DependencyConnection> connectedConnectionsCopy = Maps.newHashMap(connectionToReplace.getConnectedConnections());
+            final Map<String, DependencyConnection> connectedConnections = connectionToReplace.getConnectedConnections();
+            final Map<String, DependencyConnection> connectedConnectionsCopy = Maps.newHashMap(connectionToReplace.getConnectedConnections());
             for (DependencyConnection connectedConnectionCopy : connectedConnectionsCopy.values()) {
                 DependencyConnection toConnection = connectedConnections.get(connectedConnectionCopy.getName());
                 if (!toConnection.getParentNode().equals(fromNode.getUri())) {
                     // TODO potteintionally harmful ID guesswork
-                    reconnectInputToOutput(findNode(toConnection.getParentNode()), DependencyConnection.getIdFromConnectionName(toConnection.getName()), newOutputConnection, connectionType, true);
+                    reconnectInputToOutput(findNode(toConnection.getParentNode()), DependencyConnection.getIdFromConnectionName(toConnection.getName()),
+                            newOutputConnection, connectionType, true);
 //                    Node toNode = findNode(toConnection.getParentNode());
 //                    if (!areConnected(fromNode, toNode)) {
 //                        connect(fromNode, toNode);
