@@ -93,8 +93,13 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeleton.boneEntities = Maps.newHashMap();
             for (Bone bone : skeleton.mesh.getBones()) {
                 LocationComponent loc = new LocationComponent();
-                EntityRef parent = (bone.getParent() != null) ? skeleton.boneEntities.get(bone.getParent().getName()) : entity;
                 EntityRef boneEntity = entityManager.create(loc);
+                skeleton.boneEntities.put(bone.getName(), boneEntity);
+            }
+            for (Bone bone : skeleton.mesh.getBones()) {
+                EntityRef boneEntity = skeleton.boneEntities.get(bone.getName());
+                LocationComponent loc = boneEntity.getComponent(LocationComponent.class);
+                EntityRef parent = (bone.getParent() != null) ? skeleton.boneEntities.get(bone.getParent().getName()) : entity;
                 Location.attachChild(parent, boneEntity);
                 loc.setLocalPosition(bone.getLocalPosition());
                 loc.setLocalRotation(bone.getLocalRotation());
@@ -102,7 +107,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 if (bone.getParent() == null) {
                     skeleton.rootBone = boneEntity;
                 }
-                skeleton.boneEntities.put(bone.getName(), boneEntity);
             }
             entity.saveComponent(skeleton);
         }
