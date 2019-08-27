@@ -33,6 +33,7 @@ public class GLTF {
     private List<GLTFAccessor> accessors = Lists.newArrayList();
     private List<GLTFMesh> meshes = Lists.newArrayList();
     private List<GLTFSkin> skins = Lists.newArrayList();
+    private List<GLTFAnimation> animations = Lists.newArrayList();
 
     /**
      * @return Metadata on the GLTF asset
@@ -95,5 +96,12 @@ public class GLTF {
      */
     public List<GLTFSkin> getSkins() {
         return skins;
+    }
+
+    /**
+     * @return A list of animations in the asset
+     */
+    public List<GLTFAnimation> getAnimations() {
+        return animations;
     }
 }

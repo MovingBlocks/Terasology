@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.assets.gltf;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
@@ -111,61 +112,15 @@ public class GLTFSkeletalMeshFormat extends GLTFCommonFormat<SkeletalMeshData> {
             if (gltf.getSkins().isEmpty()) {
                 throw new IOException("Skeletal mesh '" + urn + "' missing skin");
             }
-            GLTFSkin skin = gltf.getSkins().get(0);
-            List<Matrix4f> inverseMats = loadMat4fList(skin.getInverseBindMatrices(), gltf, loadedBuffers);
-            TIntObjectMap<Bone> bones = new TIntObjectHashMap<>();
-            for (int i = 0; i < skin.getJoints().size(); i++) {
-                int nodeIndex = skin.getJoints().get(i);
-                GLTFNode node = gltf.getNodes().get(nodeIndex);
-                Vector3f position = new Vector3f();
-                Quat4f rotation = new Quat4f(Quat4f.IDENTITY);
-                if (!inverseMats.isEmpty()) {
-                    inverseMats.get(i).invert();
-                    position = inverseMats.get(i).getTranslation();
-                    rotation = MatrixUtils.extractRotation(inverseMats.get(i));
-                } else {
-                    if (node.getTranslation() != null) {
-                        position = new Vector3f(node.getTranslation());
-                    }
-                    if (node.getRotation() != null) {
-                        rotation = new Quat4f(node.getRotation());
-                    }
-                }
-                Bone bone = new Bone(nodeIndex, node.getName(), position, rotation);
-                bones.put(nodeIndex, bone);
+            TIntObjectMap<Bone> bones = loadBones(gltf, loadedBuffers);
+
+            bones.forEachValue(bone -> {
                 builder.addBone(bone);
-            }
-            for (int i = 0; i < skin.getJoints().size(); i++) {
-                int nodeIndex = skin.getJoints().get(i);
-                GLTFNode node = gltf.getNodes().get(nodeIndex);
-                Bone bone = bones.get(nodeIndex);
-                TIntIterator iterator = node.getChildren().iterator();
-                while (iterator.hasNext()) {
-                    bone.addChild(bones.get(iterator.next()));
-                }
-            }
+                return true;
+            });
 
             return builder.build();
         }
-    }
-
-    private List<Matrix4f> loadMat4fList(int inverseBindMatrices, GLTF gltf, List<byte[]> loadedBuffers) {
-        GLTFAccessor accessor = gltf.getAccessors().get(inverseBindMatrices);
-        GLTFBufferView bufferView = gltf.getBufferViews().get(accessor.getBufferView());
-        byte[] buffer = loadedBuffers.get(bufferView.getBuffer());
-        TFloatList values = new TFloatArrayList();
-        readBuffer(buffer, accessor, bufferView, values);
-        List<Matrix4f> matricies = Lists.newArrayList();
-        for (int i = 0; i < values.size(); i += 16) {
-            Matrix4f mat = new Matrix4f(
-                    values.get(i), values.get(i + 1), values.get(i + 2), values.get(i + 3),
-                    values.get(i + 4), values.get(i + 5), values.get(i + 6), values.get(i + 7),
-                    values.get(i + 8), values.get(i + 9), values.get(i + 10), values.get(i + 11),
-                    values.get(i + 12), values.get(i + 13), values.get(i + 14), values.get(i + 15)
-            );
-            matricies.add(mat);
-        }
-        return matricies;
     }
 
     private List<Vector4i> loadVector4iList(MeshAttributeSemantic semantic, GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
