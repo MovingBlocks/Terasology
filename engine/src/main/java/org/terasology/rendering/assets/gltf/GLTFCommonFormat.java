@@ -15,24 +15,31 @@
  */
 package org.terasology.rendering.assets.gltf;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.UnsignedBytes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetData;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.gltf.deserializers.*;
 import org.terasology.rendering.assets.gltf.model.*;
+import org.terasology.rendering.assets.skeletalmesh.Bone;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -196,5 +203,64 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
         } else if (gltf.getAsset().getVersion().getMajor() != SUPPORTED_VERSION.getMajor()) {
             throw new IOException("Cannot read gltf for " + urn + " as gltf version " + gltf.getAsset().getVersion() + " is not supported");
         }
+    }
+
+    protected TIntObjectMap<Bone> loadBones(GLTF gltf, List<byte[]> loadedBuffers) {
+        GLTFSkin skin = gltf.getSkins().get(0);
+        List<Matrix4f> inverseMats = loadMat4fList(skin.getInverseBindMatrices(), gltf, loadedBuffers);
+        TIntObjectMap<Bone> bones = new TIntObjectHashMap<>();
+        for (int i = 0; i < skin.getJoints().size(); i++) {
+            int nodeIndex = skin.getJoints().get(i);
+            GLTFNode node = gltf.getNodes().get(nodeIndex);
+            Vector3f position = new Vector3f();
+            Quat4f rotation = new Quat4f(Quat4f.IDENTITY);
+            if (!inverseMats.isEmpty()) {
+                inverseMats.get(i).invert();
+                position = inverseMats.get(i).getTranslation();
+                rotation = MatrixUtils.extractRotation(inverseMats.get(i));
+            } else {
+                if (node.getTranslation() != null) {
+                    position = new Vector3f(node.getTranslation());
+                }
+                if (node.getRotation() != null) {
+                    rotation = new Quat4f(node.getRotation());
+                }
+            }
+            String boneName = node.getName();
+            if (Strings.isNullOrEmpty(boneName)) {
+                boneName = "bone_" + nodeIndex;
+            }
+            Bone bone = new Bone(nodeIndex, boneName, position, rotation);
+            bones.put(nodeIndex, bone);
+        }
+        for (int i = 0; i < skin.getJoints().size(); i++) {
+            int nodeIndex = skin.getJoints().get(i);
+            GLTFNode node = gltf.getNodes().get(nodeIndex);
+            Bone bone = bones.get(nodeIndex);
+            TIntIterator iterator = node.getChildren().iterator();
+            while (iterator.hasNext()) {
+                bone.addChild(bones.get(iterator.next()));
+            }
+        }
+        return bones;
+    }
+
+    private List<Matrix4f> loadMat4fList(int inverseBindMatrices, GLTF gltf, List<byte[]> loadedBuffers) {
+        GLTFAccessor accessor = gltf.getAccessors().get(inverseBindMatrices);
+        GLTFBufferView bufferView = gltf.getBufferViews().get(accessor.getBufferView());
+        byte[] buffer = loadedBuffers.get(bufferView.getBuffer());
+        TFloatList values = new TFloatArrayList();
+        readBuffer(buffer, accessor, bufferView, values);
+        List<Matrix4f> matricies = Lists.newArrayList();
+        for (int i = 0; i < values.size(); i += 16) {
+            Matrix4f mat = new Matrix4f(
+                    values.get(i), values.get(i + 1), values.get(i + 2), values.get(i + 3),
+                    values.get(i + 4), values.get(i + 5), values.get(i + 6), values.get(i + 7),
+                    values.get(i + 8), values.get(i + 9), values.get(i + 10), values.get(i + 11),
+                    values.get(i + 12), values.get(i + 13), values.get(i + 14), values.get(i + 15)
+            );
+            matricies.add(mat);
+        }
+        return matricies;
     }
 }
