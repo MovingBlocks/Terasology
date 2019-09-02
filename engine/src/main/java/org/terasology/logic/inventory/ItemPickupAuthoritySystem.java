@@ -101,8 +101,7 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
 
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape) {
             BoxShape collisionShape = (BoxShape) blockFamily.getArchetypeBlock().getCollisionShape();
-            Vector3f extents = collisionShape.getHalfExtentsWithoutMargin();
-            extents.scale(2.0f);
+            Vector3f extents = collisionShape.getExtents();
             extents.x = Math.max(extents.x, 0.5f);
             extents.y = Math.max(extents.y, 0.5f);
             extents.z = Math.max(extents.z, 0.5f);
