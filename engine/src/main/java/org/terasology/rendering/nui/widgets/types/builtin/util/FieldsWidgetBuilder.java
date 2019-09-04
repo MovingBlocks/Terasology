@@ -102,7 +102,8 @@ public class FieldsWidgetBuilder<T> {
                 try {
                     return (F) getter.invoke(binding.get());
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException("Unreachable");
+                    // Method is always accessible
+                    throw new RuntimeException("Unreachable", e);
                 } catch (InvocationTargetException e) {
                     throw new RuntimeException(e.getCause());
                 }
@@ -113,7 +114,8 @@ public class FieldsWidgetBuilder<T> {
                 try {
                     setter.invoke(binding.get(), value);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException("Unreachable");
+                    // Method is always accessible
+                    throw new RuntimeException("Unreachable", e);
                 } catch (InvocationTargetException e) {
                     throw new RuntimeException(e.getCause());
                 }
@@ -133,8 +135,8 @@ public class FieldsWidgetBuilder<T> {
                 try {
                     return (F) field.get(binding.get());
                 } catch (IllegalAccessException e) {
-                    // Field is public
-                    throw new RuntimeException("Unreachable");
+                    // Field is public, should never be an illegal access
+                    throw new RuntimeException("Unreachable", e);
                 }
             }
 
@@ -143,8 +145,8 @@ public class FieldsWidgetBuilder<T> {
                 try {
                     field.set(binding.get(), value);
                 } catch (IllegalAccessException e) {
-                    // Field is public
-                    throw new RuntimeException("Unreachable");
+                    // Field is public, should never be an illegal access
+                    throw new RuntimeException("Unreachable", e);
                 }
             }
         };
