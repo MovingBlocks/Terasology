@@ -76,6 +76,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [GooeysQuests](https://github.com/Terasology/GooeysQuests) - spawn our mascot Gooey (console: `spawnPrefab gooey`) then `e` click to interact for commands and quests!
 * [GooKeeper](https://github.com/Terasology/GooKeeper) - those wild Gooeys totally look like they'd be happy in some Zoo enclosures. Don't they? Then have visitors pay you!
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
+* [Health](https://github.com/Terasology/Health) - basic health functionality, extracted from the engine / Core
 * [HjerlHede](https://github.com/Terasology/HjerlHede) - a pure build module containing some Structure Template based buildings from the [Danish natural museum Hjerl Hede](http://hjerlhede.dk/en)
 * [HumanoidCharacters](https://github.com/Terasology/HumanoidCharacters) - holds humanoid characters, to make you look different than a basic floating block (or an old monkey head!)
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
