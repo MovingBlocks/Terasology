@@ -1,9 +1,0 @@
-/**
- * Rubber is bouncy
- */
-{
-    "basedOn": "core:rock",
-    "displayName": "Rubber",
-    "restitution": 0.9,
-    "mass": 20
-}
