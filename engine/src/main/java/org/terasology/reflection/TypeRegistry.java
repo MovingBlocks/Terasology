@@ -110,7 +110,6 @@ public class TypeRegistry {
                         .toArray(ClassLoader[]::new)
                 ))
                 .filterInputsBy(TypeRegistry::filterWhitelistedTypes)
-                .useParallelExecutor()
         );
 
     }
