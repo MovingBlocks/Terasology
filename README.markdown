@@ -32,7 +32,7 @@ For easy setup (recommended) you can use our launcher - [download it here.](http
 
 Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](http://jenkins.terasology.org/job/DistroOmega/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
 
-For more information about playing, like hot keys or server hosting see the [dedicated page](docs/Playing.md) or check out the [modules.](docs/Modules.md)
+For more information about playing, like hot keys or server hosting, see the [dedicated page](docs/Playing.md) or check out the [modules.](docs/Modules.md)
 
 
 ## Developing
