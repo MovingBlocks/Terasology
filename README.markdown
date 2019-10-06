@@ -24,7 +24,7 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
 ![Terasology](/docs/images/menuBackground.jpg "Terasology")
 
 
-## Playing
+### Playing
 
 Terasology requires Java 8 - [download it here](https://www.java.com/en/download/). Also make sure that your graphics card driver is up to date.
 
@@ -35,7 +35,7 @@ Direct download stable builds are uploaded to [our release section here on GitHu
 For more information about playing like hot keys or server hosting see the [dedicated page](docs/Playing.md) or check out the [modules](docs/Modules.md)
 
 
-## Developing
+### Developing
 
 We have gone to great lengths to make developing and modding Terasology as easy as possible. We use Gradle to automate just about everything. As long as you have a [Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) running from source is a two step process:
 
@@ -47,16 +47,16 @@ That's really it! If you want the project set up in [IntelliJ](https://www.jetbr
 For more on developing/modding see the [wiki](https://github.com/MovingBlocks/Terasology/wiki)
 
 
-## Links
+### Links
 
-* [Game Credits](docs/Credits.md)
-* [Code of Conduct](docs/CODE_OF_CONDUCT.md)
-* [Playing](docs/Playing.md)
-* [Modules](docs/Modules.md)
-* [Developing](https://github.com/MovingBlocks/Terasology/wiki)
-* [Community Portal](http://forum.terasology.org)
-* [Reddit](http://www.reddit.com/r/Terasology)
-* [Twitter](https://twitter.com/Terasology)
-* [Facebook](http://www.facebook.com/pages/Terasology/248329655219905)
-* [G+](https://plus.google.com/b/103835217961917018533)
-* [Discord](https://discord.gg/4uKbB8J)
+1) [Game Credits](docs/Credits.md)
+2)[Code of Conduct](docs/CODE_OF_CONDUCT.md)
+3)[Playing](docs/Playing.md)
+4)[Modules](docs/Modules.md)
+5)[Developing](https://github.com/MovingBlocks/Terasology/wiki)
+6)[Community Portal](http://forum.terasology.org)
+7)[Reddit](http://www.reddit.com/r/Terasology)
+8)[Twitter](https://twitter.com/Terasology)
+9)[Facebook](http://www.facebook.com/pages/Terasology/248329655219905)
+10)[G+](https://plus.google.com/b/103835217961917018533)
+11)[Discord](https://discord.gg/4uKbB8J)
