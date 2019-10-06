@@ -67,6 +67,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [EdibleFlora](https://github.com/Terasology/EdibleFlora) - basic growth system providing plant stuff you can eat
 * [Equipment](https://github.com/Terasology/Equipment) - an equipment system with a character screen (`c`) showing stats and slots for various equipment types
 * [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system
+* [Exoplanet](https://github.com/Terasology/Exoplanet) - a new world with a second "dimension" you can travel to through a portal
 * [Fences](https://github.com/Terasology/Fences) - fences!
 * [FlexibleMovement](https://github.com/Terasology/FlexibleMovement) - a movement implementation for FlexiblePathfinding (see below) (DISCLAIMER: this module is currently unstable)
 * [FlexiblePathfinding](https://github.com/Terasology/FlexiblePathfinding) - a more flexible variant pathfinding framework
