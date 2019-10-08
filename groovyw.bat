@@ -74,7 +74,7 @@ echo "%ARG%" | findstr /C:"\*" 1>nul && (
 ) || (
     echo "%ARG%" | findstr /C:"\?" 1>nul && (
         SET CMD_LINE_ARGS=%CMD_LINE_ARGS% "%ARG%"
-    ) || (
+    ) & (
         SET CMD_LINE_ARGS=%CMD_LINE_ARGS% %ARG%
     )
 )
