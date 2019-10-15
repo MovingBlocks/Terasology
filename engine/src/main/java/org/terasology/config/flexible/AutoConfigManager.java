@@ -63,7 +63,7 @@ public class AutoConfigManager {
                 continue;
             }
 
-            SimpleUri configId = ReflectionUtil.getSimpleUriFor(configClass, environment);
+            SimpleUri configId = ReflectionUtil.getFullyQualifiedSimpleUriFor(configClass, environment);
             loadConfig(configClass, configId);
         }
 

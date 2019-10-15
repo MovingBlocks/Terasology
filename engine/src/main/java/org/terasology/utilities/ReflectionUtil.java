@@ -538,6 +538,28 @@ public final class ReflectionUtil {
         return new SimpleUri(moduleProviding, clazz.getSimpleName());
     }
 
+    /**
+     * Returns the fully qualified {@link SimpleUri} for a type belonging to the {@link ModuleEnvironment}.
+     * If the type does not belong to the module environment, null is returned.
+     */
+    public static SimpleUri getFullyQualifiedSimpleUriFor(Type type, ModuleEnvironment environment) {
+        Class<?> clazz = getRawType(type);
+
+        if (clazz.getClassLoader() == null) {
+            // Loaded with the bootstrap class loader, definitely not part of a module
+            return null;
+        }
+
+        Name moduleProviding = environment.getModuleProviding(clazz);
+
+        if (moduleProviding == null) {
+            return null;
+        }
+
+        return new SimpleUri(moduleProviding, clazz.getTypeName());
+    }
+
+
     private static class WildcardTypeImpl implements WildcardType {
         private final Type[] upperBounds;
         private final Type[] lowerBounds;
