@@ -21,17 +21,11 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.TypeInfo;
 
 public class SettingImplBuilder<T> implements SettingBuilder<T> {
-    private SimpleUri id;
     private T defaultValue;
     private SettingConstraint<T> constraint;
     private String humanReadableName = "";
     private String description = "";
     private TypeInfo<T> valueType;
-
-    public SettingImplBuilder() {
-        // TODO: Add id parameter or remove from Setting entirely
-        this.id = new SimpleUri();
-    }
 
     @Override
     public SettingBuilder<T> valueType(TypeInfo<T> valueType) {
