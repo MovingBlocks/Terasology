@@ -33,8 +33,6 @@ import java.util.Set;
 public abstract class AutoConfig {
     private SimpleUri id;
 
-    protected AutoConfig() { }
-
     static Set<Field> getSettingFieldsIn(Class<? extends AutoConfig> configType) {
         return ReflectionUtils.getFields(
             configType,
