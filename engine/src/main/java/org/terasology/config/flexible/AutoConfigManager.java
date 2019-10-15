@@ -40,8 +40,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public class AutoConfigManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AutoConfigManager.class);
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Logger logger = LoggerFactory.getLogger(AutoConfigManager.class);
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private final Set<AutoConfig> loadedConfigs = Sets.newHashSet();
     private final TypeHandlerLibrary typeHandlerLibrary;
@@ -74,7 +74,7 @@ public class AutoConfigManager {
         Optional<T> optionalConfig = InjectionHelper.safeCreateWithConstructorInjection(clazz, context);
 
         if (!optionalConfig.isPresent()) {
-            LOGGER.error("Unable to instantiate config {}", id);
+            logger.error("Unable to instantiate config {}", id);
             return;
         }
 
@@ -97,9 +97,9 @@ public class AutoConfigManager {
         }
 
         try (Reader reader = Files.newBufferedReader(configPath, TerasologyConstants.CHARSET)) {
-            serializer.deserializeOnto(config, GSON.fromJson(reader, JsonElement.class));
+            serializer.deserializeOnto(config, gson.fromJson(reader, JsonElement.class));
         } catch (IOException e) {
-            LOGGER.error("Error while loading config {} from disk", config.getId(), e);
+            logger.error("Error while loading config {} from disk", config.getId(), e);
         }
     }
 
@@ -120,9 +120,9 @@ public class AutoConfigManager {
 
         try (BufferedWriter writer = Files.newBufferedWriter(configPath, TerasologyConstants.CHARSET)) {
             JsonElement json = serializer.serialize(config);
-            GSON.toJson(json, writer);
+            gson.toJson(json, writer);
         } catch (IOException e) {
-            LOGGER.error("Error while saving config {} to disk", config.getId(), e);
+            logger.error("Error while saving config {} to disk", config.getId(), e);
         }
     }
 
