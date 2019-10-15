@@ -70,6 +70,6 @@ public class AutoConfigManagerTest {
         verify(context).put(eq(TestAutoConfig.class), argumentCaptor.capture());
 
         TestAutoConfig value = argumentCaptor.getValue();
-        assertEquals(new SimpleUri(PROVIDING_MODULE, TestAutoConfig.class.getSimpleName()), value.getId());
+        assertEquals(new SimpleUri(PROVIDING_MODULE, TestAutoConfig.class.getName()), value.getId());
     }
 }
