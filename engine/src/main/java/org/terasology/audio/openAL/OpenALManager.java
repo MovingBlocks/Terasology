@@ -43,7 +43,6 @@ import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
-import java.beans.PropertyChangeListener;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Iterator;
@@ -67,17 +66,11 @@ public class OpenALManager implements AudioManager {
 
     private Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
 
-    private PropertyChangeListener configListener = evt -> {
-        if (evt.getPropertyName().equals(AudioConfig.MUSIC_VOLUME)) {
-            setMusicVolume((Float) evt.getNewValue());
-        } else if (evt.getPropertyName().equals(AudioConfig.SOUND_VOLUME)) {
-            setSoundVolume((Float) evt.getNewValue());
-        }
-    };
-
     public OpenALManager(AudioConfig config) throws OpenALException, LWJGLException {
         logger.info("Initializing OpenAL audio manager");
-        config.subscribe(configListener);
+
+        config.musicVolume.subscribe((setting, oldValue) -> setMusicVolume(setting.get()));
+        config.soundVolume.subscribe((setting, oldValue) -> setSoundVolume(setting.get()));
 
         AL.create();
 
@@ -111,8 +104,8 @@ public class OpenALManager implements AudioManager {
         // Initialize sound pools
         pools.put("sfx", new OpenALSoundPool(30)); // effects pool
         pools.put("music", new OpenALStreamingSoundPool(2)); // music pool
-        pools.get("sfx").setVolume(config.getSoundVolume());
-        pools.get("music").setVolume(config.getMusicVolume());
+        pools.get("sfx").setVolume(config.soundVolume.get());
+        pools.get("music").setVolume(config.musicVolume.get());
     }
 
     @Override
@@ -260,7 +253,7 @@ public class OpenALManager implements AudioManager {
         Vector3f dir = orientation.rotate(Direction.FORWARD.getVector3f(), new Vector3f());
         Vector3f up = orientation.rotate(Direction.UP.getVector3f(), new Vector3f());
 
-        FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6).put(new float[] {dir.x, dir.y, dir.z, up.x, up.y, up.z});
+        FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6).put(new float[]{dir.x, dir.y, dir.z, up.x, up.y, up.z});
         listenerOri.flip();
         AL10.alListener(AL10.AL_ORIENTATION, listenerOri);
 
