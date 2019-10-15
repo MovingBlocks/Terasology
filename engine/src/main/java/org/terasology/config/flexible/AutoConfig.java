@@ -26,6 +26,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
+/**
+ * Represents a config class that will be automatically initialized and rendered by the engine.
+ * All settings must be contained in {@code public static} fields of type {@link Setting}.
+ */
 public abstract class AutoConfig {
     private SimpleUri id;
 
