@@ -23,6 +23,7 @@ import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.reflect.CollectionCopyConstructor;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
 import org.terasology.utilities.ReflectionUtil;
@@ -70,10 +71,10 @@ public class CollectionTypeHandlerFactory implements TypeHandlerFactory {
                 context
         );
 
-        ObjectConstructor<T> collectionConstructor = constructorLibrary.get(typeInfo);
+        CollectionCopyConstructor constructor = ConstructorLibrary.getCollectionCopyConstructor((TypeInfo) typeInfo);
 
         @SuppressWarnings({"unchecked"})
-        TypeHandler<T> typeHandler = new CollectionTypeHandler(elementTypeHandler, collectionConstructor);
+        TypeHandler<T> typeHandler = new CollectionTypeHandler(elementTypeHandler, constructor);
 
         return Optional.of(typeHandler);
     }
