@@ -15,9 +15,6 @@
  */
 package org.terasology.rendering.nui.widgets.types.builtin;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
@@ -27,14 +24,11 @@ import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.rendering.nui.widgets.types.builtin.util.GrowableListWidgetBuilder;
 import org.terasology.utilities.ReflectionUtil;
+import org.terasology.utilities.collection.ImmutableCollectionUtil;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CollectionWidgetFactory implements TypeWidgetFactory {
@@ -74,29 +68,6 @@ public class CollectionWidgetFactory implements TypeWidgetFactory {
             super(type, ReflectionUtil.getElementType(type), library, constructor);
         }
 
-        private T newImmutableCollection(TypeInfo<T> type, Collection<E> items) {
-            Class<T> rawType = type.getRawType();
-
-            // Guava does not support null elements
-
-            Collection<E> nonNullItems = items.stream().filter(Objects::nonNull).collect(Collectors.toList());
-
-            // If the bound collection is unmodifiable, it must either be a standard
-            // Collection or a guava ImmutableCollection, so casts always succeed
-
-            // TODO: Support more Guava types?
-
-            if (SortedSet.class.isAssignableFrom(rawType)) {
-                return (T) ImmutableSortedSet.copyOf(nonNullItems);
-            }
-
-            if (Set.class.isAssignableFrom(rawType)) {
-                return (T) ImmutableSet.copyOf(nonNullItems);
-            }
-
-            return (T) ImmutableList.copyOf(nonNullItems);
-        }
-
         @Override
         protected void updateBindingWithElements(Binding<T> binding, List<E> elements) {
             try {
@@ -104,7 +75,8 @@ public class CollectionWidgetFactory implements TypeWidgetFactory {
                 binding.get().addAll(elements);
             } catch (UnsupportedOperationException e) {
                 // Bound collection is unmodifiable, create new
-                binding.set(newImmutableCollection(type, elements));
+                // It must either be a standard Collection or a guava ImmutableCollection
+                binding.set(ImmutableCollectionUtil.copyOf(type, elements));
             }
         }
 
