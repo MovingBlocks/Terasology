@@ -23,10 +23,12 @@ import org.mockito.stubbing.Answer;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
+import org.terasology.reflection.reflect.CollectionCopyConstructor;
 import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -40,15 +42,13 @@ public class CollectionTypeHandlerTest {
     public void testSerialize() {
         IntTypeHandler elementTypeHandler = mock(IntTypeHandler.class);
 
-        ObjectConstructor<Collection<Integer>> constructor = Queues::newArrayDeque;
-
+        CollectionCopyConstructor<Collection<Integer>, Integer> ctor = Queues::newArrayDeque;
         CollectionTypeHandler<Integer> typeHandler = new CollectionTypeHandler<>(
                 elementTypeHandler,
-                constructor
+                ctor
         );
 
-        Collection<Integer> collection = constructor.construct();
-        collection.addAll(Collections.nCopies(500, -1));
+        Collection<Integer> collection = ctor.construct(Collections.nCopies(500, -1));
 
         PersistedDataSerializer context = mock(PersistedDataSerializer.class);
 
@@ -66,25 +66,32 @@ public class CollectionTypeHandlerTest {
 
     @Test
     public void testDeserialize() {
-        IntTypeHandler elementTypeHandler = mock(IntTypeHandler.class);
 
-        ObjectConstructor<Collection<Integer>> constructor = mock(ObjectConstructor.class);
-        when(constructor.construct()).then((Answer<Collection<Integer>>) invocation -> Queues.newArrayDeque());
+        IntTypeHandler elementTypeHandler = spy(new IntTypeHandler());
+
+        CollectionCopyConstructor<Collection<Integer>, Integer> constructor =
+                spy(new CollectionCopyConstructor<Collection<Integer>, Integer>() {
+                    @Override
+                    public Collection<Integer> construct(Collection<Integer> elements) {
+                        return Queues.newArrayDeque(elements);
+                    }
+                });
 
         CollectionTypeHandler<Integer> typeHandler = new CollectionTypeHandler<>(
                 elementTypeHandler,
                 constructor
         );
 
+        List<Integer> integers = Collections.nCopies(500, -1);
         JsonArray jsonArray = new JsonArray();
 
-        for (Integer i : Collections.nCopies(500, -1)) {
+        for (Integer i : integers) {
             jsonArray.add(i);
         }
 
         typeHandler.deserialize(new GsonPersistedDataArray(jsonArray));
 
-        verify(constructor).construct();
+        verify(constructor).construct(eq(integers));
 
         verify(elementTypeHandler, times(jsonArray.size())).deserialize(any());
     }
