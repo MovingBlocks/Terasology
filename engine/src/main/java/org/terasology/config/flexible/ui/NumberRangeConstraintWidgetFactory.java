@@ -39,7 +39,7 @@ public class NumberRangeConstraintWidgetFactory<T extends Number & Comparable<? 
         slider.bindValue(new Binding<Float>() {
             @Override
             public Float get() {
-                return getSetting().getValue().floatValue();
+                return getSetting().get().floatValue();
             }
 
             @Override
@@ -50,7 +50,7 @@ public class NumberRangeConstraintWidgetFactory<T extends Number & Comparable<? 
     }
 
     private void updateSliderIfInteger(UISlider slider) {
-        T settingValue = getSetting().getValue();
+        T settingValue = getSetting().get();
 
         if (settingValue instanceof Float || settingValue instanceof Double) {
             return;
@@ -61,11 +61,11 @@ public class NumberRangeConstraintWidgetFactory<T extends Number & Comparable<? 
     }
 
     private void setSettingValue(float value) {
-        getSetting().setValue(getFloatAsT(value));
+        getSetting().set(getFloatAsT(value));
     }
 
     private T getFloatAsT(float value) {
-        T settingValue = getSetting().getValue();
+        T settingValue = getSetting().get();
 
         if (settingValue instanceof Byte) {
             return castToT((byte) Math.round(value));
