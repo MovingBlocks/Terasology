@@ -38,6 +38,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -131,7 +132,7 @@ public class ConstructorLibrary {
         }
 
         if (Collection.class.isAssignableFrom(rawType)) {
-            return (ObjectConstructor<T>) getCollectionConstructor((TypeInfo<? extends Collection<?>>) typeInfo);
+            return (ObjectConstructor<T>) getCollectionConstructor((TypeInfo<? extends Collection<Object>>) typeInfo);
         }
 
         if (Map.class.isAssignableFrom(rawType)) {
@@ -159,15 +160,24 @@ public class ConstructorLibrary {
         return LinkedHashMap::new;
     }
 
-    public static ObjectConstructor<? extends Collection<?>> getCollectionConstructor(TypeInfo<? extends Collection<?>> typeInfo) {
-        Class<? extends Collection<?>> rawType = typeInfo.getRawType();
+    public static <E> ObjectConstructor<? extends Collection<E>>
+        getCollectionConstructor(TypeInfo<? extends Collection<E>> typeInfo) {
+        CollectionCopyConstructor<? extends Collection<E>, E> collectionCopyConstructor
+                = getCollectionCopyConstructor(typeInfo);
+
+        return () -> collectionCopyConstructor.construct(Collections.emptyList());
+    }
+
+    public static <E> CollectionCopyConstructor<? extends Collection<E>, E>
+        getCollectionCopyConstructor(TypeInfo<? extends Collection<E>> typeInfo) {
+        Class<? extends Collection<E>> rawType = typeInfo.getRawType();
         Type type = typeInfo.getType();
 
         // TODO: Support all Guava types?
 
         if (Multiset.class.isAssignableFrom(rawType)) {
             if (ImmutableMultiset.class.isAssignableFrom(rawType)) {
-                return ImmutableMultiset::of;
+                return ImmutableMultiset::copyOf;
             }
 
             return HashMultiset::create;
@@ -175,14 +185,14 @@ public class ConstructorLibrary {
 
         if (SortedSet.class.isAssignableFrom(rawType)) {
             if (ImmutableSortedSet.class.isAssignableFrom(rawType)) {
-                return ImmutableSortedSet::of;
+                return ImmutableSortedSet::copyOf;
             }
 
             return TreeSet::new;
         }
 
         if (EnumSet.class.isAssignableFrom(rawType)) {
-            return () -> {
+            return (items) -> {
                 if (!(type instanceof ParameterizedType)) {
                     throw new IllegalArgumentException("Invalid EnumSet type: " + type.toString());
                 }
@@ -193,13 +203,13 @@ public class ConstructorLibrary {
                     throw new IllegalArgumentException("Invalid EnumSet type: " + type.toString());
                 }
 
-                return EnumSet.noneOf((Class) elementType);
+                return EnumSet.copyOf((Collection) items);
             };
         }
 
         if (Set.class.isAssignableFrom(rawType)) {
             if (ImmutableSet.class.isAssignableFrom(rawType)) {
-                return ImmutableSet::of;
+                return ImmutableSet::copyOf;
             }
 
             return LinkedHashSet::new;
@@ -210,7 +220,7 @@ public class ConstructorLibrary {
         }
 
         if (ImmutableList.class.isAssignableFrom(rawType)) {
-            return ImmutableList::of;
+            return ImmutableList::copyOf;
         }
 
         return ArrayList::new;
