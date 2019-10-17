@@ -135,10 +135,10 @@ public class ShaderManagerLwjgl implements ShaderManager {
     }
 
     @Override
-    public void recompileAllShaders(boolean development) {
+    public void recompileAllShaders(boolean fromSource) {
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        if (development) {
-            assetManager.getLoadedAssets(Shader.class).forEach(Shader::developmentRecompile);
+        if (fromSource) {
+            assetManager.getLoadedAssets(Shader.class).forEach(Shader::recompileFromSource);
         } else {
             assetManager.getLoadedAssets(Shader.class).forEach(Shader::recompile);
         }

@@ -29,16 +29,16 @@ public abstract class Shader extends Asset<ShaderData> {
     }
 
     /**
-     * Recompiles the shader for development purposes. This allows for behavior to change when
+     * Recompiles the shader from source asset folder. This allows for behavior to change when
      * the recompileShaders command is used in the game, ie. recompiling shaders from the
      * source folder rather than the build folder
      */
-    public void developmentRecompile() {
+    public void recompileFromSource() {
         recompile();
     }
 
     /**
-     * Recompiles the shader
+     * Recompiles the shader from build asset folder.
      */
     public abstract void recompile();
 

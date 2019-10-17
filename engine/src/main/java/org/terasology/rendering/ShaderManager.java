@@ -35,9 +35,9 @@ public interface ShaderManager {
     /**
      * Shader recompilation that considers if the recompilation is for development
      * purposes or not, allowing to change what the source of the shaders is
-     * @param development whether this recompile is for development purposes
+     * @param fromSource whether this recompile reads files from source folder. True - from source. False - from build.
      */
-    void recompileAllShaders(boolean development);
+    void recompileAllShaders(boolean fromSource);
 
     /**
      * Enables the default shader program.
