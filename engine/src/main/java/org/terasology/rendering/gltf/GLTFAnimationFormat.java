@@ -65,25 +65,25 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
             if (gltf.getSkins().isEmpty()) {
                 throw new IOException("Skeletal mesh '" + urn + "' missing skin");
             }
+            GLTFSkin skin = gltf.getSkins().get(0);
             List<String> boneNames = Lists.newArrayList();
-            TIntIntMap bonePositions = new TIntIntHashMap();
             TIntList boneParents = new TIntArrayList();
+            TIntIntMap nodeToJoint = new TIntIntHashMap();
+            for (int i = 0; i < skin.getJoints().size(); i++) {
+                nodeToJoint.put(skin.getJoints().get(i), i);
+            }
 
-            TIntObjectMap<Bone> bones = loadBones(gltf, loadedBuffers);
-            bones.forEachValue(x -> {
-                bonePositions.put(x.getIndex(), boneNames.size());
-                boneNames.add(x.getName());
-                return true;
-            });
+            List<Bone> bones = loadBones(gltf, skin, loadedBuffers);
+            bones.forEach(x -> boneNames.add(x.getName()));
 
-            bones.forEachValue(x -> {
+            bones.forEach(x -> {
                 if (x.getParentIndex() != -1) {
-                    boneParents.add(bonePositions.get(x.getParentIndex()));
+                    boneParents.add(x.getParentIndex());
                 } else {
                     boneParents.add(MeshAnimationData.NO_PARENT);
                 }
-                return true;
             });
+
 
 
             Map<ResourceUrn, MeshAnimationData> animations = new HashMap<>();
@@ -94,14 +94,14 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
                     name = "anim_" + index;
                 }
 
-                animations.put(new ResourceUrn(urn, name), loadAnimation(gltf, gltfAnimation, loadedBuffers, bonePositions, boneNames, boneParents, bones));
+                animations.put(new ResourceUrn(urn, name), loadAnimation(gltf, gltfAnimation, loadedBuffers, nodeToJoint, boneNames, boneParents, bones));
             }
 
             return new MeshAnimationBundleData(animations);
         }
     }
 
-    private MeshAnimationData loadAnimation(GLTF gltf, GLTFAnimation animation, List<byte[]> loadedBuffers, TIntIntMap boneIndexMapping, List<String> boneNames, TIntList boneParents, TIntObjectMap<Bone> bones) throws IOException {
+    private MeshAnimationData loadAnimation(GLTF gltf, GLTFAnimation animation, List<byte[]> loadedBuffers, TIntIntMap boneIndexMapping, List<String> boneNames, TIntList boneParents, List<Bone> bones) throws IOException {
         List<ChannelReader> channelReaders = new ArrayList<>();
         for (GLTFChannel channel : animation.getChannels()) {
             switch (channel.getTarget().getPath()) {
