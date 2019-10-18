@@ -20,20 +20,22 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.math.AABB;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.mesh.MeshData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  */
 public class SkeletalMeshDataBuilder {
 
-    private List<Bone> bones = Lists.newArrayList();
-    private List<BoneWeight> weights = Lists.newArrayList();
-    private List<Vector2f> uvs = Lists.newArrayList();
+    private List<Bone> bones = new ArrayList<>();
+    private List<BoneWeight> weights = new ArrayList<>();
+    private List<Vector2f> uvs = new ArrayList<>();
     private TIntList vertexStartWeights = new TIntArrayList();
     private TIntList vertexWeightCounts = new TIntArrayList();
     private TIntList indices = new TIntArrayList();
@@ -145,8 +147,8 @@ public class SkeletalMeshDataBuilder {
         } else {
             staticAabb = AABB.createEmpty();
         }
-        // TODO: More validation
 
         return new SkeletalMeshData(bones, weights, uvs, vertexStartWeights, vertexWeightCounts, indices, staticAabb);
     }
+
 }
