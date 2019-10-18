@@ -16,11 +16,14 @@
 package org.terasology.rendering.gltf;
 
 import com.google.common.collect.Lists;
+import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import org.joml.Vector4i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +59,8 @@ public class GLTFSkeletalMeshFormat extends GLTFCommonFormat<SkeletalMeshData> {
 
             checkVersionSupported(urn, gltf);
             checkMeshPresent(urn, gltf);
+
+            GLTFSkin skin = gltf.getSkins().get(0);
             GLTFMesh gltfMesh = gltf.getMeshes().get(0);
 
             checkPrimitivePresent(urn, gltfMesh);
@@ -64,6 +69,11 @@ public class GLTFSkeletalMeshFormat extends GLTFCommonFormat<SkeletalMeshData> {
             List<byte[]> loadedBuffers = loadBinaryBuffers(urn, gltf);
 
             SkeletalMeshDataBuilder builder = new SkeletalMeshDataBuilder();
+
+            List<Bone> bones = loadBones(gltf, skin, loadedBuffers);
+            for (Bone bone : bones) {
+                builder.addBone(bone);
+            }
 
             List<Vector3f> positions = loadVector3fList(MeshAttributeSemantic.Position, gltfPrimitive, gltf, loadedBuffers);
             List<Vector3f> normals = loadVector3fList(MeshAttributeSemantic.Normal, gltfPrimitive, gltf, loadedBuffers);
@@ -107,18 +117,6 @@ public class GLTFSkeletalMeshFormat extends GLTFCommonFormat<SkeletalMeshData> {
 
             if (gltf.getSkins().isEmpty()) {
                 throw new IOException("Skeletal mesh '" + urn + "' missing skin");
-            }
-            TIntObjectMap<Bone> bones = loadBones(gltf, loadedBuffers);
-
-            bones.forEachValue(bone -> {
-                builder.addBone(bone);
-                return true;
-            });
-
-            List<Matrix4f> inverseMats = loadInverseMats(gltf.getSkins().get(0).getInverseBindMatrices(), gltf.getSkins().get(0).getJoints().size(), gltf, loadedBuffers);
-            for (int i = 0; i < gltf.getSkins().get(0).getJoints().size(); i++) {
-                int jointIndex = gltf.getSkins().get(0).getJoints().get(i);
-                bones.get(jointIndex).setInverseBindMatrix(inverseMats.get(i));
             }
 
             return builder.build();
