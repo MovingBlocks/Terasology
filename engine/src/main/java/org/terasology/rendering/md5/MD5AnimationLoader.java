@@ -85,9 +85,11 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
             MD5Frame frame = md5.frames[frameIndex];
             List<Vector3f> positions = Lists.newArrayListWithExpectedSize(md5.numJoints);
             List<Vector3f> rawRotations = Lists.newArrayListWithExpectedSize(md5.numJoints);
+            List<Vector3f> scales = new ArrayList<>(md5.numJoints);
             for (int i = 0; i < md5.numJoints; ++i) {
                 positions.add(new Vector3f(md5.baseFramePosition[i]));
                 rawRotations.add(new Vector3f(md5.baseFrameOrientation[i]));
+                scales.add(Vector3f.one());
             }
 
             for (int jointIndex = 0; jointIndex < md5.numJoints; ++jointIndex) {
@@ -125,7 +127,7 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
             positions.set(0, MD5ParserCommon.correctOffset(positions.get(0)));
 
 
-            frames.add(new MeshAnimationFrame(positions, rotations));
+            frames.add(new MeshAnimationFrame(positions, rotations, scales));
 
         }
         AABB aabb = AABB.createEncompassing(Arrays.asList(md5.bounds));
