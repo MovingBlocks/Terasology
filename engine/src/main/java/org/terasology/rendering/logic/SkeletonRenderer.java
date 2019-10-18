@@ -138,8 +138,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             MeshAnimation newAnimation;
             if (!skeletalMeshComp.loop) {
                 newAnimation = null;
-            } else {
+            } else if (skeletalMeshComp.animationPool != null && !skeletalMeshComp.animationPool.isEmpty()){
                 newAnimation = randomAnimationData(skeletalMeshComp, random);
+            } else {
+                newAnimation = skeletalMeshComp.animation;
             }
 
             if (newAnimation == null) {
@@ -282,10 +284,12 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 }
                 LocationComponent boneLocation = boneEntity.getComponent(LocationComponent.class);
                 if (boneLocation != null) {
-                    Vector3f pos = boneLocation.getWorldPosition();
-                    pos.sub(worldPos);
+
+                    Vector3f pos = new Vector3f(boneLocation.getLocalPosition());
+                    bone.getInverseBindMatrix().transformPoint(pos);
                     inverseWorldRot.rotate(pos, pos);
                     bonePositions.add(pos);
+
                     Quat4f rot = new Quat4f(inverseWorldRot);
                     rot.mul(boneLocation.getWorldRotation());
                     boneRotations.add(rot);
