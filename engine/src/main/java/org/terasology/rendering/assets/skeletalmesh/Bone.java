@@ -18,6 +18,7 @@ package org.terasology.rendering.assets.skeletalmesh;
 
 import com.google.common.collect.Lists;
 
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -31,6 +32,7 @@ public class Bone {
     private int index;
     private Vector3f objectSpacePos = new Vector3f();
     private Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    private Matrix4f inverseBindMatrix = new Matrix4f(Matrix4f.IDENTITY);
 
     private Bone parent;
     private List<Bone> children = Lists.newArrayList();
@@ -44,6 +46,14 @@ public class Bone {
 
     public String getName() {
         return name;
+    }
+
+    public Matrix4f getInverseBindMatrix() {
+        return inverseBindMatrix;
+    }
+
+    public void setInverseBindMatrix(Matrix4f mat) {
+        this.inverseBindMatrix.set(mat);
     }
 
     public int getIndex() {
