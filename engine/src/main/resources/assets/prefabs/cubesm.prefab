@@ -7,9 +7,9 @@
     },
     "SkeletalMesh": {
         "mesh": "engine:cubesm",
-        "material": "engine:cubesm"//,
-        //"animation" : "engine:monster#anim_0",
-        //"loop" : true
+        "material": "engine:cubesm",
+        "animation" : "engine:cubesm#move",
+        "loop" : true
 
     }
 }
