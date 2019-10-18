@@ -29,10 +29,12 @@ import java.util.List;
 public class MeshAnimationFrame {
     private List<Vector3f> bonePositions;
     private List<Quat4f> boneRotations;
+    private List<Vector3f> boneScales;
 
-    public MeshAnimationFrame(Collection<Vector3f> bonePositions, Collection<Quat4f> boneRotations) {
+    public MeshAnimationFrame(List<Vector3f> bonePositions, List<Quat4f> boneRotations, List<Vector3f> boneScales) {
         this.bonePositions = Lists.newArrayList(bonePositions);
         this.boneRotations = Lists.newArrayList(boneRotations);
+        this.boneScales = Lists.newArrayList(boneScales);
     }
 
     public Vector3f getPosition(int boneId) {
@@ -41,5 +43,9 @@ public class MeshAnimationFrame {
 
     public Quat4f getRotation(int boneId) {
         return boneRotations.get(boneId);
+    }
+
+    public Vector3f getBoneScale(int boneId) {
+        return boneScales.get(boneId);
     }
 }
