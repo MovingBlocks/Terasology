@@ -52,6 +52,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
 
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -195,15 +196,15 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     }
 
     private void updateSkeleton(SkeletalMeshComponent skeletalMeshComp, MeshAnimationFrame frameA, MeshAnimationFrame frameB, float interpolationVal) {
-
         for (int i = 0; i < skeletalMeshComp.animation.getBoneCount(); ++i) {
-            EntityRef boneEntity = skeletalMeshComp.boneEntities.get(skeletalMeshComp.animation.getBoneName(i));
-            if (boneEntity == null) {
+            String boneName = skeletalMeshComp.animation.getBoneName(i);
+            Bone bone = skeletalMeshComp.mesh.getBone(boneName);
+            EntityRef boneEntity = skeletalMeshComp.boneEntities.get(boneName);
+            if (boneEntity == null || bone == null) {
                 continue;
             }
             LocationComponent boneLoc = boneEntity.getComponent(LocationComponent.class);
             if (boneLoc != null) {
-
                 Vector3f newPos = BaseVector3f.lerp(frameA.getPosition(i), frameB.getPosition(i), interpolationVal);
                 boneLoc.setLocalPosition(newPos);
                 Quat4f newRot = BaseQuat4f.interpolate(frameA.getRotation(i), frameB.getRotation(i), interpolationVal);
@@ -276,8 +277,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
             skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(worldPos), true);
 
-            List<Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
-            List<Quat4f> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
+            Vector3f[] bonePositions = new Vector3f[skeletalMesh.mesh.getBones().size()];
+            Quat4f[] boneRotations = new Quat4f[skeletalMesh.mesh.getBones().size()];
             for (Bone bone : skeletalMesh.mesh.getBones()) {
                 EntityRef boneEntity = skeletalMesh.boneEntities.get(bone.getName());
                 if (boneEntity == null) {
@@ -289,19 +290,19 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     Vector3f pos = new Vector3f(boneLocation.getLocalPosition());
                     bone.getInverseBindMatrix().transformPoint(pos);
                     inverseWorldRot.rotate(pos, pos);
-                    bonePositions.add(pos);
+                    bonePositions[bone.getIndex()] = pos;
 
                     Quat4f rot = new Quat4f(inverseWorldRot);
                     rot.mul(boneLocation.getWorldRotation());
-                    boneRotations.add(rot);
+                    boneRotations[bone.getIndex()] = rot;
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());
-                    bonePositions.add(new Vector3f());
-                    boneRotations.add(new Quat4f());
+                    bonePositions[bone.getIndex()] = new Vector3f();
+                    boneRotations[bone.getIndex()] = new Quat4f();
                 }
             }
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
-            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(bonePositions, boneRotations);
+            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(Arrays.asList(bonePositions), Arrays.asList(boneRotations));
         }
     }
 

@@ -26,7 +26,9 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.joml.Vector4i;
 import org.slf4j.Logger;
@@ -223,9 +225,10 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
         }
     }
 
-    protected TIntObjectMap<Bone> loadBones(GLTF gltf, List<byte[]> loadedBuffers) {
-        GLTFSkin skin = gltf.getSkins().get(0);
-        TIntObjectMap<Bone> bones = new TIntObjectHashMap<>();
+    protected List<Bone> loadBones(GLTF gltf, GLTFSkin skin, List<byte[]> loadedBuffers) {
+        List<Bone> bones = new ArrayList<>();
+        TIntIntMap boneToJoint = new TIntIntHashMap();
+        List<Matrix4f> inverseMats = loadInverseMats(skin.getInverseBindMatrices(), skin.getJoints().size(), gltf, loadedBuffers);
         for (int i = 0; i < skin.getJoints().size(); i++) {
             int nodeIndex = skin.getJoints().get(i);
             GLTFNode node = gltf.getNodes().get(nodeIndex);
@@ -239,18 +242,20 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             }
             String boneName = node.getName();
             if (Strings.isNullOrEmpty(boneName)) {
-                boneName = "bone_" + nodeIndex;
+                boneName = "bone_" + i;
             }
-            Bone bone = new Bone(nodeIndex, boneName, position, rotation);
-            bones.put(nodeIndex, bone);
+            Bone bone = new Bone(i, boneName, position, rotation);
+            bone.setInverseBindMatrix(inverseMats.get(i));
+            bones.add(bone);
+            boneToJoint.put(nodeIndex, i);
         }
         for (int i = 0; i < skin.getJoints().size(); i++) {
             int nodeIndex = skin.getJoints().get(i);
             GLTFNode node = gltf.getNodes().get(nodeIndex);
-            Bone bone = bones.get(nodeIndex);
+            Bone bone = bones.get(i);
             TIntIterator iterator = node.getChildren().iterator();
             while (iterator.hasNext()) {
-                bone.addChild(bones.get(iterator.next()));
+                bone.addChild(bones.get(boneToJoint.get(iterator.next())));
             }
         }
         return bones;

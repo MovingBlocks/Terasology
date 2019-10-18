@@ -47,9 +47,9 @@ public class SkeletalMeshData implements AssetData {
     public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights, List<Vector2f> uvs, TIntList vertexStartWeights,
                             TIntList vertexWeightCounts, TIntList indices, AABB staticAABB) {
         for (Bone bone : bones) {
+            boneLookup.put(bone.getName(), bone);
             if (bone.getParent() == null) {
                 rootBone = bone;
-                break;
             }
         }
         this.bones.addAll(bones);
