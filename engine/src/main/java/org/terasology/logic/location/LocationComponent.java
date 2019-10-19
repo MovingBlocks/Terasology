@@ -113,6 +113,29 @@ public final class LocationComponent implements Component, ReplicationCheck {
         return output;
     }
 
+    /**
+     * @return A new vector containing the world location.
+     */
+    public Vector3f getRelativePosition(EntityRef parentEntity) {
+        return getRelativePosition(parentEntity, new Vector3f());
+    }
+
+    public Vector3f getRelativePosition(EntityRef parentEntity, Vector3f output) {
+        output.set(position);
+        EntityRef nextEntity = parent;
+        while (!parentEntity.equals(nextEntity)) {
+            LocationComponent parentLoc = nextEntity.getComponent(LocationComponent.class);
+            if (parentLoc == null) {
+                return output;
+            }
+            output.scale(parentLoc.scale);
+            parentLoc.getLocalRotation().rotate(output, output);
+            output.add(parentLoc.position);
+            nextEntity = parentLoc.parent;
+        }
+        return output;
+    }
+
     public Vector3f getWorldDirection() {
         Vector3f result = Direction.FORWARD.getVector3f();
         getWorldRotation().rotate(result, result);
