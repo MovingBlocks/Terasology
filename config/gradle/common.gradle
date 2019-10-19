@@ -1,5 +1,15 @@
 // This include file is meant for each Java project/module and contains setup for artifact repos, code analysis, etc
 
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    dependencies {
+        classpath "org.checkerframework:checkerframework-gradle-plugin:0.4.5"
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -7,6 +17,8 @@ apply plugin: 'project-report'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 apply plugin: 'findbugs'
+
+apply plugin: 'org.checkerframework'
 
 // Computes code coverage of (unit) tests
 apply plugin: 'jacoco'
@@ -127,4 +139,11 @@ findbugs {
 // TODO: Temporary until javadoc has been fixed for Java 8 everywhere
 javadoc {
     failOnError = false
+}
+
+checkerFramework {
+    checkers = [
+            'org.checkerframework.checker.nullness.NullnessChecker',
+            'org.checkerframework.checker.units.UnitsChecker'
+    ]
 }
