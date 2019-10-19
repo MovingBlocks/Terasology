@@ -127,10 +127,11 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
             List<Vector3f> boneLocations = new ArrayList<>();
             List<Quat4f> boneRotations = new ArrayList<>();
             List<Vector3f> boneScales = new ArrayList<>();
-            for (int boneIndex = 0; boneIndex < bones.size(); boneIndex++) {
-                boneLocations.add(Vector3f.zero());
-                boneRotations.add(new Quat4f(Quat4f.IDENTITY));
-                boneScales.add(Vector3f.one());
+            for (Bone bone : bones) {
+                boneLocations.add(new Vector3f(bone.getLocalPosition()));
+                boneRotations.add(new Quat4f(bone.getLocalRotation()));
+                // TODO: Default scale
+                boneScales.add(new Vector3f(Vector3f.one()));
             }
             MeshAnimationFrame frame = new MeshAnimationFrame(boneLocations, boneRotations, boneScales);
             channelReaders.forEach(x -> x.updateFrame(time, frame));
