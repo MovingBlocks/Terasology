@@ -15,6 +15,8 @@
  */
 package org.terasology.world.block.family;
 
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
@@ -23,7 +25,7 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * The standard block family consisting of a single symmetrical block that doesn't have unique rotations.
@@ -52,6 +54,10 @@ public class SymmetricFamily extends AbstractBlockFamily {
         block = blockBuilder.constructSimpleBlock(definition, new BlockUri(definition.getUrn()), this);
     }
 
+    @Override
+    public Block getBlockForPlacement(Vector3i position, Side attachmentSide, Vector3fc viewingDirection, Vector2fc relativeAttachmentPosition) {
+        return block;
+    }
 
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
@@ -74,6 +80,6 @@ public class SymmetricFamily extends AbstractBlockFamily {
 
     @Override
     public Iterable<Block> getBlocks() {
-        return Arrays.asList(block);
+        return Collections.singletonList(block);
     }
 }

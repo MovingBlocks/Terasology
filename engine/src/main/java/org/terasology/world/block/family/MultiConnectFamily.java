@@ -18,6 +18,8 @@ package org.terasology.world.block.family;
 import com.google.common.collect.Sets;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Rotation;
@@ -156,24 +158,25 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     }
 
     /**
-     * Using the location of the block, the side the block is being attached to and the direction the block is being placed in,
-     * determine what block should be placed.
-     * 
-     * @param location The location of where the block will be placed
-     * @param attachmentSide The side that the new block is being placed on
-     * @param direction The direction the block is being placed in
-     * 
-     * @return The block from the family to be placed
+     * {@inheritDoc}
      */
     @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
+    public Block getBlockForPlacement(Vector3i position, Side attachmentSide, Vector3fc viewingDirection, Vector2fc relativeAttachmentPosition) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
-            if (this.connectionCondition(location, connectSide)) {
+            if (this.connectionCondition(position, connectSide)) {
                 connections += SideBitFlag.getSide(connectSide);
             }
         }
         return blocks.get(connections);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
+        return getBlockForPlacement(location, null, null, null);
     }
 
     /**

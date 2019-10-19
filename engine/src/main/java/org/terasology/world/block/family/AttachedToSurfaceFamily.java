@@ -16,6 +16,8 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
 import org.terasology.math.Pitch;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -80,6 +82,11 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
         } else {
             archetype = blocks.get(Side.FRONT);
         }
+    }
+
+    @Override
+    public Block getBlockForPlacement(Vector3i position, Side attachmentSide, Vector3fc viewingDirection, Vector2fc relativeAttachmentPosition) {
+        return blocks.get(attachmentSide);
     }
 
     @Override
