@@ -30,8 +30,8 @@ import java.util.List;
 public class Bone {
     private String name;
     private int index;
-    private Vector3f objectSpacePos = new Vector3f();
-    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    private Vector3f relativePosition = new Vector3f();
+    private Quat4f relativeRotation = new Quat4f(0, 0, 0, 1);
     private Matrix4f inverseBindMatrix = new Matrix4f(Matrix4f.IDENTITY);
 
     private Bone parent;
@@ -40,8 +40,8 @@ public class Bone {
     public Bone(int index, String name, Vector3f position, Quat4f rotation) {
         this.index = index;
         this.name = name;
-        this.objectSpacePos.set(position);
-        this.rotation.set(rotation);
+        this.relativePosition.set(position);
+        this.relativeRotation.set(rotation);
     }
 
     public String getName() {
@@ -61,15 +61,7 @@ public class Bone {
     }
 
     public Vector3f getObjectPosition() {
-        return objectSpacePos;
-    }
-
-    public void setObjectPos(Vector3f newObjectSpacePos) {
-        this.objectSpacePos = newObjectSpacePos;
-    }
-
-    public Vector3f getLocalPosition() {
-        Vector3f pos = new Vector3f(objectSpacePos);
+        Vector3f pos = new Vector3f(relativePosition);
         if (parent != null) {
             pos.sub(parent.getObjectPosition());
             Quat4f inverseParentRot = new Quat4f();
@@ -79,22 +71,22 @@ public class Bone {
         return pos;
     }
 
+    public Vector3f getLocalPosition() {
+        return relativePosition;
+    }
+
     public Quat4f getObjectRotation() {
-        return rotation;
-    }
-
-    public void setObjectRotation(Quat4f newRotation) {
-        this.rotation = newRotation;
-    }
-
-    public Quat4f getLocalRotation() {
-        Quat4f rot = new Quat4f(rotation);
+        Quat4f rot = new Quat4f(relativeRotation);
         if (parent != null) {
             Quat4f inverseParentRot = new Quat4f();
             inverseParentRot.inverse(parent.getObjectRotation());
             rot.mul(inverseParentRot, rot);
         }
         return rot;
+    }
+
+    public Quat4f getLocalRotation() {
+        return relativeRotation;
     }
 
     public Bone getParent() {

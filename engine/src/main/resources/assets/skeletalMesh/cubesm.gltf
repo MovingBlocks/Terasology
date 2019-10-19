@@ -57,7 +57,7 @@
         "samplers" : [
             {
                 "input" : 7,
-                "interpolation" : "LINEAR",
+                "interpolation" : "STEP",
                 "output" : 8
             }
         ],
