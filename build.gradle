@@ -20,6 +20,9 @@ buildscript {
         // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
         jcenter()
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
@@ -32,8 +35,12 @@ buildscript {
         // Needed for caching reflected data during builds
         classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
+
+        classpath "org.checkerframework:checkerframework-gradle-plugin:0.4.5"
     }
 }
+
+apply plugin: 'org.checkerframework'
 
 // Test for right version of Java in use for running this script
 assert org.gradle.api.JavaVersion.current().isJava8Compatible()
