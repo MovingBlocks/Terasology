@@ -285,14 +285,16 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 }
                 LocationComponent boneLocation = boneEntity.getComponent(LocationComponent.class);
                 if (boneLocation != null) {
-
-                    Vector3f pos = new Vector3f(boneLocation.getLocalPosition());
+                    Vector3f pos = new Vector3f(boneLocation.getRelativePosition(entity));
                     bone.getInverseBindMatrix().transformPoint(pos);
                     inverseWorldRot.rotate(pos, pos);
                     bonePositions[bone.getIndex()] = pos;
 
                     Quat4f rot = new Quat4f(inverseWorldRot);
                     rot.mul(boneLocation.getWorldRotation());
+                    Quat4f inverse = new Quat4f();
+                    inverse.set(bone.getInverseBindMatrix());
+                    rot.mul(inverse);
                     boneRotations[bone.getIndex()] = rot;
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());
