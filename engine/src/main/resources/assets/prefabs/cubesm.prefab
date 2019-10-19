@@ -6,9 +6,9 @@
         "extents": [1, 1, 1]
     },
     "SkeletalMesh": {
-        "mesh": "engine:cubesm",
+        "mesh": "engine:3cubesm",
         "material": "engine:cubesm",
-        "animation" : "engine:cubesm#move",
+        "animation" : "engine:3cubesm#move",
         "loop" : true
 
     }
