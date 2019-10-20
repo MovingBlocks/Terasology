@@ -30,6 +30,14 @@ import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Map;
 
+/**
+ * Rotates a block to always face the player, with a few specific rules.
+ * <p>
+ * If the block is placed onto a TOP  side (eg, the ground), then the FRONT side of the block will face upwards.
+ * If the block is placed onto a BOTTOM side (eg, the underside of a roof), then the FRONT side of the block will face downwards
+ * <p>
+ * Regardless of the side the block is placed onto, it shall rotate about it's Y axis (ie YAW) to orient it's FRONT side to face the player.
+ */
 @RegisterBlockFamily("fullRotation")
 public class FullRotationFamily extends AbstractBlockFamily {
     private Map<ExtendedSide, Block> blocks = Maps.newEnumMap(ExtendedSide.class);
@@ -109,15 +117,19 @@ public class FullRotationFamily extends AbstractBlockFamily {
 
     @Override
     public Block getBlockForPlacement(Vector3i location, Side surfaceSide, Side secondaryDirection) {
-        // Surface side is horizontal -> go based on secondary
-        // Surface side is TOP -> rotate to face secondary but be right way up
-        // Surface side is BOTTOM -> rotate to face secondary but be upside down
+        // Surface side is TOP -> rotate to face secondary but point FRONT upwards
+        // Surface side is BOTTOM -> rotate to face secondary but point FRONT downwards
+        // Surface side is horizontal -> choose between secondary or surfaceSide to face the player
         ExtendedSide side;
         if (surfaceSide == Side.BOTTOM) {
             side = ExtendedSide.getExtendedSideFor(Side.BOTTOM, secondaryDirection);
         } else if (surfaceSide == Side.TOP) {
             side = ExtendedSide.getExtendedSideFor(Side.TOP, secondaryDirection);
         } else {
+            // secondaryDirection and surfaceSide can never be the same.
+            // Hence, if the secondaryDirection is TOP or BOTTOM, it means that the player is looking in the same direction as the surfaceSide.
+            // Additionally, if the surface side is a horizontal side, then the block will never face up or down, so we don't need to worry about if the player is looking vertically
+            // Thus we can use this to determine which out of secondaryDirection or surfaceSide best represents which way the player is looking.
             if (secondaryDirection == Side.TOP || secondaryDirection == Side.BOTTOM) {
                 // The view direction is the surface side
                 side = ExtendedSide.getExtendedSideFor(surfaceSide, Side.TOP);
