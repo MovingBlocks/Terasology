@@ -16,6 +16,8 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
+import org.terasology.math.Pitch;
+import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -69,12 +71,18 @@ public class FullRotationFamily extends AbstractBlockFamily {
         for (Rotation rot : Rotation.horizontalRotations()) {
             Side side = Side.TOP;
             Side rotation = rot.rotate(Side.FRONT);
-            blocks.put(ExtendedSide.getExtendedSideFor(side, rotation), transformBlock(blockBuilder, shape, definition, uri, rot, side));
+            blocks.put(ExtendedSide.getExtendedSideFor(side, rotation),
+                    transformBlock(blockBuilder, shape, definition, uri,
+                            Rotation.rotate(rot.getYaw(), Pitch.CLOCKWISE_90, Roll.NONE),
+                            side));
         }
         for (Rotation rot : Rotation.horizontalRotations()) {
             Side side = Side.BOTTOM;
             Side rotation = rot.rotate(Side.FRONT);
-            blocks.put(ExtendedSide.getExtendedSideFor(side, rotation), transformBlock(blockBuilder, shape, definition, uri, rot, side));
+            blocks.put(ExtendedSide.getExtendedSideFor(side, rotation),
+                    transformBlock(blockBuilder, shape, definition, uri,
+                            Rotation.rotate(rot.getYaw(), Pitch.CLOCKWISE_270, Roll.NONE),
+                            side));
         }
     }
 
