@@ -118,7 +118,13 @@ public class FullRotationFamily extends AbstractBlockFamily {
         } else if (surfaceSide == Side.TOP) {
             side = ExtendedSide.getExtendedSideFor(Side.TOP, secondaryDirection);
         } else {
-            side = ExtendedSide.getExtendedSideFor(surfaceSide, Side.TOP);
+            if (secondaryDirection == Side.TOP || secondaryDirection == Side.BOTTOM) {
+                // The view direction is the surface side
+                side = ExtendedSide.getExtendedSideFor(surfaceSide, Side.TOP);
+            } else {
+                // The view direction is the secondary
+                side = ExtendedSide.getExtendedSideFor(secondaryDirection, Side.TOP);
+            }
         }
         return blocks.get(side);
     }
