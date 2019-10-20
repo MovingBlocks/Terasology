@@ -65,49 +65,76 @@ public class FullRotationFamily extends AbstractBlockFamily {
     }
 
     /**
-     * @param blockBuilder
-     * @param shape
-     * @param definition
-     * @param uri
+     * Populates the map with all 12 rotations of the block that are possible.
+     * <p>
+     * These are all four 90 degree rotations about the Y-axis (YAW) for each case where the FRONT side is
+     * - facing upwards
+     * - facing horizontal
+     * - facing downwards
+     *
+     * @param blockBuilder The block builder to use to produce blocks
+     * @param shape        The shape the block should be made in
+     * @param definition   The definition for the family
+     * @param uri          The base URI for the block
      */
     private void populateBlockMaps(BlockBuilderHelper blockBuilder, BlockShape shape, BlockFamilyDefinition definition, BlockUri uri) {
         for (Rotation rot : Rotation.horizontalRotations()) {
-            Side side = rot.rotate(Side.FRONT);
-            Side rotation = Side.TOP;
-            blocks.put(ExtendedSide.getExtendedSideFor(side, rotation), transformBlock(blockBuilder, shape, definition, uri, rot, side));
+            Side primarySide = rot.rotate(Side.FRONT);
+            Side sideRotation = Side.TOP;
+            ExtendedSide extendedSide = ExtendedSide.getExtendedSideFor(primarySide, sideRotation);
+
+            blocks.put(extendedSide,
+                    transformBlock(blockBuilder,
+                            shape,
+                            definition,
+                            new BlockUri(uri, new Name(extendedSide.name())),
+                            rot,
+                            extendedSide));
         }
         for (Rotation rot : Rotation.horizontalRotations()) {
-            Side side = Side.TOP;
-            Side rotation = rot.rotate(Side.FRONT);
-            blocks.put(ExtendedSide.getExtendedSideFor(side, rotation),
-                    transformBlock(blockBuilder, shape, definition, uri,
+            Side primarySide = Side.TOP;
+            Side sideRotation = rot.rotate(Side.FRONT);
+            ExtendedSide extendedSide = ExtendedSide.getExtendedSideFor(primarySide, sideRotation);
+
+            blocks.put(extendedSide,
+                    transformBlock(blockBuilder,
+                            shape,
+                            definition,
+                            new BlockUri(uri, new Name(extendedSide.name())),
                             Rotation.rotate(rot.getYaw(), Pitch.CLOCKWISE_90, Roll.NONE),
-                            side));
+                            extendedSide));
         }
         for (Rotation rot : Rotation.horizontalRotations()) {
-            Side side = Side.BOTTOM;
-            Side rotation = rot.rotate(Side.FRONT);
-            blocks.put(ExtendedSide.getExtendedSideFor(side, rotation),
-                    transformBlock(blockBuilder, shape, definition, uri,
+            Side primarySide = Side.BOTTOM;
+            Side sideRotation = rot.rotate(Side.FRONT);
+            ExtendedSide extendedSide = ExtendedSide.getExtendedSideFor(primarySide, sideRotation);
+
+            blocks.put(extendedSide,
+                    transformBlock(blockBuilder,
+                            shape,
+                            definition,
+                            new BlockUri(uri, new Name(extendedSide.name())),
                             Rotation.rotate(rot.getYaw(), Pitch.CLOCKWISE_270, Roll.NONE),
-                            side));
+                            extendedSide));
         }
     }
 
     /**
-     * @param blockBuilder
-     * @param shape
-     * @param definition
-     * @param uri
-     * @param rot
-     * @param side
+     * Build and rotate the block according to the specified rotation.
+     *
+     * @param blockBuilder The builder instance to use
+     * @param shape        The shape specified, or null if none was
+     * @param definition   The definition instance of the family to pass to the builder
+     * @param uri          The URI of the block being build
+     * @param rot          The rotation to apply to the block
+     * @param side         The subsection of the block that this is.
      */
-    private Block transformBlock(BlockBuilderHelper blockBuilder, BlockShape shape, BlockFamilyDefinition definition, BlockUri uri, Rotation rot, Side side) {
+    private Block transformBlock(BlockBuilderHelper blockBuilder, BlockShape shape, BlockFamilyDefinition definition, BlockUri uri, Rotation rot, ExtendedSide side) {
         Block block;
         if (shape == null) {
-            block = blockBuilder.constructTransformedBlock(definition, side.name(), rot, new BlockUri(uri, new Name(side.name())), this);
+            block = blockBuilder.constructTransformedBlock(definition, side.name(), rot, uri, this);
         } else {
-            block = blockBuilder.constructTransformedBlock(definition, shape, side.name(), rot, new BlockUri(uri, new Name(side.name())), this);
+            block = blockBuilder.constructTransformedBlock(definition, shape, side.name(), rot, uri, this);
         }
         if (block == null) {
             throw new IllegalArgumentException("Missing block for side: " + side.toString());
@@ -165,6 +192,13 @@ public class FullRotationFamily extends AbstractBlockFamily {
     }
 
 
+    /**
+     * This enum encapsulates both sides, and possible rotations of those sides.
+     * The primary side is the same as the standard Side
+     * The rotation represent how that side is orientated.
+     * For instance FRONT_TOP is the front side, with it's TOP edge aligned with the TOP side. (aka default)
+     * FRONT_BOTTOM is a 180 degree rotation of this about the front side. ie the former TOP edge is now aligned with the BOTTOM face
+     */
     private enum ExtendedSide {
         FRONT_TOP, FRONT_BOTTOM, FRONT_LEFT, FRONT_RIGHT,
         BACK_TOP, BACK_BOTTOM, BACK_LEFT, BACK_RIGHT,
@@ -173,6 +207,13 @@ public class FullRotationFamily extends AbstractBlockFamily {
         TOP_FRONT, TOP_BACK, TOP_LEFT, TOP_RIGHT,
         BOTTOM_FRONT, BOTTOM_BACK, BOTTOM_LEFT, BOTTOM_RIGHT;
 
+        /**
+         * Given a primary side and a rotation, get the ExtendedSide encapsulating these.
+         *
+         * @param side     The primary side
+         * @param rotation The rotation of that side
+         * @return The ExtendedSide that represents this
+         */
         public static ExtendedSide getExtendedSideFor(Side side, Side rotation) {
             return ExtendedSide.valueOf(side.name() + "_" + rotation.name());
         }
