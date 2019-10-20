@@ -46,16 +46,12 @@ public class AutoConfigManager {
     private final Set<AutoConfig> loadedConfigs = Sets.newHashSet();
     private final TypeHandlerLibrary typeHandlerLibrary;
 
-    private Context context;
-
     public AutoConfigManager(TypeHandlerLibrary typeHandlerLibrary) {
         this.typeHandlerLibrary = typeHandlerLibrary;
     }
 
     public void loadConfigsIn(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-
-        this.context = context;
 
         for (Class<? extends AutoConfig> configClass : environment.getSubtypesOf(AutoConfig.class)) {
             if (context.get(configClass) != null) {
@@ -64,13 +60,11 @@ public class AutoConfigManager {
             }
 
             SimpleUri configId = ReflectionUtil.getFullyQualifiedSimpleUriFor(configClass, environment);
-            loadConfig(configClass, configId);
+            loadConfig(configClass, configId, context);
         }
-
-        this.context = null;
     }
 
-    private <T extends AutoConfig> void loadConfig(Class<T> clazz, SimpleUri id) {
+    private <T extends AutoConfig> void loadConfig(Class<T> clazz, SimpleUri id, Context context) {
         Optional<T> optionalConfig = InjectionHelper.safeCreateWithConstructorInjection(clazz, context);
 
         if (!optionalConfig.isPresent()) {
