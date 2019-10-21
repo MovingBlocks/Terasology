@@ -323,6 +323,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node overlaysNode = new OverlaysNode("overlaysNode", context);
         renderGraph.addNode(overlaysNode);
         renderGraph.connect(finalHazeNode, overlaysNode);
+
+        renderGraph.connect(opaqueObjectsNode, overlaysNode);
+        renderGraph.connect(opaqueBlocksNode, overlaysNode);
+        renderGraph.connect(alphaRejectBlocksNode, overlaysNode);
     }
 
     private void addLightingNodes(RenderGraph renderGraph) {
