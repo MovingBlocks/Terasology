@@ -121,9 +121,16 @@ public class TrunkSystem extends BaseComponentSystem {
             return;
         }
 
-        Block newBottomBlock = trunk.leftBlockFamily.getBlockForPlacement(leftBlockPos, Side.BOTTOM, facingDir.reverse());
-        Block newTopBlock = trunk.rightBlockFamily.getBlockForPlacement(leftBlockPos, Side.BOTTOM, facingDir.reverse());
+        Block newBottomBlock;
+        Block newTopBlock;
 
+        if (facingDir == Side.FRONT || facingDir == Side.RIGHT) {
+            newBottomBlock = trunk.rightBlockFamily.getBlockForPlacement(leftBlockPos, Side.BOTTOM, facingDir.reverse());
+            newTopBlock = trunk.leftBlockFamily.getBlockForPlacement(rightBlockPos, Side.BOTTOM, facingDir.reverse());
+        } else {
+            newBottomBlock = trunk.leftBlockFamily.getBlockForPlacement(leftBlockPos, Side.BOTTOM, facingDir.reverse());
+            newTopBlock = trunk.rightBlockFamily.getBlockForPlacement(rightBlockPos, Side.BOTTOM, facingDir.reverse());
+        }
         Map<Vector3i, Block> blockMap = new HashMap<>();
         blockMap.put(leftBlockPos, newBottomBlock);
         blockMap.put(rightBlockPos, newTopBlock);
