@@ -11,8 +11,7 @@ apply plugin: 'idea'
 // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
 //apply plugin: 'eclipse'
 
-// Git plugin details at https://github.com/ajoberstar/gradle-git
-import org.ajoberstar.gradle.git.tasks.*
+apply plugin: "org.sonarqube"
 
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
@@ -20,18 +19,21 @@ buildscript {
         // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
         jcenter()
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
         // Artifactory plugin
         classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.10.0')
 
-        // Git plugin for Gradle
-        classpath 'org.ajoberstar:gradle-git:0.6.3'
-
         // Needed for caching reflected data during builds
         classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
+
+        // SonarQube / Cloud scanning
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
     }
 }
 
