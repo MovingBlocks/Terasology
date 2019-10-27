@@ -354,7 +354,7 @@
     "storage-service-conflict-ignore": "Ignorer",
     "storage-service-log-in": "S'identifier",
     "storage-service-log-out": "Déconnexion",
-    "storage-service-log-out-popup": "Vous êtes sur le point de déconnecter votre compte de ce client. Voulez-vous supprimer les identités de client stockées localement ? Si vous ne les supprimez pas, ils seront téléchargés sur le compte du prochain utilisateur qui se connecte. Choisissez Oui si vous souhaitez vous connecter avec un autre compte; choisissez Non si vous souhaitez vous reconnecter à ce compte après votre déconnexion. Choisissez Annuler si vous ne voulez pas vous déconnecter du tout.",
+    "storage-service-log-out-popup": "Vous êtes sur le point de déconnecter votre compte de ce client. Voulez-vous supprimer les identités de client stockées localement ? Si vous ne les supprimez pas, ils seront téléchargés sur le compte du prochain utilisateur qui se connecte. Choisissez Oui si vous souhaitez vous connecter avec un autre compte ; choisissez Non si vous souhaitez vous reconnecter à ce compte après votre déconnexion. Choisissez Annuler si vous ne voulez pas vous déconnecter du tout.",
     "storage-service-logged-in": "vous êtes connecté en tant que %s",
     "storage-service-logged-out": "Vous n'êtes pas connecté",
     "storage-service-login-fail": "Échec de la connexion - %s",
