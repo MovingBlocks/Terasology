@@ -348,7 +348,7 @@
     "start-singleplayer-game": "Solo",
     "start-playing": "Commencer à jouer",
     "storage-service": "Service de stockage d'identité",
-    "storage-service-conflict-message": "Lors de la dernière synchronisation des identités de client stockées localement avec le service de stockage, un conflit a été détecté. Pour le serveur avec l'ID %s, le certificat stocké localement a l'ID %s, tandis que le certificat distant a l'ID %s. Qu'est-ce que tu veux faire ? Veuillez noter que garder l’une des versions supprimera l’autre; ignorer conservera l'identité locale localement et l'identité distante à distance, et le conflit sera détecté à nouveau lors de la prochaine synchronisation",
+    "storage-service-conflict-message": "Lors de la dernière synchronisation des identités de client stockées localement avec le service de stockage, un conflit a été détecté. Pour le serveur avec l'ID %s, le certificat stocké localement a l'ID %s, tandis que le certificat distant a l'ID %s. Qu'est-ce que tu veux faire ? Veuillez noter que garder l’une des versions supprimera l’autre ; ignorer conservera l'identité locale localement et l'identité distante à distance, et le conflit sera détecté à nouveau lors de la prochaine synchronisation",
     "storage-service-conflict-keep-local": "Conserver la version locale (écraser sur le service)",
     "storage-service-conflict-keep-remote": "Conserver la version distante (écraser en local)",
     "storage-service-conflict-ignore": "Ignorer",
