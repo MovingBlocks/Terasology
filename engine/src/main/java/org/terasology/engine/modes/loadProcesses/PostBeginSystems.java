@@ -53,7 +53,7 @@ public class PostBeginSystems extends StepBasedLoadProcess {
     @Override
     public void begin() {
         ComponentSystemManager manager = context.get(ComponentSystemManager.class);
-        final List<ComponentSystem> componentSystemList = manager.iterateAll();
+        final List<ComponentSystem> componentSystemList = manager.getAllSystems();
         componentSystems = componentSystemList.iterator();
         setTotalSteps(componentSystemList.size());
     }

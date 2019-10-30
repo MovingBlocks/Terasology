@@ -53,7 +53,7 @@ public class PreBeginSystems extends StepBasedLoadProcess {
     @Override
     public void begin() {
         ComponentSystemManager csm = context.get(ComponentSystemManager.class);
-        final List<ComponentSystem> componentSystemList = csm.iterateAll();
+        final List<ComponentSystem> componentSystemList = csm.getAllSystems();
         componentSystems = componentSystemList.iterator();
         setTotalSteps(componentSystemList.size());
     }

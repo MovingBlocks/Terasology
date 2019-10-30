@@ -26,7 +26,7 @@ public abstract class StepBasedLoadProcess implements LoadProcess {
     /**
      * Must be called after every step counted in {@link #setTotalSteps(int)} is finished.
      *
-     * The prefferable way to do this is from the end of the {@link #step()} method.
+     * The preferable way to do this is from the end of the {@link #step()} method.
      */
     protected void stepDone() {
         stepsComplete++;

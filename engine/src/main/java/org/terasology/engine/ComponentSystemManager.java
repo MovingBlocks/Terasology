@@ -141,7 +141,7 @@ public class ComponentSystemManager {
     public void initialise() {
         if (!initialised) {
             console = context.get(Console.class);
-            for (ComponentSystem system : iterateAll()) {
+            for (ComponentSystem system : getAllSystems()) {
                 initialiseSystem(system);
             }
             initialised = true;
@@ -172,7 +172,7 @@ public class ComponentSystemManager {
         return namedLookup.get(name);
     }
 
-    public List<ComponentSystem> iterateAll() {
+    public List<ComponentSystem> getAllSystems() {
         return store;
     }
 
@@ -185,7 +185,7 @@ public class ComponentSystemManager {
     }
 
     public void shutdown() {
-        for (ComponentSystem system : iterateAll()) {
+        for (ComponentSystem system : getAllSystems()) {
             system.shutdown();
         }
         updateSubscribers.clear();
