@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.math;
+
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class BorderTest {
   Border border;
@@ -38,7 +38,8 @@ public class BorderTest {
 
   @Test
   public void shrinkBorder() {
-    assertEquals(border.shrink(Rect2i.createFromMinAndSize(30, 30, 30, 30)), Rect2i.createFromMinAndSize(40, 40, 10, 10));
+    assertEquals(border.shrink(Rect2i.createFromMinAndSize(30, 30, 30, 30)),
+        Rect2i.createFromMinAndSize(40, 40, 10, 10));
   }
 
   @Test
@@ -57,17 +58,21 @@ public class BorderTest {
   }
 
   @Test
-  public void growVectorMAX() {
-    assertEquals(border.grow(new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE)), new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE));
+  public void growVectorMax() {
+    assertEquals(border.grow(new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE)), new Vector2i(
+        Integer.MAX_VALUE, Integer.MAX_VALUE));
   }
 
   @Test
   public void growBorder() {
-    assertEquals(border.grow(Rect2i.createFromMinAndSize(30, 30, 30, 30)), Rect2i.createFromMinAndSize(20, 20, 50, 50));
+    assertEquals(border.grow(Rect2i.createFromMinAndSize(30, 30, 30, 30)),
+        Rect2i.createFromMinAndSize(20, 20, 50, 50));
   }
 
   @Test
-  public void growBorderMAX() {
-    assertEquals(border.grow(Rect2i.createFromMinAndSize(10, 10, Integer.MAX_VALUE, Integer.MAX_VALUE)), Rect2i.createFromMinAndSize(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE));
+  public void growBorderMax() {
+    assertEquals(border.grow(Rect2i.createFromMinAndSize(10, 10, Integer.MAX_VALUE,
+        Integer.MAX_VALUE)),Rect2i.createFromMinAndSize(0, 0, Integer.MAX_VALUE,
+        Integer.MAX_VALUE));
   }
 }
