@@ -22,7 +22,7 @@ import org.terasology.network.ServerEvent;
 /**
  * Notifies the server that the clients view distance changed.
  *
- * If you want to change the view distance send {@link ViewDistanceChangeRequest} to the local player's client entity.
+ * If you want to change the view distance send {@link ViewDistanceChangedEvent} to the local player's client entity.
  *
  */
 @ServerEvent
