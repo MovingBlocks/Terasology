@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Replicate;
@@ -77,12 +78,18 @@ public final class LocationComponent implements Component, ReplicationCheck {
         position.set(newPos);
     }
 
+    /**
+     * @return The direction this entity is facing, relative to any parent
+     */
     public Vector3f getLocalDirection() {
         Vector3f result = Direction.FORWARD.getVector3f();
         getLocalRotation().rotate(result, result);
         return result;
     }
 
+    /**
+     * @return The location of this component, relative to any parent
+     */
     public Quat4f getLocalRotation() {
         return rotation;
     }
@@ -92,6 +99,9 @@ public final class LocationComponent implements Component, ReplicationCheck {
         rotation.set(newQuat);
     }
 
+    /**
+     * @param value The scale of this component
+     */
     public void setLocalScale(float value) {
         this.scale = value;
     }
@@ -107,6 +117,10 @@ public final class LocationComponent implements Component, ReplicationCheck {
         return getWorldPosition(new Vector3f());
     }
 
+    /**
+     * @param output
+     * @return output, which is populated with the world location of this entity
+     */
     public Vector3f getWorldPosition(Vector3f output) {
         output.set(position);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
@@ -120,26 +134,31 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * @return A new vector containing the world location.
+     * Populates out with the world transform of this entity
+     * @param out
      */
-    public Vector3f getRelativePosition(EntityRef parentEntity) {
-        return getRelativePosition(parentEntity, new Vector3f());
+    public void getWorldTransform(Matrix4f out) {
+        LocationComponent loc = parent.getComponent(LocationComponent.class);
+        if (loc != null) {
+            loc.getWorldTransform(out);
+        }
+        out.mul(new Matrix4f(rotation, position, scale));
     }
 
-    public Vector3f getRelativePosition(EntityRef parentEntity, Vector3f output) {
-        output.set(position);
-        EntityRef nextEntity = parent;
-        while (!parentEntity.equals(nextEntity)) {
-            LocationComponent parentLoc = nextEntity.getComponent(LocationComponent.class);
-            if (parentLoc == null) {
-                return output;
+    /**
+     * Populates out with the transform of this entity relative to the given entity, or the world transform if entity
+     * is not in this entity's parent hierarchy
+     * @param out
+     * @param entity
+     */
+    public void getRelativeTransform(Matrix4f out, EntityRef entity) {
+        if (!(entity.equals(parent))) {
+            LocationComponent loc = parent.getComponent(LocationComponent.class);
+            if (loc != null) {
+                loc.getRelativeTransform(out, entity);
             }
-            output.scale(parentLoc.scale);
-            parentLoc.getLocalRotation().rotate(output, output);
-            output.add(parentLoc.position);
-            nextEntity = parentLoc.parent;
         }
-        return output;
+        out.mul(new Matrix4f(rotation, position, scale));
     }
 
     public Vector3f getWorldDirection() {
@@ -231,4 +250,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     public boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner) {
         return initial || replicateChanges;
     }
+
+
 }

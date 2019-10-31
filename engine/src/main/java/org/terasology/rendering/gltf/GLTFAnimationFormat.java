@@ -40,6 +40,7 @@ import org.terasology.rendering.assets.skeletalmesh.Bone;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +49,7 @@ import java.util.Map;
 @RegisterAssetFileFormat
 public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleData> {
 
-    private static float TIME_PER_FRAME = 1f / 60f;
+    private static final float TIME_PER_FRAME = 1f / 60f;
 
     public GLTFAnimationFormat(AssetManager assetManager) {
         super(assetManager, "gltf");
@@ -75,7 +76,6 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
 
             List<Bone> bones = loadBones(gltf, skin, loadedBuffers);
             bones.forEach(x -> boneNames.add(x.getName()));
-
             bones.forEach(x -> {
                 if (x.getParentIndex() != -1) {
                     boneParents.add(x.getParentIndex());
@@ -83,7 +83,6 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
                     boneParents.add(MeshAnimationData.NO_PARENT);
                 }
             });
-
 
 
             Map<ResourceUrn, MeshAnimationData> animations = new HashMap<>();
@@ -103,17 +102,29 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
 
     private MeshAnimationData loadAnimation(GLTF gltf, GLTFAnimation animation, List<byte[]> loadedBuffers, TIntIntMap boneIndexMapping, List<String> boneNames, TIntList boneParents, List<Bone> bones) throws IOException {
         List<ChannelReader> channelReaders = new ArrayList<>();
+
         for (GLTFChannel channel : animation.getChannels()) {
+            GLTFAnimationSampler sampler = animation.getSamplers().get(channel.getSampler());
+            TFloatList times = getFloats(gltf, loadedBuffers, sampler.getInput());
+            int bone = boneIndexMapping.get(channel.getTarget().getNode());
+
             switch (channel.getTarget().getPath()) {
-                case TRANSLATION:
-                    channelReaders.add(new PositionChannelReader(gltf, animation, channel, boneIndexMapping, loadedBuffers));
+                case TRANSLATION: {
+                    List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
+
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate, x -> x.getPosition(bone)));
                     break;
-                case ROTATION:
-                    channelReaders.add(new RotationChannelReader(gltf, animation, channel, boneIndexMapping, loadedBuffers));
+                }
+                case ROTATION: {
+                    List<Quat4f> data = getQuat4fs(gltf, loadedBuffers, sampler.getOutput());
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate, x -> x.getRotation(bone)));
                     break;
-                case SCALE:
-                    channelReaders.add(new ScaleChannelReader(gltf, animation, channel, boneIndexMapping, loadedBuffers));
+                }
+                case SCALE: {
+                    List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate, x -> x.getBoneScale(bone)));
                     break;
+                }
                 default:
                     break;
             }
@@ -130,16 +141,14 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
             for (Bone bone : bones) {
                 boneLocations.add(new Vector3f(bone.getLocalPosition()));
                 boneRotations.add(new Quat4f(bone.getLocalRotation()));
-                // TODO: Default scale
-                boneScales.add(new Vector3f(Vector3f.one()));
+                boneScales.add(new Vector3f(bone.getLocalScale()));
             }
             MeshAnimationFrame frame = new MeshAnimationFrame(boneLocations, boneRotations, boneScales);
             channelReaders.forEach(x -> x.updateFrame(time, frame));
             frames.add(frame);
         }
 
-        MeshAnimationData animationData = new MeshAnimationData(boneNames, boneParents, frames, TIME_PER_FRAME, AABB.createEmpty());
-        return animationData;
+        return new MeshAnimationData(boneNames, boneParents, frames, TIME_PER_FRAME, AABB.createEmpty());
     }
 
     private TFloatList getFloats(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
@@ -172,123 +181,48 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
         void updateFrame(float time, MeshAnimationFrame frame);
 
         float endTime();
-
     }
 
-    private class PositionChannelReader implements ChannelReader {
+    private interface Interpolator<T> {
+        void interpolate(T a, T b, float delta, T out);
+    }
+
+    private interface TargetRetriever<T> {
+        T getTarget(MeshAnimationFrame frame);
+    }
+
+    private class BufferChannelReader<T> implements ChannelReader {
 
         private TFloatList times;
-        private List<Vector3f> positions;
-        private int bone;
-        private GLTFInterpolation interpolation;
+        private List<T> data;
+        private Interpolator<T> interpolator;
+        private TargetRetriever<T> targetRetriever;
 
-        public PositionChannelReader(GLTF gltf, GLTFAnimation animation, GLTFChannel channel, TIntIntMap boneIndexMapping, List<byte[]> loadedBuffers) throws IOException {
-            GLTFAnimationSampler sampler = animation.getSamplers().get(channel.getSampler());
-            interpolation = sampler.getInterpolation();
-            times = getFloats(gltf, loadedBuffers, sampler.getInput());
-            bone = boneIndexMapping.get(channel.getTarget().getNode());
-            positions = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
+        BufferChannelReader(TFloatList times, List<T> data, Interpolator<T> interpolator, TargetRetriever<T> targetRetriever) {
+            this.times = times;
+            this.data = data;
+            this.interpolator = interpolator;
+            this.targetRetriever = targetRetriever;
         }
 
-        @Override
         public void updateFrame(float time, MeshAnimationFrame frame) {
             int upperFrame = 0;
             while (upperFrame < times.size() && times.get(upperFrame) < time) {
                 upperFrame++;
             }
             int lowerFrame = Math.max(0, upperFrame - 1);
+            T target = targetRetriever.getTarget(frame);
             if (upperFrame == lowerFrame) {
-                frame.getPosition(bone).set(positions.get(lowerFrame));
+                interpolator.interpolate(data.get(lowerFrame), data.get(lowerFrame), 0, target);
             } else {
-                float t = time - times.get(lowerFrame) / (times.get(upperFrame) - times.get(lowerFrame));
-                interpolation.interpolate(positions.get(lowerFrame), positions.get(upperFrame), t, frame.getPosition(bone));
+                float t = (time - times.get(lowerFrame)) / (times.get(upperFrame) - times.get(lowerFrame));
+                interpolator.interpolate(data.get(lowerFrame), data.get(upperFrame), t, target);
             }
         }
 
-        @Override
         public float endTime() {
             return times.get(times.size() - 1);
         }
-
-
     }
 
-    private class ScaleChannelReader implements ChannelReader {
-
-        private TFloatList times;
-        private List<Vector3f> scales;
-        private int bone;
-        private GLTFInterpolation interpolation;
-
-        public ScaleChannelReader(GLTF gltf, GLTFAnimation animation, GLTFChannel channel, TIntIntMap boneIndexMapping, List<byte[]> loadedBuffers) throws IOException {
-            GLTFAnimationSampler sampler = animation.getSamplers().get(channel.getSampler());
-            interpolation = sampler.getInterpolation();
-            times = getFloats(gltf, loadedBuffers, sampler.getInput());
-            bone = boneIndexMapping.get(channel.getTarget().getNode());
-            scales = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
-        }
-
-        @Override
-        public void updateFrame(float time, MeshAnimationFrame frame) {
-            int upperFrame = 0;
-            while (upperFrame < times.size() && times.get(upperFrame) < time) {
-                upperFrame++;
-            }
-            int lowerFrame = Math.max(0, upperFrame - 1);
-            if (upperFrame == lowerFrame) {
-                frame.getBoneScale(bone).set(scales.get(lowerFrame));
-            } else {
-                float t = time - times.get(lowerFrame) / (times.get(upperFrame) - times.get(lowerFrame));
-                interpolation.interpolate(scales.get(lowerFrame), scales.get(upperFrame), t, frame.getBoneScale(bone));
-            }
-        }
-
-        @Override
-        public float endTime() {
-            return times.get(times.size() - 1);
-        }
-
-
-    }
-
-    private class RotationChannelReader implements ChannelReader {
-
-        private TFloatList times;
-        private List<Quat4f> rotations;
-        private int bone;
-        private GLTFInterpolation interpolation;
-
-        public RotationChannelReader(GLTF gltf, GLTFAnimation animation, GLTFChannel channel, TIntIntMap boneIndexMapping, List<byte[]> loadedBuffers) throws IOException {
-            GLTFAnimationSampler sampler = animation.getSamplers().get(channel.getSampler());
-            interpolation = sampler.getInterpolation();
-            times = getFloats(gltf, loadedBuffers, sampler.getInput());
-            bone = boneIndexMapping.get(channel.getTarget().getNode());
-            rotations = getQuat4fs(gltf, loadedBuffers, sampler.getOutput());
-            for (Quat4f rot : rotations) {
-                rot.inverse();
-            }
-        }
-
-        @Override
-        public void updateFrame(float time, MeshAnimationFrame frame) {
-            int upperFrame = 0;
-            while (upperFrame < times.size() && times.get(upperFrame) < time) {
-                upperFrame++;
-            }
-            int lowerFrame = Math.max(0, upperFrame - 1);
-            if (upperFrame == lowerFrame) {
-                frame.getRotation(bone).set(rotations.get(lowerFrame));
-            } else {
-                float t = time - times.get(lowerFrame) / (times.get(upperFrame) - times.get(lowerFrame));
-                interpolation.interpolate(rotations.get(lowerFrame), rotations.get(upperFrame), t, frame.getRotation(bone));
-            }
-        }
-
-        @Override
-        public float endTime() {
-            return times.get(times.size() - 1);
-        }
-
-
-    }
 }

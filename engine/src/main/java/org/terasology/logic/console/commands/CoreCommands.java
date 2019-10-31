@@ -528,7 +528,7 @@ public class CoreCommands extends BaseComponentSystem {
 
         Optional<Prefab> prefab = Assets.getPrefab(prefabName);
         if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
-            entityManager.create(prefab.get(), spawnPos, rotation);
+            entityManager.create(prefab.get(), spawnPos);
             return "Done";
         } else if (!prefab.isPresent()) {
             return "Unknown prefab";
