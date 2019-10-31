@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gltf.model;
 
+import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -37,25 +38,7 @@ public enum GLTFInterpolation {
 
         @Override
         public void interpolate(Quat4f a, Quat4f b, float t, Quat4f out) {
-            float cos = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-            float absCos = Math.abs(cos);
-            float scale0;
-            float scale1;
-            if (1.0f - absCos > 1E-6f) {
-                float sinSqr = 1.0f - absCos * absCos;
-                float sinom = (float) (1.0 / Math.sqrt(sinSqr));
-                float omega = (float) Math.atan2(sinSqr * sinom, absCos);
-                scale0 = (float) (Math.sin((1.0 - t) * omega) * sinom);
-                scale1 = (float) (Math.sin(t * omega) * sinom);
-            } else {
-                scale0 = 1.0f - t;
-                scale1 = t;
-            }
-            scale1 = cos >= 0.0f ? scale1 : -scale1;
-            out.x = scale0 * a.x + scale1 * b.x;
-            out.y = scale0 * a.y + scale1 * b.y;
-            out.z = scale0 * a.z + scale1 * b.z;
-            out.w = scale0 * a.w + scale1 * b.w;
+            out.set(BaseQuat4f.interpolate(a, b, t));
         }
     },
     /**
