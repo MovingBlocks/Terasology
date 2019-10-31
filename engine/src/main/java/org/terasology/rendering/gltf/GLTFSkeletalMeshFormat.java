@@ -41,6 +41,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 
 @RegisterAssetFileFormat
@@ -80,30 +81,22 @@ public class GLTFSkeletalMeshFormat extends GLTFCommonFormat<SkeletalMeshData> {
             TIntList joints = readIntBuffer(MeshAttributeSemantic.Joints_0, gltfPrimitive, gltf, loadedBuffers);
             TFloatList weights = readFloatBuffer(MeshAttributeSemantic.Weights_0, gltfPrimitive, gltf, loadedBuffers);
 
-            TIntList vertexStartWeights = new TIntArrayList();
-            TIntList vertexWeightCounts = new TIntArrayList();
-            int weightCount = 0;
+            List<BoneWeight> boneWeights = new ArrayList<>();
             for (int index = 0; index < positions.size(); index++) {
-                vertexStartWeights.add(weightCount);
-                int weightsAdded = 0;
+                TIntList weightJoints = new TIntArrayList();
+                TFloatList weightBiases = new TFloatArrayList();
                 for (int i = 0; i < 4; i++) {
                     if (weights.get(4 * index + i) > 0) {
-                        BoneWeight boneWeight = new BoneWeight(positions.get(index), weights.get(4 * index + i), joints.get(4 * index + i));
-                        // TODO: Support missing normals
-                        if (!normals.isEmpty()) {
-                            boneWeight.setNormal(normals.get(index));
-                        }
-                        builder.addWeight(boneWeight);
-                        weightsAdded++;
-                        weightCount++;
+                        weightBiases.add(weights.get(4 * index + i));
+                        weightJoints.add(joints.get(4 * index + i));
                     }
                 }
-                vertexWeightCounts.add(weightsAdded);
+                boneWeights.add(new BoneWeight(weightBiases, weightJoints));
             }
-            builder.setVertexWeights(vertexStartWeights, vertexWeightCounts);
-
-            List<Vector2f> uvs = loadVector2fList(MeshAttributeSemantic.Texcoord_0, gltfPrimitive, gltf, loadedBuffers);
-            builder.setUvs(uvs);
+            builder.addVertices(positions);
+            builder.addNormals(normals);
+            builder.addWeights(boneWeights);
+            builder.setUvs(loadVector2fList(MeshAttributeSemantic.Texcoord_0, gltfPrimitive, gltf, loadedBuffers));
 
             GLTFAccessor indicesAccessor = getIndicesAccessor(gltfPrimitive, gltf, urn);
             if (indicesAccessor.getBufferView() == null) {
