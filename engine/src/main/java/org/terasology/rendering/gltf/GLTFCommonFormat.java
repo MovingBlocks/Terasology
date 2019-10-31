@@ -78,7 +78,7 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
     }
 
     protected void readBuffer(byte[] bytes, GLTFAccessor accessor, GLTFBufferView bufferView, TIntList target) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, bufferView.getByteOffset(), bufferView.getByteLength());
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, bufferView.getByteOffset(), accessor.getCount() * accessor.getType().getDimension() * accessor.getComponentType().getByteLength());
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         switch (accessor.getComponentType()) {
             case UNSIGNED_BYTE:
@@ -234,17 +234,21 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             GLTFNode node = gltf.getNodes().get(nodeIndex);
             Vector3f position = new Vector3f();
             Quat4f rotation = new Quat4f(Quat4f.IDENTITY);
+            Vector3f scale = new Vector3f(Vector3f.one());
             if (node.getTranslation() != null) {
-                position = new Vector3f(node.getTranslation());
+                position.set(node.getTranslation());
             }
             if (node.getRotation() != null) {
-                rotation = new Quat4f(node.getRotation());
+                rotation.set(node.getRotation());
+            }
+            if (node.getScale() != null) {
+                scale.set(node.getScale());
             }
             String boneName = node.getName();
             if (Strings.isNullOrEmpty(boneName)) {
                 boneName = "bone_" + i;
             }
-            Bone bone = new Bone(i, boneName, position, rotation);
+            Bone bone = new Bone(i, boneName, new Matrix4f(rotation, position, scale.x));
             bone.setInverseBindMatrix(inverseMats.get(i));
             bones.add(bone);
             boneToJoint.put(nodeIndex, i);
