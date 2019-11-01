@@ -24,55 +24,55 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 
 public class BorderTest {
-  Border border;
+    Border border;
 
-  @Before
-  public void initBorder() {
-    border = new Border(10, 10, 10, 10);
-  }
+    @Before
+    public void initBorder() {
+        border = new Border(10, 10, 10, 10);
+    }
 
-  @Test
-  public void shrinkSameBorderAndRegionSize() {
-    assertEquals(border.shrink(Rect2i.createFromMinAndSize(10, 10, 10, 10)), Rect2i.EMPTY);
-  }
+    @Test
+    public void shrinkSameBorderAndRegionSize() {
+        assertEquals(border.shrink(Rect2i.createFromMinAndSize(10, 10, 10, 10)), Rect2i.EMPTY);
+    }
 
-  @Test
-  public void shrinkBorder() {
-    assertEquals(border.shrink(Rect2i.createFromMinAndSize(30, 30, 30, 30)),
-        Rect2i.createFromMinAndSize(40, 40, 10, 10));
-  }
+    @Test
+    public void shrinkBorder() {
+        assertEquals(border.shrink(Rect2i.createFromMinAndSize(30, 30, 30, 30)),
+            Rect2i.createFromMinAndSize(40, 40, 10, 10));
+    }
 
-  @Test
-  public void shrinkVector() {
-    assertEquals(border.shrink(new Vector2i(10, 10)), new Vector2i(-10, -10));
-  }
+    @Test
+    public void shrinkVector() {
+        assertEquals(border.shrink(new Vector2i(10, 10)), new Vector2i(-10, -10));
+    }
 
-  @Test
-  public void getTotals() {
-    assertEquals(border.getTotals(), new Vector2i(20, 20));
-  }
+    @Test
+    public void getTotals() {
+        assertEquals(border.getTotals(), new Vector2i(20, 20));
+    }
 
-  @Test
-  public void growVector() {
-    assertEquals(border.grow(new Vector2i(10, 10)), new Vector2i(30, 30));
-  }
+    @Test
+    public void growVector() {
+        assertEquals(border.grow(new Vector2i(10, 10)), new Vector2i(30, 30));
+    }
 
-  @Test
-  public void growVectorMax() {
-    assertEquals(border.grow(new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE)), new Vector2i(
-        Integer.MAX_VALUE, Integer.MAX_VALUE));
-  }
+    @Test
+    public void growVectorMax() {
+        assertEquals(border.grow(new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE)), new Vector2i(
+            Integer.MAX_VALUE, Integer.MAX_VALUE));
+    }
 
-  @Test
-  public void growBorder() {
-    assertEquals(border.grow(Rect2i.createFromMinAndSize(30, 30, 30, 30)),
-        Rect2i.createFromMinAndSize(20, 20, 50, 50));
-  }
+    @Test
+    public void growBorder() {
+        assertEquals(border.grow(Rect2i.createFromMinAndSize(30, 30, 30, 30)),
+            Rect2i.createFromMinAndSize(20, 20, 50, 50));
+    }
 
-  @Test
-  public void growBorderMax() {
-    assertEquals(border.grow(Rect2i.createFromMinAndSize(10, 10, Integer.MAX_VALUE,
-        Integer.MAX_VALUE)),Rect2i.createFromMinAndSize(0, 0, Integer.MAX_VALUE,
-        Integer.MAX_VALUE));
-  }
+    @Test
+    public void growBorderMax() {
+        assertEquals(border.grow(Rect2i.createFromMinAndSize(10, 10, Integer.MAX_VALUE,
+            Integer.MAX_VALUE)), Rect2i.createFromMinAndSize(0, 0, Integer.MAX_VALUE,
+            Integer.MAX_VALUE));
+    }
 }
