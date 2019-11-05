@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.dependencyConnections;
 
-import javafx.util.Pair;
 import org.terasology.rendering.opengl.FBO;
 
 /**
@@ -25,17 +24,19 @@ import org.terasology.rendering.opengl.FBO;
  */
 public class BufferPair {
 
-    private Pair<FBO, FBO> bufferPair;
+    private FBO primaryBuffer;
+    private FBO secondaryBuffer;
 
     public BufferPair(FBO primaryBuffer, FBO secondaryBuffer) {
-        this.bufferPair = new Pair(primaryBuffer, secondaryBuffer);
+        this.primaryBuffer = primaryBuffer;
+        this.secondaryBuffer = secondaryBuffer;
     }
 
     public FBO getPrimaryFbo() {
-        return bufferPair.getKey();
+        return primaryBuffer;
     }
 
     public FBO getSecondaryFbo() {
-        return bufferPair.getValue();
+        return secondaryBuffer;
     }
 }
