@@ -338,9 +338,10 @@ public class BlockCommands extends BaseComponentSystem {
         }
 
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+        int stackLimit = blockFamily.getArchetypeBlock().isStackable() ? 99 : 1;
 
-        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft--) {
-            EntityRef item = blockItemFactory.newInstance(blockFamily, 1);
+        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft = quantityLeft - stackLimit) {
+            EntityRef item = blockItemFactory.newInstance(blockFamily, Math.min(quantity, stackLimit));
             if (!item.exists()) {
                 throw new IllegalArgumentException("Unknown block or item");
             }
