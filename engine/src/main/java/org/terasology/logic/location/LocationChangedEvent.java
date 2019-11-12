@@ -30,23 +30,23 @@ public class LocationChangedEvent implements Event {
     public final ImmutableQuat4f newRotation;
 
     public LocationChangedEvent(LocationComponent newLocation) {
-        this(newLocation, null, null, newLocation.position, newLocation.rotation);
+        this(newLocation, newLocation.position, newLocation.rotation, newLocation.position, newLocation.rotation);
     }
 
     public LocationChangedEvent(LocationComponent newLocation, Vector3f oPosition) {
-        this(newLocation, oPosition, null, newLocation.position, null);
+        this(newLocation, oPosition, newLocation.rotation, newLocation.position, newLocation.rotation);
     }
 
     public LocationChangedEvent(LocationComponent newLocation, Vector3f oPosition, Vector3f nPosition) {
-        this(newLocation, oPosition, null, nPosition, newLocation.rotation);
+        this(newLocation, oPosition, newLocation.rotation, nPosition, newLocation.rotation);
     }
 
     public LocationChangedEvent(LocationComponent newLocation, Quat4f oRotation) {
-        this(newLocation, null, oRotation, newLocation.position, newLocation.rotation);
+        this(newLocation, newLocation.position, oRotation, newLocation.position, newLocation.rotation);
     }
 
     public LocationChangedEvent(LocationComponent newLocation, Quat4f oRotation, Quat4f nRotation) {
-        this(newLocation, null, oRotation, newLocation.position, nRotation);
+        this(newLocation, newLocation.position, oRotation, newLocation.position, nRotation);
     }
 
     public LocationChangedEvent(LocationComponent newLocation, Vector3f oPosition, Quat4f oRotation) {
