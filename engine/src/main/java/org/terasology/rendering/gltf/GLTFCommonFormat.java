@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAssetFileFormat<T> {
@@ -309,6 +310,9 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
 
     protected List<Vector2f> loadVector2fList(MeshAttributeSemantic semantic, GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {
         TFloatList floats = readFloatBuffer(semantic, gltfPrimitive, gltf, loadedBuffers);
+        if (floats == null) {
+            return Collections.emptyList();
+        }
 
         List<Vector2f> vectors = Lists.newArrayListWithCapacity(floats.size() / 2);
         for (int i = 0; i < floats.size(); i += 2) {
@@ -344,7 +348,7 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
 
             return floats;
         }
-        throw new IOException("Cannot load gltf without " + semantic);
+        return new TFloatArrayList();
     }
 
     protected TIntList readIntBuffer(MeshAttributeSemantic semantic, GLTFPrimitive gltfPrimitive, GLTF gltf, List<byte[]> loadedBuffers) throws IOException {

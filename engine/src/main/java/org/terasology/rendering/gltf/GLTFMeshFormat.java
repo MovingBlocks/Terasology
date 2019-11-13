@@ -22,7 +22,11 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.rendering.assets.mesh.MeshData;
-import org.terasology.rendering.gltf.model.*;
+import org.terasology.rendering.gltf.model.GLTF;
+import org.terasology.rendering.gltf.model.GLTFAccessor;
+import org.terasology.rendering.gltf.model.GLTFBufferView;
+import org.terasology.rendering.gltf.model.GLTFMesh;
+import org.terasology.rendering.gltf.model.GLTFPrimitive;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
