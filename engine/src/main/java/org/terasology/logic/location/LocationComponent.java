@@ -17,6 +17,7 @@ package org.terasology.logic.location;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
 import org.terasology.math.geom.Matrix4f;
@@ -83,7 +84,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * @return The location of this component, relative to any parent
+     * @return The rotation of this component, relative to any parent
      */
     public Quat4f getLocalRotation() {
         return rotation;
@@ -244,6 +245,4 @@ public final class LocationComponent implements Component, ReplicationCheck {
     public boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner) {
         return initial || replicateChanges;
     }
-
-
 }
