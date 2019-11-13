@@ -125,6 +125,9 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
     private void updateSkeletalMeshOfEntity(EntityRef entity, float delta) {
         SkeletalMeshComponent skeletalMeshComp = entity.getComponent(SkeletalMeshComponent.class);
+        if (skeletalMeshComp.mesh == null) {
+            return;
+        }
 
         if (skeletalMeshComp.animation == null && skeletalMeshComp.animationPool != null) {
             skeletalMeshComp.animation = randomAnimationData(skeletalMeshComp, random);
