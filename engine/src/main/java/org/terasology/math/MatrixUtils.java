@@ -17,7 +17,11 @@
 package org.terasology.math;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.math.geom.*;
+import org.terasology.math.geom.BaseMatrix4f;
+import org.terasology.math.geom.Matrix3f;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 
 import java.nio.FloatBuffer;
 
