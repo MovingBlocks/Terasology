@@ -29,11 +29,14 @@ import org.terasology.world.zones.ZonePlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -101,7 +104,8 @@ public class WorldBuilder extends ProviderStore {
             provider.setSeed(seed);
         }
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
-        return new WorldImpl(providerChains, rasterizers, entityProviders, determineBorders(providerChains), seaLevel);
+        List<WorldRasterizer> orderedRasterizers = ensureRasterizerOrdering();
+        return new WorldImpl(providerChains, orderedRasterizers, entityProviders, determineBorders(providerChains), seaLevel);
     }
 
     private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains) {
@@ -316,6 +320,45 @@ public class WorldBuilder extends ProviderStore {
         }
         return false;
     }
+
+    private List<WorldRasterizer> ensureRasterizerOrdering() {
+        List<WorldRasterizer> orderedRasterizers = Lists.newArrayList();
+        Map<WorldRasterizer, List<WorldRasterizer>> dependencyMap = new HashMap<>();
+        Set<Class<? extends WorldRasterizer>> addedRasterizers = new HashSet<>();
+        for (WorldRasterizer rasterizer : rasterizers) {
+            RunsAfter runsAfter = rasterizer.getClass().getAnnotation(RunsAfter.class);
+            if (runsAfter != null) {
+                List<Class<? extends WorldRasterizer>> classList = Arrays.asList(runsAfter.value());
+                List<WorldRasterizer> dependencies = rasterizers.stream()
+                        .filter(r -> classList.contains(r.getClass()))
+                        .collect(Collectors.toList());
+                dependencies.forEach(dependency -> {
+                    if (!addedRasterizers.contains(dependency.getClass())) {
+                        orderedRasterizers.add(dependency);
+                        addedRasterizers.add(dependency.getClass());
+                    }
+                });
+                dependencyMap.put(rasterizer, dependencies);
+                orderedRasterizers.add(rasterizer);
+            }
+//            if (rasterizer.getClass().getSimpleName().equals("ManaCrystalRasterizer")) {
+//                // Look ahead for the one we need
+//                for (WorldRasterizer otherRasterizer : rasterizers) {
+//                    if (otherRasterizer.getClass().getSimpleName().equals("CaveRasterizer")) {
+//                        orderedRasterizers.add(otherRasterizer);
+//                    }
+//                }
+//                orderedRasterizers.add(rasterizer);
+//            } else if (rasterizer.getClass().getSimpleName().equals("CaveRasterizer")) {
+//                continue;
+            else if (!addedRasterizers.contains(rasterizer.getClass())) {
+                orderedRasterizers.add(rasterizer);
+                addedRasterizers.add(rasterizer.getClass());
+            }
+        }
+        return orderedRasterizers;
+    }
+
 
     public FacetedWorldConfigurator createConfigurator() {
         List<ConfigurableFacetProvider> configurables = new ArrayList<>();
