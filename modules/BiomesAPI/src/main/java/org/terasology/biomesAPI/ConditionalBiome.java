@@ -33,7 +33,7 @@ public interface ConditionalBiome extends Biome {
      * @param value This facet's value.
      * @return True if possible.
      */
-    default boolean isValid(Class<FieldFacet2D> facetClass, Float value)
+    default boolean isValid(Class<? extends FieldFacet2D> facetClass, Float value)
     {
         return true;
     }
@@ -46,7 +46,7 @@ public interface ConditionalBiome extends Biome {
      */
     default boolean isValid(GeneratingRegion region, BaseVector2i pos)
     {
-        for (Class<FieldFacet2D> classy : getLimitedFacets())
+        for (Class<? extends FieldFacet2D> classy : getLimitedFacets())
         {
             FieldFacet2D facetResult = region.getRegionFacet(classy);
             if (!isValid(classy, facetResult.get(pos)))
@@ -60,13 +60,13 @@ public interface ConditionalBiome extends Biome {
     /**
      * @return A list of all facets that this biome has restrictions towards.
      */
-    Set<Class<FieldFacet2D>> getLimitedFacets();
+    Set<Class<? extends FieldFacet2D>> getLimitedFacets();
 
-    void setLowerLimit(Class<FieldFacet2D> facetClass, Float minimum);
+    void setLowerLimit(Class<? extends FieldFacet2D> facetClass, Float minimum);
 
-    void setUpperLimit(Class<FieldFacet2D> facetClass, Float maximum);
+    void setUpperLimit(Class<? extends FieldFacet2D> facetClass, Float maximum);
 
-    default void setLimits(Class<FieldFacet2D> facetClass, Float minimum, Float maximum)
+    default void setLimits(Class<? extends FieldFacet2D> facetClass, Float minimum, Float maximum)
     {
         setLowerLimit(facetClass, minimum);
         setUpperLimit(facetClass, maximum);

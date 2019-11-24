@@ -22,21 +22,21 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class BaseConditionalBiome implements ConditionalBiome {
-    protected Map<Class<FieldFacet2D>, Vector2f> limitedFacets;
+    protected Map<Class<? extends FieldFacet2D>, Vector2f> limitedFacets;
 
     @Override
-    public boolean isValid(Class<FieldFacet2D> facetClass, Float value) {
+    public boolean isValid(Class<? extends FieldFacet2D> facetClass, Float value) {
         Vector2f constraints = limitedFacets.get(facetClass);
         return constraints == null || (value >= constraints.x && value <= constraints.y);
     }
 
     @Override
-    public Set<Class<FieldFacet2D>> getLimitedFacets() {
+    public Set<Class<? extends FieldFacet2D>> getLimitedFacets() {
         return limitedFacets.keySet();
     }
 
     @Override
-    public void setLowerLimit(Class<FieldFacet2D> facetClass, Float minimum) {
+    public void setLowerLimit(Class<? extends FieldFacet2D> facetClass, Float minimum) {
         limitedFacets.compute(facetClass, (k, v) -> {
             if (v == null) v = new Vector2f(minimum, Float.MAX_VALUE);
             v.x = minimum;
@@ -45,7 +45,7 @@ public abstract class BaseConditionalBiome implements ConditionalBiome {
     }
 
     @Override
-    public void setUpperLimit(Class<FieldFacet2D> facetClass, Float maximum) {
+    public void setUpperLimit(Class<? extends FieldFacet2D> facetClass, Float maximum) {
         limitedFacets.compute(facetClass, (k, v) -> {
             if (v == null) v = new Vector2f(Float.MIN_VALUE, maximum);
             v.y = maximum;
