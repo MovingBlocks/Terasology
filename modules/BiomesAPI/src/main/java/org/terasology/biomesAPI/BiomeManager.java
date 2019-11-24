@@ -24,17 +24,21 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.players.PlayerCharacterComponent;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
+import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.blockdata.ExtraDataSystem;
 import org.terasology.world.chunks.blockdata.RegisterExtraData;
+import org.terasology.world.generation.GeneratingRegion;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +99,33 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
     @Override
     public <T extends Biome> List<T> getRegisteredBiomes(Class<T> biomeClass) {
         return biomeMap.values().stream().filter(biomeClass::isInstance).map(biomeClass::cast).collect(Collectors.toList());
+    }
+
+    public List<Biome> getValidBiomes(GeneratingRegion region, BaseVector2i pos) {
+        return getValidBiomes(region, pos, false);
+    }
+
+    public List<Biome> getValidBiomes(GeneratingRegion region, BaseVector2i pos, boolean conditionalOnly) {
+        List<Biome> matches = new ArrayList<>();
+        for (Biome biome : biomeMap.values()) {
+            if (biome instanceof ConditionalBiome) {
+                if (((ConditionalBiome) biome).isValid(region, pos)) matches.add(biome);
+            } else if (!conditionalOnly) {
+                matches.add(biome);
+            }
+        }
+        return matches;
+    }
+
+    public Biome randomValidBiome(GeneratingRegion region, BaseVector2i pos, Random random)
+    {
+        return randomValidBiome(region, pos, random, false);
+    }
+
+    public Biome randomValidBiome(GeneratingRegion region, BaseVector2i pos, Random random, boolean conditionalOnly)
+    {
+        List<Biome> biomeList = getValidBiomes(region, pos, conditionalOnly);
+        return biomeList.get(random.nextInt(biomeList.size()));
     }
 
     /**
