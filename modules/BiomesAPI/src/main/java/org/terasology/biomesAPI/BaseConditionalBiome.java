@@ -15,14 +15,20 @@
  */
 package org.terasology.biomesAPI;
 
-import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.world.generation.facets.base.FieldFacet2D;
 
 import java.util.Map;
 import java.util.Set;
 
 public abstract class BaseConditionalBiome implements ConditionalBiome {
-    protected Map<Class<FieldFacet2D>, NumberRangeConstraint<Float>> limitedFacets;
+    protected Map<Class<FieldFacet2D>, Vector2f> limitedFacets;
+
+    @Override
+    public boolean isValid(Class<FieldFacet2D> facetClass, Float value) {
+        Vector2f constraints = limitedFacets.get(facetClass);
+        return constraints == null || (value >= constraints.x && value <= constraints.y);
+    }
 
     @Override
     public Set<Class<FieldFacet2D>> getLimitedFacets() {
@@ -30,15 +36,10 @@ public abstract class BaseConditionalBiome implements ConditionalBiome {
     }
 
     @Override
-    public boolean isValid(Class<FieldFacet2D> facetClass, Float value) {
-        NumberRangeConstraint<Float> constraints = limitedFacets.get(facetClass);
-        return constraints == null || constraints.isSatisfiedBy(value);
-    }
-
-    @Override
     public void setLowerLimit(Class<FieldFacet2D> facetClass, Float minimum) {
         limitedFacets.compute(facetClass, (k, v) -> {
-            v = new NumberRangeConstraint<Float>(minimum, v != null ? v.getMax() : 1f, true, true);
+            if (v == null) v = new Vector2f(minimum, Float.MAX_VALUE);
+            v.x = minimum;
             return v;
         });
     }
@@ -46,7 +47,8 @@ public abstract class BaseConditionalBiome implements ConditionalBiome {
     @Override
     public void setUpperLimit(Class<FieldFacet2D> facetClass, Float maximum) {
         limitedFacets.compute(facetClass, (k, v) -> {
-            v = new NumberRangeConstraint<Float>(v != null ? v.getMin() : 0f, maximum,true, true);
+            if (v == null) v = new Vector2f(Float.MIN_VALUE, maximum);
+            v.y = maximum;
             return v;
         });
     }
