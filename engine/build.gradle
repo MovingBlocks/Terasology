@@ -132,8 +132,8 @@ dependencies {
     compile 'com.jagrosh:DiscordIPC:0.4'
 
     // Our developed libs
-    compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.3'
-    compile group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.3'
+    compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.4'
+    compile group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.4'
     compile group: 'org.terasology', name: 'TeraMath', version: '1.4.0'
     compile group: 'org.terasology', name: 'splash-screen', version: '1.0.2'
     compile group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'

@@ -45,6 +45,7 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
@@ -104,7 +105,7 @@ public abstract class TerasologyTestingEnvironment {
         context.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         context.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager.getEnvironment());
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");

@@ -1,7 +1,0 @@
-/**
- * Brick is Brick
- */
-{
-    "basedOn": "core:rock",
-    "displayName": "Brick"
-}

@@ -84,7 +84,7 @@ public class CopyStrategyLibrary {
 
     // TODO: Consider CopyStrategyFactory system for Collections and similar
     public CopyStrategy<?> getStrategy(Type genericType) {
-        Class<?> typeClass = ReflectionUtil.getClassOfType(genericType);
+        Class<?> typeClass = ReflectionUtil.getRawType(genericType);
         if (typeClass == null) {
             logger.error("Cannot obtain class for type {}, using default strategy", genericType);
             return defaultStrategy;

@@ -23,7 +23,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.world.block.Block;
@@ -68,8 +68,8 @@ public class RegisterBlocks extends SingleStepLoadProcess {
             blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), false);
         }
         context.put(BlockManager.class, blockManager);
-        context.get(TypeSerializationLibrary.class).add(Block.class, new BlockTypeHandler(blockManager));
-        context.get(TypeSerializationLibrary.class).add(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
+        context.get(TypeHandlerLibrary.class).addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
+        context.get(TypeHandlerLibrary.class).addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
 
         blockManager.initialise(gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap());
 

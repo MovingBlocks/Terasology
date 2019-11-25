@@ -27,7 +27,7 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -63,11 +63,11 @@ public class EntitySerializer {
         this(entityManager, entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
     }
 
-    public EntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
+    public EntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary, TypeHandlerLibrary typeHandlerLibrary) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = componentLibrary;
-        this.componentSerializer = new ComponentSerializer(componentLibrary, typeSerializationLibrary);
+        this.componentSerializer = new ComponentSerializer(componentLibrary, typeHandlerLibrary);
     }
 
     /**

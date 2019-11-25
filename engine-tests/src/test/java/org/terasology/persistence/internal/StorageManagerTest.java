@@ -28,6 +28,7 @@ import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -50,6 +51,7 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -108,15 +110,19 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         assert !Files.isRegularFile(vfs.getPath("global.dat"));
 
         entityManager = context.get(EngineEntityManager.class);
-        moduleEnvironment = context.get(ModuleEnvironment.class);
+        moduleEnvironment = mock(ModuleEnvironment.class);
         blockManager = context.get(BlockManager.class);
         extraDataManager = context.get(ExtraBlockDataManager.class);
+
+        ModuleManager moduleManager = mock(ModuleManager.class);
+
+        when(moduleManager.getEnvironment()).thenReturn(moduleEnvironment);
 
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleEnvironment);
+        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, mock(TypeRegistry.class));
         recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
 
