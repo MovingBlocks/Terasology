@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ *
  */
 public class SkeletalMeshData implements AssetData {
 
@@ -64,14 +65,23 @@ public class SkeletalMeshData implements AssetData {
         calculateNormals();
     }
 
+    /**
+     * @return Information on all bones composing the mesh
+     */
     public Collection<Bone> getBones() {
         return bones;
     }
 
+    /**
+     * @return Information on the root bone
+     */
     public Bone getRootBone() {
         return rootBone;
     }
 
+    /**
+     * @return Provides the vertex positions for the default pose
+     */
     public List<Vector3f> getBindPoseVertexPositions() {
         Matrix4f[] transforms = new Matrix4f[bones.size()];
         for (Bone bone : bones) {
@@ -80,6 +90,9 @@ public class SkeletalMeshData implements AssetData {
         return getVertexPositions(Arrays.asList(transforms));
     }
 
+    /**
+     * @return Provides the vertex normals for the default pose
+     */
     public List<Vector3f> getBindPoseVertexNormals() {
         Matrix4f[] transforms = new Matrix4f[bones.size()];
         for (Bone bone : bones) {
@@ -88,6 +101,11 @@ public class SkeletalMeshData implements AssetData {
         return getVertexNormals(Arrays.asList(transforms));
     }
 
+    /**
+     * Provides the positions of all vertices of the mesh, transformed based on the transformation matrices of all bones
+     * @param boneTransforms A transformation matrix for each bone in the skeletal mesh
+     * @return The positions of each vertex
+     */
     public List<Vector3f> getVertexPositions(List<Matrix4f> boneTransforms) {
         List<Vector3f> results = Lists.newArrayListWithCapacity(getVertexCount());
         for (int i = 0; i < vertices.size(); i++) {
@@ -105,6 +123,11 @@ public class SkeletalMeshData implements AssetData {
         return results;
     }
 
+    /**
+     * Provides the normals of all vertices of the mesh, transformed based on the transformation matrices of all bones
+     * @param boneTransforms A transformation matrix for each bone in the skeletal mesh
+     * @return The normals of each vertex
+     */
     public List<Vector3f> getVertexNormals(List<Matrix4f> boneTransforms) {
         List<Vector3f> results = Lists.newArrayListWithCapacity(getVertexCount());
         for (int i = 0; i < normals.size(); i++) {
@@ -122,22 +145,38 @@ public class SkeletalMeshData implements AssetData {
         return results;
     }
 
+    /**
+     * @return The number of vertices composing the mesh
+     */
     public int getVertexCount() {
         return vertices.size();
     }
 
+    /**
+     * @param name The name of the bone
+     * @return Provides information for the named bone
+     */
     public Bone getBone(String name) {
         return boneLookup.get(name);
     }
 
+    /**
+     * @return The indices instructing how to render the vertices as triangles
+     */
     public TIntList getIndices() {
         return indices;
     }
 
+    /**
+     * @return The texture coordinate of each vertex
+     */
     public List<Vector2f> getUVs() {
         return uvs;
     }
 
+    /**
+     * @return A axis-aligned bounding box that surrounds the skeletal mesh given its default pose.
+     */
     public AABB getStaticAABB() {
         return staticAABB;
     }
