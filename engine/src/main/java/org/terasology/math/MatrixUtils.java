@@ -248,6 +248,17 @@ public final class MatrixUtils {
         return result;
     }
 
+    /**
+     * This method pulls out the rotation component of a transformation matrix - that is a matrix
+     * which is the composition of a translation, rotation and scale. It will produce odd results
+     * on other matrices.
+     * It works by determining and removing the scale element (which is represented along the diagonal
+     * of the matrix - the rotation part of the matrix remains on upper left 3x3 portion of the matrix
+     * (translation is on the fourth column). See
+     * <a href="https://en.wikipedia.org/wiki/Rotation_matrix">Rotation matrix</a>
+     * @param m The transformation matrix to extract rotation from
+     * @return The rotation component of a transformation matrix
+     */
     public static Quat4f extractRotation(BaseMatrix4f m) {
         float w = (float) (Math.sqrt(1 + m.getM00() + m.getM11() + m.getM22()) / 2.0f);
         float denom = 4 * w;
