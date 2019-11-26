@@ -19,6 +19,8 @@ import org.terasology.biomesAPI.BiomeRegistry;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.registry.In;
+import org.terasology.world.generation.facets.SurfaceHumidityFacet;
+import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 import java.util.stream.Stream;
 
@@ -35,6 +37,16 @@ public class CoreBiomes extends BaseComponentSystem {
      */
     @Override
     public void preBegin() {
+        CoreBiome.DESERT.setLowerLimit(SurfaceTemperatureFacet.class, 0.5f);
+        CoreBiome.DESERT.setUpperLimit(SurfaceHumidityFacet.class, 0.3f);
+        CoreBiome.SNOW.setUpperLimit(SurfaceTemperatureFacet.class, 0.3f);
+        CoreBiome.SNOW.setLowerLimit(SurfaceHumidityFacet.class, 0.5f);
+        CoreBiome.PLAINS.setLimits(SurfaceHumidityFacet.class, 0.3f, 0.6f);
+        CoreBiome.PLAINS.setLowerLimit(SurfaceTemperatureFacet.class, 0.5f);
+        CoreBiome.MOUNTAINS.setLimits(SurfaceHumidityFacet.class, 0.2f, 0.6f);
+        CoreBiome.MOUNTAINS.setUpperLimit(SurfaceTemperatureFacet.class, 0.5f);
+        CoreBiome.FOREST.setLowerLimit(SurfaceHumidityFacet.class, 0.3f);
+        CoreBiome.FOREST.setLimits(SurfaceTemperatureFacet.class, 0.4f, 0.7f);
         Stream.of(CoreBiome.values()).forEach(biomeRegistry::registerBiome);
     }
 }

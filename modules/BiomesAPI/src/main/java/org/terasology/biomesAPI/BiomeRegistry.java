@@ -16,10 +16,13 @@
 package org.terasology.biomesAPI;
 
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.GeneratingRegion;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface BiomeRegistry {
@@ -96,4 +99,21 @@ public interface BiomeRegistry {
      * @return Collection of biomes of given subtype
      */
     <T extends Biome> Collection<T> getRegisteredBiomes(Class<T> biomeClass);
+
+    /**
+     * Returns all biomes that do not forbid themselves from the given location.
+     * @param region The world region
+     * @param pos The location in the world
+     * @return Collection of biomes that are valid for that location
+     */
+    Collection<Biome> getValidBiomes(GeneratingRegion region, BaseVector2i pos);
+
+    /**
+     * Returns all biomes that do not forbid themselves from the given location.
+     * @param region The world region
+     * @param pos The location in the world
+     * @param conditionalOnly If true, ignore biomes that have no restrictions
+     * @return Collection of biomes that are valid for that location
+     */
+    Collection<Biome> getValidBiomes(GeneratingRegion region, BaseVector2i pos, boolean conditionalOnly);
 }

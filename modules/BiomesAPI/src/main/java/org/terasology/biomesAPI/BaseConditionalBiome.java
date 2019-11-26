@@ -18,11 +18,12 @@ package org.terasology.biomesAPI;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.world.generation.facets.base.FieldFacet2D;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public abstract class BaseConditionalBiome implements ConditionalBiome {
-    protected Map<Class<? extends FieldFacet2D>, Vector2f> limitedFacets;
+    protected Map<Class<? extends FieldFacet2D>, Vector2f> limitedFacets = new HashMap<>();
 
     @Override
     public boolean isValid(Class<? extends FieldFacet2D> facetClass, Float value) {

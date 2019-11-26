@@ -101,10 +101,12 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
         return biomeMap.values().stream().filter(biomeClass::isInstance).map(biomeClass::cast).collect(Collectors.toList());
     }
 
+    @Override
     public List<Biome> getValidBiomes(GeneratingRegion region, BaseVector2i pos) {
         return getValidBiomes(region, pos, false);
     }
 
+    @Override
     public List<Biome> getValidBiomes(GeneratingRegion region, BaseVector2i pos, boolean conditionalOnly) {
         List<Biome> matches = new ArrayList<>();
         for (Biome biome : biomeMap.values()) {
@@ -115,17 +117,6 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
             }
         }
         return matches;
-    }
-
-    public Biome randomValidBiome(GeneratingRegion region, BaseVector2i pos, Random random)
-    {
-        return randomValidBiome(region, pos, random, false);
-    }
-
-    public Biome randomValidBiome(GeneratingRegion region, BaseVector2i pos, Random random, boolean conditionalOnly)
-    {
-        List<Biome> biomeList = getValidBiomes(region, pos, conditionalOnly);
-        return biomeList.get(random.nextInt(biomeList.size()));
     }
 
     /**
