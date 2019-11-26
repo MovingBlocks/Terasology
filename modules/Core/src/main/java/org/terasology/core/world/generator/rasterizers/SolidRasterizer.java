@@ -17,7 +17,6 @@ package org.terasology.core.world.generator.rasterizers;
 
 import org.terasology.biomesAPI.Biome;
 import org.terasology.biomesAPI.BiomeRegistry;
-import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
@@ -104,56 +103,48 @@ public class SolidRasterizer implements WorldRasterizer {
         }
     }
 
-    private Block getSurfaceBlock(int depth, int height,
-                                  Biome type,
-                                  int seaLevel) {
-        if (type instanceof CoreBiome) {
-            switch ((CoreBiome) type) {
-                case FOREST:
-                case PLAINS:
-                case MOUNTAINS:
-                    // Beach
-                    if (depth == 0 && height > seaLevel && height < seaLevel + 96) {
-                        return grass;
-                    } else if (depth == 0 && height >= seaLevel + 96) {
-                        return snow;
-                    } else if (depth > 32) {
-                        return stone;
-                    } else {
-                        return dirt;
-                    }
-                case SNOW:
-                    if (depth == 0 && height > seaLevel) {
-                        // Snow on top
-                        return snow;
-                    } else if (depth > 32) {
-                        // Stone
-                        return stone;
-                    } else {
-                        // Dirt
-                        return dirt;
-                    }
-                case DESERT:
-                    if (depth > 8) {
-                        // Stone
-                        return stone;
-                    } else {
-                        return sand;
-                    }
-                case OCEAN:
-                    if (depth == 0) {
-                        return sand;
-                    } else {
-                        return stone;
-                    }
-                case BEACH:
-                    if (depth < 3) {
-                        return sand;
-                    } else {
-                        return stone;
-                    }
-            }
+    private Block getSurfaceBlock(int depth, int height, Biome type, int seaLevel) {
+        switch (type.getName()) {
+            case "Snow":
+                if (depth == 0 && height > seaLevel) {
+                    // Snow on top
+                    return snow;
+                } else if (depth > 32) {
+                    // Stone
+                    return stone;
+                } else {
+                    // Dirt
+                    return dirt;
+                }
+            case "Desert":
+                if (depth > 8) {
+                    // Stone
+                    return stone;
+                } else {
+                    return sand;
+                }
+            case "Ocean":
+                if (depth == 0) {
+                    return sand;
+                } else {
+                    return stone;
+                }
+            case "Beach":
+                if (depth < 3) {
+                    return sand;
+                } else {
+                    return stone;
+                }
+            default:
+                if (depth == 0 && height > seaLevel && height < seaLevel + 96) {
+                    return grass;
+                } else if (depth == 0 && height >= seaLevel + 96) {
+                    return snow;
+                } else if (depth > 32) {
+                    return stone;
+                } else {
+                    return dirt;
+                }
         }
-        return dirt;
     }
 }
