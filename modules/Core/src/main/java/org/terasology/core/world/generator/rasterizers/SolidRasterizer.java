@@ -33,6 +33,7 @@ import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceDepthFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 public class SolidRasterizer implements WorldRasterizer {
 
@@ -65,6 +66,7 @@ public class SolidRasterizer implements WorldRasterizer {
         SurfaceDepthFacet surfaceDepthFacet = chunkRegion.getFacet(SurfaceDepthFacet.class);
         BiomeFacet biomeFacet = chunkRegion.getFacet(BiomeFacet.class);
         SeaLevelFacet seaLevelFacet = chunkRegion.getFacet(SeaLevelFacet.class);
+        SurfaceTemperatureFacet surfaceTemperatureFacet = chunkRegion.getFacet(SurfaceTemperatureFacet.class);
         int seaLevel = seaLevelFacet.getSeaLevel();
 
         Vector2i pos2d = new Vector2i();
@@ -92,7 +94,7 @@ public class SolidRasterizer implements WorldRasterizer {
                 chunk.setBlock(pos, block);
             } else {
                 // fill up terrain up to sealevel height with water or ice
-                if (posY == seaLevel && CoreBiome.SNOW == biome) {
+                if (posY == seaLevel && surfaceTemperatureFacet.get(pos.x, pos.y) <= 0.2F) {
                     chunk.setBlock(pos, ice);
                 } else if (posY <= seaLevel) {         // either OCEAN or SNOW
                     chunk.setBlock(pos, water);
