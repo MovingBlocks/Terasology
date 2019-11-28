@@ -47,6 +47,9 @@ public class CoreBiomes extends BaseComponentSystem {
         CoreBiome.MOUNTAINS.setUpperLimit(SurfaceTemperatureFacet.class, 0.5f);
         CoreBiome.FOREST.setLowerLimit(SurfaceHumidityFacet.class, 0.3f);
         CoreBiome.FOREST.setLimits(SurfaceTemperatureFacet.class, 0.4f, 0.7f);
+        //Beach and Ocean are special hardcoded conditions for now
+        CoreBiome.OCEAN.setLimits(SurfaceTemperatureFacet.class, 1F, 0F);
+        CoreBiome.BEACH.setLimits(SurfaceTemperatureFacet.class, 1F, 0F);
         Stream.of(CoreBiome.values()).forEach(biomeRegistry::registerBiome);
     }
 }
