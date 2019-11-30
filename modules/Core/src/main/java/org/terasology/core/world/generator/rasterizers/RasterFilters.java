@@ -16,11 +16,14 @@
 package org.terasology.core.world.generator.rasterizers;
 
 import com.google.common.base.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Side;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.facets.DensityFacet;
 
@@ -32,17 +35,18 @@ import java.util.Collection;
  */
 public class RasterFilters {
 
+    private static Logger log = LoggerFactory.getLogger(RasterFilters.class);
+
     /**
      * Checks a list of valid block types against the block below the specified location.
-     * @see #whiteListBlocks(CoreChunk, BaseVector3i, String...)
+     * @see #whiteListBlocks(BaseVector3i, String...)
      */
-    public static Predicate<Vector3i> whiteListBlocks(CoreChunk chunk, String... whiteList) {
-        return whiteListBlocks(chunk, new Vector3i(0, -1, 0), whiteList);
+    public static Predicate<ChunkSpot> whiteListBlocks(String... whiteList) {
+        return whiteListBlocks(new Vector3i(0, -1, 0), whiteList);
     }
 
     /**
      * Checks a list of valid block types against the specified location.
-     * @param chunk The generated chunk that is being decorated.
      * @param location The offset to be applied to the input.
      *                 Typically, it will be (x = 0, y = -1, z = 0): the block directly beneath the checked location.
      * @param whiteList A list of block names or block categories that are to be accepted.
@@ -56,16 +60,19 @@ public class RasterFilters {
      *                  - "<u>Dirt:</u>" will match any block name ending in "Dirt", but also any block from a "FancyDirt" module.<br/>
      *                  - "<u>:Dirt:</u>" will match only blocks named "Dirt" from any module.<br/>
      *                  - "<u>Dirt:engine:cube</u>" will match any block name ending in "Dirt" that is a normal cube shape.<br/>
-     *                  - "<u>engine:cube</u>" will match any full block. <u><i>This particular example is not recommended; use {@link org.terasology.core.world.generator.facetProviders.PositionFilters#density(DensityFacet) PositionFilters.density} or {@link #canSupport(CoreChunk, Collection<Side>) RasterFilters.canSupport} instead.</u></i><br/>
+     *                  - "<u>engine:cube</u>" will match any full block. <u><i>This particular example is not recommended; use {@link org.terasology.core.world.generator.facetProviders.PositionFilters#density(DensityFacet) PositionFilters.density} or {@link #canSupport(Collection<Side>) RasterFilters.canSupport} instead.</u></i><br/>
      *                  If the whitelisted name <b>does not</b> include a semicolon, it will only be matched against block categories.<br/>
      *                  - "<u>Wood</u>" will not find any block named "Wood" unless the block has the "Wood" category.<br/>
      *                  Block names and categories may be used interchangeably in the same whitelist.
      * @return True if the checked location contains a matching block.
      */
-    public static Predicate<Vector3i> whiteListBlocks(CoreChunk chunk, BaseVector3i location, String... whiteList) {
+    public static Predicate<ChunkSpot> whiteListBlocks(BaseVector3i location, String... whiteList) {
         return input -> {
             assert input != null && whiteList.length > 0;
-            Block block = chunk.getBlock(input.add(location));
+            Vector3i check = new Vector3i(input.pos.x + location.getX(), input.pos.y + location.getY(), input.pos.z + location.getZ());
+            if (!ChunkConstants.CHUNK_REGION.encompasses(check.x, check.y, check.z)) return false;
+            log.info("CHECKING " + check);
+            Block block = input.chunk.getBlock(check);
             BlockFamily bF = block.getBlockFamily(); //the primary metadata about the block
             String bU = block.getURI().toString().toLowerCase(); //e.g. "CoreBlocks:Dirt:engine:stairs.LEFT"
             String bN = block.getURI().getIdentifier().toString().toLowerCase(); //e.g. "Dirt"
@@ -80,32 +87,31 @@ public class RasterFilters {
 
     /**
      * Checks a list of valid block types against the block below the specified location.
-     * @see #whiteListBlocks(CoreChunk, BaseVector3i, String...)
+     * @see #whiteListBlocks(BaseVector3i, String...)
      */
-    public static Predicate<Vector3i> blackListBlocks(CoreChunk chunk, String... blackList) {
-        return blackListBlocks(chunk, new Vector3i(0, -1, 0), blackList);
+    public static Predicate<ChunkSpot> blackListBlocks(String... blackList) {
+        return blackListBlocks(new Vector3i(0, -1, 0), blackList);
     }
 
     /**
      * Checks a list of specified blocks against the specified location.
      * @return true if the block does not match any of the blacklisted input.
-     * @see #whiteListBlocks(CoreChunk, BaseVector3i, String...)
+     * @see #whiteListBlocks(BaseVector3i, String...)
      */
-    public static Predicate<Vector3i> blackListBlocks(CoreChunk chunk, BaseVector3i location, String... blackList) {
-        return input -> !whiteListBlocks(chunk, location, blackList).apply(input);
+    public static Predicate<ChunkSpot> blackListBlocks(BaseVector3i location, String... blackList) {
+        return input -> !whiteListBlocks(location, blackList).apply(input);
     }
 
     /**
      * Checks to see if the given location can support an attached block at any of the given locations.
-     * @param chunk The generated chunk that is being decorated.
      * @param sides The acceptable sides that can support this location, such as {@link Side#horizontalSides()}
      * @return True if any of the given sides return a positive for {@link Block#isAttachmentAllowed()}
      */
-    public static Predicate<Vector3i> canSupport(CoreChunk chunk, Collection<Side> sides) {
+    public static Predicate<ChunkSpot> canSupport(Collection<Side> sides) {
         return input -> {
             for (Side side : sides)
             {
-                if (canSupport(chunk, side).apply(input)) return true;
+                if (canSupport(side).apply(input)) return true;
             }
             return false;
         };
@@ -113,11 +119,21 @@ public class RasterFilters {
 
     /**
      * Checks to see if the given location can be supported by the block at the given side.
-     * @param chunk The generated chunk being decorated.
      * @param side The side to check, relative to the input location, such as {@link Side#BOTTOM} for the block beneath the input location.
      * @return True if the block at the given side returns a positive for {@link Block#isAttachmentAllowed()}
      */
-    public static Predicate<Vector3i> canSupport(CoreChunk chunk, Side side) {
-        return input -> input != null && chunk.getBlock(input.add(side.getVector3i())).isAttachmentAllowed();
+    public static Predicate<ChunkSpot> canSupport(Side side) {
+        return input -> input != null && input.chunk.getBlock(input.pos.add(side.getVector3i())).isAttachmentAllowed();
+    }
+
+    public static class ChunkSpot {
+        public final CoreChunk chunk;
+        public final Vector3i pos;
+
+        public ChunkSpot(CoreChunk chunky, Vector3i position)
+        {
+            chunk = chunky;
+            pos = position;
+        }
     }
 }
