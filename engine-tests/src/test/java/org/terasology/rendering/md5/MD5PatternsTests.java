@@ -15,15 +15,15 @@
  */
 package org.terasology.rendering.md5;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @RunWith(Enclosed.class)
 public class MD5PatternsTests {

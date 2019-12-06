@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.internal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 
@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNull;
 public class LineTest {
     private Rect2i cropRegion;
 
-    @Before
+    @BeforeEach
     public void setup() {
         cropRegion = Rect2i.createFromMinAndMax(10, 20, 30, 30);
     }

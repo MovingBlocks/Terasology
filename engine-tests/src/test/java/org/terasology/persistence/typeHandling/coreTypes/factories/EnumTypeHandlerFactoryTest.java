@@ -15,14 +15,15 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class EnumTypeHandlerFactoryTest {
     private enum SomeEnum {

@@ -17,7 +17,7 @@
 package org.terasology.world.time;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the world-time related classes

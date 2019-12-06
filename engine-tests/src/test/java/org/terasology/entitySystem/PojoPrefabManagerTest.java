@@ -15,8 +15,8 @@
  */
 package org.terasology.entitySystem;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
@@ -40,9 +40,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.utilities.Assets;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  */
@@ -53,7 +51,7 @@ public class PojoPrefabManagerTest {
     private ComponentLibrary componentLibrary;
     private PojoPrefabManager prefabManager;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);

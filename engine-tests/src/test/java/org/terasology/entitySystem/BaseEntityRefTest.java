@@ -16,9 +16,9 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -39,15 +39,9 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
-import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
-import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
+import static org.terasology.entitySystem.entity.internal.EntityScope.*;
 
 public class BaseEntityRefTest {
 
@@ -55,7 +49,7 @@ public class BaseEntityRefTest {
     private PojoEntityManager entityManager;
     private EntityRef ref;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() throws Exception {
         context = new ContextImpl();
         ModuleManager moduleManager = ModuleManagerFactory.create();
@@ -69,7 +63,7 @@ public class BaseEntityRefTest {
         CoreRegistry.setContext(context);
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.put(NetworkSystem.class, mock(NetworkSystem.class));
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);

@@ -1,8 +1,8 @@
 
 package org.terasology.input;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
@@ -26,20 +26,13 @@ import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.InjectionHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class InputSystemTests {
 
@@ -54,7 +47,7 @@ public class InputSystemTests {
 
     private BindsManager bindsManager;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         Context context = new ContextImpl();

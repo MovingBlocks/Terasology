@@ -18,8 +18,8 @@ package org.terasology.world.chunks.localChunkProvider;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TShortObjectHashMap;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.terasology.entitySystem.Component;
@@ -50,12 +50,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class LocalChunkProviderTest {
 
@@ -68,7 +63,7 @@ public class LocalChunkProviderTest {
     private EntityRef worldEntity;
     private ChunkCache chunkCache;
 
-    @Before
+    @BeforeEach
     public void setUp(){
         entityManager = mock(EntityManager.class);
         chunkFinalizer = mock(ChunkFinalizer.class);

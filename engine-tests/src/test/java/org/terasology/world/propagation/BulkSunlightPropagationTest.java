@@ -16,8 +16,8 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -56,7 +56,7 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
     private SunlightRegenBatchPropagator propagator;
 
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
 

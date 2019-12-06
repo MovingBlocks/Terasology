@@ -16,11 +16,10 @@
 package org.terasology.persistence.internal;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -38,13 +37,13 @@ public class GamePreviewImageProviderTest {
     private static final Path TMP_FOLDER = Paths.get("out", "test", "engine-tests", "tmp", PREVIEWS).toAbsolutePath();
     private static final Path TMP_PREVIEWS_FOLDER = TMP_FOLDER.resolve(PREVIEWS);
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         FileUtils.forceDelete(new File(TMP_FOLDER.toUri()));
         Files.createDirectories(TMP_FOLDER);
     }
 
-    @AfterClass
+    @AfterAll
     public static void clean() throws IOException {
         FileUtils.forceDelete(new File(Paths.get("out", "test", "engine-tests", "tmp").toUri()));
     }

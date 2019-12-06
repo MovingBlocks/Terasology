@@ -7,8 +7,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.Appender;
 import com.google.common.collect.Iterables;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -37,7 +37,7 @@ public class ComponentSystemManagerTest {
     private ComponentSystemManager systemUnderTest;
     private Console console;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Context context = mock(Context.class);
         EntityManager entityManager = mock(EntityManager.class);

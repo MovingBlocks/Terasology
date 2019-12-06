@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Queues;
 import com.google.gson.JsonArray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.stubbing.Answer;
 import org.terasology.persistence.typeHandling.PersistedData;

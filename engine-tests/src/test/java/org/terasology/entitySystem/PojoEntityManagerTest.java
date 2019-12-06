@@ -16,9 +16,9 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -31,11 +31,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.entity.internal.PojoEntityPool;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.*;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
@@ -54,11 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
@@ -71,7 +63,7 @@ public class PojoEntityManagerTest {
     private PojoEntityManager entityManager;
     private Prefab prefab;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() throws Exception {
         context = new ContextImpl();
         ModuleManager moduleManager = ModuleManagerFactory.create();
@@ -85,7 +77,7 @@ public class PojoEntityManagerTest {
         CoreRegistry.setContext(context);
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.put(NetworkSystem.class, mock(NetworkSystem.class));
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);

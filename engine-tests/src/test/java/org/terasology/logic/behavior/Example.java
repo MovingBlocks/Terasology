@@ -18,11 +18,7 @@ package org.terasology.logic.behavior;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.behavior.actions.Print;
-import org.terasology.logic.behavior.core.Actor;
-import org.terasology.logic.behavior.core.BaseAction;
-import org.terasology.logic.behavior.core.BehaviorNode;
-import org.terasology.logic.behavior.core.BehaviorState;
-import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.logic.behavior.core.*;
 
 public final class Example {
 

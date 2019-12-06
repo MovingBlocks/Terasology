@@ -15,8 +15,8 @@
  */
 package org.terasology.world.propagation;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -52,7 +52,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     private Region3i testingRegion = Region3i.createFromMinMax(new Vector3i(-ChunkConstants.SIZE_X, -ChunkConstants.SIZE_Y, -ChunkConstants.SIZE_Z),
             new Vector3i(2 * ChunkConstants.SIZE_X, 2 * ChunkConstants.SIZE_Y, 2 * ChunkConstants.SIZE_Z));
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
         lightRules = new LightPropagationRules();

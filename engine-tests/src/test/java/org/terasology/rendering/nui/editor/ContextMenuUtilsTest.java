@@ -18,8 +18,8 @@ package org.terasology.rendering.nui.editor;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.JsonParser;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.subsystem.headless.renderer.HeadlessCanvasRenderer;
 import org.terasology.i18n.TranslationSystem;
@@ -50,7 +50,7 @@ import static org.junit.Assert.fail;
 public class ContextMenuUtilsTest extends TerasologyTestingEnvironment {
     private static JsonTree inputTree;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupInput() {
         context.put(InputSystem.class, new InputSystem());
         context.put(TranslationSystem.class, new TranslationSystemImpl(context));

@@ -15,8 +15,8 @@
  */
 package org.terasology.entitySystem;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -32,11 +32,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.prefab.internal.PrefabFormat;
-import org.terasology.entitySystem.stubs.ListOfEnumsComponent;
-import org.terasology.entitySystem.stubs.ListOfObjectComponent;
-import org.terasology.entitySystem.stubs.MappedContainerComponent;
-import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
-import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.entitySystem.stubs.*;
 import org.terasology.math.Side;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -50,9 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +58,7 @@ public class PrefabTest {
 
     private PrefabManager prefabManager;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         ContextImpl context = new ContextImpl();
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());

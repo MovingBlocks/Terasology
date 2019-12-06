@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;
@@ -24,9 +24,7 @@ import org.terasology.rendering.nui.UIWidget;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class CardLayoutTest {
@@ -39,7 +37,7 @@ public class CardLayoutTest {
     private UIWidget widget2;
     private UIWidget widget3;
 
-    @Before
+    @BeforeEach
     public void setup() {
         cardLayout = new CardLayout();
 

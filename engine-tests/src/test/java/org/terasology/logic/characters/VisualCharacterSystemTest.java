@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.characters;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -53,7 +53,7 @@ public class VisualCharacterSystemTest {
      */
     private long nextEntityId = 1;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         this.system = new VisualCharacterSystem();
         Context context = new ContextImpl();

@@ -16,9 +16,9 @@
 package org.terasology.config.flexible.internal;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.SettingChangeListener;
@@ -41,7 +41,7 @@ public class SettingImplTest {
 
         private int eventResult;
 
-        @Before
+        @BeforeEach
         public void setUp() {
             setting = new SettingImpl<>(
                 TypeInfo.of(Integer.class), 50,
@@ -75,7 +75,7 @@ public class SettingImplTest {
 
         private int eventCallCount;
 
-        @Before
+        @BeforeEach
         public void setUp() {
             setting = new SettingImpl<>(
                 TypeInfo.of(Integer.class), 50,

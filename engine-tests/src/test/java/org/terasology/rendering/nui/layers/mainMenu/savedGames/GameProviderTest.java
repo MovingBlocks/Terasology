@@ -17,10 +17,10 @@ package org.terasology.rendering.nui.layers.mainMenu.savedGames;
 
 import com.google.common.base.Charsets;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 
@@ -44,7 +44,7 @@ public class GameProviderTest {
     private static final String GAME_MANIFEST_JSON = "gameManifest.json";
     private static String MANIFEST_EXAMPLE;
 
-    @BeforeClass
+    @BeforeAll
     public static void init()
             throws NoSuchFieldException, IllegalAccessException, IOException {
         PathManager pathManager = PathManager.getInstance();
@@ -68,7 +68,7 @@ public class GameProviderTest {
         }
     }
 
-    @After
+    @AfterEach
     public void cleanUp()
             throws IOException {
         FileUtils.cleanDirectory(new File(TMP_SAVES_FOLDER_PATH.toUri()));

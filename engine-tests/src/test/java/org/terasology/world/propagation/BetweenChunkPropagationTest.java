@@ -16,8 +16,8 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -42,11 +42,7 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.propagation.light.InternalLightProcessor;
-import org.terasology.world.propagation.light.SunlightPropagationRules;
-import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
-import org.terasology.world.propagation.light.SunlightRegenWorldView;
-import org.terasology.world.propagation.light.SunlightWorldView;
+import org.terasology.world.propagation.light.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -69,7 +65,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     private BatchPropagator sunlightPropagator;
     private SunlightRegenBatchPropagator propagator;
 
-    @Before
+    @BeforeEach
     @Override
     public void setup() throws Exception {
         super.setup();

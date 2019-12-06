@@ -15,8 +15,8 @@
  */
 package org.terasology.world.generator;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -51,7 +51,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     private ExtraBlockDataManager extraDataManager;
 
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);

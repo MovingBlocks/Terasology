@@ -19,7 +19,7 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;

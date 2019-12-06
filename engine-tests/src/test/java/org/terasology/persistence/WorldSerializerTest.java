@@ -15,7 +15,7 @@
  */
 package org.terasology.persistence;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;

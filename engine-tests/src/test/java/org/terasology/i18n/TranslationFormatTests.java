@@ -16,20 +16,9 @@
 
 package org.terasology.i18n;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Locale;
-
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.exceptions.InvalidAssetFilenameException;
 import org.terasology.assets.format.AssetDataFile;
@@ -39,6 +28,17 @@ import org.terasology.i18n.assets.TranslationData;
 import org.terasology.i18n.assets.TranslationFormat;
 import org.terasology.naming.Name;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Locale;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * Tests for the {@link TranslationFormat} class.
  */
@@ -46,7 +46,7 @@ public class TranslationFormatTests {
 
     private TranslationFormat format;
 
-    @Before
+    @BeforeEach
     public void setup() {
         format = new TranslationFormat();
     }

@@ -16,13 +16,11 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.*;
-import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.inMemory.AbstractPersistedData;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
@@ -30,8 +28,6 @@ import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.reflection.TypeInfo;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 

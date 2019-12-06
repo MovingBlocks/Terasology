@@ -17,8 +17,9 @@
 package org.terasology.world.generation.facets;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
@@ -26,13 +27,12 @@ import org.terasology.world.generation.facets.base.ObjectFacet3D;
 
 /**
  * Tests different implementations of {@link ObjectFacet3D}.
- *
  */
 public abstract class ObjectFacetTest {
 
     private ObjectFacet3D<Integer> facet;
 
-    @Before
+    @BeforeEach
     public void setup() {
         Border3D border = new Border3D(0, 0, 0).extendBy(0, 15, 10);
         Vector3i min = new Vector3i(10, 20, 30);
@@ -53,18 +53,19 @@ public abstract class ObjectFacetTest {
         Assert.assertNull(facet.getWorld(10, 20, 30));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testRelBounds() {
-        facet.set(-15, -15, -15, 1);
+        Assertions.assertThrows(IllegalArgumentException.class, ()->
+                facet.set(-15, -15, -15, 1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testWorldBounds() {
-        facet.setWorld(0, 0, 0, 1);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> facet.setWorld(0, 0, 0, 1));
     }
 
     // Powers of 2 can be represented as float without rounding errors !
-
     @Test
     public void testPrimitiveGetSet() {
         facet.set(0, 1, 2, 2);

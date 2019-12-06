@@ -18,8 +18,8 @@ package org.terasology.config.flexible;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
@@ -29,11 +29,10 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
-import java.lang.reflect.Type;
 import java.nio.file.FileSystem;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -48,7 +47,7 @@ public class AutoConfigManagerTest {
     private final ModuleManager moduleManager = mock(ModuleManager.class);
     private final ModuleEnvironment environment = mock(ModuleEnvironment.class);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);

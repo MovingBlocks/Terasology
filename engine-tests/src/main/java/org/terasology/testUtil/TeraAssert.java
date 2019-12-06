@@ -15,18 +15,15 @@
  */
 package org.terasology.testUtil;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collection;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 
 /**

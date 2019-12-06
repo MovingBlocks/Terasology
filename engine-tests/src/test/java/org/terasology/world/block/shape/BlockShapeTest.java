@@ -15,19 +15,19 @@
  */
 package org.terasology.world.block.shape;
 
-import org.terasology.physics.bullet.shapes.BulletConvexHullShape;
-import org.terasology.physics.shapes.CollisionShape;
-import org.terasology.physics.shapes.ConvexHullShape;
 import com.bulletphysics.util.ObjectArrayList;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Rotation;
 import org.terasology.math.VecMath;
 import org.terasology.math.Yaw;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.physics.bullet.shapes.BulletConvexHullShape;
+import org.terasology.physics.shapes.CollisionShape;
+import org.terasology.physics.shapes.ConvexHullShape;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
@@ -38,7 +38,7 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
     private BlockManagerImpl blockManager;
     private AssetManager assetManager;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
 

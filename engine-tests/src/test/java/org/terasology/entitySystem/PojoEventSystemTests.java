@@ -16,8 +16,8 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -58,7 +58,7 @@ public class PojoEventSystemTests {
     PojoEntityManager entityManager;
     EntityRef entity;
 
-    @Before
+    @BeforeEach
     public void setup() {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);

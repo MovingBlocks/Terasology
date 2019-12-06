@@ -15,8 +15,8 @@
  */
 package org.terasology.math;
 
-import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;

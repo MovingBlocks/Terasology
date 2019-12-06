@@ -19,10 +19,7 @@ import com.google.common.collect.Lists;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.*;
 import org.mockito.Matchers;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
@@ -45,12 +42,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
-import org.terasology.recording.CharacterStateEventPositionMap;
-import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.recording.RecordedEventStore;
+import org.terasology.recording.*;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldProvider;
@@ -65,26 +57,25 @@ import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.WorldInfo;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     public static final String PLAYER_ID = "someId";
     public static final Vector3i CHUNK_POS = new Vector3i(1, 2, 3);
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private static File temporaryFolder;
 
     private ModuleEnvironment moduleEnvironment;
     private ReadWriteStorageManager esm;
@@ -99,12 +90,20 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     private RecordAndReplayUtils recordAndReplayUtils;
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
-    @Before
+    @BeforeAll
+    static void createFolder() throws IOException {
+        File createdFolder = File.createTempFile("junit", "", null);
+        createdFolder.delete();
+        createdFolder.mkdir();
+        temporaryFolder = createdFolder;
+    }
+
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
         JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(temporaryFolder.getRoot().toPath());
+        PathManager.getInstance().useOverrideHomePath(temporaryFolder.toPath());
         savePath = PathManager.getInstance().getSavePath("testSave");
 
         assert !Files.isRegularFile(vfs.getPath("global.dat"));
@@ -168,6 +167,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @Test
+    @Order(1)
     public void testGetUnstoredPlayerReturnsNewStor() {
         PlayerStore store = esm.loadPlayerStore(PLAYER_ID);
         assertNotNull(store);

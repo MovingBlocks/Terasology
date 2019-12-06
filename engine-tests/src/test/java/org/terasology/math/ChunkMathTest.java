@@ -15,7 +15,7 @@
  */
 package org.terasology.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.config.Config;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;

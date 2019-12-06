@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.delay;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -40,7 +40,7 @@ public class DelayedActionSystemTest extends TerasologyTestingEnvironment {
 
     private Time time;
 
-    @Before
+    @BeforeEach
     @Override
     public void setup() throws Exception {
         super.setup();

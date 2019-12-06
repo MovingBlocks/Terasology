@@ -18,12 +18,8 @@ package org.terasology.logic.behavior;
 import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
 import org.junit.Assert;
-import org.junit.Before;
-import org.terasology.logic.behavior.core.Actor;
-import org.terasology.logic.behavior.core.BehaviorNode;
-import org.terasology.logic.behavior.core.BehaviorState;
-import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
-import org.terasology.logic.behavior.core.DelegateNode;
+import org.junit.jupiter.api.BeforeEach;
+import org.terasology.logic.behavior.core.*;
 
 import java.util.List;
 
@@ -34,7 +30,7 @@ public class CountCallsTest {
     private List<Integer> executeCalled = Lists.newArrayList();
     private GsonBuilder gsonBuilder;
 
-    @Before
+    @BeforeEach
     public void init() {
         constructCalled.clear();
         destructCalled.clear();

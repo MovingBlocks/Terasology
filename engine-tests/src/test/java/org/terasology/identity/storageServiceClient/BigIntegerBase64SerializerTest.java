@@ -17,7 +17,7 @@ package org.terasology.identity.storageServiceClient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 

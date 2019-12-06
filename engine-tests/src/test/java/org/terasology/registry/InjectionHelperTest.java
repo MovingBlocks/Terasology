@@ -15,8 +15,9 @@
  */
 package org.terasology.registry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 
@@ -31,7 +32,7 @@ public class InjectionHelperTest {
     private ServiceA serviceA;
     private ServiceB serviceB;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         serviceA = new ServiceAImpl();
         serviceB = new ServiceBImpl();
@@ -121,7 +122,7 @@ public class InjectionHelperTest {
         assertThat(constructorA_AB.getServiceB(), is(nullValue()));
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void testConstructorInjectionNoDefaultConstructorForFallback() {
         Context context = new ContextImpl();
         context.put(ServiceA.class, serviceA);
@@ -129,7 +130,8 @@ public class InjectionHelperTest {
 
         //there is only one constructor for serviceB which is not present on the context.
         //a default constructor is not available, so the injection fails.
-        InjectionHelper.createWithConstructorInjection(ConstructorB.class, context);
+        Assertions.assertThrows(NoSuchElementException.class,
+                () -> InjectionHelper.createWithConstructorInjection(ConstructorB.class, context));
     }
 
     //test classes and interfaces for injection

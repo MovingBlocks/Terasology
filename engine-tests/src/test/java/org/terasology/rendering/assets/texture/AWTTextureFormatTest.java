@@ -16,7 +16,7 @@
 package org.terasology.rendering.assets.texture;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;

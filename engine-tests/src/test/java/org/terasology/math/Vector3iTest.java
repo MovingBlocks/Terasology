@@ -15,21 +15,14 @@
  */
 package org.terasology.math;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  */
@@ -42,22 +35,22 @@ public class Vector3iTest {
     public Vector3iTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         v1 = new Vector3i(1, 3, 7);
         v2 = new Vector3i(2, 6, 14);
         v3 = new Vector3i(3, 9, 21);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 

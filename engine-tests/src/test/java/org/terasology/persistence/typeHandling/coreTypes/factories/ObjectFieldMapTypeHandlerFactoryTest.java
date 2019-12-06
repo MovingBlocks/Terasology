@@ -16,8 +16,7 @@
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
 import com.google.common.collect.Maps;
-import org.junit.Test;
-import org.reflections.Reflections;
+import org.junit.jupiter.api.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

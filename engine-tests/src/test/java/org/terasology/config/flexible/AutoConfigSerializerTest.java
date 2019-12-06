@@ -18,8 +18,8 @@ package org.terasology.config.flexible;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
@@ -35,7 +35,7 @@ public class AutoConfigSerializerTest {
 
     private AutoConfigSerializer<TestAutoConfig> autoConfigSerializer;
 
-    @Before
+    @BeforeEach
     public void setup() {
         TypeHandlerLibrary library = TypeHandlerLibrary.withReflections(mock(Reflections.class));
         autoConfigSerializer = new AutoConfigSerializer<>(TestAutoConfig.class, library);

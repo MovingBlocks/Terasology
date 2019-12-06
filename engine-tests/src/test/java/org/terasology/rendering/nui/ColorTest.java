@@ -15,20 +15,16 @@
  */
 package org.terasology.rendering.nui;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class ColorTest {
     private Color color;
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setUp() {
         color = new Color(1, 10, 60, 255);
     }
@@ -51,14 +47,14 @@ public class ColorTest {
 
     @Test
     public void testAlterRedThrowsWhenColorLessThanLowerBound() {
-        expectedException.expect(IllegalArgumentException.class);
-        color.alterRed(-1);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> color.alterRed(-1));
     }
 
     @Test
     public void testAlterRedThrowsWhenColorLargerThanUpperBound() {
-        expectedException.expect(IllegalArgumentException.class);
-        color.alterRed(256);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> color.alterRed(256));
     }
 
     @Test
@@ -74,14 +70,14 @@ public class ColorTest {
 
     @Test
     public void testAlterGreenThrowsWhenColorLessThanLowerBound() {
-        expectedException.expect(IllegalArgumentException.class);
-        color.alterGreen(-1);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> color.alterGreen(-1));
     }
 
     @Test
     public void testAlterGreenThrowsWhenColorLargerThanUpperBound() {
-        expectedException.expect(IllegalArgumentException.class);
-        color.alterGreen(256);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> color.alterGreen(256));
     }
 
     @Test
@@ -97,14 +93,14 @@ public class ColorTest {
 
     @Test
     public void testAlterBlueThrowsWhenColorLessThanLowerBound() {
-        expectedException.expect(IllegalArgumentException.class);
-        color.alterBlue(-1);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> color.alterBlue(-1));
     }
 
     @Test
     public void testAlterBlueThrowsWhenColorLargerThanUpperBound() {
-        expectedException.expect(IllegalArgumentException.class);
-        color.alterBlue(256);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> color.alterBlue(256));
     }
 
     @Test
@@ -120,13 +116,13 @@ public class ColorTest {
 
     @Test
     public void testAlterAlphaThrowsWhenColorLessThanLowerBound() {
-        expectedException.expect(IllegalArgumentException.class);
-        color.alterAlpha(-1);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> color.alterAlpha(-1));
     }
 
     @Test
     public void testAlterAlphaThrowsWhenColorLargerThanUpperBound() {
-        expectedException.expect(IllegalArgumentException.class);
-        color.alterAlpha(256);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                ()->color.alterAlpha(256));
     }
 }

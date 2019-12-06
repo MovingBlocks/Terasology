@@ -15,11 +15,7 @@
  */
 package org.terasology.math;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.terasology.config.Config;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
@@ -36,22 +32,22 @@ public class IntMathTest {
     public IntMathTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
         Config config = new Config(new MockContext());
         CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, config);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 

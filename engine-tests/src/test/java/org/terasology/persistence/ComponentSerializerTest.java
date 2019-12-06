@@ -16,9 +16,9 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
@@ -53,12 +53,12 @@ public class ComponentSerializerTest {
     private ComponentSerializer componentSerializer;
     private Context context;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() throws Exception {
         moduleManager = ModuleManagerFactory.create();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         context = new ContextImpl();
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());

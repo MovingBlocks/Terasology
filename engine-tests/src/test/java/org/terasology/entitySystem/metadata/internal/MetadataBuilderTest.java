@@ -15,8 +15,8 @@
  */
 package org.terasology.entitySystem.metadata.internal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
@@ -24,10 +24,7 @@ import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  */
@@ -36,7 +33,7 @@ public class MetadataBuilderTest {
     private ReflectFactory factory = new ReflectionReflectFactory();
     private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(factory);
 
-    @Before
+    @BeforeEach
     public void setup() {
     }
 

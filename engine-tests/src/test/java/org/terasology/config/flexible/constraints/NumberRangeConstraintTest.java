@@ -15,16 +15,16 @@
  */
 package org.terasology.config.flexible.constraints;
 
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(Enclosed.class)
 public class NumberRangeConstraintTest {
-    public static class IntegerConstraint {
+
+    @Nested
+    public class IntegerConstraint {
         private NumberRangeConstraint<Integer> constraint;
 
         private void initConstraint(Integer min, Integer max, boolean minInclusive, boolean maxInclusive) {
@@ -112,7 +112,8 @@ public class NumberRangeConstraintTest {
         }
     }
 
-    public static class DoubleConstraint {
+    @Nested
+    public class DoubleConstraint {
         private static final double MAX_ALLOWED_ERROR = 0.000001d;
 
         private NumberRangeConstraint<Double> constraint;

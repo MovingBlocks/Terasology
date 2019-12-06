@@ -16,7 +16,7 @@
 package org.terasology.math;
 
 import com.google.common.collect.Iterables;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 

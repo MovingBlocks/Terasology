@@ -16,8 +16,8 @@
 package org.terasology.logic.behavior;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.logic.behavior.actions.CounterAction;
 import org.terasology.logic.behavior.actions.Print;
 import org.terasology.logic.behavior.actions.TimeoutAction;
@@ -46,7 +46,7 @@ public class CounterTest {
         assertRun("{ sequence:[ { timeout:{ time=1, child:{ timeout:{ time=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }", 2, "[A][B][A][B]");
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         treeBuilder = new BehaviorTreeBuilder();

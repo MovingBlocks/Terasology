@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.location;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -43,7 +43,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
     Quat4f yawPitch;
     long nextFakeEntityId = 1;
 
-    @Before
+    @BeforeEach
     public void setup() {
         loc = new LocationComponent();
         entity = createFakeEntityWith(loc);

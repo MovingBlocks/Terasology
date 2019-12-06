@@ -15,7 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.html;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.terasology.rendering.nui.widgets.browser.data.DocumentData;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.FlowParagraphData;
@@ -36,9 +37,10 @@ public class HTMLParserTest {
         assertEquals(0, documentData.getParagraphs().size());
     }
 
-    @Test(expected = HTMLParseException.class)
+    @Test
     public void testParseUnfinishedBody() throws IOException, SAXException, ParserConfigurationException {
-        DocumentData documentData = htmlParser.parseHTMLDocument("<body>");
+        Assertions.assertThrows(HTMLParseException.class,
+                ()-> htmlParser.parseHTMLDocument("<body>"));
     }
 
     @Test
@@ -55,13 +57,15 @@ public class HTMLParserTest {
         assertEquals(2, documentData.getParagraphs().size());
     }
 
-    @Test(expected = HTMLParseException.class)
+    @Test
     public void testParseUnfinishedParagraph() throws IOException, SAXException, ParserConfigurationException {
-        DocumentData documentData = htmlParser.parseHTMLDocument("<body><p>Text</body>");
+        Assertions.assertThrows(HTMLParseException.class,
+                ()-> htmlParser.parseHTMLDocument("<body><p>Text</body>"));
     }
 
-    @Test(expected = HTMLParseException.class)
+    @Test
     public void testParseTextOutsideParagraph() throws IOException, SAXException, ParserConfigurationException {
-        DocumentData documentData = htmlParser.parseHTMLDocument("<body>Text</body>");
+        Assertions.assertThrows(HTMLParseException.class,
+                ()-> htmlParser.parseHTMLDocument("<body>Text</body>"));
     }
 }

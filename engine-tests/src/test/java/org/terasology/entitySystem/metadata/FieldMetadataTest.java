@@ -15,7 +15,7 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.reflection.copy.CopyStrategyLibrary;

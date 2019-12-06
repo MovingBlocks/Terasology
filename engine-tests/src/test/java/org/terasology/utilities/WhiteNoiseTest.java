@@ -17,7 +17,7 @@
 package org.terasology.utilities;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.utilities.random.FastRandom;
 

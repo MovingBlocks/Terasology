@@ -16,8 +16,8 @@
 
 package org.terasology.entitySystem.metadata;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
@@ -40,7 +40,7 @@ public class ComponentMetadataTest {
     private ReflectFactory reflectFactory = new ReflectionReflectFactory();
     private CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
 
-    @Before
+    @BeforeEach
     public void prepare() {
         context = new ContextImpl();
         context.put(ReflectFactory.class, reflectFactory);

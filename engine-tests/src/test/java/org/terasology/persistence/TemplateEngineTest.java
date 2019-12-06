@@ -18,7 +18,7 @@ package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link TemplateEngineImpl} class.

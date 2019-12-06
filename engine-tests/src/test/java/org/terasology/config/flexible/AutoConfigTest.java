@@ -17,7 +17,7 @@ package org.terasology.config.flexible;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.reflection.TypeInfo;
 
@@ -25,7 +25,7 @@ import java.lang.reflect.Field;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.terasology.config.flexible.SettingArgument.*;
 
 public class AutoConfigTest {

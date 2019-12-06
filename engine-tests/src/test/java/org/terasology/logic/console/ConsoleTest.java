@@ -17,7 +17,7 @@ package org.terasology.logic.console;
 
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 
 import java.util.Iterator;

@@ -15,7 +15,7 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 

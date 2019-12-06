@@ -15,16 +15,13 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import com.google.common.collect.Queues;
 import com.google.gson.JsonArray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
-import org.mockito.stubbing.Answer;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.reflect.ObjectConstructor;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,8 +29,6 @@ import java.util.Collections;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 public class ArrayTypeHandlerTest {
     private static final int ARRAY_SIZE = 500;

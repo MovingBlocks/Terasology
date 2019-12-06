@@ -18,7 +18,7 @@ package org.terasology;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.DependencyResolver;
@@ -35,7 +35,7 @@ public abstract class ModuleEnvironmentTest {
     protected ModuleManager moduleManager;
     protected TypeRegistry typeRegistry;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
