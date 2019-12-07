@@ -17,11 +17,19 @@ package org.terasology.persistence.typeHandling;
 
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.terasology.persistence.typeHandling.coreTypes.*;
+import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.reflection.TypeInfo;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

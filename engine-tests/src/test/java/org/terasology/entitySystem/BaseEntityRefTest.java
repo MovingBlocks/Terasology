@@ -39,9 +39,15 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.terasology.entitySystem.entity.internal.EntityScope.*;
+import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
+import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
+import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
 
 public class BaseEntityRefTest {
 

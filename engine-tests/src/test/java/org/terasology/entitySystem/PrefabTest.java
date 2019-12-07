@@ -32,7 +32,11 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.prefab.internal.PrefabFormat;
-import org.terasology.entitySystem.stubs.*;
+import org.terasology.entitySystem.stubs.ListOfEnumsComponent;
+import org.terasology.entitySystem.stubs.ListOfObjectComponent;
+import org.terasology.entitySystem.stubs.MappedContainerComponent;
+import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
+import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.math.Side;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -46,7 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

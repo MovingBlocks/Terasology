@@ -23,7 +23,9 @@ import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  */

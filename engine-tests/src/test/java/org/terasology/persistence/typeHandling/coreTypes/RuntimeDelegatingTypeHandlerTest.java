@@ -20,7 +20,11 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.reflections.Reflections;
-import org.terasology.persistence.typeHandling.*;
+import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
+import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.inMemory.AbstractPersistedData;
 import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
@@ -31,7 +35,13 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RuntimeDelegatingTypeHandlerTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);

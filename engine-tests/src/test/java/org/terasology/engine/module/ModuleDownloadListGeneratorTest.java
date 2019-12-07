@@ -19,7 +19,13 @@ import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.module.*;
+import org.terasology.module.BaseModule;
+import org.terasology.module.DependencyResolver;
+import org.terasology.module.ModuleMetadata;
+import org.terasology.module.ModuleRegistry;
+import org.terasology.module.Module;
+import org.terasology.module.ResolutionResult;
+import org.terasology.module.TableModuleRegistry;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;
 

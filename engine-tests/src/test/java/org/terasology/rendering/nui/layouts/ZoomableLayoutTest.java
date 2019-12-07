@@ -23,7 +23,9 @@ import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.terasology.math.TeraMath.ceilToInt;
 
 public class ZoomableLayoutTest {

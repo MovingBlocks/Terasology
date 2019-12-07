@@ -22,7 +22,11 @@ import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.entitySystem.Component;
 import org.terasology.naming.Name;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;

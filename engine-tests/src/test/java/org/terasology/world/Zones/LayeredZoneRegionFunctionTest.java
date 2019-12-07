@@ -22,7 +22,11 @@ import org.junit.jupiter.api.Test;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.world.generation.*;
+import org.terasology.world.generation.Border3D;
+import org.terasology.world.generation.FacetProvider;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.RegionImpl;
+import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.zones.LayeredZoneRegionFunction;
 import org.terasology.world.zones.MinMaxLayerThickness;
@@ -31,8 +35,15 @@ import org.terasology.world.zones.Zone;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.ABOVE_GROUND;
+import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.GROUND;
+import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.LOW_SKY;
+import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.MEDIUM_SKY;
+import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.MEDIUM_UNDERGROUND;
+import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.SHALLOW_UNDERGROUND;
 
 public class LayeredZoneRegionFunctionTest {
 

@@ -18,8 +18,16 @@ package org.terasology.documentation.apiScraper;
 
 import org.terasology.documentation.apiScraper.util.ApiMethod;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Detects API changes between two instances of a scanned code base.

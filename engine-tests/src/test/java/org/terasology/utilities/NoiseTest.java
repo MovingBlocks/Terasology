@@ -20,7 +20,12 @@ import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.terasology.utilities.procedural.*;
+import org.terasology.utilities.procedural.BrownianNoise;
+import org.terasology.utilities.procedural.DiscreteWhiteNoise;
+import org.terasology.utilities.procedural.Noise;
+import org.terasology.utilities.procedural.PerlinNoise;
+import org.terasology.utilities.procedural.SimplexNoise;
+import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 

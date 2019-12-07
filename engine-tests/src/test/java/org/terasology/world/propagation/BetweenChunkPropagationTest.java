@@ -42,7 +42,11 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.propagation.light.*;
+import org.terasology.world.propagation.light.InternalLightProcessor;
+import org.terasology.world.propagation.light.SunlightPropagationRules;
+import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
+import org.terasology.world.propagation.light.SunlightRegenWorldView;
+import org.terasology.world.propagation.light.SunlightWorldView;
 
 import java.util.Collection;
 import java.util.Map;

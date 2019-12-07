@@ -48,7 +48,9 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.utilities.Assets;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
 import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;

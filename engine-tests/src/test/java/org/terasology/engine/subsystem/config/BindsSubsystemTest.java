@@ -10,20 +10,34 @@ import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.config.BindsSubsystem.BindsConfigAdapter;
-import org.terasology.input.*;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.BindableButton;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.Input;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
 import org.terasology.input.Keyboard.Key;
 import org.terasology.input.Keyboard.KeyId;
-import org.terasology.module.*;
+import org.terasology.input.RegisterBindAxis;
+import org.terasology.input.RegisterBindButton;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ModuleMetadata;
+import org.terasology.module.ModuleRegistry;
+import org.terasology.module.Module;
+import org.terasology.module.TableModuleRegistry;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

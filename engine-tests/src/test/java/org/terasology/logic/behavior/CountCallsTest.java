@@ -19,7 +19,11 @@ import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
-import org.terasology.logic.behavior.core.*;
+import org.terasology.logic.behavior.core.Actor;
+import org.terasology.logic.behavior.core.BehaviorNode;
+import org.terasology.logic.behavior.core.BehaviorState;
+import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.logic.behavior.core.DelegateNode;
 
 import java.util.List;
 
