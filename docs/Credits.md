@@ -270,7 +270,8 @@ Contributors
  [AahzBrut](https://github.com/AahzBrut),
  [Qwertygiy](https://github.com/Qwertygiy),
  [praj-foss](https://github.com/praj-foss),
- [aRealCyborg](https://github.com/aRealCyborg)
+ [aRealCyborg](https://github.com/aRealCyborg),
+ [DarkWeird](https://github.com/DarkWeird)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
