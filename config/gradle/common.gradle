@@ -69,7 +69,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 // Extra details provided for unit tests
 test {
     useJUnitPlatform()
-    systemProperty('junit.jupiter.execution.parallel.enabled','true')
 
     // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
     ignoreFailures = true
