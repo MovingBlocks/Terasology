@@ -237,17 +237,18 @@ public final class ParticlePool {
         textureOffset[i2 + X_OFFSET] = 0.0f;
 
         // 3D vectors
-        position[i3 + X_OFFSET] = position[i3 + Y_OFFSET];
-        position[i3 + Y_OFFSET] = position[i3 + Z_OFFSET];
+
+        position[i3 + X_OFFSET] = 0.0f;
+        position[i3 + Y_OFFSET] = 0.0f;
         position[i3 + Z_OFFSET] = 0.0f;
-        previousPosition[i3 + X_OFFSET] = previousPosition[i3 + Y_OFFSET];
-        previousPosition[i3 + Y_OFFSET] = previousPosition[i3 + Z_OFFSET];
+        previousPosition[i3 + X_OFFSET] = 0.0f;
+        previousPosition[i3 + Y_OFFSET] = 0.0f;
         previousPosition[i3 + Z_OFFSET] = 0.0f;
-        velocity[i3 + X_OFFSET] = velocity[i3 + Y_OFFSET];
-        velocity[i3 + Y_OFFSET] = velocity[i3 + Z_OFFSET];
+        velocity[i3 + X_OFFSET] = 0.0f;
+        velocity[i3 + Y_OFFSET] = 0.0f;
         velocity[i3 + Z_OFFSET] = 0.0f;
-        scale[i3 + X_OFFSET] = scale[i3 + Y_OFFSET];
-        scale[i3 + Y_OFFSET] = scale[i3 + Z_OFFSET];
+        scale[i3 + X_OFFSET] = 1.0f;
+        scale[i3 + Y_OFFSET] = 1.0f;
         scale[i3 + Z_OFFSET] = 1.0f;
 
         // 4D vectors
