@@ -82,36 +82,37 @@ public final class ChunkTessellator {
             // Vertices double to account for light info
             elements.finalVertices = BufferUtils.createIntBuffer(
                     elements.vertices.size() + /* POSITION */
-                            elements.tex.size() + /* TEX0 (UV0 and flags) */
-                            elements.tex.size() + /* TEX1 (lighting data) */
-                            elements.flags.size() + /* FLAGS */
-                            elements.color.size() + /* COLOR */
-                            elements.normals.size()  /* NORMALS */
+                    elements.tex.size() + /* TEX0.xy (texture coords) */
+                    elements.flags.size() + /* TEX0.z (flags) */
+                    elements.frames.size() + /* TEX0.w (animation frame counts) */
+                    elements.vertexCount * 3 + /* TEX1 (lighting data) */
+                    elements.color.size() + /* COLOR */
+                    elements.normals.size() /* NORMALS */
             );
 
-            int cTex = 0;
-            int cColor = 0;
-            int cFlags = 0;
-            for (int i = 0; i < elements.vertices.size(); i += 3, cTex += 2, cColor += 4, cFlags++) {
+            for (int i = 0; i < elements.vertexCount; i++) {
                 Vector3f vertexPos = new Vector3f(
-                        elements.vertices.get(i),
-                        elements.vertices.get(i + 1),
-                        elements.vertices.get(i + 2));
+                        elements.vertices.get(i * 3),
+                        elements.vertices.get(i * 3 + 1),
+                        elements.vertices.get(i * 3 + 2));
 
                 /* POSITION */
                 elements.finalVertices.put(Float.floatToIntBits(vertexPos.x));
                 elements.finalVertices.put(Float.floatToIntBits(vertexPos.y));
                 elements.finalVertices.put(Float.floatToIntBits(vertexPos.z));
 
-                /* UV0 - TEX DATA 0 */
-                elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(cTex)));
-                elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(cTex + 1)));
+                /* UV0 - TEX DATA 0.xy */
+                elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(i * 2)));
+                elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(i * 2 + 1)));
 
-                /* FLAGS */
-                elements.finalVertices.put(Float.floatToIntBits(elements.flags.get(cFlags)));
+                /* FLAGS - TEX DATA 0.z */
+                elements.finalVertices.put(Float.floatToIntBits(elements.flags.get(i)));
+                
+                /* ANIMATION FRAME COUNT - TEX DATA 0.w*/
+                elements.finalVertices.put(Float.floatToIntBits(elements.frames.get(i)));
 
                 float[] result = new float[3];
-                Vector3f normal = new Vector3f(elements.normals.get(i), elements.normals.get(i + 1), elements.normals.get(i + 2));
+                Vector3f normal = new Vector3f(elements.normals.get(i * 3), elements.normals.get(i * 3 + 1), elements.normals.get(i * 3 + 2));
                 calcLightingValuesForVertexPos(chunkView, vertexPos, result, normal);
 
                 /* LIGHTING DATA / TEX DATA 1 */
@@ -121,10 +122,10 @@ public final class ChunkTessellator {
 
                 /* PACKED COLOR */
                 final int packedColor = RenderMath.packColor(
-                        elements.color.get(cColor),
-                        elements.color.get(cColor + 1),
-                        elements.color.get(cColor + 2),
-                        elements.color.get(cColor + 3));
+                        elements.color.get(i * 4),
+                        elements.color.get(i * 4 + 1),
+                        elements.color.get(i * 4 + 2),
+                        elements.color.get(i * 4 + 3));
                 elements.finalVertices.put(packedColor);
 
                 /* NORMALS */
