@@ -55,7 +55,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
@@ -64,6 +64,7 @@ import org.terasology.physics.CollisionGroupManager;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
@@ -80,7 +81,6 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -134,7 +134,6 @@ public class HeadlessEnvironment extends Environment {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         EngineEntityManager engineEntityManager = context.get(EngineEntityManager.class);
         BlockManager blockManager = context.get(BlockManager.class);
-        BiomeManager biomeManager = context.get(BiomeManager.class);
         RecordAndReplaySerializer recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
         Path savePath = PathManager.getInstance().getSavePath("world1");
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
@@ -146,7 +145,7 @@ public class HeadlessEnvironment extends Environment {
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, blockManager, biomeManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+                engineEntityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
     }
 
     @Override
@@ -166,7 +165,7 @@ public class HeadlessEnvironment extends Environment {
     protected void setupCollisionManager() {
         CollisionGroupManager collisionGroupManager = new CollisionGroupManager();
         context.put(CollisionGroupManager.class, collisionGroupManager);
-        context.get(TypeSerializationLibrary.class).add(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
+        context.get(TypeHandlerLibrary.class).addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
     }
 
     @Override
@@ -174,9 +173,9 @@ public class HeadlessEnvironment extends Environment {
         WorldAtlas worldAtlas = new NullWorldAtlas();
         BlockManagerImpl blockManager = new BlockManagerImpl(worldAtlas, assetManager);
         context.put(BlockManager.class, blockManager);
-        TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
-        typeSerializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
-        typeSerializationLibrary.add(Block.class, new BlockTypeHandler(blockManager));
+        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        typeHandlerLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
+        typeHandlerLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
     }
     
     @Override
@@ -269,6 +268,9 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
+        TypeRegistry typeRegistry = new TypeRegistry();
+        context.put(TypeRegistry.class, typeRegistry);
+
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ModuleRegistry registry = moduleManager.getRegistry();
 
@@ -277,6 +279,7 @@ public class HeadlessEnvironment extends Environment {
 
         if (result.isSuccess()) {
             ModuleEnvironment modEnv = moduleManager.loadEnvironment(result.getModules(), true);
+            typeRegistry.reload(modEnv);
             logger.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
         } else {
             logger.error("Could not resolve module dependencies for " + moduleNames);

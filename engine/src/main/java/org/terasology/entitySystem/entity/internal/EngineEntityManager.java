@@ -19,7 +19,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 import java.util.Optional;
 
@@ -113,7 +113,7 @@ public interface EngineEntityManager extends LowLevelEntityManager, EngineEntity
     /**
      * @return The default serialization library to use for serializing components
      */
-    TypeSerializationLibrary getTypeSerializerLibrary();
+    TypeHandlerLibrary getTypeSerializerLibrary();
 
     /**
      * Gets the entity pool associated with a given entity.

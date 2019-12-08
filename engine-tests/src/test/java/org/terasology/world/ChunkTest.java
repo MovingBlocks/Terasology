@@ -17,14 +17,12 @@ package org.terasology.world;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -54,11 +52,9 @@ public class ChunkTest extends TerasologyTestingEnvironment {
         blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager);
         CoreRegistry.put(BlockManager.class, blockManager);
 
-        BiomeManager biomeManager = Mockito.mock(BiomeManager.class);
-        
         ExtraBlockDataManager extraDataManager = new ExtraBlockDataManager();
 
-        chunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
+        chunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");

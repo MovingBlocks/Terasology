@@ -24,7 +24,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 final class RunningMeansMode extends TimeMetricsMode {
 
      RunningMeansMode() {
-        super("Running means", 10);
+        super("\n- Means -", 10);
     }
 
     @Override

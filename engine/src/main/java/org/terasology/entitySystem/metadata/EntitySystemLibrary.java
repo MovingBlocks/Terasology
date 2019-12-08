@@ -17,7 +17,7 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.context.Context;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 /**
  * The set of metadata libraries used by the entity system
@@ -25,12 +25,12 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
  */
 public class EntitySystemLibrary {
 
-    private final TypeSerializationLibrary typeSerializationLibrary;
+    private final TypeHandlerLibrary typeHandlerLibrary;
     private final ComponentLibrary componentLibrary;
     private final EventLibrary eventLibrary;
 
-    public EntitySystemLibrary(Context context, TypeSerializationLibrary typeSerializationLibrary) {
-        this.typeSerializationLibrary = typeSerializationLibrary;
+    public EntitySystemLibrary(Context context, TypeHandlerLibrary typeHandlerLibrary) {
+        this.typeHandlerLibrary = typeHandlerLibrary;
         this.componentLibrary = new ComponentLibrary(context);
         this.eventLibrary = new EventLibrary(context);
 
@@ -46,8 +46,8 @@ public class EntitySystemLibrary {
     /**
      * @return The library of serializers
      */
-    public TypeSerializationLibrary getSerializationLibrary() {
-        return typeSerializationLibrary;
+    public TypeHandlerLibrary getSerializationLibrary() {
+        return typeHandlerLibrary;
     }
 
     /**

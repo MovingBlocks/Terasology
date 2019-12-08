@@ -75,7 +75,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String DEFAULT_GITHUB_MODULE_URL = "https://github.com/Terasology/";
-    private static final List INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay", "BuilderSampleGameplay");
+    private static final List INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay", "BuilderSampleGameplay", "BiomesAPI");
     @In
     private ModuleManager moduleManager;
     @In
@@ -228,7 +228,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         installedVersion.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                if (dependencyInfoBinding.get() != null) {
+                if (dependencyInfoBinding.get() != null && moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()) != null) {
                     return String.valueOf(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()).getVersion());
                 }
                 return "";
@@ -288,6 +288,11 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(DependencyInfo value, Canvas canvas) {
+                if (moduleManager.getRegistry().getLatestModuleVersion(value.getId()) == null) {
+                    canvas.setMode("invalid");
+                } else {
+                    canvas.setMode("available");
+                }
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
@@ -316,7 +321,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             public Boolean get() {
                 final String online = onlineVersion.getText();
                 final String installed = installedVersion.getText();
-                if (StringUtils.isNotBlank(online)) {
+                if (StringUtils.isNotBlank(online) && StringUtils.isNotBlank(installed)) {
                     return new Version(online).compareTo(new Version(installed)) > 0;
                 }
                 return false;
@@ -472,5 +477,10 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

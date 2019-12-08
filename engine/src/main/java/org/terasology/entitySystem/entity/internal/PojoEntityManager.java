@@ -43,7 +43,7 @@ import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     private RefStrategy refStrategy = new DefaultRefStrategy();
 
-    private TypeSerializationLibrary typeSerializerLibrary;
+    private TypeHandlerLibrary typeSerializerLibrary;
 
     @Override
     public RefStrategy getEntityRefStrategy() {
@@ -405,11 +405,11 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public TypeSerializationLibrary getTypeSerializerLibrary() {
+    public TypeHandlerLibrary getTypeSerializerLibrary() {
         return typeSerializerLibrary;
     }
 
-    public void setTypeSerializerLibrary(TypeSerializationLibrary serializerLibrary) {
+    public void setTypeSerializerLibrary(TypeHandlerLibrary serializerLibrary) {
         this.typeSerializerLibrary = serializerLibrary;
     }
 

@@ -47,7 +47,6 @@ import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
 /**
@@ -85,7 +84,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
 
     @ReceiveEvent
     public void onRegionOutlineComponentDeactivation(BeforeDeactivateComponent event, EntityRef entity,
-                                     RegionOutlineComponent component) {
+                                                     RegionOutlineComponent component) {
         entityToRegionOutlineMap.remove(entity);
     }
 
@@ -96,7 +95,6 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
             return; // skip everything if there is nothing to do to avoid possibly costly draw mode changes
         }
         glDisable(GL_DEPTH_TEST);
-        glLineWidth(2);
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
@@ -120,7 +118,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
-        for (RegionOutlineComponent regionOutline: entityToRegionOutlineMap.values()) {
+        for (RegionOutlineComponent regionOutline : entityToRegionOutlineMap.values()) {
             material.setFloat3("colorOffset", regionOutline.color.rf(), regionOutline.color.gf(), regionOutline.color.bf(), true);
             drawRegionOutline(regionOutline);
         }

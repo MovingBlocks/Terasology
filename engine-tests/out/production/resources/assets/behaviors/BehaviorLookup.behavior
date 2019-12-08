@@ -1,0 +1,3 @@
+{
+    lookup : { tree : "unittest:BehaviorA" }
+}

@@ -60,7 +60,7 @@ public class AddServerPopup extends CoreScreenLayer {
             String name = nameText.getText();
             String owner = ownerText.getText();
             String address = addressText.getText();
-            Integer portBoxed = Ints.tryParse(portText.getText());
+            Integer portBoxed = Ints.tryParse(portText.getText().trim());
             int port = (portBoxed != null) ? portBoxed : TerasologyConstants.DEFAULT_PORT;
 
             if (serverInfo == null) {
@@ -87,7 +87,7 @@ public class AddServerPopup extends CoreScreenLayer {
             public Boolean get() {
                 return !nameText.getText().isEmpty()
                         && !addressText.getText().isEmpty()
-                        && Ints.tryParse(portText.getText()) != null;
+                        && Ints.tryParse(portText.getText().trim()) != null;
             }
         });
 

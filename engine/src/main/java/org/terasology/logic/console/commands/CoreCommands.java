@@ -16,6 +16,7 @@
 package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Streams;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -28,6 +29,7 @@ import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -81,14 +83,15 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import java.util.List;
+import java.util.Set;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Arrays;
 
 /**
  * Adds a series of useful commands to the game. Likely these could be moved to more fitting places over time.
@@ -200,19 +203,19 @@ public class CoreCommands extends BaseComponentSystem {
                 " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
 
         // iterate through commands adding them to result
-        if (commands.size() > 0) {
+        if (!commands.isEmpty()) {
             result += "\nCommands:";
             result = commands.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
 
         // iterate through prefabs adding them to result
-        if (prefabs.size() > 0) {
+        if (!prefabs.isEmpty()) {
             result += "\nPrefabs:";
             result = prefabs.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
 
         // iterate through blocks adding them to result
-        if (blocks.size() > 0) {
+        if (!blocks.isEmpty()) {
             result += "\nBlocks:";
             result = blocks.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
@@ -456,17 +459,44 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     /**
-     * Writes out information on all entities to a text file for debugging
+     * Writes out information on entities having specific components to a text file for debugging
+     * If no component names provided - writes out information on all entities
      *
+     * @param componentNames string contains one or several component names, if more then one name
+     *                       provided - they must be braced with double quotes and all names separated
+     *                       by space
+     * @return String containing information about number of entities saved
      * @throws IOException thrown when error with saving file occures
      */
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
-            helpText = "Writes entity information out into a file named \"entityDump.txt\".")
-    public void dumpEntities() throws IOException {
+            helpText = "Writes entity information out into a file named \"entityDump.txt\"." +
+                    " Supports list of component names, which will be used to only save entities that contains" +
+                    " one or more of those components. Names should be separated by spaces.")
+    public String dumpEntities(@CommandParam(value = "componentNames", required = false) String... componentNames) throws IOException {
+        int savedEntityCount;
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
         PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
         WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
-        worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+        if (componentNames.length == 0) {
+            savedEntityCount = worldDumper .save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+        } else {
+            List<Class<? extends Component>> filterComponents = Arrays.stream(componentNames)
+                    .map(String::trim) //Trim off whitespace
+                    .filter(o -> !o.isEmpty()) //Remove empty strings
+                    .map(o -> o.toLowerCase().endsWith("component") ? o : o + "component") //All component class names finish with "component"
+                    .map(o -> Streams.stream(moduleManager.getEnvironment().getSubtypesOf(Component.class))
+                            .filter(e -> e.getSimpleName().equalsIgnoreCase(o))
+                            .findFirst())
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+            if (!filterComponents.isEmpty()) {
+                savedEntityCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), filterComponents);
+            } else {
+                return "Could not find components matching given names";
+            }
+        }
+        return "Number of entities saved: " + savedEntityCount;
     }
 
     /**
@@ -629,7 +659,7 @@ public class CoreCommands extends BaseComponentSystem {
         }
         String[] remoteAddress = server.getRemoteAddress().split("-");
         String address = remoteAddress[1];
-        int port = Integer.valueOf(remoteAddress[2]);
+        int port = Integer.parseInt(remoteAddress[2]);
         try {
             PingService pingService = new PingService(address, port);
             long delay = pingService.call();

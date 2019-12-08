@@ -1,8 +1,0 @@
-{
-    "basedOn": "core:wood",
-    "displayName": "Birch Log",
-    "tiles": {
-        "topBottom": "Core:BirchTrunk",
-        "sides": "Core:BirchBark"
-    }
-}

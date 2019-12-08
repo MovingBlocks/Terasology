@@ -399,7 +399,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         if (config.getRendering().isRenderPlacingBox()) {
             if (aabb != null) {
                 aabbRenderer.setAABB(aabb);
-                aabbRenderer.render(2f);
+                aabbRenderer.render();
             }
         }
     }
@@ -507,6 +507,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     /**
      * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer.
      * This can be needed in special cases where the local player isn't fully available (TODO: May be a bug?)
+     *
      * @return the EntityRef that the networking system says is the client associated with this player
      */
     public EntityRef getClientEntityViaNetworkSystem() {

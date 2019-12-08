@@ -15,49 +15,30 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Bytes;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Optional;
 
 /**
  */
-public class ByteTypeHandler implements TypeHandler<Byte> {
+public class ByteTypeHandler extends TypeHandler<Byte> {
 
     @Override
-    public PersistedData serialize(Byte value, SerializationContext context) {
-        if (value != null) {
-            return context.create(new byte[]{value});
-        }
-        return context.createNull();
+    public PersistedData serializeNonNull(Byte value, PersistedDataSerializer serializer) {
+        return serializer.serialize(new byte[]{value});
     }
 
     @Override
-    public Byte deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<Byte> deserialize(PersistedData data) {
         if (data.isBytes()) {
-            return data.getAsBytes()[0];
+            return Optional.of(data.getAsBytes()[0]);
         } else if (data.isNumber()) {
-            return (byte) data.getAsInteger();
+            return Optional.of((byte) data.getAsInteger());
         }
 
-        return null;
+        return Optional.empty();
     }
 
-    @Override
-    public PersistedData serializeCollection(Collection<Byte> value, SerializationContext context) {
-        return context.create(Bytes.toArray(value));
-    }
-
-    @Override
-    public List<Byte> deserializeCollection(PersistedData data, DeserializationContext context) {
-        if (data.isBytes()) {
-            return Lists.newArrayList(Bytes.asList(data.getAsBytes()));
-        }
-        return Lists.newArrayList();
-    }
 }

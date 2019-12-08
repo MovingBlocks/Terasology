@@ -1,0 +1,5 @@
+{
+    "ListOfEnums":{
+        "elements":["TOP","LEFT","RIGHT","FRONT","BACK","BOTTOM"]
+    }
+}

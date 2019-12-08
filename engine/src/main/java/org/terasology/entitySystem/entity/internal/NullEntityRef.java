@@ -21,6 +21,7 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Null entity implementation - acts the same as an empty entity, except you cannot add anything to it.
@@ -53,6 +54,16 @@ public final class NullEntityRef extends EntityRef {
 
     @Override
     public boolean hasComponent(Class<? extends Component> component) {
+        return false;
+    }
+
+    @Override
+    public boolean hasAnyComponents(List<Class<? extends Component>> filterComponents) {
+        return false;
+    }
+
+    @Override
+    public boolean hasAllComponents(List<Class<? extends Component>> filterComponents) {
         return false;
     }
 

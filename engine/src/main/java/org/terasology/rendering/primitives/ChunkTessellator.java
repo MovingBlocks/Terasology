@@ -85,7 +85,9 @@ public final class ChunkTessellator {
                     elements.tex.size() + /* TEX0.xy (texture coords) */
                     elements.flags.size() + /* TEX0.z (flags) */
                     elements.frames.size() + /* TEX0.w (animation frame counts) */
+
                     elements.vertexCount * 3 + /* TEX1 (lighting data) */
+
                     elements.color.size() + /* COLOR */
                     elements.normals.size() /* NORMALS */
             );
@@ -96,14 +98,17 @@ public final class ChunkTessellator {
                         elements.vertices.get(i * 3 + 1),
                         elements.vertices.get(i * 3 + 2));
 
+
                 /* POSITION */
                 elements.finalVertices.put(Float.floatToIntBits(vertexPos.x));
                 elements.finalVertices.put(Float.floatToIntBits(vertexPos.y));
                 elements.finalVertices.put(Float.floatToIntBits(vertexPos.z));
 
                 /* UV0 - TEX DATA 0.xy */
+
                 elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(i * 2)));
                 elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(i * 2 + 1)));
+
 
                 /* FLAGS - TEX DATA 0.z */
                 elements.finalVertices.put(Float.floatToIntBits(elements.flags.get(i)));
@@ -112,7 +117,9 @@ public final class ChunkTessellator {
                 elements.finalVertices.put(Float.floatToIntBits(elements.frames.get(i)));
 
                 float[] result = new float[3];
+
                 Vector3f normal = new Vector3f(elements.normals.get(i * 3), elements.normals.get(i * 3 + 1), elements.normals.get(i * 3 + 2));
+
                 calcLightingValuesForVertexPos(chunkView, vertexPos, result, normal);
 
                 /* LIGHTING DATA / TEX DATA 1 */
@@ -122,10 +129,12 @@ public final class ChunkTessellator {
 
                 /* PACKED COLOR */
                 final int packedColor = RenderMath.packColor(
+
                         elements.color.get(i * 4),
                         elements.color.get(i * 4 + 1),
                         elements.color.get(i * 4 + 2),
                         elements.color.get(i * 4 + 3));
+
                 elements.finalVertices.put(packedColor);
 
                 /* NORMALS */

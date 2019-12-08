@@ -43,7 +43,7 @@ class BlockPlacementBenchmark extends AbstractBenchmarkInstance {
         LocalPlayer localPlayer = context.get(LocalPlayer.class);
         this.region3i = BenchmarkScreen.getChunkRegionAbove(localPlayer.getPosition());
         BlockManager blockManager = context.get(BlockManager.class);
-        this.stone = blockManager.getBlock("Core:Stone");
+        this.stone = blockManager.getBlock("CoreBlocks:Stone");
         this.useSetBlocksInsteadOfSetBlock = useSetBlocksInsteadOfSetBlock;
         this.air = blockManager.getBlock("engine:air");
         blockToPlace = stone;

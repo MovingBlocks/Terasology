@@ -15,19 +15,26 @@
  */
 package org.terasology.core.world;
 
-import org.terasology.world.biomes.BiomeRegistry;
-import org.terasology.world.biomes.BiomeRegistrator;
+import org.terasology.biomesAPI.BiomeRegistry;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.registry.In;
+
+import java.util.stream.Stream;
 
 /**
  * Registers all core biomes with the engine.
  */
-public class CoreBiomes implements BiomeRegistrator {
+@RegisterSystem
+public class CoreBiomes extends BaseComponentSystem {
+    @In
+    private BiomeRegistry biomeRegistry;
 
+    /**
+     * Registration of systems must be done in preBegin to be early enough.
+     */
     @Override
-    public void registerBiomes(BiomeRegistry registry) {
-        for (CoreBiome coreBiome : CoreBiome.values()) {
-            registry.registerBiome(coreBiome);
-        }
+    public void preBegin() {
+        Stream.of(CoreBiome.values()).forEach(biomeRegistry::registerBiome);
     }
-
 }

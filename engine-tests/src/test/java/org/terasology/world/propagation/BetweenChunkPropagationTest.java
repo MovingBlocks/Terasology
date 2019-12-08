@@ -18,7 +18,6 @@ package org.terasology.world.propagation;
 import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -27,7 +26,6 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -58,7 +56,6 @@ import static org.junit.Assert.assertEquals;
 public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     private BlockManagerImpl blockManager;
-    private BiomeManager biomeManager;
     private ExtraBlockDataManager extraDataManager;
     private Block solid;
     private SunlightPropagationRules lightRules;
@@ -80,7 +77,6 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
         regenRules = new SunlightRegenPropagationRules();
         blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
-        biomeManager = Mockito.mock(BiomeManager.class);
         CoreRegistry.put(BlockManager.class, blockManager);
         extraDataManager = new ExtraBlockDataManager();
 
@@ -102,8 +98,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testBetweenChunksSimple() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager, extraDataManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -124,8 +120,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testBetweenChunksSimpleSunlightRegenOnly() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager, extraDataManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -144,8 +140,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testBetweenChunksWithOverhang() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager, extraDataManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -172,8 +168,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testPropagateSunlightAppearingMidChunk() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, biomeManager, extraDataManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, biomeManager, extraDataManager);
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);

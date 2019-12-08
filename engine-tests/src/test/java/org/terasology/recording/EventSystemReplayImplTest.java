@@ -19,7 +19,9 @@ import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.reflections.Reflections;
 import org.terasology.context.internal.ContextImpl;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
@@ -31,12 +33,11 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.events.InputEvent;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.registry.CoreRegistry;
 
 import java.util.ArrayList;
@@ -59,9 +60,10 @@ public class EventSystemReplayImplTest {
     public void setup() {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
-        ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
-        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategies);
+
+        Reflections reflections = new Reflections(getClass().getClassLoader());
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
+
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, serializationLibrary);
         PojoEntityManager entityManager = new PojoEntityManager();
         entityManager.setComponentLibrary(entitySystemLibrary.getComponentLibrary());
@@ -73,7 +75,10 @@ public class EventSystemReplayImplTest {
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, null);
+        ModuleManager moduleManager = mock(ModuleManager.class);
+        when(moduleManager.getEnvironment()).thenReturn(mock(ModuleEnvironment.class));
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, eventStore,
+                recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, mock(TypeRegistry.class));
         recordAndReplayCurrentStatus.setStatus(RecordAndReplayStatus.REPLAYING);
         entity = entityManager.create();
         Long id = entity.getId();
