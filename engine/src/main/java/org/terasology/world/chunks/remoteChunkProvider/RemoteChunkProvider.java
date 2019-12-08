@@ -132,10 +132,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         invalidateChunks.drainTo(positions, UNLOAD_PER_FRAME);
         for (Vector3i pos : positions) {
             Chunk removed = chunkCache.remove(pos);
-            if (removed != null) {
-                if (!removed.isReady()) {
-                    sortedReadyChunks.remove(removed);
-                }
+            if (removed != null && !removed.isReady() && !sortedReadyChunks.remove(removed)) {
                 worldEntity.send(new BeforeChunkUnload(pos));
                 removed.dispose();
             }
