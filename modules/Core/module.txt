@@ -15,6 +15,14 @@
       {
         "id" : "Health",
         "minVersion" : "0.1.0-SNAPSHOT"
+      },
+      {
+        "id" : "CoreAssets",
+        "minVersion" : "1.0.0"
+      },
+      {
+        "id" : "CoreBlocks",
+        "minVersion" : "1.0.0"
       }
     ]
 }

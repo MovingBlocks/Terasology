@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -51,11 +50,13 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private float bobbingVerticalOffsetFactor;
     private float cachedBobbingRotationOffsetFactor;
     private float cachedBobbingVerticalOffsetFactor;
+    private DisplayDevice displayDevice;
 
     private Vector3f tempRightVector = new Vector3f();
 
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
         super(worldProvider, renderingConfig);
+        this.displayDevice = displayDevice;
         this.cameraSettings = renderingConfig.getCameraSettings();
 
         displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
@@ -145,7 +146,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         tempRightVector.cross(viewingDirection, up);
         tempRightVector.scale(bobbingRotationOffsetFactor);
 
-        projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar());
+        projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar(), this.displayDevice);
 
         viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
                 viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
@@ -189,8 +190,8 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     }
 
     // TODO: Move the dependency on LWJGL (Display) elsewhere
-    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar) {
-        float aspectRatio = (float) Display.getWidth() / Display.getHeight();
+    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar, DisplayDevice displayDevice) {
+        float aspectRatio = (float) displayDevice.getDisplayWidth() / displayDevice.getDisplayHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
         return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);

@@ -113,7 +113,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the" +
-            " commands, e.g.: \"listBlocks engine: core:\" will list all blocks from the engine and core module",
+            " commands, e.g.: \"listBlocks engine: CoreBlocks:\" will list all blocks from the engine and coreblocks module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -338,9 +338,10 @@ public class BlockCommands extends BaseComponentSystem {
         }
 
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+        int stackLimit = blockFamily.getArchetypeBlock().isStackable() ? 99 : 1;
 
-        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft--) {
-            EntityRef item = blockItemFactory.newInstance(blockFamily, 1);
+        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft = quantityLeft - stackLimit) {
+            EntityRef item = blockItemFactory.newInstance(blockFamily, Math.min(quantity, stackLimit));
             if (!item.exists()) {
                 throw new IllegalArgumentException("Unknown block or item");
             }

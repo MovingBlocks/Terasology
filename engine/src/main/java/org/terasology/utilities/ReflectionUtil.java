@@ -20,6 +20,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
+import org.terasology.engine.SimpleUri;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.rendering.nui.UIWidget;
 
 import java.lang.reflect.Array;
@@ -509,10 +512,53 @@ public final class ReflectionUtil {
 
     public static <T> Set<Class<? extends T>> loadClasses(Iterable<String> subTypes, ClassLoader[] classLoaders) {
         return Lists.newArrayList(subTypes).parallelStream()
-            .map(subtypeName -> (Class<? extends T>) ReflectionUtils.forName(subtypeName, classLoaders))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
+                .map(subtypeName -> (Class<? extends T>) ReflectionUtils.forName(subtypeName, classLoaders))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
+
+    /**
+     * Returns the {@link SimpleUri} for a type belonging to the {@link ModuleEnvironment}.
+     * If the type does not belong to the module environment, null is returned.
+     */
+    public static SimpleUri getSimpleUriFor(Type type, ModuleEnvironment environment) {
+        Class<?> clazz = getRawType(type);
+
+        if (clazz.getClassLoader() == null) {
+            // Loaded with the bootstrap class loader, definitely not part of a module
+            return null;
+        }
+
+        Name moduleProviding = environment.getModuleProviding(clazz);
+
+        if (moduleProviding == null) {
+            return null;
+        }
+
+        return new SimpleUri(moduleProviding, clazz.getSimpleName());
+    }
+
+    /**
+     * Returns the fully qualified {@link SimpleUri} for a type belonging to the {@link ModuleEnvironment}.
+     * If the type does not belong to the module environment, null is returned.
+     */
+    public static SimpleUri getFullyQualifiedSimpleUriFor(Type type, ModuleEnvironment environment) {
+        Class<?> clazz = getRawType(type);
+
+        if (clazz.getClassLoader() == null) {
+            // Loaded with the bootstrap class loader, definitely not part of a module
+            return null;
+        }
+
+        Name moduleProviding = environment.getModuleProviding(clazz);
+
+        if (moduleProviding == null) {
+            return null;
+        }
+
+        return new SimpleUri(moduleProviding, clazz.getTypeName());
+    }
+
 
     private static class WildcardTypeImpl implements WildcardType {
         private final Type[] upperBounds;

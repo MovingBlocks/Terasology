@@ -43,8 +43,8 @@ public class BulletBoxShape extends BulletCollisionShape implements org.terasolo
     }
 
     @Override
-    public Vector3f getHalfExtentsWithoutMargin() {
+    public Vector3f getExtents() {
         javax.vecmath.Vector3f out = new javax.vecmath.Vector3f();
-        return VecMath.from(boxShape.getHalfExtentsWithoutMargin(out));
+        return VecMath.from(boxShape.getHalfExtentsWithoutMargin(out)).scale(2);
     }
 }
