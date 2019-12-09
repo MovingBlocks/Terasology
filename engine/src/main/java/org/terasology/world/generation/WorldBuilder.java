@@ -340,18 +340,7 @@ public class WorldBuilder extends ProviderStore {
                 });
                 dependencyMap.put(rasterizer, dependencies);
                 orderedRasterizers.add(rasterizer);
-            }
-//            if (rasterizer.getClass().getSimpleName().equals("ManaCrystalRasterizer")) {
-//                // Look ahead for the one we need
-//                for (WorldRasterizer otherRasterizer : rasterizers) {
-//                    if (otherRasterizer.getClass().getSimpleName().equals("CaveRasterizer")) {
-//                        orderedRasterizers.add(otherRasterizer);
-//                    }
-//                }
-//                orderedRasterizers.add(rasterizer);
-//            } else if (rasterizer.getClass().getSimpleName().equals("CaveRasterizer")) {
-//                continue;
-            else if (!addedRasterizers.contains(rasterizer.getClass())) {
+            } else if (!addedRasterizers.contains(rasterizer.getClass())) {
                 orderedRasterizers.add(rasterizer);
                 addedRasterizers.add(rasterizer.getClass());
             }
