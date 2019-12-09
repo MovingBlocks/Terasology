@@ -29,7 +29,7 @@ import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.nio.file.FileSystem;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public abstract class ModuleEnvironmentTest {
     protected ModuleManager moduleManager;

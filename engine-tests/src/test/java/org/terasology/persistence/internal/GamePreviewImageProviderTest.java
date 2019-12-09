@@ -16,7 +16,6 @@
 package org.terasology.persistence.internal;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +28,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GamePreviewImageProviderTest {
 
@@ -52,8 +55,8 @@ public class GamePreviewImageProviderTest {
     public void getAllPreviewImagesEmptyTest() {
         final List<BufferedImage> result = GamePreviewImageProvider.getAllPreviewImages(TMP_FOLDER);
 
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.isEmpty());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -63,16 +66,16 @@ public class GamePreviewImageProviderTest {
 
         final List<BufferedImage> result = GamePreviewImageProvider.getAllPreviewImages(TMP_FOLDER);
 
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.isEmpty());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
     public void getNextGamePreviewImagePathEmptyFolderTest() {
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
-        Assert.assertNotNull(imagePath);
-        Assert.assertEquals(TMP_PREVIEWS_FOLDER.resolve(DEFAULT_IMAGE_NAME), imagePath);
+        assertNotNull(imagePath);
+        assertEquals(TMP_PREVIEWS_FOLDER.resolve(DEFAULT_IMAGE_NAME), imagePath);
     }
 
     @Test
@@ -82,8 +85,8 @@ public class GamePreviewImageProviderTest {
 
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
-        Assert.assertNotNull(imagePath);
-        Assert.assertEquals(TMP_PREVIEWS_FOLDER.resolve("2.jpg"), imagePath);
+        assertNotNull(imagePath);
+        assertEquals(TMP_PREVIEWS_FOLDER.resolve("2.jpg"), imagePath);
     }
 
     @Test
@@ -101,7 +104,7 @@ public class GamePreviewImageProviderTest {
 
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
-        Assert.assertNotNull(imagePath);
-        Assert.assertEquals(expectedOldestFile, imagePath);
+        assertNotNull(imagePath);
+        assertEquals(expectedOldestFile, imagePath);
     }
 }

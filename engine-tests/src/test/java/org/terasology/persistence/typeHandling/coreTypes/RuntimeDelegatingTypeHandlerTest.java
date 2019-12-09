@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.reflections.Reflections;
@@ -35,6 +34,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.eq;
@@ -199,7 +199,7 @@ public class RuntimeDelegatingTypeHandlerTest {
 
         Optional<Base> deserialized = runtimeDelegatingTypeHandler.deserialize(persistedData);
 
-        Assert.assertFalse(deserialized.isPresent());
+        assertFalse(deserialized.isPresent());
 
         verify(typeHandlerLibrary, never()).getTypeHandler(eq(baseType));
         verify(typeHandlerLibrary, never()).getTypeHandler(eq((Type) subType));

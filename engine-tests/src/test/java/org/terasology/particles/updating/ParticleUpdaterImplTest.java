@@ -35,8 +35,7 @@ import org.terasology.physics.engine.PhysicsEngine;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

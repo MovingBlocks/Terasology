@@ -21,8 +21,8 @@ import org.terasology.math.TeraMath;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test for {@link ParticlePool}.

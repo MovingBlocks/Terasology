@@ -36,7 +36,7 @@ import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.propagation.light.LightPropagationRules;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 

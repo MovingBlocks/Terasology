@@ -17,7 +17,6 @@
 package org.terasology.utilities;
 
 import com.google.common.collect.Lists;
-import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.terasology.utilities.procedural.BrownianNoise;
@@ -30,6 +29,10 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A few tests for different {@link Noise} implementations.
@@ -74,11 +77,11 @@ public class NoiseTest {
             }
         }
 
-        Assert.assertTrue(min >= -1);
-        Assert.assertTrue(max <= 1);
+        assertTrue(min >= -1);
+        assertTrue(max <= 1);
 
-        Assert.assertEquals(-1, min, 0.05);
-        Assert.assertEquals(1, max, 0.05);
+        assertEquals(-1, min, 0.05);
+        assertEquals(1, max, 0.05);
     }
 
     @ParameterizedTest
@@ -96,6 +99,6 @@ public class NoiseTest {
             }
         }
 
-        Assert.fail();
+        fail();
     }
 }

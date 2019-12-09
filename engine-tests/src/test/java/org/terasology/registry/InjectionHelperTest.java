@@ -23,9 +23,8 @@ import org.terasology.context.internal.ContextImpl;
 
 import java.util.NoSuchElementException;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class InjectionHelperTest {
 
@@ -43,18 +42,18 @@ public class InjectionHelperTest {
 
     @Test
     public void testSharePopulatesCoreRegistry() {
-        assertThat(CoreRegistry.get(ServiceA.class), is(nullValue()));
+        assertNull(CoreRegistry.get(ServiceA.class));
 
         InjectionHelper.share(serviceA);
 
-        assertThat(CoreRegistry.get(ServiceA.class), is(serviceA));
+        assertEquals(CoreRegistry.get(ServiceA.class), serviceA);
     }
 
     @Test
     public void testShareRequiresShareAnnotation() {
         InjectionHelper.share(new ServiceAImplNoAnnotation());
 
-        assertThat(CoreRegistry.get(ServiceA.class), is(nullValue()));
+        assertNull(CoreRegistry.get(ServiceA.class));
     }
 
     @Test
@@ -66,8 +65,8 @@ public class InjectionHelperTest {
         FieldInjectionAB fieldInjectionAB = new FieldInjectionAB();
         InjectionHelper.inject(fieldInjectionAB);
 
-        assertThat(fieldInjectionAB.getServiceA(), is(serviceA));
-        assertThat(fieldInjectionAB.getServiceB(), is(serviceB));
+        assertEquals(fieldInjectionAB.getServiceA(), serviceA);
+        assertEquals(fieldInjectionAB.getServiceB(), serviceB);
     }
 
     @Test
@@ -78,8 +77,8 @@ public class InjectionHelperTest {
         FieldInjectionAB fieldInjectionAB = new FieldInjectionAB();
         InjectionHelper.inject(fieldInjectionAB);
 
-        assertThat(fieldInjectionAB.getServiceA(), is(serviceA));
-        assertThat(fieldInjectionAB.getServiceB(), is(nullValue()));
+        assertEquals(fieldInjectionAB.getServiceA(), serviceA);
+        assertNull(fieldInjectionAB.getServiceB());
     }
 
     @Test
@@ -91,8 +90,8 @@ public class InjectionHelperTest {
         ConstructorAB constructorAB = InjectionHelper.createWithConstructorInjection(ConstructorAB.class, context);
 
         //the two-arg constructor should be used as it has the most parameters and all can be populated
-        assertThat(constructorAB.getServiceA(), is(serviceA));
-        assertThat(constructorAB.getServiceB(), is(serviceB));
+        assertEquals(constructorAB.getServiceA(), serviceA);
+        assertEquals(constructorAB.getServiceB(), serviceB);
     }
 
     @Test
@@ -105,8 +104,8 @@ public class InjectionHelperTest {
 
         //the two-arg constructor can't be populated because serviceB is not available
         //there is no fallback for a constructor with only serviceA, so the default constructor is called
-        assertThat(constructorAB.getServiceA(), is(nullValue()));
-        assertThat(constructorAB.getServiceB(), is(nullValue()));
+        assertNull(constructorAB.getServiceA());
+        assertNull(constructorAB.getServiceB());
     }
 
     @Test
@@ -118,8 +117,8 @@ public class InjectionHelperTest {
         ConstructorA_AB constructorA_AB = InjectionHelper.createWithConstructorInjection(ConstructorA_AB.class, context);
 
         //the one-arg constructor is used as it can be populated  with serviceA which is available
-        assertThat(constructorA_AB.getServiceA(), is(serviceA));
-        assertThat(constructorA_AB.getServiceB(), is(nullValue()));
+        assertEquals(constructorA_AB.getServiceA(), serviceA);
+        assertNull(constructorA_AB.getServiceB());
     }
 
     @Test

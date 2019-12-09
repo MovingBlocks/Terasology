@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.behavior;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.logic.behavior.actions.CounterAction;
@@ -25,6 +24,8 @@ import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.logic.behavior.core.BehaviorTreeRunner;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CounterTest {
     private BehaviorTreeBuilder treeBuilder;
@@ -62,7 +63,7 @@ public class CounterTest {
         String json = treeBuilder.toJson(node);
         BehaviorNode n2 = treeBuilder.fromJson(json);
         String json2 = treeBuilder.toJson(n2);
-        Assert.assertEquals(json, json2);
+        assertEquals(json, json2);
         Actor actor = new Actor(null);
         actor.setDelta(0.5f);
         BehaviorTreeRunner runner = new DefaultBehaviorTreeRunner(node, actor);
@@ -70,6 +71,6 @@ public class CounterTest {
             runner.step();
         }
 
-        Assert.assertEquals(expectedOutput, Print.output.toString());
+        assertEquals(expectedOutput, Print.output.toString());
     }
 }

@@ -17,7 +17,6 @@ package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BehaviorNode;
@@ -26,6 +25,8 @@ import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.logic.behavior.core.DelegateNode;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CountCallsTest {
     public int nextId2;
@@ -73,8 +74,8 @@ public class CountCallsTest {
         }
         node.destruct(null);
 
-        Assert.assertEquals(result, actualStates);
-        Assert.assertEquals(executed, executeCalled);
+        assertEquals(result, actualStates);
+        assertEquals(executed, executeCalled);
     }
 
     public BehaviorNode fromJson(String json) {

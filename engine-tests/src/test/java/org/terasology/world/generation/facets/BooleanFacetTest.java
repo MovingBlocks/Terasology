@@ -16,7 +16,6 @@
 
 package org.terasology.world.generation.facets;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +23,9 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BooleanFieldFacet3D;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests different implementations of {@link BooleanFieldFacet3D}.
@@ -50,8 +52,8 @@ public abstract class BooleanFacetTest {
      */
     @Test
     public void testUnset() {
-        Assert.assertEquals(false, facet.get(0, 0, 0));
-        Assert.assertEquals(false, facet.getWorld(10, 20, 30));
+        assertFalse(facet.get(0, 0, 0));
+        assertFalse(facet.getWorld(10, 20, 30));
     }
 
     @Test
@@ -69,37 +71,37 @@ public abstract class BooleanFacetTest {
     @Test
     public void testPrimitiveGetSet() {
         facet.set(0, 1, 2, true);
-        Assert.assertTrue(facet.get(0, 1, 2));
+        assertTrue(facet.get(0, 1, 2));
     }
 
     @Test
     public void testBoxedGetSet() {
         facet.set(0, 1, 3, true);
-        Assert.assertTrue(facet.get(0, 1, 3));
+        assertTrue(facet.get(0, 1, 3));
     }
 
     @Test
     public void testBoxedWorldGetSet() {
         facet.set(0, 1, 4, true);
-        Assert.assertTrue(facet.get(0, 1, 4));
+        assertTrue(facet.get(0, 1, 4));
     }
 
     @Test
     public void testMixedGetSet1() {
         facet.set(0, 1, 5, true);
-        Assert.assertTrue(facet.getWorld(10, 21, 35));
+        assertTrue(facet.getWorld(10, 21, 35));
     }
 
     @Test
     public void testMixedGetSet2() {
         facet.setWorld(24, 35, 46, true);
-        Assert.assertTrue(facet.get(14, 15, 16));
+        assertTrue(facet.get(14, 15, 16));
     }
 
     @Test
     public void testMixedOnBorder() {
         facet.set(-5, -6, -7, true);
-        Assert.assertTrue(facet.getWorld(5, 14, 23));
+        assertTrue(facet.getWorld(5, 14, 23));
     }
 
 }

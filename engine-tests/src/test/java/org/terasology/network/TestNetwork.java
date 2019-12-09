@@ -33,7 +33,7 @@ import org.terasology.network.internal.NetworkSystemImpl;
 
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 
 /**

@@ -33,8 +33,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -143,19 +142,19 @@ public class InputSystemTests {
 
         inputSystem.update(delta);
 
-        assertThat(clientEntityKeyEvents.size(), is(1));
+        assertEquals(clientEntityKeyEvents.size(), 1);
         CapturedKeyEvent clientEvent = clientEntityKeyEvents.get(0);
-        assertThat(clientEvent.key, is(Key.W));
-        assertThat(clientEvent.keyCharacter, is(characterFor(Key.W)));
-        assertThat(clientEvent.delta, is(delta));
-        assertThat(clientEvent.buttonState, is(ButtonState.DOWN));
+        assertEquals(clientEvent.key, Key.W);
+        assertEquals(clientEvent.keyCharacter, characterFor(Key.W));
+        assertEquals(clientEvent.delta, delta);
+        assertEquals(clientEvent.buttonState, ButtonState.DOWN);
 
-        assertThat(characterEntityKeyEvents.size(), is(1));
+        assertEquals(characterEntityKeyEvents.size(), 1);
         CapturedKeyEvent characterEvent = characterEntityKeyEvents.get(0);
-        assertThat(characterEvent.key, is(Key.W));
-        assertThat(characterEvent.keyCharacter, is(characterFor(Key.W)));
-        assertThat(characterEvent.delta, is(delta));
-        assertThat(characterEvent.buttonState, is(ButtonState.DOWN));
+        assertEquals(characterEvent.key, Key.W);
+        assertEquals(characterEvent.keyCharacter, characterFor(Key.W));
+        assertEquals(characterEvent.delta, delta);
+        assertEquals(characterEvent.buttonState, ButtonState.DOWN);
     }
 
     @Test
@@ -165,19 +164,19 @@ public class InputSystemTests {
 
         inputSystem.update(delta);
 
-        assertThat(clientEntityKeyEvents.size(), is(1));
+        assertEquals(clientEntityKeyEvents.size(), 1);
         CapturedKeyEvent clientEvent = clientEntityKeyEvents.get(0);
-        assertThat(clientEvent.key, is(Key.W));
-        assertThat(clientEvent.keyCharacter, is(characterFor(Key.W)));
-        assertThat(clientEvent.delta, is(delta));
-        assertThat(clientEvent.buttonState, is(ButtonState.UP));
+        assertEquals(clientEvent.key, Key.W);
+        assertEquals(clientEvent.keyCharacter, characterFor(Key.W));
+        assertEquals(clientEvent.delta, delta);
+        assertEquals(clientEvent.buttonState, ButtonState.UP);
 
-        assertThat(characterEntityKeyEvents.size(), is(1));
+        assertEquals(characterEntityKeyEvents.size(), 1);
         CapturedKeyEvent characterEvent = characterEntityKeyEvents.get(0);
-        assertThat(characterEvent.key, is(Key.W));
-        assertThat(characterEvent.keyCharacter, is(characterFor(Key.W)));
-        assertThat(characterEvent.delta, is(delta));
-        assertThat(characterEvent.buttonState, is(ButtonState.UP));
+        assertEquals(characterEvent.key, Key.W);
+        assertEquals(characterEvent.keyCharacter, characterFor(Key.W));
+        assertEquals(characterEvent.delta, delta);
+        assertEquals(characterEvent.buttonState, ButtonState.UP);
     }
 
     @Test
@@ -188,19 +187,19 @@ public class InputSystemTests {
 
         inputSystem.update(1f);
 
-        assertThat(clientEntityKeyEvents.size(), is(6));
-        assertThat(clientEntityKeyEvents.get(0).key, is(Key.A));
-        assertThat(clientEntityKeyEvents.get(0).buttonState, is(ButtonState.DOWN));
-        assertThat(clientEntityKeyEvents.get(1).key, is(Key.A));
-        assertThat(clientEntityKeyEvents.get(1).buttonState, is(ButtonState.UP));
-        assertThat(clientEntityKeyEvents.get(2).key, is(Key.B));
-        assertThat(clientEntityKeyEvents.get(2).buttonState, is(ButtonState.DOWN));
-        assertThat(clientEntityKeyEvents.get(3).key, is(Key.B));
-        assertThat(clientEntityKeyEvents.get(3).buttonState, is(ButtonState.UP));
-        assertThat(clientEntityKeyEvents.get(4).key, is(Key.C));
-        assertThat(clientEntityKeyEvents.get(4).buttonState, is(ButtonState.DOWN));
-        assertThat(clientEntityKeyEvents.get(5).key, is(Key.C));
-        assertThat(clientEntityKeyEvents.get(5).buttonState, is(ButtonState.UP));
+        assertEquals(clientEntityKeyEvents.size(), 6);
+        assertEquals(clientEntityKeyEvents.get(0).key, Key.A);
+        assertEquals(clientEntityKeyEvents.get(0).buttonState, ButtonState.DOWN);
+        assertEquals(clientEntityKeyEvents.get(1).key, Key.A);
+        assertEquals(clientEntityKeyEvents.get(1).buttonState, ButtonState.UP);
+        assertEquals(clientEntityKeyEvents.get(2).key, Key.B);
+        assertEquals(clientEntityKeyEvents.get(2).buttonState, ButtonState.DOWN);
+        assertEquals(clientEntityKeyEvents.get(3).key, Key.B);
+        assertEquals(clientEntityKeyEvents.get(3).buttonState, ButtonState.UP);
+        assertEquals(clientEntityKeyEvents.get(4).key, Key.C);
+        assertEquals(clientEntityKeyEvents.get(4).buttonState, ButtonState.DOWN);
+        assertEquals(clientEntityKeyEvents.get(5).key, Key.C);
+        assertEquals(clientEntityKeyEvents.get(5).buttonState, ButtonState.UP);
     }
 
     @Test

@@ -25,7 +25,7 @@ import org.terasology.persistence.serializers.WorldSerializer;
 import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WorldSerializerTest extends TerasologyTestingEnvironment {
 

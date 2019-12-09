@@ -22,7 +22,7 @@ import org.terasology.context.internal.MockContext;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ChunkMathTest {
 

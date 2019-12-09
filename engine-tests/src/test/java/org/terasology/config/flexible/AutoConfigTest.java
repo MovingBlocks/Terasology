@@ -25,7 +25,7 @@ import java.lang.reflect.Field;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.terasology.config.flexible.SettingArgument.constraint;
 import static org.terasology.config.flexible.SettingArgument.defaultValue;
 import static org.terasology.config.flexible.SettingArgument.description;

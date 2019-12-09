@@ -37,7 +37,7 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ChunkTest extends TerasologyTestingEnvironment {
 
