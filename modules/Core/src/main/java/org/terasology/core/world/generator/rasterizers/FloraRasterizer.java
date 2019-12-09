@@ -44,24 +44,24 @@ public class FloraRasterizer implements WorldRasterizer {
         air = blockManager.getBlock(BlockManager.AIR_ID);
 
         flora.put(FloraType.GRASS, ImmutableList.<Block>of(
-                blockManager.getBlock("core:TallGrass1"),
-                blockManager.getBlock("core:TallGrass2"),
-                blockManager.getBlock("core:TallGrass3")));
+                blockManager.getBlock("CoreBlocks:TallGrass1"),
+                blockManager.getBlock("CoreBlocks:TallGrass2"),
+                blockManager.getBlock("CoreBlocks:TallGrass3")));
 
         flora.put(FloraType.FLOWER, ImmutableList.<Block>of(
-                blockManager.getBlock("core:Dandelion"),
-                blockManager.getBlock("core:Glowbell"),
-                blockManager.getBlock("core:Iris"),
-                blockManager.getBlock("core:Lavender"),
-                blockManager.getBlock("core:RedClover"),
-                blockManager.getBlock("core:RedFlower"),
-                blockManager.getBlock("core:Tulip"),
-                blockManager.getBlock("core:YellowFlower")));
+                blockManager.getBlock("CoreBlocks:Dandelion"),
+                blockManager.getBlock("CoreBlocks:Glowbell"),
+                blockManager.getBlock("CoreBlocks:Iris"),
+                blockManager.getBlock("CoreBlocks:Lavender"),
+                blockManager.getBlock("CoreBlocks:RedClover"),
+                blockManager.getBlock("CoreBlocks:RedFlower"),
+                blockManager.getBlock("CoreBlocks:Tulip"),
+                blockManager.getBlock("CoreBlocks:YellowFlower")));
 
         flora.put(FloraType.MUSHROOM, ImmutableList.<Block>of(
-                blockManager.getBlock("core:BigBrownShroom"),
-                blockManager.getBlock("core:BrownShroom"),
-                blockManager.getBlock("core:RedShroom")));
+                blockManager.getBlock("CoreBlocks:BigBrownShroom"),
+                blockManager.getBlock("CoreBlocks:BrownShroom"),
+                blockManager.getBlock("CoreBlocks:RedShroom")));
     }
 
     @Override

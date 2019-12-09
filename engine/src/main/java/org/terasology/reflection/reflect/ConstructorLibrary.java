@@ -25,6 +25,7 @@ import org.terasology.reflection.reflect.internal.UnsafeAllocator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class ConstructorLibrary {
         // Next try raw type match for instance creators
         @SuppressWarnings("unchecked") // types must agree
         final InstanceCreator<T> rawTypeCreator =
-                (InstanceCreator<T>) instanceCreators.get(rawType);
+            (InstanceCreator<T>) instanceCreators.get(rawType);
         if (rawTypeCreator != null) {
             return () -> rawTypeCreator.createInstance(type);
         }
@@ -90,24 +91,32 @@ public class ConstructorLibrary {
     private <T> ObjectConstructor<T> newUnsafeAllocator(TypeInfo<T> typeInfo) {
         return new ObjectConstructor<T>() {
             private final UnsafeAllocator unsafeAllocator = UnsafeAllocator.create();
+
             @SuppressWarnings("unchecked")
-            @Override public T construct() {
+            @Override
+            public T construct() {
                 try {
                     Object newInstance = unsafeAllocator.newInstance(typeInfo.getRawType());
                     return (T) newInstance;
                 } catch (Exception e) {
                     throw new RuntimeException("Unable to create an instance of " + typeInfo.getType() +
-                            ". Registering an InstanceCreator for this type may fix this problem.", e);
+                                                   ". Registering an InstanceCreator for this type may fix this problem.", e);
                 }
             }
         };
     }
 
     private <T> ObjectConstructor<T> newDefaultConstructor(Class<? super T> rawType) {
-        @SuppressWarnings("unchecked") // T is the same raw type as is requested
-                Constructor<T> constructor = (Constructor<T>) Arrays.stream(rawType.getDeclaredConstructors())
-                .min(Comparator.comparingInt(c -> c.getParameterTypes().length))
-                .orElse(null);
+        if (rawType.isInterface() || Modifier.isAbstract(rawType.getModifiers())) {
+            return null;
+        }
+
+        @SuppressWarnings("unchecked")
+        // T is the same raw type as is requested
+            Constructor<T> constructor =
+            (Constructor<T>) Arrays.stream(rawType.getDeclaredConstructors())
+                                 .min(Comparator.comparingInt(c -> c.getParameterTypes().length))
+                                 .orElse(null);
 
         if (constructor == null || constructor.getParameterTypes().length != 0) {
             return null;
@@ -123,7 +132,7 @@ public class ConstructorLibrary {
                 throw new RuntimeException("Failed to invoke " + constructor + " with no args", e);
             } catch (InvocationTargetException e) {
                 throw new RuntimeException("Failed to invoke " + constructor + " with no args",
-                        e.getTargetException());
+                    e.getTargetException());
             } catch (IllegalAccessException e) {
                 throw new AssertionError(e);
             }
@@ -136,7 +145,7 @@ public class ConstructorLibrary {
      */
     @SuppressWarnings("unchecked") // use runtime checks to guarantee that 'T' is what it is
     private <T> ObjectConstructor<T> newDefaultImplementationConstructor(
-            final Type type, Class<? super T> rawType) {
+        final Type type, Class<? super T> rawType) {
         if (Collection.class.isAssignableFrom(rawType)) {
             if (SortedSet.class.isAssignableFrom(rawType)) {
                 return new ObjectConstructor<T>() {
@@ -209,7 +218,7 @@ public class ConstructorLibrary {
                     }
                 };
             } else if (type instanceof ParameterizedType && !(String.class.isAssignableFrom(
-                    TypeInfo.of(((ParameterizedType) type).getActualTypeArguments()[0]).getRawType()))) {
+                TypeInfo.of(((ParameterizedType) type).getActualTypeArguments()[0]).getRawType()))) {
                 return new ObjectConstructor<T>() {
                     @Override
                     public T construct() {

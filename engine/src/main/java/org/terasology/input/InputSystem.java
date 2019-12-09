@@ -155,8 +155,8 @@ public class InputSystem extends BaseComponentSystem {
                 || inputEntities.length != 2
                 || inputEntities[0] == null
                 || inputEntities[1] == null
-                || !inputEntities[0].equals(localPlayer.getClientEntity())
-                || !inputEntities[1].equals(localPlayer.getCharacterEntity())) {
+                || inputEntities[0] != localPlayer.getClientEntity()
+                || inputEntities[1] != localPlayer.getCharacterEntity()) {
             inputEntities = new EntityRef[]{localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
         }
     }

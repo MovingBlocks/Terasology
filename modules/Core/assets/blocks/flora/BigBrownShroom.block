@@ -1,8 +1,0 @@
-/**
- * Like a normal shroom, just bigger and brown
- * @author (art) eleazzaar
- */
-{
-    "author": "eleazzaar",
-    "basedOn": "core:plant"
-}

@@ -148,11 +148,13 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         if (forceEntityUpdate || !(Objects.equal(oldType.getBlockFamily(), type.getBlockFamily()) && Objects.equal(oldType.getPrefab(), type.getPrefab()))) {
             updateBlockEntityComponents(blockEntity, oldType, type, retainComponents);
         }
+
+        OnChangedBlock changedEvent = new OnChangedBlock(pos, type, oldType);
         EntityRef regionEntity = blockRegionLookup.get(pos);
         if (regionEntity != null) {
-            regionEntity.send(new OnChangedBlock(pos, type, oldType));
+            regionEntity.send(changedEvent);
         }
-        blockEntity.send(new OnChangedBlock(new Vector3i(pos), type, oldType));
+        blockEntity.send(changedEvent);
     }
 
     @Override

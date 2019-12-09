@@ -31,4 +31,9 @@ public class BulletSphereShape extends BulletCollisionShape implements org.teras
     public CollisionShape rotate(Quat4f rot) {
         return this;
     }
+
+    @Override
+    public float getRadius() {
+        return sphereShape.getRadius();
+    }
 }
