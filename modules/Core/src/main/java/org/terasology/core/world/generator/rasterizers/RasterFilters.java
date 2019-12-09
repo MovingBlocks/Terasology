@@ -71,7 +71,6 @@ public class RasterFilters {
             assert input != null && whiteList.length > 0;
             Vector3i check = new Vector3i(input.pos.x + location.getX(), input.pos.y + location.getY(), input.pos.z + location.getZ());
             if (!ChunkConstants.CHUNK_REGION.encompasses(check.x, check.y, check.z)) return false;
-            log.info("CHECKING " + check);
             Block block = input.chunk.getBlock(check);
             BlockFamily bF = block.getBlockFamily(); //the primary metadata about the block
             String bU = block.getURI().toString().toLowerCase(); //e.g. "CoreBlocks:Dirt:engine:stairs.LEFT"
