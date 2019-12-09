@@ -59,8 +59,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 
-    private static final int UNLOAD_PER_FRAME = 64;
-
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
     private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
@@ -128,8 +126,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     private void checkForUnload() {
-        List<Vector3i> positions = Lists.newArrayListWithCapacity(UNLOAD_PER_FRAME);
-        invalidateChunks.drainTo(positions, UNLOAD_PER_FRAME);
+        List<Vector3i> positions = Lists.newArrayListWithCapacity(invalidateChunks.size());
+        invalidateChunks.drainTo(positions);
         for (Vector3i pos : positions) {
             Chunk removed = chunkCache.remove(pos);
             if (removed != null && !removed.isReady() && !sortedReadyChunks.remove(removed)) {
@@ -254,13 +252,13 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
-        Chunk[] chunks = new Chunk[region.size().x * region.size().y * region.size().z];
+      Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
         for (Vector3i chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            if (chunk == null || !chunk.isReady()) {
+            if (chunk == null) {
                 return null;
             }
-            chunkPos.sub(region.min());
+            chunkPos.sub(region.minX(), region.minY(), region.minZ());
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
