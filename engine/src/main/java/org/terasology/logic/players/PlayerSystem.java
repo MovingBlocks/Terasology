@@ -245,11 +245,12 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         LocationComponent location = clientEntity.getComponent(LocationComponent.class);
         PlayerFactory playerFactory = new PlayerFactory(entityManager, worldProvider);
         Vector3f spawnPosition = playerFactory.findSpawnPositionFromLocationComponent(location);
-        location.setWorldPosition(spawnPosition);
-        clientEntity.saveComponent(location);
 
         playerCharacter.addComponent(new AliveCharacterComponent());
         playerCharacter.send(new CharacterTeleportEvent(spawnPosition));
+
+        location.setWorldPosition(spawnPosition);
+        clientEntity.saveComponent(location);
 
         logger.debug("Re-spawing player at: {}", spawnPosition);
 
