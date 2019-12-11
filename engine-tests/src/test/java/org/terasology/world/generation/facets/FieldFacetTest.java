@@ -16,13 +16,15 @@
 
 package org.terasology.world.generation.facets;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.FieldFacet3D;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests different implementations of {@link FieldFacet3D}.
@@ -32,7 +34,7 @@ public abstract class FieldFacetTest {
 
     private FieldFacet3D facet;
 
-    @Before
+    @BeforeEach
     public void setup() {
         Border3D border = new Border3D(0, 0, 0).extendBy(0, 15, 10);
         Vector3i min = new Vector3i(10, 20, 30);
@@ -49,18 +51,20 @@ public abstract class FieldFacetTest {
      */
     @Test
     public void testUnset() {
-        Assert.assertEquals(0.0f, facet.get(0, 0, 0), 0.0);
-        Assert.assertEquals(0.0f, facet.getWorld(10, 20, 30), 0.0);
+        assertEquals(0.0f, facet.get(0, 0, 0), 0.0);
+        assertEquals(0.0f, facet.getWorld(10, 20, 30), 0.0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testRelBounds() {
-        facet.set(-15, -15, -15, 1);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> facet.set(-15, -15, -15, 1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testWorldBounds() {
-        facet.setWorld(0, 0, 0, 1);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> facet.setWorld(0, 0, 0, 1));
     }
 
     // Powers of 2 can be represented as float without rounding errors !
@@ -68,37 +72,37 @@ public abstract class FieldFacetTest {
     @Test
     public void testPrimitiveGetSet() {
         facet.set(0, 1, 2, 2.0f);
-        Assert.assertEquals(2.0f, facet.get(0, 1, 2), 0.0);
+        assertEquals(2.0f, facet.get(0, 1, 2), 0.0);
     }
 
     @Test
     public void testBoxedGetSet() {
         facet.set(0, 1, 3, 4f);
-        Assert.assertEquals(4.0f, facet.get(0, 1, 3), 0.0);
+        assertEquals(4.0f, facet.get(0, 1, 3), 0.0);
     }
 
     @Test
     public void testBoxedWorldGetSet() {
         facet.set(0, 1, 4, 8f);
-        Assert.assertEquals(8.0f, facet.get(0, 1, 4), 0.0);
+        assertEquals(8.0f, facet.get(0, 1, 4), 0.0);
     }
 
     @Test
     public void testMixedGetSet1() {
         facet.set(0, 1, 5, 16f);
-        Assert.assertEquals(16.0f, facet.getWorld(10, 21, 35), 0.0);
+        assertEquals(16.0f, facet.getWorld(10, 21, 35), 0.0);
     }
 
     @Test
     public void testMixedGetSet2() {
         facet.setWorld(24, 35, 46, 32f);
-        Assert.assertEquals(32.0f, facet.get(14, 15, 16), 0.0);
+        assertEquals(32.0f, facet.get(14, 15, 16), 0.0);
     }
 
     @Test
     public void testMixedOnBorder() {
         facet.set(-5, -6, -7, 64f);
-        Assert.assertEquals(64.0f, facet.getWorld(5, 14, 23), 0.0);
+        assertEquals(64.0f, facet.getWorld(5, 14, 23), 0.0);
     }
 
 }

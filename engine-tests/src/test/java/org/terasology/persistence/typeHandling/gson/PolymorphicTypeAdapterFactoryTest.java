@@ -19,11 +19,12 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PolymorphicTypeAdapterFactoryTest {
     private static final Dog DOG = new Dog(1.25f);
@@ -46,7 +47,7 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         Walker newAnimal = interfaceGson.fromJson(json, Walker.class);
 
-        Assert.assertTrue(newAnimal instanceof Animal);
+        assertTrue(newAnimal instanceof Animal);
     }
 
     @Test
@@ -57,7 +58,7 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         Animal newAnimal = baseClassGson.fromJson(json, Animal.class);
 
-        Assert.assertTrue(newAnimal instanceof Cheetah);
+        assertTrue(newAnimal instanceof Cheetah);
     }
 
     @Test
@@ -67,7 +68,7 @@ public class PolymorphicTypeAdapterFactoryTest {
         String json = baseClassGson.toJson(capsule);
 
         Capsule newCapsule = baseClassGson.fromJson(json, Capsule.class);
-        Assert.assertTrue(newCapsule.animal instanceof Dog);
+        assertTrue(newCapsule.animal instanceof Dog);
     }
 
     @Test
@@ -76,10 +77,11 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         String json = baseClassGson.toJson(animals);
 
-        List<Animal> newAnimals = baseClassGson.fromJson(json, new TypeToken<List<Animal>>(){}.getType());
+        List<Animal> newAnimals = baseClassGson.fromJson(json, new TypeToken<List<Animal>>() {
+        }.getType());
 
-        Assert.assertTrue(newAnimals.get(1) instanceof Dog);
-        Assert.assertTrue(newAnimals.get(2) instanceof Cheetah);
+        assertTrue(newAnimals.get(1) instanceof Dog);
+        assertTrue(newAnimals.get(2) instanceof Cheetah);
     }
 
     @Test
@@ -88,11 +90,12 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         String json = interfaceGson.toJson(walkers);
 
-        List<Walker> newWalkers = interfaceGson.fromJson(json, new TypeToken<List<Walker>>(){}.getType());
+        List<Walker> newWalkers = interfaceGson.fromJson(json, new TypeToken<List<Walker>>() {
+        }.getType());
 
-        Assert.assertTrue(newWalkers.get(0) instanceof Animal);
-        Assert.assertTrue(newWalkers.get(1) instanceof Dog);
-        Assert.assertTrue(newWalkers.get(2) instanceof Cheetah);
+        assertTrue(newWalkers.get(0) instanceof Animal);
+        assertTrue(newWalkers.get(1) instanceof Dog);
+        assertTrue(newWalkers.get(2) instanceof Cheetah);
     }
 
     private static class Capsule {

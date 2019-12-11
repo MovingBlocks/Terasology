@@ -19,7 +19,7 @@ package org.terasology.world.generator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +65,8 @@ public class TreeTests {
         
         extraDataManager = new ExtraBlockDataManager();
 
-        Mockito.when(blockManager.getBlock(Matchers.<BlockUri>any())).thenReturn(air);
-        Mockito.when(blockManager.getBlock(Matchers.<String>any())).thenReturn(air);
+        Mockito.when(blockManager.getBlock(ArgumentMatchers.<BlockUri>any())).thenReturn(air);
+        Mockito.when(blockManager.getBlock(ArgumentMatchers.<String>any())).thenReturn(air);
 
         context.put(BlockManager.class, blockManager);
     }

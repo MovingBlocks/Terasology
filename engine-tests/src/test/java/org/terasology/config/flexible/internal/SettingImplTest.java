@@ -16,10 +16,9 @@
 package org.terasology.config.flexible.internal;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.SettingChangeListener;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
@@ -30,18 +29,20 @@ import org.terasology.utilities.random.Random;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(Enclosed.class)
 public class SettingImplTest {
     private static final SimpleUri SETTING_ID = new SimpleUri("engine-tests:TestSetting");
 
-    public static class SetValue {
+    @Nested
+    public class SetValue {
         private Setting<Integer> setting;
 
         private int eventResult;
 
-        @Before
+        @BeforeEach
         public void setUp() {
             setting = new SettingImpl<>(
                 TypeInfo.of(Integer.class), 50,
@@ -68,14 +69,15 @@ public class SettingImplTest {
         }
     }
 
-    public static class Subscribers {
+    @Nested
+    public class Subscribers {
         private Setting<Integer> setting;
 
         private SettingChangeListener<Integer> listener;
 
         private int eventCallCount;
 
-        @Before
+        @BeforeEach
         public void setUp() {
             setting = new SettingImpl<>(
                 TypeInfo.of(Integer.class), 50,

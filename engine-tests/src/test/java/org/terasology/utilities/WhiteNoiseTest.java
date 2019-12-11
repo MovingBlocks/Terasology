@@ -16,10 +16,11 @@
 
 package org.terasology.utilities;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.utilities.random.FastRandom;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A simple validity test for {@link org.terasology.utilities.procedural.WhiteNoise}
@@ -53,7 +54,7 @@ public class WhiteNoiseTest {
         for (int i = 0; i < bucketCount; i++) {
             float val = Math.abs((buckets[i] - avg) / avg);
             // less than 5% deviation from the expected average
-            Assert.assertTrue(val < 0.05);
+            assertTrue(val < 0.05);
         }
     }
 }
