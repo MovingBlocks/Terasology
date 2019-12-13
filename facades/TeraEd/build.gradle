@@ -29,9 +29,9 @@ task editor(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath sourceSets.main.output.classesDir
+//     classpath sourceSets.main.output.classesDir // TODO RETURN!!
     classpath sourceSets.main.output.resourcesDir
-    classpath project(':engine').sourceSets.main.output.classesDir
+//    classpath project(':engine').sourceSets.main.output.classesDir // TODO RETURN!!!
     classpath project(':engine').configurations.runtime
 }
 

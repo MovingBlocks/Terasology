@@ -10,14 +10,14 @@ import groovy.json.JsonSlurper
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Put resources in the same folder as java classes to make them available in the sandbox
-sourceSets {
-    main {
-        java {
-            output.classesDir 'build/classes/main'
-            output.resourcesDir 'build/classes/main'
-        }
-    }
-}
+//sourceSets { //TODO MAYBE RETURN
+//    main {
+//        java {
+//            output.classesDir 'build/classes/main'
+//            output.resourcesDir 'build/classes/main'
+//        }
+//    }
+//}
 
 // Read the internal version out of the engine-tests module.txt
 def moduleFile = file('src/main/resources/module.txt')

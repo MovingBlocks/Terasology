@@ -95,9 +95,9 @@ task game(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath sourceSets.main.output.classesDir
+//    classpath sourceSets.main.output.classesDir //TODO RETURN!!!
     classpath sourceSets.main.output.resourcesDir
-    classpath project(':engine').sourceSets.main.output.classesDir
+//     classpath project(':engine').sourceSets.main.output.classesDir // TODO RETURN!!!
     classpath project(':engine').configurations.runtime
 }
 
@@ -117,9 +117,9 @@ task profile(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath sourceSets.main.output.classesDir
+//    classpath sourceSets.main.output.classesDir // TODO RETURN!!!
     classpath sourceSets.main.output.resourcesDir
-    classpath project(':engine').sourceSets.main.output.classesDir
+//    classpath project(':engine').sourceSets.main.output.classesDir // TODO RETURN!!
     classpath project(':engine').configurations.runtime
 }
 
@@ -139,15 +139,15 @@ task debug(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath sourceSets.main.output.classesDir
+//    classpath sourceSets.main.output.classesDir // TODO RETURN!!
     classpath sourceSets.main.output.resourcesDir
-    classpath project(':engine').sourceSets.main.output.classesDir
+//    classpath project(':engine').sourceSets.main.output.classesDir //TODO RETURN!!!
     classpath project(':engine').configurations.runtime
 }
 
 // By delaying this task to doLast (the << bit) we don't get the headless server dir set up unless actually wanting it
 // TODO: This is not the Gradle Way. Needs more declared output-fu to determine up-to-date instead of the if
-task setupServerConfig() << {
+task setupServerConfig {
     description "Parses parameters passed via Gradle and writes them to the local run-from-source server dir's config.cfg"
 
     def json = new JsonBuilder()
@@ -183,7 +183,7 @@ task setupServerConfig() << {
 }
 
 // TODO: Seems to always be up to date so no modules get copied
-task setupServerModules(type: Sync) << {
+task setupServerModules(type: Sync) {
     description 'Parses "extraModules" - a comma-separated list of modules and puts them into ' + localServerDataPath
 
     if (project.hasProperty('extraModules')) {
@@ -218,9 +218,9 @@ task server(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath sourceSets.main.output.classesDir
+//    classpath sourceSets.main.output.classesDir // TODO RETURN!!
     classpath sourceSets.main.output.resourcesDir
-    classpath project(':engine').sourceSets.main.output.classesDir
+//    classpath project(':engine').sourceSets.main.output.classesDir // TODO RETURN!!
     classpath project(':engine').configurations.runtime
 }
 

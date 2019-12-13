@@ -1,13 +1,16 @@
-// This include file is meant for each Java project/module and contains setup for artifact repos, code analysis, etc
-
+// language
 apply plugin: 'java'
+
+// IDEs
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+// ?
 apply plugin: 'project-report'
+
+// Static code analyzers
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
-apply plugin: 'findbugs'
-
+apply plugin: 'com.github.spotbugs'
 // Computes code coverage of (unit) tests
 apply plugin: 'jacoco'
 
@@ -47,9 +50,9 @@ repositories {
 }
 
 dependencies {
-    checkstyle ('com.puppycrawl.tools:checkstyle:6.14.1')
-    pmd ('net.sourceforge.pmd:pmd-core:6.15.0')
-    pmd ('net.sourceforge.pmd:pmd-java:6.15.0')
+    checkstyle('com.puppycrawl.tools:checkstyle:6.14.1')
+    pmd('net.sourceforge.pmd:pmd-core:6.15.0')
+    pmd('net.sourceforge.pmd:pmd-java:6.15.0')
     // the FindBugs version is set in the configuration
 }
 
@@ -84,7 +87,7 @@ test {
     }
 
     jacoco {
-        append = false
+       // append = false
         excludes = ["org.terasology.protobuf.*"]
     }
 }
@@ -119,9 +122,9 @@ pmd {
     ruleSets = []
 }
 
-findbugs {
+spotbugs {
+    toolVersion = '4.0.0-beta4'
     ignoreFailures = true
-    toolVersion = '3.0.1'
     excludeFilter = new File(rootDir, "config/metrics/findbugs/findbugs-exclude.xml")
 }
 

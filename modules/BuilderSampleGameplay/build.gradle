@@ -23,7 +23,7 @@ buildscript {
 
     dependencies {
         // Artifactory plugin
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.0.0')
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.10.0')
 
         // Git plugin for Gradle
         classpath 'org.ajoberstar:gradle-git:0.6.3'
@@ -166,13 +166,13 @@ dependencies {
 }
 
 // Change the output dir of each module
-sourceSets {
-    main {
-        java {
-            output.classesDir 'build/classes'
-        }
-    }
-}
+//sourceSets { // TODO MAYBE RETURN!!
+//    main {
+//        java {
+//            output.classesDir 'build/classes'
+//        }
+//    }
+//}
 
 // Generate the module directory structure if missing
 task createSkeleton() {
@@ -202,26 +202,26 @@ task createSkeleton() {
     mkdir('src/test/java')
 }
 
-task cacheReflections {
-    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
-    // TODO: The extra "org" qualifier excludes test classes otherwise sucked up in Jenkins, causing issues. Redo later
-    File dirToReflect = new File(sourceSets.main.output.classesDir, "org")
-    inputs.files dirToReflect
-    outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
-    dependsOn classes
-    doFirst {
-        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
-        dirToReflect.mkdirs()
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .addUrls(dirToReflect.toURI().toURL())
-                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-        reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
-    }
+task cacheReflections { // TODO RETURN!!
+//    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
+//    // TODO: The extra "org" qualifier excludes test classes otherwise sucked up in Jenkins, causing issues. Redo later
+//    File dirToReflect = new File(sourceSets.main.output.classesDir, "org")
+//    inputs.files dirToReflect
+//    outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+//    dependsOn classes
+//    doFirst {
+//        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
+//        dirToReflect.mkdirs()
+//        Reflections reflections = new Reflections(new ConfigurationBuilder()
+//                .addUrls(dirToReflect.toURI().toURL())
+//                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
+//        reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+//    }
 }
 
 task cleanReflections(type: Delete) {
     description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
-    delete sourceSets.main.output.classesDir.toString() + "/reflections.cache"
+//    delete sourceSets.main.output.classesDir.toString() + "/reflections.cache" // TODO RETURN!!
 }
 
 // This task syncs everything in the assets dir into the output dir, used when jarring the module

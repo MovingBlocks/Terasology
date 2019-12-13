@@ -1,7 +1,8 @@
 // Stuff specific to IDEA IntelliJ setup - meant to be included by more central Gradle files
+//apply from: "$rootDir/config/gradle/common.gradle"
+apply plugin: 'idea'
 
 ext {
-
     // Activate Checkstyle config
     ideaActivateCheckstyle = { Node iprNode ->
         // Even if the component already exists this'll just overwrite it - shouldn't duplicate
