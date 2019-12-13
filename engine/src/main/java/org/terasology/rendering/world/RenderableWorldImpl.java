@@ -38,6 +38,9 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.World;
+import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -138,9 +141,11 @@ class RenderableWorldImpl implements RenderableWorld {
         chunkProvider.completeUpdate();
         chunkProvider.beginUpdate();
 
+        World world = CoreRegistry.get(WorldGenerator.class).getWorld();
         RenderableChunk chunk;
         ChunkMesh newMesh;
         ChunkView localView;
+        Region worldData;
         for (Vector3i chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
             chunk = chunkProvider.getChunk(chunkCoordinates);
             if (chunk == null) {
@@ -152,7 +157,8 @@ class RenderableWorldImpl implements RenderableWorld {
                 }
                 chunk.setDirty(false);
 
-                newMesh = chunkTessellator.generateMesh(localView, ChunkConstants.SIZE_Y, 0);
+                worldData = world.getWorldData(localView.getWorldRegion());
+                newMesh = chunkTessellator.generateMesh(localView, worldData, ChunkConstants.SIZE_Y, 0);
                 newMesh.generateVBOs();
 
                 if (chunk.hasMesh()) {

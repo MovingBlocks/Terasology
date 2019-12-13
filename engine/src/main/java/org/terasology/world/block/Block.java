@@ -27,6 +27,7 @@ import org.terasology.math.Transform;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -95,6 +96,8 @@ public final class Block {
     private boolean waving;
     private byte luminance;
     private Vector3f tint = new Vector3f(0, 0, 0);
+    private Map<BlockPart, BlockColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
+    private Map<BlockPart, Vector4f> colorOffsets = Maps.newEnumMap(BlockPart.class);
 
     // Collision related
     private boolean penetrable;
@@ -125,6 +128,16 @@ public final class Block {
     private CollisionShape collisionShape;
     private Vector3f collisionOffset;
     private AABB bounds = AABB.createEmpty();
+
+    /**
+     * Init. a new block with default properties in place.
+     */
+    public Block() {
+        for (BlockPart part : BlockPart.values()) {
+            colorSource.put(part, DefaultColorSource.DEFAULT);
+            colorOffsets.put(part, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+        }
+    }
 
     public short getId() {
         return id;
@@ -531,6 +544,33 @@ public final class Block {
         this.primaryAppearance = appearence;
     }
 
+    public BlockColorSource getColorSource(BlockPart part) {
+        return colorSource.get(part);
+    }
+
+    public void setColorSource(BlockColorSource colorSource) {
+        for (BlockPart part : BlockPart.values()) {
+            this.colorSource.put(part, colorSource);
+        }
+    }
+
+    public void setColorSource(BlockPart part, BlockColorSource value) {
+        this.colorSource.put(part, value);
+    }
+
+    public Vector4f getColorOffset(BlockPart part) {
+        return colorOffsets.get(part);
+    }
+
+    public void setColorOffset(BlockPart part, Vector4f color) {
+        colorOffsets.put(part, color);
+    }
+
+    public void setColorOffsets(Vector4f color) {
+        for (BlockPart part : BlockPart.values()) {
+            colorOffsets.put(part, color);
+        }
+    }
 
     /**
      * @return Standalone mesh
