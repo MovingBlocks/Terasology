@@ -60,6 +60,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -275,20 +277,25 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             }
         });
     }
+    
+     private int getVersion(String version) {
+        Pattern pattern = Pattern.compile("[0-9]+");
+        Matcher matcher = pattern.matcher(version);
+        matcher.find();
+        return Integer.parseInt(matcher.group());
+    }
+
 
     private boolean validateVersion(DependencyInfo value) {
         String version = String.valueOf(moduleManager.getRegistry().getLatestModuleVersion(value.getId()).getVersion());
         String max = value.getMaxVersion().toString();
         String min = value.getMinVersion().toString();
 
-        int Max = max.charAt(0);
-        int Min = min.charAt(0);
-        int Version = version.charAt(0);
+        int maxVersion = getVersion(max);
+        int minVersion = getVersion(min);
+        int installedVersion = getVersion(version);
 
-        if(Version < Min || Version > Max) {
-            return false;
-        }
-        return true;
+        return installedVersion >= minVersion && installedVersion <= maxVersion;
     }
 
     private void setUpDependencies() {
