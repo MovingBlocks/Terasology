@@ -276,6 +276,21 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         });
     }
 
+    private boolean validateVersion(DependencyInfo value){
+        String version= String.valueOf(moduleManager.getRegistry().getLatestModuleVersion(value.getId()).getVersion());
+        String max=value.getMaxVersion().toString();
+        String min=value.getMinVersion().toString();
+
+        int Max=max.charAt(0);
+        int Min=min.charAt(0);
+        int Version=version.charAt(0);
+
+        if(Version<Min||Version>Max){
+            return false;
+        }
+        return true;
+    }
+
     private void setUpDependencies() {
         dependencies.setList(Collections.emptyList());
         dependencies.setItemRenderer(new AbstractItemRenderer<DependencyInfo>() {
@@ -288,7 +303,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(DependencyInfo value, Canvas canvas) {
-                if (moduleManager.getRegistry().getLatestModuleVersion(value.getId()) == null) {
+                if(!validateVersion(value)){
                     canvas.setMode("invalid");
                 } else {
                     canvas.setMode("available");
