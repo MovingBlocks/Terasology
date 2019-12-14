@@ -16,6 +16,7 @@
 package org.terasology.world.propagation.light;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Side;
@@ -30,7 +31,11 @@ import org.terasology.world.propagation.PropagatorWorldView;
 import org.terasology.world.propagation.StandardBatchPropagator;
 import org.terasology.world.propagation.SunlightRegenBatchPropagator;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,7 +48,7 @@ public class LightMerger<T> {
     private static final Logger logger = LoggerFactory.getLogger(LightMerger.class);
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private Future<T> resultFuture;
+    private BlockingQueue<T> results = Queues.newLinkedBlockingQueue();
 
     private GeneratingChunkProvider chunkProvider;
     private LightPropagationRules lightRules = new LightPropagationRules();
@@ -56,23 +61,19 @@ public class LightMerger<T> {
     }
 
     public void beginMerge(final Chunk chunk, final T data) {
-        resultFuture = executorService.submit(() -> {
+        executorService.submit(() -> {
             merge(chunk);
-            return data;
+            results.add(data);
         });
     }
 
-    public T completeMerge() {
-        if (resultFuture != null) {
-            try {
-                T result = resultFuture.get();
-                resultFuture = null;
-                return result;
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException("Error completing lighting merge", e);
-            }
+    public List<T> completeMerge() {
+        if (!results.isEmpty()) {
+            List<T> data = Lists.newArrayList();
+            results.drainTo(data);
+            return data;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private void merge(Chunk chunk) {

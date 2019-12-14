@@ -109,12 +109,13 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public void completeUpdate() {
-        Chunk chunk = lightMerger.completeMerge();
-        if (chunk != null) {
-            chunk.markReady();
-            listener.onChunkReady(chunk.getPosition());
-            worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
-        }
+        lightMerger.completeMerge().forEach(chunk -> {
+            if (chunkCache.containsKey(chunk.getPosition())) {
+                chunk.markReady();
+                listener.onChunkReady(chunk.getPosition());
+                worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
+            }
+        });
     }
 
     @Override
@@ -151,13 +152,11 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             }
         }
         if (!sortedReadyChunks.isEmpty()) {
-            boolean loaded = false;
-            for (int i = sortedReadyChunks.size() - 1; i >= 0 && !loaded; i--) {
+            for (int i = sortedReadyChunks.size() - 1; i >= 0; i--) {
                 Chunk chunkInfo = sortedReadyChunks.get(i);
                 PerformanceMonitor.startActivity("Make Chunk Available");
                 if (makeChunkAvailable(chunkInfo)) {
                     sortedReadyChunks.remove(i);
-                    loaded = true;
                 }
                 PerformanceMonitor.endActivity();
             }
@@ -252,7 +251,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
-      Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
+        Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
         for (Vector3i chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
             if (chunk == null) {

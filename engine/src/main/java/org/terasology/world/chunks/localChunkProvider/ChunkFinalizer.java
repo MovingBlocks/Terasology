@@ -19,6 +19,8 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.internal.ReadyChunkInfo;
 
+import java.util.List;
+
 /**
  * Post-processor for loaded or generated chunks.
  * Can be used to add extra runtime-metadata like light merging to a chunk before the chunk is stored in memory.
@@ -27,7 +29,7 @@ public interface ChunkFinalizer {
 
     void initialize(GeneratingChunkProvider generatingChunkProvider);
 
-    ReadyChunkInfo completeFinalization();
+    List<ReadyChunkInfo> completeFinalization();
 
     void beginFinalization(Chunk chunk, ReadyChunkInfo readyChunkInfo);
 
