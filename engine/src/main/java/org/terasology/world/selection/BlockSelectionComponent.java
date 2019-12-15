@@ -54,4 +54,10 @@ public class BlockSelectionComponent implements Component {
      * Texture used to indicate the selected blocks when drawing block selection.  Defaults to "engine:selection" if not specified.
      */
     public Texture texture;
+
+    /**
+     * If this is the position of the selected region changes with the camera target. This must be set true for a component
+     * before sending the {@link org.terasology.logic.selection.MovableSelectionStartEvent} using the appropriate entity
+     */
+    public boolean isMovable = false;
 }

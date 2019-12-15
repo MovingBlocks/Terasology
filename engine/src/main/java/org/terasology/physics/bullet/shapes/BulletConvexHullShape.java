@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class BulletConvexHullShape extends BulletCollisionShape implements org.terasology.physics.shapes.ConvexHullShape {
+    // TODO: Handle scale
     private final ConvexHullShape convexHullShape;
 
     public BulletConvexHullShape(List<Vector3f> vertices) {
@@ -51,5 +52,12 @@ public class BulletConvexHullShape extends BulletCollisionShape implements org.t
             transformedVerts.add(com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), vert, new javax.vecmath.Vector3f()));
         }
         return new BulletConvexHullShape(transformedVerts);
+    }
+
+    @Override
+    public Vector3f[] getVertices() {
+        return convexHullShape.getPoints().stream()
+                .map(VecMath::from)
+                .toArray(Vector3f[]::new);
     }
 }

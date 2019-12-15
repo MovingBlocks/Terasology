@@ -22,7 +22,7 @@ import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 /**
  * Stores the surface depth limits.
  * The surface depth limit (inclusive) is an optional bottom limit for the default world generator.
- * No blocks below the surface depth limit are altered, and biomes are not set.
+ * No blocks below the surface depth limit are altered..
  */
 public class SurfaceDepthFacet extends BaseFieldFacet2D {
 

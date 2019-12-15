@@ -36,10 +36,9 @@ import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufDeserializationContext;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufSerializationContext;
+import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -53,17 +52,15 @@ public class NetworkEntitySerializer {
     private ComponentSerializeCheck componentSerializeCheck = ComponentSerializeCheck.NullCheck.create();
     private EngineEntityManager entityManager;
     private ComponentLibrary componentLibrary;
-    private TypeSerializationLibrary typeSerializationLibrary;
-    private ProtobufSerializationContext serializationContext;
-    private ProtobufDeserializationContext deserializationContext;
+    private TypeHandlerLibrary typeHandlerLibrary;
+    private ProtobufPersistedDataSerializer serializationContext;
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
 
-    public NetworkEntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
+    public NetworkEntitySerializer(EngineEntityManager entityManager, ComponentLibrary componentLibrary, TypeHandlerLibrary typeHandlerLibrary) {
         this.entityManager = entityManager;
         this.componentLibrary = componentLibrary;
-        this.typeSerializationLibrary = typeSerializationLibrary;
-        this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
-        this.deserializationContext = new ProtobufDeserializationContext(typeSerializationLibrary);
+        this.typeHandlerLibrary = typeHandlerLibrary;
+        this.serializationContext = new ProtobufPersistedDataSerializer();
     }
 
     public void setComponentSerializeCheck(ComponentSerializeCheck componentSerializeCheck) {
@@ -151,7 +148,7 @@ public class NetworkEntitySerializer {
         }
 
         byte fieldCount = 0;
-        Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
+        Serializer serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
         for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
             if (fieldCheck.shouldSerializeField(field, newComponent, componentInitial)) {
                 Object oldValue = field.getValue(oldComponent);
@@ -184,7 +181,7 @@ public class NetworkEntitySerializer {
             return;
         }
 
-        Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
+        Serializer serializer = typeHandlerLibrary.getSerializerFor(componentMetadata);
         byte fieldCount = 0;
         for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
             if (fieldCheck.shouldSerializeField(field, component, componentInitial)) {
@@ -228,13 +225,13 @@ public class NetworkEntitySerializer {
                 createdNewComponent = true;
                 component = metadata.newInstance();
             }
-            Serializer serializer = typeSerializationLibrary.getSerializerFor(metadata);
+            Serializer serializer = typeHandlerLibrary.getSerializerFor(metadata);
             for (int fieldIndex = 0; fieldIndex < UnsignedBytes.toInt(entityData.getComponentFieldCounts().byteAt(componentIndex)); ++fieldIndex) {
                 byte fieldId = entityData.getFieldIds().byteAt(fieldPos);
                 ReplicatedFieldMetadata fieldMetadata = metadata.getField(fieldId);
                 if (fieldMetadata != null && fieldCheck.shouldDeserialize(metadata, fieldMetadata)) {
                     logger.trace("Deserializing field {} of component {} as value {}", fieldMetadata, metadata, entityData.getFieldValue(fieldPos));
-                    serializer.deserializeOnto(component, fieldMetadata, new ProtobufPersistedData(entityData.getFieldValue(fieldPos)), deserializationContext);
+                    serializer.deserializeOnto(component, fieldMetadata, new ProtobufPersistedData(entityData.getFieldValue(fieldPos)));
                 }
                 fieldPos++;
             }

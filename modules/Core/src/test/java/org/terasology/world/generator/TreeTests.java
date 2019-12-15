@@ -34,7 +34,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.MersenneRandom;
 import org.terasology.utilities.random.Random;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -51,7 +50,6 @@ public class TreeTests {
     private static final Logger logger = LoggerFactory.getLogger(TreeTests.class);
 
     private BlockManager blockManager;
-    private BiomeManager biomeManager;
     private ExtraBlockDataManager extraDataManager;
 
     @Before
@@ -64,8 +62,6 @@ public class TreeTests {
 
         blockManager = Mockito.mock(BlockManager.class);
         Block air = blockManager.getBlock(BlockManager.AIR_ID);
-
-        biomeManager = Mockito.mock(BiomeManager.class);
         
         extraDataManager = new ExtraBlockDataManager();
 
@@ -119,7 +115,7 @@ public class TreeTests {
 
         Rect2i chunks = Rect2i.createFromMinAndMax(-1, -1, 1, 1);
         for (BaseVector2i chunkPos : chunks.contents()) {
-            Chunk chunk = new ChunkImpl(chunkPos.getX(), 0, chunkPos.getY(), blockManager, biomeManager, extraDataManager) {
+            Chunk chunk = new ChunkImpl(chunkPos.getX(), 0, chunkPos.getY(), blockManager, extraDataManager) {
                 @Override
                 public Block setBlock(int x, int y, int z, Block block) {
                     Vector3i world = chunkToWorldPosition(x, y, z);

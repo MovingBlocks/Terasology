@@ -177,7 +177,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
     private String generateResult(String suggestion, Name commandName,
                                   List<String> commandParameters, int suggestedIndex) {
         if (suggestedIndex <= 0) {
-            return suggestion;
+            return suggestion + " ";
         } else {
             StringBuilder result = new StringBuilder();
             result.append(commandName.toString());
@@ -189,6 +189,9 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
 
             result.append(" ");
             result.append(suggestion);
+
+            result.append(" ");
+
             return result.toString();
         }
     }

@@ -21,6 +21,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [AdditionalRails](https://github.com/Terasology/AdditionalRails) - container module for more rails
 * [AdditionalVegetables](https://github.com/Terasology/AdditionalVegetables) - container module for more vegetables
 * [AdditionalWorlds](https://github.com/Terasology/AdditionalWorlds) - container module for more worlds
+* [AdvancedRails](https://github.com/Terasology/AdvancedRails) - more advanced content for rail systems
 * [AdventureAssets](https://github.com/Terasology/AdventureAssets) - a set of assets for adventure time!
 * [Alchemy](https://github.com/Terasology/Alchemy) - create alchemical potions!
 * [AlchemyPlantGenerator](https://github.com/Terasology/AlchemyPlantGenerator) - a world plugin that'll seed the plants used by Alchemy into a given plugin-capable world
@@ -28,8 +29,10 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Anatomy](https://github.com/Terasology/Anatomy) - an anatomical system meant to provide an alternative to typical HP only systems
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
 * [AnotherWorldPlants](https://github.com/Terasology/AnotherWorldPlants) - farming and tree growth for AnotherWorld
+* [Apiculture](https://github.com/Terasology/Apiculture) - BEES! RUN! Well, eventually, they're still being trained to do stuff. GSOC 2019
 * [BasicCrafting](https://github.com/Terasology/BasicCrafting) - a basic crafting system
 * [Behaviors](https://github.com/Terasology/Behaviors) - library module containing various behavior trees for use in our AI system
+* BiomesAPI - library module for basic Biome functionality
 * [BlockDetector](https://github.com/Terasology/BlockDetector) - adds a simple little tool that can detect specific blocks (beeping in proximity)
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
 * [BlockPicker](https://github.com/Terasology/BlockPicker) - allows the player access to an infinite block inventory with the `B` key
@@ -52,6 +55,8 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Cooking](https://github.com/Terasology/Cooking) - cook stuff!
 * [CopperAndBronze](https://github.com/Terasology/CopperAndBronze) - another era for throughout the ages, this time copper and bronze (comes after wood and stone)
 * Core - mandatory content needed for normal game launch
+* [CoreAssets](https://github.com/Terasology/CoreAssets) - base assets extracted from Core
+* [CoreBlocks](https://github.com/Terasology/CoreBlocks) - base blocks extracted from Core
 * CoreSampleGameplay - gameplay front for Core - allows modules to depend on Core without the default starting inventory
 * [CustomOreGen](https://github.com/Terasology/CustomOreGen) - library containing an ore distribution algorithm based on [JRoush's CustomOreGen](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1282294-1-4-6-v2-custom-ore-generation-updated-jan-5th)
 * [DamagingBlocks](https://github.com/Terasology/DamagingBlocks) - allows blocks like lava to hurt the player
@@ -62,6 +67,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [EdibleFlora](https://github.com/Terasology/EdibleFlora) - basic growth system providing plant stuff you can eat
 * [Equipment](https://github.com/Terasology/Equipment) - an equipment system with a character screen (`c`) showing stats and slots for various equipment types
 * [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system
+* [Exoplanet](https://github.com/Terasology/Exoplanet) - a new world with a second "dimension" you can travel to through a portal
 * [Fences](https://github.com/Terasology/Fences) - fences!
 * [FlexibleMovement](https://github.com/Terasology/FlexibleMovement) - a movement implementation for FlexiblePathfinding (see below) (DISCLAIMER: this module is currently unstable)
 * [FlexiblePathfinding](https://github.com/Terasology/FlexiblePathfinding) - a more flexible variant pathfinding framework
@@ -74,6 +80,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [GooeysQuests](https://github.com/Terasology/GooeysQuests) - spawn our mascot Gooey (console: `spawnPrefab gooey`) then `e` click to interact for commands and quests!
 * [GooKeeper](https://github.com/Terasology/GooKeeper) - those wild Gooeys totally look like they'd be happy in some Zoo enclosures. Don't they? Then have visitors pay you!
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
+* [Health](https://github.com/Terasology/Health) - basic health functionality, extracted from the engine / Core
 * [HjerlHede](https://github.com/Terasology/HjerlHede) - a pure build module containing some Structure Template based buildings from the [Danish natural museum Hjerl Hede](http://hjerlhede.dk/en)
 * [HumanoidCharacters](https://github.com/Terasology/HumanoidCharacters) - holds humanoid characters, to make you look different than a basic floating block (or an old monkey head!)
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
@@ -103,6 +110,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [MawGooey](https://github.com/Terasology/MawGooey) - Introduces Gooey's 'odd' cousin to the game. Say hi, just don't get too close ..
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [MedievalCities](https://github.com/Terasology/MedievalCities) - a set of building templates for a medieval era city
+* [MetalRenegades](https://github.com/Terasology/MetalRenegades) - gameplay template set in a Wild West style world. GSOC 2019
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [Minesweeper](https://github.com/Terasology/Minesweeper) - a little game inside a game
 * [Minimap](https://github.com/Terasology/Minimap) - a basic minimap. Show/hide with `M` by default and zoom with numpad `-` and `+`
@@ -136,6 +144,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [SimpleLiquids](https://github.com/Terasology/SimpleLiquids) - lets water propagate in the world - beware of floods!
 * [Smithing](https://github.com/Terasology/Smithing) - crafting for metal-based recipes
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
+* [SoundyGenetics](https://github.com/Terasology/SoundyGenetics) - advanced genetics system. GSOC 2019
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
 * [StaticCities](https://github.com/Terasology/StaticCities) - variant of Cities that places all cities during world generation without later dynamic growth
 * [StructuralResources](https://github.com/Terasology/StructuralResources) - a set of structural shapes suitable for buildings and such
@@ -154,6 +163,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [WeatherManager](https://github.com/Terasology/WeatherManager) - simple weather foundation, tracks whether, maintains a single cloud layer, and so on 
 * [WildAnimals](https://github.com/Terasology/WildAnimals) - a module containing animals, initially a deer you can spawn in-world via console with `spawnPrefab deer` then watch wander idly
 * [WildAnimalsGenome](https://github.com/Terasology/WildAnimalsGenome) - bridge module using Genome to bring more advanced features to WildAnimals
+* [WildAnimalsMadness](https://github.com/Terasology/WildAnimalsMadness) - these wild animals have acquired some sort of madness! Or at least they seem to be thinking, somehow .. GSOC 2019
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big content module including "from scratch" crafting, starting with wood here
 * [WoodAndStoneCraftingJournal](https://github.com/Terasology/WoodAndStoneCraftingJournal) - a Journal bridging module for WoodCrafting and StoneCrafting (no direct relation with the WoodAndStone module)
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes

@@ -217,7 +217,6 @@ Contributors
  [4Denthusiast](https://github.com/4Denthusiast),
  [dacharya64](https://github.com/dacharya64),
  [Naman-sopho](https://github.com/Naman-sopho),
- [TheFlash98](https://github.com/TheFlash98),
  [iaronaraujo](https://github.com/iaronaraujo),
  [l0ftyWhizZ](https://github.com/l0ftyWhizZ),
  [manas96](https://github.com/manas96),
@@ -267,7 +266,12 @@ Contributors
  [darshan3](https://github.com/darshan3),
  [Loonride](https://github.com/Loonride),
  [casals](https://github.com/casals),
- [Prafful 'profgrammer' Javare](https://github.com/profgrammer)
+ [Prafful 'profgrammer' Javare](https://github.com/profgrammer),
+ [AahzBrut](https://github.com/AahzBrut),
+ [Qwertygiy](https://github.com/Qwertygiy),
+ [praj-foss](https://github.com/praj-foss),
+ [aRealCyborg](https://github.com/aRealCyborg),
+ [DarkWeird](https://github.com/DarkWeird)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

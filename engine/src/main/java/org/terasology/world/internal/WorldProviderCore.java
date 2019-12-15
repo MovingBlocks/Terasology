@@ -20,7 +20,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.time.WorldTime;
 
@@ -121,25 +120,6 @@ public interface WorldProviderCore {
         }
         return resultMap;
     }
-
-
-
-    /**
-     * Changes the biome at the given position.
-     *
-     * @param pos   The world position to change
-     * @param biome The biome to set
-     * @return The previous biome type at the position. Null if the change failed (because the necessary chunk was not loaded)
-     */
-    Biome setBiome(Vector3i pos, Biome biome);
-
-    /**
-     * Returns the biome at a specific world position.
-     *
-     * @param pos The position
-     * @return The biome at the given position.
-     */
-    Biome getBiome(Vector3i pos);
 
     /**
      * Returns the block at the given position.

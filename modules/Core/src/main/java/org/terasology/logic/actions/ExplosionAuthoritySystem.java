@@ -28,7 +28,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
-import org.terasology.logic.health.DoDamageEvent;
+import org.terasology.logic.health.event.DoDamageEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
@@ -70,11 +70,11 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        explosionSounds.add(Assets.getSound("core:explode1"));
-        explosionSounds.add(Assets.getSound("core:explode2"));
-        explosionSounds.add(Assets.getSound("core:explode3"));
-        explosionSounds.add(Assets.getSound("core:explode4"));
-        explosionSounds.add(Assets.getSound("core:explode5"));
+        explosionSounds.add(Assets.getSound("CoreAssets:Explode1"));
+        explosionSounds.add(Assets.getSound("CoreAssets:Explode2"));
+        explosionSounds.add(Assets.getSound("CoreAssets:Explode3"));
+        explosionSounds.add(Assets.getSound("CoreAssets:Explode4"));
+        explosionSounds.add(Assets.getSound("CoreAssets:Explode5"));
     }
 
     @ReceiveEvent
@@ -107,7 +107,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
     }
 
     void doExplosion(ExplosionActionComponent explosionComp, Vector3f origin, EntityRef instigatingBlockEntity) {
-        EntityBuilder builder = entityManager.newBuilder("core:smokeExplosion");
+        EntityBuilder builder = entityManager.newBuilder("CoreAssets:smokeExplosion");
         builder.getComponent(LocationComponent.class).setWorldPosition(origin);
         EntityRef smokeEntity = builder.build();
 
@@ -144,7 +144,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
     public void onActivateFuseOnBlock(ActivateEvent event, EntityRef entityRef, TimedExplosionComponent timedExplosionComponent) {
         if (event.getTarget().hasComponent(BlockComponent.class) && event.getTarget().hasComponent(ExplosionActionComponent.class)
                 && !event.getTarget().hasComponent(TimedExplosionComponent.class)) {
-            Optional<StaticSound> fuseBurningSound = Assets.getSound("core:FuseBurning");
+            Optional<StaticSound> fuseBurningSound = Assets.getSound("CoreAssets:FuseBurning");
             if (fuseBurningSound.isPresent()) {
                 event.getTarget().send(new PlaySoundEvent(fuseBurningSound.get(), 1f));
             }

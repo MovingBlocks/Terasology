@@ -16,6 +16,7 @@ extensions
 !/facades/TeraEd
 !/facades/subprojects.gradle
 /modules/*
+!/modules/BiomesAPI
 !/modules/Core
 !/modules/CoreSampleGameplay
 !/modules/BuilderSampleGameplay
@@ -43,6 +44,7 @@ engine-tests/engine-tests.iml
 /*.ipr
 /*.iws
 /projectFilesBackup*
+/**/*.iml
 
 # Ignore Eclipse
 .checkstyle
