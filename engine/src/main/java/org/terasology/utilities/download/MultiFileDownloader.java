@@ -16,7 +16,6 @@
 package org.terasology.utilities.download;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Path;
@@ -27,20 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-/**
- * Downloads multiple files.
- */
-
 public class MultiFileDownloader implements Callable<List<Path>> {
-    private Map<URI, Path> uriToTargetMap;
+    private Map<URL, Path> urlToTargetMap;
     private MultiFileTransferProgressListener progressListener;
 
-    /**
-     * @param uriToTargetMap
-     * @param progressListener a progress listener. Will be called with 0 repeatedly if size cannot be determined.
-     */
-    public MultiFileDownloader(Map<URI, Path> uriToTargetMap, MultiFileTransferProgressListener progressListener) {
-        this.uriToTargetMap = uriToTargetMap;
+    public MultiFileDownloader(Map<URL, Path> urlToTargetMap, MultiFileTransferProgressListener progressListener) {
+        this.urlToTargetMap = urlToTargetMap;
         this.progressListener = progressListener;
     }
 
@@ -48,25 +39,22 @@ public class MultiFileDownloader implements Callable<List<Path>> {
     public List<Path> call() throws IOException {
 
         // Obtain the size of each file
-        final int numFiles = uriToTargetMap.size();
+        final int numFiles = urlToTargetMap.size();
         if (numFiles < 1) { // avoid reporting progress like "Retrieving file size 1 of 0"
             return Collections.emptyList();
         }
-        final Map<URI, Long> fileSizes = getSizes();
+        final Map<URL, Long> fileSizes = getSizes();
         final long totalBytes = sum(fileSizes.values());
 
         List<Path> downloadedFiles = new ArrayList<>();
         int index = 0;
         long completedFilesBytes = 0;
-        for (Map.Entry<URI, Path> entry : uriToTargetMap.entrySet()) {
+        for (Map.Entry<URL, Path> entry : urlToTargetMap.entrySet()) {
             final int downloadedFileCount = index + 1;
             final long previousFilesBytes = completedFilesBytes;
             SingleFileTransferProgressListener singleDownloadListener = (fileDownloadedBytes, fileTotalBytes) ->
-                progressListener.onDownloadProgress(previousFilesBytes + fileDownloadedBytes, totalBytes, downloadedFileCount, numFiles);
-
-            // Converting URI to URL in order to pass it SingleFileDownloader's constructor
-            URL url = entry.getKey().toURL();
-            SingleFileDownloader fileDownloader = new SingleFileDownloader(url, entry.getValue(),
+                    progressListener.onDownloadProgress(previousFilesBytes + fileDownloadedBytes, totalBytes, downloadedFileCount, numFiles);
+            SingleFileDownloader fileDownloader = new SingleFileDownloader(entry.getKey(), entry.getValue(),
                     singleDownloadListener);
             downloadedFiles.add(fileDownloader.call());
             completedFilesBytes += fileSizes.get(entry.getKey());
@@ -74,14 +62,15 @@ public class MultiFileDownloader implements Callable<List<Path>> {
         }
         return downloadedFiles;
     }
-    private Map<URI, Long> getSizes() throws IOException {
-        Map<URI, Long> result = new HashMap<>();
+
+    private Map<URL, Long> getSizes() throws IOException {
+        Map<URL, Long> result = new HashMap<>();
         int current = 1;
-        int total = uriToTargetMap.size();
-        for (URI uri: uriToTargetMap.keySet()) {
+        int total = urlToTargetMap.size();
+        for (URL url: urlToTargetMap.keySet()) {
             progressListener.onSizeMetadataProgress(current, total);
-            URLConnection connection = uri.toURL().openConnection();
-            result.put(uri, connection.getContentLengthLong());
+            URLConnection conn = url.openConnection();
+            result.put(url, conn.getContentLengthLong());
             current++;
         }
         return result;
