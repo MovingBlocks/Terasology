@@ -43,7 +43,7 @@ println "Version for $project.name loaded as $version for group $group"
 dependencies {
 
     // Dependency on the engine itself
-    compile project(':engine')
+    implementation project(':engine')
 
     // Test lib dependencies
     implementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
