@@ -28,6 +28,8 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -43,12 +45,12 @@ public class FloraRasterizer implements WorldRasterizer {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         air = blockManager.getBlock(BlockManager.AIR_ID);
 
-        flora.put(FloraType.GRASS, ImmutableList.<Block>of(
+        flora.put(FloraType.GRASS, Arrays.asList(
                 blockManager.getBlock("CoreBlocks:TallGrass1"),
                 blockManager.getBlock("CoreBlocks:TallGrass2"),
                 blockManager.getBlock("CoreBlocks:TallGrass3")));
 
-        flora.put(FloraType.FLOWER, ImmutableList.<Block>of(
+        flora.put(FloraType.FLOWER, Arrays.asList(
                 blockManager.getBlock("CoreBlocks:Dandelion"),
                 blockManager.getBlock("CoreBlocks:Glowbell"),
                 blockManager.getBlock("CoreBlocks:Iris"),
@@ -58,10 +60,20 @@ public class FloraRasterizer implements WorldRasterizer {
                 blockManager.getBlock("CoreBlocks:Tulip"),
                 blockManager.getBlock("CoreBlocks:YellowFlower")));
 
-        flora.put(FloraType.MUSHROOM, ImmutableList.<Block>of(
+        flora.put(FloraType.MUSHROOM, Arrays.asList(
                 blockManager.getBlock("CoreBlocks:BigBrownShroom"),
                 blockManager.getBlock("CoreBlocks:BrownShroom"),
                 blockManager.getBlock("CoreBlocks:RedShroom")));
+    }
+
+    public void addFloraBlock(FloraType floraType, Block block)
+    {
+        flora.get(floraType).add(block);
+    }
+
+    public void removeFloraBlock(FloraType floraType, Block block)
+    {
+        flora.get(floraType).remove(block);
     }
 
     @Override
@@ -78,6 +90,7 @@ public class FloraRasterizer implements WorldRasterizer {
             List<Block> list = flora.get(type);
             int blockIdx = Math.abs(noise.intNoise(pos.x(), pos.y(), pos.z())) % list.size();
             Block block = list.get(blockIdx);
+            //TODO: make sure conditions for block are met (i.e. support for grass)
             chunk.setBlock(pos, block);
         });
     }

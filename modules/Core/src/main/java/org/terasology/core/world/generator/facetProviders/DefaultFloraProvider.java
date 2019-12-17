@@ -61,7 +61,7 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
             FloraType.FLOWER, 0.1f,
             FloraType.MUSHROOM, 0.05f);
 
-    private Map<CoreBiome, Float> biomeProbs = ImmutableMap.<CoreBiome, Float>builder()
+    private Map<Biome, Float> biomeProbs = ImmutableMap.<Biome, Float>builder()
             .put(CoreBiome.FOREST, 0.3f)
             .put(CoreBiome.PLAINS, 0.2f)
             .put(CoreBiome.MOUNTAINS, 0.2f)
@@ -93,6 +93,27 @@ public class DefaultFloraProvider extends SurfaceObjectProvider<Biome, FloraType
     public DefaultFloraProvider(Configuration configuration) {
         this();
         this.configuration = configuration;
+    }
+
+    public DefaultFloraProvider addNewFlora(Biome biome, FloraType flora, float probability)
+    {
+        register(biome, flora, probability);
+        return this;
+    }
+
+    public DefaultFloraProvider addFloraBiome(Biome biome)
+    {
+        return addFloraBiome(biome, 0.2F);
+    }
+
+    public DefaultFloraProvider addFloraBiome(Biome biome, float probability)
+    {
+        for (FloraType type : typeProbs.keySet()) {
+            float typeProb = typeProbs.get(type);
+            float prob = probability * typeProb;
+            register(biome, type, prob);
+        }
+        return this;
     }
 
     @Override
