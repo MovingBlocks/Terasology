@@ -56,8 +56,8 @@ configurations {
         exclude module: 'jinput-platform'
     }
 
-    // Beyond the standard compile "configuration" we declare one called "devCompile" specific to the "dev" source set
-   devImplementation.extendsFrom implementation
+    // Beyond the standard compile "configuration" we declare one called "devImplementation" specific to the "dev" source set
+    devImplementation.extendsFrom implementation
 }
 
 // TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
@@ -69,14 +69,25 @@ configurations.all {
 dependencies {
 
 
-
+    // White list packages {@see ExternalApiWhiteList class}
+    apiElements group: 'com.google.guava', name: 'guava', version: '23.0'
+    apiElements group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
+    apiElements group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
+    apiElements(group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version: '0.8.0') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+    apiElements group: 'java3d', name: 'vecmath', version: '1.3.1'
 
     // Storage and networking
     implementation group: 'com.google.guava', name: 'guava', version: '23.0'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.6.2'
-    implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.6.1'
     implementation group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
     implementation group: 'io.netty', name: 'netty', version: '3.10.5.Final'
+    implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.6.1'
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
+
+    //Utilities
+    implementation group: 'org.codehaus.plexus', name: 'plexus-utils', version: '1.5.6'
 
     // Java magic
     implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '4.2.2'
@@ -86,8 +97,11 @@ dependencies {
 
     // Graphics, 3D, UI, etc
     implementation group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
+
+
     implementation group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
-    implementation group: 'java3d', name: 'vecmath', version: '1.3.1' // Note: Downgraded to this release until TeraMath ready
+    implementation group: 'java3d', name: 'vecmath', version: '1.3.1'
+    // Note: Downgraded to this release until TeraMath ready
     implementation group: 'org.joml', name: 'joml', version: '1.8.1'
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     implementation group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
@@ -109,18 +123,19 @@ dependencies {
     implementation group: 'org.eaxy', name: 'eaxy', version: '0.1'
 
     // telemetry
-    implementation (group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version :'0.8.0'){
-        exclude group:'org.slf4j',module:'slf4j-simple'
+    implementation(group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version: '0.8.0') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
 
     // Discord RPC
-    implementation 'com.jagrosh:DiscordIPC:0.4'
+    compile 'com.jagrosh:DiscordIPC:0.4'
 
     // TODO move to api/implementation system, see https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
     // Profits : Speed up builds, you can permit using some libraries from using by modules (at compile time)
     // Our developed libs
     compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.5'
+    compile group: 'org.terasology', name: 'gestalt-util', version: '5.1.5'
     compile group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.5'
     compile group: 'org.terasology', name: 'TeraMath', version: '1.4.0'
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.3.1'
@@ -158,7 +173,9 @@ dependencies {
 
 task cacheReflections {
     description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
-    inputs.files sourceSets*.output*.classesDirs, // getClassesDir from all sourceSets (for any jvm (seems) language)
+    inputs.files sourceSets.main.output.classesDirs,
+            sourceSets.dev.output.classesDirs,
+            // getClassesDir from all sourceSets (for any jvm (seems) language)
 //            configurations."${sourceSets.main.compileConfigurationName}", // TODO: Remove when compile has been removed
             configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
 
@@ -169,7 +186,7 @@ task cacheReflections {
     doLast {
         // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
         Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
-                .addUrls(inputs.files.collect {it.toURI().toURL()})
+                .addUrls(inputs.files.collect { it.toURI().toURL() })
                 .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
         reflections.save("$buildDir/classes/reflections.cache")
     }
@@ -184,8 +201,10 @@ jar {
     from(tasks.getByName("cacheReflections").outputs)
 
     manifest {
-        def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
-        attributes("Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+        def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
+            it.getName()
+        }.join(" $subDirLibs/")
+        attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
     }
 }
 
@@ -224,17 +243,17 @@ task createVersionInfoFile {
     onlyIf { env.BUILD_URL != null }
     doLast {
         versionInfoFileDir.mkdirs()
-        ant.propertyfile (file: versionInfoFile) {
-            ant.entry(key:'buildNumber',value:env.BUILD_NUMBER)
-            ant.entry(key:'buildId',value:env.BUILD_ID)
-            ant.entry(key:'buildTag',value:env.BUILD_TAG)
-            ant.entry(key:'buildUrl',value:env.BUILD_URL)
-            ant.entry(key:'jobName',value:env.JOB_NAME)
-            ant.entry(key:'gitBranch',value:convertGitBranch(env.GIT_BRANCH))
-            ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
-            ant.entry(key:'dateTime',value:startDateTimeString)
-            ant.entry(key:'displayVersion',value:displayVersion)
-            ant.entry(key:'engineVersion',value:version)
+        ant.propertyfile(file: versionInfoFile) {
+            ant.entry(key: 'buildNumber', value: env.BUILD_NUMBER)
+            ant.entry(key: 'buildId', value: env.BUILD_ID)
+            ant.entry(key: 'buildTag', value: env.BUILD_TAG)
+            ant.entry(key: 'buildUrl', value: env.BUILD_URL)
+            ant.entry(key: 'jobName', value: env.JOB_NAME)
+            ant.entry(key: 'gitBranch', value: convertGitBranch(env.GIT_BRANCH))
+            ant.entry(key: 'gitCommit', value: env.GIT_COMMIT)
+            ant.entry(key: 'dateTime', value: startDateTimeString)
+            ant.entry(key: 'displayVersion', value: displayVersion)
+            ant.entry(key: 'engineVersion', value: version)
         }
     }
 }
@@ -250,7 +269,7 @@ jar.finalizedBy cleanReflections
 idea {
     module {
         // Add development "dev" dir
-       // sourceDirs += sourceSets.dev.allJava.srcDirs // TODO RETURN!!!
+        // sourceDirs += sourceSets.dev.allJava.srcDirs // TODO RETURN!!!
 
         // Change around the output a bit
         inheritOutputDirs = false

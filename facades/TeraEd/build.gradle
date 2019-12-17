@@ -11,7 +11,8 @@ println "TeraEd VERSION: $version"
 group = 'org.terasology.facades'
 
 dependencies {
-    compile project(':engine')
+    implementation project(':engine')
+    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
 }
 
 task editor(type:JavaExec) {
