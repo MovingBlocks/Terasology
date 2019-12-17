@@ -77,7 +77,9 @@ test {
     ignoreFailures = true
     // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
     testLogging.showStandardStreams = true
-
+    reports {
+        junitXml.enabled = true
+    }
     // Arguments to include while running tests
     jvmArgs '-Xms512m', '-Xmx1024m'
 

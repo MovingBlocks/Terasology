@@ -95,10 +95,11 @@ task game(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-//    classpath sourceSets.main.output.classesDir //TODO RETURN!!!
+    classpath sourceSets.main.output.classesDirs
     classpath sourceSets.main.output.resourcesDir
-//     classpath project(':engine').sourceSets.main.output.classesDir // TODO RETURN!!!
-    classpath project(':engine').configurations.runtime
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').sourceSets.main.output.resourcesDir
+    classpath project(':engine').configurations.runtimeClasspath
 }
 
 task profile(type:JavaExec) {
@@ -117,10 +118,11 @@ task profile(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-//    classpath sourceSets.main.output.classesDir // TODO RETURN!!!
+    classpath sourceSets.main.output.classesDirs
     classpath sourceSets.main.output.resourcesDir
-//    classpath project(':engine').sourceSets.main.output.classesDir // TODO RETURN!!
-    classpath project(':engine').configurations.runtime
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').sourceSets.main.output.resourcesDir
+    classpath project(':engine').configurations.runtimeClasspath
 }
 
 task debug(type:JavaExec) {
@@ -139,10 +141,11 @@ task debug(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-//    classpath sourceSets.main.output.classesDir // TODO RETURN!!
+    classpath sourceSets.main.output.classesDirs
     classpath sourceSets.main.output.resourcesDir
-//    classpath project(':engine').sourceSets.main.output.classesDir //TODO RETURN!!!
-    classpath project(':engine').configurations.runtime
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').sourceSets.main.output.resourcesDir
+    classpath project(':engine').configurations.runtimeClasspath
 }
 
 // By delaying this task to doLast (the << bit) we don't get the headless server dir set up unless actually wanting it
@@ -218,10 +221,11 @@ task server(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-//    classpath sourceSets.main.output.classesDir // TODO RETURN!!
+    classpath sourceSets.main.output.classesDirs
     classpath sourceSets.main.output.resourcesDir
-//    classpath project(':engine').sourceSets.main.output.classesDir // TODO RETURN!!
-    classpath project(':engine').configurations.runtime
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').sourceSets.main.output.resourcesDir
+    classpath project(':engine').configurations.runtimeClasspath
 }
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
