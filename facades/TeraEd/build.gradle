@@ -17,6 +17,7 @@ dependencies {
 
 task editor(type:JavaExec) {
     description = "Run 'TeraEd' to configure graphics shader parameters in a standard PC application"
+    group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives

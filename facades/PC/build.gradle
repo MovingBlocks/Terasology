@@ -82,6 +82,7 @@ configurations {
 
 task game(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application"
+    group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
@@ -104,6 +105,7 @@ task game(type:JavaExec) {
 
 task profile(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application (with Java FlightRecorder profiling)"
+    group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
@@ -127,6 +129,7 @@ task profile(type:JavaExec) {
 
 task debug(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application (in debug mode)"
+    group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
@@ -206,6 +209,7 @@ task setupServerModules(type: Sync) {
 // TODO: Make a task to reset server / game data
 task server(type:JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
+    group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
@@ -250,6 +254,7 @@ task copyCreditsFile(type: Copy) {
 // Main application dist target. Does NOT include any modules.
 task distApp (type: Sync) {
     description = "Creates an application package for distribution"
+    group = "terasology dist"
 
     dependsOn createVersionFile
     dependsOn copyCreditsFile
@@ -303,6 +308,7 @@ task distModules (type: Sync) {
 }
 
 task distPCZip (type: Zip) {
+    group = "terasology dist"
     dependsOn distApp
     dependsOn distModules
     from "$distsDir/app"
@@ -310,6 +316,7 @@ task distPCZip (type: Zip) {
 }
 
 task distForLauncher (type: Sync) {
+    group = "terasology dist"
 
     into rootDirDist
     from distPCZip
