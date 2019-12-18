@@ -9,16 +9,6 @@ import groovy.json.JsonSlurper
 // Java Section                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Put resources in the same folder as java classes to make them available in the sandbox
-//sourceSets { //TODO MAYBE RETURN
-//    main {
-//        java {
-//            output.classesDir 'build/classes/main'
-//            output.resourcesDir 'build/classes/main'
-//        }
-//    }
-//}
-
 // Read the internal version out of the engine-tests module.txt
 def moduleFile = file('src/main/resources/module.txt')
 
@@ -65,3 +55,11 @@ dependencies {
     //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
     compile group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.2.1'
 }
+
+task copyResourcesToClasses(type:Copy) {
+    from sourceSets.main.output.resourcesDir
+    into sourceSets.main.output.classesDirs.first()
+}
+
+//TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
+test.dependsOn copyResourcesToClasses

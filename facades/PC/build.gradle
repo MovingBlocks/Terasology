@@ -217,7 +217,7 @@ task server(type:JavaExec) {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
-    String[] runArgs = [" -Xmx1536m -headless", "-homedir=$localServerDataPath"]
+    String[] runArgs = ["-Xmx1536", "-headless", "-homedir=$localServerDataPath"]
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those

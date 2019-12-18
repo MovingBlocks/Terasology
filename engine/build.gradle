@@ -180,7 +180,7 @@ task cacheReflections {
             configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
 
     outputs.upToDateWhen(classes.outputs.upToDateSpec)
-    outputs.file("$buildDir/classes/reflections.cache")
+    outputs.file("$buildDir/resources/main/reflections.cache")
     dependsOn classes
 
     doLast {
@@ -269,7 +269,7 @@ jar.dependsOn copyResourcesToClasses
 
 jar.dependsOn createVersionInfoFile
 jar.dependsOn cacheReflections
-jar.finalizedBy cleanReflections
+//jar.finalizedBy cleanReflections
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
