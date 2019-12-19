@@ -17,8 +17,7 @@ package org.terasology.persistence.serializers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.ModuleEnvironmentTest;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
@@ -33,8 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TypeSerializerTest extends ModuleEnvironmentTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);

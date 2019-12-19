@@ -15,13 +15,13 @@
  */
 package org.terasology.utilities;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.MersenneRandom;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests {@link MersenneRandom}.

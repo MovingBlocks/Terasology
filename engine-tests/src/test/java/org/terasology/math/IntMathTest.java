@@ -15,11 +15,11 @@
  */
 package org.terasology.math;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.config.Config;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
@@ -28,30 +28,31 @@ import org.terasology.registry.CoreRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
+ *
  */
 public class IntMathTest {
     public IntMathTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
         Config config = new Config(new MockContext());
         CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, config);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -66,11 +67,11 @@ public class IntMathTest {
 
         int largestIntegerPowerOfTwo = powersOfTwo.get(powersOfTwo.size() - 1);
         //test other boundary values
-        assertEquals("0", 0, TeraMath.ceilPowerOfTwo(0));
-        assertEquals("-1", 0, TeraMath.ceilPowerOfTwo(0));
-        assertEquals("Integer.MIN_VALUE", 0, TeraMath.ceilPowerOfTwo(Integer.MIN_VALUE));
-        assertEquals("Integer.MAX_VALUE", 0, TeraMath.ceilPowerOfTwo(Integer.MAX_VALUE));
-        assertEquals("Largest integer power of two + 1", 0, TeraMath.ceilPowerOfTwo(largestIntegerPowerOfTwo + 1));
+        assertEquals(0, TeraMath.ceilPowerOfTwo(0), "0");
+        assertEquals(0, TeraMath.ceilPowerOfTwo(0), "-1");
+        assertEquals(0, TeraMath.ceilPowerOfTwo(Integer.MIN_VALUE), "Integer.MIN_VALUE");
+        assertEquals(0, TeraMath.ceilPowerOfTwo(Integer.MAX_VALUE), "Integer.MAX_VALUE");
+        assertEquals(0, TeraMath.ceilPowerOfTwo(largestIntegerPowerOfTwo + 1), "Largest integer power of two + 1");
     }
 
     @Test
@@ -110,20 +111,20 @@ public class IntMathTest {
      */
     private void testCeilPowerOfTwo(int currentPowerOfTwo, int nextPowerOfTwo) {
 
-        assertEquals("input " + currentPowerOfTwo,
-                currentPowerOfTwo, TeraMath.ceilPowerOfTwo(currentPowerOfTwo)
+        assertEquals(currentPowerOfTwo, TeraMath.ceilPowerOfTwo(currentPowerOfTwo),
+                () -> "input " + currentPowerOfTwo
         );
 
 
         int expectedValue = (currentPowerOfTwo == 1) ? 0
                 : (currentPowerOfTwo == 2) ? 1 : currentPowerOfTwo;
 
-        assertEquals("input " + currentPowerOfTwo + " - 1",
-                expectedValue, TeraMath.ceilPowerOfTwo(currentPowerOfTwo - 1)
+        assertEquals(expectedValue, TeraMath.ceilPowerOfTwo(currentPowerOfTwo - 1),
+                "input " + currentPowerOfTwo + " - 1"
         );
 
-        assertEquals("input " + currentPowerOfTwo + " + 1",
-                nextPowerOfTwo, TeraMath.ceilPowerOfTwo(currentPowerOfTwo + 1)
+        assertEquals(nextPowerOfTwo, TeraMath.ceilPowerOfTwo(currentPowerOfTwo + 1),
+                () -> "input " + currentPowerOfTwo + " + 1"
         );
     }
 

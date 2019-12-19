@@ -17,10 +17,9 @@ package org.terasology.rendering.nui.layers.mainMenu.savedGames;
 
 import com.google.common.base.Charsets;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 
@@ -34,6 +33,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 
 public class GameProviderTest {
     private static final String GAME_1 = "Game 1";
@@ -44,7 +49,7 @@ public class GameProviderTest {
     private static final String GAME_MANIFEST_JSON = "gameManifest.json";
     private static String MANIFEST_EXAMPLE;
 
-    @BeforeClass
+    @BeforeAll
     public static void init()
             throws NoSuchFieldException, IllegalAccessException, IOException {
         PathManager pathManager = PathManager.getInstance();
@@ -64,11 +69,11 @@ public class GameProviderTest {
         try {
             MANIFEST_EXAMPLE = com.google.common.io.Files.toString(file, Charsets.UTF_8);
         } catch (IOException e) {
-            Assert.fail("Could not load input file");
+            fail("Could not load input file");
         }
     }
 
-    @After
+    @AfterEach
     public void cleanUp()
             throws IOException {
         FileUtils.cleanDirectory(new File(TMP_SAVES_FOLDER_PATH.toUri()));
@@ -83,24 +88,24 @@ public class GameProviderTest {
 
         final List<GameInfo> result = GameProvider.getSavedGames();
 
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.isEmpty());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
     public void noSavedGames() {
         final List<GameInfo> result = GameProvider.getSavedGames();
 
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.isEmpty());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
     public void noSavedRecordings() {
         final List<GameInfo> result = GameProvider.getSavedRecordings();
 
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.isEmpty());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -111,8 +116,8 @@ public class GameProviderTest {
 
         final List<GameInfo> result = GameProvider.getSavedRecordings();
 
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.isEmpty());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -124,21 +129,21 @@ public class GameProviderTest {
         writeToFile(manifestFilePath, MANIFEST_EXAMPLE);
 
         final List<GameInfo> result = GameProvider.getSavedGames();
-        Assert.assertNotNull(result);
-        Assert.assertEquals(1, result.size());
+        assertNotNull(result);
+        assertEquals(1, result.size());
         final GameInfo gameInfo = result.get(0);
-        Assert.assertNotNull(gameInfo);
-        Assert.assertNotNull(gameInfo.getManifest());
-        Assert.assertNotNull(gameInfo.getTimestamp());
-        Assert.assertNotNull(gameInfo.getSavePath());
-        Assert.assertEquals(GAME_1, gameInfo.getManifest().getTitle());
-        Assert.assertEquals(TMP_SAVE_GAME_PATH, gameInfo.getSavePath());
+        assertNotNull(gameInfo);
+        assertNotNull(gameInfo.getManifest());
+        assertNotNull(gameInfo.getTimestamp());
+        assertNotNull(gameInfo.getSavePath());
+        assertEquals(GAME_1, gameInfo.getManifest().getTitle());
+        assertEquals(TMP_SAVE_GAME_PATH, gameInfo.getSavePath());
     }
 
     @Test
     public void emptySavesGameFolderTest() {
         final boolean res = GameProvider.isSavesFolderEmpty();
-        Assert.assertTrue(res);
+        assertTrue(res);
     }
 
     @Test
@@ -146,15 +151,15 @@ public class GameProviderTest {
         Files.createDirectories(TMP_SAVE_GAME_PATH);
         Files.createFile(TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME));
         final boolean res = GameProvider.isSavesFolderEmpty();
-        Assert.assertFalse(res);
+        assertFalse(res);
     }
 
     @Test
     public void getNextGameNameDefaultNoSavesTest() {
         final String name = GameProvider.getNextGameName();
 
-        Assert.assertNotNull(name);
-        Assert.assertEquals(GAME_1, name);
+        assertNotNull(name);
+        assertEquals(GAME_1, name);
     }
 
     @Test
@@ -166,8 +171,8 @@ public class GameProviderTest {
 
         final String name = GameProvider.getNextGameName();
 
-        Assert.assertNotNull(name);
-        Assert.assertEquals("Game 2", name);
+        assertNotNull(name);
+        assertEquals("Game 2", name);
     }
 
     @Test
@@ -179,8 +184,8 @@ public class GameProviderTest {
 
         final String name = GameProvider.getNextGameName();
 
-        Assert.assertNotNull(name);
-        Assert.assertEquals(GAME_1, name);
+        assertNotNull(name);
+        assertEquals(GAME_1, name);
     }
 
     private void writeToFile(Path manifestFilePath, final String content)

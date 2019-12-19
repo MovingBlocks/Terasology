@@ -16,20 +16,8 @@
 
 package org.terasology.i18n;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Locale;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.exceptions.InvalidAssetFilenameException;
 import org.terasology.assets.format.AssetDataFile;
@@ -39,6 +27,20 @@ import org.terasology.i18n.assets.TranslationData;
 import org.terasology.i18n.assets.TranslationFormat;
 import org.terasology.naming.Name;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * Tests for the {@link TranslationFormat} class.
  */
@@ -46,25 +48,25 @@ public class TranslationFormatTests {
 
     private TranslationFormat format;
 
-    @Before
+    @BeforeEach
     public void setup() {
         format = new TranslationFormat();
     }
 
     @Test
     public void testGetAssetName() throws InvalidAssetFilenameException {
-        Assert.assertEquals(new Name("menu"),  format.getAssetName("menu.lang"));
-        Assert.assertEquals(new Name("menu_pl"),  format.getAssetName("menu_pl.lang"));
+        assertEquals(new Name("menu"),  format.getAssetName("menu.lang"));
+        assertEquals(new Name("menu_pl"),  format.getAssetName("menu_pl.lang"));
     }
 
     @Test
     public void testPathMatcher() {
-        Assert.assertFalse(format.getFileMatcher().matches(Paths.get("menu.json")));
-        Assert.assertFalse(format.getFileMatcher().matches(Paths.get("menu.prefab")));
+        assertFalse(format.getFileMatcher().matches(Paths.get("menu.json")));
+        assertFalse(format.getFileMatcher().matches(Paths.get("menu.prefab")));
 
-        Assert.assertTrue(format.getFileMatcher().matches(Paths.get("menu.lang")));
-        Assert.assertTrue(format.getFileMatcher().matches(Paths.get("menu_pl.lang")));
-        Assert.assertTrue(format.getFileMatcher().matches(Paths.get("menu_en-US-x-lvariant-POSIX.lang")));
+        assertTrue(format.getFileMatcher().matches(Paths.get("menu.lang")));
+        assertTrue(format.getFileMatcher().matches(Paths.get("menu_pl.lang")));
+        assertTrue(format.getFileMatcher().matches(Paths.get("menu_en-US-x-lvariant-POSIX.lang")));
     }
 
     @Test
@@ -73,8 +75,8 @@ public class TranslationFormatTests {
         ResourceUrn urn = createUrnFromFile(format, assetDataFile);
 
         TranslationData data = format.load(urn, Collections.singletonList(assetDataFile));
-        Assert.assertEquals(new SimpleUri("engine:menu"), data.getProjectUri());
-        Assert.assertEquals(Locale.ROOT, data.getLocale());
+        assertEquals(new SimpleUri("engine:menu"), data.getProjectUri());
+        assertEquals(Locale.ROOT, data.getLocale());
     }
 
     @Test
@@ -83,8 +85,8 @@ public class TranslationFormatTests {
         ResourceUrn urn = createUrnFromFile(format, assetDataFile);
 
         TranslationData data = format.load(urn, Collections.singletonList(assetDataFile));
-        Assert.assertEquals(Locale.GERMANY, data.getLocale());
-        Assert.assertTrue(data.getTranslations().isEmpty());
+        assertEquals(Locale.GERMANY, data.getLocale());
+        assertTrue(data.getTranslations().isEmpty());
     }
 
     @Test
@@ -94,7 +96,7 @@ public class TranslationFormatTests {
         ResourceUrn urn = createUrnFromFile(format, assetDataFile);
 
         TranslationData data = format.load(urn, Collections.singletonList(assetDataFile));
-        Assert.assertEquals("Einzelspieler", data.getTranslations().get("engine:mainMenuScreen#singleplayer#text"));
+        assertEquals("Einzelspieler", data.getTranslations().get("engine:mainMenuScreen#singleplayer#text"));
     }
 
     @Test
@@ -104,8 +106,8 @@ public class TranslationFormatTests {
         ResourceUrn urn = createUrnFromFile(format, assetDataFile);
 
         TranslationData data = format.load(urn, Collections.singletonList(assetDataFile));
-        Assert.assertEquals("line 1 \n line 2 \n line 3", data.getTranslations().get("multi-line"));
-        Assert.assertEquals("line 1 \n line 2 \n line 3", data.getTranslations().get("single-line"));
+        assertEquals("line 1 \n line 2 \n line 3", data.getTranslations().get("multi-line"));
+        assertEquals("line 1 \n line 2 \n line 3", data.getTranslations().get("single-line"));
     }
 
     // TODO: consider making this available to other test classes

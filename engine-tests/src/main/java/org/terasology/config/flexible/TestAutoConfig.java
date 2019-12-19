@@ -18,7 +18,9 @@ package org.terasology.config.flexible;
 import com.google.common.collect.ImmutableList;
 import org.terasology.reflection.TypeInfo;
 
-import static org.terasology.config.flexible.SettingArgument.*;
+import static org.terasology.config.flexible.SettingArgument.defaultValue;
+import static org.terasology.config.flexible.SettingArgument.name;
+import static org.terasology.config.flexible.SettingArgument.type;
 
 public class TestAutoConfig extends AutoConfig {
     public final Setting<String> stringSetting = setting(

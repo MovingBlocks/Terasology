@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,7 +50,7 @@ public class ZoomableLayoutTest {
     private Vector2f size2;
     private Vector2f size3;
 
-    @Before
+    @BeforeEach
     public void setup() {
         zoomableLayout = new ZoomableLayout();
 

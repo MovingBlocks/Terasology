@@ -35,6 +35,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
@@ -54,13 +55,14 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
+ *
  */
 public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 
-    private static final int LOAD_PER_FRAME = 1;
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
     private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<Vector3i> invalidateChunks = Queues.newLinkedBlockingQueue();
     private List<Chunk> sortedReadyChunks = Lists.newArrayList();
     private ChunkReadyListener listener;
     private EntityRef worldEntity = EntityRef.NULL;
@@ -101,39 +103,63 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     public void invalidateChunks(Vector3i pos) {
-        Chunk removed = chunkCache.remove(pos);
-        if (removed != null && !removed.isReady()) {
-            sortedReadyChunks.remove(removed);
-        }
+        invalidateChunks.offer(pos);
+    }
 
+
+    @Override
+    public void completeUpdate() {
+        Chunk chunk = lightMerger.completeMerge();
+        if (chunk != null) {
+            chunk.markReady();
+            listener.onChunkReady(chunk.getPosition());
+            worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
+        }
     }
 
     @Override
     public void beginUpdate() {
         if (listener != null) {
-            List<Chunk> newReadyChunks = Lists.newArrayList();
-            readyChunks.drainTo(newReadyChunks);
-            if (!newReadyChunks.isEmpty()) {
-                sortedReadyChunks.addAll(newReadyChunks);
-                Collections.sort(sortedReadyChunks, new ReadyChunkRelevanceComparator());
-                for (Chunk chunk : newReadyChunks) {
-                    Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
-                    if (oldChunk != null) {
-                        oldChunk.dispose();
-                    }
+            checkForUnload();
+            makeChunksAvailable();
+        }
+    }
+
+    private void checkForUnload() {
+        List<Vector3i> positions = Lists.newArrayListWithCapacity(invalidateChunks.size());
+        invalidateChunks.drainTo(positions);
+        for (Vector3i pos : positions) {
+            Chunk removed = chunkCache.remove(pos);
+            if (removed != null && !removed.isReady() && !sortedReadyChunks.remove(removed)) {
+                worldEntity.send(new BeforeChunkUnload(pos));
+                removed.dispose();
+            }
+        }
+    }
+
+    private void makeChunksAvailable() {
+        List<Chunk> newReadyChunks = Lists.newArrayList();
+        readyChunks.drainTo(newReadyChunks);
+        if (!newReadyChunks.isEmpty()) {
+            sortedReadyChunks.addAll(newReadyChunks);
+            Collections.sort(sortedReadyChunks, new ReadyChunkRelevanceComparator());
+            for (Chunk chunk : newReadyChunks) {
+                Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
+                if (oldChunk != null) {
+                    oldChunk.dispose();
                 }
             }
-            if (!sortedReadyChunks.isEmpty()) {
-                int loaded = 0;
-                for (int i = sortedReadyChunks.size() - 1; i >= 0 && loaded < LOAD_PER_FRAME; i--) {
-                    Chunk chunkInfo = sortedReadyChunks.get(i);
-                    PerformanceMonitor.startActivity("Make Chunk Available");
-                    if (makeChunkAvailable(chunkInfo)) {
-                        sortedReadyChunks.remove(i);
-                        loaded++;
-                    }
-                    PerformanceMonitor.endActivity();
+        }
+        if (!sortedReadyChunks.isEmpty()) {
+            boolean loaded = false;
+            for (int i = sortedReadyChunks.size() - 1; i >= 0 && !loaded; i--) {
+                Chunk chunkInfo = sortedReadyChunks.get(i);
+                PerformanceMonitor.startActivity("Make Chunk Available");
+                if (makeChunkAvailable(chunkInfo)) {
+                    sortedReadyChunks.remove(i);
+                    loaded = true;
                 }
+                PerformanceMonitor.endActivity();
             }
         }
     }
@@ -226,13 +252,13 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
-        Chunk[] chunks = new Chunk[region.size().x * region.size().y * region.size().z];
+      Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
         for (Vector3i chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            if (chunk == null || !chunk.isReady()) {
+            if (chunk == null) {
                 return null;
             }
-            chunkPos.sub(region.min());
+            chunkPos.sub(region.minX(), region.minY(), region.minZ());
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
@@ -246,28 +272,22 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
+        // RemoteChunkProvider not track Entities(players) by region now
     }
 
     @Override
     public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener chunkRegionListener) {
+        // RemoteChunkProvider not track Entities(players) by region now
     }
 
     @Override
     public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
+        // RemoteChunkProvider not track Entities(players) by region now
     }
 
     @Override
     public void removeRelevanceEntity(EntityRef entity) {
-    }
-
-    @Override
-    public void completeUpdate() {
-        Chunk chunk = lightMerger.completeMerge();
-        if (chunk != null) {
-            chunk.markReady();
-            listener.onChunkReady(chunk.getPosition());
-            worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
-        }
+        // RemoteChunkProvider not track Entities(players) by region now
     }
 
     @Override

@@ -16,13 +16,14 @@
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
 import com.google.common.collect.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class DebugMetricsSystemTest {
@@ -128,23 +129,26 @@ public class DebugMetricsSystemTest {
         assertEquals(modes.get(1), system.getCurrentMode());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testRemovingDefaultMetric() {
         DebugMetricsSystem system = getEmptySystem();
         MetricsMode defaultMode = system.getCurrentMode();
-        system.unregister(defaultMode);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> system.unregister(defaultMode));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testRegisterNull() {
         DebugMetricsSystem system = getEmptySystem();
-        system.register(null);
+        Assertions.assertThrows(NullPointerException.class,
+                () -> system.register(null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testUnregisterNull() {
         DebugMetricsSystem system = getEmptySystem();
-        system.unregister(null);
+        Assertions.assertThrows(NullPointerException.class,
+                () -> system.unregister(null));
     }
 
     @Test

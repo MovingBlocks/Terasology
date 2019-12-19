@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.internal.ContextImpl;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 public class PerspectiveCameraTest {
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Config config = new Config(new MockContext());
         config.loadDefaults();
