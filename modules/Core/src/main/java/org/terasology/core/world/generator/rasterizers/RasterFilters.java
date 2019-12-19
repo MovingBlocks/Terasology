@@ -33,6 +33,7 @@ import java.util.Collection;
  * A collection of filters that restrict the placement of objects based on block type.
  * Filters that rely on facets, not specific block data, can be found in {@link org.terasology.core.world.generator.facetProviders.PositionFilters}.
  */
+//TODO: improve worldgen so that this sort of thing is feasible.
 public class RasterFilters {
 
     private static Logger log = LoggerFactory.getLogger(RasterFilters.class);
@@ -70,15 +71,19 @@ public class RasterFilters {
         return input -> {
             assert input != null && whiteList.length > 0;
             Vector3i check = new Vector3i(input.pos.x + location.getX(), input.pos.y + location.getY(), input.pos.z + location.getZ());
-            if (!ChunkConstants.CHUNK_REGION.encompasses(check.x, check.y, check.z)) return false;
-            Block block = input.chunk.getBlock(check);
-            BlockFamily bF = block.getBlockFamily(); //the primary metadata about the block
-            String bU = block.getURI().toString().toLowerCase(); //e.g. "CoreBlocks:Dirt:engine:stairs.LEFT"
-            String bN = block.getURI().getIdentifier().toString().toLowerCase(); //e.g. "Dirt"
-            for (String key : whiteList)
-            {
-                if (key.contains(":") && bU.contains(key.toLowerCase())) return true;
-                if (bN.equalsIgnoreCase(key) || bF.hasCategory(key)) return true;
+            if (ChunkConstants.CHUNK_REGION.encompasses(check.x, check.y, check.z)) {
+                Block block = input.chunk.getBlock(check);
+                BlockFamily bF = block.getBlockFamily(); //the primary metadata about the block
+                String bU = block.getURI().toString().toLowerCase(); //e.g. "CoreBlocks:Dirt:engine:stairs.LEFT"
+                String bN = block.getURI().getIdentifier().toString().toLowerCase(); //e.g. "Dirt"
+                for (String key : whiteList) {
+                    if (key.contains(":") && bU.contains(key.toLowerCase())) return true;
+                    if (bN.equalsIgnoreCase(key) || bF.hasCategory(key)) return true;
+                }
+            } else {
+                if (ChunkConstants.CHUNK_REGION.encompasses(input.pos)) {
+                    return true;
+                }
             }
             return false;
         };
