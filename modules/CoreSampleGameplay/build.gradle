@@ -78,44 +78,15 @@ configurations.all {
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
+    compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
+    compile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
+
+    for (dependency in moduleDepends) {
+        compile(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
+    }
+
     if (project.name != project(':').name) {
         println "\nProcessing module '$project.name' in a multi-project workspace"
-
-        // Dependency on the engine itself (actually its built jar file)
-        compile project(':engine')
-
-        // Engine unit tests contain classes that module unit tests can extend, so need to be compile, not testCompile
-        compile project(':engine-tests')
-
-        if (moduleDepends.size() > 0) {
-            println "* $project.name has extra dependencies:"
-            moduleDepends.each {
-                println "** $it"
-            }
-        } else {
-            println "* No extra dependencies"
-        }
-
-        // If the module has dependencies on other modules we look for either a source version or a remote binary
-        for (dependency in moduleDepends) {
-            File wouldBeSrcPath = new File(rootDir, 'modules/' + dependency)
-            //println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
-
-            // First see if we have an actual source module project in the Gradle project tree (user fetchModule'ed it)
-            if (wouldBeSrcPath.exists()) {
-                //TODO: This could hit problems with corrupt module directories?
-
-                println "*** Identified source: " + dependency
-                // Note: if artifactoryPublish is used in a multi-project workspace including modules the .pom gets hard version refs
-                // Normally they're expected to run in Jenkins standalone where they'll instead match the else and get version '+'
-                compile project(':modules:' + dependency)
-            } else {
-                println "*** Seeking as binary: " + dependency
-                // The '+' is satisfied by any version. "changing" triggers better checking for updated snapshots
-                // TODO: When version handling and promotion is in then we can probably ignore snapshots in normal cases
-                compile(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
-            }
-        }
 
         // This step resolves artifacts early, after which project config CANNOT be altered again!
         configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
@@ -142,20 +113,6 @@ dependencies {
         }
     } else {
         println "We're in a single-project non-Core module workspace (Jenkins) so will look elsewhere for dependencies"
-
-        // TODO: While this is easy it would prevent modules declaring an engine dependency of a specific version
-        // TODO: Look for a provided engine jar in the workspace and use that if present
-        // TODO: Only use engine, engine-tests, and maybe core for compilation, but remove when publishing?
-        compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
-        compile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
-
-        // To get Terasology module dependencies we simply declare them against Artifactory
-        moduleDepends.each {
-            println "*** Attempting to fetch dependency module from Artifactory for " + project.name + ": " + it
-            // The '+' is satisfied by any version
-            compile(group: 'org.terasology.modules', name: it, version: '+', changing: true)
-
-        }
 
         // TODO: parse and apply external lib dependencies if any are present
         // TODO: Consider / keep an eye on whether resolving artifacts early at this point causes any trouble (is only for logging)
@@ -276,7 +233,7 @@ eclipse {
 }
 
 // Utility task to update the module (except Core) via Git - not tested with local changes present, may cause trouble
-task (updateModule, type: GitPull)  {
+task(updateModule, type: GitPull) {
     description = 'Updates source for the module from its home (most likely GitHub)'
 
     // Base whether the task executes on two things

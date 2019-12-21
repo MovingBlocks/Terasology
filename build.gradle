@@ -1,4 +1,3 @@
-
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
     repositories {
@@ -88,39 +87,39 @@ dependencies {
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
 }
 
-task extractWindowsNatives(type:Copy) {
+task extractWindowsNatives(type: Copy) {
     description = "Extracts the Windows natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
     }
-    into ("$dirNatives/windows")
-    exclude ('META-INF/**')
+    into("$dirNatives/windows")
+    exclude('META-INF/**')
 }
 
-task extractMacOSXNatives(type:Copy) {
+task extractMacOSXNatives(type: Copy) {
     description = "Extracts the OSX natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
     }
-    into ("$dirNatives/macosx")
-    exclude ('META-INF/**')
+    into("$dirNatives/macosx")
+    exclude('META-INF/**')
 }
 
-task extractLinuxNatives(type:Copy) {
+task extractLinuxNatives(type: Copy) {
     description = "Extracts the Linux natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
     }
-    into ("$dirNatives/linux")
-    exclude ('META-INF/**')
+    into("$dirNatives/linux")
+    exclude('META-INF/**')
 }
 
-task extractJNLuaNatives(type:Copy) {
+task extractJNLuaNatives(type: Copy) {
     description = "Extracts the JNLua natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('jnlua') ? zipTree(it) : [] }
     }
-    into ("$dirNatives")
+    into("$dirNatives")
 }
 
 task extractNatives {
@@ -137,7 +136,7 @@ task extractNatives {
 // Helper tasks                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-task extractConfig (type: Copy) {
+task extractConfig(type: Copy) {
     description = "Extracts our configuration files from the zip we fetched as a dependency"
     from {
         configurations.codeMetrics.collect {
@@ -149,7 +148,7 @@ task extractConfig (type: Copy) {
 
 // Helper that returns a list of all local Terasology module projects
 def terasologyModules() {
-    subprojects.findAll {it.parent.name == 'modules'}
+    subprojects.findAll { it.parent.name == 'modules' }
 }
 
 // Helper that replaces the build.gradle under every module with a fresh copy from the Core module
@@ -190,12 +189,12 @@ clean.doLast {
     println "Cleaned root - don't forget to re-extract stuff! 'gradlew extractNatives extractConfig' will do so, or 'gradlew idea' (or eclipse)"
 }
 
-task protobufCompileWindows(type:Exec) {
+task protobufCompileWindows(type: Exec) {
     description = "Run 'Protobuf Compiler' (Windows)"
     commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=engine\\src\\main\\protobuf', '--java_out', 'engine\\src\\main\\java', 'engine\\src\\main\\protobuf\\*'
 }
 
-task protobufCompileLinux(type:Exec) {
+task protobufCompileLinux(type: Exec) {
     description = "Run 'Protobuf Compiler' (Linux)"
     commandLine 'protobuf/compiler/protoc', '--proto_path=engine/src/main/protobuf', '--java_out', 'engine/src/main/java', "engine/src/main/protobuf/EntityData.proto", "engine/src/main/protobuf/NetMessage.proto"
 }
@@ -261,7 +260,7 @@ idea {
             }
 
             // Sets sourceCompatibility within IntelliJ (without this root build having the Java plugin applied)
-            whenMerged {project ->
+            whenMerged { project ->
                 project.jdk.languageLevel = 'JDK_1_8'
             }
         }
@@ -277,4 +276,28 @@ idea {
 
 cleanIdea.doLast {
     new File('Terasology.iws').delete()
+}
+
+
+// Magic for replace remote dependency on local project (source)
+// for Engine
+allprojects {
+    configurations.all {
+        resolutionStrategy.dependencySubstitution {
+            substitute module("org.terasology.engine:engine") because "we have sources!" with project(":engine")
+            substitute module("org.terasology.engine:engine-tests") because "we have sources!" with project(":engine-tests")
+        }
+    }
+}
+
+// Magic for replace remote dependency on local project (source)
+// For exists modules
+project(":modules").subprojects.forEach { proj ->
+    project(":modules").subprojects {
+        configurations.all {
+            resolutionStrategy.dependencySubstitution {
+                substitute module("org.terasology.modules:${proj.name}") with project(":modules:${proj.name}")
+            }
+        }
+    }
 }
