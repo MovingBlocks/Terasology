@@ -15,7 +15,9 @@
  */
 package org.terasology.physics.shapes;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.physics.bullet.shapes.BulletCollisionShape;
 
 import java.util.List;
 
@@ -62,4 +64,13 @@ public interface CollisionShapeFactory {
      * @return The created sphere shape.
      */
     SphereShape getNewSphere(float radius);
+
+
+    /**
+     * Returns the colliding body associated with the entity
+     *
+     * @param entityRef
+     * @return
+     */
+    BulletCollisionShape getShapeFor(EntityRef entityRef);
 }

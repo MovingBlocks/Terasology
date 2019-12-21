@@ -16,13 +16,13 @@
 
 package org.terasology.physics.bullet;
 
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btVoxelContentProvider;
+import com.badlogic.gdx.physics.bullet.collision.btVoxelInfo;
+import com.badlogic.gdx.physics.bullet.linearmath.btVector3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.physics.bullet.shapes.BulletCollisionShape;
-import org.terasology.physics.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
-import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
-import org.terasology.math.VecMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
@@ -30,77 +30,39 @@ import org.terasology.world.block.Block;
  * This class links Terasology's voxel world with the physics engine, providing it with the collision information for each block location.
  *
  */
-public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
+public class PhysicsWorldWrapper extends btVoxelContentProvider {
+    private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
 
     private WorldProvider world;
 
     public PhysicsWorldWrapper(WorldProvider world) {
+        super();
         this.world = world;
     }
 
     @Override
-    public VoxelInfo getCollisionShapeAt(int x, int y, int z) {
+    public void getVoxel(int x, int y, int z, btVoxelInfo info) {
         Block block = world.getBlock(x, y, z);
-        return new TeraVoxelInfo(block, block.isTargetable(), !block.isPenetrable(), new Vector3i(x, y, z));
+
+        btVector3 offset = new btVector3(block.getCollisionOffset().x,block.getCollisionOffset().y,block.getCollisionOffset().z);
+        btCollisionShape shape = ((BulletCollisionShape)block.getCollisionShape()).underlyingShape;
+
+        info.setTracable(shape != null && block.isTargetable());
+        info.setBlocking(shape != null && !block.isPenetrable());
+        info.setVoxelTypeId(block.getId());
+        info.setX(x);
+        info.setY(y);
+        info.setZ(z);
+        info.setCollisionShape(shape);
+        info.setCollisionOffset(offset);
+        info.setFriction(0);
+        info.setRestitution(0);
+        info.setRollingFriction(0);
+        info.dispose();
+        offset.dispose();
     }
 
-    public void dispose() {
-        world = null;
-    }
 
-    private static class TeraVoxelInfo implements VoxelInfo {
 
-        private boolean colliding;
-        private boolean blocking;
-        private CollisionShape shape;
-        private Vector3i position;
-        private Vector3f offset;
-        private float friction;
-        private float restitution;
-
-         TeraVoxelInfo(Block block, boolean colliding, boolean blocking, Vector3i position) {
-            this.shape = block.getCollisionShape();
-            this.offset = block.getCollisionOffset();
-            this.colliding = shape != null && colliding;
-            this.blocking = shape != null && blocking;
-            this.position = position;
-            this.friction = block.getFriction();
-            this.restitution = block.getRestitution();
-        }
-
-        @Override
-        public boolean isColliding() {
-            return colliding;
-        }
-
-        @Override
-        public Object getUserData() {
-            return position;
-        }
-
-        @Override
-        public com.bulletphysics.collision.shapes.CollisionShape getCollisionShape() {
-            return ((BulletCollisionShape) shape).underlyingShape;
-        }
-
-        @Override
-        public javax.vecmath.Vector3f getCollisionOffset() {
-            return VecMath.to(offset);
-        }
-
-        @Override
-        public boolean isBlocking() {
-            return blocking;
-        }
-
-        @Override
-        public float getFriction() {
-             return friction;
-        }
-
-        @Override
-        public float getRestitution() {
-            return restitution;
-        }
-    }
 }
+

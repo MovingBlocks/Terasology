@@ -15,15 +15,16 @@
  */
 package org.terasology.physics.bullet.shapes;
 
-import com.bulletphysics.collision.shapes.SphereShape;
+import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
+import org.terasology.physics.shapes.SphereShape;
 
-public class BulletSphereShape extends BulletCollisionShape implements org.terasology.physics.shapes.SphereShape {
-    private final SphereShape sphereShape;
+public class BulletSphereShape extends BulletCollisionShape implements SphereShape {
+    private final btSphereShape sphereShape;
 
     public BulletSphereShape(float radius) {
-        sphereShape = new SphereShape(radius);
+        sphereShape = new btSphereShape(radius);
         underlyingShape = sphereShape;
     }
 

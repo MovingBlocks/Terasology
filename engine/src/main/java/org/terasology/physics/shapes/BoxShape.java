@@ -26,5 +26,6 @@ public interface BoxShape extends CollisionShape {
      *
      * @return The {@link Vector3f} containing the dimensional extents of the box shape.
      */
-    Vector3f getExtents();
+    Vector3f getHalfExtentsWithoutMargin();
+
 }

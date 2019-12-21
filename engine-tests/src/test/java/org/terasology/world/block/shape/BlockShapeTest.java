@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Rotation;
-import org.terasology.math.VecMath;
 import org.terasology.math.Yaw;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.bullet.shapes.BulletConvexHullShape;
@@ -78,10 +77,11 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
 
         BulletConvexHullShape bulletConvexHullShape = (BulletConvexHullShape) shape;
 
-        ObjectArrayList<javax.vecmath.Vector3f> points = ((com.bulletphysics.collision.shapes.ConvexHullShape) bulletConvexHullShape.underlyingShape).getPoints();
-        for (int x = 0; x < points.size(); x++) {
-            fuzzVectorTest(test[x], VecMath.from(points.get(x)));
+            ObjectArrayList<javax.vecmath.Vector3f> points = ((com.bulletphysics.collision.shapes.ConvexHullShape) bulletConvexHullShape.underlyingShape).getPoints();
+            for (int x = 0; x < points.size(); x++) {
+                fuzzVectorTest(test[x], VecMath.from(points.get(x)));
 
+            }
         }
 
     }

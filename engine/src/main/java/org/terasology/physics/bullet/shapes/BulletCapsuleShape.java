@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,20 @@
  */
 package org.terasology.physics.bullet.shapes;
 
-
-import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
-
-import org.terasology.math.AABB;
-import org.terasology.math.Transform;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
+import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
 
-public abstract class BulletCollisionShape implements CollisionShape {
-    public btCollisionShape underlyingShape;
+public class BulletCapsuleShape extends BulletCollisionShape {
 
-    @Override
-    public AABB getAABB(Transform transform) {
+    private final btCapsuleShape capsuleShape;
 
-        Vector3f min = new Vector3f();
-        Vector3f max = new Vector3f();
-        Matrix4f m = new Matrix4f();
-        underlyingShape.getAabb(m,min,max);
-
-        return AABB.createMinMax(min, max).move(transform.origin);
+    public BulletCapsuleShape(float radius, float height) {
+        capsuleShape = new btCapsuleShape(radius,height);
+        underlyingShape = capsuleShape;
     }
-
+    @Override
+    public CollisionShape rotate(Quat4f rot) {
+        return this;
+    }
 }

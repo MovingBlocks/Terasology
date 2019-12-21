@@ -23,6 +23,7 @@ buildscript {
     }
 
     dependencies {
+
         // Artifactory plugin
         classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.10.0')
 
@@ -81,6 +82,7 @@ dependencies {
 
     // Natives for JNLua (Kallisti, KComputers)
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
+    natives group: 'org.terasology', name: 'native-bullet', version: '0.0.6-20191126.060752-1', ext: 'zip'
 }
 
 task extractWindowsNatives(type:Copy) {
@@ -118,12 +120,22 @@ task extractJNLuaNatives(type:Copy) {
     into ("$dirNatives")
 }
 
+task extractNativeBulletNatives(type:Copy) {
+    description = "Extracts the JNLua natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('native-bullet') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives")
+}
+
+
 task extractNatives {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
     dependsOn extractWindowsNatives
     dependsOn extractLinuxNatives
     dependsOn extractMacOSXNatives
     dependsOn extractJNLuaNatives
+    dependsOn extractNativeBulletNatives
 }
 
 // TODO: Test meta modules and other libs - not that there's really much to test other than being able to Git via Gradle
