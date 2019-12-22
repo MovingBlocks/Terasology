@@ -35,7 +35,7 @@ public class EntityMotionState extends btMotionState {
     private static final Logger logger = LoggerFactory.getLogger(EntityMotionState.class);
 
     private EntityRef entity;
-
+    private Quat4f rot = new Quat4f();
     /**
      * Only the BulletPhysics class is expected to create instances.
      *
@@ -57,9 +57,9 @@ public class EntityMotionState extends btMotionState {
     public void setWorldTransform(Matrix4f transform) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            Quat4f rot = new Quat4f();
             rot.set(transform);
-            loc.setWorldRotation(rot);
+            rot.normalize();
+            loc.setLocalRotation(rot);
             loc.setWorldPosition(transform.getTranslation());
         }
     }

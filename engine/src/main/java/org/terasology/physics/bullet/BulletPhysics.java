@@ -253,7 +253,6 @@ public class BulletPhysics implements PhysicsEngine {
         callback.setCollisionFilterGroup(StandardCollisionGroup.ALL.getFlag());
         callback.setCollisionFilterMask(filter);
 
-
         discreteDynamicsWorld.rayTest(from, to, callback);
         if (callback.hasHit()) {
             btCollisionObject collisionObject = callback.getCollisionObject();
