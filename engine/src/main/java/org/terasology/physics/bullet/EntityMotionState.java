@@ -57,10 +57,10 @@ public class EntityMotionState extends btMotionState {
     public void setWorldTransform(Matrix4f transform) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            loc.setWorldPosition(transform.getTranslation());
             Quat4f rot = new Quat4f();
             rot.set(transform);
             loc.setWorldRotation(rot);
+            loc.setWorldPosition(transform.getTranslation());
         }
     }
 

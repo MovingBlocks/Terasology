@@ -55,9 +55,9 @@ public class PhysicsWorldWrapper extends btVoxelContentProvider {
         info.setZ(z);
         info.setCollisionShape(shape);
         info.setCollisionOffset(offset);
-        info.setFriction(0);
-        info.setRestitution(0);
-        info.setRollingFriction(0);
+        info.setFriction(block.getFriction());
+        info.setRestitution(block.getRestitution());
+        info.setRollingFriction(block.getFriction());
         info.dispose();
         offset.dispose();
     }

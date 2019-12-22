@@ -55,7 +55,6 @@ public class PhysicsLiquidWrapper extends btVoxelContentProvider {
         info.setFriction(0);
         info.setRestitution(0);
         info.setRollingFriction(0);
-        offset.dispose();
     }
 
 
