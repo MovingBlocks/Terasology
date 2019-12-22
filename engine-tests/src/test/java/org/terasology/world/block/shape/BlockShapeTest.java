@@ -15,7 +15,6 @@
  */
 package org.terasology.world.block.shape;
 
-import com.bulletphysics.util.ObjectArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
@@ -52,38 +51,35 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testConvexHull() {
-        BlockShape blockShape =  assetManager.getAsset("engine:halfSlope", BlockShape.class).get();
+        BlockShape blockShape = assetManager.getAsset("engine:halfSlope", BlockShape.class).get();
         CollisionShape shape = blockShape.getCollisionShape(Rotation.rotate(Yaw.CLOCKWISE_90));
 
         assertTrue(shape instanceof ConvexHullShape);
         Vector3f[] test = new Vector3f[]{new Vector3f(0.49999997f, 0.0f, 0.49999997f),
-                new Vector3f(-0.49999997f, -0.49999997f, 0.49999997f),
-                new Vector3f(0.49999997f, -0.49999997f, 0.49999997f),
-                new Vector3f(0.49999997f, 0.0f, -0.49999997f),
-                new Vector3f(0.49999997f, -0.49999997f, -0.49999997f),
-                new Vector3f(-0.49999997f, -0.49999997f, -0.49999997f),
-                new Vector3f(0.49999997f, -0.49999997f, 0.49999997f),
-                new Vector3f(0.49999997f, -0.49999997f, -0.49999997f),
-                new Vector3f(0.49999997f, 0.0f, -0.49999997f),
-                new Vector3f(0.49999997f, 0.0f, 0.49999997f),
-                new Vector3f(0.49999997f, -0.49999997f, 0.49999997f),
-                new Vector3f(-0.49999997f, -0.49999997f, 0.49999997f),
-                new Vector3f(-0.49999997f, -0.49999997f, -0.49999997f),
-                new Vector3f(0.49999997f, -0.49999997f, -0.49999997f),
-                new Vector3f(0.49999997f, 0.0f, -0.49999997f),
-                new Vector3f(-0.49999997f, -0.49999997f, -0.49999997f),
-                new Vector3f(-0.49999997f, -0.49999997f, 0.49999997f),
-                new Vector3f(0.49999997f, 0.0f, 0.49999997f)};
+            new Vector3f(-0.49999997f, -0.49999997f, 0.49999997f),
+            new Vector3f(0.49999997f, -0.49999997f, 0.49999997f),
+            new Vector3f(0.49999997f, 0.0f, -0.49999997f),
+            new Vector3f(0.49999997f, -0.49999997f, -0.49999997f),
+            new Vector3f(-0.49999997f, -0.49999997f, -0.49999997f),
+            new Vector3f(0.49999997f, -0.49999997f, 0.49999997f),
+            new Vector3f(0.49999997f, -0.49999997f, -0.49999997f),
+            new Vector3f(0.49999997f, 0.0f, -0.49999997f),
+            new Vector3f(0.49999997f, 0.0f, 0.49999997f),
+            new Vector3f(0.49999997f, -0.49999997f, 0.49999997f),
+            new Vector3f(-0.49999997f, -0.49999997f, 0.49999997f),
+            new Vector3f(-0.49999997f, -0.49999997f, -0.49999997f),
+            new Vector3f(0.49999997f, -0.49999997f, -0.49999997f),
+            new Vector3f(0.49999997f, 0.0f, -0.49999997f),
+            new Vector3f(-0.49999997f, -0.49999997f, -0.49999997f),
+            new Vector3f(-0.49999997f, -0.49999997f, 0.49999997f),
+            new Vector3f(0.49999997f, 0.0f, 0.49999997f)};
 
         BulletConvexHullShape bulletConvexHullShape = (BulletConvexHullShape) shape;
 
-            ObjectArrayList<javax.vecmath.Vector3f> points = ((com.bulletphysics.collision.shapes.ConvexHullShape) bulletConvexHullShape.underlyingShape).getPoints();
-            for (int x = 0; x < points.size(); x++) {
-                fuzzVectorTest(test[x], VecMath.from(points.get(x)));
-
-            }
+        Vector3f[] points = ((ConvexHullShape) bulletConvexHullShape.underlyingShape).getVertices();
+        for (int x = 0; x < points.length; x++) {
+            fuzzVectorTest(test[x], points[x]);
         }
-
     }
 
     private void fuzzVectorTest(Vector3f test, Vector3f actual) {
