@@ -21,7 +21,6 @@ import org.joml.Vector2fc;
 /**
  * @author Immortius
  */
-@Deprecated
 public final class Rect2f extends BaseRect {
     public static final Rect2f EMPTY = new Rect2f();
 

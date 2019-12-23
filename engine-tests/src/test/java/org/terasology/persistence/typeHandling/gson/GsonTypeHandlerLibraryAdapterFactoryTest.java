@@ -20,8 +20,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.math.Rect2f;
+import org.joml.Vector4f;
+import org.terasology.math.Rect2i;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.rendering.nui.Color;
 
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static final TestClass OBJECT = new TestClass(
             new Color(0xDEADBEEF),
-            ImmutableSet.of(Vector4f.zero(), Vector4f.one()),
+            ImmutableSet.of(new Vector4f(),new Vector4f(1,1,1,1)),
             ImmutableMap.of(
                     "someRect",
                     Rect2i.createFromMinAndSize(-3, -3, 10, 10)

@@ -16,12 +16,12 @@
 
 package org.terasology.network.internal;
 
+import org.joml.Vector3i;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.registry.CoreRegistry;

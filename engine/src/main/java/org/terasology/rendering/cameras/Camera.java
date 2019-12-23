@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
 
@@ -205,17 +205,21 @@ public abstract class Camera {
      * Get the orientation of the camera.
      * @return the orientation direction, a quaternion.
      */
-    public Quat4f getOrientation() {
-        return new Quat4f(JomlUtil.from(viewingDirection), viewingAngle);
+    public Quaternionf getOrientation() {
+        return new Quaternionf(new AxisAngle4f(viewingAngle,viewingDirection));
+//        return new Quat4f(JomlUtil.from(viewingDirection), viewingAngle);
     }
 
     /**
      Try to set the viewing direction.
      * @param direction
      */
-    public void setOrientation(Quat4f direction) {
-        viewingDirection = new Vector3f(direction.x,direction.y,direction.z);
-        viewingAngle = direction.getAngle();
+    public void setOrientation(Quaternionf direction) {
+        AxisAngle4f axisAngle = new AxisAngle4f().set(direction);
+        viewingAngle = axisAngle.angle;
+        viewingDirection = new Vector3f(axisAngle.x,axisAngle.y,axisAngle.z);
+//        viewingDirection = new Vector3f(direction.x,direction.y,direction.z);
+//        viewingAngle = direction.getAngle();
     }
 
     public ViewFrustum getViewFrustum() {

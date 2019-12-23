@@ -15,8 +15,8 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
+import org.terasology.math.Rect2i;
 import org.terasology.utilities.procedural.BrownianNoise;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise;

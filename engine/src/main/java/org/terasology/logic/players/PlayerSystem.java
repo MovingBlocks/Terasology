@@ -17,6 +17,9 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Lists;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -36,9 +39,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -127,7 +127,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         PlayerStore playerStore = connected.getPlayerStore();
 
         Client owner = networkSystem.getOwner(entity);
-        Vector3i minViewDist = ViewDistance.LEGALLY_BLIND.getChunkDistance();
+        Vector3ic minViewDist = ViewDistance.LEGALLY_BLIND.getChunkDistance();
 
         if (playerStore.hasCharacter()) {
 
@@ -139,7 +139,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 // chunk for spawning location is ready, so spawn right now
                 playerStore.restoreEntities();
                 EntityRef character = playerStore.getCharacter();
-                Vector3i viewDist = owner.getViewDistance().getChunkDistance();
+                Vector3ic viewDist = owner.getViewDistance().getChunkDistance();
                 addRelevanceEntity(entity, viewDist, owner);
                 restoreCharacter(entity, character);
             } else {
@@ -178,14 +178,14 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             if (!character.hasComponent(AliveCharacterComponent.class)) {
                 character.addComponent(new AliveCharacterComponent());
             }
-            Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
+            Location.attachChild(character, entity, new Vector3f(), new Quaternionf().identity());
         } else {
             character.destroy();
             spawnPlayer(entity);
         }
     }
 
-    private void updateRelevanceEntity(EntityRef entity, Vector3i chunkDistance) {
+    private void updateRelevanceEntity(EntityRef entity, Vector3ic chunkDistance) {
         //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
         //relevanceRegion.distance = chunkDistance;
         //entity.saveComponent(relevanceRegion);
@@ -198,7 +198,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     }
 
 
-    private void addRelevanceEntity(EntityRef entity, Vector3i chunkDistance, Client owner) {
+    private void addRelevanceEntity(EntityRef entity, Vector3ic chunkDistance, Client owner) {
         //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
         //relevanceRegion.distance = chunkDistance;
         //entity.addComponent(relevanceRegion);
@@ -224,7 +224,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
         LocationComponent loc = character.getComponent(LocationComponent.class);
         loc.setWorldPosition(spawnPosition);
-        loc.setLocalRotation(new Quat4f());  // reset rotation
+        loc.setLocalRotation(new Quaternionf());  // reset rotation
         character.saveComponent(loc);
     }
 
@@ -255,7 +255,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         logger.debug("Re-spawing player at: {}", spawnPosition);
 
         Client clientListener = networkSystem.getOwner(clientEntity);
-        Vector3i distance = clientListener.getViewDistance().getChunkDistance();
+        Vector3ic distance = clientListener.getViewDistance().getChunkDistance();
         updateRelevanceEntity(clientEntity, distance);
         playerCharacter.send(new OnPlayerRespawnedEvent());
     }
@@ -268,7 +268,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         EntityRef playerCharacter = playerFactory.newInstance(clientEntity);
 
         Client clientListener = networkSystem.getOwner(clientEntity);
-        Vector3i distance = clientListener.getViewDistance().getChunkDistance();
+        Vector3ic distance = clientListener.getViewDistance().getChunkDistance();
         updateRelevanceEntity(clientEntity, distance);
         client.character = playerCharacter;
         clientEntity.saveComponent(client);

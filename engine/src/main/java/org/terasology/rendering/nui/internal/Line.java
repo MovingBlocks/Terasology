@@ -18,8 +18,9 @@ package org.terasology.rendering.nui.internal;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2f;
+import org.joml.Vector2i;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.Color;
 
 import java.nio.FloatBuffer;

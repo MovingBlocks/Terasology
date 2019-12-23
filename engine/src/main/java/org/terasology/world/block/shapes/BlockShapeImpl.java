@@ -24,7 +24,7 @@ import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.Yaw;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.BlockPart;
 
@@ -102,7 +102,7 @@ public class BlockShapeImpl extends BlockShape {
         if (simplifiedRot.equals(Rotation.none())) {
             return new Vector3f(baseCollisionOffset);
         }
-        return simplifiedRot.getQuat4f().rotate(baseCollisionOffset, new Vector3f());
+        return baseCollisionOffset.rotate(simplifiedRot.getQuat4f(),new Vector3f());//.rotate(baseCollisionOffset, new Vector3f());
     }
 
     @Override

@@ -16,14 +16,15 @@
 
 package org.terasology.world.chunks.pipeline;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 /**
  */
 public abstract class AbstractChunkTask implements ChunkTask {
     private final Vector3i position;
 
-    public AbstractChunkTask(Vector3i position) {
+    public AbstractChunkTask(Vector3ic position) {
         this.position = new Vector3i(position);
     }
 

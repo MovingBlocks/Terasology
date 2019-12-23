@@ -18,7 +18,7 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;

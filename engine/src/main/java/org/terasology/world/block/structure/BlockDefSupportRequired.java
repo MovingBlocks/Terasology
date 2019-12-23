@@ -16,7 +16,7 @@
 package org.terasology.world.block.structure;
 
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;

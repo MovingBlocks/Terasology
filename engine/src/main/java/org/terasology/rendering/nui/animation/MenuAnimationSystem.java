@@ -16,7 +16,8 @@
 
 package org.terasology.rendering.nui.animation;
 
-import org.terasology.math.geom.Rect2i;
+
+import org.terasology.math.Rect2i;
 
 /**
  * Controls animations to and from different screens

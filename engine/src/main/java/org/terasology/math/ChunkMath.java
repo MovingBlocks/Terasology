@@ -18,8 +18,11 @@ package org.terasology.math;
 
 import java.math.RoundingMode;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import com.google.common.math.DoubleMath;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.chunks.ChunkConstants;
 
 /**
@@ -62,21 +65,24 @@ public final class ChunkMath {
     }
 
     public static int calcChunkPosX(int x) {
-        return calcChunkPosX(x, ChunkConstants.CHUNK_POWER.x);
+        return calcChunkPosX(x, ChunkConstants.CHUNK_POWER.x());
     }
     public static int calcChunkPosY(int y) {
-        return calcChunkPosY(y, ChunkConstants.CHUNK_POWER.y);
+        return calcChunkPosY(y, ChunkConstants.CHUNK_POWER.y());
     }
     public static int calcChunkPosZ(int z) {
-        return calcChunkPosZ(z, ChunkConstants.CHUNK_POWER.z);
+        return calcChunkPosZ(z, ChunkConstants.CHUNK_POWER.z());
     }
 
-    public static Vector3i calcChunkPos(Vector3i pos, Vector3i chunkPower) {
+    public static Vector3i calcChunkPos(Vector3i pos, Vector3ic chunkPower) {
         return calcChunkPos(pos.x, pos.y, pos.z, chunkPower);
     }
 
-    public static Vector3i calcChunkPos(Vector3f pos) {
-        return calcChunkPos(new Vector3i(pos, RoundingMode.HALF_UP));
+    public static Vector3i calcChunkPos(Vector3fc pos) {
+        return calcChunkPos(new Vector3i(
+            DoubleMath.roundToInt(pos.x(), RoundingMode.HALF_UP),
+            DoubleMath.roundToInt(pos.y(), RoundingMode.HALF_UP),
+            DoubleMath.roundToInt(pos.z(), RoundingMode.HALF_UP)));
     }
 
     public static Vector3i calcChunkPos(Vector3i pos) {
@@ -91,18 +97,18 @@ public final class ChunkMath {
         return calcChunkPos(region, ChunkConstants.CHUNK_POWER);
     }
 
-    public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
-        return new Vector3i(calcChunkPosX(x, chunkPower.x), calcChunkPosY(y, chunkPower.y), calcChunkPosZ(z, chunkPower.z));
+    public static Vector3i calcChunkPos(int x, int y, int z, Vector3ic chunkPower) {
+        return new Vector3i(calcChunkPosX(x, chunkPower.x()), calcChunkPosY(y, chunkPower.y()), calcChunkPosZ(z, chunkPower.z()));
     }
 
-    public static Vector3i[] calcChunkPos(Region3i region, Vector3i chunkPower) {
-        int minX = calcChunkPosX(region.minX(), chunkPower.x);
-        int minY = calcChunkPosY(region.minY(), chunkPower.y);
-        int minZ = calcChunkPosZ(region.minZ(), chunkPower.z);
+    public static Vector3i[] calcChunkPos(Region3i region, Vector3ic chunkPower) {
+        int minX = calcChunkPosX(region.minX(), chunkPower.x());
+        int minY = calcChunkPosY(region.minY(), chunkPower.y());
+        int minZ = calcChunkPosZ(region.minZ(), chunkPower.z());
 
-        int maxX = calcChunkPosX(region.maxX(), chunkPower.x);
-        int maxY = calcChunkPosY(region.maxY(), chunkPower.y);
-        int maxZ = calcChunkPosZ(region.maxZ(), chunkPower.z);
+        int maxX = calcChunkPosX(region.maxX(), chunkPower.x());
+        int maxY = calcChunkPosY(region.maxY(), chunkPower.y());
+        int maxZ = calcChunkPosZ(region.maxZ(), chunkPower.z());
 
         int size = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
 
@@ -143,15 +149,15 @@ public final class ChunkMath {
     }
 
     public static int calcBlockPosX(int blockX) {
-        return calcBlockPosX(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x);
+        return calcBlockPosX(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x());
     }
 
     public static int calcBlockPosY(int blockY) {
-        return calcBlockPosY(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y);
+        return calcBlockPosY(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y());
     }
 
     public static int calcBlockPosZ(int blockZ) {
-        return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z);
+        return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z());
     }
 
     public static Vector3i calcBlockPos(Vector3i worldPos) {
@@ -162,8 +168,8 @@ public final class ChunkMath {
         return calcBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
 
-    public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
-        return new Vector3i(calcBlockPosX(x, chunkFilterSize.x), calcBlockPosY(y, chunkFilterSize.y), calcBlockPosZ(z, chunkFilterSize.z));
+    public static Vector3i calcBlockPos(int x, int y, int z, Vector3ic chunkFilterSize) {
+        return new Vector3i(calcBlockPosX(x, chunkFilterSize.x()), calcBlockPosY(y, chunkFilterSize.y()), calcBlockPosZ(z, chunkFilterSize.z()));
     }
 
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
@@ -181,7 +187,7 @@ public final class ChunkMath {
     // TODO: This doesn't belong in this class, move it.
     public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
         Side surfaceDir = Side.inDirection(normal);
-        Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
+        Vector3f attachDir = new Vector3f(surfaceDir.reverse().getVector3i());
         Vector3f rawDirection = new Vector3f(direction);
         float dot = rawDirection.dot(attachDir);
         rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
@@ -196,27 +202,27 @@ public final class ChunkMath {
      * @return
      */
     public static Region3i getEdgeRegion(Region3i region, Side side) {
-        Vector3i sideDir = side.getVector3i();
+        Vector3ic sideDir = side.getVector3i();
         Vector3i min = region.min();
         Vector3i max = region.max();
         Vector3i edgeMin = new Vector3i(min);
         Vector3i edgeMax = new Vector3i(max);
-        if (sideDir.x < 0) {
+        if (sideDir.x() < 0) {
             edgeMin.x = min.x;
             edgeMax.x = min.x;
-        } else if (sideDir.x > 0) {
+        } else if (sideDir.x() > 0) {
             edgeMin.x = max.x;
             edgeMax.x = max.x;
-        } else if (sideDir.y < 0) {
+        } else if (sideDir.y() < 0) {
             edgeMin.y = min.y;
             edgeMax.y = min.y;
-        } else if (sideDir.y > 0) {
+        } else if (sideDir.y() > 0) {
             edgeMin.y = max.y;
             edgeMax.y = max.y;
-        } else if (sideDir.z < 0) {
+        } else if (sideDir.z() < 0) {
             edgeMin.z = min.z;
             edgeMax.z = min.z;
-        } else if (sideDir.z > 0) {
+        } else if (sideDir.z() > 0) {
             edgeMin.z = max.z;
             edgeMax.z = max.z;
         }

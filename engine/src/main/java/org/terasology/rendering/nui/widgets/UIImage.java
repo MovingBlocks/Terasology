@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
@@ -84,7 +84,7 @@ public class UIImage extends CoreWidget {
         if (image.get() != null) {
             return image.get().size();
         }
-        return Vector2i.zero();
+        return new Vector2i(0,0);
     }
 
     /**

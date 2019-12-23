@@ -15,8 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2f;
+import org.joml.Vector2i;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;

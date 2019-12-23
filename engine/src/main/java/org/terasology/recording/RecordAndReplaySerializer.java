@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.reflection.TypeRegistry;
 
 import java.io.FileWriter;
@@ -172,7 +172,7 @@ public final class RecordAndReplaySerializer {
             logger.error("Error while serializing AttackEvent extras:", e);
         }
     }
-    
+
     private void deserializeAttackEventExtraRecorder(Gson gson, String recordingPath) {
         try (FileReader fileReader = new FileReader(recordingPath + DIRECTION_ORIGIN_LIST)) {
             JsonParser parser = new JsonParser();

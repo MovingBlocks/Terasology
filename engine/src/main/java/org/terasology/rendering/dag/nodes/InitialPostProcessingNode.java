@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.JomlUtil;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.SubmersibleCamera;
@@ -134,7 +134,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
         // Shader Parameters
 
-        initialPostMaterial.setFloat3("inLiquidTint", worldProvider.getBlock(JomlUtil.from(activeCamera.getPosition())).getTint(), true);
+        initialPostMaterial.setFloat3("inLiquidTint", worldProvider.getBlock(new Vector3f(activeCamera.getPosition())).getTint(), true);
 
         if (bloomIsEnabled) {
             initialPostMaterial.setFloat("bloomFactor", bloomFactor, true);

@@ -18,6 +18,8 @@ package org.terasology.rendering.logic;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
@@ -35,13 +37,8 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.BaseQuat4f;
-import org.terasology.math.geom.BaseVector3f;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
@@ -198,9 +195,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             LocationComponent boneLoc = boneEntity.getComponent(LocationComponent.class);
             if (boneLoc != null) {
 
-                Vector3f newPos = BaseVector3f.lerp(frameA.getPosition(i), frameB.getPosition(i), interpolationVal);
+                Vector3f newPos =new Vector3f(frameA.getPosition(i)).lerp(frameB.getPosition(i), interpolationVal);
+                //BaseVector3f.lerp(frameA.getPosition(i), frameB.getPosition(i), interpolationVal);
                 boneLoc.setLocalPosition(newPos);
-                Quat4f newRot = BaseQuat4f.interpolate(frameA.getRotation(i), frameB.getRotation(i), interpolationVal);
+                Quaternionf newRot = new Quaternionf(frameA.getRotation(i)).nlerp(frameB.getRotation(i),interpolationVal);//BaseQuat4f.interpolate(frameA.getRotation(i), frameB.getRotation(i), interpolationVal);
                 newRot.normalize();
                 boneLoc.setLocalRotation(newRot);
                 boneEntity.saveComponent(boneLoc);
@@ -210,11 +208,11 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
     @Override
     public void renderOpaque() {
-        Vector3f cameraPosition = JomlUtil.from(worldRenderer.getActiveCamera().getPosition());
+        Vector3f cameraPosition = new Vector3f(worldRenderer.getActiveCamera().getPosition());
 
-        Quat4f worldRot = new Quat4f();
+        Quaternionf worldRot = new Quaternionf();
         Vector3f worldPos = new Vector3f();
-        Quat4f inverseWorldRot = new Quat4f();
+        Quaternionf inverseWorldRot = new Quaternionf();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
@@ -234,7 +232,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             }
             LocationComponent location = entity.getComponent(LocationComponent.class);
             location.getWorldRotation(worldRot);
-            inverseWorldRot.inverse(worldRot);
+            inverseWorldRot.conjugate(worldRot);
             location.getWorldPosition(worldPos);
             float worldScale = location.getWorldScale();
 
@@ -257,9 +255,12 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
             worldPos.y -= skeletalMesh.heightOffset;
 
-            Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
+//            Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
+            Matrix4f matrixCameraSpace = new Matrix4f().rotate(worldRot)
+                .translate(worldPositionCameraSpace)
+                .scale(worldScale);
 
-            Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
+            Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
             MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
             skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
@@ -271,7 +272,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(worldPos), true);
 
             List<Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
-            List<Quat4f> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
+            List<Quaternionf> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
             for (Bone bone : skeletalMesh.mesh.getBones()) {
                 EntityRef boneEntity = skeletalMesh.boneEntities.get(bone.getName());
                 if (boneEntity == null) {
@@ -281,15 +282,15 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 if (boneLocation != null) {
                     Vector3f pos = boneLocation.getWorldPosition();
                     pos.sub(worldPos);
-                    inverseWorldRot.rotate(pos, pos);
+                    pos.rotate(inverseWorldRot);
                     bonePositions.add(pos);
-                    Quat4f rot = new Quat4f(inverseWorldRot);
+                    Quaternionf rot = new Quaternionf(inverseWorldRot);
                     rot.mul(boneLocation.getWorldRotation());
                     boneRotations.add(rot);
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());
                     bonePositions.add(new Vector3f());
-                    boneRotations.add(new Quat4f());
+                    boneRotations.add(new Quaternionf());
                 }
             }
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
@@ -305,7 +306,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     public void renderOverlay() {
         if (config.getRendering().getDebug().isRenderSkeletons()) {
             glDisable(GL_DEPTH_TEST);
-            Vector3f cameraPosition = JomlUtil.from(worldRenderer.getActiveCamera().getPosition());
+            Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
             Material material = Assets.getMaterial("engine:white").get();
             material.setFloat("sunlight", 1.0f, true);
             material.setFloat("blockLight", 1.0f, true);
@@ -325,9 +326,12 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 worldPositionCameraSpace.sub(worldPos, cameraPosition);
 
                 float worldScale = location.getWorldScale();
-                Matrix4f matrixCameraSpace = new Matrix4f(new Quat4f(0, 0, 0, 1), worldPositionCameraSpace, worldScale);
+                Matrix4f matrixCameraSpace = new Matrix4f()
+                    .rotate(new Quaternionf(0, 0, 0, 1))
+                    .translate(worldPositionCameraSpace)
+                    .scale(worldScale);
 
-                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
+                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
                 MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
                 material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
@@ -353,10 +357,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         }
         glPushMatrix();
         Vector3f worldPosA = loc.getWorldPosition();
-        Quat4f worldRot = loc.getWorldRotation();
-        Vector3f offset = new Vector3f(0, 0, 0.1f);
-        worldRot.rotate(offset, offset);
-        offset.add(worldPosA);
+        Quaternionf worldRot = loc.getWorldRotation();
+        Vector3f offset = new Vector3f(0, 0, 0.1f)
+            .rotate(worldRot)
+            .add(worldPosA);
 
         glBegin(GL11.GL_LINES);
         glVertex3f(worldPosA.x, worldPosA.y, worldPosA.z);

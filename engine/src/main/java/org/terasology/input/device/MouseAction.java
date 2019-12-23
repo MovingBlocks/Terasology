@@ -17,7 +17,7 @@ package org.terasology.input.device;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 
 /**
  */

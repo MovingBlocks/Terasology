@@ -16,6 +16,7 @@
 package org.terasology.audio.openAL;
 
 import com.google.common.collect.Maps;
+import org.joml.Quaternionf;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
@@ -40,8 +41,7 @@ import org.terasology.audio.openAL.streamingSound.OpenALStreamingSound;
 import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.config.AudioConfig;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -244,14 +244,14 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity) {
+    public void updateListener(Vector3f position, Quaternionf orientation, Vector3f velocity) {
 
         AL10.alListener3f(AL10.AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
         OpenALException.checkState("Setting listener velocity");
 
-        Vector3f dir = orientation.rotate(Direction.FORWARD.getVector3f(), new Vector3f());
-        Vector3f up = orientation.rotate(Direction.UP.getVector3f(), new Vector3f());
+        Vector3f dir =  Direction.FORWARD.getVector3f().rotate(orientation);//orientation.rotate(Direction.FORWARD.getVector3f(), new Vector3f());
+        Vector3f up = Direction.UP.getVector3f().rotate(orientation);//orientation.rotate(Direction.UP.getVector3f(), new Vector3f());
 
         FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6).put(new float[]{dir.x, dir.y, dir.z, up.x, up.y, up.z});
         listenerOri.flip();

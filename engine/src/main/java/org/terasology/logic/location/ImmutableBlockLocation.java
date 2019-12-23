@@ -15,8 +15,9 @@
  */
 package org.terasology.logic.location;
 
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 
 public class ImmutableBlockLocation {
     public final int x;
@@ -34,8 +35,8 @@ public class ImmutableBlockLocation {
     }
 
     public ImmutableBlockLocation move(Side side) {
-        final Vector3i directionVector = side.getVector3i();
-        return new ImmutableBlockLocation(x + directionVector.x, y + directionVector.y, z + directionVector.z);
+        final Vector3ic directionVector = side.getVector3i();
+        return new ImmutableBlockLocation(x + directionVector.x(), y + directionVector.y(), z + directionVector.z());
     }
 
     public Vector3i toVector3i() {

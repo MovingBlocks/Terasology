@@ -15,7 +15,7 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;

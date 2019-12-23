@@ -16,23 +16,23 @@
 
 package org.terasology.physics.events;
 
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.BaseVector3f;
 
 public class MovedEvent implements Event {
-    private BaseVector3f delta;
-    private BaseVector3f finalPosition;
+    private Vector3fc delta;
+    private Vector3fc finalPosition;
 
-    public MovedEvent(BaseVector3f delta, BaseVector3f finalPosition) {
+    public MovedEvent(Vector3fc delta, Vector3fc finalPosition) {
         this.delta = delta;
         this.finalPosition = finalPosition;
     }
 
-    public BaseVector3f getDelta() {
+    public Vector3fc getDelta() {
         return delta;
     }
 
-    public BaseVector3f getPosition() {
+    public Vector3fc getPosition() {
         return finalPosition;
     }
 }

@@ -15,8 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2f;
+import org.joml.Vector2i;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -60,7 +61,7 @@ public class UIScrollingText extends CoreWidget {
      */
     @LayoutConfig
     private int lineSpacing = 3;
-    
+
     /**
      * Maps text to their Y coordinates
      */

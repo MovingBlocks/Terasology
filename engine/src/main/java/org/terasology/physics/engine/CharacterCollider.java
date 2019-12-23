@@ -16,7 +16,7 @@
 
 package org.terasology.physics.engine;
 
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 /**
  * A character collider is a non-blocking collider for use calculating character movement.

@@ -24,6 +24,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -35,7 +36,7 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.persistence.ChunkStore;
@@ -89,7 +90,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
-    private static final Vector3i UNLOAD_LEEWAY = Vector3i.one();
+    private static final Vector3i UNLOAD_LEEWAY = new Vector3i(1,1,1);
 
     private StorageManager storageManager;
     private final EntityManager entityManager;
@@ -158,7 +159,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
         Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, Vector3i.one());
+            return createWorldView(region, new Vector3i(1,1,1));
         }
         return null;
     }
@@ -203,7 +204,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener) {
+    public void addRelevanceEntity(EntityRef entity, Vector3ic distance, ChunkRegionListener listener) {
         if (!entity.exists()) {
             return;
         }
@@ -238,7 +239,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
-    public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
+    public void updateRelevanceEntity(EntityRef entity, Vector3ic distance) {
         regionLock.readLock().lock();
         try {
             ChunkRelevanceRegion region = regions.get(entity);
@@ -716,7 +717,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-            return pos.gridDistance(regionCenter);
+            return (int) pos.gridDistance(regionCenter);
         }
     }
 
@@ -745,7 +746,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-            return pos.gridDistance(regionCenter);
+            return (int) pos.gridDistance(regionCenter);
         }
     }
 

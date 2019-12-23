@@ -19,6 +19,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import org.joml.Quaternionf;
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -31,12 +35,8 @@ import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.math.Border;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -292,7 +292,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     }
 
     @Override
-    public SubRegion subRegionFBO(ResourceUrn uri, BaseVector2i size) {
+    public SubRegion subRegionFBO(ResourceUrn uri, Vector2ic size) {
         return new SubRegionFBOImpl(uri, size);
     }
 
@@ -361,7 +361,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         String family = (widget.getFamily() != null) ? widget.getFamily() : state.family;
         UISkin skin = (widget.getSkin() != null) ? widget.getSkin() : state.skin;
         UIStyle elementStyle = skin.getStyleFor(family, widget.getClass(), UIWidget.BASE_PART, widget.getMode());
-        Rect2i region = applyStyleToSize(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeRestrictions), elementStyle);
+        Rect2i region = applyStyleToSize(Rect2i.createFromMinAndSize(new Vector2i(), sizeRestrictions), elementStyle);
         try (SubRegion ignored = subRegionForWidget(widget, region, false)) {
             Vector2i preferredSize = widget.getPreferredContentSize(this, elementStyle.getMargin().shrink(sizeRestrictions));
             preferredSize = elementStyle.getMargin().grow(preferredSize);
@@ -407,7 +407,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         try (SubRegion ignored = subRegionForWidget(element, regionArea, false)) {
             if (element.isSkinAppliedByCanvas()) {
                 drawBackground();
-                try (SubRegion withMargin = subRegionForWidget(element, newStyle.getMargin().shrink(Rect2i.createFromMinAndSize(Vector2i.zero(), regionArea.size())), false)) {
+                try (SubRegion withMargin = subRegionForWidget(element, newStyle.getMargin().shrink(Rect2i.createFromMinAndSize(new Vector2i(), regionArea.size())), false)) {
                     drawStyledWidget(element);
                 }
             } else {
@@ -671,7 +671,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
+    public void drawMesh(Mesh mesh, Material material, Rect2i region, Quaternionf rotation, Vector3f offset, float scale) {
         if (material == null) {
             logger.warn("Attempted to draw with nonexistent material");
             return;
@@ -690,7 +690,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
+    public void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quaternionf rotation, Vector3f offset, float scale) {
         meshMat.setTexture("texture", texture);
         drawMesh(mesh, meshMat, region, rotation, offset, scale);
     }
@@ -863,7 +863,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         private FrameBufferObject fbo;
         private CanvasState previousState;
 
-        private SubRegionFBOImpl(ResourceUrn uri, BaseVector2i size) {
+        private SubRegionFBOImpl(ResourceUrn uri, Vector2ic size) {
             previousState = state;
 
             fbo = renderer.getFBO(uri, size);

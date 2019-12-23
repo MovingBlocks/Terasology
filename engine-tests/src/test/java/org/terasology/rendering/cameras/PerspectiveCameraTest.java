@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.config.Config;
@@ -22,8 +24,6 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldProvider;
 
@@ -51,7 +51,7 @@ public class PerspectiveCameraTest {
 
 
         PerspectiveCamera camera = new PerspectiveCamera(provider, config, device);
-        camera.setOrientation(new Quat4f(45, .001f, .001f));
+        camera.setOrientation(new Quaternionf(45, .001f, .001f));
         camera.updateMatrices();
 
         Matrix4f viewMatrix = new Matrix4f(5.0273395f, 0.0f, 0.0f, 0.0f

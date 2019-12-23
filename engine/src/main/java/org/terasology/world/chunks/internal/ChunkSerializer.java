@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.protobuf.ByteString;
 import gnu.trove.list.TByteList;
 import gnu.trove.list.array.TByteArrayList;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -147,7 +147,7 @@ public final class ChunkSerializer {
         }
         return new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z, decodedData);
     }
-    
+
     /**
      * Decode compressed data into an existing TeraArray.
      * Generic w.r.t. TeraArray subclasses, allowing the data to be used for any type of TeraArray.

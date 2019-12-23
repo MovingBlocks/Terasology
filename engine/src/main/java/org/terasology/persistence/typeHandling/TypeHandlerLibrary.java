@@ -18,18 +18,18 @@ package org.terasology.persistence.typeHandling;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector4f;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.IntegerRange;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteArrayTypeHandler;
@@ -181,7 +181,7 @@ public class TypeHandlerLibrary {
 
     private static void populateWithDefaultHandlers(TypeHandlerLibrary serializationLibrary) {
         serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
-        serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+        serializationLibrary.addTypeHandler(Quaternionf.class, new Quat4fTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new AssetTypeHandlerFactory());
 

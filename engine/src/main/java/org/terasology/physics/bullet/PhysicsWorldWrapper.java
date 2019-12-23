@@ -16,13 +16,13 @@
 
 package org.terasology.physics.bullet;
 
+import org.terasology.math.VecMath;
 import org.terasology.physics.bullet.shapes.BulletCollisionShape;
 import org.terasology.physics.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
 import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
-import org.terasology.math.VecMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 

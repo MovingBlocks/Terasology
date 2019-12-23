@@ -19,6 +19,11 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import com.google.common.math.DoubleMath;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -26,8 +31,6 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.world.block.BlockManager;
@@ -231,7 +234,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
         Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, Vector3i.one());
+            return createWorldView(region, new Vector3i(1,1,1));
         }
         return null;
     }
@@ -276,12 +279,12 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener chunkRegionListener) {
+    public void addRelevanceEntity(EntityRef entity, Vector3ic distance, ChunkRegionListener chunkRegionListener) {
         // RemoteChunkProvider not track Entities(players) by region now
     }
 
     @Override
-    public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
+    public void updateRelevanceEntity(EntityRef entity, Vector3ic distance) {
         // RemoteChunkProvider not track Entities(players) by region now
     }
 
@@ -313,8 +316,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
 
         private int score(Vector3i chunk) {
-            Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(localPlayer.getPosition(), RoundingMode.HALF_UP));
-            return playerChunk.distanceSquared(chunk);
+            Vector3fc pos = localPlayer.getPosition();
+            Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(DoubleMath.roundToInt(pos.x(), RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(pos.y(), RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(pos.z(), RoundingMode.HALF_UP)));
+            return (int) playerChunk.distanceSquared(chunk);
+
+//            Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(localPlayer.getPosition(), RoundingMode.HALF_UP));
+//            return playerChunk.distanceSquared(chunk);
         }
     }
 
@@ -326,7 +335,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
 
         private float score(Vector3i chunkPos) {
-            Vector3f vec = chunkPos.toVector3f();
+            Vector3f vec = new Vector3f(chunkPos);
             vec.sub(localPlayer.getPosition());
             return vec.lengthSquared();
         }

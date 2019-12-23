@@ -16,6 +16,7 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
+import org.joml.Quaternionf;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,8 +32,7 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.ComponentSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -71,7 +71,7 @@ public class ComponentSerializerTest {
         TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
 
         serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-        serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+        serializationLibrary.addTypeHandler(Quaternionf.class, new Quat4fTypeHandler());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         context.put(NetworkSystem.class, networkSystem);

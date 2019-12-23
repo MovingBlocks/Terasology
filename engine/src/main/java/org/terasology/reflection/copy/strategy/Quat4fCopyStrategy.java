@@ -15,19 +15,19 @@
  */
 package org.terasology.reflection.copy.strategy;
 
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 
 /**
  */
 @RegisterCopyStrategy
-public class Quat4fCopyStrategy implements CopyStrategy<Quat4f> {
+public class Quat4fCopyStrategy implements CopyStrategy<Quaternionf> {
 
     @Override
-    public Quat4f copy(Quat4f value) {
+    public Quaternionf copy(Quaternionf value) {
         if (value != null) {
-            return new Quat4f(value);
+            return new Quaternionf(value);
         }
         return null;
     }

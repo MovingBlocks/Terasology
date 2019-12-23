@@ -28,7 +28,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -89,7 +89,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                 drive.set(targetDirection);
 
                 float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-                location.getLocalRotation().set(new Vector3f(0, 1, 0), yaw);
+                location.getLocalRotation().setAngleAxis(yaw,0.0f,1.0f,0.0f);
                 entity.saveComponent(location);
             }
             entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, time.getGameDeltaInMs()));

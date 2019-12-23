@@ -26,9 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.math.Rect2f;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.atlas.Atlas;
 import org.terasology.rendering.assets.atlas.AtlasData;
@@ -348,7 +348,7 @@ public class WorldAtlasImpl implements WorldAtlas {
 
         g.setColor(clearColor);
         g.fillRect(0, 0, size, size);
-        
+
         int totalIndex = 0;
         for (int tileIndex = 0; tileIndex < tileImages.size(); tileIndex++) {
             BlockTile tile = tileImages.get(tileIndex);

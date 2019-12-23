@@ -23,10 +23,13 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.google.common.math.DoubleMath;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -42,7 +45,6 @@ import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
@@ -252,12 +254,16 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), RoundingMode.HALF_UP)));
+//                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), RoundingMode.HALF_UP)));
+                    Vector3f pos = loc.getWorldPosition();
+                    center.set(ChunkMath.calcChunkPos(new Vector3i(DoubleMath.roundToInt(pos.x, RoundingMode.HALF_UP),
+                        DoubleMath.roundToInt(pos.y, RoundingMode.HALF_UP),
+                        DoubleMath.roundToInt(pos.z, RoundingMode.HALF_UP))));
                 }
                 Vector3i pos = null;
-                int distance = Integer.MAX_VALUE;
+                long distance = Integer.MAX_VALUE;
                 for (Vector3i chunkPos : readyChunks.keySet()) {
-                    int chunkDistance = chunkPos.distanceSquared(center);
+                    long chunkDistance = chunkPos.distanceSquared(center);
                     if (pos == null || chunkDistance < distance) {
                         pos = chunkPos;
                         distance = chunkDistance;
@@ -430,7 +436,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         List<NetData.BlockChangeMessage> blockChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBlockChanges.size());
         queuedOutgoingBlockChanges.drainTo(blockChanges);
         message.addAllBlockChange(blockChanges);
-        
+
         List<NetData.ExtraDataChangeMessage> extraDataChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingExtraDataChanges.size());
         queuedOutgoingExtraDataChanges.drainTo(extraDataChanges);
         message.addAllExtraDataChange(extraDataChanges);

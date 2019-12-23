@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem;
 
+import org.joml.Quaternionf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -31,8 +32,7 @@ import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
@@ -63,7 +63,7 @@ public class PojoPrefabManagerTest {
         TypeHandlerLibrary lib = new TypeHandlerLibrary(reflections);
 
         lib.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-        lib.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+        lib.addTypeHandler(Quaternionf.class, new Quat4fTypeHandler());
 
         entitySystemLibrary = new EntitySystemLibrary(context, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();

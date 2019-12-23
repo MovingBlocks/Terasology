@@ -17,13 +17,13 @@ package org.terasology.logic.players;
 
 import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.rendering.openvrprovider.ControllerListener;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 
 /**
@@ -33,9 +33,9 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
 
     @Owns
     public EntityRef mountPointEntity = EntityRef.NULL;
-    public Vector3f rotateDegrees = Vector3f.zero();
-    public Vector3f translate = Vector3f.zero();
-    public Quat4f rotationQuaternion;
+    public Vector3f rotateDegrees = new Vector3f();
+    public Vector3f translate = new Vector3f();
+    public Quaternionf rotationQuaternion;
     public float scale = 1f;
 
     // TODO: @In
@@ -100,7 +100,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
         translate = new Vector3f(adjustedPose.m30(), adjustedPose.m31(), adjustedPose.m32());
         org.joml.Vector4f jomlQuaternion = org.terasology.rendering.openvrprovider.OpenVRUtil.convertToQuaternion(adjustedPose);
         if (rotationQuaternion == null) {
-            rotationQuaternion = new Quat4f(jomlQuaternion.x, jomlQuaternion.y, jomlQuaternion.z, jomlQuaternion.w);
+            rotationQuaternion = new Quaternionf(jomlQuaternion.x, jomlQuaternion.y, jomlQuaternion.z, jomlQuaternion.w);
         } else {
             rotationQuaternion.set(jomlQuaternion.x, jomlQuaternion.y, jomlQuaternion.z, jomlQuaternion.w);
         }

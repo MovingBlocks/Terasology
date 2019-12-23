@@ -16,7 +16,7 @@
 package org.terasology.biomesAPI;
 
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.chunks.CoreChunk;
 
 import java.util.Collection;

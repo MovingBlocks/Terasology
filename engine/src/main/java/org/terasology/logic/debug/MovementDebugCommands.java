@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.debug;
 
+import org.joml.Quaternionf;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,6 @@ import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -41,7 +41,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.ClientComponent;
 
 import java.util.Optional;
@@ -246,7 +246,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 LocationComponent loc = client.getComponent(LocationComponent.class);
                 Vector3f currentPosition = loc.getWorldPosition();
                 clientComp.character
-                        .send(new CharacterTeleportEvent(new Vector3f(currentPosition.getX(), currentPosition.getY() + (amount - prevHeight) / 2, currentPosition.getZ())));
+                        .send(new CharacterTeleportEvent(new Vector3f(currentPosition.x(), currentPosition.y() + (amount - prevHeight) / 2, currentPosition.z())));
                 physics.removeCharacterCollider(clientComp.character);
                 physics.getCharacterCollider(clientComp.character);
                 return "Height of player set to " + amount + " (was " + prevHeight + ")";
@@ -268,7 +268,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 float prevHeight = gazeMountPointComponent.translate.y;
                 gazeMountPointComponent.translate.y = amount;
                 Location.removeChild(player, gazeMountPointComponent.gazeEntity);
-                Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quaternionf().identity());
                 player.saveComponent(gazeMountPointComponent);
                 return "Eye-height of player set to " + amount + " (was " + prevHeight + ")";
             }
@@ -403,7 +403,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String teleportAllPlayersToPlayer(@CommandParam("username") String username) {
 
-        Vector3f vPlayerLocation = Vector3f.zero();
+        Vector3f vPlayerLocation = new Vector3f();
         boolean bPlayerLocationWasFound = false;
         EntityRef playerEntity = null;
 

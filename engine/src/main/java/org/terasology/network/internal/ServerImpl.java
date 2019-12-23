@@ -27,6 +27,7 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
@@ -36,7 +37,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.Server;
@@ -291,7 +291,7 @@ public class ServerImpl implements Server {
             }
         }
     }
-    
+
     /**
      * Apply the block changes from the message to the local world.
      */

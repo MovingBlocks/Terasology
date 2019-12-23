@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
+import org.terasology.math.Rect2i;
 
 /**
  * Describes the possible methods drawing to a region of a different size to the image being drawn.

@@ -18,10 +18,10 @@ package org.terasology.math;
 
 import com.google.common.base.Objects;
 import gnu.trove.list.TFloatList;
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3d;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Matrix3f;
+import org.joml.Quaternionf;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -142,14 +142,14 @@ public final class AABB {
     public Vector3f getExtents() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.sub(min);
-        dimensions.scale(HALVING_FACTOR);
+        dimensions.mul(HALVING_FACTOR);
         return dimensions;
     }
 
     public Vector3f getCenter() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.add(min);
-        dimensions.scale(HALVING_FACTOR);
+        dimensions.mul(HALVING_FACTOR);
         return dimensions;
     }
 
@@ -182,7 +182,7 @@ public final class AABB {
      * @param scale The scale of the new AABB with respect to the old AABB.
      * @return The new transformed AABB.
      */
-    public AABB transform(Quat4f rotation, Vector3f offset, float scale) {
+    public AABB transform(Quaternionf rotation, Vector3f offset, float scale) {
         Transform transform = new Transform(offset, rotation, scale);
         return transform(transform);
     }
@@ -229,9 +229,10 @@ public final class AABB {
 
         Vector3f extent = new Vector3f();
 
-        extent.x = absBasis.getRow(0).dot(localHalfExtents);
-        extent.y = absBasis.getRow(1).dot(localHalfExtents);
-        extent.z = absBasis.getRow(2).dot(localHalfExtents);
+        Vector3f temp = new Vector3f();
+        extent.x = absBasis.getRow(0,temp).dot(localHalfExtents);
+        extent.y = absBasis.getRow(1,temp).dot(localHalfExtents);
+        extent.z = absBasis.getRow(2,temp).dot(localHalfExtents);
 
         Vector3f worldMin = new Vector3f();
         worldMin.sub(center, extent);

@@ -16,13 +16,11 @@
 
 package org.terasology.world.chunks.pipeline;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.utilities.concurrency.Task;
 
 /**
  */
 public interface ChunkTask extends Task {
-
     Vector3i getPosition();
-
 }

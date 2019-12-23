@@ -17,16 +17,16 @@ package org.terasology.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
@@ -53,7 +53,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
     private static final int MAX_BILLBOARD_CHUNKS = 64;
-    private static final int MAX_LOADABLE_CHUNKS = ViewDistance.MEGA.getChunkDistance().x * ViewDistance.MEGA.getChunkDistance().y * ViewDistance.MEGA.getChunkDistance().z;
+    private static final int MAX_LOADABLE_CHUNKS = ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
     private static final Vector3f CHUNK_CENTER_OFFSET = new Vector3f(0.5f, 0.5f, 0.5f);
 
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
@@ -248,8 +248,8 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private Region3i calculateRenderableRegion(ViewDistance newViewDistance) {
         Vector3i cameraCoordinates = calcCameraCoordinatesInChunkUnits();
-        Vector3i renderableRegionSize = newViewDistance.getChunkDistance();
-        Vector3i renderableRegionExtents = new Vector3i(renderableRegionSize.x / 2, renderableRegionSize.y / 2, renderableRegionSize.z / 2);
+        Vector3ic renderableRegionSize = newViewDistance.getChunkDistance();
+        Vector3i renderableRegionExtents = new Vector3i(renderableRegionSize.x() / 2, renderableRegionSize.y() / 2, renderableRegionSize.z() / 2);
         return Region3i.createFromCenterExtents(cameraCoordinates, renderableRegionExtents);
     }
 
@@ -259,7 +259,7 @@ class RenderableWorldImpl implements RenderableWorld {
      * @return The player offset chunk
      */
     private Vector3i calcCameraCoordinatesInChunkUnits() {
-        Vector3f cameraCoordinates = JomlUtil.from(playerCamera.getPosition());
+        Vector3f cameraCoordinates = playerCamera.getPosition();
         return new Vector3i((int) (cameraCoordinates.x / ChunkConstants.SIZE_X),
                 (int) (cameraCoordinates.y / ChunkConstants.SIZE_Y),
                 (int) (cameraCoordinates.z / ChunkConstants.SIZE_Z));
@@ -269,7 +269,7 @@ class RenderableWorldImpl implements RenderableWorld {
     public void generateVBOs() {
         PerformanceMonitor.startActivity("Building Mesh VBOs");
         ChunkMesh pendingMesh;
-        chunkMeshUpdateManager.setCameraPosition(JomlUtil.from(playerCamera.getPosition()));
+        chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
         for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
 
             if (chunk.hasPendingMesh() && chunksInProximityOfCamera.contains(chunk)) {
@@ -434,7 +434,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private static float squaredDistanceToCamera(RenderableChunk chunk, Vector3f cameraPosition) {
         // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
         // comments are in use instead of appropriately named vectors.
-        Vector3f result = chunk.getPosition().toVector3f(); // chunk position in chunk coordinates
+        Vector3f result = new Vector3f(chunk.getPosition()); // chunk position in chunk coordinates
         result.add(CHUNK_CENTER_OFFSET);                    // chunk center in chunk coordinates
 
         result.x *= ChunkConstants.SIZE_X;    // chunk center in world coordinates
@@ -455,7 +455,7 @@ class RenderableWorldImpl implements RenderableWorld {
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
             Preconditions.checkNotNull(chunk1);
             Preconditions.checkNotNull(chunk2);
-            Vector3f cameraPosition = JomlUtil.from(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
+            Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
@@ -472,7 +472,7 @@ class RenderableWorldImpl implements RenderableWorld {
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
             Preconditions.checkNotNull(chunk1);
             Preconditions.checkNotNull(chunk2);
-            Vector3f cameraPosition = JomlUtil.from(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
+            Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 

@@ -17,8 +17,8 @@
 package org.terasology.network.serialization;
 
 import gnu.trove.list.TIntList;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeHandling.PersistedData;

@@ -25,8 +25,8 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import java.util.List;
 import java.util.Set;
@@ -54,7 +54,7 @@ public class BindableButtonImpl implements BindableButton {
     private boolean consumedActivation;
 
     /**
-     * 
+     *
      * @param id The id of the binding
      * @param displayName Readable name of the binding
      * @param event The event to send when the binding is updated

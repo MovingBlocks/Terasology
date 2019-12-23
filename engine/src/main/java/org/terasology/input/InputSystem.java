@@ -52,7 +52,7 @@ import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.input.internal.AbstractBindableAxis;
 import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.registry.In;
 
 import java.util.List;

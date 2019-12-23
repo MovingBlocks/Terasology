@@ -26,8 +26,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.event.DoDamageEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -70,7 +70,7 @@ public class ArrowAction extends BaseComponentSystem {
 
         if (time.getGameTime() > lastTime + 1.0f / arrowActionComponent.arrowsPerSecond) {
             Vector3f target = event.getHitNormal();
-            Vector3i blockPos = new Vector3i(target);
+            Vector3i blockPos = new Vector3i((int)target.x,(int)target.y,(int)target.z);
 
             Vector3f position = new Vector3f(event.getOrigin());
             Vector3f dir = new Vector3f(event.getDirection());

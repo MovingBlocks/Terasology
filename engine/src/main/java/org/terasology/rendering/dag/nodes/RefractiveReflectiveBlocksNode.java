@@ -20,8 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -96,7 +95,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
     public static float waterOffsetY;
 
     private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
-    
+
     private RenderQueuesHelper renderQueues;
     private WorldRenderer worldRenderer;
     private BackdropProvider backdropProvider;
@@ -264,14 +263,14 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        final Vector3f cameraPosition = JomlUtil.from(activeCamera.getPosition());
+        final Vector3f cameraPosition = activeCamera.getPosition();
 
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaBlend.poll();
 
             if (chunk.hasMesh()) {
                 final ChunkMesh chunkMesh = chunk.getMesh();
-                final Vector3f chunkPosition = chunk.getPosition().toVector3f();
+                final Vector3f chunkPosition = new Vector3f(chunk.getPosition());
 
                 chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
                 numberOfRenderedTriangles += chunkMesh.render(REFRACTIVE, chunkPosition, cameraPosition);

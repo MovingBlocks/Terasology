@@ -16,8 +16,9 @@
 
 package org.terasology.world.chunks;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.internal.ChunkViewCore;
 
 import java.util.Collection;
@@ -69,14 +70,14 @@ public interface ChunkProvider {
      * @param distance The region (in chunks) around the entity that should be near cached
      * @param listener A listener to chunk region events
      */
-    void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener);
+    void addRelevanceEntity(EntityRef entity, Vector3ic distance, ChunkRegionListener listener);
 
     /**
      * Retrieves the ChunkRelevanceRegion object for the given entity
      *
      * @param entity
      */
-    void updateRelevanceEntity(EntityRef entity, Vector3i distance);
+    void updateRelevanceEntity(EntityRef entity, Vector3ic distance);
 
     /**
      * Removes an entity from producing a caching region

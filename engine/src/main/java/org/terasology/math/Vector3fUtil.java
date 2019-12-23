@@ -16,8 +16,7 @@
 
 package org.terasology.math;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.physics.engine.PhysicsEngineManager;
+import org.joml.Vector3f;
 
 /**
  */
@@ -31,7 +30,7 @@ public final class Vector3fUtil {
      */
     public static Vector3f reflect(Vector3f direction, Vector3f normal, Vector3f out) {
         out.set(normal);
-        out.scale(-2.0f * direction.dot(normal));
+        out.mul(-2.0f * direction.dot(normal));
         out.add(direction);
         return out;
     }
@@ -41,7 +40,7 @@ public final class Vector3fUtil {
      */
     public static Vector3f getParallelComponent(Vector3f direction, Vector3f normal, Vector3f out) {
         out.set(normal);
-        out.scale(direction.dot(normal));
+        out.mul(direction.dot(normal));
         return out;
     }
 
@@ -50,7 +49,7 @@ public final class Vector3fUtil {
      */
     public static Vector3f getPerpendicularComponent(Vector3f direction, Vector3f normal, Vector3f out) {
         Vector3f perpendicular = getParallelComponent(direction, normal, out);
-        perpendicular.scale(-1);
+        perpendicular.mul(-1);
         perpendicular.add(direction);
         return perpendicular;
     }

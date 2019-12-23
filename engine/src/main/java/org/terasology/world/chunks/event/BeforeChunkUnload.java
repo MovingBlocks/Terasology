@@ -16,8 +16,9 @@
 
 package org.terasology.world.chunks.event;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
 
 /**
  */
@@ -25,7 +26,7 @@ public class BeforeChunkUnload implements Event {
 
     private Vector3i chunkPos = new Vector3i();
 
-    public BeforeChunkUnload(Vector3i chunkPos) {
+    public BeforeChunkUnload(Vector3ic chunkPos) {
         this.chunkPos.set(chunkPos);
     }
 

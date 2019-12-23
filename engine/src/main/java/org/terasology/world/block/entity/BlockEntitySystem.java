@@ -15,6 +15,8 @@
  */
 package org.terasology.world.block.entity;
 
+import com.google.common.math.DoubleMath;
+import org.joml.Vector3f;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -29,7 +31,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -107,12 +109,17 @@ public class BlockEntitySystem extends BaseComponentSystem {
                     }
                 } else {
                     // just drop the ActAsBlock block
-                    Vector3i location = new Vector3i(blockRegion.region.center(), RoundingMode.HALF_UP);
+                    Vector3f center = blockRegion.region.center();
+                    Vector3i location = new Vector3i(DoubleMath.roundToInt(center.x,RoundingMode.HALF_UP),
+                        DoubleMath.roundToInt(center.y,RoundingMode.HALF_UP),
+                        DoubleMath.roundToInt(center.z,RoundingMode.HALF_UP));
                     commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
                 }
             } else if (entity.hasComponent(LocationComponent.class)) {
                 LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-                Vector3i location = new Vector3i(locationComponent.getWorldPosition(), RoundingMode.HALF_UP);
+                Vector3i location = new Vector3i(DoubleMath.roundToInt(locationComponent.getWorldPosition().x,RoundingMode.HALF_UP),
+                    DoubleMath.roundToInt(locationComponent.getWorldPosition().y,RoundingMode.HALF_UP),
+                    DoubleMath.roundToInt(locationComponent.getWorldPosition().z,RoundingMode.HALF_UP));//locationComponent.getWorldPosition(), RoundingMode.HALF_UP);
                 commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
             }
         }
@@ -135,7 +142,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 if (blockDamageModifierComponent != null) {
                     impulsePower = blockDamageModifierComponent.impulsePower;
                 }
-                
+
                 processDropping(item, location, impulsePower);
             }
         }
@@ -181,7 +188,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
     }
 
     private void processDropping(EntityRef item, Vector3i location, float impulsePower) {
-        item.send(new DropItemEvent(location.toVector3f()));
+        item.send(new DropItemEvent(new Vector3f(location)));
         item.send(new ImpulseEvent(random.nextVector3f(impulsePower)));
     }
 

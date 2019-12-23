@@ -17,8 +17,8 @@
 package org.terasology.logic.spawner;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
 import org.terasology.world.generation.World;
 
 /**

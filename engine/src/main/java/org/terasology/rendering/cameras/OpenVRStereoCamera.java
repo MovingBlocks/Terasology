@@ -19,7 +19,6 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
@@ -217,23 +216,24 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         updateMatrices(activeFov);
     }
 
-    private void jomlMatrix4f(Matrix4f matrixInput, org.terasology.math.geom.Matrix4f matrixOut) {
-        matrixOut.set(0, 0, matrixInput.m00());
-        matrixOut.set(0, 1, matrixInput.m10());
-        matrixOut.set(0, 2, matrixInput.m20());
-        matrixOut.set(0, 3, matrixInput.m30());
-        matrixOut.set(1, 0, matrixInput.m01());
-        matrixOut.set(1, 1, matrixInput.m11());
-        matrixOut.set(1, 2, matrixInput.m21());
-        matrixOut.set(1, 3, matrixInput.m31());
-        matrixOut.set(2, 0, matrixInput.m02());
-        matrixOut.set(2, 1, matrixInput.m12());
-        matrixOut.set(2, 2, matrixInput.m22());
-        matrixOut.set(2, 3, matrixInput.m32());
-        matrixOut.set(3, 0, matrixInput.m03());
-        matrixOut.set(3, 1, matrixInput.m13());
-        matrixOut.set(3, 2, matrixInput.m23());
-        matrixOut.set(3, 3, matrixInput.m33());
+    private void jomlMatrix4f(Matrix4f matrixInput, Matrix4f matrixOut) {
+        matrixOut.set(matrixInput).transpose();
+//        matrixOut.set(0, 0, matrixInput.m00());
+//        matrixOut.set(0, 1, matrixInput.m10());
+//        matrixOut.set(0, 2, matrixInput.m20());
+//        matrixOut.set(0, 3, matrixInput.m30());
+//        matrixOut.set(1, 0, matrixInput.m01());
+//        matrixOut.set(1, 1, matrixInput.m11());
+//        matrixOut.set(1, 2, matrixInput.m21());
+//        matrixOut.set(1, 3, matrixInput.m31());
+//        matrixOut.set(2, 0, matrixInput.m02());
+//        matrixOut.set(2, 1, matrixInput.m12());
+//        matrixOut.set(2, 2, matrixInput.m22());
+//        matrixOut.set(2, 3, matrixInput.m32());
+//        matrixOut.set(3, 0, matrixInput.m03());
+//        matrixOut.set(3, 1, matrixInput.m13());
+//        matrixOut.set(3, 2, matrixInput.m23());
+//        matrixOut.set(3, 3, matrixInput.m33());
     }
 
     @Override
@@ -251,7 +251,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         // set camera orientation
         Vector4f vecQuaternion = OpenVRUtil.convertToQuaternion(leftEyePose);
         Quaternionf quaternion = new Quaternionf(vecQuaternion.x, vecQuaternion.y, vecQuaternion.z, vecQuaternion.w);
-        setOrientation(new Quat4f(quaternion.x, quaternion.y, quaternion.z, quaternion.w));
+        setOrientation(new Quaternionf(quaternion.x, quaternion.y, quaternion.z, quaternion.w));
 
 
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix

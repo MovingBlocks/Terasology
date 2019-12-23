@@ -15,8 +15,8 @@
  */
 package org.terasology.world;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.WorldProviderCore;
 
@@ -87,7 +87,7 @@ public interface WorldProvider extends WorldProviderCore {
     byte getSunlight(Vector3i pos);
 
     byte getTotalLight(Vector3i pos);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -96,7 +96,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @return The (index)th extra-data value at the given position
      */
     int getExtraData(int index, Vector3i pos);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -108,7 +108,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @return The replaced value
      */
     int setExtraData(int index, int x, int y, int z, int value);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -119,7 +119,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @return The named extra-data value at the given position
      */
     int getExtraData(String fieldName, int x, int y, int z);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -128,7 +128,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @return The named extra-data value at the given position
      */
     int getExtraData(String fieldName, Vector3i pos);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -140,7 +140,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @return The replaced value
      */
     int setExtraData(String fieldName, int x, int y, int z, int value);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *

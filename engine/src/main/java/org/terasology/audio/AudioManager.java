@@ -15,9 +15,9 @@
  */
 package org.terasology.audio;
 
+import org.joml.Quaternionf;
 import org.terasology.assets.AssetFactory;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 /**
  * Manages the playing of sounds and music as well as muting and updating listeners
@@ -124,7 +124,7 @@ public interface AudioManager {
      * @param orientation The new orientation (in a quaternion)
      * @param velocity The new velocity
      */
-    void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity);
+    void updateListener(Vector3f position, Quaternionf orientation, Vector3f velocity);
 
     /**
      * Gracefully destroy audio subsystem.

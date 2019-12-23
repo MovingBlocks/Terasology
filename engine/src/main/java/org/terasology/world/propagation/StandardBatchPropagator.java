@@ -20,7 +20,7 @@ import com.google.common.collect.Sets;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
@@ -304,7 +304,7 @@ public class StandardBatchPropagator implements BatchPropagator {
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         IndexProvider indexProvider = createIndexProvider(side);
 
-        Region3i edgeRegion = ChunkMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
+        Region3i edgeRegion = ChunkMath.getEdgeRegion(Region3i.createFromMinAndSize(new Vector3i(), ChunkConstants.CHUNK_SIZE), side);
 
         int edgeSize = edgeRegion.size().x * edgeRegion.size().y * edgeRegion.size().z;
         int[] depth = new int[edgeSize];

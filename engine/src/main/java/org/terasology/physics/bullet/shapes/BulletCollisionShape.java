@@ -32,7 +32,7 @@ public abstract class BulletCollisionShape implements org.terasology.physics.sha
         javax.vecmath.Vector3f max = new javax.vecmath.Vector3f();
         underlyingShape.getAabb(t, min, max);
 
-        return AABB.createMinMax(VecMath.from(min), VecMath.from(max));
+        return AABB.createMinMax(VecMath.from(min),VecMath.from(max));
     }
 
     protected static Transform toBulletTransform(org.terasology.math.Transform transform) {

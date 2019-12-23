@@ -17,9 +17,10 @@ package org.terasology.rendering.nui.layouts;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2f;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.Canvas;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,7 +61,7 @@ public class ZoomableLayoutTest {
 
         canvas = mock(Canvas.class);
 
-        //    
+        //
         //   +------+
         //   |  1   |
         //   +------+
@@ -166,7 +167,7 @@ public class ZoomableLayoutTest {
 
         //item1 out of canvas
         verify(canvas).drawWidget(item1, Rect2i.createFromMinAndMax(new Vector2i(ceilToInt(pos1.x - pos2.x), ceilToInt(pos1.y - pos2.y)), new Vector2i(ceilToInt(pos1.x + size1.x - pos2.x), ceilToInt(pos1.y + size1.y - pos2.y))));
-        verify(canvas).drawWidget(item2, Rect2i.createFromMinAndMax(Vector2i.zero(), new Vector2i(ceilToInt(size2.x), ceilToInt(size2.y))));
+        verify(canvas).drawWidget(item2, Rect2i.createFromMinAndMax(new Vector2i(), new Vector2i(ceilToInt(size2.x), ceilToInt(size2.y))));
         verify(canvas).drawWidget(item3, Rect2i.createFromMinAndMax(new Vector2i(ceilToInt(pos3.x - pos2.x), ceilToInt(pos3.y - pos2.y)), new Vector2i(ceilToInt(pos3.x + size3.x - pos2.x), ceilToInt(pos3.y + size3.y - pos2.y))));
     }
 

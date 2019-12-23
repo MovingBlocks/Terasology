@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering;
 
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 
 /**
  */

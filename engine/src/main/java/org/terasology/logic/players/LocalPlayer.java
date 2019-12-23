@@ -16,6 +16,8 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Sets;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -24,8 +26,6 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -113,10 +113,10 @@ public class LocalPlayer {
         return location.getWorldPosition(out);
     }
 
-    public Quat4f getRotation() {
+    public Quaternionf getRotation() {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
         if (location == null) {
-            return new Quat4f(Quat4f.IDENTITY);
+            return new Quaternionf().identity();
         }
         return location.getWorldRotation();
     }
@@ -138,10 +138,10 @@ public class LocalPlayer {
         return location.getWorldPosition(out);
     }
 
-    public Quat4f getViewRotation() {
+    public Quaternionf getViewRotation() {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
         if (clientComponent == null) {
-            return new Quat4f(Quat4f.IDENTITY);
+            return new Quaternionf().identity();
         }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
         if (location == null) {
@@ -152,11 +152,11 @@ public class LocalPlayer {
     }
 
     public Vector3f getViewDirection() {
-        Quat4f rot = getViewRotation();
+        Quaternionf rot = getViewRotation();
         // TODO: Put a generator for direction vectors in a util class somewhere
         // And just put quaternion -> vector somewhere too
         Vector3f dir = Direction.FORWARD.getVector3f();
-        return rot.rotate(dir, dir);
+        return rot.transform(dir,dir);
     }
 
     public Vector3f getVelocity() {

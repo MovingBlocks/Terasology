@@ -17,9 +17,8 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.persistence.typeHandling.DeserializationException;
+import org.joml.Vector2f;
+import org.terasology.math.Rect2f;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;

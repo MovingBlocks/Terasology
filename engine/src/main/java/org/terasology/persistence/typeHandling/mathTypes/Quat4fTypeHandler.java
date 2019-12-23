@@ -16,7 +16,7 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import gnu.trove.list.TFloatList;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
@@ -25,20 +25,20 @@ import java.util.Optional;
 
 /**
  */
-public class Quat4fTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Quat4f> {
+public class Quat4fTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Quaternionf> {
 
     @Override
-    public PersistedData serializeNonNull(Quat4f value, PersistedDataSerializer serializer) {
+    public PersistedData serializeNonNull(Quaternionf value, PersistedDataSerializer serializer) {
         return serializer.serialize(value.x, value.y, value.z, value.w);
     }
 
     @Override
-    public Optional<Quat4f> deserialize(PersistedData data) {
+    public Optional<Quaternionf> deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 3) {
                 TFloatList floats = dataArray.getAsFloatArray();
-                return Optional.of(new Quat4f(floats.get(0), floats.get(1), floats.get(2), floats.get(3)));
+                return Optional.of(new Quaternionf(floats.get(0), floats.get(1), floats.get(2), floats.get(3)));
             }
         }
         return Optional.empty();

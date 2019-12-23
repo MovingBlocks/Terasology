@@ -16,7 +16,7 @@
 package org.terasology.world.block.internal;
 
 import gnu.trove.list.TIntList;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 
 import java.util.Iterator;

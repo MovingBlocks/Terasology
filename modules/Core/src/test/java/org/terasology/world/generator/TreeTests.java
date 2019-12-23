@@ -16,6 +16,8 @@
 
 package org.terasology.world.generator;
 
+import org.joml.Vector2ic;
+import org.joml.Vector3i;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +30,7 @@ import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
 import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.core.world.generator.trees.Trees;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.Rect2i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.MersenneRandom;
 import org.terasology.utilities.random.Random;
@@ -62,7 +62,7 @@ public class TreeTests {
 
         blockManager = Mockito.mock(BlockManager.class);
         Block air = blockManager.getBlock(BlockManager.AIR_ID);
-        
+
         extraDataManager = new ExtraBlockDataManager();
 
         Mockito.when(blockManager.getBlock(ArgumentMatchers.<BlockUri>any())).thenReturn(air);
@@ -114,8 +114,8 @@ public class TreeTests {
         final Vector3i max = new Vector3i(pos);
 
         Rect2i chunks = Rect2i.createFromMinAndMax(-1, -1, 1, 1);
-        for (BaseVector2i chunkPos : chunks.contents()) {
-            Chunk chunk = new ChunkImpl(chunkPos.getX(), 0, chunkPos.getY(), blockManager, extraDataManager) {
+        for (Vector2ic chunkPos : chunks.contents()) {
+            Chunk chunk = new ChunkImpl(chunkPos.x(), 0, chunkPos.y(), blockManager, extraDataManager) {
                 @Override
                 public Block setBlock(int x, int y, int z, Block block) {
                     Vector3i world = chunkToWorldPosition(x, y, z);
@@ -128,7 +128,7 @@ public class TreeTests {
 
             Random random = new MersenneRandom(seed);
             BlockManager blockManagerLocal = CoreRegistry.get(BlockManager.class);
-            Vector3i relPos = chunk.chunkToWorldPosition(0, 0, 0).sub(pos).invert();
+            Vector3i relPos = chunk.chunkToWorldPosition(0, 0, 0).sub(pos).mul(-1);
             treeGen.generate(blockManagerLocal, chunk, random, relPos.x, relPos.y, relPos.z);
         }
 

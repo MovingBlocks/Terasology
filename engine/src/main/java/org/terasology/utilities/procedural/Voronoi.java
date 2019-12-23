@@ -15,8 +15,8 @@
  */
 package org.terasology.utilities.procedural;
 
+import org.joml.Vector2f;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2f;
 
 import java.util.Random;
 
@@ -60,7 +60,7 @@ public class Voronoi {
             result.distance = Float.MAX_VALUE;
         }
 
-        at.scale(DENSITY_ADJUSTMENT);
+        at.mul(DENSITY_ADJUSTMENT);
         at.add(offset);
 
         int cellX = TeraMath.floorToInt(at.x);
@@ -103,7 +103,7 @@ public class Voronoi {
         }
 
         for (VoronoiResult result : results) {
-            result.delta.scale(INVERSE_DENSITY_ADJUSTMENT);
+            result.delta.mul(INVERSE_DENSITY_ADJUSTMENT);
             result.distance *= INVERSE_DENSITY_ADJUSTMENT * INVERSE_DENSITY_ADJUSTMENT;
         }
 

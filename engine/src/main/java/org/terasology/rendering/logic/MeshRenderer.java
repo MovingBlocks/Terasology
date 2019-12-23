@@ -15,7 +15,8 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.math.JomlUtil;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.terasology.math.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -39,10 +40,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.VecMath;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -168,9 +166,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     }
 
     private void renderEntitiesByMaterial(SetMultimap<Material, EntityRef> meshByMaterial) {
-        Vector3f cameraPosition = JomlUtil.from(worldRenderer.getActiveCamera().getPosition());
+        Vector3f cameraPosition = new Vector3f(worldRenderer.getActiveCamera().getPosition());
 
-        Quat4f worldRot = new Quat4f();
+        Quaternionf worldRot = new Quaternionf();
         Vector3f worldPos = new Vector3f();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
@@ -207,7 +205,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
                     Vector3f offsetFromCamera = new Vector3f();
                     offsetFromCamera.sub(worldPos, cameraPosition);
-                    Matrix4f matrixCameraSpace = new Matrix4f(worldRot, offsetFromCamera, worldScale);
+                    Matrix4f matrixCameraSpace = new Matrix4f().rotate(worldRot).
+                        translation(offsetFromCamera).
+                        scale(worldScale);
 
                     AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
@@ -219,7 +219,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                             lastMesh.preRender();
                         }
 
-                        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
+                        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
                         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
                         MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
 
