@@ -15,17 +15,22 @@
  */
 package org.terasology.rendering.gltf;
 
+import gnu.trove.list.TFloatList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.gltf.model.GLTF;
 import org.terasology.rendering.gltf.model.GLTFAccessor;
 import org.terasology.rendering.gltf.model.GLTFBufferView;
 import org.terasology.rendering.gltf.model.GLTFMesh;
+import org.terasology.rendering.gltf.model.GLTFNode;
 import org.terasology.rendering.gltf.model.GLTFPrimitive;
 
 import java.io.IOException;
@@ -86,9 +91,71 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
             checkIndicesBuffer(indicesBuffer);
 
             readBuffer(loadedBuffers.get(indicesBuffer.getBuffer()), indicesAccessor, indicesBuffer, mesh.getIndices());
+            applyTransformations(gltf, mesh.getVertices(), mesh.getNormals());
             return mesh;
         }
     }
 
+    private void applyTransformations(GLTF gltf, TFloatList vertices, TFloatList normals) {
+        GLTFNode node = null;
+        for(GLTFNode curr : gltf.getNodes()) {
+            if(curr.getMesh() == 0) {
+                node = curr;
+                break;
+            }
+        }
 
+        Matrix4f transform = new Matrix4f(Matrix4f.IDENTITY);
+
+        if(node != null) {
+            if (node.getMatrix() == null) {
+                Vector3f position = new Vector3f();
+                Quat4f rotation = new Quat4f(Quat4f.IDENTITY);
+                Vector3f scale = new Vector3f(Vector3f.one());
+
+                if (node.getTranslation() != null) {
+                    position.set(node.getTranslation());
+                }
+                if (node.getRotation() != null) {
+                    rotation.set(node.getRotation());
+                }
+                if (node.getScale() != null) {
+                    scale.set(node.getScale());
+                }
+                transform.set(new Matrix4f(rotation, position, 1.0f));
+
+                transform.set(0, 0, scale.getX()*transform.get(0, 0));
+                transform.set(0, 1, scale.getX()*transform.get(0, 1));
+                transform.set(0, 2, scale.getX()*transform.get(0, 2));
+
+                transform.set(1, 0, scale.getY()*transform.get(1, 0));
+                transform.set(1, 1, scale.getY()*transform.get(1, 1));
+                transform.set(1, 2, scale.getY()*transform.get(1, 2));
+
+                transform.set(2, 0, scale.getZ()*transform.get(2, 0));
+                transform.set(2, 1, scale.getZ()*transform.get(2, 1));
+                transform.set(2, 2, scale.getZ()*transform.get(2, 2));
+            } else {
+                transform.set(node.getMatrix());
+            }
+        }
+
+        applyTransformations(vertices, transform, false);
+        transform.setTranslation(new Vector3f());
+        applyTransformations(normals, transform, true);
+    }
+
+    private void applyTransformations(TFloatList buffer, Matrix4f transform, boolean normalize) {
+        Vector3f current = new Vector3f();
+        for(int i=0; i<buffer.size(); i+=3) {
+            current.set(buffer.get(i), buffer.get(i+1), buffer.get(i+2));
+            transform.transformPoint(current);
+            if(normalize) {
+                current.normalize();
+            }
+            buffer.set(i, current.getX());
+            buffer.set(i+1, current.getY());
+            buffer.set(i+2, current.getZ());
+        }
+    }
 }
