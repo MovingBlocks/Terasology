@@ -179,7 +179,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
         // Actual Node Processing
 
-        final Vector3f cameraPosition = JomlUtil.from(activeCamera.getPosition());
+        final org.joml.Vector3f cameraPosition = activeCamera.getPosition();
 
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
@@ -192,7 +192,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
 
                 chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
-                numberOfRenderedTriangles += chunkMesh.render(ALPHA_REJECT, chunkPosition, cameraPosition);
+                numberOfRenderedTriangles += chunkMesh.render(ALPHA_REJECT, JomlUtil.from(chunkPosition), cameraPosition);
 
             } else {
                 numberOfChunksThatAreNotReadyYet++; // TODO: verify - should we count them only in ChunksOpaqueNode?

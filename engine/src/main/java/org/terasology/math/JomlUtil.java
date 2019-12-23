@@ -98,8 +98,8 @@ public class JomlUtil {
         return new org.joml.Vector2f(vec.x(), vec.y());
     }
 
-    public static org.joml.Vector2i from(BaseVector3i vec) {
-        return new org.joml.Vector2i(vec.x(), vec.y());
+    public static org.joml.Vector3i from(BaseVector3i vec) {
+        return new org.joml.Vector3i(vec.x(), vec.y(), vec.z());
     }
 
     public static Quat4f from(Quaternionf quat) {

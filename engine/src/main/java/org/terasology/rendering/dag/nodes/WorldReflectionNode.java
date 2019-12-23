@@ -186,7 +186,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        final Vector3f cameraPosition = JomlUtil.from(activeCamera.getPosition());
+        final org.joml.Vector3f cameraPosition = activeCamera.getPosition();
 
         while (renderQueues.chunksOpaqueReflection.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksOpaqueReflection.poll();
@@ -196,7 +196,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
 
                 chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
-                numberOfRenderedTriangles += chunkMesh.render(OPAQUE, chunkPosition, cameraPosition);
+                numberOfRenderedTriangles += chunkMesh.render(OPAQUE, JomlUtil.from(chunkPosition), cameraPosition);
 
             } else {
                 numberOfChunksThatAreNotReadyYet++;

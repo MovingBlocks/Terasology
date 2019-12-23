@@ -96,7 +96,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
     public static float waterOffsetY;
 
     private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
-    
+
     private RenderQueuesHelper renderQueues;
     private WorldRenderer worldRenderer;
     private BackdropProvider backdropProvider;
@@ -264,7 +264,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        final Vector3f cameraPosition = JomlUtil.from(activeCamera.getPosition());
+        final org.joml.Vector3f cameraPosition = activeCamera.getPosition();
 
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaBlend.poll();
@@ -274,7 +274,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
 
                 chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
-                numberOfRenderedTriangles += chunkMesh.render(REFRACTIVE, chunkPosition, cameraPosition);
+                numberOfRenderedTriangles += chunkMesh.render(REFRACTIVE, JomlUtil.from(chunkPosition), cameraPosition);
 
             } else {
                 numberOfChunksThatAreNotReadyYet++;

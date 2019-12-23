@@ -259,10 +259,10 @@ class RenderableWorldImpl implements RenderableWorld {
      * @return The player offset chunk
      */
     private Vector3i calcCameraCoordinatesInChunkUnits() {
-        Vector3f cameraCoordinates = JomlUtil.from(playerCamera.getPosition());
-        return new Vector3i((int) (cameraCoordinates.x / ChunkConstants.SIZE_X),
-                (int) (cameraCoordinates.y / ChunkConstants.SIZE_Y),
-                (int) (cameraCoordinates.z / ChunkConstants.SIZE_Z));
+        org.joml.Vector3f cameraCoordinates = playerCamera.getPosition();
+        return new Vector3i((int) (cameraCoordinates.x() / ChunkConstants.SIZE_X),
+                (int) (cameraCoordinates.y() / ChunkConstants.SIZE_Y),
+                (int) (cameraCoordinates.z() / ChunkConstants.SIZE_Z));
     }
 
     @Override
