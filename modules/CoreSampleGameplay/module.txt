@@ -4,7 +4,7 @@
     "displayName" : "Core Gameplay",
     "description" : "Minimal gameplay template. Little content but a few starting items.",
     "dependencies" : [
-        {"id": "Core", "minVersion": "2.0.0"}
+        {"id": "Core", "minVersion": "2.2.1"}
     ],
     "isGameplay" : "true",
     "defaultWorldGenerator" : "Core:FacetedPerlin"

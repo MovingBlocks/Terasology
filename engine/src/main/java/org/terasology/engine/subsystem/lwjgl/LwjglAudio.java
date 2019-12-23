@@ -25,7 +25,7 @@ import org.terasology.audio.StaticSound;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
-import org.terasology.config.Config;
+import org.terasology.config.AudioConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
@@ -43,9 +43,8 @@ public class LwjglAudio extends BaseLwjglSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        Config config = rootContext.get(Config.class);
         try {
-            audioManager = new OpenALManager(config.getAudio());
+            audioManager = new OpenALManager(rootContext.get(AudioConfig.class));
         } catch (LWJGLException | OpenALException e) {
             logger.warn("Could not load OpenAL manager - sound is disabled", e);
             audioManager = new NullAudioManager();

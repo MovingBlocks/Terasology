@@ -76,7 +76,7 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.NetData;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -534,12 +534,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         context.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
-        TypeSerializationLibrary typeSerializationLibrary = new TypeSerializationLibrary(entityManager.getTypeSerializerLibrary());
-        typeSerializationLibrary.add(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
+        TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary(entityManager.getTypeSerializerLibrary());
+        typeHandlerLibrary.addTypeHandler(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
         // TODO: Add network override types here (that use id lookup tables)
 
-        eventSerializer = new EventSerializer(eventLibrary, typeSerializationLibrary);
-        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), typeSerializationLibrary);
+        eventSerializer = new EventSerializer(eventLibrary, typeHandlerLibrary);
+        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), typeHandlerLibrary);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {

@@ -31,7 +31,9 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
  * Applies an amount of the max depth for regions that are rivers
+ * @deprecated Prefer using {@link SimplexRiverProvider}.
  */
+@Deprecated
 @Updates(@Facet(SurfaceHeightFacet.class))
 public class PerlinRiverProvider implements FacetProvider, ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;

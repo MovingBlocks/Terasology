@@ -16,9 +16,10 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -34,20 +35,17 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.ComponentSerializer;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -55,25 +53,25 @@ import static org.mockito.Mockito.mock;
 public class ComponentSerializerTest {
     private static ModuleManager moduleManager;
     private ComponentSerializer componentSerializer;
-    private ReflectFactory reflectFactory = new ReflectionReflectFactory();
-    private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
     private Context context;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() throws Exception {
         moduleManager = ModuleManagerFactory.create();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         context = new ContextImpl();
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
         context.put(ModuleManager.class, moduleManager);
         CoreRegistry.setContext(context);
 
-        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
-        serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
-        serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
+        Reflections reflections = new Reflections(getClass().getClassLoader());
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
+
+        serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         context.put(NetworkSystem.class, networkSystem);

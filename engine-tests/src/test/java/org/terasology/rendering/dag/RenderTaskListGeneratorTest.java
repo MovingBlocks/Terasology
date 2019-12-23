@@ -17,13 +17,13 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.engine.SimpleUri;
 
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RenderTaskListGeneratorTest {
 

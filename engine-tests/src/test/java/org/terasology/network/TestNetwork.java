@@ -17,9 +17,9 @@
 package org.terasology.network;
 
 import com.google.common.collect.Lists;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.config.Config;
 import org.terasology.engine.EngineTime;
@@ -33,7 +33,7 @@ import org.terasology.network.internal.NetworkSystemImpl;
 
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -42,7 +42,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
 
     private List<NetworkSystem> netSystems = Lists.newArrayList();
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
         CertificateGenerator generator = new CertificateGenerator();
@@ -50,7 +50,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         context.get(Config.class).getSecurity().setServerCredentials(serverIdentiy.getPublicCert(), serverIdentiy.getPrivateCert());
     }
 
-    @After
+    @AfterEach
     public void cleanUp() {
         netSystems.forEach(NetworkSystem::shutdown);
 

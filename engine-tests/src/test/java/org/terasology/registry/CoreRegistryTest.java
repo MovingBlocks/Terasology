@@ -17,14 +17,14 @@
 package org.terasology.registry;
 
 import com.google.common.collect.Maps;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.context.Context;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class CoreRegistryTest {
     private Context context;
@@ -32,7 +32,7 @@ public class CoreRegistryTest {
     /**
      * Create a Context implementation instance an assign it to CoreRegistry before testing.
      */
-    @Before
+    @BeforeEach
     public void setup() {
         context = new ContextImplementation();
         CoreRegistry.setContext(context);

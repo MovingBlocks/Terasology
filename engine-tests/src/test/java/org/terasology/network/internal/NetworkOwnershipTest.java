@@ -16,8 +16,8 @@
 
 package org.terasology.network.internal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
@@ -34,7 +34,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.BlockEntityRegistry;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -50,7 +50,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     private EntityRef clientEntity;
 
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
         ModuleManager moduleManager = ModuleManagerFactory.create();

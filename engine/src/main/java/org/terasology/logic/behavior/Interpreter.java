@@ -38,6 +38,17 @@ public class Interpreter {
         this.actor = actor;
     }
 
+    /**
+     * Copy constructor to save BT execution state
+     * @param interpreter
+     */
+    public Interpreter(Interpreter interpreter) {
+        this.actor = interpreter.actor;
+        this.treeRunner = interpreter.treeRunner;
+        this.tree = interpreter.tree;
+        this.callback = interpreter.callback;
+    }
+
     public void setCallback(DefaultBehaviorTreeRunner.Callback callback) {
         this.callback = callback;
         reset();

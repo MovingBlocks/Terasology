@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -41,7 +41,7 @@ public class RowLayoutTest {
     private UIWidget itemAt1x2;
     private UIWidget itemAt1x3;
 
-    @Before
+    @BeforeEach
     public void setup() {
         rowLayout = new RowLayout();
 

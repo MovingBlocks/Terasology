@@ -32,7 +32,6 @@ public final class RootConfig {
     private PermissionConfig permission = new PermissionConfig();
     private InputConfig input = new InputConfig();
     private BindsConfig binds = new BindsConfig();
-    private AudioConfig audio = new AudioConfig();
     private RenderingConfig rendering = new RenderingConfig();
     private ModuleConfig defaultModSelection = new ModuleConfig();
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
@@ -74,10 +73,6 @@ public final class RootConfig {
 
     public PlayerConfig getPlayer() {
         return player;
-    }
-
-    public AudioConfig getAudio() {
-        return audio;
     }
 
     public SystemConfig getSystem() {

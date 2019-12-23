@@ -26,7 +26,9 @@ import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 /**
+ * @deprecated Prefer using {@link SimplexSurfaceTemperatureProvider}.
  */
+@Deprecated
 @Produces(SurfaceTemperatureFacet.class)
 public class PerlinSurfaceTemperatureProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;

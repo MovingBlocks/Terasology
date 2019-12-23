@@ -55,7 +55,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, selfBlock);
 
                 if (blockAppearance.getPart(BlockPart.CENTER) != null) {
-                    blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh,x,y,z,renderType,vertexFlag);
+                    blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, renderType, vertexFlag);
                 }
 
                 BlockMeshPart blockMeshPart = blockAppearance.getPart(BlockPart.fromSide(side));
