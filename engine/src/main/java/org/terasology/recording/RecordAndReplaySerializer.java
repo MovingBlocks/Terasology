@@ -23,10 +23,11 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.reflection.TypeRegistry;
 
 import java.io.FileWriter;
 import java.io.FileReader;
@@ -47,7 +48,6 @@ public final class RecordAndReplaySerializer {
     private static final String STATE_EVENT_POSITION = "/state_event_position" + JSON;
     private static final String DIRECTION_ORIGIN_LIST = "/direction_origin_list" + JSON;
 
-    private EntityManager entityManager;
     private RecordedEventStore recordedEventStore;
     private RecordAndReplayUtils recordAndReplayUtils;
     private CharacterStateEventPositionMap characterStateEventPositionMap;
@@ -55,14 +55,15 @@ public final class RecordAndReplaySerializer {
     private RecordedEventSerializer recordedEventSerializer;
 
     public RecordAndReplaySerializer(EntityManager manager, RecordedEventStore store,
-                                     RecordAndReplayUtils recordAndReplayUtils, CharacterStateEventPositionMap characterStateEventPositionMap,
-                                     DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList, ModuleEnvironment moduleEnvironment) {
-        this.entityManager = manager;
+                                     RecordAndReplayUtils recordAndReplayUtils,
+                                     CharacterStateEventPositionMap characterStateEventPositionMap,
+                                     DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList,
+                                     ModuleManager moduleManager, TypeRegistry typeRegistry) {
         this.recordedEventStore = store;
         this.recordAndReplayUtils = recordAndReplayUtils;
         this.characterStateEventPositionMap = characterStateEventPositionMap;
         this.directionAndOriginPosRecorderList = directionAndOriginPosRecorderList;
-        this.recordedEventSerializer = new RecordedEventSerializer(entityManager, moduleEnvironment);
+        this.recordedEventSerializer = new RecordedEventSerializer(manager, moduleManager, typeRegistry);
     }
 
     /**
@@ -73,7 +74,7 @@ public final class RecordAndReplaySerializer {
         serializeRecordedEvents(recordingPath);
         Gson gson = new GsonBuilder().create();
         serializeFileAmount(gson, recordingPath);
-        serializeCharacterStateEventPositonMap(gson, recordingPath);
+        serializeCharacterStateEventPositionMap(gson, recordingPath);
         serializeAttackEventExtraRecorder(gson, recordingPath);
     }
 
@@ -97,7 +98,7 @@ public final class RecordAndReplaySerializer {
         deserializeRecordedEvents(recordingPath);
         Gson gson = new GsonBuilder().create();
         deserializeFileAmount(gson, recordingPath);
-        deserializeCharacterStateEventPositonMap(gson, recordingPath);
+        deserializeCharacterStateEventPositionMap(gson, recordingPath);
         deserializeAttackEventExtraRecorder(gson, recordingPath);
     }
 
@@ -135,7 +136,7 @@ public final class RecordAndReplaySerializer {
         }
     }
 
-    private void serializeCharacterStateEventPositonMap(Gson gson, String recordingPath) {
+    private void serializeCharacterStateEventPositionMap(Gson gson, String recordingPath) {
         try {
             JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + STATE_EVENT_POSITION));
             gson.toJson(characterStateEventPositionMap.getIdToData(), HashMap.class, writer);
@@ -147,7 +148,7 @@ public final class RecordAndReplaySerializer {
         }
     }
 
-    private void deserializeCharacterStateEventPositonMap(Gson gson, String recordingPath) {
+    private void deserializeCharacterStateEventPositionMap(Gson gson, String recordingPath) {
         try (FileReader fileReader = new FileReader(recordingPath + STATE_EVENT_POSITION)) {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(fileReader);

@@ -15,15 +15,14 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldProvider;
@@ -34,7 +33,7 @@ import static org.mockito.Mockito.when;
 public class PerspectiveCameraTest {
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Config config = new Config(new MockContext());
         config.loadDefaults();
@@ -63,16 +62,16 @@ public class PerspectiveCameraTest {
                 , 0.0f, 8.937492f, 0.0f, 0.0f
                 , 0.0f, 0.0f, -1.00004f, -0.20000401f
                 , 0.0f, 0.0f, -1.0f, 0.0f);
-        Matrix4f normViewMatrix = new Matrix4f(0.27303523f,0.0f,-0.962004f,-0.0f
-                ,-0.96200305f,0.0014514439f,-0.27303496f,-0.0f,
-                0.0013962948f,0.99999887f,3.962953f,-0.0f,
-                0.0f,0.0f,0.0f,1.0f);
+        Matrix4f normViewMatrix = new Matrix4f(0.27303523f, 0.0f, -0.962004f, -0.0f
+                , -0.96200305f, 0.0014514439f, -0.27303496f, -0.0f,
+                0.0013962948f, 0.99999887f, 3.962953f, -0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f);
 
 
-        camera.getViewMatrix().equals(viewMatrix, 0.5f);
-        camera.getProjectionMatrix().equals(projectionMatrix, 0.5f);
-        camera.getNormViewMatrix().equals(normViewMatrix,0.5f);
+        camera.getViewMatrix().epsilonEquals(viewMatrix, 0.5f);
+        camera.getProjectionMatrix().epsilonEquals(projectionMatrix, 0.5f);
+        camera.getNormViewMatrix().epsilonEquals(normViewMatrix, 0.5f);
         camera.setReflected(true);
-        camera.getNormViewMatrix().equals(normViewMatrix,0.5f);
+        camera.getNormViewMatrix().epsilonEquals(normViewMatrix, 0.5f);
     }
 }

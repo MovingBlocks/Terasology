@@ -8,6 +8,9 @@ import groovy.json.JsonSlurper
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.exception.GrgitException
 import org.ajoberstar.grgit.Remote
+import org.eclipse.jgit.errors.RepositoryNotFoundException
+
+import static Ansi.*
 
 class common {
 
@@ -184,37 +187,42 @@ class common {
      * @param itemName the name of the item to update
      */
     def updateItem(String itemName) {
-        println "Attempting to update $itemType $itemName"
         File targetDir = new File(targetDirectory, itemName)
         if (!targetDir.exists()) {
-            println "$itemType \"$itemName\" not found"
+            println color("$itemType \"$itemName\" not found", Ansi.RED)
             return
         }
-        def itemGit = Grgit.open(dir: targetDir)
-
-        // Do a check for the default remote before we attempt to update
-        def remotes = itemGit.remote.list()
-        def targetUrl = remotes.find{
-            it.name == defaultRemote
-        }?.url
-        if (targetUrl == null || !isUrlValid(targetUrl)) {
-            println "While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl"
-            return
-        }
-
-        // At this point we should have a valid remote to pull from. If local repo is clean then pull!
-        def clean = itemGit.status().clean
-        println "Is \"$itemName\" clean? $clean"
-        if (!clean) {
-            println "$itemType has uncommitted changes. Skipping."
-            return
-        }
-        println "Updating $itemType $itemName"
-
         try {
-            itemGit.pull remote: defaultRemote
-        } catch (GrgitException exception) {
-            println "Unable to update $itemName, Skipping: ${exception.getMessage()}"
+            def itemGit = Grgit.open(dir: targetDir)
+
+            // Do a check for the default remote before we attempt to update
+            def remotes = itemGit.remote.list()
+            def targetUrl = remotes.find{
+                it.name == defaultRemote
+            }?.url
+            if (targetUrl == null || !isUrlValid(targetUrl)) {
+                println color("While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl", Ansi.RED)
+                return
+            }
+
+            // At this point we should have a valid remote to pull from. If local repo is clean then pull!
+            def clean = itemGit.status().clean
+            def branchName = itemGit.branch.getCurrent().fullName
+
+            print "$itemType '$itemName' [$branchName]: "
+
+            if (!clean) {
+                println color("uncommitted changes. Skipping.", Ansi.YELLOW)
+            } else {
+                println color("updating $itemType $itemName", Ansi.GREEN)
+                try {
+                    itemGit.pull remote: defaultRemote
+                } catch (GrgitException exception) {
+                    println color("Unable to update $itemName, Skipping: ${exception.getMessage()}", Ansi.RED)
+                }
+            }
+        } catch(RepositoryNotFoundException exception) {
+            println color("Skipping update for $itemName: no repository found (probably engine module)", Ansi.LIGHT_YELLOW)
         }
     }
 
@@ -431,4 +439,45 @@ class common {
     void unCacheItemList() {
         itemListCached = false
     }
+}
+
+/**
+ * Small ANSI coloring utility.
+ * @see https://gist.github.com/tvinke/db4d21dfdbdae49e6f92dcf1ca6120de
+ * @see http://www.bluesock.org/~willg/dev/ansi.html
+ * @see https://gist.github.com/dainkaplan/4651352
+ */
+class Ansi {
+
+    static final String NORMAL          = "\u001B[0m"
+
+    static final String	BOLD            = "\u001B[1m"
+    static final String	ITALIC	        = "\u001B[3m"
+    static final String	UNDERLINE       = "\u001B[4m"
+    static final String	BLINK           = "\u001B[5m"
+    static final String	RAPID_BLINK	    = "\u001B[6m"
+    static final String	REVERSE_VIDEO   = "\u001B[7m"
+    static final String	INVISIBLE_TEXT  = "\u001B[8m"
+
+    static final String	BLACK           = "\u001B[30m"
+    static final String	RED             = "\u001B[31m"
+    static final String	GREEN           = "\u001B[32m"
+    static final String	YELLOW          = "\u001B[33m"
+    static final String	BLUE            = "\u001B[34m"
+    static final String	MAGENTA         = "\u001B[35m"
+    static final String	CYAN            = "\u001B[36m"
+    static final String	WHITE           = "\u001B[37m"
+
+    static final String	DARK_GRAY       = "\u001B[1;30m"
+    static final String	LIGHT_RED       = "\u001B[1;31m"
+    static final String	LIGHT_GREEN     = "\u001B[1;32m"
+    static final String LIGHT_YELLOW    = "\u001B[1;33m"
+    static final String	LIGHT_BLUE      = "\u001B[1;34m"
+    static final String	LIGHT_PURPLE    = "\u001B[1;35m"
+    static final String	LIGHT_CYAN      = "\u001B[1;36m"
+
+    static String color(String text, String ansiValue) {
+        ansiValue + text + NORMAL
+    }
+
 }

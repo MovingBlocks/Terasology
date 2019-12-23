@@ -15,14 +15,14 @@
  */
 package org.terasology.particles;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test for {@link ParticlePool}.
@@ -105,7 +105,7 @@ public class ParticlePoolTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void constructorTest() {
         final int[] poolSizes = {1, 27, 133};
 
@@ -125,7 +125,8 @@ public class ParticlePoolTest {
             assertEquals(size * 4, pool.color.length);
         }
         // Should throw exception after creating the pool
-        ParticlePool pool = new ParticlePool(0);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new ParticlePool(0));
         
     }
 

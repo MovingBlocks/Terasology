@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 
 public class ModuleManagerImpl implements ModuleManager {
     private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
@@ -160,17 +159,24 @@ public class ModuleManagerImpl implements ModuleManager {
                     if (null == id || displayName.equalsIgnoreCase("")) {
                         logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping");
                         logger.warn("{}", url);
+                        continue;
                     }
 
                     logger.info("Loading module {} from class path at {}", displayName, url.getFile());
 
                     // the url contains a protocol, and points to the module.txt
                     // we need to trim both of those away to get the module's path
-                    Path path = Paths.get(url.getFile()
+                    String targetFile = url.getFile()
                             .replace("file:", "")
                             .replace("!/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
-                            .replace("/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
-                    );
+                            .replace("/" + TerasologyConstants.MODULE_INFO_FILENAME, "");
+
+                    // Windows specific check - Path doesn't like /C:/... style Strings indicating files
+                    if (targetFile.matches("/[a-zA-Z]:.*")) {
+                        targetFile = targetFile.substring(1);
+                    }
+
+                    Path path = Paths.get(targetFile);
 
                     Module module = loader.load(path);
                     registry.add(module);

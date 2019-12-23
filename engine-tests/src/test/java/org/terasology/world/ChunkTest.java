@@ -15,8 +15,8 @@
  */
 package org.terasology.world;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -37,7 +37,7 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ChunkTest extends TerasologyTestingEnvironment {
 
@@ -45,7 +45,7 @@ public class ChunkTest extends TerasologyTestingEnvironment {
     private BlockManagerImpl blockManager;
     private Block solid;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);

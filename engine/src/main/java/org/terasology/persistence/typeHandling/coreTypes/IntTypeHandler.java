@@ -15,56 +15,27 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Optional;
 
 /**
  */
-public class IntTypeHandler implements TypeHandler<Integer> {
+public class IntTypeHandler extends TypeHandler<Integer> {
 
     @Override
-    public PersistedData serialize(Integer value, SerializationContext context) {
-        if (value != null) {
-            return context.create(value);
-        }
-        return context.createNull();
+    public PersistedData serializeNonNull(Integer value, PersistedDataSerializer serializer) {
+        return serializer.serialize(value);
     }
 
     @Override
-    public Integer deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<Integer> deserialize(PersistedData data) {
         if (data.isNumber()) {
-            return data.getAsInteger();
+            return Optional.of(data.getAsInteger());
         }
-        return null;
+        return Optional.empty();
     }
 
-    @Override
-    public PersistedData serializeCollection(Collection<Integer> value, SerializationContext context) {
-        return context.create(Ints.toArray(value));
-    }
-
-    @Override
-    public List<Integer> deserializeCollection(PersistedData data, DeserializationContext context) {
-        if (data.isArray()) {
-            PersistedDataArray array = data.getAsArray();
-            List<Integer> result = Lists.newArrayListWithCapacity(array.size());
-            for (PersistedData item : array) {
-                if (item.isNumber()) {
-                    result.add(item.getAsInteger());
-                } else {
-                    result.add(null);
-                }
-            }
-            return result;
-        }
-        return Lists.newArrayList();
-    }
 }

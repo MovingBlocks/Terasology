@@ -15,21 +15,22 @@
  */
 package org.terasology.testUtil;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collection;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Supplier;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
+ *
  */
 public final class TeraAssert {
     private TeraAssert() {
@@ -42,9 +43,9 @@ public final class TeraAssert {
             assertNotNull(actual);
             List<? extends T> copyActual = Lists.newArrayList(actual);
             for (Object obj : expected) {
-                assertTrue("Missing element: " + obj, copyActual.remove(obj));
+                assertTrue(copyActual.remove(obj), () -> "Missing element: " + obj);
             }
-            assertTrue("Unexpected additional elements: " + copyActual.toString(), copyActual.isEmpty());
+            assertTrue(copyActual.isEmpty(), () -> "Unexpected additional elements: " + copyActual.toString());
         }
     }
 
@@ -53,10 +54,10 @@ public final class TeraAssert {
             assertNull(actual);
         } else {
             assertNotNull(actual);
-            String errorMessage = "Expected " + expected + ", actual" + actual;
-            org.junit.Assert.assertEquals(errorMessage, expected.x, actual.x, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.y, actual.y, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.z, actual.z, error);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            org.junit.jupiter.api.Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
         }
     }
 
@@ -65,11 +66,11 @@ public final class TeraAssert {
             assertNull(actual);
         } else {
             assertNotNull(actual);
-            String errorMessage = "Expected " + expected + ", actual" + actual;
-            org.junit.Assert.assertEquals(errorMessage, expected.x, actual.x, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.y, actual.y, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.z, actual.z, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.w, actual.w, error);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            org.junit.jupiter.api.Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.w, actual.w, error, errorMessageSupplier);
         }
     }
 
@@ -78,11 +79,11 @@ public final class TeraAssert {
             assertNull(actual);
         } else {
             assertNotNull(actual);
-            String errorMessage = "Expected " + expected + ", actual" + actual;
-            org.junit.Assert.assertEquals(errorMessage, expected.x, actual.x, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.y, actual.y, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.z, actual.z, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.w, actual.w, error);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            org.junit.jupiter.api.Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.w, actual.w, error, errorMessageSupplier);
         }
     }
 }
