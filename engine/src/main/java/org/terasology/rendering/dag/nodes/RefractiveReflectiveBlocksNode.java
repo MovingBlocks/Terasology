@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -218,7 +218,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
 
         // Common Shader Parameters
 
-        sunDirection = backdropProvider.getSunDirection(false);
+        sunDirection = JomlUtil.from(backdropProvider.getSunDirection(false));
 
         chunkMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
         chunkMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
@@ -264,17 +264,17 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        final org.joml.Vector3f cameraPosition = activeCamera.getPosition();
+        final Vector3f cameraPosition = activeCamera.getPosition();
 
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaBlend.poll();
 
             if (chunk.hasMesh()) {
                 final ChunkMesh chunkMesh = chunk.getMesh();
-                final Vector3f chunkPosition = chunk.getPosition().toVector3f();
+                final Vector3f chunkPosition = new Vector3f(JomlUtil.from(chunk.getPosition()));
 
                 chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
-                numberOfRenderedTriangles += chunkMesh.render(REFRACTIVE, JomlUtil.from(chunkPosition), cameraPosition);
+                numberOfRenderedTriangles += chunkMesh.render(REFRACTIVE, chunkPosition, cameraPosition);
 
             } else {
                 numberOfChunksThatAreNotReadyYet++;

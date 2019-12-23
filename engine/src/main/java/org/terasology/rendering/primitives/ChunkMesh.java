@@ -233,11 +233,11 @@ public class ChunkMesh {
      * @param chunkPosition a Vector3f instance holding the world coordinates of a chunk
      * @param chunkIsAnimated a boolean: true if the chunk is animated, false otherwise
      */
-    public void updateMaterial(Material chunkMaterial, Vector3f chunkPosition, boolean chunkIsAnimated) {
+    public void updateMaterial(Material chunkMaterial, Vector3fc chunkPosition, boolean chunkIsAnimated) {
         chunkMaterial.setFloat3("chunkPositionWorld",
-                chunkPosition.x * ChunkConstants.SIZE_X,
-                chunkPosition.y * ChunkConstants.SIZE_Y,
-                chunkPosition.z * ChunkConstants.SIZE_Z,
+                chunkPosition.x() * ChunkConstants.SIZE_X,
+                chunkPosition.y() * ChunkConstants.SIZE_Y,
+                chunkPosition.z() * ChunkConstants.SIZE_Z,
                 true);
         chunkMaterial.setFloat("animated", chunkIsAnimated ? 1.0f : 0.0f, true);
     }

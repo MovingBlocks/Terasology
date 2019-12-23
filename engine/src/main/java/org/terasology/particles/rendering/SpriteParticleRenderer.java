@@ -150,9 +150,9 @@ public class SpriteParticleRenderer implements RenderSystem {
     public void renderAlphaBlend() {
         Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();
         material.enable();
-        Vector3f camPos = JomlUtil.from( worldRenderer.getActiveCamera().getPosition());
+        org.joml.Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
 
-        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, camPos));
+        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, JomlUtil.from(camPos)));
     }
 
     @Override

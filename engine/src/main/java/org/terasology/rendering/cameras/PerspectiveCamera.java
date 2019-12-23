@@ -156,7 +156,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
                 up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
         reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
-        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, 1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
         reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
         reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
         viewMatrix.mul(reflectionMatrix, viewMatrixReflected);
