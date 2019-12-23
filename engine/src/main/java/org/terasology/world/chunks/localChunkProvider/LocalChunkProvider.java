@@ -31,6 +31,10 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.characters.AliveCharacterComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterTeleportEvent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -71,6 +75,7 @@ import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -335,6 +340,13 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
         for (Component component : store.iterateComponents()) {
             entity.addComponent(component);
+            if (component instanceof LocationComponent && entity.hasAllComponents(
+                    Arrays.asList(AliveCharacterComponent.class, CharacterMovementComponent.class))) {
+                // TODO: must be a better way to do this
+                // Setting the LocationComponent doesn't work as it gets overwritten
+                // on the first character movement update
+                entity.send(new CharacterTeleportEvent(((LocationComponent) component).getWorldPosition()));
+            }
         }
     }
 
