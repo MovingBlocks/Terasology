@@ -98,8 +98,8 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
     private void applyTransformations(GLTF gltf, TFloatList vertices, TFloatList normals) {
         GLTFNode node = null;
-        for(GLTFNode curr : gltf.getNodes()) {
-            if(curr.getMesh() == 0) {
+        for (GLTFNode curr : gltf.getNodes()) {
+            if (curr.getMesh() == 0) {
                 node = curr;
                 break;
             }
@@ -107,7 +107,7 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
         Matrix4f transform = new Matrix4f(Matrix4f.IDENTITY);
 
-        if(node != null) {
+        if (node != null) {
             if (node.getMatrix() == null) {
                 Vector3f position = new Vector3f();
                 Quat4f rotation = new Quat4f(Quat4f.IDENTITY);
@@ -124,17 +124,17 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
                 }
                 transform.set(new Matrix4f(rotation, position, 1.0f));
 
-                transform.set(0, 0, scale.getX()*transform.get(0, 0));
-                transform.set(0, 1, scale.getX()*transform.get(0, 1));
-                transform.set(0, 2, scale.getX()*transform.get(0, 2));
+                transform.set(0, 0, scale.getX() * transform.get(0, 0));
+                transform.set(0, 1, scale.getX() * transform.get(0, 1));
+                transform.set(0, 2, scale.getX() * transform.get(0, 2));
 
-                transform.set(1, 0, scale.getY()*transform.get(1, 0));
-                transform.set(1, 1, scale.getY()*transform.get(1, 1));
-                transform.set(1, 2, scale.getY()*transform.get(1, 2));
+                transform.set(1, 0, scale.getY() * transform.get(1, 0));
+                transform.set(1, 1, scale.getY() * transform.get(1, 1));
+                transform.set(1, 2, scale.getY() * transform.get(1, 2));
 
-                transform.set(2, 0, scale.getZ()*transform.get(2, 0));
-                transform.set(2, 1, scale.getZ()*transform.get(2, 1));
-                transform.set(2, 2, scale.getZ()*transform.get(2, 2));
+                transform.set(2, 0, scale.getZ() * transform.get(2, 0));
+                transform.set(2, 1, scale.getZ() * transform.get(2, 1));
+                transform.set(2, 2, scale.getZ() * transform.get(2, 2));
             } else {
                 transform.set(node.getMatrix());
             }
@@ -147,15 +147,15 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
     private void applyTransformations(TFloatList buffer, Matrix4f transform, boolean normalize) {
         Vector3f current = new Vector3f();
-        for(int i=0; i<buffer.size(); i+=3) {
-            current.set(buffer.get(i), buffer.get(i+1), buffer.get(i+2));
+        for (int i = 0; i < buffer.size(); i += 3) {
+            current.set(buffer.get(i), buffer.get(i + 1), buffer.get(i + 2));
             transform.transformPoint(current);
-            if(normalize) {
+            if (normalize) {
                 current.normalize();
             }
             buffer.set(i, current.getX());
-            buffer.set(i+1, current.getY());
-            buffer.set(i+2, current.getZ());
+            buffer.set(i + 1, current.getY());
+            buffer.set(i + 2, current.getZ());
         }
     }
 }
