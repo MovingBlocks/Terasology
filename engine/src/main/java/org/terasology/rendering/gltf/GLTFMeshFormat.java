@@ -97,17 +97,26 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
     }
 
     private void applyTransformations(GLTF gltf, TFloatList vertices, TFloatList normals) {
-        GLTFNode node = null;
-        for (GLTFNode curr : gltf.getNodes()) {
-            if (curr.getMesh() == 0) {
-                node = curr;
+        int nodeIndex = -1;
+        for (int i = 0; i < gltf.getNodes().size(); i++) {
+            if (gltf.getNodes().get(i).getMesh() == 0) {
+                nodeIndex = i;
                 break;
             }
         }
 
+        Matrix4f transform = getMatrix(gltf, nodeIndex);
+
+        applyTransformations(vertices, transform, false);
+        transform.setTranslation(new Vector3f());
+        applyTransformations(normals, transform, true);
+    }
+
+    private Matrix4f getMatrix(GLTF gltf, int nodeIndex) {
         Matrix4f transform = new Matrix4f(Matrix4f.IDENTITY);
 
-        if (node != null) {
+        if (nodeIndex != -1) {
+            GLTFNode node = gltf.getNodes().get(nodeIndex);
             if (node.getMatrix() == null) {
                 Vector3f position = new Vector3f();
                 Quat4f rotation = new Quat4f(Quat4f.IDENTITY);
@@ -138,11 +147,24 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
             } else {
                 transform.set(node.getMatrix());
             }
+
+            int parentNodeIndex = getParentNode(gltf, nodeIndex);
+            Matrix4f parentTransform = getMatrix(gltf, parentNodeIndex);
+            parentTransform.mul(transform); //Must be multiplied in the right order
+            transform.set(parentTransform);
         }
 
-        applyTransformations(vertices, transform, false);
-        transform.setTranslation(new Vector3f());
-        applyTransformations(normals, transform, true);
+        return transform;
+    }
+
+    private int getParentNode(GLTF gltf, int nodeIndex) {
+        for (int i = 0; i < gltf.getNodes().size(); i++) {
+            GLTFNode curr = gltf.getNodes().get(i);
+            if (curr.getChildren() != null && curr.getChildren().contains(nodeIndex)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private void applyTransformations(TFloatList buffer, Matrix4f transform, boolean normalize) {
