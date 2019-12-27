@@ -36,6 +36,7 @@ public class EntityMotionState extends btMotionState {
 
     private EntityRef entity;
     private Quat4f rot = new Quat4f();
+    private Matrix4f trans = new Matrix4f();
     /**
      * Only the BulletPhysics class is expected to create instances.
      *
@@ -45,16 +46,20 @@ public class EntityMotionState extends btMotionState {
     EntityMotionState(EntityRef entity) {
         super();
         this.entity = entity;
+        LocationComponent loc = entity.getComponent(LocationComponent.class);
+        trans.set(new Matrix4f(loc.getWorldRotation(),loc.getWorldPosition(),1.0f));
     }
 
     @Override
     public void getWorldTransform(Matrix4f transform) {
-        LocationComponent loc = entity.getComponent(LocationComponent.class);
-        transform.set(new Matrix4f(loc.getWorldRotation(),loc.getWorldPosition(),1.0f));
+        transform.set(trans);
+//        LocationComponent loc = entity.getComponent(LocationComponent.class);
+//        transform.set(new Matrix4f(loc.getWorldRotation(),loc.getWorldPosition(),1.0f));
     }
 
     @Override
     public void setWorldTransform(Matrix4f transform) {
+        trans.set(transform);
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             rot.set(transform);

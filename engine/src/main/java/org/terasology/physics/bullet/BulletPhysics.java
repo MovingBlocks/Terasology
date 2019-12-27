@@ -127,6 +127,7 @@ public class BulletPhysics implements PhysicsEngine {
 
         broadphase = new btDbvtBroadphase();
         defaultCollisionConfiguration = new btDefaultCollisionConfiguration();
+
         dispatcher = new btCollisionDispatcher(defaultCollisionConfiguration);
         sequentialImpulseConstraintSolver = new btSequentialImpulseConstraintSolver();
         discreteDynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, sequentialImpulseConstraintSolver, defaultCollisionConfiguration);
@@ -651,8 +652,10 @@ public class BulletPhysics implements PhysicsEngine {
 
         for (Map.Entry<EntityRef, BulletRigidBody> entree : entityRigidBodies.entrySet()) {
             BulletRigidBody body = entree.getValue();
-            body.rb.applyCentralImpulse(body.pendingImpulse);
-            body.rb.applyCentralForce(body.pendingForce);
+            if(body.pendingImpulse.lengthSquared() > .01f || body.pendingForce.lengthSquared() > .01f ) {
+                body.rb.applyCentralImpulse(body.pendingImpulse);
+                body.rb.applyCentralForce(body.pendingForce);
+            }
             body.pendingImpulse.x = 0;
             body.pendingImpulse.y = 0;
             body.pendingImpulse.z = 0;
