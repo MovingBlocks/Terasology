@@ -105,7 +105,7 @@ dependencies {
     compile group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     compile group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
 
-    compile group: 'org.terasology', name: 'native-bullet', version: '0.1.8-20191225.064104-1'
+    compile group: 'org.terasology', name: 'native-bullet', version: '0.2.11-20191229.005019-1'
 
     // Assembly & Bytecode
     compile group: 'org.ow2.asm', name: 'asm', version: '5.0.3'

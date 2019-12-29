@@ -82,7 +82,7 @@ dependencies {
 
     // Natives for JNLua (Kallisti, KComputers)
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
-    natives group: 'org.terasology', name: 'native-bullet', version: '0.1.8-20191225.064104-1', ext: 'zip'
+    natives group: 'org.terasology', name: 'native-bullet', version: '0.2.11-20191229.005019-1', ext: 'zip'
 }
 
 task extractWindowsNatives(type:Copy) {

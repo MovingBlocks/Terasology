@@ -43,7 +43,6 @@ public class PhysicsWorldWrapper extends btVoxelContentProvider {
     @Override
     public void getVoxel(int x, int y, int z, btVoxelInfo info) {
         Block block = world.getBlock(x, y, z);
-
         btVector3 offset = new btVector3(block.getCollisionOffset().x,block.getCollisionOffset().y,block.getCollisionOffset().z);
         btCollisionShape shape = ((BulletCollisionShape)block.getCollisionShape()).underlyingShape;
 

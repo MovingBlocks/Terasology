@@ -37,7 +37,7 @@ import com.badlogic.gdx.physics.bullet.collision.btPairCachingGhostObject;
 import com.badlogic.gdx.physics.bullet.collision.btPersistentManifold;
 import com.badlogic.gdx.physics.bullet.collision.btPersistentManifoldArray;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
-import com.badlogic.gdx.physics.bullet.collision.btVoxelInfo;
+import com.badlogic.gdx.physics.bullet.collision.btVector3i;
 import com.badlogic.gdx.physics.bullet.collision.btVoxelShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
@@ -112,6 +112,7 @@ public class BulletPhysics implements PhysicsEngine {
 
     private final BulletRigidBody rigidBody;
     private final BulletRigidBody liquidBody;
+//    private final btConstraintSolverPoolMt solverPoolMt;
 
     private final btGhostPairCallback callback;
 
@@ -120,7 +121,7 @@ public class BulletPhysics implements PhysicsEngine {
 
     private final PhysicsWorldWrapper wrapper;
     private final PhysicsLiquidWrapper liquidWrapper;
-
+//    private final btITaskScheduler scheduler;
     public BulletPhysics(WorldProvider world) {
 
         callback = new btGhostPairCallback();
@@ -128,8 +129,12 @@ public class BulletPhysics implements PhysicsEngine {
         broadphase = new btDbvtBroadphase();
         defaultCollisionConfiguration = new btDefaultCollisionConfiguration();
 
+//        scheduler = LinearMath.btCreateDefaultTaskScheduler();
+//        LinearMath.btSetTaskScheduler(scheduler);
+
         dispatcher = new btCollisionDispatcher(defaultCollisionConfiguration);
         sequentialImpulseConstraintSolver = new btSequentialImpulseConstraintSolver();
+//        solverPoolMt = new btConstraintSolverPoolMt(100);
         discreteDynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, sequentialImpulseConstraintSolver, defaultCollisionConfiguration);
         discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
@@ -173,8 +178,9 @@ public class BulletPhysics implements PhysicsEngine {
 
     @Override
     public void dispose() {
-        discreteDynamicsWorld.dispose();
+        this.discreteDynamicsWorld.dispose();
         this.dispatcher.dispose();
+//        this.solverPoolMt.dispose();
     }
 
     @Override
@@ -264,15 +270,17 @@ public class BulletPhysics implements PhysicsEngine {
             callback.getHitNormalWorld(hitNormalWorld);
 
             if(callback.hasHit()) {
-                btVoxelInfo info = callback.getVoxelInfo();
                 callback.dispose();
                 if (collisionObject.userData instanceof EntityRef) { //we hit an other entity
                     return new HitResult((EntityRef) collisionObject.userData,
                             hitPointWorld,
                             hitNormalWorld);
                 }
-                else if (!info.isEmpty()) {
-                    Vector3i voxelPosition = new Vector3i(info.getX(), info.getY(), info.getZ());
+                else if ((collisionObject.getCollisionFlags() & btCollisionObject.CollisionFlags.CF_VOXEL_OBJECT) > 0) {
+                    btVector3i pos = new btVector3i();
+                    collisionObject.getVoxelPosition(pos);
+
+                    Vector3i voxelPosition = new Vector3i(pos.getX(), pos.getY(), pos.getZ());
                     final EntityRef entityAt = blockEntityRegistry.getEntityAt(voxelPosition);
                     return new HitResult(entityAt,
                             hitPointWorld,
@@ -296,7 +304,7 @@ public class BulletPhysics implements PhysicsEngine {
         applyPendingImpulsesAndForces();
         try {
             PerformanceMonitor.startActivity("Step Simulation");
-            if (discreteDynamicsWorld.stepSimulation(delta, 8) != 0) {
+            if (discreteDynamicsWorld.stepSimulation(delta,8) != 0) {
                 for (BulletCharacterMoverCollider collider : entityColliders.values()) {
                     collider.pending = false;
                 }
