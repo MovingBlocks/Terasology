@@ -163,7 +163,7 @@ public class GLSLShader extends Shader {
 
         StringBuilder builder = new StringBuilder().append(preProcessorPreamble);
         if (renderConfig.isVolumetricFog()) {
-            builder.append("#define VOLUMETRIC_FOG");
+            builder.append("#define VOLUMETRIC_FOG \n");
         }
 
         if (renderConfig.isAnimateGrass()) {
