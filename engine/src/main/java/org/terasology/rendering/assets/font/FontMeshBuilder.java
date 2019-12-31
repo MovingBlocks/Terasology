@@ -17,13 +17,13 @@ package org.terasology.rendering.assets.font;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.nui.Color;
+import org.terasology.nui.HorizontalAlign;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.FontUnderline;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

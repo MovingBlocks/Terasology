@@ -26,7 +26,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.math.AABB;
-import org.terasology.math.Border;
+import org.terasology.nui.math.Border;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseQuat4f;
@@ -38,18 +38,20 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.assets.font.Font;
+import org.terasology.nui.asset.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.Color;
+import org.terasology.nui.HorizontalAlign;
+import org.terasology.nui.ScaleMode;
+import org.terasology.nui.TextLineBuilder;
+import org.terasology.nui.VerticalAlign;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
-import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.TextLineBuilder;
-import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.opengl.FrameBufferObject;
 import org.terasology.rendering.opengl.LwjglFrameBufferObject;
 import org.terasology.utilities.Assets;
@@ -280,9 +282,9 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
     }
 
     @Override
-    public void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
+    public void drawTexture(UITextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
                             float ux, float uy, float uw, float uh, float alpha) {
-        if (!texture.getTexture().isLoaded()) {
+        if (!((org.terasology.rendering.assets.texture.TextureRegion)texture).getTexture().isLoaded()) {
             return;
         }
 
@@ -340,7 +342,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
             }
         }
 
-        textureMat.setTexture("texture", texture.getTexture());
+        textureMat.setTexture("texture", ((org.terasology.rendering.assets.texture.TextureRegion)texture).getTexture());
         textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
         textureMat.bindTextures();
         mesh.render();
@@ -362,7 +364,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
             }
         }
         if (fontMesh == null) {
-            fontMesh = fontMeshBuilder.createTextMesh(font, lines, absoluteRegion.width(), hAlign, color, shadowColor, underlined);
+            fontMesh = fontMeshBuilder.createTextMesh((org.terasology.rendering.assets.font.Font)font, lines, absoluteRegion.width(), hAlign, color, shadowColor, underlined);
             cachedText.put(key, fontMesh);
         }
 
@@ -380,8 +382,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
     }
 
     @Override
-    public void drawTextureBordered(TextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
-        if (!texture.getTexture().isLoaded()) {
+    public void drawTextureBordered(UITextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
+        if (!((org.terasology.rendering.assets.texture.TextureRegion)texture).getTexture().isLoaded()) {
             return;
         }
 
@@ -486,7 +488,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
         textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
 
-        textureMat.setTexture("texture", texture.getTexture());
+        textureMat.setTexture("texture", ((org.terasology.rendering.assets.texture.TextureRegion)texture).getTexture());
         textureMat.setFloat4("color", 1, 1, 1, alpha);
         textureMat.bindTextures();
         mesh.render();

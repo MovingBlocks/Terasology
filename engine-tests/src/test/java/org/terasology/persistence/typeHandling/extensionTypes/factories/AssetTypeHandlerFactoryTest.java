@@ -20,12 +20,12 @@ import org.junit.jupiter.api.Test;
 import org.terasology.assets.Asset;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StreamingSound;
+import org.terasology.nui.asset.UIElement;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.nui.asset.UIElement;
 
 import java.util.List;
 import java.util.Optional;

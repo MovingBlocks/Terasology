@@ -22,7 +22,7 @@ import org.terasology.module.sandbox.API;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 
 import java.security.AccessController;

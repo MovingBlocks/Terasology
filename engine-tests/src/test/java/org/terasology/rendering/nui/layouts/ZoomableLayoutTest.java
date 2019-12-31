@@ -20,7 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.layouts.ZoomableLayout;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;

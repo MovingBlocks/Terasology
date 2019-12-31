@@ -20,19 +20,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.nui.properties.Range;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.rendering.nui.properties.Range;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.or;
-import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withType;
 

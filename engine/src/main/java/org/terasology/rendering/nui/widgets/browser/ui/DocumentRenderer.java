@@ -17,9 +17,9 @@ package org.terasology.rendering.nui.widgets.browser.ui;
 
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.Color;
 import org.terasology.rendering.nui.widgets.browser.data.DocumentData;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;

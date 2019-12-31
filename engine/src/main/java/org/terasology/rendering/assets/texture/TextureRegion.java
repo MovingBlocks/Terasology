@@ -23,7 +23,8 @@ import org.terasology.math.geom.Vector2i;
  * Interface for any asset that describes a region of a texture that can be rendered (can include textures themselves).
  *
  */
-public interface TextureRegion {
+// TODO: Remove UITextureRegion extension when NUI is fully re-integrated
+public interface TextureRegion extends org.terasology.nui.UITextureRegion {
 
     Texture getTexture();
 

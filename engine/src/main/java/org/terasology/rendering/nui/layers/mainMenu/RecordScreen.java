@@ -26,7 +26,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIButton;
 
 import java.util.Objects;
 import java.util.stream.Stream;

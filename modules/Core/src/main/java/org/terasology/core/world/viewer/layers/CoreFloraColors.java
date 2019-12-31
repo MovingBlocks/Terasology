@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.terasology.core.world.generator.rasterizers.FloraType;
-import org.terasology.rendering.nui.Color;
 
 import com.google.common.collect.Maps;
+import org.terasology.nui.Color;
 
 /**
  * Maps {@link FloraType} to color.

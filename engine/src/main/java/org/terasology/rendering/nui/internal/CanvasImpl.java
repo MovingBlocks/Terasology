@@ -30,38 +30,37 @@ import org.terasology.input.InputSystem;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.math.Border;
+import org.terasology.nui.math.Border;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.assets.font.Font;
+import org.terasology.nui.asset.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
-import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Color;
+import org.terasology.nui.HorizontalAlign;
+import org.terasology.nui.InteractionListener;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TabbingManager;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.VerticalAlign;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseDragEvent;
-import org.terasology.rendering.nui.events.NUIMouseOverEvent;
-import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
-import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
-import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.skin.UIStyle;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UITooltip;
+import org.terasology.nui.ScaleMode;
+import org.terasology.nui.SubRegion;
+import org.terasology.nui.TabbingManager;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.VerticalAlign;
+import org.terasology.nui.events.NUIMouseClickEvent;
+import org.terasology.nui.events.NUIMouseDoubleClickEvent;
+import org.terasology.nui.events.NUIMouseDragEvent;
+import org.terasology.nui.events.NUIMouseOverEvent;
+import org.terasology.nui.events.NUIMouseReleaseEvent;
+import org.terasology.nui.events.NUIMouseWheelEvent;
+import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UIStyle;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UITooltip;
 import org.terasology.rendering.opengl.FrameBufferObject;
 import org.terasology.utilities.Assets;
 
@@ -101,7 +100,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     private CanvasState state;
 
     private Material meshMat;
-    private Texture whiteTexture;
+    private UITextureRegion whiteTexture;
 
     private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
@@ -291,10 +290,11 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         return new SubRegionImpl(region, crop);
     }
 
-    @Override
-    public SubRegion subRegionFBO(ResourceUrn uri, BaseVector2i size) {
-        return new SubRegionFBOImpl(uri, size);
-    }
+    //NOTE: Removed as it was not used and implied a particular backend
+    //@Override
+    //public SubRegion subRegionFBO(ResourceUrn uri, BaseVector2i size) {
+    //    return new SubRegionFBOImpl(uri, size);
+    //}
 
     @Override
     public void setDrawOnTop(boolean drawOnTop) {
@@ -456,22 +456,22 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     }
 
     @Override
-    public void drawTexture(TextureRegion texture) {
+    public void drawTexture(UITextureRegion texture) {
         drawTexture(texture, state.getRelativeRegion());
     }
 
     @Override
-    public void drawTexture(TextureRegion texture, Color color) {
+    public void drawTexture(UITextureRegion texture, Color color) {
         drawTexture(texture, state.getRelativeRegion(), color);
     }
 
     @Override
-    public void drawTexture(TextureRegion texture, Rect2i region) {
+    public void drawTexture(UITextureRegion texture, Rect2i region) {
         drawTextureRaw(texture, region, getCurrentStyle().getTextureScaleMode());
     }
 
     @Override
-    public void drawTexture(TextureRegion texture, Rect2i region, Color color) {
+    public void drawTexture(UITextureRegion texture, Rect2i region, Color color) {
         drawTextureRaw(texture, region, color, getCurrentStyle().getTextureScaleMode());
     }
 
@@ -592,29 +592,29 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     }
 
     @Override
-    public void drawTextureRaw(TextureRegion texture, Rect2i region, ScaleMode mode) {
+    public void drawTextureRaw(UITextureRegion texture, Rect2i region, ScaleMode mode) {
         drawTextureRaw(texture, region, mode, 0f, 0f, 1f, 1f);
     }
 
     @Override
-    public void drawTextureRaw(TextureRegion texture, Rect2i region, Color color, ScaleMode mode) {
+    public void drawTextureRaw(UITextureRegion texture, Rect2i region, Color color, ScaleMode mode) {
         drawTextureRaw(texture, region, color, mode, 0f, 0f, 1f, 1f);
     }
 
     @Override
-    public void drawTextureRaw(TextureRegion texture, Rect2i region, ScaleMode mode, int ux, int uy, int uw, int uh) {
+    public void drawTextureRaw(UITextureRegion texture, Rect2i region, ScaleMode mode, int ux, int uy, int uw, int uh) {
         drawTextureRaw(texture, region, mode,
             (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
             (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
     }
 
     @Override
-    public void drawTextureRaw(TextureRegion texture, Rect2i region, ScaleMode mode, float ux, float uy, float uw, float uh) {
+    public void drawTextureRaw(UITextureRegion texture, Rect2i region, ScaleMode mode, float ux, float uy, float uw, float uh) {
         drawTextureRaw(texture, region, Color.WHITE, mode, ux, uy, uw, uh);
     }
 
     @Override
-    public void drawTextureRaw(TextureRegion texture, Rect2i region, Color color, ScaleMode mode, float ux, float uy, float uw, float uh) {
+    public void drawTextureRaw(UITextureRegion texture, Rect2i region, Color color, ScaleMode mode, float ux, float uy, float uw, float uh) {
         if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
             return;
         }
@@ -630,19 +630,19 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     }
 
     @Override
-    public void drawTextureRawBordered(TextureRegion texture, Rect2i region, Border border, boolean tile) {
+    public void drawTextureRawBordered(UITextureRegion texture, Rect2i region, Border border, boolean tile) {
         drawTextureRawBordered(texture, region, border, tile, 0f, 0f, 1f, 1f);
     }
 
     @Override
-    public void drawTextureRawBordered(TextureRegion texture, Rect2i region, Border border, boolean tile, int ux, int uy, int uw, int uh) {
+    public void drawTextureRawBordered(UITextureRegion texture, Rect2i region, Border border, boolean tile, int ux, int uy, int uw, int uh) {
         drawTextureRawBordered(texture, region, border, tile,
             (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
             (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
     }
 
     @Override
-    public void drawTextureRawBordered(TextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh) {
+    public void drawTextureRawBordered(UITextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh) {
         if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
             return;
         }
@@ -657,6 +657,8 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         }
     }
 
+    // TODO: drawMaterial and drawMesh support has been removed
+    /*
     @Override
     public void drawMaterial(Material material, Rect2i region) {
         if (material.isRenderable()) {
@@ -690,10 +692,10 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
+    public void drawMesh(Mesh mesh, UITextureRegion texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
         meshMat.setTexture("texture", texture);
         drawMesh(mesh, meshMat, region, rotation, offset, scale);
-    }
+    }*/
 
     @Override
     public void addInteractionRegion(InteractionListener listener) {
@@ -923,7 +925,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
 
         private Color color;
         private ScaleMode mode;
-        private TextureRegion texture;
+        private UITextureRegion texture;
         private Rect2i absoluteRegion;
         private Rect2i cropRegion;
         private float ux;
@@ -932,7 +934,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         private float uh;
         private float alpha;
 
-        private DrawTextureOperation(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
+        private DrawTextureOperation(UITextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
                                      Rect2i cropRegion, float ux, float uy, float uw, float uh, float alpha) {
             this.color = color;
             this.mode = mode;
@@ -956,7 +958,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
 
     private final class DrawBorderedTextureOperation implements DrawOperation {
 
-        private TextureRegion texture;
+        private UITextureRegion texture;
         private Border border;
         private boolean tile;
         private Rect2i absoluteRegion;
@@ -967,7 +969,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         private float uh;
         private float alpha;
 
-        private DrawBorderedTextureOperation(TextureRegion texture, Rect2i absoluteRegion, Border border, boolean tile,
+        private DrawBorderedTextureOperation(UITextureRegion texture, Rect2i absoluteRegion, Border border, boolean tile,
                                              Rect2i cropRegion, float ux, float uy, float uw, float uh, float alpha) {
             this.texture = texture;
             this.tile = tile;

@@ -21,19 +21,25 @@ import com.google.common.collect.Maps;
 
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.nui.properties.Checkbox;
+import org.terasology.nui.properties.OneOf;
+import org.terasology.nui.properties.OneOfProviderFactory;
+import org.terasology.nui.properties.Property;
+import org.terasology.nui.properties.Range;
+import org.terasology.nui.properties.TextField;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.itemRendering.ItemRenderer;
-import org.terasology.rendering.nui.widgets.UICheckbox;
-import org.terasology.rendering.nui.widgets.UIDropdown;
-import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.nui.widgets.UITextEntry;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
+import org.terasology.nui.itemRendering.ItemRenderer;
+import org.terasology.nui.widgets.UICheckbox;
+import org.terasology.nui.widgets.UIDropdown;
+import org.terasology.nui.widgets.UISlider;
+import org.terasology.nui.widgets.UITextEntry;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -262,7 +268,7 @@ public class PropertyProvider {
     private class TextPropertyFactory<T> implements PropertyFactory<TextField> {
         @Override
         public Property create(Object target, FieldMetadata<Object, ?> fieldMetadata, String id, TextField info) {
-            UITextEntry<T> text = new UITextEntry<>();
+            UITextEntry<T> text = new UITextEntry<T>();
 
             Binding<T> textBinding = createTextBinding(target, (FieldMetadata<Object, T>) fieldMetadata);
             TextMapper<T> textMapper = createTextMapping(fieldMetadata.getType());

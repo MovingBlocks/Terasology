@@ -25,8 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.properties.Range;
+import org.terasology.nui.Color;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.base.FieldFacet2D;
 import org.terasology.world.viewer.color.ColorBlender;
@@ -155,10 +154,8 @@ public abstract class FieldFacetLayer extends AbstractFacetLayer {
      */
     protected static class Config implements FacetLayerConfig {
 
-        @Range(min = -100, max = 100, increment = 1f, precision = 1)
         private double offset;
 
-        @Range(min = 0, max = 100, increment = 0.1f, precision = 1)
         private double scale;
     }
 }

@@ -18,12 +18,12 @@ package org.terasology.rendering.backdrop;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.context.Context;
+import org.terasology.nui.properties.Range;
 import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.sun.CelestialSystem;
 
 import static org.lwjgl.opengl.GL11.GL_BACK;

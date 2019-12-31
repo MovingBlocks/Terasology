@@ -17,7 +17,7 @@
 package org.terasology.rendering;
 
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 /**
  * Defines a set of special characters that manipulate the font color of a rendered text string.
@@ -66,7 +66,7 @@ public final class FontColor {
      * @deprecated use {@link FontColor#getColored(String, Color)} instead
      */
     @Deprecated
-    public static char toChar(org.terasology.rendering.nui.Color color) {
+    public static char toChar(org.terasology.nui.Color color) {
         return toChar(color.r(), color.g(), color.b());
     }
     
@@ -94,7 +94,7 @@ public final class FontColor {
      * @param color the color
      * @return the encoded string
      */
-    public static String getColored(String str, org.terasology.rendering.nui.Color color) {
+    public static String getColored(String str, org.terasology.nui.Color color) {
         return toChar(color) + str + getReset();
     }
     

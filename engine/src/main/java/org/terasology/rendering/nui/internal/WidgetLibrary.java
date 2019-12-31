@@ -23,7 +23,7 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.nui.UIWidget;
 
 /**
  */

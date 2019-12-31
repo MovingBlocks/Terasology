@@ -18,12 +18,12 @@ package org.terasology.rendering.nui.layers.hud;
 import com.google.common.collect.Lists;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.CoreWidget;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ import java.util.List;
 public class UICrosshair extends CoreWidget {
 
     @LayoutConfig
-    private List<TextureRegion> chargeStages = Lists.newArrayList();
+    private List<UITextureRegion> chargeStages = Lists.newArrayList();
 
     private Binding<Float> chargeAmount = new DefaultBinding<>(0f);
 

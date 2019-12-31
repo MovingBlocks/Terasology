@@ -22,14 +22,22 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.nui.AbstractWidget;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.InteractionListener;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.TabbingManager;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.WidgetWithOrder;
 import org.terasology.rendering.nui.animation.MenuAnimationSystem;
 import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
-import org.terasology.rendering.nui.layouts.ScrollableArea;
-import org.terasology.rendering.nui.widgets.UIRadialRing;
-import org.terasology.rendering.nui.widgets.UIRadialSection;
+import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.nui.events.NUIMouseClickEvent;
+import org.terasology.nui.events.NUIMouseWheelEvent;
+import org.terasology.nui.layouts.ScrollableArea;
+import org.terasology.nui.widgets.UIRadialRing;
+import org.terasology.nui.widgets.UIRadialSection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,7 +133,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
             if (next instanceof WidgetWithOrder) {
                 TabbingManager.addToWidgetsList((WidgetWithOrder) next);
-                TabbingManager.addToUsedNums(((WidgetWithOrder) next).order);
+                TabbingManager.addToUsedNums(((WidgetWithOrder) next).getOrder());
                 ((WidgetWithOrder) next).setParent(parentToSet);
             }
 
@@ -136,7 +144,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 while (iter.hasNext()) {
                     next = iter.next();
                     TabbingManager.addToWidgetsList((WidgetWithOrder) next);
-                    TabbingManager.addToUsedNums(((WidgetWithOrder) next).order);
+                    TabbingManager.addToUsedNums(((WidgetWithOrder) next).getOrder());
                     if (setParent) {
                         ((WidgetWithOrder) next).setParent(parentToSet);
                     }
@@ -184,7 +192,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(true);
         }
-        TabbingManager.setOpenScreen(this);
+        // TODO: Tabbing
+        //TabbingManager.setOpenScreen(this);
     }
 
     @Override
@@ -217,19 +226,21 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         if (contents != null) {
             if (!TabbingManager.isInitialized()) {
                 TabbingManager.init();
-                TabbingManager.setOpenScreen(this);
+                // TODO: Tabbing
+                // TabbingManager.setOpenScreen(this);
 
                 Iterator<UIWidget> widgets = contents.iterator();
                 iterateThrough(widgets);
             }
 
-            if (TabbingManager.getOpenScreen() == null) {
+            // TODO: Tabbing
+            /*if (TabbingManager.getOpenScreen() == null) {
                 TabbingManager.setOpenScreen(this);
 
                 Iterator<UIWidget> widgets = contents.iterator();
                 iterateThrough(widgets);
 
-            }
+            }*/
             contents.update(delta);
             animationSystem.update(delta);
             if (depth == SortOrderSystem.DEFAULT_DEPTH) {

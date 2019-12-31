@@ -47,19 +47,23 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.widgets.UIText;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.registry.InjectionHelper;
-import org.terasology.rendering.nui.AbstractWidget;
-import org.terasology.rendering.nui.ControlWidget;
+import org.terasology.nui.AbstractWidget;
+import org.terasology.nui.ControlWidget;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 import org.terasology.rendering.nui.SortOrderSystem;
-import org.terasology.rendering.nui.TabbingManager;
+import org.terasology.nui.TabbingManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.asset.UIElement;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.utilities.Assets;
@@ -119,6 +123,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         // and UI screens should be created on demand anyway.
         ModuleAwareAssetTypeManager maaTypeManager = context.get(ModuleAwareAssetTypeManager.class);
         maaTypeManager.getAssetType(UIElement.class).ifPresent(type -> type.disposeAll());
+
+        // NOTE: Taken from the original UIText source.
+        UIText.DEFAULT_CURSOR_TEXTURE = assetManager.getAsset("engine:white", Texture.class).get();
     }
 
     @Override

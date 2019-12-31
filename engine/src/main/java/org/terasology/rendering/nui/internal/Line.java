@@ -20,7 +20,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 import java.nio.FloatBuffer;
 import java.util.Objects;

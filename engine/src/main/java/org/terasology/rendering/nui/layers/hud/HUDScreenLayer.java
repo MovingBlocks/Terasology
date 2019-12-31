@@ -22,14 +22,14 @@ import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.nui.Canvas;
 import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.ControlWidget;
+import org.terasology.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.asset.UIElement;
 
 import java.util.Iterator;
 import java.util.Map;

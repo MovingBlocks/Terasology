@@ -21,7 +21,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.naming.Name;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
