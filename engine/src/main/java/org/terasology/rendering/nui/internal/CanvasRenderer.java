@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.internal;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.nui.math.Border;
+import org.terasology.math.geom.Border;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2i;

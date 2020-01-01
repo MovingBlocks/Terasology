@@ -30,7 +30,7 @@ import org.terasology.input.InputSystem;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.nui.math.Border;
+import org.terasology.math.geom.Border;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Quat4f;
