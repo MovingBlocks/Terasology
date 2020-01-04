@@ -296,7 +296,7 @@ project(":modules").subprojects.forEach { proj ->
     project(":modules").subprojects {
         configurations.all {
             resolutionStrategy.dependencySubstitution {
-                substitute module("org.terasology.modules:${proj.name}") with project(":modules:${proj.name}")
+                substitute module("org.terasology.modules:${proj.name}") because "we have sources!" with project(":modules:${proj.name}")
             }
         }
     }

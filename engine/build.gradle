@@ -131,8 +131,6 @@ dependencies {
     // Discord RPC
     compile 'com.jagrosh:DiscordIPC:0.4'
 
-    // TODO move to api/implementation system, see https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
-    // Profits : Speed up builds, you can permit using some libraries from using by modules (at compile time)
     // Our developed libs
     compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.5'
     compile group: 'org.terasology', name: 'gestalt-util', version: '5.1.5'
@@ -176,7 +174,6 @@ task cacheReflections {
     inputs.files sourceSets.main.output.classesDirs,
             sourceSets.dev.output.classesDirs,
             // getClassesDir from all sourceSets (for any jvm (seems) language)
-//            configurations."${sourceSets.main.compileConfigurationName}", // TODO: Remove when compile has been removed
             configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
 
     outputs.upToDateWhen(classes.outputs.upToDateSpec)
@@ -278,7 +275,7 @@ jar.dependsOn cacheReflections
 idea {
     module {
         // Add development "dev" dir
-        // sourceDirs += sourceSets.dev.allJava.srcDirs // TODO RETURN!!!
+        sourceDirs += sourceSets.dev.allJava.srcDirs
 
         // Change around the output a bit
         inheritOutputDirs = false
