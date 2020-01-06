@@ -16,6 +16,7 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.context.Context;
+import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.physics.Physics;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.physics.engine.PhysicsEngine;

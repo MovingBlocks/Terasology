@@ -17,6 +17,7 @@ package org.terasology.physics.bullet;
 
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.Collision;
+import com.badlogic.gdx.physics.bullet.collision.VoxelCollisionAlgorithmWrapper;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btBroadphaseInterface;
 import com.badlogic.gdx.physics.bullet.collision.btBroadphasePair;
@@ -38,6 +39,7 @@ import com.badlogic.gdx.physics.bullet.collision.btPersistentManifold;
 import com.badlogic.gdx.physics.bullet.collision.btPersistentManifoldArray;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.collision.btVector3i;
+import com.badlogic.gdx.physics.bullet.collision.btVoxelInfo;
 import com.badlogic.gdx.physics.bullet.collision.btVoxelShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
@@ -47,9 +49,12 @@ import com.google.api.client.util.Maps;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import gnu.trove.set.hash.TShortHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
@@ -61,6 +66,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.physics.bullet.shapes.BulletCollisionShape;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
 import org.terasology.physics.engine.CharacterCollider;
@@ -71,8 +77,18 @@ import org.terasology.physics.engine.RigidBody;
 import org.terasology.physics.engine.SweepCallback;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldChangeListener;
+import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.event.BeforeChunkUnload;
+import org.terasology.world.chunks.event.OnChunkLoaded;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -85,6 +101,7 @@ import java.util.Set;
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet).
  */
+@RegisterSystem
 public class BulletPhysics implements PhysicsEngine {
     public static final int AABB_SIZE = Integer.MAX_VALUE;
 
@@ -107,22 +124,26 @@ public class BulletPhysics implements PhysicsEngine {
 
     private final btCollisionConfiguration defaultCollisionConfiguration;
     private final btSequentialImpulseConstraintSolver sequentialImpulseConstraintSolver;
-    private final btRigidBody.btRigidBodyConstructionInfo blockConsInf;
-    private final btRigidBody.btRigidBodyConstructionInfo liquidConsInfo;
+//    private final btRigidBody.btRigidBodyConstructionInfo liquidConsInfo;
 
-    private final BulletRigidBody rigidBody;
-    private final BulletRigidBody liquidBody;
+
+//    private final BulletRigidBody liquidBody;
 //    private final btConstraintSolverPoolMt solverPoolMt;
 
     private final btGhostPairCallback callback;
 
-    private final btVoxelShape worldShape;
-    private final btVoxelShape liquidShape;
+//    private final btVoxelShape worldShape;
+//    private final btVoxelShape liquidShape;
 
-    private final PhysicsWorldWrapper wrapper;
-    private final PhysicsLiquidWrapper liquidWrapper;
+//    private final VoxelCollisionAlgorithmWrapper wrapper;
+//    private final PhysicsLiquidWrapper liquidWrapper;
 //    private final btITaskScheduler scheduler;
-    public BulletPhysics(WorldProvider world) {
+
+    private ChunkProvider chunkProvider;
+    private WorldProvider worldProvider;
+
+    public BulletPhysics(WorldProvider worldProvider,ChunkProvider chunkProvider) {
+        this.chunkProvider = chunkProvider;
 
         callback = new btGhostPairCallback();
 
@@ -143,31 +164,32 @@ public class BulletPhysics implements PhysicsEngine {
 
         //TODO: reimplement wrapper
 
-        wrapper = new PhysicsWorldWrapper(world);
-        worldShape = new btVoxelShape(wrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));
 
-        liquidWrapper = new PhysicsLiquidWrapper(world);
-        liquidShape = new btVoxelShape(liquidWrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));//liquidWrapper);*/
+//        for(Block block : blockManager.listRegisteredBlocks()){
+//            btCollisionShape shape = ((BulletCollisionShape)block.getCollisionShape()).underlyingShape;
+//            btVoxelInfo info = new btVoxelInfo(shape != null && block.isTargetable(),shape != null && !block.isPenetrable(),block.getId(),shape,block.getCollisionOffset(),block.getFriction(),block.getRestitution(),block.getFriction());
+//            wrapper.setVoxelInfo(info);
+//        }
 
-        Matrix4f matrix4f = new Matrix4f();
-        matrix4f.setIdentity();
-        btDefaultMotionState blockMotionState = new btDefaultMotionState(matrix4f);
-
-        blockConsInf = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
-        rigidBody = new BulletRigidBody(blockConsInf);
-        rigidBody.rb.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
-        short mask = (short) (~(StandardCollisionGroup.STATIC.getFlag() | StandardCollisionGroup.LIQUID.getFlag()));
-        discreteDynamicsWorld.addRigidBody(rigidBody.rb, combineGroups(StandardCollisionGroup.WORLD), mask);
+//
+//        liquidWrapper = new PhysicsLiquidWrapper(world);
+//        liquidShape = new btVoxelShape(liquidWrapper,new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));//liquidWrapper);*/
 
 
-        liquidConsInfo = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, liquidShape, new Vector3f());
-        liquidBody = new BulletRigidBody(liquidConsInfo);
-        liquidBody.rb.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
-        discreteDynamicsWorld.addRigidBody(liquidBody.rb, combineGroups(StandardCollisionGroup.LIQUID), StandardCollisionGroup.SENSOR.getFlag());
+
+
+//        liquidConsInfo = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, liquidShape, new Vector3f());
+//        liquidBody = new BulletRigidBody(liquidConsInfo);
+//        liquidBody.rb.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
+//        discreteDynamicsWorld.addRigidBody(liquidBody.rb, combineGroups(StandardCollisionGroup.LIQUID), StandardCollisionGroup.SENSOR.getFlag());
+
 
     }
 
-    //*****************Physics Interface methods******************\\
+    public btDiscreteDynamicsWorld getWorld() {
+        return discreteDynamicsWorld;
+    }
+        //*****************Physics Interface methods******************\\
 
     @Override
     public List<PhysicsSystem.CollisionPair> getCollisionPairs() {

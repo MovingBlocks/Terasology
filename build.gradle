@@ -56,7 +56,6 @@ repositories {
     // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
     jcenter()
     mavenCentral()
-
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
@@ -82,7 +81,7 @@ dependencies {
 
     // Natives for JNLua (Kallisti, KComputers)
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
-    natives group: 'org.terasology', name: 'native-bullet', version: '0.2.11-20191229.005019-1', ext: 'zip'
+    natives group: 'org.terasology', name: 'native-bullet', version: '0.2.13-20200106.050344-1', ext: 'zip'
 }
 
 task extractWindowsNatives(type:Copy) {
