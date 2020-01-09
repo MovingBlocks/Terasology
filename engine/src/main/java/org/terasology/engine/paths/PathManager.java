@@ -151,7 +151,7 @@ public final class PathManager {
      * @param rootPath Path to use as the home path.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
-    public void useOverrideHomePath(Path rootPath) throws IOException {
+    public void useOverrideHomePath(Path rootPath) throws Exception {
         this.homePath = rootPath;
         updateDirs();
     }
@@ -160,7 +160,7 @@ public final class PathManager {
      * Uses a platform-specific default home path for this execution.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
-    public void useDefaultHomePath() throws IOException {
+    public void useDefaultHomePath() throws Exception {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_LINUX:
                 homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
@@ -185,6 +185,11 @@ public final class PathManager {
                 homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
                 break;
         }
+        updateDirs();
+    }
+
+    public void chooseHomePathManually(Path manualPath) throws Exception {
+        this.homePath = manualPath;
         updateDirs();
     }
 
@@ -280,7 +285,7 @@ public final class PathManager {
      * Updates all of the path manager's file/directory references to match the path settings. Creates directories if they don't already exist.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
-    private void updateDirs() throws IOException {
+    private void updateDirs() throws Exception {
         Files.createDirectories(homePath);
         savesPath = homePath.resolve(SAVED_GAMES_DIR);
         Files.createDirectories(savesPath);
