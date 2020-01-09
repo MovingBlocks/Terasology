@@ -4,6 +4,10 @@ buildscript {
         // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
         jcenter()
         mavenCentral()
+        // gradle plugins
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
@@ -16,12 +20,10 @@ buildscript {
         // Needed for caching reflected data during builds
         classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
+
+        //Spotbugs
+        classpath "com.github.spotbugs:spotbugs-gradle-plugin:3.0.0"
     }
-}
-
-
-plugins {
-    id "com.github.spotbugs" version "3.0.0"
 }
 
 // Separate build file for structure heavy stuff like using Git to fetch other repos to embed within the project
@@ -37,6 +39,10 @@ apply plugin: 'base'
 
 // Git plugin details at https://github.com/ajoberstar/gradle-git
 import org.ajoberstar.gradle.git.tasks.*
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 
 
 // Test for right version of Java in use for running this script
@@ -199,6 +205,94 @@ task protobufCompileLinux(type: Exec) {
     commandLine 'protobuf/compiler/protoc', '--proto_path=engine/src/main/protobuf', '--java_out', 'engine/src/main/java', "engine/src/main/protobuf/EntityData.proto", "engine/src/main/protobuf/NetMessage.proto"
 }
 
+
+
+// Magic for replace remote dependency on local project (source)
+// for Engine
+allprojects {
+    configurations.all {
+        resolutionStrategy.dependencySubstitution {
+            substitute module("org.terasology.engine:engine") because "we have sources!" with project(":engine")
+            substitute module("org.terasology.engine:engine-tests") because "we have sources!" with project(":engine-tests")
+        }
+    }
+}
+
+// Magic for replace remote dependency on local project (source)
+// For exists modules
+project(":modules").subprojects.forEach { proj ->
+    project(":modules").subprojects {
+        configurations.all {
+            resolutionStrategy.dependencySubstitution {
+                substitute module("org.terasology.modules:${proj.name}") because "we have sources!" with project(":modules:${proj.name}")
+            }
+        }
+    }
+}
+
+/**
+ * Gathering remote modules files from remoteRepo to 'modules' for autoloading in game-time (tasks server, game etc)
+ */
+class RemoteModuleGatherer implements DependencyResolutionListener {
+
+    private final Path modulesDir
+
+    RemoteModuleGatherer(Path  modulesDir) {
+        this.modulesDir = modulesDir
+    }
+
+    @Override
+    void beforeResolve(ResolvableDependencies dependencies) {
+        // nothing to do
+    }
+
+    @Override
+    void afterResolve(ResolvableDependencies dependencies) {
+        // We process only module dependencies
+        if (dependencies.path.startsWith(":modules:") &&
+                dependencies.name == "compileClasspath") {
+            def projectName = dependencies.path.split(":")[2]
+
+            if (!dependencies.artifacts.artifacts.empty) {
+                println "\nProcessing module '$projectName' in a multi-project workspace"
+            }
+
+            dependencies.artifacts.artifacts.each {
+                if (isRemoteTerasologyModule(it)) {
+                    println "$projectName resolved binary $it"
+                    def binaryModulePath = modulesDir.resolve(it.file.name)
+                    Files.copy(it.file.toPath(), binaryModulePath, StandardCopyOption.REPLACE_EXISTING)
+                } else if (isLocalTerasologyModule(it)) {
+                    println "*** Found module dependency $it in source form, not copying a runtime jar from Gradle"
+                } else {
+                    //ignore non terasology module
+                }
+            }
+        }
+    }
+
+    private static boolean isRemoteTerasologyModule(ResolvedArtifactResult artifact) {
+        def componentIdentifier = artifact.id.componentIdentifier
+        if (componentIdentifier instanceof ModuleComponentIdentifier) {
+            def module = componentIdentifier as ModuleComponentIdentifier
+            return module.group == 'org.terasology.modules'
+        }
+        return false
+    }
+
+    private static boolean isLocalTerasologyModule(ResolvedArtifactResult artifact) {
+        def componentIdentifier = artifact.id.componentIdentifier
+        if (componentIdentifier instanceof ProjectComponentIdentifier) {
+            def module = componentIdentifier as ProjectComponentIdentifier
+            return !(module.projectName in ['engine', 'engine-tests'])
+        }
+        return false
+    }
+}
+
+gradle.addListener(new RemoteModuleGatherer(rootDir.toPath().resolve("modules")))
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -276,28 +370,4 @@ idea {
 
 cleanIdea.doLast {
     new File('Terasology.iws').delete()
-}
-
-
-// Magic for replace remote dependency on local project (source)
-// for Engine
-allprojects {
-    configurations.all {
-        resolutionStrategy.dependencySubstitution {
-            substitute module("org.terasology.engine:engine") because "we have sources!" with project(":engine")
-            substitute module("org.terasology.engine:engine-tests") because "we have sources!" with project(":engine-tests")
-        }
-    }
-}
-
-// Magic for replace remote dependency on local project (source)
-// For exists modules
-project(":modules").subprojects.forEach { proj ->
-    project(":modules").subprojects {
-        configurations.all {
-            resolutionStrategy.dependencySubstitution {
-                substitute module("org.terasology.modules:${proj.name}") because "we have sources!" with project(":modules:${proj.name}")
-            }
-        }
-    }
 }

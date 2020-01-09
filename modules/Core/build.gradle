@@ -4,7 +4,6 @@
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import groovy.json.JsonSlurper
-import java.text.SimpleDateFormat;
 
 // Git plugin details at https://github.com/ajoberstar/gradle-git
 import org.ajoberstar.gradle.git.tasks.*
@@ -20,6 +19,10 @@ buildscript {
         // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
         jcenter()
         mavenCentral()
+        // gradle plugins
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
@@ -32,6 +35,9 @@ buildscript {
         // Needed for caching reflected data during builds
         classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
+
+        //Spotbugs
+        classpath "com.github.spotbugs:spotbugs-gradle-plugin:3.0.0"
     }
 }
 
@@ -74,56 +80,19 @@ println "Version for $project.name loaded as $version for group $group"
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
+configurations {
+    terasologyModule
+    compile.extendsFrom terasologyModule
+}
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
-    compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
-    compile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
+    implementation(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
+    implementation(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
 
     for (dependency in moduleDepends) {
-        compile(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
-    }
-
-    if (project.name != project(':').name) {
-        println "\nProcessing module '$project.name' in a multi-project workspace"
-
-        // This step resolves artifacts early, after which project config CANNOT be altered again!
-        configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
-            def id = artifact.moduleVersion.id
-
-            // Check for any needed module dependencies on other modules that we need at runtime
-            if (id.group == 'org.terasology.modules' && id.name != "Core") {
-                File moduleSrcPath = new File(rootDir, 'modules/' + id.name)
-                File moduleJarPath = new File(rootDir, 'modules/' + id.name + '-' + id.version + '.jar')
-
-                if (moduleSrcPath.exists()) {
-                    println "*** Found module dependency $id.name in source form, not copying a runtime jar from Gradle"
-                } else {
-                    println "$project.name resolved binary $id.group - $id.name at version $id.version"
-
-                    // This copies the jar from the Gradle cache to the game's module dir for runtime usage, if needed
-                    if (!moduleJarPath.exists()) {
-                        println "* Writing a runtime jar to /modules: " + moduleJarPath.name
-                        moduleJarPath.createNewFile()
-                        moduleJarPath << artifact.file.bytes
-                    }
-                }
-            }
-        }
-    } else {
-        println "We're in a single-project non-Core module workspace (Jenkins) so will look elsewhere for dependencies"
-
-        // TODO: parse and apply external lib dependencies if any are present
-        // TODO: Consider / keep an eye on whether resolving artifacts early at this point causes any trouble (is only for logging)
-        // This step resolves artifacts (both compile & testCompile) and prints out some interesting versions
-        configurations.testCompile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
-            def id = artifact.moduleVersion.id
-            // Print out module (and engine stuff) dependencies and the exact versions they resolved at
-            if (id.group.startsWith('org.terasology')) {
-                println "*** $project.name remotely resolved $id.group - $id.name - version $id.version"
-            }
-        }
+        terasologyModule(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
     }
 }
 
