@@ -42,6 +42,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
+import org.terasology.nui.TabbingManager;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.WidgetUtil;
@@ -304,6 +305,11 @@ public class InputSettingsScreen extends CoreScreenLayer {
     public void onClosed() {
         super.onClosed();
         bindsManager.registerBinds();
+
+        // TODO: Find a better place to do this in.
+        TabbingManager.tabForwardInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingUI")).get(0);
+        TabbingManager.tabBackInputModifier = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingModifier")).get(0);
+        TabbingManager.activateInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:activate")).get(0);
     }
 
     @Override

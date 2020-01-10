@@ -309,7 +309,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             }
         }
 
-        return false;
+        return super.onKeyEvent(event);
     }
 
     protected boolean isEscapeToCloseAllowed() {

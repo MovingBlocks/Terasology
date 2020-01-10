@@ -31,6 +31,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -98,6 +99,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private Map<ResourceUrn, ControlWidget> overlays = Maps.newLinkedHashMap();
     private Context context;
     private AssetManager assetManager;
+    private BindsManager bindsManager;
 
     public NUIManagerInternal(CanvasRenderer renderer, Context context) {
         this.context = context;
@@ -106,6 +108,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         this.canvas = new CanvasImpl(this, context, renderer);
         this.keyboard = context.get(InputSystem.class).getKeyboard();
         this.mouse = context.get(InputSystem.class).getMouseDevice();
+        this.bindsManager = context.get(BindsManager.class);
 
         this.renderingConfig = context.get(Config.class).getRendering();
         this.uiScale = this.renderingConfig.getUiScale() / 100f;
@@ -126,6 +129,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         // NOTE: Taken from the original UIText source.
         UIText.DEFAULT_CURSOR_TEXTURE = assetManager.getAsset("engine:white", Texture.class).get();
+
+        // TODO: This is a work-around for-now to fix tabbing
+        TabbingManager.setFocusManager(this);
+        TabbingManager.tabForwardInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingUI")).get(0);
+        TabbingManager.tabBackInputModifier = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingModifier")).get(0);
+        TabbingManager.activateInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:activate")).get(0);
     }
 
     @Override
