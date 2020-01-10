@@ -32,6 +32,7 @@ import java.util.List;
 
 import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.or;
+import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withType;
 
