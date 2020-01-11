@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -180,7 +181,7 @@ public class PojoEventSystemTests {
     public void testChildEvent() {
         entity.addComponent(new IntegerComponent());
         TestEventHandler handler = new TestEventHandler();
-        eventSystem.registerEvent(new SimpleUri("test:childEvent"), TestChildEvent.class);
+        eventSystem.registerEvent(new ResourceUrn("test:childEvent"), TestChildEvent.class);
         eventSystem.registerEventHandler(handler);
 
         TestChildEvent event = new TestChildEvent();
@@ -193,7 +194,7 @@ public class PojoEventSystemTests {
     public void testChildEventReceivedByUnfilteredHandler() {
         entity.addComponent(new IntegerComponent());
         TestEventHandler handler = new TestEventHandler();
-        eventSystem.registerEvent(new SimpleUri("test:childEvent"), TestChildEvent.class);
+        eventSystem.registerEvent(new ResourceUrn("test:childEvent"), TestChildEvent.class);
         eventSystem.registerEventHandler(handler);
 
         TestChildEvent event = new TestChildEvent();

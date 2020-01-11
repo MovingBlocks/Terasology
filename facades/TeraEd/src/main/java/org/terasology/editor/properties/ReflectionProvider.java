@@ -18,6 +18,7 @@ package org.terasology.editor.properties;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.nui.properties.Range;
@@ -45,7 +46,7 @@ public class ReflectionProvider<T> implements PropertyProvider<T> {
         try {
             ReflectFactory reflectFactory = context.get(ReflectFactory.class);
             CopyStrategyLibrary copyStrategies = context.get(CopyStrategyLibrary.class);
-            ClassMetadata<T, ?> classMetadata = new DefaultClassMetadata<>(new SimpleUri(), (Class<T>) target.getClass(), reflectFactory, copyStrategies);
+            ClassMetadata<T, ?> classMetadata = new DefaultClassMetadata<>(new ResourceUrn("engine:empty"), (Class<T>) target.getClass(), reflectFactory, copyStrategies);
             for (Field field : getAllFields(target.getClass(), and(withAnnotation(Range.class), or(withType(Float.TYPE), withType(Float.class))))) {
                 Range range = field.getAnnotation(Range.class);
                 FieldMetadata<T, Float> fieldMetadata = (FieldMetadata<T, Float>) classMetadata.getField(field.getName());

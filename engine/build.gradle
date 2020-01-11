@@ -141,6 +141,7 @@ dependencies {
     compile group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
 
     compile group: 'org.terasology.nui', name: 'nui', version: '0.1'
+    compile group: 'org.terasology.nui', name: 'nui-reflect', version: '0.1'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')

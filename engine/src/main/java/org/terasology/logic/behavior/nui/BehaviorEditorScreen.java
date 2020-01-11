@@ -30,6 +30,7 @@ import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UIDropdown;
 import org.terasology.nui.widgets.UIList;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
@@ -40,7 +41,7 @@ import org.terasology.rendering.nui.layers.mainMenu.EnterTextPopup;
 import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.nui.properties.Property;
-import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.nui.properties.PropertyProvider;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -87,7 +88,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
         palette = find("palette", UIList.class);
         behaviorEditor.initialize(context);
         behaviorEditor.bindSelection(new Binding<RenderableNode>() {
-            private PropertyProvider provider = new PropertyProvider();
+            private PropertyProvider provider = new PropertyProvider(context.get(ReflectFactory.class), providerFactory);
 
             @Override
             public RenderableNode get() {
@@ -125,7 +126,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
             }
         });
         selectEntity.bindSelection(new Binding<Interpreter>() {
-            private PropertyProvider provider = new PropertyProvider();
+            private PropertyProvider provider = new PropertyProvider(context.get(ReflectFactory.class), providerFactory);
 
             @Override
             public Interpreter get() {

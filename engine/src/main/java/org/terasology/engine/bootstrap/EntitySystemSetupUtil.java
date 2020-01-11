@@ -16,6 +16,7 @@
 
 package org.terasology.engine.bootstrap;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
@@ -171,7 +172,7 @@ public final class EntitySystemSetupUtil {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                library.register(new SimpleUri(environment.getModuleProviding(componentType), componentName), componentType);
+                library.register(new ResourceUrn(environment.getModuleProviding(componentType).toString(), componentName), componentType);
             }
         }
     }

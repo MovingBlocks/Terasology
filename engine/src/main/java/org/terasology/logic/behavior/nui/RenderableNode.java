@@ -34,7 +34,7 @@ import org.terasology.nui.events.NUIMouseDragEvent;
 import org.terasology.nui.events.NUIMouseOverEvent;
 import org.terasology.nui.events.NUIMouseReleaseEvent;
 import org.terasology.nui.layouts.ZoomableLayout;
-import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.nui.properties.PropertyProvider;
 
 import java.util.List;
 

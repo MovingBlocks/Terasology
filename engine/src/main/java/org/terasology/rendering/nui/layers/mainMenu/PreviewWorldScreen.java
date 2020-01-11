@@ -33,7 +33,9 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.module.exceptions.UnresolvedDependencyException;
+import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -53,7 +55,7 @@ import org.terasology.nui.widgets.UIDropdown;
 import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.nui.properties.PropertyProvider;
 import org.terasology.utilities.Assets;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
@@ -200,7 +202,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         for (String label : params.keySet()) {
 
-            PropertyProvider provider = new PropertyProvider() {
+            PropertyProvider provider = new PropertyProvider(context.get(ReflectFactory.class), context.get(OneOfProviderFactory.class)) {
                 @Override
                 protected <T> Binding<T> createTextBinding(Object target, FieldMetadata<Object, T> fieldMetadata) {
                     return new WorldConfigBinding<>(worldConfig, label, compLib, fieldMetadata);

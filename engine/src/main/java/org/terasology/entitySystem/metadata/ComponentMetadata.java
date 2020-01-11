@@ -18,6 +18,7 @@ package org.terasology.entitySystem.metadata;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
@@ -54,7 +55,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
      * @param copyStrategies A copy strategy library
      * @throws NoSuchMethodException If the component has no default constructor
      */
-    public ComponentMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies) throws NoSuchMethodException {
+    public ComponentMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies) throws NoSuchMethodException {
         super(uri, type, factory, copyStrategies, Predicates.<Field>alwaysTrue());
         replicated = type.getAnnotation(Replicate.class) != null;
         blockLifecycleEventsRequired = type.getAnnotation(RequiresBlockLifecycleEvents.class) != null;
