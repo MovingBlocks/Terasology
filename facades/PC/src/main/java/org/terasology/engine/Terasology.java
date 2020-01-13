@@ -17,9 +17,6 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import java.io.File;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileSystemView;
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.crashreporter.CrashReporter;
@@ -116,6 +113,7 @@ public final class Terasology {
     private static boolean soundEnabled = true;
     private static boolean splashEnabled = true;
     private static boolean loadLastGame;
+
 
     private Terasology() {
     }
@@ -364,21 +362,13 @@ public final class Terasology {
                 PathManager.getInstance().useDefaultHomePath();
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             reportException(e);
-
-            // This would allow the user to choose the file path manually.
-            JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-            int returnValue = jfc.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = jfc.getSelectedFile();
-                homePath = Paths.get(selectedFile.getAbsolutePath());
-                try {
-                    PathManager.getInstance().chooseHomePathManually(homePath);
-                } catch (Exception ex) {
-                    reportException(ex);
-                    System.exit(0);
-                }
+            try {
+                PathManager.getInstance().chooseHomePathManually();
+            } catch (IOException ex) {
+                reportException(e);
+                System.exit(0);
             }
             System.exit(0);
         }

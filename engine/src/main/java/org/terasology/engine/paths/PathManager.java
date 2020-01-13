@@ -32,6 +32,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import javax.swing.JFileChooser;
+import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
+
 
 /**
  * Manager class that keeps track of the game's various paths and save directories.
@@ -52,6 +55,8 @@ public final class PathManager {
     private static final String REGEX = "[^A-Za-z0-9-_ ]";
 
     private static PathManager instance;
+
+    private static Context context;
     private Path installPath;
     private Path homePath;
     private Path savesPath;
@@ -151,7 +156,7 @@ public final class PathManager {
      * @param rootPath Path to use as the home path.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
-    public void useOverrideHomePath(Path rootPath) throws Exception {
+    public void useOverrideHomePath(Path rootPath) throws IOException {
         this.homePath = rootPath;
         updateDirs();
     }
@@ -160,7 +165,7 @@ public final class PathManager {
      * Uses a platform-specific default home path for this execution.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
-    public void useDefaultHomePath() throws Exception {
+    public void useDefaultHomePath() throws IOException {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_LINUX:
                 homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
@@ -169,15 +174,18 @@ public final class PathManager {
                 homePath = Paths.get(System.getProperty("user.home"), "Library", "Application Support", TERASOLOGY_FOLDER_NAME);
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                String savedGamesPath = Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_SavedGames);
+                String savedGamesPath = Shell32Util
+                    .getKnownFolderPath(KnownFolders.FOLDERID_SavedGames);
                 if (savedGamesPath == null) {
-                    savedGamesPath = Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_Documents);
+                    savedGamesPath = Shell32Util
+                        .getKnownFolderPath(KnownFolders.FOLDERID_Documents);
                 }
                 Path rawPath;
                 if (savedGamesPath != null) {
                     rawPath = Paths.get(savedGamesPath);
                 } else {
-                    rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toPath();
+                    rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory()
+                        .toPath();
                 }
                 homePath = rawPath.resolve(TERASOLOGY_FOLDER_NAME);
                 break;
@@ -188,8 +196,21 @@ public final class PathManager {
         updateDirs();
     }
 
-    public void chooseHomePathManually(Path manualPath) throws Exception {
-        this.homePath = manualPath;
+    /**
+     * Gives user the option to manually choose home path.
+     * @throws IOException Thrown when required directories cannot be accessed.
+     */
+    public void chooseHomePathManually() throws IOException {
+        DisplayDevice display = context.get(DisplayDevice.class);
+        boolean isHeadless = display.isHeadless();
+        if (!isHeadless) {
+            Path rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory()
+                .toPath();
+            homePath = rawPath.resolve("Terasology");
+        } else {
+            // If the system is headless
+            homePath = Paths.get("").toAbsolutePath();
+        }
         updateDirs();
     }
 
@@ -285,7 +306,7 @@ public final class PathManager {
      * Updates all of the path manager's file/directory references to match the path settings. Creates directories if they don't already exist.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
-    private void updateDirs() throws Exception {
+    private void updateDirs() throws IOException {
         Files.createDirectories(homePath);
         savesPath = homePath.resolve(SAVED_GAMES_DIR);
         Files.createDirectories(savesPath);
