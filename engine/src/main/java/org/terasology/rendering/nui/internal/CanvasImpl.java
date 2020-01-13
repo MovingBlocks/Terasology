@@ -45,6 +45,7 @@ import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Color;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.nui.InteractionListener;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.nui.ScaleMode;
 import org.terasology.nui.SubRegion;
@@ -658,8 +659,6 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
     }
 
     // TODO: drawMaterial and drawMesh support has been removed
-    /*
-    @Override
     public void drawMaterial(Material material, Rect2i region) {
         if (material.isRenderable()) {
             Rect2i drawRegion = relativeToAbsolute(region);
@@ -672,7 +671,6 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         }
     }
 
-    @Override
     public void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
         if (material == null) {
             logger.warn("Attempted to draw with nonexistent material");
@@ -691,11 +689,10 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         renderer.drawMesh(mesh, material, drawRegion, drawRegion.intersect(state.cropRegion), rotation, offset, scale, state.getAlpha());
     }
 
-    @Override
     public void drawMesh(Mesh mesh, UITextureRegion texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
-        meshMat.setTexture("texture", texture);
+        meshMat.setTexture("texture", ((TextureRegion)texture).getTexture());
         drawMesh(mesh, meshMat, region, rotation, offset, scale);
-    }*/
+    }
 
     @Override
     public void addInteractionRegion(InteractionListener listener) {
