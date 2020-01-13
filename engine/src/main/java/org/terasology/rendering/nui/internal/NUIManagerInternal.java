@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.audio.StaticSound;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -49,6 +50,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
@@ -131,6 +133,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         // NOTE: Taken from the original UIText source.
         UIText.DEFAULT_CURSOR_TEXTURE = assetManager.getAsset("engine:white", Texture.class).get();
+
+        // NOTE: Taken from the original UIButton source.
+        UIButton.DEFAULT_CLICK_SOUND = assetManager.getAsset("engine:click", StaticSound.class).get();
 
         // TODO: This is a work-around for-now to fix tabbing
         TabbingManager.setFocusManager(this);

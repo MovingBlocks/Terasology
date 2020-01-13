@@ -181,7 +181,7 @@ public class PojoEventSystemTests {
     public void testChildEvent() {
         entity.addComponent(new IntegerComponent());
         TestEventHandler handler = new TestEventHandler();
-        eventSystem.registerEvent(new ResourceUrn("test:childEvent"), TestChildEvent.class);
+        eventSystem.registerEvent(new SimpleUri("test:childEvent"), TestChildEvent.class);
         eventSystem.registerEventHandler(handler);
 
         TestChildEvent event = new TestChildEvent();
@@ -194,7 +194,7 @@ public class PojoEventSystemTests {
     public void testChildEventReceivedByUnfilteredHandler() {
         entity.addComponent(new IntegerComponent());
         TestEventHandler handler = new TestEventHandler();
-        eventSystem.registerEvent(new ResourceUrn("test:childEvent"), TestChildEvent.class);
+        eventSystem.registerEvent(new SimpleUri("test:childEvent"), TestChildEvent.class);
         eventSystem.registerEventHandler(handler);
 
         TestChildEvent event = new TestChildEvent();
