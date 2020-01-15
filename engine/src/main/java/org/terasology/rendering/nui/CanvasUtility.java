@@ -19,6 +19,7 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.Canvas;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.internal.CanvasImpl;
@@ -40,5 +41,15 @@ public final class CanvasUtility {
         }
 
         ((CanvasImpl) canvas).drawMesh(mesh, texture, region, rotation, offset, scale);
+    }
+
+    public static void drawMaterial(Canvas canvas, Material material, Rect2i region) {
+        // TODO: Find a way to abstractly implement drawMaterial in NUI
+
+        if (!(canvas instanceof CanvasImpl)) {
+            throw new UnsupportedOperationException("Drawing materials is only supported using Terasology's internal renderer.");
+        }
+
+        ((CanvasImpl) canvas).drawMaterial(material, region);
     }
 }

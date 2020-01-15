@@ -658,7 +658,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         }
     }
 
-    // TODO: drawMaterial and drawMesh support has been removed
+    // NOTE: drawMaterial and drawMesh can now only be accessed through CanvasUtility
     public void drawMaterial(Material material, Rect2i region) {
         if (material.isRenderable()) {
             Rect2i drawRegion = relativeToAbsolute(region);
