@@ -50,6 +50,9 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.events.NUIBindButtonEvent;
+import org.terasology.nui.events.NUIMouseButtonEvent;
+import org.terasology.nui.events.NUIMouseWheelEvent;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -624,7 +627,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             return;
         }
         if (focus != null) {
-            focus.onMouseButtonEvent(event);
+            focus.onMouseButtonEvent(new NUIMouseButtonEvent(event.getButton(), event.getState(), event.getMousePosition()));
             if (event.isConsumed()) {
                 return;
             }
@@ -651,13 +654,13 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
 
         if (focus != null) {
-            focus.onMouseWheelEvent(event);
-            if (event.isConsumed()) {
+            NUIMouseWheelEvent nuiEvent = new NUIMouseWheelEvent(mouse, keyboard, event.getMousePosition(), event.getWheelTurns());
+            focus.onMouseWheelEvent(nuiEvent);
+            if (nuiEvent.isConsumed()) {
+                event.consume();
                 return;
             }
         }
-
-
 
         if (canvas.processMouseWheel(event.getWheelTurns(), mouse.getPosition())) {
             event.consume();
@@ -696,14 +699,21 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
+        NUIBindButtonEvent nuiEvent = new NUIBindButtonEvent(mouse, keyboard, new ResourceUrn(event.getId().getModuleName(), event.getId().getObjectName()), event.getState());
+
         if (focus != null) {
-            focus.onBindEvent(event);
+            focus.onBindEvent(nuiEvent);
         }
         if (!event.isConsumed()) {
             for (UIScreenLayer layer : screens) {
                 if (layer.isReleasingMouse()) {
-                    layer.onBindEvent(event);
-                    if (event.isConsumed() || !layer.isLowerLayerVisible()) {
+                    layer.onBindEvent(nuiEvent);
+                    if (nuiEvent.isConsumed()) {
+                        event.consume();
+                        break;
+                    }
+
+                    if (!layer.isLowerLayerVisible()) {
                         break;
                     }
                 }
