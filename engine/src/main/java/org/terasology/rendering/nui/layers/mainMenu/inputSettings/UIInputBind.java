@@ -31,8 +31,10 @@ import org.terasology.nui.TextLineBuilder;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.nui.events.NUIMouseOverEvent;
+import org.terasology.nui.events.NUIMouseWheelEvent;
 
 import java.util.List;
 
@@ -99,8 +101,8 @@ public class UIInputBind extends CoreWidget {
     }
 
     @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-        if (capturingInput && event.isDown()) {
+    public void onMouseButtonEvent(NUIMouseButtonEvent event) {
+        if (capturingInput && event.getState().isDown()) {
             setNewInput(InputType.MOUSE_BUTTON.getInput(event.getButton().getId()));
             capturingInput = false;
             event.consume();
@@ -108,7 +110,7 @@ public class UIInputBind extends CoreWidget {
     }
 
     @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
+    public void onMouseWheelEvent(NUIMouseWheelEvent event) {
         if (capturingInput) {
             MouseInput mouseInput = MouseInput.find(InputType.MOUSE_WHEEL, event.getWheelTurns());
             setNewInput(InputType.MOUSE_WHEEL.getInput(mouseInput.getId()));

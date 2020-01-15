@@ -66,7 +66,7 @@ import org.terasology.nui.skin.UISkin;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
+import org.terasology.nui.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.editor.layers.NUIEditorScreen;
 import org.terasology.rendering.nui.editor.layers.NUISkinEditorScreen;

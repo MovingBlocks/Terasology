@@ -16,10 +16,9 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.TabbingUIButton;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.nui.AbstractWidget;
@@ -30,6 +29,8 @@ import org.terasology.nui.LayoutConfig;
 import org.terasology.nui.TabbingManager;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.WidgetWithOrder;
+import org.terasology.nui.events.NUIBindButtonEvent;
+import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.rendering.nui.animation.MenuAnimationSystem;
 import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.nui.events.NUIKeyEvent;
@@ -247,7 +248,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 setDepthAuto();
             }
             if (activateBindEvent) {
-                onBindEvent(new TabbingUIButton());
+                onBindEvent(new NUIBindButtonEvent(null, null, new ResourceUrn("engine:tabbingUI"), ButtonState.DOWN));
             }
         }
     }
@@ -292,11 +293,11 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     }
 
     @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
+    public void onMouseButtonEvent(NUIMouseButtonEvent event) {
     }
 
     @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
+    public void onMouseWheelEvent(NUIMouseWheelEvent event) {
     }
 
     @Override

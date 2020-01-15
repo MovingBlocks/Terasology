@@ -39,7 +39,7 @@ import org.terasology.network.PingService;
 import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.ServerInfoService;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
+import org.terasology.nui.FontColor;
 import org.terasology.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.WidgetUtil;
