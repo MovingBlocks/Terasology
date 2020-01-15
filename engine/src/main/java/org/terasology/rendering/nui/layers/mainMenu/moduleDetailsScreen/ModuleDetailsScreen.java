@@ -29,6 +29,7 @@ import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
+import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.naming.Version;
@@ -94,12 +95,12 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         }
     };
 
-    private UIList<Module> modules;
+    private UIList<Module> moduleList;
     private final Binding<Module> moduleInfoBinding = new ReadOnlyBinding<Module>() {
         @Override
         public Module get() {
-            if (modules.getSelection() != null) {
-                return modules.getSelection();
+            if (moduleList.getSelection() != null) {
+                return moduleList.getSelection();
             }
             return null;
         }
@@ -114,12 +115,14 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     private UIButton updateModuleButton;
     private UIText description;
     private UIButton close;
+    private DependencyResolver dependencyResolver;
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         initWidgets();
+        dependencyResolver = new DependencyResolver(moduleManager.getRegistry());
 
         if (isScreenValid()) {
 
@@ -149,7 +152,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         maxSupportedVersion = find("maxSupportedVersion", UILabel.class);
         onlineVersion = find("onlineVersion", UILabel.class);
         required = find("required", UILabel.class);
-        modules = find("modules", UIList.class);
+        moduleList = find("modules", UIList.class);
         dependencies = find("dependencies", UIList.class);
         openInBrowser = find("openInBrowser", UIButtonWebBrowser.class);
         updateModuleButton = find("update", UIButton.class);
@@ -172,7 +175,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     }
 
     private void setUpModules() {
-        modules.subscribeSelection(((widget, item) -> {
+        moduleList.subscribeSelection(((widget, item) -> {
             if (item != null) {
                 dependencies.setList(getSortedDependencies(item));
                 dependencies.setSelection(null);
@@ -180,7 +183,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 this.updateOpenInBrowserButton();
             }
         }));
-        modules.setItemRenderer(new StringTextRenderer<Module>() {
+        moduleList.setItemRenderer(new StringTextRenderer<Module>() {
             @Override
             public String getString(Module value) {
                 if (value != null) {
@@ -306,10 +309,10 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         });
         dependencies.subscribe(((widget, item) -> {
             if (item != null) {
-                modules.getList().stream()
+                moduleList.getList().stream()
                         .filter(m -> item.getId().equals(m.getId()))
                         .findFirst()
-                        .ifPresent(m -> modules.setSelection(m));
+                        .ifPresent(m -> moduleList.setSelection(m));
             }
         }));
     }
@@ -370,9 +373,32 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     public void setModules(final Collection<Module> modules) {
         if (modules != null) {
+            moduleList.setItemRenderer(new AbstractItemRenderer<Module>() {
+
+                String getString(Module value) {
+                    return value.getMetadata().getDisplayName().toString();
+                }
+
+                @Override
+                public void draw(Module value, Canvas canvas) {
+                    if (dependencyResolver.resolve(value.getMetadata().getId()).isSuccess()) {
+                        canvas.setMode("available");
+                    } else {
+                        canvas.setMode("invalid");
+                    }
+                    canvas.drawText(getString(value), canvas.getRegion());
+                }
+
+                @Override
+                public Vector2i getPreferredSize(Module value, Canvas canvas) {
+                    String text = getString(value);
+                    return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                            canvas.getCurrentStyle().getFont().getLineHeight());
+                }
+            });
             final Set<Module> mods = new HashSet<>(modules);
             mods.addAll(getAllModuleDependencies(modules));
-            this.modules.setList(
+            this.moduleList.setList(
                     mods.stream()
                             .sorted(Comparator.comparing(Module::getId))
                             .collect(Collectors.toList())
@@ -382,9 +408,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     public void setSelectedModule(final Module selectedModule) {
         if (selectedModule != null) {
-            this.modules.setSelection(selectedModule);
+            this.moduleList.setSelection(selectedModule);
         } else {
-            this.modules.select(0);
+            this.moduleList.select(0);
         }
     }
 
@@ -471,7 +497,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     private boolean isScreenValid() {
         if (Stream.of(moduleName, installedVersion, minSupportedVersion, maxSupportedVersion, close,
-                onlineVersion, required, dependencies, modules, openInBrowser, updateModuleButton, description)
+                onlineVersion, required, dependencies, moduleList, openInBrowser, updateModuleButton, description)
                 .anyMatch(Objects::isNull)) {
             logger.error("Can't initialize screen correctly. At least one widget was missed!");
             return false;
