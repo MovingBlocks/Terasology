@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Used to indicate that this {@link WorldRasterizer} must be run after the indicated Rasterizers.
+ *  Indicates that this {@link WorldRasterizer} must be run <em>after</em> the specified rasterizers.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
