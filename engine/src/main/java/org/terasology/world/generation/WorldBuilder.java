@@ -321,24 +321,32 @@ public class WorldBuilder extends ProviderStore {
         return false;
     }
 
+    // Ensure that rasterizers that must run after others are in the correct order. This ensures that blocks from
+    // the dependent raterizer are not being overwritten by any antecedent rasterizer.
+    // TODO: This will only handle first-order dependencies and does not check for circular dependencies
     private List<WorldRasterizer> ensureRasterizerOrdering() {
         List<WorldRasterizer> orderedRasterizers = Lists.newArrayList();
-        Map<WorldRasterizer, List<WorldRasterizer>> dependencyMap = new HashMap<>();
+
         Set<Class<? extends WorldRasterizer>> addedRasterizers = new HashSet<>();
+
         for (WorldRasterizer rasterizer : rasterizers) {
+            // Does this rasterizer have the annotation
             RunsAfter runsAfter = rasterizer.getClass().getAnnotation(RunsAfter.class);
             if (runsAfter != null) {
-                List<Class<? extends WorldRasterizer>> classList = Arrays.asList(runsAfter.value());
-                List<WorldRasterizer> dependencies = rasterizers.stream()
-                        .filter(r -> classList.contains(r.getClass()))
+                List<Class<? extends WorldRasterizer>> antecedentClassList = Arrays.asList(runsAfter.value());
+                List<WorldRasterizer> antecedents = rasterizers.stream()
+                        .filter(r -> antecedentClassList.contains(r.getClass()))
                         .collect(Collectors.toList());
-                dependencies.forEach(dependency -> {
+
+                // Add all antecedents to the list first
+                antecedents.forEach(dependency -> {
                     if (!addedRasterizers.contains(dependency.getClass())) {
                         orderedRasterizers.add(dependency);
                         addedRasterizers.add(dependency.getClass());
                     }
                 });
-                dependencyMap.put(rasterizer, dependencies);
+
+                // Then add this one
                 orderedRasterizers.add(rasterizer);
             } else if (!addedRasterizers.contains(rasterizer.getClass())) {
                 orderedRasterizers.add(rasterizer);
