@@ -291,11 +291,10 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         return new SubRegionImpl(region, crop);
     }
 
-    //NOTE: Removed as it was not used and implied a particular backend
-    //@Override
-    //public SubRegion subRegionFBO(ResourceUrn uri, BaseVector2i size) {
-    //    return new SubRegionFBOImpl(uri, size);
-    //}
+    //NOTE: now only accessible via CanvasUtility
+    public SubRegion subRegionFBO(ResourceUrn uri, BaseVector2i size) {
+        return new SubRegionFBOImpl(uri, size);
+    }
 
     @Override
     public void setDrawOnTop(boolean drawOnTop) {
