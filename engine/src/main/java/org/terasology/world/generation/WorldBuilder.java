@@ -29,7 +29,6 @@ import org.terasology.world.zones.ZonePlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -330,10 +329,10 @@ public class WorldBuilder extends ProviderStore {
         Set<Class<? extends WorldRasterizer>> addedRasterizers = new HashSet<>();
 
         for (WorldRasterizer rasterizer : rasterizers) {
-            // Does this rasterizer have the annotation
-            RunsAfter runsAfter = rasterizer.getClass().getAnnotation(RunsAfter.class);
-            if (runsAfter != null) {
-                List<Class<? extends WorldRasterizer>> antecedentClassList = Arrays.asList(runsAfter.value());
+            // Does this have dependencies on other rasterizers
+            RequiresRasterizer requiresRasterizer = rasterizer.getClass().getAnnotation(RequiresRasterizer.class);
+            if (requiresRasterizer != null) {
+                List<Class<? extends WorldRasterizer>> antecedentClassList = Arrays.asList(requiresRasterizer.value());
                 List<WorldRasterizer> antecedents = rasterizers.stream()
                         .filter(r -> antecedentClassList.contains(r.getClass()))
                         .collect(Collectors.toList());

@@ -21,10 +21,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Indicates that this {@link WorldRasterizer} must be run <em>after</em> the specified rasterizers.
+ *  Indicates that this {@link WorldRasterizer} depends on the output/result of other rasterizers, and should
+ *  be executed after them.
+ *  <p><em>Note:</em> This only handles first-order dependencies (e.g. A depends on B) and will not work with
+ *  higher order dependencies (e.g. A depends on B which depends on C).</p>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RunsAfter {
+public @interface RequiresRasterizer {
     Class<? extends WorldRasterizer>[] value();
 }
