@@ -367,10 +367,9 @@ public final class Terasology {
             try {
                 PathManager.getInstance().chooseHomePathManually();
             } catch (IOException ex) {
-                reportException(e);
+                reportException(ex);
                 System.exit(0);
             }
-            System.exit(0);
         }
     }
 
