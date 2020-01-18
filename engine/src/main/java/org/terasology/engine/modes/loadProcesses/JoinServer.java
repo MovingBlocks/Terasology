@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.modes.VariableStepLoadProcess;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
@@ -41,7 +41,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class JoinServer implements LoadProcess {
+//TODO document this!
+public class JoinServer extends VariableStepLoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(JoinServer.class);
 
     private Context context;

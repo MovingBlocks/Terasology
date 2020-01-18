@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.modes.loadProcesses;
-
-import org.terasology.engine.modes.LoadProcess;
+package org.terasology.engine.modes;
 
 /**
+ * Used for LoadProcesses taking more than one step.
  */
 public abstract class StepBasedLoadProcess implements LoadProcess {
 
     private int stepsComplete;
     private int totalSteps = 1;
 
+    /**
+     * Must be called after every step counted in {@link #setTotalSteps(int)} is finished.
+     *
+     * The preferable way to do this is from the end of the {@link #step()} method.
+     */
     protected void stepDone() {
         stepsComplete++;
     }
 
+    /**
+     * Set the total amount of steps load process is going to take.
+     *
+     * @param amount The expected amount of steps.
+     */
     protected void setTotalSteps(int amount) {
         this.totalSteps = Math.max(1, amount);
     }
