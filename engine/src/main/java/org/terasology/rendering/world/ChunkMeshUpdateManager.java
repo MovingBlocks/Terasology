@@ -23,6 +23,7 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.utilities.concurrency.TaskMaster;
@@ -32,6 +33,8 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.ShutdownChunkTask;
+import org.terasology.world.generation.World;
+import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -135,6 +138,7 @@ public final class ChunkMeshUpdateManager {
         private RenderableChunk c;
         private ChunkTessellator tessellator;
         private WorldProvider worldProvider;
+        private World world;
         private ChunkMeshUpdateManager chunkMeshUpdateManager;
 
         ChunkUpdateTask(RenderableChunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkMeshUpdateManager chunkMeshUpdateManager) {
@@ -142,6 +146,7 @@ public final class ChunkMeshUpdateManager {
             this.c = chunk;
             this.tessellator = tessellator;
             this.worldProvider = worldProvider;
+            this.world = CoreRegistry.get(WorldGenerator.class).getWorld();
         }
 
         @Override
@@ -170,7 +175,7 @@ public final class ChunkMeshUpdateManager {
                  */
                 c.setDirty(false);
                 if (chunkView.isValidView()) {
-                    newMesh = tessellator.generateMesh(chunkView, ChunkConstants.SIZE_Y, 0);
+                    newMesh = tessellator.generateMesh(chunkView, world.getWorldData(chunkView.getWorldRegion()), ChunkConstants.SIZE_Y, 0);
 
                     c.setPendingMesh(newMesh);
                     ChunkMonitor.fireChunkTessellated(c.getPosition(), newMesh);
