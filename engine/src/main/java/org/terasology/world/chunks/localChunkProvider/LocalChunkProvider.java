@@ -262,10 +262,8 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     @Override
     public void completeUpdate() {
-        ReadyChunkInfo readyChunkInfo = chunkFinalizer.completeFinalization();
-        if (readyChunkInfo != null) {
-            processReadyChunk(readyChunkInfo);
-        }
+        List<ReadyChunkInfo> readyChunkInfos = chunkFinalizer.completeFinalization();
+        readyChunkInfos.forEach(this::processReadyChunk);
     }
 
     private void processReadyChunk(final ReadyChunkInfo readyChunkInfo) {
@@ -364,13 +362,11 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             Collections.sort(sortedReadyChunks, new ReadyChunkRelevanceComparator());
         }
         if (!sortedReadyChunks.isEmpty()) {
-            boolean loaded = false;
-            for (int i = sortedReadyChunks.size() - 1; i >= 0 && !loaded; i--) {
+            for (int i = sortedReadyChunks.size() - 1; i >= 0; i--) {
                 ReadyChunkInfo chunkInfo = sortedReadyChunks.get(i);
                 PerformanceMonitor.startActivity("Make Chunk Available");
                 if (makeChunkAvailable(chunkInfo)) {
                     sortedReadyChunks.remove(i);
-                    loaded = true;
                 }
                 PerformanceMonitor.endActivity();
             }
