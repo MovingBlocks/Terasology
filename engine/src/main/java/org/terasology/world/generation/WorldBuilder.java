@@ -29,11 +29,13 @@ import org.terasology.world.zones.ZonePlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  */
@@ -101,7 +103,8 @@ public class WorldBuilder extends ProviderStore {
             provider.setSeed(seed);
         }
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
-        return new WorldImpl(providerChains, rasterizers, entityProviders, determineBorders(providerChains), seaLevel);
+        List<WorldRasterizer> orderedRasterizers = ensureRasterizerOrdering();
+        return new WorldImpl(providerChains, orderedRasterizers, entityProviders, determineBorders(providerChains), seaLevel);
     }
 
     private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains) {
@@ -316,6 +319,42 @@ public class WorldBuilder extends ProviderStore {
         }
         return false;
     }
+
+    // Ensure that rasterizers that must run after others are in the correct order. This ensures that blocks from
+    // the dependent raterizer are not being overwritten by any antecedent rasterizer.
+    // TODO: This will only handle first-order dependencies and does not check for circular dependencies
+    private List<WorldRasterizer> ensureRasterizerOrdering() {
+        List<WorldRasterizer> orderedRasterizers = Lists.newArrayList();
+
+        Set<Class<? extends WorldRasterizer>> addedRasterizers = new HashSet<>();
+
+        for (WorldRasterizer rasterizer : rasterizers) {
+            // Does this have dependencies on other rasterizers
+            RequiresRasterizer requiresRasterizer = rasterizer.getClass().getAnnotation(RequiresRasterizer.class);
+            if (requiresRasterizer != null) {
+                List<Class<? extends WorldRasterizer>> antecedentClassList = Arrays.asList(requiresRasterizer.value());
+                List<WorldRasterizer> antecedents = rasterizers.stream()
+                        .filter(r -> antecedentClassList.contains(r.getClass()))
+                        .collect(Collectors.toList());
+
+                // Add all antecedents to the list first
+                antecedents.forEach(dependency -> {
+                    if (!addedRasterizers.contains(dependency.getClass())) {
+                        orderedRasterizers.add(dependency);
+                        addedRasterizers.add(dependency.getClass());
+                    }
+                });
+
+                // Then add this one
+                orderedRasterizers.add(rasterizer);
+            } else if (!addedRasterizers.contains(rasterizer.getClass())) {
+                orderedRasterizers.add(rasterizer);
+                addedRasterizers.add(rasterizer.getClass());
+            }
+        }
+        return orderedRasterizers;
+    }
+
 
     public FacetedWorldConfigurator createConfigurator() {
         List<ConfigurableFacetProvider> configurables = new ArrayList<>();
