@@ -17,6 +17,8 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.crashreporter.CrashReporter;
@@ -41,6 +43,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.subsystem.openvr.OpenVRInput;
 import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.game.GameManifest;
+import org.terasology.logic.characters.CharacterSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
@@ -107,6 +110,8 @@ public final class Terasology {
     private static final String NO_SPLASH = "-noSplash";
     private static final String SERVER_PORT = "-serverPort=";
     private static final String OVERRIDE_DEFAULT_CONFIG = "-overrideDefaultConfig=";
+    private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
+
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
@@ -363,7 +368,7 @@ public final class Terasology {
             }
 
         } catch (IOException e) {
-            reportException(e);
+            logger.warn("The game cannot detect default home directory");
             try {
                 PathManager.getInstance().chooseHomePathManually();
             } catch (IOException ex) {
