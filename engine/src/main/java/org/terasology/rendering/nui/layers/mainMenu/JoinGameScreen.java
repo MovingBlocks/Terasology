@@ -19,11 +19,13 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
+import java.net.InetAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
+import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.StateLoading;
@@ -67,8 +69,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-/**
- */
 public class JoinGameScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
@@ -104,7 +104,12 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private Predicate<ServerInfo> activeServersOnly = ServerInfo::isActive;
 
+    private BroadCastServer broadCastServer = new BroadCastServer();
+
     private boolean updateComplete;
+
+    private final Context context = null;
+
 
     @Override
     public void initialise() {
@@ -352,6 +357,21 @@ public class JoinGameScreen extends CoreScreenLayer {
                 refresh();
             });
         }
+
+        UIButton broadCastServerButton = find("broadcast", UIButton.class);
+        if (broadCastServerButton != null) {
+            broadCastServerButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                @Override
+                public Boolean get() {
+                    return broadCastServer.isTurnOnBroadcast();
+                }
+            });
+            broadCastServerButton.subscribe(button -> {
+                    broadCastServer.setTurnOnBroadcast(true);
+                    String message = buildBroadCastMessage();
+                    broadCastServer.startBroadcast(message);
+             });
+        }
     }
 
     private void bindCustomButtons() {
@@ -516,4 +536,22 @@ public class JoinGameScreen extends CoreScreenLayer {
         visibleList.setSelection(i);
     }
 
+    public String buildBroadCastMessage() {
+        Future<ServerInfoMessage> info = extInfo.get(visibleList.getSelection());
+        Config configuration = context.get(Config.class);
+        int hostPort = configuration.getNetwork().getServerPort();
+        try {
+            if (info.isDone()) {
+                String message =
+                    "Hello I am running on IP Address:" + InetAddress.getLocalHost().getHostAddress()
+                        + " " + "and port: " + hostPort + "having the following"
+                        + "modules " + getModulesText(info);
+                return message;
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            return translationSystem.translate("${engine:menu#connection-failed}");
+        }
+    }
 }
