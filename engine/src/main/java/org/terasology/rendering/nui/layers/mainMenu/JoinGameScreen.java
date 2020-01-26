@@ -363,7 +363,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             broadCastServerButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
                 @Override
                 public Boolean get() {
-                    return broadCastServer.isTurnOnBroadcast();
+                    return !broadCastServer.isTurnOnBroadcast();
                 }
             });
             broadCastServerButton.subscribe(button -> {
