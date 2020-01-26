@@ -25,14 +25,14 @@ publishing {
                         println "PUBLISH repoKey is terasology-snapshot-local (default value)"
                     }
 
-                    credentials {
-                        if (rootProject.hasProperty("artifactoryUser") && rootProject.hasProperty("artifactoryPass")) {
-                            username = "$artifactoryUser"
-                            password = "$artifactoryPass"
+                    if (rootProject.hasProperty("mavenUser") && rootProject.hasProperty("mavenPass")) {
+                        credentials {
+                            username = "$mavenUser"
+                            password = "$mavenPass"
                         }
-                    }
-                    authentication {
-                        basic(BasicAuthentication)
+                        authentication {
+                            basic(BasicAuthentication)
+                        }
                     }
                 }
             }
