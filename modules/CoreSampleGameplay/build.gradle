@@ -1,7 +1,7 @@
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
-apply from: "$rootDir/config/gradle/artifactory.gradle"
+apply from: "$rootDir/config/gradle/maven.gradle"
 
 import groovy.json.JsonSlurper
 

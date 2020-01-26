@@ -1,7 +1,7 @@
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
-apply from: "$rootDir/config/gradle/artifactory.gradle"
+apply from: "$rootDir/config/gradle/maven.gradle"
 
 import groovy.json.JsonSlurper
 

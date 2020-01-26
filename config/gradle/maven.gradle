@@ -1,23 +1,8 @@
-// This include file applies our Artifactory related settings to places that need them (root project + modules)
+// This include file applies maven-publish related settings to places that need them (root project + modules)
 // It is a superset of the the stuff common to Java sub projects so we include the common.gradle here
 apply from: "$rootDir/config/gradle/common.gradle"
 
-// Artifactory publishing requires these (without maven we'd get no .pom with dependency info published)
-apply plugin: 'maven'
 apply plugin: 'maven-publish'
-
-// The following helps configure artifacts for each sub-project that applies this file
-// A configuration for publishing artifacts
-//configurations {
-//    published
-//}
-//
-//// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
-//artifacts {
-//    published jar
-//    published sourceJar
-//    published javadocJar
-//}
 
 publishing {
     publications {
