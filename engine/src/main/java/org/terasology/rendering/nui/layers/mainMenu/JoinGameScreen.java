@@ -19,7 +19,9 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -35,9 +37,11 @@ import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.Keyboard;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
+import org.terasology.network.BroadCastServer;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.PingService;
+import org.terasology.network.Server;
 import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.ServerInfoService;
 import org.terasology.registry.In;
@@ -73,6 +77,8 @@ public class JoinGameScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
+    private Channel channel;
+
 
     @In
     private Config config;
@@ -107,9 +113,6 @@ public class JoinGameScreen extends CoreScreenLayer {
     private BroadCastServer broadCastServer = new BroadCastServer();
 
     private boolean updateComplete;
-
-    private final Context context = null;
-
 
     @Override
     public void initialise() {
@@ -359,6 +362,7 @@ public class JoinGameScreen extends CoreScreenLayer {
         }
 
         UIButton broadCastServerButton = find("broadcast", UIButton.class);
+        broadCastServerButton.setText("Broadcast");
         if (broadCastServerButton != null) {
             broadCastServerButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
                 @Override
@@ -368,7 +372,9 @@ public class JoinGameScreen extends CoreScreenLayer {
             });
             broadCastServerButton.subscribe(button -> {
                     broadCastServer.setTurnOnBroadcast(true);
+                    broadCastServerButton.setText("Stop BroadCast");
                     String message = buildBroadCastMessage();
+                    System.out.println(message);
                     broadCastServer.startBroadcast(message);
              });
         }
@@ -536,22 +542,9 @@ public class JoinGameScreen extends CoreScreenLayer {
         visibleList.setSelection(i);
     }
 
-    public String buildBroadCastMessage() {
-        Future<ServerInfoMessage> info = extInfo.get(visibleList.getSelection());
-        Config configuration = context.get(Config.class);
-        int hostPort = configuration.getNetwork().getServerPort();
-        try {
-            if (info.isDone()) {
-                String message =
-                    "Hello I am running on IP Address:" + InetAddress.getLocalHost().getHostAddress()
-                        + " " + "and port: " + hostPort + "having the following"
-                        + "modules " + getModulesText(info);
-                return message;
-            } else {
-                return null;
-            }
-        } catch (Exception ex) {
-            return translationSystem.translate("${engine:menu#connection-failed}");
-        }
+    private String buildBroadCastMessage() {
+        logger.info("Building Broadcast Message");
+        int serverPort = config.getNetwork().getServerPort();
+        return "Hello I am running on server" + config.getNetwork().getMasterServer()+ "and Port:"+ serverPort;
     }
 }

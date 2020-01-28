@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -28,11 +28,18 @@ import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.rendering.nui.layers.mainMenu.JoinGameScreen;
 
 
 public class BroadCastServer {
+
     private static DatagramSocket socket;
     private static boolean turnOnBroadcast;
+    private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
+    private NetworkSystem networkSystem;
+
 
     public boolean isTurnOnBroadcast() {
         return turnOnBroadcast;
@@ -46,13 +53,13 @@ public class BroadCastServer {
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
+                    logger.info("Broadcasting message" + message);
                     for (InetAddress inadr : listAllBroadcastAddresses()) {
                         broadcast(message, inadr);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("Hello !!");
             }
         };
         ScheduledExecutorService service = Executors
@@ -63,7 +70,6 @@ public class BroadCastServer {
     /**
      * @param broadcastMessage The broadcast Message
      * @param address address for which the message needs to be broadcasted
-     * @throws IOException
      */
     public void broadcast(
         String broadcastMessage, InetAddress address) throws IOException {
@@ -77,9 +83,9 @@ public class BroadCastServer {
         socket.send(packet);
         socket.close();
     }
+
     /**
      * @return List of InetAddresses for the network interface
-     * @throws SocketException
      */
     public static List<InetAddress> listAllBroadcastAddresses() throws SocketException {
         List<InetAddress> broadcastList = new ArrayList<>();
@@ -99,4 +105,5 @@ public class BroadCastServer {
         }
         return broadcastList;
     }
+
 }
