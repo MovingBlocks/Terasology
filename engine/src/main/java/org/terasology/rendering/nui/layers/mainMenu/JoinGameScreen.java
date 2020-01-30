@@ -362,20 +362,24 @@ public class JoinGameScreen extends CoreScreenLayer {
         }
 
         UIButton broadCastServerButton = find("broadcast", UIButton.class);
-        broadCastServerButton.setText("Broadcast");
         if (broadCastServerButton != null) {
             broadCastServerButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
                 @Override
                 public Boolean get() {
-                    return !broadCastServer.isTurnOnBroadcast();
+                    return true;
                 }
             });
             broadCastServerButton.subscribe(button -> {
+                if (!broadCastServer.isBroadCastTurnedOn()) {
                     broadCastServer.setTurnOnBroadcast(true);
-                    broadCastServerButton.setText("Stop BroadCast");
+                    broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-terminate-broadcast}"));
                     String message = buildBroadCastMessage();
-                    System.out.println(message);
                     broadCastServer.startBroadcast(message);
+                } else {
+                    broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-broadcast}"));
+                    broadCastServer.setTurnOnBroadcast(false);
+                    broadCastServer.stopBroadCast();
+                }
              });
         }
     }

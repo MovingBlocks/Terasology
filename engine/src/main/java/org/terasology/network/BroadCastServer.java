@@ -38,10 +38,10 @@ public class BroadCastServer {
     private static DatagramSocket socket;
     private static boolean turnOnBroadcast;
     private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
-    private NetworkSystem networkSystem;
+    private static ScheduledExecutorService service;
 
 
-    public boolean isTurnOnBroadcast() {
+    public boolean isBroadCastTurnedOn() {
         return turnOnBroadcast;
     }
 
@@ -50,6 +50,7 @@ public class BroadCastServer {
     }
 
     public void startBroadcast(String message) {
+        service = Executors.newSingleThreadScheduledExecutor();
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
@@ -58,13 +59,17 @@ public class BroadCastServer {
                         broadcast(message, inadr);
                     }
                 } catch (Exception e) {
+                    logger.info("Broadcasting has been interrupted " + e.getMessage());
                     e.printStackTrace();
                 }
             }
         };
-        ScheduledExecutorService service = Executors
-            .newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(runnable, 0, 300, TimeUnit.SECONDS);
+    }
+
+    public void stopBroadCast() {
+        logger.info("Shutting down BroadCasting");
+        service.shutdown();
     }
 
     /**
