@@ -30,12 +30,17 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.layers.mainMenu.JoinGameScreen;
 
 
 public class BroadCastServer {
 
     private static DatagramSocket socket;
+
+    @In
+    private Config config;
     private static boolean turnOnBroadcast;
     private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
     private static ScheduledExecutorService service;
@@ -49,7 +54,8 @@ public class BroadCastServer {
         BroadCastServer.turnOnBroadcast = turnOnBroadcast;
     }
 
-    public void startBroadcast(String message) {
+    public void startBroadcast() {
+        String message = buildBroadCastMessage();
         service = Executors.newSingleThreadScheduledExecutor();
         Runnable runnable = new Runnable() {
             public void run() {
@@ -109,6 +115,13 @@ public class BroadCastServer {
                 .forEach(broadcastList::add);
         }
         return broadcastList;
+    }
+
+
+    private String buildBroadCastMessage() {
+        logger.info("Building Broadcast Message");
+        int serverPort = config.getNetwork().getServerPort();
+        return "Hello I am running on server" + config.getNetwork().getMasterServer() + "and Port:" + serverPort;
     }
 
 }

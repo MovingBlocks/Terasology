@@ -19,15 +19,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
-import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.StateLoading;
@@ -41,7 +38,6 @@ import org.terasology.network.BroadCastServer;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.PingService;
-import org.terasology.network.Server;
 import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.ServerInfoService;
 import org.terasology.registry.In;
@@ -373,8 +369,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 if (!broadCastServer.isBroadCastTurnedOn()) {
                     broadCastServer.setTurnOnBroadcast(true);
                     broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-terminate-broadcast}"));
-                    String message = buildBroadCastMessage();
-                    broadCastServer.startBroadcast(message);
+                    broadCastServer.startBroadcast();
                 } else {
                     broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-broadcast}"));
                     broadCastServer.setTurnOnBroadcast(false);
@@ -546,9 +541,4 @@ public class JoinGameScreen extends CoreScreenLayer {
         visibleList.setSelection(i);
     }
 
-    private String buildBroadCastMessage() {
-        logger.info("Building Broadcast Message");
-        int serverPort = config.getNetwork().getServerPort();
-        return "Hello I am running on server" + config.getNetwork().getMasterServer()+ "and Port:"+ serverPort;
-    }
 }
