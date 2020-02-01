@@ -16,46 +16,21 @@
 package org.terasology.rendering.nui.internal;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Border;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.nui.UITextureRegion;
-import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.nui.Color;
-import org.terasology.nui.HorizontalAlign;
-import org.terasology.nui.ScaleMode;
-import org.terasology.nui.VerticalAlign;
 import org.terasology.rendering.opengl.FrameBufferObject;
 
 /**
  */
-public interface CanvasRenderer {
-
-    void preRender();
-
-    void postRender();
-
-    Vector2i getTargetSize();
-
-    void crop(Rect2i cropRegion);
-
+public interface TerasologyCanvasRenderer extends CanvasRenderer {
     FrameBufferObject getFBO(ResourceUrn urn, BaseVector2i size);
 
     void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quat4f rotation, Vector3f offset, float scale, float alpha);
 
     void drawMaterialAt(Material material, Rect2i drawRegion);
-
-    void drawLine(int sx, int sy, int ex, int ey, Color color);
-
-    void drawTexture(UITextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion, float ux, float uy, float uw, float uh, float alpha);
-
-    void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Color color,
-                  Color shadowColor, float alpha, boolean underlined);
-
-    void drawTextureBordered(UITextureRegion texture, Rect2i absoluteRegion, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha);
 }

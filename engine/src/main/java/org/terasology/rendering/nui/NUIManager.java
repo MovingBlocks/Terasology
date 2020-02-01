@@ -20,9 +20,9 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.nui.ControlWidget;
 import org.terasology.nui.FocusManager;
 import org.terasology.nui.UIWidget;
+import org.terasology.nui.canvas.CanvasControl;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.nui.asset.UIElement;
-import org.terasology.rendering.nui.internal.CanvasControl;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 import java.util.Deque;

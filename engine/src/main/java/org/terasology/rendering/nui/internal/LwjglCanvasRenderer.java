@@ -86,7 +86,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  */
-public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListener {
+public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyChangeListener {
 
     private static final String CROPPING_BOUNDARIES_PARAM = "croppingBoundaries";
     private static final Rect2f FULL_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
@@ -258,7 +258,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
 
     @Override
     public void drawLine(int sx, int sy, int ex, int ey, Color color) {
-        Line.draw(sx, sy, ex, ey, 2, color, color, 0);
+        LineRenderer.draw(sx, sy, ex, ey, 2, color, color, 0);
     }
 
     @Override

@@ -30,10 +30,11 @@ import org.terasology.nui.VerticalAlign;
 import org.terasology.nui.asset.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.nui.canvas.CanvasRenderer;
+import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.rendering.opengl.FrameBufferObject;
 
-public class HeadlessCanvasRenderer implements CanvasRenderer {
+public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
 
     @Override
     public void preRender() {

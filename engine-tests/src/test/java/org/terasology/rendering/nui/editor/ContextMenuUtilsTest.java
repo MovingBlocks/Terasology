@@ -28,7 +28,7 @@ import org.terasology.input.InputSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.editor.layers.PlaceholderScreen;
 import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
-import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.nui.layouts.RowLayout;
 import org.terasology.nui.layouts.RowLayoutHint;
@@ -40,6 +40,7 @@ import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeConverter;
+import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class ContextMenuUtilsTest extends TerasologyTestingEnvironment {
         context.put(InputSystem.class, new InputSystem());
         context.put(TranslationSystem.class, new TranslationSystemImpl(context));
         context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());
-        context.put(NUIManager.class, new NUIManagerInternal(context.get(CanvasRenderer.class), context));
+        context.put(NUIManager.class, new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context));
 
         File file = new File(ContextMenuUtilsTest.class.getClassLoader().getResource("contextMenuBuilderInput.ui").getFile());
         String content = null;

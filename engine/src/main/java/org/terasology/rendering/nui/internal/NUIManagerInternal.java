@@ -49,7 +49,8 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
-import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.canvas.CanvasControl;
+import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.nui.events.NUIBindButtonEvent;
 import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
@@ -71,7 +72,6 @@ import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.utilities.Assets;
@@ -108,11 +108,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private AssetManager assetManager;
     private BindsManager bindsManager;
 
-    public NUIManagerInternal(CanvasRenderer renderer, Context context) {
+    public NUIManagerInternal(TerasologyCanvasRenderer renderer, Context context) {
         this.context = context;
         this.hudScreenLayer = new HUDScreenLayer();
         InjectionHelper.inject(hudScreenLayer, context);
-        this.canvas = new CanvasImpl(this, context, renderer);
+        this.canvas = new TerasologyCanvasImpl(this, context, renderer);
         this.keyboard = context.get(InputSystem.class).getKeyboard();
         this.mouse = context.get(InputSystem.class).getMouseDevice();
         this.bindsManager = context.get(BindsManager.class);
