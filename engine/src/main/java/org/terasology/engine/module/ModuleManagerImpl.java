@@ -103,6 +103,7 @@ public class ModuleManagerImpl implements ModuleManager {
         loadModulesFromClassPath();
 
         ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
+        scanner.getModuleLoader().setDirectoryCodeLocation(Paths.get("build", "classes", "java", "main"));
         scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
         scanner.scan(registry, PathManager.getInstance().getModulePaths());
 
