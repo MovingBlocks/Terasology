@@ -22,7 +22,7 @@ publishing {
                         url = "http://artifactory.terasology.org/artifactory/$publishRepo"
                         println "Changing PUBLISH repoKey set via property to $publishRepo"
                     } else if (repoViaEnv != null && repoViaEnv != "") {
-                        url = repoViaEnv
+                        url = "http://artifactory.terasology.org/artifactory/$repoViaEnv"
                         println "Changing PUBLISH repoKey set via env var to $repoViaEnv"
                     } else {
                         url = 'http://artifactory.terasology.org/artifactory/terasology-snapshot-local'
