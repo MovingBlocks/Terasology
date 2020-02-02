@@ -1,7 +1,7 @@
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
-apply from: "$rootDir/config/gradle/maven.gradle"
+apply from: "$rootDir/config/gradle/publish.gradle"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import java.text.SimpleDateFormat;

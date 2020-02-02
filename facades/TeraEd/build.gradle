@@ -1,7 +1,7 @@
 // The Editor facade is responsible for the (shader) editor - a plain Java application runnable on PCs
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
-apply from: "$rootDir/config/gradle/maven.gradle"
+apply from: "$rootDir/config/gradle/publish.gradle"
 
 // Base the engine tests on the same version number as the engine
 version = project(':engine').version

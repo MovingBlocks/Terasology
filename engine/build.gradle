@@ -1,7 +1,7 @@
 // The engine build is the primary Java project and has the primary list of dependencies
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
-apply from: "$rootDir/config/gradle/maven.gradle"
+apply from: "$rootDir/config/gradle/publish.gradle"
 
 import groovy.json.JsonSlurper
 import org.reflections.Reflections;
