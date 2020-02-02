@@ -15,18 +15,11 @@
  */
 package org.terasology.network;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,14 +32,9 @@ import org.terasology.rendering.nui.layers.mainMenu.JoinGameScreen;
 public class BroadCastServer {
 
     private static DatagramSocket socket;
-
-
     private static boolean turnOnBroadcast;
     private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
     private static ScheduledExecutorService service;
-    private Config config;
-
-
 
     public boolean isBroadCastTurnedOn() {
         return turnOnBroadcast;
@@ -83,9 +71,8 @@ public class BroadCastServer {
         // Broadcast address for finding routers.
         final String ssdpIP = "239.255.255.250";
         int timeout = 5000;
-        InetAddress localhost = InetAddress.getLocalHost();
         // Send from localhost:1901
-        InetSocketAddress srcAddress = new InetSocketAddress(localhost, ssdpSearchPort);
+        InetSocketAddress srcAddress = new InetSocketAddress(ssdpSearchPort);
         // Send to 239.255.255.250:1900
         InetSocketAddress dstAddress = new InetSocketAddress(InetAddress.getByName(ssdpIP), ssdpPort);
         // ----------------------------------------- //
@@ -108,15 +95,14 @@ public class BroadCastServer {
         try {
             multicast = new MulticastSocket(null);
             multicast.bind(srcAddress);
-            multicast.setTimeToLive(4);
-            System.out.println("Send multicast request.");
+            multicast.setTimeToLive(timeout);
+            logger.info("Send multicast request.");
             // ----- Sending multi-cast packet ----- //
             multicast.send(discoveryPacket);
         } finally {
-            System.out.println("Multicast ends. Close connection.");
+            logger.info("Multicast ends. Close connection.");
             multicast.disconnect();
             multicast.close();
         }
     }
-
 }
