@@ -92,7 +92,7 @@ task game(type:JavaExec) {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
-    args ["-homedir"]
+    args "-homedir"
     jvmArgs ["-Xmx1536m"]
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
