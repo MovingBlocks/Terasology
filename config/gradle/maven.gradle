@@ -15,11 +15,11 @@ publishing {
 
             repositories {
                 maven {
-                    name = 'MovingBlocks'
+                    name = 'TerasologyOrg'
 
-                    if (rootProject.hasProperty("artifactoryPublishRepo")) {
-                        url = "http://artifactory.terasology.org/artifactory/$artifactoryPublishRepo"
-                        println "Changing PUBLISH repoKey to $artifactoryPublishRepo"
+                    if (rootProject.hasProperty("publishRepo")) {
+                        url = "http://artifactory.terasology.org/artifactory/$publishRepo"
+                        println "Changing PUBLISH repoKey to $publishRepo"
                     } else {
                         url = 'http://artifactory.terasology.org/artifactory/terasology-snapshot-local'
                         println "PUBLISH repoKey is terasology-snapshot-local (default value)"
