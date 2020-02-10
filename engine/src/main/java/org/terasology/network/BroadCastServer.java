@@ -18,20 +18,18 @@ package org.terasology.network;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
 import org.terasology.rendering.nui.layers.mainMenu.JoinGameScreen;
 
 
 public class BroadCastServer {
 
-    private static DatagramSocket socket;
+    private static DatagramSocket receiveSocket;
+    private static DatagramSocket sendSocket;
     private static boolean turnOnBroadcast;
     private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
     private static ScheduledExecutorService service;
@@ -45,19 +43,24 @@ public class BroadCastServer {
     }
 
     public void startBroadcast() {
-        service = Executors.newSingleThreadScheduledExecutor();
-        Runnable runnable = new Runnable() {
-            public void run() {
-                try {
-                    logger.info("Broadcasting message");
-                        broadCast();
-                } catch (Exception e) {
-                    logger.info("Broadcasting has been interrupted " + e.getMessage());
-                    e.printStackTrace();
+        try {
+            sendBroadCast();
+            service = Executors.newSingleThreadScheduledExecutor();
+            Runnable runnable = new Runnable() {
+                public void run() {
+                    logger.info("Listening to broadcast");
+                    try {
+                        listenToBroadCast();
+                    } catch (Exception e) {
+                        logger.error("Broadcasting has been interrupted" + e.getMessage());
+                    }
                 }
-            }
-        };
-        service.scheduleAtFixedRate(runnable, 0, 300, TimeUnit.SECONDS);
+            };
+            service.scheduleAtFixedRate(runnable, 0, 300, TimeUnit.SECONDS);
+        } catch (Exception e) {
+        logger.info("Broadcasting has been interrupted " + e.getMessage());
+        e.printStackTrace();
+        }
     }
 
     public void stopBroadCast() {
@@ -65,44 +68,65 @@ public class BroadCastServer {
         service.shutdown();
     }
 
-    private void broadCast() throws Exception {
-        final int ssdpPort = 1900;
-        final int ssdpSearchPort = 1901;
-        // Broadcast address for finding routers.
-        final String ssdpIP = "239.255.255.250";
-        int timeout = 5000;
-        // Send from localhost:1901
-        InetSocketAddress srcAddress = new InetSocketAddress(ssdpSearchPort);
-        // Send to 239.255.255.250:1900
-        InetSocketAddress dstAddress = new InetSocketAddress(InetAddress.getByName(ssdpIP), ssdpPort);
-        // ----------------------------------------- //
-        //       Construct the request packet.       //
-        // ----------------------------------------- //
-        StringBuffer discoveryMessage = new StringBuffer();
-        discoveryMessage.append("M-SEARCH * HTTP/1.1\r\n");
-        discoveryMessage.append("HOST: " + ssdpIP + ":" + ssdpPort + "\r\n");
-        discoveryMessage.append("ST: urn:schemas-upnp-org:device:InternetGatewayDevice:1\r\n");
-        // ST: urn:schemas-upnp-org:service:WANIPConnection:1\r\n
-        discoveryMessage.append("MAN: \"ssdp:discover\"\r\n");
-        discoveryMessage.append("MX: 2\r\n");
-        discoveryMessage.append("\r\n");
-        byte[] discoveryMessageBytes = discoveryMessage.toString().getBytes();
-        DatagramPacket discoveryPacket = new DatagramPacket(discoveryMessageBytes, discoveryMessageBytes.length, dstAddress);
-        // ----------------------------------- //
-        //       Send multi-cast packet.       //
-        // ----------------------------------- //
-        MulticastSocket multicast = null;
+    private void listenToBroadCast() throws Exception {
+        byte[] buffer = "__DISCOVERY_REQUEST__".getBytes();
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        getReceiveSocket().receive(packet);
+        logger.info("Discovery package received! -> " + packet.getAddress() + ":" + packet.getPort());
+
+        //Validate the data sent.
+        String data = new String(packet.getData()).trim();
+        if (data.equals("__DISCOVERY_REQUEST__")) { // validate command
+            // Send response
+            byte[] response = new byte["__DISCOVERY_RESPONSE".length()];
+            DatagramPacket responsePacket = new DatagramPacket(response, response.length, packet.getAddress(), packet.getPort());
+            getReceiveSocket().send(responsePacket);
+            logger.info("Response sent to: " + packet.getAddress() + ":" + packet.getPort());
+        } else {
+            logger.info("Error, not valid package!" + packet.getAddress() + ":" + packet.getPort());
+        }
+    }
+
+    private DatagramSocket getReceiveSocket()  {
         try {
-            multicast = new MulticastSocket(null);
-            multicast.bind(srcAddress);
-            multicast.setTimeToLive(timeout);
-            logger.info("Send multicast request.");
-            // ----- Sending multi-cast packet ----- //
-            multicast.send(discoveryPacket);
-        } finally {
-            logger.info("Multicast ends. Close connection.");
-            multicast.disconnect();
-            multicast.close();
+            if (receiveSocket == null) {
+                receiveSocket = new DatagramSocket(8002,
+                    InetAddress.getByName("0.0.0.0")); // 0.0.0.0 for listen to all ips
+                receiveSocket.setBroadcast(true);
+            }
+        } catch (Exception e) {
+            logger.error("Broadcast Exception Encountered" + e.getMessage());
+        }
+        return receiveSocket;
+    }
+
+    private DatagramSocket getSendSocket() {
+        try {
+            if (sendSocket == null) {
+                sendSocket = new DatagramSocket(8001, InetAddress.getLocalHost());
+                sendSocket.setBroadcast(true);
+            }
+        } catch (Exception e) {
+            logger.error("Broadcast Exception Encountered" + e.getMessage());
+        }
+        return sendSocket;
+    }
+
+    public void sendBroadCast() throws Exception {
+        // Discovery request command
+        byte[] data = "__DISCOVERY_REQUEST__".getBytes();
+        DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), 8002);
+        getSendSocket().send(packet);
+        logger.info("Discovery package sent!" + packet.getAddress() + ":" + packet.getPort());
+
+        // Discovery response command
+        byte[] response = new byte["__DISCOVERY_RESPONSE__".length()];
+        DatagramPacket responsePacket = new DatagramPacket(response, response.length);
+        getSendSocket().receive(responsePacket);
+        logger.info("Discovery response received!" + responsePacket.getAddress() + ":" + responsePacket.getPort());
+        String responseData = new String(responsePacket.getData()).trim();
+        if (responseData.equals("__DISCOVERY_RESPONSE__")) { // Check valid command
+            logger.info("Found server!" + responsePacket.getAddress() + ":" + responsePacket.getPort());
         }
     }
 }
