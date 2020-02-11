@@ -33,6 +33,8 @@ public class BroadCastServer {
     private static boolean turnOnBroadcast;
     private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
     private static ScheduledExecutorService service;
+    private static String discoveryRequest = "__DISCOVERY_REQUEST__";
+    private static String discoveryResponse = "__DISCOVERY_RESPONSE__";
 
     public boolean isBroadCastTurnedOn() {
         return turnOnBroadcast;
@@ -69,16 +71,16 @@ public class BroadCastServer {
     }
 
     private void listenToBroadCast() throws Exception {
-        byte[] buffer = "__DISCOVERY_REQUEST__".getBytes();
+        byte[] buffer = discoveryRequest.getBytes();
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         getReceiveSocket().receive(packet);
         logger.info("Discovery package received! -> " + packet.getAddress() + ":" + packet.getPort());
 
         //Validate the data sent.
         String data = new String(packet.getData()).trim();
-        if (data.equals("__DISCOVERY_REQUEST__")) { // validate command
+        if (data.equals(discoveryRequest)) { // validate command
             // Send response
-            byte[] response = new byte["__DISCOVERY_RESPONSE".length()];
+            byte[] response = new byte[discoveryResponse.length()];
             DatagramPacket responsePacket = new DatagramPacket(response, response.length, packet.getAddress(), packet.getPort());
             getReceiveSocket().send(responsePacket);
             logger.info("Response sent to: " + packet.getAddress() + ":" + packet.getPort());
@@ -114,18 +116,18 @@ public class BroadCastServer {
 
     public void sendBroadCast() throws Exception {
         // Discovery request command
-        byte[] data = "__DISCOVERY_REQUEST__".getBytes();
+        byte[] data = discoveryRequest.getBytes();
         DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), 8002);
         getSendSocket().send(packet);
         logger.info("Discovery package sent!" + packet.getAddress() + ":" + packet.getPort());
 
         // Discovery response command
-        byte[] response = new byte["__DISCOVERY_RESPONSE__".length()];
+        byte[] response = new byte[discoveryResponse.length()];
         DatagramPacket responsePacket = new DatagramPacket(response, response.length);
         getSendSocket().receive(responsePacket);
         logger.info("Discovery response received!" + responsePacket.getAddress() + ":" + responsePacket.getPort());
         String responseData = new String(responsePacket.getData()).trim();
-        if (responseData.equals("__DISCOVERY_RESPONSE__")) { // Check valid command
+        if (responseData.equals(discoveryResponse)) { // Check valid command
             logger.info("Found server!" + responsePacket.getAddress() + ":" + responsePacket.getPort());
         }
     }
