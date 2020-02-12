@@ -18,6 +18,7 @@ package org.terasology.network;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -71,7 +72,7 @@ public class BroadCastServer {
     }
 
     private void listenToBroadCast() throws Exception {
-        byte[] buffer = discoveryRequest.getBytes();
+        byte[] buffer = discoveryRequest.getBytes(StandardCharsets.UTF_8);
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         getReceiveSocket().receive(packet);
         logger.info("Discovery package received! -> " + packet.getAddress() + ":" + packet.getPort());
@@ -116,7 +117,7 @@ public class BroadCastServer {
 
     public void sendBroadCast() throws Exception {
         // Discovery request command
-        byte[] data = discoveryRequest.getBytes();
+        byte[] data = discoveryRequest.getBytes(StandardCharsets.UTF_8);
         DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), 8002);
         getSendSocket().send(packet);
         logger.info("Discovery package sent!" + packet.getAddress() + ":" + packet.getPort());
