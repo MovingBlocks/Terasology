@@ -323,7 +323,7 @@ task distForLauncher (type: Sync) {
     from distPCZip
 
     into ("../resources/main/org/terasology/version") {
-        from ("$rootDir/engine/build/classes/org/terasology/version") {
+        from ("$rootDir/engine/build/classes/java/main/org/terasology/version") {
             include ('versionInfo.properties')
         }
     }
