@@ -30,6 +30,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Matrix4f;
@@ -95,7 +96,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
             return; // skip everything if there is nothing to do to avoid possibly costly draw mode changes
         }
         glDisable(GL_DEPTH_TEST);
-        Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
+        Vector3f cameraPosition = JomlUtil.from(worldRenderer.getActiveCamera().getPosition());
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
@@ -110,7 +111,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
 
         Matrix4f matrixCameraSpace = new Matrix4f(new Quat4f(0, 0, 0, 1), worldPositionCameraSpace, 1.0f);
 
-        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
         material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
