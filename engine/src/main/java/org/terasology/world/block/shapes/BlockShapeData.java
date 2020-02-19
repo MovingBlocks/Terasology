@@ -22,14 +22,18 @@ import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.BlockSection;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 /**
  */
 public class BlockShapeData implements AssetData {
     private String displayName = "";
-    private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
+    private List<BlockMeshPart> meshParts = new ArrayList<>();
+    private EnumMap<Side, List<BlockMeshPart>> meshBySide = new EnumMap<>(Side.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape collisionShape;
     private Vector3f collisionOffset = new Vector3f();
@@ -48,18 +52,25 @@ public class BlockShapeData implements AssetData {
         this.displayName = displayName;
     }
 
-    public BlockMeshPart getMeshPart(BlockPart part) {
-        return meshParts.get(part);
+    public List<BlockMeshPart> getMeshParts() {
+        return meshParts;
+    }
+
+    public List<BlockMeshPart> getMeshParts(Side side) {
+        return meshBySide.get(side);
     }
 
     /**
-     * Sets the mesh to use for the given block part
+     * Adds the given mesh to the lists of faces to render at the proper sides
      *
-     * @param part
      * @param mesh
      */
-    public void setMeshPart(BlockPart part, BlockMeshPart mesh) {
-        meshParts.put(part, mesh);
+    public void setMeshPart(BlockMeshPart mesh, byte key) {
+        List<Side> sides = BlockSection.fromKey(key);
+        for (Side side : sides) {
+            meshBySide.computeIfAbsent(side, (v) -> new ArrayList<>()).add(mesh);
+        }
+        meshParts.add(mesh);
     }
 
     public boolean isBlockingSide(Side side) {

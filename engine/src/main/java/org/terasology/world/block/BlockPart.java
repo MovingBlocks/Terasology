@@ -24,7 +24,10 @@ import java.util.EnumMap;
 import java.util.List;
 
 /**
+ * The original method of determining when to render specific parts of a block shape.
+ * Deprecrated in favor of BlockSection.
  */
+@Deprecated
 public enum BlockPart {
     TOP(Side.TOP),
     LEFT(Side.LEFT),

@@ -28,7 +28,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.BlockPart;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,7 +38,8 @@ import java.util.Map;
 public class BlockShapeImpl extends BlockShape {
 
     private String displayName;
-    private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
+    private List<BlockMeshPart> meshParts = new ArrayList<>();
+    private EnumMap<Side, List<BlockMeshPart>> meshBySide = new EnumMap<>(Side.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape baseCollisionShape;
     private Vector3f baseCollisionOffset = new Vector3f();
@@ -56,9 +59,17 @@ public class BlockShapeImpl extends BlockShape {
         return displayName;
     }
 
+    /**
+     * @return All mesh parts contained by the block
+     */
     @Override
-    public BlockMeshPart getMeshPart(BlockPart part) {
-        return meshParts.get(part);
+    public List<BlockMeshPart> getMeshParts() {
+        return meshParts;
+    }
+
+    @Override
+    public List<BlockMeshPart> getMeshParts(Side side) {
+        return meshBySide.get(side);
     }
 
     @Override
@@ -70,11 +81,11 @@ public class BlockShapeImpl extends BlockShape {
     protected void doReload(BlockShapeData data) {
         collisionShape.clear();
         displayName = data.getDisplayName();
-        for (BlockPart part : BlockPart.values()) {
-            this.meshParts.put(part, data.getMeshPart(part));
-        }
+        this.meshParts.addAll(data.getMeshParts());
+
         for (Side side : Side.getAllSides()) {
             this.fullSide.put(side, data.isBlockingSide(side));
+            this.meshBySide.put(side, data.getMeshParts(side));
         }
         this.baseCollisionShape = data.getCollisionShape();
         this.baseCollisionOffset.set(data.getCollisionOffset());

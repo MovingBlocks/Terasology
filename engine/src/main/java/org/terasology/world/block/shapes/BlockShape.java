@@ -24,6 +24,8 @@ import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.world.block.BlockPart;
 
+import java.util.List;
+
 /**
  * Describes a shape that a block can take. The shape may also be rotated if not symmetrical.
  *
@@ -40,10 +42,15 @@ public abstract class BlockShape extends Asset<BlockShapeData> {
     public abstract String getDisplayName();
 
     /**
-     * @param part
-     * @return The mesh part for the given part of the block, or null if it has none
+     * @return All mesh parts contained by the block
      */
-    public abstract BlockMeshPart getMeshPart(BlockPart part);
+    public abstract List<BlockMeshPart> getMeshParts();
+
+    /**
+     * @param side
+     * @return The mesh parts for the given side of the block, or null if it has none
+     */
+    public abstract List<BlockMeshPart> getMeshParts(Side side);
 
     /**
      * @param side

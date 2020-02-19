@@ -33,6 +33,7 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rotation;
+import org.terasology.math.Side;
 import org.terasology.math.Transform;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -42,6 +43,7 @@ import org.terasology.physics.shapes.ConvexHullShape;
 import org.terasology.utilities.gson.Vector2fTypeAdapter;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.BlockSection;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,6 +51,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static org.terasology.physics.engine.PhysicsEngineManager.COLLISION_SHAPE_FACTORY;
 
@@ -94,6 +97,9 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
         public static final String POSITION = "position";
         public static final String EXTENTS = "extents";
         public static final String RADIUS = "radius";
+        public static final String VERTICES = "vertices";
+        public static final String NORMALS = "normals";
+        public static final String SIDES = "sides";
 
         @Override
         public BlockShapeData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -104,12 +110,53 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 shape.setDisplayName(shapeObj.getAsJsonPrimitive(DISPLAY_NAME).getAsString());
             }
 
-            for (BlockPart part : BlockPart.values()) {
-                if (shapeObj.has(part.toString().toLowerCase(Locale.ENGLISH))) {
-                    JsonObject meshObj = shapeObj.getAsJsonObject(part.toString().toLowerCase(Locale.ENGLISH));
-                    shape.setMeshPart(part, (BlockMeshPart) context.deserialize(meshObj, BlockMeshPart.class));
-                    if (part.isSide() && meshObj.has(FULL_SIDE)) {
-                        shape.setBlockingSide(part.getSide(), meshObj.get(FULL_SIDE).getAsBoolean());
+            //Here we parse the JSON for all block sections.
+            for (Map.Entry<String, JsonElement> entry : shapeObj.entrySet()) {
+                if (entry.getValue().isJsonObject()) {
+                    JsonObject meshObj = entry.getValue().getAsJsonObject();
+                    //First, we check to ascertain that this is representing a block section.
+                    if (meshObj.has(VERTICES) && meshObj.has(NORMALS)) {
+                        byte sides = 0;
+                        //Second, we check whether the shape has the new "sides" parameter.
+                        if (meshObj.has(SIDES)) {
+                            String rawSides = meshObj.get(SIDES).getAsString();
+                            try {
+                                //First attempt: we check if it is a simple number.
+                                sides = Byte.parseByte(rawSides, 10);
+                            } catch (Exception e) {
+                                if (rawSides.length() == 1) {
+                                    try {
+                                        //Second attempt: we see if it is a byte encoded as a single character.
+                                        sides = rawSides.getBytes()[0];
+                                    } catch (Exception ignored) {}
+                                } else {
+                                    if (BlockSection.fromWord(rawSides).length > 0) {
+                                        //Third attempt: we see if it is a valid side name, like "left" or "sides".
+                                        sides = BlockSection.key(rawSides);
+                                    } else if (rawSides.length() == 6 || rawSides.length() == 8) {
+                                        try {
+                                            //Fourth attempt: we see if it is presented in binary, e.g. 10110100
+                                            //8 is valid; 8 bits in a byte. 6 is also valid; the last 2 bits are unused.
+                                            sides = Byte.parseByte(rawSides, 2);
+                                        } catch (Exception ignored) {}
+                                    }
+                                }
+                            }
+                        } else {
+                            //If there is no "sides" parameter, the part's name is used, as with legacy .shape files.
+                            sides = BlockSection.key(entry.getKey());
+                        }
+                        shape.setMeshPart((BlockMeshPart) context.deserialize(meshObj, BlockMeshPart.class), sides);
+                    }
+                }
+            }
+
+            //Full-side blocking must still be defined with names matching proper Side values.
+            for (Side side : Side.values()) {
+                if (shapeObj.has(side.toString().toLowerCase(Locale.ENGLISH))) {
+                    JsonObject meshObj = shapeObj.getAsJsonObject(side.toString().toLowerCase(Locale.ENGLISH));
+                    if (meshObj.has(FULL_SIDE)) {
+                        shape.setBlockingSide(side, meshObj.get(FULL_SIDE).getAsBoolean());
                     }
                 }
             }
@@ -162,8 +209,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
 
         private List<Vector3f> buildVertList(BlockShapeData shape) {
             List<Vector3f> result = new ArrayList<>();
-            for (BlockPart part : BlockPart.values()) {
-                BlockMeshPart meshPart = shape.getMeshPart(part);
+            for (BlockMeshPart meshPart : shape.getMeshParts()) {
                 if (meshPart != null) {
                     for (int i = 0; i < meshPart.size(); ++i) {
                         result.add(meshPart.getVertex(i));
@@ -248,6 +294,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
         }
     }
 
+    //TODO: modify parser to allow faces as 3 separate indices for vertex, normal, and texCoord
     private static class BlockMeshPartHandler implements JsonDeserializer<BlockMeshPart> {
 
         @Override
