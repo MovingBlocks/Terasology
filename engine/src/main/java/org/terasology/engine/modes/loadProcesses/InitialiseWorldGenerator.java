@@ -17,6 +17,7 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.context.Context;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.generator.WorldGenerator;
 

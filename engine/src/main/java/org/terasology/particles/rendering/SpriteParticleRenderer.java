@@ -22,6 +22,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.particles.ParticlePool;
 import org.terasology.particles.ParticleSystemManager;
@@ -149,9 +150,9 @@ public class SpriteParticleRenderer implements RenderSystem {
     public void renderAlphaBlend() {
         Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();
         material.enable();
-        Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
+        org.joml.Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
 
-        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, camPos));
+        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, JomlUtil.from(camPos)));
     }
 
     @Override

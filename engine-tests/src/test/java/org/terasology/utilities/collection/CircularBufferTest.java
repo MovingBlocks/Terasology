@@ -16,14 +16,15 @@
 package org.terasology.utilities.collection;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -133,31 +134,30 @@ public class CircularBufferTest {
     }
 
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testIteratorRemoveTwice() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(2);
         buffer.addAll(ImmutableList.of(1, 2));
         Iterator<Integer> iterator = buffer.iterator();
         iterator.next();
         iterator.remove();
-        iterator.remove();
+        Assertions.assertThrows(IllegalStateException.class,  iterator::remove);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testIteratorRemoveWithoutNext() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(2);
         buffer.addAll(ImmutableList.of(1, 2));
-        buffer.iterator().remove();
+        Assertions.assertThrows(IllegalStateException.class, buffer.iterator()::remove);
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void testIteratorAfterEnd() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(1);
         buffer.add(1);
         Iterator<Integer> it = buffer.iterator();
         it.next();
         it.remove();
-        it.next();
-        it.remove();
+        Assertions.assertThrows(NoSuchElementException.class,  it::next);
     }
 }

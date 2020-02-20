@@ -16,7 +16,7 @@
 package org.terasology.persistence.typeHandling;
 
 import com.google.common.collect.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.reflections.Reflections;
@@ -25,11 +25,9 @@ import org.terasology.reflection.TypeInfo;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.both;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
@@ -83,11 +81,12 @@ public class FutureTypeHandlerTest {
                 eq(new TypeInfo<RecursiveType<Integer>>() {}.getType())
         );
 
-        assertThat(resultCaptor.getResult().get(),
-                both(notNullValue()).and(instanceOf(FutureTypeHandler.class)));
+        // Optional#get() can throw NoSuchElementException
+        TypeHandler possibleFuture = assertDoesNotThrow(()-> resultCaptor.getResult().get());
+        assertTrue(possibleFuture instanceof FutureTypeHandler);
 
         FutureTypeHandler<RecursiveType<Integer>> future =
-                (FutureTypeHandler<RecursiveType<Integer>>) resultCaptor.getResult().get();
+                (FutureTypeHandler<RecursiveType<Integer>>) possibleFuture;
 
         assertEquals(typeHandler, future.typeHandler);
     }

@@ -124,6 +124,25 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         return null;
     }
 
+    //SetBlocks, not SetBlock, is currently triggered by the engine whenever a player places a block.
+    //This allows for several useful features, such as quickly synchronizing placement across networks.
+    //However, this means that even if only one block is placed, this is the method being called.
+    //It must be overridden here to allow an OnChangedBlock event to be properly sent for placed blocks.
+    @Override
+    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+        if (GameThread.isCurrentThread()) {
+            Map<Vector3i, Block> oldBlocks = super.setBlocks(blocks);
+            for (Vector3i vec : oldBlocks.keySet()) {
+                if (oldBlocks.get(vec) != null) {
+                    EntityRef blockEntity = getBlockEntityAt(vec);
+                    updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, Collections.<Class<? extends Component>>emptySet());
+                }
+            }
+            return oldBlocks;
+        }
+        return null;
+    }
+
     @Override
     @SafeVarargs
     public final Block setBlockRetainComponent(Vector3i pos, Block type, Class<? extends Component>... components) {

@@ -16,9 +16,10 @@
 
 package org.terasology.rendering.animation;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link Animation} class
@@ -43,45 +44,45 @@ public class AnimationTest {
     @Test
     public void testStartEndValuesOnce() {
         Animation ani = once().start();
-        Assert.assertEquals(0.0f, c.value, 0.0f);
+        assertEquals(0.0f, c.value, 0.0f);
         ani.update(2.5f);
-        Assert.assertEquals(1.0f, c.value, 0.0f);
+        assertEquals(1.0f, c.value, 0.0f);
     }
 
     @Test
     public void testStartEndValuesInfinite() {
         Animation ani = infinite().start();
-        Assert.assertEquals(0.0f, c.value, 0.0f);
+        assertEquals(0.0f, c.value, 0.0f);
         ani.update(2.5f);
-        Assert.assertEquals(.25f, c.value, EPS); // (2.5 % 2) / 2
+        assertEquals(.25f, c.value, EPS); // (2.5 % 2) / 2
     }
 
     @Test
     public void testOverflowInfinite() {
         Animation ani = infinite().start();
-        Assert.assertEquals(0.0f, c.value, 0.0f);
+        assertEquals(0.0f, c.value, 0.0f);
         ani.update(112.5f);
-        Assert.assertEquals(.25f, c.value, EPS); // (112.5 % 2) / 2
+        assertEquals(.25f, c.value, EPS); // (112.5 % 2) / 2
     }
 
     @Test
     public void testUpdates() {
         Animation ani = once();
         ani.update(2.5f);  // ignored
-        Assert.assertEquals(0f, c.value, 0f);
+        assertEquals(0f, c.value, 0f);
         ani.start();
         ani.update(0.5f);
-        Assert.assertEquals(0.25f, c.value, EPS); // 0.5 / 2
+        assertEquals(0.25f, c.value, EPS); // 0.5 / 2
         ani.pause();
         ani.update(0.5f);  // ignored
-        Assert.assertEquals(0.25f, c.value, EPS); // same
+        assertEquals(0.25f, c.value, EPS); // same
         ani.resume();
         ani.update(1.0f);
-        Assert.assertEquals(0.75f, c.value, EPS); // 1.5 / 2
+        assertEquals(0.75f, c.value, EPS); // 1.5 / 2
         ani.update(1.0f);
-        Assert.assertEquals(1.00f, c.value, 0f);  // 2.5 / 2 -> capped
+        assertEquals(1.00f, c.value, 0f);  // 2.5 / 2 -> capped
         ani.update(1.0f);  // ignored
-        Assert.assertEquals(1.00f, c.value, 0f);  // same
+        assertEquals(1.00f, c.value, 0f);  // same
     }
 
     @Test
@@ -99,20 +100,20 @@ public class AnimationTest {
     public void testUpdatesReverse() {
         Animation ani = once().setReverseMode();
         ani.update(2.5f);  // ignored
-        Assert.assertEquals(0f, c.value, 0f);
+        assertEquals(0f, c.value, 0f);
         ani.start();
         ani.update(0.5f);
-        Assert.assertEquals(0.75f, c.value, EPS); // 1 - 0.5 / 2
+        assertEquals(0.75f, c.value, EPS); // 1 - 0.5 / 2
         ani.pause();
         ani.update(0.5f);  // ignored
-        Assert.assertEquals(0.75f, c.value, EPS); // same
+        assertEquals(0.75f, c.value, EPS); // same
         ani.resume();
         ani.update(1.0f);
-        Assert.assertEquals(0.25f, c.value, EPS); // 1 - 1.5 / 2
+        assertEquals(0.25f, c.value, EPS); // 1 - 1.5 / 2
         ani.update(1.0f);
-        Assert.assertEquals(0.00f, c.value, 0f);  // 1 - 2.5 / 2 -> capped
+        assertEquals(0.00f, c.value, 0f);  // 1 - 2.5 / 2 -> capped
         ani.update(1.0f);  // ignored
-        Assert.assertEquals(0.00f, c.value, 0f);  // same
+        assertEquals(0.00f, c.value, 0f);  // same
     }
 
     private Animation once() {

@@ -91,6 +91,28 @@ task game(type:JavaExec) {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
+    String[] runArgs = [" -Xmx1536m -homedir"]
+    args runArgs
+
+    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
+    classpath sourceSets.main.output.classesDir
+    classpath sourceSets.main.output.resourcesDir
+    classpath project(':engine').sourceSets.main.output.classesDir
+    classpath project(':engine').configurations.runtime
+}
+
+task profile(type:JavaExec) {
+    description = "Run 'Terasology' to play the game as a standard PC application (with Java FlightRecorder profiling)"
+
+    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
+    dependsOn rootProject.extractNatives
+    dependsOn rootProject.moduleClasses
+    dependsOn classes
+
+    // Run arguments
+    jvmArgs = ["-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"]
+    main = mainClassName
+    workingDir = rootDir
     String[] runArgs = ["-homedir"]
     args runArgs
 
@@ -113,7 +135,7 @@ task debug(type:JavaExec) {
     jvmArgs = ["-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"]
     main = mainClassName
     workingDir = rootDir
-    String[] runArgs = ["-homedir"]
+    String[] runArgs = [" -Xmx1536m -homedir"]
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
@@ -192,7 +214,7 @@ task server(type:JavaExec) {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
-    String[] runArgs = ["-headless", "-homedir=$localServerDataPath"]
+    String[] runArgs = [" -Xmx1536m -headless", "-homedir=$localServerDataPath"]
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those

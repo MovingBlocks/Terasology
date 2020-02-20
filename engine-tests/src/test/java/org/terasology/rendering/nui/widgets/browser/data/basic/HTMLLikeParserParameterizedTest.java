@@ -15,52 +15,42 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-@RunWith(value = Parameterized.class)
 public class HTMLLikeParserParameterizedTest {
-    private final String encodedText;
-    private final String unencodedText;
 
-    public HTMLLikeParserParameterizedTest(String encodedText, String unencodedText) {
-        this.encodedText = encodedText;
-        this.unencodedText = unencodedText;
-    }
-
-    @Test
-    public void testEncodeHTMLLike() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testEncodeHTMLLike(String encodedText, String unencodedText) {
         String actual = HTMLLikeParser.encodeHTMLLike(unencodedText);
 
         assertEquals(encodedText, actual);
     }
 
-    @Test
-    public void testUnencodeHTMLLike() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testUnencodeHTMLLike(String encodedText, String unencodedText) {
         String actual = HTMLLikeParser.unencodeHTMLLike(encodedText);
 
         assertEquals(unencodedText, actual);
     }
 
-    @Parameters
-    public static Collection data() {
-        Object[][] data = new Object[][]{
-                {"&amp;", "&"},
-                {"&lt;", "<"},
-                {"&gt;", ">"},
-                {"&lt;&gt;&amp;", "<>&"},
-                {"Leading text &lt;&gt;&amp;", "Leading text <>&"},
-                {"&lt;&gt;&amp; trailing text", "<>& trailing text"},
-                {"&lt;bold&gt;MovingBlocks &amp; Terasology&lt;/bold&gt;", "<bold>MovingBlocks & Terasology</bold>"}
-        };
-
-        return Arrays.asList(data);
+    public static Stream<? extends Arguments> data() {
+        return Stream.of(
+                arguments("&amp;", "&"),
+                arguments("&lt;", "<"),
+                arguments("&gt;", ">"),
+                arguments("&lt;&gt;&amp;", "<>&"),
+                arguments("Leading text &lt;&gt;&amp;", "Leading text <>&"),
+                arguments("&lt;&gt;&amp; trailing text", "<>& trailing text"),
+                arguments("&lt;bold&gt;MovingBlocks &amp; Terasology&lt;/bold&gt;", "<bold>MovingBlocks & Terasology</bold>")
+        );
     }
 }

@@ -129,6 +129,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     public String getInstigatorName(EntityRef instigator) {
         if (instigator.hasComponent(CharacterComponent.class)) {
             EntityRef instigatorClient = instigator.getComponent(CharacterComponent.class).controller;
+            // todo add nullPointer break
             EntityRef instigatorClientInfo = instigatorClient.getComponent(ClientComponent.class).clientInfo;
             DisplayNameComponent displayNameComponent = instigatorClientInfo.getComponent(DisplayNameComponent.class);
             return displayNameComponent.name;
@@ -163,6 +164,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     public String getDamageTypeName(Prefab damageType) {
         //A DisplayName can be specified in the damage type prefab
         //Otherwise, the game will attempt to generate one from the name of that prefab
+        logger.info("damageType {}", damageType.toString());
         if (damageType.hasComponent(DisplayNameComponent.class)) {
             DisplayNameComponent displayNameComponent = damageType.getComponent(DisplayNameComponent.class);
             return displayNameComponent.name;

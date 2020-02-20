@@ -17,16 +17,16 @@
 package org.terasology.utilities;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link CamelCaseMatcher}
- *
  */
 public class CamelCaseMatcherTest {
 
@@ -38,7 +38,7 @@ public class CamelCaseMatcherTest {
 
         for (String query : queries) {
             Collection<String> matches = CamelCaseMatcher.getMatches(query, commands, true);
-            assertTrue("The query did not match the command", matches.size() == 1);
+            assertEquals(1, matches.size(), "The query did not match the command");
         }
     }
 
@@ -58,21 +58,21 @@ public class CamelCaseMatcherTest {
 
         for (String query : noHitQueries) {
             Collection<String> matches = CamelCaseMatcher.getMatches(query, commands, true);
-            assertTrue("The query '" + query + "' should not match any command", matches.size() == 0);
+            assertEquals(0, matches.size(), () -> "The query '" + query + "' should not match any command");
         }
 
         List<String> oneHitQueries = ImmutableList.of("liFSB", "puW", "liI");
 
         for (String query : oneHitQueries) {
             Collection<String> matches = CamelCaseMatcher.getMatches(query, commands, true);
-            assertTrue("The query '" + query + "' should match exactly 1 command, not " + matches.size(), matches.size() == 1);
+            assertEquals(1, matches.size(), () -> "The query '" + query + "' should match exactly 1 command, not " + matches.size());
         }
 
         List<String> multiHitQueries = ImmutableList.of("liB", "spa", "seMaGSpe");
 
         for (String query : multiHitQueries) {
             Collection<String> matches = CamelCaseMatcher.getMatches(query, commands, true);
-            assertTrue("The query '" + query + "' should match multiple commands, not " + matches.size(), matches.size() > 1);
+            assertTrue(matches.size() > 1, "The query '" + query + "' should match multiple commands, not " + matches.size());
         }
     }
 

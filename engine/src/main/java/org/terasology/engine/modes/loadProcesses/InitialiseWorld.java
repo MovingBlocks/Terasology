@@ -23,6 +23,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;

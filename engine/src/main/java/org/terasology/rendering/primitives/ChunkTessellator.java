@@ -27,6 +27,7 @@ import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.generation.Region;
 
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +45,7 @@ public final class ChunkTessellator {
         this.bufferPool = bufferPool;
     }
 
-    public ChunkMesh generateMesh(ChunkView chunkView, int meshHeight, int verticalOffset) {
+    public ChunkMesh generateMesh(ChunkView chunkView, Region worldData, int meshHeight, int verticalOffset) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh(bufferPool);
 
@@ -55,7 +56,7 @@ public final class ChunkTessellator {
                 for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
                     Block block = chunkView.getBlock(x, y, z);
                     if (block != null && block.getMeshGenerator() != null) {
-                        block.getMeshGenerator().generateChunkMesh(chunkView, mesh, x, y, z);
+                        block.getMeshGenerator().generateChunkMesh(chunkView, mesh, worldData, x, y, z);
                     }
                 }
             }

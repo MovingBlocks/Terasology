@@ -15,11 +15,13 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class HTMLLikeParserTest {
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testUnencodeUnsupportedEntities() {
-        HTMLLikeParser.unencodeHTMLLike("&invalid;");
+        Assertions.assertThrows(IllegalArgumentException.class,
+                ()->HTMLLikeParser.unencodeHTMLLike("&invalid;"));
     }
 }

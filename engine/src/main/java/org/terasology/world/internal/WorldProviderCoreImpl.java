@@ -267,7 +267,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 listener.onBlockChanged(pos, type, oldType);
             }
         }
-        type.getEntity().send(new OnChangedBlock(pos, type, oldType));
     }
     
     private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
