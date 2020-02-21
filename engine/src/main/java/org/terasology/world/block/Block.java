@@ -27,6 +27,7 @@ import org.terasology.math.Transform;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -42,6 +43,7 @@ import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.chunks.ChunkConstants;
 
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -95,6 +97,8 @@ public final class Block {
     private boolean waving;
     private byte luminance;
     private Vector3f tint = new Vector3f(0, 0, 0);
+    private Map<String, BlockColorSource> colorSource = new HashMap<>();
+    private Map<String, Vector4f> colorOffsets = new HashMap<>();
 
     // Collision related
     private boolean penetrable;
@@ -125,6 +129,14 @@ public final class Block {
     private CollisionShape collisionShape;
     private Vector3f collisionOffset;
     private AABB bounds = AABB.createEmpty();
+
+    /**
+     * Init. a new block with default properties in place.
+     */
+    public Block() {
+        colorSource.put("default", DefaultColorSource.DEFAULT);
+        colorOffsets.put("default", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+    }
 
     public short getId() {
         return id;
@@ -527,10 +539,33 @@ public final class Block {
         return primaryAppearance;
     }
 
-    public void setPrimaryAppearance(BlockAppearance appearence) {
-        this.primaryAppearance = appearence;
+    public void setPrimaryAppearance(BlockAppearance appearance) {
+        this.primaryAppearance = appearance;
     }
 
+    public BlockColorSource getColorSource(String blockSection) {
+        return colorSource.computeIfAbsent(blockSection, (k) -> colorSource.get("default"));
+    }
+
+    public void setColorSource(BlockColorSource colorSource) {
+        this.colorSource.put("default", colorSource);
+    }
+
+    public void setColorSource(String blockSection, BlockColorSource value) {
+        this.colorSource.put(blockSection, value);
+    }
+
+    public Vector4f getColorOffset(String blockSection) {
+        return colorOffsets.computeIfAbsent(blockSection, (k) -> colorOffsets.get("default"));
+    }
+
+    public void setColorOffset(String blockSection, Vector4f color) {
+        colorOffsets.put(blockSection, color);
+    }
+
+    public void setColorOffsets(Vector4f color) {
+        colorOffsets.put("default", color);
+    }
 
     /**
      * @return Standalone mesh

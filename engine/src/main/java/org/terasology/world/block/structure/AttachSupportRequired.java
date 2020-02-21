@@ -26,6 +26,7 @@ import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class AttachSupportRequired implements BlockStructuralSupport {
@@ -47,8 +48,8 @@ public class AttachSupportRequired implements BlockStructuralSupport {
     }
 
     private boolean hasRequiredSupportOnSideForBlock(Vector3i location, Side sideChanged, Block block) {
-        final BlockMeshPart part = block.getPrimaryAppearance().getPart(BlockPart.fromSide(sideChanged));
-        if (part != null) {
+        final List<BlockMeshPart> parts = block.getPrimaryAppearance().getParts(sideChanged);
+        if (!parts.isEmpty()) {
             // This block has mesh on this side, therefore it requires a support on that side
             if (!hasSupportFromBlockOnSide(location, sideChanged, Collections.<Vector3i, Block>emptyMap())) {
                 return false;

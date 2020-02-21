@@ -18,10 +18,13 @@ package org.terasology.world.block;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
+import org.terasology.math.Side;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,33 +33,32 @@ import java.util.Map;
  */
 public class BlockAppearance {
 
-    private Map<BlockPart, BlockMeshPart> blockParts;
-    private Map<BlockPart, Vector2f> textureAtlasPos = new EnumMap<>(BlockPart.class);
+    private Map<String, BlockMeshPart> blockParts = new HashMap<>();
+    private Map<String, Vector2f> textureAtlasPos = new HashMap<>();
+    private Map<Side, List<BlockMeshPart>> blockSides = Maps.newEnumMap(Side.class);
 
     public BlockAppearance() {
-        blockParts = Maps.newEnumMap(BlockPart.class);
-        textureAtlasPos = Maps.newEnumMap(BlockPart.class);
-        for (BlockPart part : BlockPart.values()) {
-            textureAtlasPos.put(part, new Vector2f());
-        }
     }
 
-    public BlockAppearance(Map<BlockPart, BlockMeshPart> blockParts, Map<BlockPart, Vector2f> textureAtlasPos) {
+    public BlockAppearance(Map<String, BlockMeshPart> blockParts, Map<Side, List<BlockMeshPart>> blockSide, Map<String, Vector2f> textureAtlasPos) {
         Preconditions.checkNotNull(blockParts);
+        Preconditions.checkNotNull(blockSide);
         Preconditions.checkNotNull(textureAtlasPos);
         this.blockParts = blockParts;
         this.textureAtlasPos.putAll(textureAtlasPos);
-        for (BlockPart part : BlockPart.values()) {
-            Preconditions.checkNotNull("Missing texture atlas position for part " + part, textureAtlasPos.get(part));
-        }
+        this.blockSides = blockSide;
     }
 
-    public BlockMeshPart getPart(BlockPart part) {
-        return blockParts.get(part);
+    public BlockMeshPart getPart(String name) {
+        return blockParts.get(name);
     }
 
-    public Vector2f getTextureAtlasPos(BlockPart part) {
-        return new Vector2f(textureAtlasPos.get(part));
+    public List<BlockMeshPart> getParts(Side side) {
+        return blockSides.get(side);
+    }
+
+    public Vector2f getTextureAtlasPos(String name) {
+        return new Vector2f(textureAtlasPos.get(name));
     }
 
 }

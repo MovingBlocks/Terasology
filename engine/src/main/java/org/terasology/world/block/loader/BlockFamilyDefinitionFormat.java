@@ -60,6 +60,7 @@ import java.lang.reflect.Type;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -112,13 +113,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
     private void applyDefaults(ResourceUrn resourceUrn, SectionDefinitionData section) {
         Optional<BlockTile> defaultTile = assetManager.getAsset(resourceUrn, BlockTile.class);
-        if (defaultTile.isPresent()) {
-            for (BlockPart part : BlockPart.values()) {
-                if (section.getBlockTiles().get(part) == null) {
-                    section.getBlockTiles().put(part, defaultTile.get());
-                }
-            }
-        }
+        defaultTile.ifPresent(blockTile -> section.getBlockTiles().put("default", blockTile));
         if (section.getSounds() == null) {
             section.setSounds(assetManager.getAsset(DEFAULT_SOUNDS, BlockSounds.class).get());
         }
@@ -221,37 +216,32 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         }
 
         private <T> void readBlockPartMap(JsonObject jsonObject, String singleName,
-                                          String partsName, Supplier<EnumMap<BlockPart, T>> supplier, Class<T> type, JsonDeserializationContext context) {
+                                          String partsName, Supplier<Map<String, T>> supplier, Class<T> type, JsonDeserializationContext context) {
             if (jsonObject.has(singleName)) {
                 T value = context.deserialize(jsonObject.get(singleName), type);
-                for (BlockPart blockPart : BlockPart.values()) {
-                    supplier.get().put(blockPart, value);
-                }
+                supplier.get().put("default", value);
             }
             if (jsonObject.has(partsName) && jsonObject.get(partsName).isJsonObject()) {
                 JsonObject partsObject = jsonObject.getAsJsonObject(partsName);
-                if (partsObject.has("all")) {
-                    T value = context.deserialize(partsObject.get("all"), type);
-                    for (BlockPart blockPart : BlockPart.values()) {
-                        supplier.get().put(blockPart, value);
-                    }
-                }
-                if (partsObject.has("sides")) {
-                    T value = context.deserialize(partsObject.get("sides"), type);
-                    for (BlockPart blockPart : BlockPart.horizontalSides()) {
-                        supplier.get().put(blockPart, value);
-                    }
-                }
-                if (partsObject.has("topBottom")) {
-                    T value = context.deserialize(partsObject.get("topBottom"), type);
-                    supplier.get().put(BlockPart.TOP, value);
-                    supplier.get().put(BlockPart.BOTTOM, value);
-                }
-                for (BlockPart part : BlockPart.values()) {
-                    String partName = part.toString().toLowerCase(Locale.ENGLISH);
-                    if (partsObject.has(partName)) {
-                        T value = context.deserialize(partsObject.get(partName), type);
-                        supplier.get().put(part, value);
+                for (Map.Entry<String, JsonElement> entry : partsObject.entrySet()) {
+                    T value = context.deserialize(entry.getValue(), type);
+                    switch (entry.getKey()) {
+                        case "all":
+                            supplier.get().put("default", value);
+                            break;
+                        case "sides":
+                            supplier.get().put("left", value);
+                            supplier.get().put("right", value);
+                            supplier.get().put("front", value);
+                            supplier.get().put("back", value);
+                            break;
+                        case "topBottom":
+                            supplier.get().put("top", value);
+                            supplier.get().put("bottom", value);
+                            break;
+                        default:
+                            supplier.get().put(entry.getKey(), value);
+                            break;
                     }
                 }
             }

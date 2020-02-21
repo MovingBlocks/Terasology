@@ -16,14 +16,18 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.collect.Maps;
+import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.DefaultColorSource;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 
 /**
  */
@@ -52,7 +56,9 @@ public class SectionDefinitionData {
 
     private Vector3f tint = new Vector3f();
 
-    private EnumMap<BlockPart, BlockTile> blockTiles = Maps.newEnumMap(BlockPart.class);
+    private HashMap<String, BlockTile> blockTiles = new HashMap<>();
+    private HashMap<String, DefaultColorSource> colorSources = new HashMap<>();
+    private HashMap<String, Vector4f> colorOffsets = new HashMap<>();
 
     private float mass = 10f;
     private boolean debrisOnDestroy = true;
@@ -68,6 +74,8 @@ public class SectionDefinitionData {
     private boolean ice;
 
     public SectionDefinitionData() {
+        colorSources.put("default", DefaultColorSource.DEFAULT);
+        colorOffsets.put("default", new Vector4f(1, 1, 1, 1));
     }
 
     public SectionDefinitionData(SectionDefinitionData other) {
@@ -93,7 +101,9 @@ public class SectionDefinitionData {
         this.luminance = other.luminance;
         this.tint = new Vector3f(other.tint);
 
-        this.blockTiles = new EnumMap<>(other.blockTiles);
+        this.blockTiles = new HashMap<>(other.blockTiles);
+        this.colorSources = new HashMap<>(other.colorSources);
+        this.colorOffsets = new HashMap<>(other.colorOffsets);
 
         this.mass = other.mass;
         this.debrisOnDestroy = other.debrisOnDestroy;
@@ -246,14 +256,28 @@ public class SectionDefinitionData {
         this.tint = tint;
     }
 
-    public EnumMap<BlockPart, BlockTile> getBlockTiles() {
+    public HashMap<String, BlockTile> getBlockTiles() {
         return blockTiles;
     }
 
     public void setAllTiles(BlockTile tile) {
-        for (BlockPart part : BlockPart.values()) {
-            blockTiles.put(part, tile);
-        }
+        blockTiles.put("default", tile);
+    }
+
+    public HashMap<String, DefaultColorSource> getColorSources() {
+        return colorSources;
+    }
+
+    public void setAllColorSources(DefaultColorSource source) {
+        colorSources.put("default", source);
+    }
+
+    public HashMap<String, Vector4f> getColorOffsets() {
+        return colorOffsets;
+    }
+
+    public void setAllColorOffsets(BaseVector4f offset) {
+        colorOffsets.put("default", new Vector4f(offset));
     }
 
     public float getMass() {

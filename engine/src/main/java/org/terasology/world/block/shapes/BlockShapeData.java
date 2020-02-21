@@ -26,13 +26,14 @@ import org.terasology.world.block.BlockSection;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  */
 public class BlockShapeData implements AssetData {
     private String displayName = "";
-    private List<BlockMeshPart> meshParts = new ArrayList<>();
+    public HashMap<String, BlockMeshPart> meshParts = new HashMap<>();
     private EnumMap<Side, List<BlockMeshPart>> meshBySide = new EnumMap<>(Side.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape collisionShape;
@@ -52,10 +53,6 @@ public class BlockShapeData implements AssetData {
         this.displayName = displayName;
     }
 
-    public List<BlockMeshPart> getMeshParts() {
-        return meshParts;
-    }
-
     public List<BlockMeshPart> getMeshParts(Side side) {
         return meshBySide.get(side);
     }
@@ -65,12 +62,12 @@ public class BlockShapeData implements AssetData {
      *
      * @param mesh
      */
-    public void setMeshPart(BlockMeshPart mesh, byte key) {
+    public void setMeshPart(BlockMeshPart mesh, String name, byte key) {
         List<Side> sides = BlockSection.fromKey(key);
         for (Side side : sides) {
             meshBySide.computeIfAbsent(side, (v) -> new ArrayList<>()).add(mesh);
         }
-        meshParts.add(mesh);
+        meshParts.put(name, mesh);
     }
 
     public boolean isBlockingSide(Side side) {

@@ -70,9 +70,7 @@ public class AutoBlockProvider implements AssetDataProducer<BlockFamilyDefinitio
         Optional<BlockTile> blockTile = assetManager.getAsset(urn, BlockTile.class);
         if (blockTile.isPresent() && blockTile.get().isAutoBlock()) {
             BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-            for (BlockPart part : BlockPart.values()) {
-                data.getBaseSection().getBlockTiles().put(part, blockTile.get());
-            }
+            data.getBaseSection().getBlockTiles().put("default", blockTile.get());
             data.getBaseSection().setSounds(assetManager.getAsset("engine:default", BlockSounds.class).get());
             data.setBlockFamily(FreeformFamily.class);
             return Optional.of(data);

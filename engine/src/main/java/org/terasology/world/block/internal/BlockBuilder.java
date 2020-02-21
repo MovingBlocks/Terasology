@@ -25,6 +25,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.BlockSection;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -34,6 +35,8 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.WorldAtlas;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BlockBuilder implements BlockBuilderHelper {
@@ -120,6 +123,11 @@ public class BlockBuilder implements BlockBuilderHelper {
         setBlockFullSides(block, shape, rotation);
         block.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation));
 
+        for (String part : shape.getMeshMap().keySet()) {
+            block.setColorSource(part, section.getColorSources().get(part));
+            block.setColorOffset(part, section.getColorOffsets().get(part));
+        }
+
         block.setUri(uri);
         block.setBlockFamily(blockFamily);
 
@@ -175,50 +183,51 @@ public class BlockBuilder implements BlockBuilderHelper {
         return block;
     }
 
-    private BlockAppearance createAppearance(BlockShape shape, Map<BlockPart, BlockTile> tiles, Rotation rot) {
-        Map<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
-        Map<BlockPart, Vector2f> textureAtlasPositions = Maps.newEnumMap(BlockPart.class);
-        for (BlockPart part : BlockPart.values()) {
+    private BlockAppearance createAppearance(BlockShape shape, Map<String, BlockTile> tiles, Rotation rot) {
+        Map<String, BlockMeshPart> meshParts = new HashMap<>();
+        Map<Side, List<BlockMeshPart>> sideListMap = Maps.newEnumMap(Side.class);
+        Map<String, Vector2f> textureAtlasPositions = new HashMap<>();
+        for (String blockPart : shape.getMeshMap().keySet()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             Vector2f atlasPos;
             int frameCount;
-            BlockTile tile = tiles.get(part);
+            BlockTile tile = tiles.get(blockPart);
             if (tile == null) {
                 atlasPos = new Vector2f();
                 frameCount = 1;
             } else {
-                atlasPos = worldAtlas.getTexCoords(tile, shape.getMeshPart(part) != null);
+                atlasPos = worldAtlas.getTexCoords(tile, shape.getMeshPart(blockPart) != null);
                 frameCount = tile.getLength();
             }
-            BlockPart targetPart = part.rotate(rot);
-            textureAtlasPositions.put(targetPart, atlasPos);
-            if (shape.getMeshPart(part) != null) {
-                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize(), frameCount));
+            textureAtlasPositions.put(blockPart, atlasPos);
+            if (shape.getMeshPart(blockPart) != null) {
+                meshParts.put(blockPart, shape.getMeshPart(blockPart).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize(), frameCount));
             }
         }
-        return new BlockAppearance(meshParts, textureAtlasPositions);
+        for (Side side : Side.getAllSides()) {
+            sideListMap.put(rot.rotate(side), shape.getMeshParts(side));
+        }
+        return new BlockAppearance(meshParts, sideListMap, textureAtlasPositions);
     }
 
     private void setBlockFullSides(Block block, BlockShape shape, Rotation rot) {
         for (Side side : Side.getAllSides()) {
-            BlockPart targetPart = BlockPart.fromSide(rot.rotate(side));
-            block.setFullSide(targetPart.getSide(), shape.isBlockingSide(side));
+            block.setFullSide(rot.rotate(side), shape.isBlockingSide(side));
         }
     }
 
-    private void applyLiquidShapes(Block block, Map<BlockPart, BlockTile> tiles) {
+    private void applyLiquidShapes(Block block, Map<String, BlockTile> tiles) {
         for (Side side : Side.getAllSides()) {
-            BlockPart part = BlockPart.fromSide(side);
-            BlockTile blockTile = tiles.get(part);
+            BlockTile blockTile = tiles.get(side.name().toLowerCase());
             if (blockTile != null) {
                 BlockMeshPart lowMeshPart = lowShape
-                        .getMeshPart(part)
+                        .getMeshPart(side.name().toLowerCase())
                         .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize(), blockTile.getLength());
-                block.setLowLiquidMesh(part.getSide(), lowMeshPart);
+                block.setLowLiquidMesh(side, lowMeshPart);
                 BlockMeshPart topMeshPart = topShape
-                        .getMeshPart(part)
+                        .getMeshPart(side.name().toLowerCase())
                         .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize(), blockTile.getLength());
-                block.setTopLiquidMesh(part.getSide(), topMeshPart);
+                block.setTopLiquidMesh(side, topMeshPart);
             }
         }
     }

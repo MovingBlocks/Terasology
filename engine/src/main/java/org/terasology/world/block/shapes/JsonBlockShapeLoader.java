@@ -146,7 +146,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                             //If there is no "sides" parameter, the part's name is used, as with legacy .shape files.
                             sides = BlockSection.key(entry.getKey());
                         }
-                        shape.setMeshPart((BlockMeshPart) context.deserialize(meshObj, BlockMeshPart.class), sides);
+                        shape.setMeshPart(context.deserialize(meshObj, BlockMeshPart.class), entry.getKey(), sides);
                     }
                 }
             }
@@ -209,7 +209,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
 
         private List<Vector3f> buildVertList(BlockShapeData shape) {
             List<Vector3f> result = new ArrayList<>();
-            for (BlockMeshPart meshPart : shape.getMeshParts()) {
+            for (BlockMeshPart meshPart : shape.meshParts.values()) {
                 if (meshPart != null) {
                     for (int i = 0; i < meshPart.size(); ++i) {
                         result.add(meshPart.getVertex(i));

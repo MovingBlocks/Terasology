@@ -26,10 +26,12 @@ import org.terasology.math.Side;
 import org.terasology.math.Yaw;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +40,7 @@ import java.util.Map;
 public class BlockShapeImpl extends BlockShape {
 
     private String displayName;
-    private List<BlockMeshPart> meshParts = new ArrayList<>();
+    public Map<String, BlockMeshPart> meshParts = new HashMap<>();
     private EnumMap<Side, List<BlockMeshPart>> meshBySide = new EnumMap<>(Side.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape baseCollisionShape;
@@ -59,12 +61,14 @@ public class BlockShapeImpl extends BlockShape {
         return displayName;
     }
 
-    /**
-     * @return All mesh parts contained by the block
-     */
     @Override
-    public List<BlockMeshPart> getMeshParts() {
+    public Map<String, BlockMeshPart> getMeshMap() {
         return meshParts;
+    }
+
+    @Override
+    public BlockMeshPart getMeshPart(String name) {
+        return meshParts.get(name);
     }
 
     @Override
@@ -81,7 +85,7 @@ public class BlockShapeImpl extends BlockShape {
     protected void doReload(BlockShapeData data) {
         collisionShape.clear();
         displayName = data.getDisplayName();
-        this.meshParts.addAll(data.getMeshParts());
+        this.meshParts.putAll(data.meshParts);
 
         for (Side side : Side.getAllSides()) {
             this.fullSide.put(side, data.isBlockingSide(side));
