@@ -1,13 +1,16 @@
-// This include file is meant for each Java project/module and contains setup for artifact repos, code analysis, etc
-
+// language
 apply plugin: 'java'
+
+// IDEs
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+// ?
 apply plugin: 'project-report'
+
+// Static code analyzers
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
-apply plugin: 'findbugs'
-
+apply plugin: 'com.github.spotbugs'
 // Computes code coverage of (unit) tests
 apply plugin: 'jacoco'
 
@@ -31,9 +34,14 @@ repositories {
 
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
+        def repoViaEnv = System.getenv()["RESOLUTION_REPO"]
         if (rootProject.hasProperty("alternativeResolutionRepo")) {
             // If the user supplies an alternative repo via gradle.properties then use that
+            // println "Changing RESOLUTION repo set via gradle.properties to $alternativeResolutionRepo"
             url alternativeResolutionRepo
+        } else if (repoViaEnv != null && repoViaEnv != "") {
+            // println "Changing RESOLUTION repoKey set via env var to $repoViaEnv"
+            url = repoViaEnv
         } else {
             // Our default is the main virtual repo containing everything except repos for testing Artifactory itself
             url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
@@ -47,9 +55,9 @@ repositories {
 }
 
 dependencies {
-    checkstyle ('com.puppycrawl.tools:checkstyle:6.14.1')
-    pmd ('net.sourceforge.pmd:pmd-core:6.15.0')
-    pmd ('net.sourceforge.pmd:pmd-java:6.15.0')
+    checkstyle('com.puppycrawl.tools:checkstyle:6.14.1')
+    pmd('net.sourceforge.pmd:pmd-core:6.15.0')
+    pmd('net.sourceforge.pmd:pmd-java:6.15.0')
     // the FindBugs version is set in the configuration
 }
 
@@ -57,13 +65,13 @@ task sourceJar(type: Jar) {
     description = "Create a JAR with all sources"
     from sourceSets.main.allSource
     from sourceSets.test.allSource
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     description = "Create a JAR with the JavaDoc for the java sources"
     from javadoc.destinationDir
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
 }
 
 // Extra details provided for unit tests
@@ -74,7 +82,9 @@ test {
     ignoreFailures = true
     // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
     testLogging.showStandardStreams = true
-
+    reports {
+        junitXml.enabled = true
+    }
     // Arguments to include while running tests
     jvmArgs '-Xms512m', '-Xmx1024m'
 
@@ -84,8 +94,9 @@ test {
     }
 
     jacoco {
-        append = false
-        excludes = ["org.terasology.protobuf.*"]
+       // append = false
+        excludes = ["org.terasology.protobuf.*",
+                    "*MethodAccess","*FieldAccess"]
     }
 }
 
@@ -119,9 +130,9 @@ pmd {
     ruleSets = []
 }
 
-findbugs {
+spotbugs {
+    toolVersion = '4.0.0-beta4'
     ignoreFailures = true
-    toolVersion = '3.0.1'
     excludeFilter = new File(rootDir, "config/metrics/findbugs/findbugs-exclude.xml")
 }
 

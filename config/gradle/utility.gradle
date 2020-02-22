@@ -1,6 +1,6 @@
 // This extra build file is mainly for structural setup of the project using Git to import other repos from GitHub
 
-// Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
+//// Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
     repositories {
         // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
@@ -14,7 +14,7 @@ buildscript {
     }
 }
 
-// Git plugin details at https://github.com/ajoberstar/gradle-git
+//// Git plugin details at https://github.com/ajoberstar/gradle-git
 import org.ajoberstar.gradle.git.tasks.*
 
 ext {
