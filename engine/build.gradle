@@ -67,8 +67,6 @@ configurations.all {
 
 // Primary dependencies definition
 dependencies {
-
-
     // White list packages {@see ExternalApiWhiteList class}
     apiElements group: 'com.google.guava', name: 'guava', version: '23.0'
     apiElements group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
@@ -99,12 +97,9 @@ dependencies {
 
     // Graphics, 3D, UI, etc
     implementation group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
-
-
     implementation group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
     implementation group: 'java3d', name: 'vecmath', version: '1.3.1'
-    // Note: Downgraded to this release until TeraMath ready
-    implementation group: 'org.joml', name: 'joml', version: '1.8.1'
+    compile group: 'org.joml', name: 'joml', version: '1.9.19'
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     implementation group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
@@ -114,7 +109,6 @@ dependencies {
     implementation group: 'org.ow2.asm', name: 'asm-tree', version: '5.0.4'
     implementation group: 'org.ow2.asm', name: 'asm-util', version: '5.0.4'
     implementation group: 'org.ow2.asm', name: 'asm-commons', version: '5.0.4'
-
 
     // Logging and audio
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
@@ -138,7 +132,6 @@ dependencies {
     compile group: 'org.terasology', name: 'gestalt-util', version: '5.1.5'
     compile group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.5'
     compile group: 'org.terasology', name: 'TeraMath', version: '1.4.0'
-    compile group: 'org.joml', name: 'joml', version: '1.9.19'
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.3.1'
     compile group: 'org.terasology', name: 'splash-screen', version: '1.0.2'
     compile group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
