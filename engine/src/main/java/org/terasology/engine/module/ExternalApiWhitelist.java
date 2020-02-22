@@ -80,6 +80,7 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl.opengl.GL12")
             .add("org.lwjgl.opengl.GL13")
             .add("org.terasology.jnlua")
+            .add("org.joml")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
