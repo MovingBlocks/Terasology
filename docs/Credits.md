@@ -272,7 +272,8 @@ Contributors
  [praj-foss](https://github.com/praj-foss),
  [aRealCyborg](https://github.com/aRealCyborg),
  [DarkWeird](https://github.com/DarkWeird),
- [PAndaContron](https://github.com/PAndaContron)
+ [PAndaContron](https://github.com/PAndaContron),
+ [sin3point14](https://github.com/sin3point14)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
