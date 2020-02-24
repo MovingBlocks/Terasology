@@ -43,7 +43,7 @@ import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 /**
  */
-@RegisterWorldGenerator(id = "facetedperlin", displayName = "Perlin", description = "Faceted world generator")
+@RegisterWorldGenerator(id = "facetedperlin", displayName = "Perlin", description = "Faceted world generator using perlin")
 public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
     private final FixedSpawner spawner = new FixedSpawner(0, 0);

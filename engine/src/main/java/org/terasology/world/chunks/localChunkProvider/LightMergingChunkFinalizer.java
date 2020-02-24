@@ -20,6 +20,8 @@ import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.propagation.light.LightMerger;
 
+import java.util.List;
+
 class LightMergingChunkFinalizer implements ChunkFinalizer {
 
     private LightMerger<ReadyChunkInfo> lightMerger;
@@ -30,7 +32,7 @@ class LightMergingChunkFinalizer implements ChunkFinalizer {
     }
 
     @Override
-    public ReadyChunkInfo completeFinalization() {
+    public List<ReadyChunkInfo> completeFinalization() {
         return lightMerger.completeMerge();
     }
 

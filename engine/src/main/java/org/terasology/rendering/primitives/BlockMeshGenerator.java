@@ -18,6 +18,7 @@ package org.terasology.rendering.primitives;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.ChunkView;
+import org.terasology.world.generation.Region;
 
 /**
  * This is used to generate Mesh data from a block in a chunk to a ChunkMesh output.
@@ -34,7 +35,7 @@ public interface BlockMeshGenerator {
      * @param y     Input position Y.
      * @param z     Input position Z.
      */
-    void generateChunkMesh(ChunkView view, ChunkMesh mesh, int x, int y, int z);
+    void generateChunkMesh(ChunkView view, ChunkMesh mesh, Region worldData, int x, int y, int z);
 
     /**
      * @return A standalone mesh used for items, inventory, etc...

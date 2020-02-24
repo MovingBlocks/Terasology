@@ -17,18 +17,13 @@ package org.terasology.config.flexible.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.SettingChangeListener;
 import org.terasology.config.flexible.constraints.SettingConstraint;
-import org.terasology.engine.SimpleUri;
+import org.terasology.reflection.TypeInfo;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.text.MessageFormat;
 import java.util.Set;
 
 /**
@@ -38,61 +33,49 @@ import java.util.Set;
  */
 class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
-    private final SimpleUri id;
-    private final String warningFormatString;
 
     private final T defaultValue;
-    private final Class<T> valueClass;
+    private final TypeInfo<T> valueType;
 
     private final String humanReadableName;
     private final String description;
 
     private final SettingConstraint<T> constraint;
-    private final Set<PropertyChangeListener> subscribers = Sets.newHashSet();
+    private final Set<SettingChangeListener<T>> subscribers = Sets.newHashSet();
 
     protected T value;
 
     /**
      * Creates a new {@link SettingImpl} with the given id, default value and constraint.
      *
-     * @param id                The id of the setting.
+     * @param valueType The {@link TypeInfo} describing the type of values t
      * @param defaultValue      The default value of the setting.
      * @param constraint        The constraint that the setting values must satisfy.
      * @param humanReadableName The human readable name of the setting.
      * @param description       A description of the setting.
      */
-    @SuppressWarnings("unchecked")
-    SettingImpl(SimpleUri id, T defaultValue, SettingConstraint<T> constraint,
+    SettingImpl(TypeInfo<T> valueType, T defaultValue, SettingConstraint<T> constraint,
                 String humanReadableName, String description) {
-        this.id = id;
+        this.valueType = valueType;
         this.humanReadableName = humanReadableName;
         this.description = description;
 
-        this.warningFormatString = MessageFormat.format("Setting {0}: '{'0}'", this.id);
-
         this.constraint = constraint;
+
+        Preconditions.checkNotNull(defaultValue, "The default value for a Setting cannot be null.");
 
         if (isConstraintUnsatisfiedBy(defaultValue)) {
             throw new IllegalArgumentException("The default value must be a valid value. " +
-                    "Check the logs for more information.");
+                                                   "Check the logs for more information.");
         }
-
-        Preconditions.checkNotNull(defaultValue, formatWarning("The default value cannot be null."));
 
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
-        this.valueClass = (Class<T>) defaultValue.getClass();
     }
 
-    private String formatWarning(String s) {
-        return MessageFormat.format(warningFormatString, s);
-    }
-
-    private void dispatchChangedEvent(PropertyChangeEvent event) {
-        for (PropertyChangeListener subscriber : subscribers) {
-            subscriber.propertyChange(event);
+    private void dispatchChangedEvent(T oldValue) {
+        for (SettingChangeListener<T> subscriber : subscribers) {
+            subscriber.onValueChanged(this, oldValue);
         }
     }
 
@@ -105,18 +88,14 @@ class SettingImpl<T> implements Setting<T> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean subscribe(PropertyChangeListener listener) {
+    public boolean subscribe(SettingChangeListener<T> listener) {
         if (listener == null) {
-            LOGGER.warn(formatWarning("A null subscriber cannot be added."));
+            LOGGER.warn("Cannot add a null subscriber to a Setting.");
             return false;
         }
 
         if (subscribers.contains(listener)) {
-            LOGGER.warn(formatWarning("The listener has already been subscribed."));
             return false;
         }
 
@@ -125,13 +104,9 @@ class SettingImpl<T> implements Setting<T> {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean unsubscribe(PropertyChangeListener listener) {
+    public boolean unsubscribe(SettingChangeListener<T> listener) {
         if (!subscribers.contains(listener)) {
-            LOGGER.warn(formatWarning("The listener does not exist in the subscriber list."));
             return false;
         }
 
@@ -140,92 +115,59 @@ class SettingImpl<T> implements Setting<T> {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasSubscribers() {
         return !subscribers.isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public SimpleUri getId() {
-        return id;
+    public TypeInfo<T> getValueType() {
+        return valueType;
     }
 
-    @Override
-    public Class<T> getValueClass() {
-        return valueClass;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public SettingConstraint<T> getConstraint() {
         return constraint;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T getDefaultValue() {
         return defaultValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public T getValue() {
+    public T get() {
         return value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean setValue(T newValue) {
-        Preconditions.checkNotNull(newValue, formatWarning("The value of a setting cannot be null."));
+    public boolean set(T newValue) {
+        Preconditions.checkNotNull(newValue, "The value of a setting cannot be null.");
 
         if (isConstraintUnsatisfiedBy(newValue)) {
             return false;
         }
 
-        PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, newValue);
+        if (newValue.equals(this.value)) {
+            return false;
+        }
+
+        T oldValue = this.value;
+
         this.value = newValue;
-        dispatchChangedEvent(event);
+
+        dispatchChangedEvent(oldValue);
 
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getHumanReadableName() {
         return humanReadableName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getDescription() {
         return description;
-    }
-
-    @Override
-    public void setValueFromJson(String json) {
-        value = GSON.fromJson(json, valueClass);
-    }
-
-    @Override
-    public JsonElement getValueAsJson() {
-        return GSON.toJsonTree(value);
     }
 }

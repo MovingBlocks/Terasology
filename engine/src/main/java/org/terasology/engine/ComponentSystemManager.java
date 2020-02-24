@@ -128,6 +128,7 @@ public class ComponentSystemManager {
         context.get(EntityManager.class).getEventSystem().registerEventHandler(object);
 
         if (initialised) {
+            logger.warn("System " + object.getClass().getName() + " registered post-init.");
             initialiseSystem(object);
         }
     }
@@ -140,7 +141,7 @@ public class ComponentSystemManager {
     public void initialise() {
         if (!initialised) {
             console = context.get(Console.class);
-            for (ComponentSystem system : iterateAll()) {
+            for (ComponentSystem system : getAllSystems()) {
                 initialiseSystem(system);
             }
             initialised = true;
@@ -171,7 +172,7 @@ public class ComponentSystemManager {
         return namedLookup.get(name);
     }
 
-    public Iterable<ComponentSystem> iterateAll() {
+    public List<ComponentSystem> getAllSystems() {
         return store;
     }
 
@@ -184,7 +185,7 @@ public class ComponentSystemManager {
     }
 
     public void shutdown() {
-        for (ComponentSystem system : iterateAll()) {
+        for (ComponentSystem system : getAllSystems()) {
             system.shutdown();
         }
         updateSubscribers.clear();

@@ -16,6 +16,7 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.context.Context;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;

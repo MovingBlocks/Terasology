@@ -73,7 +73,14 @@ switch(cleanerArgs[0]) {
             common.retrieve(((String[])selectedItems.toArray()), recurse)
         }
         break
-
+    case "get-all":
+        println "Preparing to get all modules"
+        ArrayList<String> selectedItems = new ArrayList<String>()
+        common.cacheItemList()
+        selectedItems.addAll(common.retrieveAvalibleItemsWithWildcardMatch("*"));
+        common.unCacheItemList()
+        common.retrieve(((String[])selectedItems.toArray()), recurse)
+        break
     case "create":
         println "We're doing a create"
         String name
@@ -214,6 +221,7 @@ def printUsage() {
     println ""
     println "Available sub-commands:"
     println "- 'get' - retrieves one or more items in source form (separate with spaces)"
+    println "- 'get-all' - retrieves all modules that can be found on the configured remote locations"
     println "- 'recurse' - retrieves the given item(s) *and* their dependencies in source form (really only for modules)"
     println "- 'list' - lists items that are available for download or downloaded already."
     println "- 'create' - creates a new item of the given type."
@@ -230,7 +238,7 @@ def printUsage() {
     println "'-condensed-list-format' to group items by starting letter for the 'list' sub-command (default with many items)"
     println ""
     println "Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub."
-    println "Example: 'groovyw module get *' - would retrieve all the modules in the Terasology organisation on GitHub."
+    println "Example: 'groovyw module get-all' - would retrieve all the modules in the Terasology organisation on GitHub."
     println "Example: 'groovyw module get Sa??l*' - would retrieve all the modules in the Terasology organisation on GitHub" +
             " that start with \"Sa\", have any two characters after that, then an \"l\" and then end with anything else." +
             " This should retrieve the Sample repository from the Terasology organisation on GitHub."
@@ -242,7 +250,7 @@ def printUsage() {
     println ""
     println "*NOTE*: Item names are case sensitive. If you add items then `gradlew idea` or similar may be needed to refresh your IDE"
     println ""
-    println "If you omit further arguments beyond the sub command you'll be prompted for details"
+    println "If you omit further arguments beyond the sub-command you'll be prompted for details"
     println ""
     println "For advanced usage see project documentation. For instance you can provide an alternative GitHub home"
     println "A gradle.properties file (one exists under '/templates' in an engine workspace) can provide such overrides"

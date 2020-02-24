@@ -30,7 +30,9 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
  * Applies an amount of the max depth for regions that are oceans
+ * @deprecated Prefer using {@link SimplexOceanProvider}.
  */
+@Deprecated
 @Updates(@Facet(SurfaceHeightFacet.class))
 public class PerlinOceanProvider implements ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;

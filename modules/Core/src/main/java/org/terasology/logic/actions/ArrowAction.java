@@ -24,7 +24,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.health.DoDamageEvent;
+import org.terasology.logic.health.event.DoDamageEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -81,7 +81,7 @@ public class ArrowAction extends BaseComponentSystem {
             Block currentBlock = worldProvider.getBlock(blockPos);
 
             if (currentBlock.isDestructible()) {
-                EntityBuilder builder = entityManager.newBuilder("Core:defaultBlockParticles");
+                EntityBuilder builder = entityManager.newBuilder("CoreAssets:defaultBlockParticles");
                 builder.getComponent(LocationComponent.class).setWorldPosition(target);
                 builder.build();
             }

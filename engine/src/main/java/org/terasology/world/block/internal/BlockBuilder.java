@@ -120,6 +120,11 @@ public class BlockBuilder implements BlockBuilderHelper {
         setBlockFullSides(block, shape, rotation);
         block.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation));
 
+        for (BlockPart part : BlockPart.values()) {
+            block.setColorSource(part, section.getColorSources().get(part));
+            block.setColorOffset(part, section.getColorOffsets().get(part));
+        }
+
         block.setUri(uri);
         block.setBlockFamily(blockFamily);
 

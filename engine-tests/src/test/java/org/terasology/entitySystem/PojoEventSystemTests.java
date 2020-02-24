@@ -16,8 +16,9 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -36,17 +37,14 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.recording.EventCatcher;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,13 +58,13 @@ public class PojoEventSystemTests {
     PojoEntityManager entityManager;
     EntityRef entity;
 
-    @Before
+    @BeforeEach
     public void setup() {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
-        ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
-        TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategies);
+
+        Reflections reflections = new Reflections(getClass().getClassLoader());
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
 
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, serializationLibrary);
         compLibrary = entitySystemLibrary.getComponentLibrary();

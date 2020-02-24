@@ -26,7 +26,8 @@ import org.terasology.utilities.download.MultiFileDownloader;
 import org.terasology.utilities.download.MultiFileTransferProgressListener;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class ModuleInstaller implements Callable<List<Module>> {
 
     @Override
     public List<Module> call() throws Exception {
-        Map<URL, Path> filesToDownload = getDownloadUrls(moduleList);
+        Map<URI, Path> filesToDownload = getDownloadUrls(moduleList);
         logger.info("Started downloading {} modules", filesToDownload.size());
         MultiFileDownloader downloader = new MultiFileDownloader(filesToDownload, downloadProgressListener);
         List<Path> downloadedModulesPaths = downloader.call();
@@ -72,17 +73,22 @@ public class ModuleInstaller implements Callable<List<Module>> {
         return newInstalledModules;
     }
 
-    private Map<URL, Path> getDownloadUrls(Iterable<Module> modules) {
-        Map<URL, Path> result = new HashMap<>();
+    private Map<URI, Path> getDownloadUrls(Iterable<Module> modules) {
+        Map<URI, Path> result = new HashMap<>();
         for (Module module: modules) {
             ModuleMetadata metadata = module.getMetadata();
             String version = metadata.getVersion().toString();
             String id = metadata.getId().toString();
-            URL url = RemoteModuleExtension.getDownloadUrl(metadata);
+            URI uri = null;
+            try {
+                uri = RemoteModuleExtension.getDownloadUrl(metadata).toURI();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
             String fileName = String.format("%s-%s.jar", id, version);
             Path folder = PathManager.getInstance().getHomeModPath().normalize();
             Path target = folder.resolve(fileName);
-            result.put(url, target);
+            result.put(uri, target);
         }
         return result;
     }

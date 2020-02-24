@@ -15,13 +15,14 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * Provides global access to fonts.
@@ -205,7 +206,7 @@ public abstract class Camera {
      * @return the orientation direction, a quaternion.
      */
     public Quat4f getOrientation() {
-        return new Quat4f(viewingDirection, viewingAngle);
+        return new Quat4f(JomlUtil.from(viewingDirection), viewingAngle);
     }
 
     /**
@@ -213,7 +214,7 @@ public abstract class Camera {
      * @param direction
      */
     public void setOrientation(Quat4f direction) {
-        viewingDirection = direction.getAxis();
+        viewingDirection = new Vector3f(direction.x,direction.y,direction.z);
         viewingAngle = direction.getAngle();
     }
 

@@ -15,11 +15,12 @@
  */
 package org.terasology.world.chunks.localChunkProvider;
 
+import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TShortObjectHashMap;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.terasology.entitySystem.Component;
@@ -45,9 +46,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -68,8 +67,8 @@ public class LocalChunkProviderTest {
     private EntityRef worldEntity;
     private ChunkCache chunkCache;
 
-    @Before
-    public void setUp(){
+    @BeforeEach
+    public void setUp() {
         entityManager = mock(EntityManager.class);
         chunkFinalizer = mock(ChunkFinalizer.class);
         blockManager = mock(BlockManager.class);
@@ -87,7 +86,7 @@ public class LocalChunkProviderTest {
     public void testCompleteUpdateMarksChunkReady() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
         final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
+        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
 
         chunkProvider.completeUpdate();
 
@@ -98,7 +97,7 @@ public class LocalChunkProviderTest {
     public void testCompleteUpdateHandlesFinalizedChunkIfReady() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
         final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
+        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
 
         chunkProvider.completeUpdate();
 
@@ -114,7 +113,7 @@ public class LocalChunkProviderTest {
         final EntityStore entityStore = createEntityStoreWithComponents(testComponent);
         final List<EntityStore> entityStores = Collections.singletonList(entityStore);
         final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
+        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
         final EntityRef mockEntity = mock(EntityRef.class);
         when(entityManager.create()).thenReturn(mockEntity);
 
@@ -131,7 +130,7 @@ public class LocalChunkProviderTest {
         final EntityStore entityStore = createEntityStoreWithPrefabAndComponents(prefab, testComponent);
         final List<EntityStore> entityStores = Collections.singletonList(entityStore);
         final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
+        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
         final EntityRef mockEntity = mock(EntityRef.class);
         when(entityManager.create(any(Prefab.class))).thenReturn(mockEntity);
 
@@ -146,7 +145,7 @@ public class LocalChunkProviderTest {
         final Chunk chunk = mockChunkAt(0, 0, 0);
         final ChunkStore chunkStore = mock(ChunkStore.class);
         final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, new TShortObjectHashMap<>(), chunkStore, Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
+        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
 
         chunkProvider.completeUpdate();
 
@@ -162,15 +161,16 @@ public class LocalChunkProviderTest {
         final TShortObjectHashMap<TIntList> blockPositionMappings = new TShortObjectHashMap<>();
         blockPositionMappings.put(blockId, withPositions(new Vector3i(1, 2, 3)));
         final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMappings, mock(ChunkStore.class), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
+        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
 
         chunkProvider.completeUpdate();
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
         verify(blockEntity, atLeastOnce()).send(eventArgumentCaptor.capture());
         final Event event = eventArgumentCaptor.getAllValues().get(0);
-        assertThat(event, instanceOf(OnAddedBlocks.class));
-        assertThat(((OnAddedBlocks) event).getBlockPositions(), hasItem(new Vector3i(1, 2, 3)));
+        assertTrue(event instanceof OnAddedBlocks);
+        Iterable<Vector3i> positions = ((OnAddedBlocks) event).getBlockPositions();
+        assertTrue(Lists.newArrayList(positions).contains(new Vector3i(1, 2, 3)));
     }
 
     @Test
@@ -182,15 +182,16 @@ public class LocalChunkProviderTest {
         registerBlockWithIdAndEntity(blockId, blockEntity, blockManager);
         blockPositionMappings.put(blockId, withPositions(new Vector3i(1, 2, 3)));
         final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMappings, mock(ChunkStore.class), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
+        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
 
         chunkProvider.completeUpdate();
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
         verify(blockEntity, atLeastOnce()).send(eventArgumentCaptor.capture());
         final Event event = eventArgumentCaptor.getAllValues().get(1);
-        assertThat(event, instanceOf(OnActivatedBlocks.class));
-        assertThat(((OnActivatedBlocks) event).getBlockPositions(), hasItem(new Vector3i(1, 2, 3)));
+        assertTrue(event instanceof OnActivatedBlocks);
+        Iterable<Vector3i> positions = ((OnActivatedBlocks) event).getBlockPositions();
+        assertTrue(Lists.newArrayList(positions).contains(new Vector3i(1, 2, 3)));
     }
 
     private static void markAllChunksAsReady(final ChunkCache chunkCache) {

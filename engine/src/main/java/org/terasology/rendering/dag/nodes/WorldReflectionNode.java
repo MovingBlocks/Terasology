@@ -15,11 +15,12 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.JomlUtil;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -192,7 +193,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
 
             if (chunk.hasMesh()) {
                 final ChunkMesh chunkMesh = chunk.getMesh();
-                final Vector3f chunkPosition = chunk.getPosition().toVector3f();
+                final Vector3f chunkPosition = JomlUtil.from(chunk.getPosition().toVector3f());
 
                 chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
                 numberOfRenderedTriangles += chunkMesh.render(OPAQUE, chunkPosition, cameraPosition);

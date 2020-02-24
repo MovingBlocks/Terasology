@@ -36,7 +36,9 @@ import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 /**
  * Adds surface height for hill and mountain regions. Mountain and hill regions are based off of temperature and humidity.
+ * @deprecated Prefer using {@link SimplexHillsAndMountainsProvider}.
  */
+@Deprecated
 @Requires({@Facet(SurfaceTemperatureFacet.class), @Facet(SurfaceHumidityFacet.class)})
 @Updates(@Facet(SurfaceHeightFacet.class))
 public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvider {

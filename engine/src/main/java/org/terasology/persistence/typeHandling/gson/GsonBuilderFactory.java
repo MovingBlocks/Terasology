@@ -15,10 +15,9 @@
  */
 package org.terasology.persistence.typeHandling.gson;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapterFactory;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 /**
  * Class containing static factory methods for generating {@link GsonBuilder} objects that follow Terasology
@@ -35,14 +34,14 @@ public class GsonBuilderFactory {
 
     /**
      * Create a {@link GsonBuilder} which uses type handlers loaded from the given
-     * {@link TypeSerializationLibrary} and complies with Terasology JSON serialization rules.
+     * {@link TypeHandlerLibrary} and complies with Terasology JSON serialization rules.
      *
-     * @param typeSerializationLibrary The {@link TypeSerializationLibrary} to load type handler
+     * @param typeHandlerLibrary The {@link TypeHandlerLibrary} to load type handler
      *                                 definitions from
      */
-    public static GsonBuilder createGsonBuilderWithTypeSerializationLibrary(TypeSerializationLibrary typeSerializationLibrary) {
+    public static GsonBuilder createGsonBuilderWithTypeSerializationLibrary(TypeHandlerLibrary typeHandlerLibrary) {
         TypeAdapterFactory typeAdapterFactory =
-                new GsonTypeSerializationLibraryAdapterFactory(typeSerializationLibrary);
+                new GsonTypeSerializationLibraryAdapterFactory(typeHandlerLibrary);
 
         return createDefaultGsonBuilder()
                 .registerTypeAdapterFactory(typeAdapterFactory);

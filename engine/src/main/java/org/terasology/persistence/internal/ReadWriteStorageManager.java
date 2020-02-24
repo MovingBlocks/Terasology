@@ -44,7 +44,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
@@ -153,7 +153,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private static EngineEntityManager createPrivateEntityManager(ComponentLibrary componentLibrary) {
         PojoEntityManager pojoEntityManager = new PojoEntityManager();
         pojoEntityManager.setComponentLibrary(componentLibrary);
-        pojoEntityManager.setTypeSerializerLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
+        pojoEntityManager.setTypeSerializerLibrary(CoreRegistry.get(TypeHandlerLibrary.class));
         return pojoEntityManager;
     }
 
@@ -408,7 +408,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         logger.info("Saving - Creating game snapshot");
         PerformanceMonitor.startActivity("Saving");
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.preSave();
         }
 
@@ -420,7 +420,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             saveGamePreviewImage();
         }
 
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.postSave();
         }
         PerformanceMonitor.endActivity();
@@ -432,14 +432,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         logger.info("Auto Saving - Creating game snapshot");
         PerformanceMonitor.startActivity("Auto Saving");
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.preAutoSave();
         }
 
         saveTransaction = createSaveTransaction();
         saveThreadManager.offer(saveTransaction);
 
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.postAutoSave();
         }
 

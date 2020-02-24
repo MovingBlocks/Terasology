@@ -16,12 +16,12 @@
 
 package org.terasology.world.time;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the world-time related classes
- *
  */
 public class WorldTimeTest {
 
@@ -44,7 +44,7 @@ public class WorldTimeTest {
         }
 
         for (int i = 0; i < fracs.length; i++) {
-            Assert.assertEquals("Fraction " + fracs[i] + " was hits " + hits[i] + " times", days, hits[i]);
+            assertEquals(days, hits[i], "Fraction " + fracs[i] + " was hits " + hits[i] + " times");
         }
     }
 }

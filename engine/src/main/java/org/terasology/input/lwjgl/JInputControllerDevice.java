@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Retrieves information on connected controllers through JInput.
@@ -77,7 +78,8 @@ public class JInputControllerDevice implements ControllerDevice {
             .build();
 
     private ControllerConfig config;
-    private final List<Controller> controllers = new ArrayList<>();
+    /* MUST be a CopyOnWriteArrayList! Or else you just get crashes when unplugging controllers. */
+    private final List<Controller> controllers = new CopyOnWriteArrayList<>();
 
     public JInputControllerDevice(ControllerConfig config) {
         this.config = config;

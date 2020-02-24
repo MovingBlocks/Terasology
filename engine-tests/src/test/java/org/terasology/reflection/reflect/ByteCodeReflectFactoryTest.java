@@ -15,7 +15,7 @@
  */
 package org.terasology.reflection.reflect;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -23,9 +23,9 @@ import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */

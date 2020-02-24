@@ -17,8 +17,9 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link TemplateEngineImpl} class.
@@ -29,21 +30,21 @@ public class TemplateEngineTest {
     public void testSimple() {
         TemplateEngineImpl engine = new TemplateEngineImpl(text -> "bla");
 
-        Assert.assertEquals("I like bla!", engine.transform("I like ${text}!"));
+        assertEquals("I like bla!", engine.transform("I like ${text}!"));
     }
 
     @Test
     public void testEmpty() {
         TemplateEngineImpl engine = new TemplateEngineImpl(text -> null);
 
-        Assert.assertEquals("I like !", engine.transform("I like ${text}!"));
+        assertEquals("I like !", engine.transform("I like ${text}!"));
     }
 
     @Test
     public void testTwo() {
         TemplateEngineImpl engine = new TemplateEngineImpl(ImmutableMap.of("text1", "bla", "text2", "blubb")::get);
 
-        Assert.assertEquals("I like bla, but not blubb!",
+        assertEquals("I like bla, but not blubb!",
                 engine.transform("I like ${text1}, but not ${text2}!"));
     }
 

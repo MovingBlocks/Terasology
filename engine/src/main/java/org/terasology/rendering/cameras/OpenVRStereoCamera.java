@@ -15,15 +15,15 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.openvrprovider.OpenVRUtil;
 import org.terasology.rendering.world.WorldRenderer;
@@ -217,7 +217,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         updateMatrices(activeFov);
     }
 
-    private void jomlMatrix4f(org.joml.Matrix4f matrixInput, org.terasology.math.geom.Matrix4f matrixOut) {
+    private void jomlMatrix4f(Matrix4f matrixInput, org.terasology.math.geom.Matrix4f matrixOut) {
         matrixOut.set(0, 0, matrixInput.m00());
         matrixOut.set(0, 1, matrixInput.m10());
         matrixOut.set(0, 2, matrixInput.m20());
@@ -240,10 +240,10 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     public void updateMatrices(float fov) {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
 
-        org.joml.Matrix4f leftEyeProjection = vrProvider.getState().getEyeProjectionMatrix(0);
-        org.joml.Matrix4f rightEyeProjection = vrProvider.getState().getEyeProjectionMatrix(1);
-        org.joml.Matrix4f leftEyePose = vrProvider.getState().getEyePose(0);
-        org.joml.Matrix4f rightEyePose = vrProvider.getState().getEyePose(1);
+        Matrix4f leftEyeProjection = vrProvider.getState().getEyeProjectionMatrix(0);
+        Matrix4f rightEyeProjection = vrProvider.getState().getEyeProjectionMatrix(1);
+        Matrix4f leftEyePose = vrProvider.getState().getEyePose(0);
+        Matrix4f rightEyePose = vrProvider.getState().getEyePose(1);
         float halfIPD = (float) Math.sqrt(Math.pow(leftEyePose.m30() - rightEyePose.m30(), 2)
                 + Math.pow(leftEyePose.m31() - rightEyePose.m31(), 2)
                 + Math.pow(leftEyePose.m32() - rightEyePose.m32(), 2)) / 2.0f;
@@ -261,36 +261,36 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         if (Math.sqrt(Math.pow(leftEyePose.m30(), 2) + Math.pow(leftEyePose.m31(), 2) + Math.pow(leftEyePose.m32(), 2))  < 0.25)  {
             return;
         }
-        jomlMatrix4f(leftEyeProjection, projectionMatrixLeftEye);
-        jomlMatrix4f(rightEyeProjection, projectionMatrixRightEye);
+        projectionMatrixLeftEye.set(leftEyeProjection);
+        projectionMatrixRightEye.set(rightEyeProjection);
         projectionMatrix = projectionMatrixLeftEye;
 
-        jomlMatrix4f(leftEyePose, viewMatrixLeftEye);
-        jomlMatrix4f(rightEyePose, viewMatrixRightEye);
+        viewMatrixLeftEye.set(leftEyePose);
+        viewMatrixRightEye.set(rightEyePose);
 
         viewMatrix = viewMatrixLeftEye;
         normViewMatrix = viewMatrixLeftEye;
 
-        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
-        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
-        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
+        reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f)));
+        reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
+        reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
 
-        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+        viewMatrix.mul(reflectionMatrix,viewMatrixReflected);
 
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
         normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
 
-        viewTranslationLeftEye.setIdentity();
+        viewTranslationLeftEye.identity();
         viewTranslationLeftEye.setTranslation(new Vector3f(halfIPD, 0.0f, 0.0f));
 
-        viewTranslationRightEye.setIdentity();
+        viewTranslationRightEye.identity();
         viewTranslationRightEye.setTranslation(new Vector3f(-halfIPD, 0.0f, 0.0f));
 
 
-        viewMatrixReflectedLeftEye.mul(viewMatrixReflected, viewTranslationLeftEye);
-        viewMatrixReflectedRightEye.mul(viewMatrixReflected, viewTranslationRightEye);
+        viewMatrixReflected.mul(viewTranslationLeftEye,viewMatrixReflectedLeftEye);
+        viewMatrixReflected.mul(viewTranslationRightEye,viewMatrixReflectedRightEye);
 
         viewProjectionMatrixLeftEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);

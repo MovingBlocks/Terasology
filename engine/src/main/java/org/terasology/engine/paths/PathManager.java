@@ -32,6 +32,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import javax.swing.JFileChooser;
+import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
+
 
 /**
  * Manager class that keeps track of the game's various paths and save directories.
@@ -52,6 +55,8 @@ public final class PathManager {
     private static final String REGEX = "[^A-Za-z0-9-_ ]";
 
     private static PathManager instance;
+
+    private static Context context;
     private Path installPath;
     private Path homePath;
     private Path savesPath;
@@ -169,21 +174,42 @@ public final class PathManager {
                 homePath = Paths.get(System.getProperty("user.home"), "Library", "Application Support", TERASOLOGY_FOLDER_NAME);
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                String savedGamesPath = Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_SavedGames);
+                String savedGamesPath = Shell32Util
+                    .getKnownFolderPath(KnownFolders.FOLDERID_SavedGames);
                 if (savedGamesPath == null) {
-                    savedGamesPath = Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_Documents);
+                    savedGamesPath = Shell32Util
+                        .getKnownFolderPath(KnownFolders.FOLDERID_Documents);
                 }
                 Path rawPath;
                 if (savedGamesPath != null) {
                     rawPath = Paths.get(savedGamesPath);
                 } else {
-                    rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toPath();
+                    rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory()
+                        .toPath();
                 }
                 homePath = rawPath.resolve(TERASOLOGY_FOLDER_NAME);
                 break;
             default:
                 homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
                 break;
+        }
+        updateDirs();
+    }
+
+    /**
+     * Gives user the option to manually choose home path.
+     * @throws IOException Thrown when required directories cannot be accessed.
+     */
+    public void chooseHomePathManually() throws IOException {
+        DisplayDevice display = context.get(DisplayDevice.class);
+        boolean isHeadless = display.isHeadless();
+        if (!isHeadless) {
+            Path rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory()
+                .toPath();
+            homePath = rawPath.resolve("Terasology");
+        } else {
+            // If the system is headless
+            homePath = Paths.get("").toAbsolutePath();
         }
         updateDirs();
     }
@@ -302,7 +328,7 @@ public final class PathManager {
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
         Files.createDirectories(screenshotPath);
         nativesPath = installPath.resolve(NATIVES_DIR);
-        configsPath = installPath.resolve(CONFIGS_DIR);
+        configsPath = homePath.resolve(CONFIGS_DIR);
         if (currentWorldPath == null) {
             currentWorldPath = homePath;
         }

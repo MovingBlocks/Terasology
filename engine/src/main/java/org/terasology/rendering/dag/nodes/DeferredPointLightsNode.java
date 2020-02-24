@@ -24,6 +24,7 @@ import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -158,7 +159,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
         // Specific Shader Parameters
 
-        cameraPosition = activeCamera.getPosition();
+        cameraPosition = JomlUtil.from(activeCamera.getPosition());
 
         // TODO: This is necessary right now because activateFeature removes all material parameters.
         // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
@@ -176,7 +177,7 @@ public class DeferredPointLightsNode extends AbstractNode {
             lightGeometryMaterial.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
             lightGeometryMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
 
-            activeCameraToLightSpace.sub(cameraPosition, lightCamera.getPosition());
+            activeCameraToLightSpace.sub(cameraPosition, JomlUtil.from(lightCamera.getPosition()));
             lightGeometryMaterial.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z, true);
         }
 
@@ -190,7 +191,7 @@ public class DeferredPointLightsNode extends AbstractNode {
                 final Vector3f lightPositionInTeraCoords = locationComponent.getWorldPosition();
 
                 Vector3f lightPositionRelativeToCamera = new Vector3f();
-                lightPositionRelativeToCamera.sub(lightPositionInTeraCoords, activeCamera.getPosition());
+                lightPositionRelativeToCamera.sub(lightPositionInTeraCoords, JomlUtil.from(activeCamera.getPosition()));
 
                 if (lightIsRenderable(lightComponent, lightPositionRelativeToCamera)) {
                     lightGeometryMaterial.setCamera(activeCamera);
@@ -207,7 +208,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
                     // setting shader parameters for the light position in camera space
                     Vector3f lightPositionInViewSpace = new Vector3f(lightPositionRelativeToCamera);
-                    activeCamera.getViewMatrix().transformPoint(lightPositionInViewSpace);
+                    JomlUtil.from(activeCamera.getViewMatrix()).transformPoint(lightPositionInViewSpace);
                     lightGeometryMaterial.setFloat3("lightViewPos", lightPositionInViewSpace.x, lightPositionInViewSpace.y, lightPositionInViewSpace.z, true);
 
                     // set the size and location of the sphere to be rendered via shader parameters

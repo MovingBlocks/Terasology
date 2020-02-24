@@ -43,6 +43,15 @@ public class TreeRasterizer implements WorldRasterizer {
     @Override
     public void initialize() {
         blockManager = CoreRegistry.get(BlockManager.class);
+        //TODO: Remove these lines when lazy block registration is fixed
+        //Currently they are required to ensure that the blocks are all registered before worldgen
+        blockManager.getBlock("CoreBlocks:OakTrunk");
+        blockManager.getBlock("CoreBlocks:PineTrunk");
+        blockManager.getBlock("CoreBlocks:BirchTrunk");
+        blockManager.getBlock("CoreBlocks:GreenLeaf");
+        blockManager.getBlock("CoreBlocks:DarkLeaf");
+        blockManager.getBlock("CoreBlocks:RedLeaf");
+        blockManager.getBlock("CoreBlocks:Cactus");
     }
 
     @Override
