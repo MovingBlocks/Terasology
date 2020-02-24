@@ -41,7 +41,7 @@ public class BlockShapeImpl extends BlockShape {
 
     private String displayName;
     public Map<String, BlockMeshPart> meshParts = new HashMap<>();
-    private EnumMap<Side, List<BlockMeshPart>> meshBySide = new EnumMap<>(Side.class);
+    private EnumMap<Side, List<String>> meshBySide = new EnumMap<>(Side.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape baseCollisionShape;
     private Vector3f baseCollisionOffset = new Vector3f();
@@ -72,7 +72,7 @@ public class BlockShapeImpl extends BlockShape {
     }
 
     @Override
-    public List<BlockMeshPart> getMeshParts(Side side) {
+    public List<String> getMeshParts(Side side) {
         return meshBySide.get(side);
     }
 

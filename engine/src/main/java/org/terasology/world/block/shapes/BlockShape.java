@@ -47,7 +47,7 @@ public abstract class BlockShape extends Asset<BlockShapeData> {
      * @param side
      * @return The mesh parts for the given side of the block, or null if it has none
      */
-    public abstract List<BlockMeshPart> getMeshParts(Side side);
+    public abstract List<String> getMeshParts(Side side);
 
     public abstract Map<String, BlockMeshPart> getMeshMap();
 

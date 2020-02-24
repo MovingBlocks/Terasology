@@ -35,12 +35,12 @@ public class BlockAppearance {
 
     private Map<String, BlockMeshPart> blockParts = new HashMap<>();
     private Map<String, Vector2f> textureAtlasPos = new HashMap<>();
-    private Map<Side, List<BlockMeshPart>> blockSides = Maps.newEnumMap(Side.class);
+    private Map<Side, List<String>> blockSides = Maps.newEnumMap(Side.class);
 
     public BlockAppearance() {
     }
 
-    public BlockAppearance(Map<String, BlockMeshPart> blockParts, Map<Side, List<BlockMeshPart>> blockSide, Map<String, Vector2f> textureAtlasPos) {
+    public BlockAppearance(Map<String, BlockMeshPart> blockParts, Map<Side, List<String>> blockSide, Map<String, Vector2f> textureAtlasPos) {
         Preconditions.checkNotNull(blockParts);
         Preconditions.checkNotNull(blockSide);
         Preconditions.checkNotNull(textureAtlasPos);
@@ -53,7 +53,7 @@ public class BlockAppearance {
         return blockParts.get(name);
     }
 
-    public List<BlockMeshPart> getParts(Side side) {
+    public List<String> getParts(Side side) {
         return blockSides.get(side);
     }
 

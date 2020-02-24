@@ -34,7 +34,7 @@ import java.util.List;
 public class BlockShapeData implements AssetData {
     private String displayName = "";
     public HashMap<String, BlockMeshPart> meshParts = new HashMap<>();
-    private EnumMap<Side, List<BlockMeshPart>> meshBySide = new EnumMap<>(Side.class);
+    private EnumMap<Side, List<String>> meshBySide = new EnumMap<>(Side.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape collisionShape;
     private Vector3f collisionOffset = new Vector3f();
@@ -53,7 +53,7 @@ public class BlockShapeData implements AssetData {
         this.displayName = displayName;
     }
 
-    public List<BlockMeshPart> getMeshParts(Side side) {
+    public List<String> getMeshParts(Side side) {
         return meshBySide.get(side);
     }
 
@@ -65,7 +65,7 @@ public class BlockShapeData implements AssetData {
     public void setMeshPart(BlockMeshPart mesh, String name, byte key) {
         List<Side> sides = BlockSection.fromKey(key);
         for (Side side : sides) {
-            meshBySide.computeIfAbsent(side, (v) -> new ArrayList<>()).add(mesh);
+            meshBySide.computeIfAbsent(side, (v) -> new ArrayList<>()).add(name);
         }
         meshParts.put(name, mesh);
     }

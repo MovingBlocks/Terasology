@@ -185,7 +185,7 @@ public class BlockBuilder implements BlockBuilderHelper {
 
     private BlockAppearance createAppearance(BlockShape shape, Map<String, BlockTile> tiles, Rotation rot) {
         Map<String, BlockMeshPart> meshParts = new HashMap<>();
-        Map<Side, List<BlockMeshPart>> sideListMap = Maps.newEnumMap(Side.class);
+        Map<Side, List<String>> sideListMap = Maps.newEnumMap(Side.class);
         Map<String, Vector2f> textureAtlasPositions = new HashMap<>();
         for (String blockPart : shape.getMeshMap().keySet()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
