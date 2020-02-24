@@ -544,7 +544,10 @@ public final class Block {
     }
 
     public BlockColorSource getColorSource(String blockSection) {
-        return colorSource.computeIfAbsent(blockSection, (k) -> colorSource.get("default"));
+        if (colorSource.containsKey(blockSection) && colorSource.get(blockSection) != null) {
+            return colorSource.get(blockSection);
+        }
+        return colorSource.get("default");
     }
 
     public void setColorSource(BlockColorSource colorSource) {
@@ -556,7 +559,10 @@ public final class Block {
     }
 
     public Vector4f getColorOffset(String blockSection) {
-        return colorOffsets.computeIfAbsent(blockSection, (k) -> colorOffsets.get("default"));
+        if (colorOffsets.containsKey(blockSection) && colorOffsets.get(blockSection) != null) {
+            return colorOffsets.get(blockSection);
+        }
+        return colorOffsets.get("default");
     }
 
     public void setColorOffset(String blockSection, Vector4f color) {

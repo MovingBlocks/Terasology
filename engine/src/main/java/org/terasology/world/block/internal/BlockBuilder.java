@@ -123,9 +123,11 @@ public class BlockBuilder implements BlockBuilderHelper {
         setBlockFullSides(block, shape, rotation);
         block.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation));
 
-        for (String part : shape.getMeshMap().keySet()) {
-            block.setColorSource(part, section.getColorSources().get(part));
-            block.setColorOffset(part, section.getColorOffsets().get(part));
+        for (String key : section.getColorSources().keySet()) {
+            block.setColorSource(key, section.getColorSources().get(key));
+        }
+        for (String key : section.getColorOffsets().keySet()) {
+            block.setColorOffset(key, section.getColorOffsets().get(key));
         }
 
         block.setUri(uri);
@@ -191,7 +193,12 @@ public class BlockBuilder implements BlockBuilderHelper {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             Vector2f atlasPos;
             int frameCount;
-            BlockTile tile = tiles.get(blockPart);
+            BlockTile tile;
+            if (tiles.containsKey(blockPart)) {
+                tile = tiles.get(blockPart);
+            } else {
+                tile = tiles.get("default");
+            }
             if (tile == null) {
                 atlasPos = new Vector2f();
                 frameCount = 1;

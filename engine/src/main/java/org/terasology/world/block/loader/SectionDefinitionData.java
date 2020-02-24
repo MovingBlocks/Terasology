@@ -28,6 +28,7 @@ import org.terasology.world.block.tiles.BlockTile;
 
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  */
@@ -256,7 +257,7 @@ public class SectionDefinitionData {
         this.tint = tint;
     }
 
-    public HashMap<String, BlockTile> getBlockTiles() {
+    public Map<String, BlockTile> getBlockTiles() {
         return blockTiles;
     }
 
@@ -264,7 +265,7 @@ public class SectionDefinitionData {
         blockTiles.put("default", tile);
     }
 
-    public HashMap<String, DefaultColorSource> getColorSources() {
+    public Map<String, DefaultColorSource> getColorSources() {
         return colorSources;
     }
 
@@ -272,7 +273,7 @@ public class SectionDefinitionData {
         colorSources.put("default", source);
     }
 
-    public HashMap<String, Vector4f> getColorOffsets() {
+    public Map<String, Vector4f> getColorOffsets() {
         return colorOffsets;
     }
 
