@@ -18,10 +18,15 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-
-import org.jboss.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
@@ -59,22 +64,8 @@ import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
 public class JoinGameScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
-
-    private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
-    private Channel channel;
-
 
     @In
     private Config config;
@@ -94,6 +85,9 @@ public class JoinGameScreen extends CoreScreenLayer {
     @In
     private StorageServiceWorker storageServiceWorker;
 
+    @In
+    private BroadCastServer broadCastServer;
+
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
     private ServerInfoService infoService;
@@ -105,8 +99,6 @@ public class JoinGameScreen extends CoreScreenLayer {
     private List<ServerInfo> listedServers = new ArrayList<>();
 
     private Predicate<ServerInfo> activeServersOnly = ServerInfo::isActive;
-
-    private BroadCastServer broadCastServer = new BroadCastServer();
 
     private boolean updateComplete;
 
@@ -359,23 +351,18 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         UIButton broadCastServerButton = find("broadcast", UIButton.class);
         if (broadCastServerButton != null) {
-            broadCastServerButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+            broadCastServerButton.bindText(new ReadOnlyBinding<String>() {
                 @Override
-                public Boolean get() {
-                    return true;
+                public String get() {
+                    if (!broadCastServer.isBroadCastTurnedOn()) {
+                        broadCastServer.startBroadcast();
+                        return translationSystem.translate("${engine:menu#join-server-terminate-broadcast}");
+                    } else {
+                        broadCastServer.stopBroadCast();
+                        return translationSystem.translate("${engine:menu#join-server-broadcast}");
+                    }
                 }
             });
-            broadCastServerButton.subscribe(button -> {
-                if (!broadCastServer.isBroadCastTurnedOn()) {
-                    broadCastServer.setTurnOnBroadcast(true);
-                    broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-terminate-broadcast}"));
-                    broadCastServer.startBroadcast();
-                } else {
-                    broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-broadcast}"));
-                    broadCastServer.setTurnOnBroadcast(false);
-                    broadCastServer.stopBroadCast();
-                }
-             });
         }
     }
 

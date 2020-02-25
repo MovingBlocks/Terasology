@@ -21,31 +21,25 @@ import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.rendering.nui.layers.mainMenu.JoinGameScreen;
-
 
 public class BroadCastServer {
 
     private static DatagramSocket receiveSocket;
     private static DatagramSocket sendSocket;
     private static boolean turnOnBroadcast;
-    private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
+    private static final Logger logger = LoggerFactory.getLogger(BroadCastServer.class);
     private static ScheduledExecutorService service;
-    private static String discoveryRequest = "__DISCOVERY_REQUEST__";
-    private static String discoveryResponse = "__DISCOVERY_RESPONSE__";
+    private static final String DISCOVERY_REQUEST = "DISCOVERY_REQUEST";
+    private static final String DISCOVERY_RESPONSE = "DISCOVERY_RESPONSE";
 
     public boolean isBroadCastTurnedOn() {
         return turnOnBroadcast;
     }
 
-    public void setTurnOnBroadcast(boolean turnOnBroadcast) {
-        BroadCastServer.turnOnBroadcast = turnOnBroadcast;
-    }
-
     public void startBroadcast() {
+        BroadCastServer.turnOnBroadcast = true;
         try {
             sendBroadCast();
             service = Executors.newSingleThreadScheduledExecutor();
@@ -53,35 +47,36 @@ public class BroadCastServer {
                 public void run() {
                     logger.info("Listening to broadcast");
                     try {
-                        listenToBroadCast();
+                        while(turnOnBroadcast) {
+                            listenToBroadCast();
+                        }
                     } catch (Exception e) {
                         logger.error("Broadcasting has been interrupted" + e.getMessage());
                     }
                 }
             };
-            service.scheduleAtFixedRate(runnable, 0, 300, TimeUnit.SECONDS);
         } catch (Exception e) {
         logger.info("Broadcasting has been interrupted " + e.getMessage());
-        e.printStackTrace();
         }
     }
 
     public void stopBroadCast() {
+        BroadCastServer.turnOnBroadcast = false;
         logger.info("Shutting down BroadCasting");
         service.shutdown();
     }
 
     private void listenToBroadCast() throws Exception {
-        byte[] buffer = discoveryRequest.getBytes(StandardCharsets.UTF_8);
+        byte[] buffer = DISCOVERY_REQUEST.getBytes(StandardCharsets.UTF_8);
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         getReceiveSocket().receive(packet);
         logger.info("Discovery package received! -> " + packet.getAddress() + ":" + packet.getPort());
 
         //Validate the data sent.
         String data = new String(packet.getData()).trim();
-        if (data.equals(discoveryRequest)) { // validate command
+        if (data.equals(DISCOVERY_REQUEST)) { // validate command
             // Send response
-            byte[] response = new byte[discoveryResponse.length()];
+            byte[] response = new byte[DISCOVERY_RESPONSE.length()];
             DatagramPacket responsePacket = new DatagramPacket(response, response.length, packet.getAddress(), packet.getPort());
             getReceiveSocket().send(responsePacket);
             logger.info("Response sent to: " + packet.getAddress() + ":" + packet.getPort());
@@ -117,18 +112,18 @@ public class BroadCastServer {
 
     public void sendBroadCast() throws Exception {
         // Discovery request command
-        byte[] data = discoveryRequest.getBytes(StandardCharsets.UTF_8);
+        byte[] data = DISCOVERY_REQUEST.getBytes(StandardCharsets.UTF_8);
         DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), 8002);
         getSendSocket().send(packet);
         logger.info("Discovery package sent!" + packet.getAddress() + ":" + packet.getPort());
 
         // Discovery response command
-        byte[] response = new byte[discoveryResponse.length()];
+        byte[] response = new byte[DISCOVERY_RESPONSE.length()];
         DatagramPacket responsePacket = new DatagramPacket(response, response.length);
         getSendSocket().receive(responsePacket);
         logger.info("Discovery response received!" + responsePacket.getAddress() + ":" + responsePacket.getPort());
-        String responseData = new String(responsePacket.getData()).trim();
-        if (responseData.equals(discoveryResponse)) { // Check valid command
+        String responseData = new String(responsePacket.getData(), StandardCharsets.UTF_8);
+        if (responseData.equals(DISCOVERY_RESPONSE)) { // Check valid command
             logger.info("Found server!" + responsePacket.getAddress() + ":" + responsePacket.getPort());
         }
     }
