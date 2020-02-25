@@ -104,6 +104,11 @@
                         "text": "${engine:menu#extras-label}"
                     },
                     {
+                        "type": "UIButton",
+                        "id": "refreshControllers",
+                        "text": "${engine:menu#refresh-controllers}"
+                    },
+                    {
                         "type" : "UISpace",
                         "size" : [1, 64]
                     },

@@ -443,5 +443,6 @@
     "caching-textures": "caching-textures",
     "loading-prefabs": "loading-prefabs",
     "post-initialise-systems": "post-initialise-systems",
-    "reticulating-splines": "reticulating-splines"
+    "reticulating-splines": "reticulating-splines",
+    "refresh-controllers": "refresh-controllers"
 }

@@ -18,6 +18,9 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.NonNativeJVMDetector;
+import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
@@ -87,6 +90,17 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "extras", button->triggerForwardAnimation(ExtrasMenuScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
         WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> triggerForwardAnimation(PlayerSettingsScreen.ASSET_URI));
+        WidgetUtil.trySubscribe(this, "refreshControllers", button -> {
+            // cast engine to TerasologyEngine.
+            TerasologyEngine terasologyEngine = (TerasologyEngine) engine;
+            // find all subsystems of type LwjglInput and call refreshControllerList on them
+            for (EngineSubsystem subsystem : terasologyEngine.getSubsystems()) {
+                if (subsystem instanceof LwjglInput) {
+                    LwjglInput lwjglInput = (LwjglInput) subsystem;
+                    lwjglInput.refreshControllerList();
+                }
+            }
+        });
     }
 
     private void updateStorageServiceStatus() {
