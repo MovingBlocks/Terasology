@@ -83,6 +83,10 @@ public final class ChunkMath {
         return calcChunkPos(pos.x, pos.y, pos.z);
     }
 
+    public static org.joml.Vector3i calcChunkPos(org.joml.Vector3i pos) {
+        return JomlUtil.from(calcChunkPos(pos.x, pos.y, pos.z));
+    }
+
     public static Vector3i calcChunkPos(int x, int y, int z) {
         return calcChunkPos(x, y, z, ChunkConstants.CHUNK_POWER);
     }
@@ -154,8 +158,13 @@ public final class ChunkMath {
         return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z);
     }
 
+    @Deprecated
     public static Vector3i calcBlockPos(Vector3i worldPos) {
         return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
+    }
+
+    public static org.joml.Vector3i calcBlockPos(org.joml.Vector3i worldPos) {
+        return JomlUtil.from(calcBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER));
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z) {

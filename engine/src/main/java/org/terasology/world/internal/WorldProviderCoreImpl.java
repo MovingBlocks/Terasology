@@ -21,14 +21,14 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
@@ -159,12 +159,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public ChunkViewCore getLocalView(Vector3i chunkPos) {
-        return chunkProvider.getLocalView(chunkPos);
+        return chunkProvider.getLocalView(JomlUtil.from(chunkPos));
     }
 
     @Override
     public ChunkViewCore getWorldViewAround(Vector3i chunk) {
-        return chunkProvider.getSubviewAroundChunk(chunk);
+        return chunkProvider.getSubviewAroundChunk(JomlUtil.from(chunk));
     }
 
     @Override
@@ -174,7 +174,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public boolean isRegionRelevant(Region3i region) {
-        for (Vector3i chunkPos : ChunkMath.calcChunkPos(region)) {
+        for (org.terasology.math.geom.Vector3i chunkPos : ChunkMath.calcChunkPos(region)) {
             if (!chunkProvider.isChunkReady(chunkPos)) {
                 return false;
             }
@@ -189,14 +189,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
          * command "showSCreen BenchmarkScreen".
          */
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        CoreChunk chunk = chunkProvider.getChunk(JomlUtil.from(chunkPos));
         if (chunk != null) {
             Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
-            Block oldBlockType = chunk.setBlock(blockPos, type);
+            Block oldBlockType = chunk.setBlock(JomlUtil.from(blockPos), type);
             if (oldBlockType != type) {
                 BlockChange oldChange = blockChanges.get(worldPos);
                 if (oldChange == null) {
-                    blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
+                    blockChanges.put(worldPos, new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
                 } else {
                     oldChange.setTo(type);
                 }
@@ -221,21 +221,21 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         for (Map.Entry<Vector3i, Block> entry : blocks.entrySet()) {
             Vector3i worldPos = entry.getKey();
             Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
-            CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+            CoreChunk chunk = chunkProvider.getChunk(JomlUtil.from(chunkPos));
 
             if (chunk != null) {
                 Block type = entry.getValue();
                 Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
-                Block oldBlockType = chunk.setBlock(blockPos, type);
+                Block oldBlockType = chunk.setBlock(JomlUtil.from(blockPos), type);
                 if (oldBlockType != type) {
                     BlockChange oldChange = blockChanges.get(worldPos);
                     if (oldChange == null) {
-                        blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
+                        blockChanges.put(worldPos, new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
                     } else {
                         oldChange.setTo(type);
                     }
                     setDirtyChunksNear(worldPos);
-                    changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
+                    changedBlocks.add(new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
                 }
                 result.put(worldPos, oldBlockType);
             } else {
@@ -244,14 +244,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
 
         for (BlockChange change : changedBlocks) {
-            notifyBlockChanged(change.getPosition(), change.getTo(), change.getFrom());
+            notifyBlockChanged(JomlUtil.from(change.getPosition()), change.getTo(), change.getFrom());
         }
 
         return result;
     }
-    
+
     private void setDirtyChunksNear(Vector3i pos0) {
-        for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(pos0, 1)) {
+        for (org.terasology.math.geom.Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(JomlUtil.from(pos0), 1)) {
             RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
             if (dirtiedChunk != null) {
                 dirtiedChunk.setDirty(true);
@@ -264,16 +264,16 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         // TODO: Review, should only happen on main thread (as should changes to listeners)
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
-                listener.onBlockChanged(pos, type, oldType);
+                listener.onBlockChanged(JomlUtil.from(pos), type, oldType);
             }
         }
     }
-    
+
     private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
         // TODO: Change to match block , if those changes are made.
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
-                listener.onExtraDataChanged(index, pos, newData, oldData);
+                listener.onExtraDataChanged(index, JomlUtil.from(pos), newData, oldData);
             }
         }
     }
@@ -289,10 +289,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public byte getLight(int x, int y, int z) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
+        org.terasology.math.geom.Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            org.terasology.math.geom.Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getLight(blockPos);
         }
         return 0;
@@ -300,10 +300,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public byte getSunlight(int x, int y, int z) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
+        org.terasology.math.geom.Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            org.terasology.math.geom.Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return chunk.getSunlight(blockPos);
         }
         return 0;
@@ -311,10 +311,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public byte getTotalLight(int x, int y, int z) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
+        org.terasology.math.geom.Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            org.terasology.math.geom.Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
             return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
         }
         return 0;
@@ -332,7 +332,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public int setExtraData(int index, Vector3i worldPos, int value) {
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        CoreChunk chunk = chunkProvider.getChunk(JomlUtil.from(chunkPos));
         if (chunk != null) {
             Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
             int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);

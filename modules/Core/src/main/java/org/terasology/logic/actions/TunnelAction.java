@@ -25,6 +25,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.event.DoDamageEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.Physics;
@@ -72,7 +73,7 @@ public class TunnelAction extends BaseComponentSystem {
         int blockCounter = tunnelActionComponent.maxDestroyedBlocks;
         for (int s = 0; s <= tunnelActionComponent.maxTunnelDepth; s++) {
             origin.add(dir);
-            if (!worldProvider.isBlockRelevant(origin)) {
+            if (!worldProvider.isBlockRelevant(JomlUtil.from(origin))) {
                 break;
             }
 
@@ -90,7 +91,7 @@ public class TunnelAction extends BaseComponentSystem {
 
                     blockPos.set((int) target.x, (int) target.y, (int) target.z);
 
-                    Block currentBlock = worldProvider.getBlock(blockPos);
+                    Block currentBlock = worldProvider.getBlock(JomlUtil.from(blockPos));
 
                     if (currentBlock.isDestructible()) {
                         if (particleEffects < tunnelActionComponent.maxParticalEffects) {
@@ -100,7 +101,7 @@ public class TunnelAction extends BaseComponentSystem {
                             particleEffects++;
                         }
                         if (random.nextFloat() < tunnelActionComponent.thoroughness) {
-                            EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
+                            EntityRef blockEntity = blockEntityRegistry.getEntityAt(JomlUtil.from(blockPos));
                             blockEntity.send(new DoDamageEvent(tunnelActionComponent.damageAmount, tunnelActionComponent.damageType));
                         }
 

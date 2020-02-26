@@ -31,6 +31,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.location.LocationResynchEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -207,7 +208,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 while (true) {
                     HitResult hitInfo = physics.rayTrace(vLocation, vDirection, fDistanceThisFrame + 0.5f, DEFAULT_COLLISION_GROUP);
                     if (hitInfo.isHit()) {
-                        Block hitBlock = worldProvider.getBlock(hitInfo.getBlockPosition());
+                        Block hitBlock = worldProvider.getBlock(JomlUtil.from(hitInfo.getBlockPosition()));
                         if (hitBlock != null) {
                             Vector3f vTravelledDistance = vLocation.sub(hitInfo.getHitPoint());
                             float fTravelledDistance  = vTravelledDistance.length();

@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldProvider;
@@ -52,14 +53,14 @@ class BlockPlacementBenchmark extends AbstractBenchmarkInstance {
     @Override
     public void runStep() {
         if (useSetBlocksInsteadOfSetBlock) {
-            Map<Vector3i, Block> blocksToPlace = new HashMap<>();
+            Map<org.joml.Vector3i, Block> blocksToPlace = new HashMap<>();
             for (Vector3i v : region3i) {
-                blocksToPlace.put(v, blockToPlace);
+                blocksToPlace.put(JomlUtil.from(v), blockToPlace);
             }
             worldProvider.setBlocks(blocksToPlace);
         } else {
             for (Vector3i v : region3i) {
-                worldProvider.setBlock(v, blockToPlace);
+                worldProvider.setBlock(JomlUtil.from(v), blockToPlace);
             }
         }
         if (blockToPlace == stone) {

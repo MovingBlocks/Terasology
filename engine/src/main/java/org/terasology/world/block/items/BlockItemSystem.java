@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.items;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.telemetry.GamePlayStatsComponent;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
@@ -95,10 +96,10 @@ public class BlockItemSystem extends BaseComponentSystem {
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.
             if (networkSystem.getMode().isAuthority()) {
-                PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
+                PlaceBlocks placeBlocks = new PlaceBlocks(JomlUtil.from(placementPos), block, event.getInstigator());
                 worldProvider.getWorldEntity().send(placeBlocks);
                 if (!placeBlocks.isConsumed()) {
-                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
+                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(JomlUtil.from(placementPos)), event.getInstigator()));
                 } else {
                     event.consume();
                 }

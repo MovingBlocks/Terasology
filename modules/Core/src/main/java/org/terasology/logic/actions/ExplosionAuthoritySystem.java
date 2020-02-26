@@ -31,6 +31,7 @@ import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.event.DoDamageEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
@@ -124,11 +125,11 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
                 target.y += direction.y * j;
                 target.z += direction.z * j;
                 blockPos.set((int) target.x, (int) target.y, (int) target.z);
-                Block currentBlock = worldProvider.getBlock(blockPos);
+                Block currentBlock = worldProvider.getBlock(JomlUtil.from(blockPos));
 
                 /* PHYSICS */
                 if (currentBlock.isDestructible()) {
-                    EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
+                    EntityRef blockEntity = blockEntityRegistry.getEntityAt(JomlUtil.from(blockPos));
                     // allow explosions to chain together,  but do not chain on the instigating block
                     if (!blockEntity.equals(instigatingBlockEntity) && blockEntity.hasComponent(ExplosionActionComponent.class)) {
                         doExplosion(blockEntity.getComponent(ExplosionActionComponent.class), blockPos.toVector3f(), blockEntity);
@@ -163,7 +164,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
             if (entityRef.hasComponent(BlockComponent.class)) {
                 BlockComponent blockComponent = entityRef.getComponent(BlockComponent.class);
                 // always destroy the block that caused the explosion
-                worldProvider.setBlock(blockComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
+                worldProvider.setBlock(JomlUtil.from(blockComponent.position), blockManager.getBlock(BlockManager.AIR_ID));
                 // create the explosion from the block's location
                 doExplosion(explosionActionComponent, blockComponent.position.toVector3f(), entityRef);
             } else if (entityRef.hasComponent(LocationComponent.class)) {

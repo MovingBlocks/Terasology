@@ -15,9 +15,9 @@
  */
 package org.terasology.world.block.entity.placement;
 
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 
 import java.util.Collections;

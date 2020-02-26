@@ -152,7 +152,7 @@ class RenderableWorldImpl implements RenderableWorld {
             if (chunk == null) {
                 pregenerationIsComplete = false;
             } else if (chunk.isDirty()) {
-                localView = worldProvider.getLocalView(chunkCoordinates);
+                localView = worldProvider.getLocalView(JomlUtil.from(chunkCoordinates));
                 if (localView == null) {
                     continue;
                 }
@@ -388,7 +388,7 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     private boolean areSurroundingChunksLoaded(RenderableChunk chunk) {
-        return worldProvider.getWorldViewAround(chunk.getPosition()) != null;
+        return worldProvider.getWorldViewAround(JomlUtil.from(chunk.getPosition())) != null;
     }
 
     private boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {

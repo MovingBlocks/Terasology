@@ -49,8 +49,8 @@ public abstract class SubmersibleCamera extends Camera {
             cameraPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPosition, worldProvider.getTime().getDays());
         }
 
-        if (worldProvider.isBlockRelevant(cameraPosition)) {
-            return worldProvider.getBlock(cameraPosition).isLiquid();
+        if (worldProvider.isBlockRelevant(JomlUtil.from(cameraPosition))) {
+            return worldProvider.getBlock(JomlUtil.from(cameraPosition)).isLiquid();
         }
         return false;
     }

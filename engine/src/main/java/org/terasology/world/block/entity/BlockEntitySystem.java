@@ -29,6 +29,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -85,7 +86,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
     @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
     public void doDestroy(DoDestroyEvent event, EntityRef entity, BlockComponent blockComponent) {
         commonDestroyed(event, entity, blockComponent.block);
-        worldProvider.setBlock(blockComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
+        worldProvider.setBlock(JomlUtil.from(blockComponent.position), blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
@@ -102,7 +103,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 if (blockComponent.dropBlocksInRegion) {
                     // loop through all the blocks in this region and drop them
                     for (Vector3i location : blockRegion.region) {
-                        Block blockInWorld = worldProvider.getBlock(location);
+                        Block blockInWorld = worldProvider.getBlock(JomlUtil.from(location));
                         commonDefaultDropsHandling(event, entity, location, blockInWorld.getBlockFamily().getArchetypeBlock());
                     }
                 } else {
@@ -135,7 +136,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 if (blockDamageModifierComponent != null) {
                     impulsePower = blockDamageModifierComponent.impulsePower;
                 }
-                
+
                 processDropping(item, location, impulsePower);
             }
         }

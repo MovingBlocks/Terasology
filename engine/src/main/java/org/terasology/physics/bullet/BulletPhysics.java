@@ -57,6 +57,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.VecMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -242,7 +243,7 @@ public class BulletPhysics implements PhysicsEngine {
         discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.hasHit()) {
             if (closest.userData instanceof Vector3i) { //We hit a world block
-                final EntityRef entityAt = blockEntityRegistry.getEntityAt((Vector3i) closest.userData);
+                final EntityRef entityAt = blockEntityRegistry.getEntityAt(JomlUtil.from((Vector3i) closest.userData));
                 return new HitResult(entityAt,
                         VecMath.from(closest.hitPointWorld),
                         VecMath.from(closest.hitNormalWorld),

@@ -25,6 +25,7 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.ImmutableVector3f;
@@ -99,7 +100,7 @@ public class KinematicCharacterMover implements CharacterMover {
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         CharacterStateEvent result = new CharacterStateEvent(initial);
         result.setSequenceNumber(input.getSequenceNumber());
-        if (worldProvider.isBlockRelevant(initial.getPosition())) {
+        if (worldProvider.isBlockRelevant(JomlUtil.from(initial.getPosition()))) {
             updatePosition(characterMovementComponent, result, input, entity);
 
             if (input.isFirstRun()) {
@@ -137,7 +138,7 @@ public class KinematicCharacterMover implements CharacterMover {
             Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
             Vector3i currentPosition = new Vector3i(oldPosition);
             for (int currentHeight = 0; currentHeight < oldBlocks.length; currentHeight++) {
-                oldBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
+                oldBlocks[currentHeight] = worldProvider.getBlock(JomlUtil.from(currentPosition));
                 currentPosition.add(0, 1, 0);
             }
 
@@ -145,7 +146,7 @@ public class KinematicCharacterMover implements CharacterMover {
             Block[] newBlocks = new Block[(int) Math.ceil(characterHeight)];
             currentPosition = new Vector3i(newPosition);
             for (int currentHeight = 0; currentHeight < characterHeight; currentHeight++) {
-                newBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
+                newBlocks[currentHeight] = worldProvider.getBlock(JomlUtil.from(currentPosition));
                 currentPosition.add(0, 1, 0);
             }
 
@@ -177,8 +178,8 @@ public class KinematicCharacterMover implements CharacterMover {
         top.y += 0.5f * movementComp.height;
         bottom.y -= 0.5f * movementComp.height;
 
-        final boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
-        final boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
+        final boolean topUnderwater = worldProvider.getBlock(JomlUtil.from(top)).isLiquid();
+        final boolean bottomUnderwater = worldProvider.getBlock(JomlUtil.from(bottom)).isLiquid();
 
         final boolean newSwimming = !topUnderwater && bottomUnderwater;
         final boolean newDiving = topUnderwater && bottomUnderwater;
@@ -195,7 +196,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
         updateMode(state, newSwimming, newDiving, newClimbing, isCrouching);
     }
-    
+
     /**
      * Updates a character's movement mode and changes his vertical velocity accordingly.
      * @param state The current state of the character.
@@ -247,7 +248,7 @@ public class KinematicCharacterMover implements CharacterMover {
         float distance = 100f;
 
         for (Vector3f side : sides) {
-            Block block = worldProvider.getBlock(side);
+            Block block = worldProvider.getBlock(JomlUtil.from(side));
             if (block.isClimbable()) {
                 //If any of our sides are near a climbable block, check if we are near to the side
                 Vector3i myPos = new Vector3i(worldPos, RoundingMode.HALF_UP);
@@ -734,7 +735,7 @@ public class KinematicCharacterMover implements CharacterMover {
                             break;
                         case DIVING:
                         case SWIMMING:
-                            entity.send(new SwimStrokeEvent(worldProvider.getBlock(state.getPosition())));
+                            entity.send(new SwimStrokeEvent(worldProvider.getBlock(JomlUtil.from(state.getPosition()))));
                             break;
                         case CLIMBING:
                         case FLYING:

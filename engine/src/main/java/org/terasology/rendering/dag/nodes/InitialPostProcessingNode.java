@@ -134,7 +134,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
         // Shader Parameters
 
-        initialPostMaterial.setFloat3("inLiquidTint", worldProvider.getBlock(JomlUtil.from(activeCamera.getPosition())).getTint(), true);
+        initialPostMaterial.setFloat3("inLiquidTint", worldProvider.getBlock(activeCamera.getPosition()).getTint(), true);
 
         if (bloomIsEnabled) {
             initialPostMaterial.setFloat("bloomFactor", bloomFactor, true);

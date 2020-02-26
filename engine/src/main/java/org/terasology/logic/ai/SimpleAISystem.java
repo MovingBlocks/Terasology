@@ -28,6 +28,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -56,7 +57,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
             Vector3f worldPos = location.getWorldPosition();
 
             // Skip this AI if not in a loaded chunk
-            if (!worldProvider.isBlockRelevant(worldPos)) {
+            if (!worldProvider.isBlockRelevant(JomlUtil.from(worldPos))) {
                 continue;
             }
             SimpleAIComponent ai = entity.getComponent(SimpleAIComponent.class);

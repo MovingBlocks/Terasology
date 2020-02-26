@@ -36,6 +36,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -81,7 +82,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         Iterator<SpawningClientInfo> i = clientsPreparingToSpawn.iterator();
         while (i.hasNext()) {
             SpawningClientInfo spawning = i.next();
-            if (worldProvider.isBlockRelevant(spawning.position)) {
+            if (worldProvider.isBlockRelevant(JomlUtil.from(spawning.position))) {
                 PlayerStore playerStore = spawning.playerStore;
                 if (playerStore == null) {
                     spawnPlayer(spawning.clientEntity);
@@ -97,7 +98,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         i = clientsPreparingToRespawn.iterator();
         while (i.hasNext()) {
             SpawningClientInfo spawning = i.next();
-            if (worldProvider.isBlockRelevant(spawning.position)) {
+            if (worldProvider.isBlockRelevant(JomlUtil.from(spawning.position))) {
                 respawnPlayer(spawning.clientEntity);
                 i.remove();
             }
@@ -135,7 +136,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             loc.setWorldPosition(storedLocation);
             entity.saveComponent(loc);
 
-            if (worldProvider.isBlockRelevant(storedLocation)) {
+            if (worldProvider.isBlockRelevant(JomlUtil.from(storedLocation))) {
                 // chunk for spawning location is ready, so spawn right now
                 playerStore.restoreEntities();
                 EntityRef character = playerStore.getCharacter();
@@ -153,7 +154,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             entity.saveComponent(loc);
 
             addRelevanceEntity(entity, minViewDist, owner);
-            if (worldProvider.isBlockRelevant(spawnPosition)) {
+            if (worldProvider.isBlockRelevant(JomlUtil.from(spawnPosition))) {
                 spawnPlayer(entity);
             } else {
                 clientsPreparingToSpawn.add(new SpawningClientInfo(entity, spawnPosition));
@@ -232,7 +233,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         Vector3f spawnPosition = entity.getComponent(LocationComponent.class).getWorldPosition();
 
-        if (worldProvider.isBlockRelevant(spawnPosition)) {
+        if (worldProvider.isBlockRelevant(JomlUtil.from(spawnPosition))) {
             respawnPlayer(entity);
         } else {
             updateRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance());

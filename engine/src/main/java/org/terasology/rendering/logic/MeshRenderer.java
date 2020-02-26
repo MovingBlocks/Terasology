@@ -253,7 +253,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
      * @return true if the entity itself or the block at the given position are relevant, false otherwise.
      */
     private boolean isRelevant(EntityRef entity, Vector3f position) {
-        return worldProvider.isBlockRelevant(position) || entity.isAlwaysRelevant();
+        return worldProvider.isBlockRelevant(JomlUtil.from(position)) || entity.isAlwaysRelevant();
     }
 
     @Override

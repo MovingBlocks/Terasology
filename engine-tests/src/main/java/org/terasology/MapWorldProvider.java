@@ -16,10 +16,11 @@
 package org.terasology;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -101,7 +102,7 @@ public class MapWorldProvider implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
         Chunk chunk = chunks.get(chunkPos);
         if (chunk == null && worldGenerator != null) {
-            chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
+            chunk = new ChunkImpl(JomlUtil.from(chunkPos), blockManager, extraDataManager);
             worldGenerator.createChunk(chunk, entityBuffer);
             chunks.put(chunkPos, chunk);
         }
@@ -151,12 +152,12 @@ public class MapWorldProvider implements WorldProviderCore {
     public byte getTotalLight(int x, int y, int z) {
         return 0;
     }
-    
+
     @Override
     public int setExtraData(int index, Vector3i pos, int value) {
         return 0;
     }
-    
+
     @Override
     public int getExtraData(int index, int x, int y, int z) {
         return 0;

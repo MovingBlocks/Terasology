@@ -16,9 +16,9 @@
 
 package org.terasology.world.internal;
 
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.time.WorldTime;
@@ -97,7 +97,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+    public Map<org.joml.Vector3i, Block> setBlocks(Map<org.joml.Vector3i, Block> blocks) {
         return base.setBlocks(blocks);
     }
 
@@ -120,12 +120,12 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     public byte getTotalLight(int x, int y, int z) {
         return base.getTotalLight(x, y, z);
     }
-    
+
     @Override
     public int getExtraData(int index, int x, int y, int z) {
         return base.getExtraData(index, x, y, z);
     }
-    
+
     @Override
     public int setExtraData(int index, Vector3i pos, int value) {
         return base.setExtraData(index, pos, value);

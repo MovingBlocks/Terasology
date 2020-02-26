@@ -35,6 +35,7 @@ import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
@@ -210,7 +211,7 @@ public class BlockCommands extends BaseComponentSystem {
             if (def.isPresent()) {
                 BlockFamily blockFamily = blockManager.getBlockFamily(uri);
                 Block block = blockManager.getBlock(blockFamily.getURI());
-                world.setBlock(targetLocation.position, block);
+                world.setBlock(JomlUtil.from(targetLocation.position), block);
             } else if (matchingUris.size() > 1) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("Non-unique shape name, possible matches: ");

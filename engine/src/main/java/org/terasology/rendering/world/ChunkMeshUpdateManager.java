@@ -20,6 +20,7 @@ import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
@@ -167,7 +168,7 @@ public final class ChunkMeshUpdateManager {
         @Override
         public void run() {
             ChunkMesh newMesh;
-            ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
+            ChunkView chunkView = worldProvider.getLocalView(JomlUtil.from(c.getPosition()));
             if (chunkView != null) {
                 /*
                  * Important set dirty flag first, so that a concurrent modification of the chunk in the mean time we

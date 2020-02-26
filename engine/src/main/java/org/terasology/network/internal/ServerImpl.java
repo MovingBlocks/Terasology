@@ -36,6 +36,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
@@ -235,7 +236,7 @@ public class ServerImpl implements Server {
             Event event = eventSerializer.deserialize(message.getEvent());
             EntityRef target = EntityRef.NULL;
             if (message.hasTargetBlockPos()) {
-                target = blockEntityRegistry.getBlockEntityAt(NetMessageUtil.convert(message.getTargetBlockPos()));
+                target = blockEntityRegistry.getBlockEntityAt(JomlUtil.from(NetMessageUtil.convert(message.getTargetBlockPos())));
             } else if (message.hasTargetId()) {
                 target = networkSystem.getEntity(message.getTargetId());
             }
@@ -291,7 +292,7 @@ public class ServerImpl implements Server {
             }
         }
     }
-    
+
     /**
      * Apply the block changes from the message to the local world.
      */
@@ -302,8 +303,8 @@ public class ServerImpl implements Server {
             // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(blockChange.getPos());
-            if (worldProvider.isBlockRelevant(pos)) {
-                worldProvider.setBlock(pos, newBlock);
+            if (worldProvider.isBlockRelevant(JomlUtil.from(pos))) {
+                worldProvider.setBlock(JomlUtil.from(pos), newBlock);
             } else {
                 awaitingChunkReadyBlockUpdates.put(ChunkMath.calcChunkPos(pos), blockChange);
             }
@@ -317,8 +318,8 @@ public class ServerImpl implements Server {
         for (NetData.ExtraDataChangeMessage extraDataChange : message.getExtraDataChangeList()) {
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(extraDataChange.getPos());
-            if (worldProvider.isBlockRelevant(pos)) {
-                worldProvider.setExtraData(extraDataChange.getIndex(), pos, extraDataChange.getNewData());
+            if (worldProvider.isBlockRelevant(JomlUtil.from(pos))) {
+                worldProvider.setExtraData(extraDataChange.getIndex(), JomlUtil.from(pos), extraDataChange.getNewData());
             } else {
                 awaitingChunkReadyExtraDataUpdates.put(ChunkMath.calcChunkPos(pos), extraDataChange);
             }
@@ -377,7 +378,7 @@ public class ServerImpl implements Server {
             entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
             BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
             if (blockComponent != null && !blockEntityBefore) {
-                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.position).equals(currentEntity)) {
+                if (!blockEntityRegistry.getExistingBlockEntityAt(JomlUtil.from(blockComponent.position)).equals(currentEntity)) {
                     logger.error("Failed to associated new block entity");
                 }
             }
@@ -417,7 +418,7 @@ public class ServerImpl implements Server {
         for (NetData.BlockChangeMessage message : updateBlockMessages) {
             Vector3i pos = NetMessageUtil.convert(message.getPos());
             Block newBlock = blockManager.getBlock((short) message.getNewBlock());
-            worldProvider.setBlock(pos, newBlock);
+            worldProvider.setBlock(JomlUtil.from(pos), newBlock);
         }
 
         List<NetData.ExtraDataChangeMessage> updateExtraDataMessages = awaitingChunkReadyExtraDataUpdates.removeAll(chunkPos);
@@ -425,7 +426,7 @@ public class ServerImpl implements Server {
             Vector3i pos = NetMessageUtil.convert(message.getPos());
             int newValue = message.getNewData();
             int i = message.getIndex();
-            worldProvider.setExtraData(i, pos, newValue);
+            worldProvider.setExtraData(i, JomlUtil.from(pos), newValue);
         }
     }
 }

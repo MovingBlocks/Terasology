@@ -31,6 +31,7 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
@@ -88,7 +89,7 @@ public class TrunkSystem extends BaseComponentSystem {
 
         Vector3i primePos = new Vector3i(targetBlockComp.position);
         primePos.add(offsetDir.getVector3i());
-        Block primeBlock = worldProvider.getBlock(primePos);
+        Block primeBlock = worldProvider.getBlock(JomlUtil.from(primePos));
         if (!primeBlock.isReplacementAllowed()) {
             event.consume();
             return;
@@ -131,9 +132,9 @@ public class TrunkSystem extends BaseComponentSystem {
             newBottomBlock = trunk.leftBlockFamily.getBlockForPlacement(leftBlockPos, Side.BOTTOM, facingDir.reverse());
             newTopBlock = trunk.rightBlockFamily.getBlockForPlacement(rightBlockPos, Side.BOTTOM, facingDir.reverse());
         }
-        Map<Vector3i, Block> blockMap = new HashMap<>();
-        blockMap.put(leftBlockPos, newBottomBlock);
-        blockMap.put(rightBlockPos, newTopBlock);
+        Map<org.joml.Vector3i, Block> blockMap = new HashMap<>();
+        blockMap.put(JomlUtil.from(leftBlockPos), newBottomBlock);
+        blockMap.put(JomlUtil.from(rightBlockPos), newTopBlock);
         PlaceBlocks blockEvent = new PlaceBlocks(blockMap, event.getInstigator());
         worldProvider.getWorldEntity().send(blockEvent);
 

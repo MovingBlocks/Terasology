@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayerSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -217,7 +218,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 chunksInProximity.clear();
                 for (Vector3i chunkPosition : viewRegion) {
                     RenderableChunk c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && worldProvider.getLocalView(c.getPosition()) != null) {
+                    if (c != null && worldProvider.getLocalView(JomlUtil.from(c.getPosition())) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;
@@ -240,7 +241,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // add
                 for (Vector3i chunkPosition : viewRegion) {
                     RenderableChunk c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && worldProvider.getLocalView(c.getPosition()) != null) {
+                    if (c != null && worldProvider.getLocalView(JomlUtil.from(c.getPosition())) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;

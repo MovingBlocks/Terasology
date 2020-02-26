@@ -731,8 +731,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public float getRenderingLightIntensityAt(Vector3f pos) {
-        float rawLightValueSun = worldProvider.getSunlight(pos) / 15.0f;
-        float rawLightValueBlock = worldProvider.getLight(pos) / 15.0f;
+        float rawLightValueSun = worldProvider.getSunlight(JomlUtil.from(pos)) / 15.0f;
+        float rawLightValueBlock = worldProvider.getLight(JomlUtil.from(pos)) / 15.0f;
 
         float lightValueSun = (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0) * rawLightValueSun;
         lightValueSun *= backdropProvider.getDaylight();
@@ -747,12 +747,12 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public float getMainLightIntensityAt(Vector3f position) {
-        return backdropProvider.getDaylight() * worldProvider.getSunlight(position) / 15.0f;
+        return backdropProvider.getDaylight() * worldProvider.getSunlight(JomlUtil.from(position)) / 15.0f;
     }
 
     @Override
     public float getBlockLightIntensityAt(Vector3f position) {
-        return worldProvider.getLight(position) / 15.0f;
+        return worldProvider.getLight(JomlUtil.from(position)) / 15.0f;
     }
 
     @Override

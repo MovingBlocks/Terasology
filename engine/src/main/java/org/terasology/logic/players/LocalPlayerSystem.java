@@ -380,7 +380,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
                 if (blockComp != null || blockRegion != null) {
                     Vector3f blockPos = location.getWorldPosition();
-                    Block block = worldProvider.getBlock(blockPos);
+                    Block block = worldProvider.getBlock(JomlUtil.from(blockPos));
                     aabb = block.getBounds(blockPos);
                 } else {
                     MeshComponent mesh = target.getComponent(MeshComponent.class);

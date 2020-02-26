@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.CollisionGroup;
@@ -72,7 +73,7 @@ public class TargetSystem {
     public boolean updateTarget(Vector3f pos, Vector3f dir, float maxDist) {
 
         if (targetBlockPos != null && !target.exists()) {
-            target = blockRegistry.getEntityAt(targetBlockPos);
+            target = blockRegistry.getEntityAt(JomlUtil.from(targetBlockPos));
         }
 
         HitResult hitInfo = physics.rayTrace(pos, dir, maxDist, filter);

@@ -294,9 +294,16 @@ public enum Side {
         }
     }
 
+    @Deprecated
     public Vector3i getAdjacentPos(Vector3i position) {
         Vector3i result = new Vector3i(position);
         result.add(vector3iDir);
+        return result;
+    }
+
+    public org.joml.Vector3i getAdjacentPos(org.joml.Vector3i position) {
+        org.joml.Vector3i result = new org.joml.Vector3i(position);
+        result.add(JomlUtil.from(vector3iDir));
         return result;
     }
 

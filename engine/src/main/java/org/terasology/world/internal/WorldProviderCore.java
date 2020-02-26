@@ -16,9 +16,10 @@
 package org.terasology.world.internal;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.time.WorldTime;
@@ -40,7 +41,7 @@ public interface WorldProviderCore {
 
     /**
      * Returns the title of this world.
-     *
+     *JomlUtil.round
      * @return the title of this world
      */
     String getTitle();
@@ -152,7 +153,7 @@ public interface WorldProviderCore {
     byte getSunlight(int x, int y, int z);
 
     byte getTotalLight(int x, int y, int z);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -163,7 +164,7 @@ public interface WorldProviderCore {
      * @return The (index)th extra-data value at the given position
      */
     int getExtraData(int index, int x, int y, int z);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *

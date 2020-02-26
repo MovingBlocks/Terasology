@@ -16,6 +16,7 @@
 package org.terasology.world.block.internal;
 
 import gnu.trove.list.TIntList;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 
@@ -53,7 +54,7 @@ public class BlockPositionIterator implements Iterator<Vector3i> {
             nextResult.x = positionList.get(i++);
             nextResult.y = positionList.get(i++);
             nextResult.z = positionList.get(i++);
-            if (!registry.hasPermanentBlockEntity(nextResult)) {
+            if (!registry.hasPermanentBlockEntity(JomlUtil.from(nextResult))) {
                 return;
             }
         }

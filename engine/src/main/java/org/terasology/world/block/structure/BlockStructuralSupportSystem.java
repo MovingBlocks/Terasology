@@ -23,6 +23,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DestroyEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -91,10 +92,10 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
 
     @ReceiveEvent
     public void preventInvalidPlacement(PlaceBlocks placeBlocks, EntityRef world) {
-        final Map<Vector3i, Block> blocksMap = placeBlocks.getBlocks();
+        final Map<org.joml.Vector3i, Block> blocksMap = placeBlocks.getBlocks();
         for (BlockStructuralSupport support : supports) {
-            for (Map.Entry<Vector3i, Block> blockEntry : blocksMap.entrySet()) {
-                final Vector3i position = blockEntry.getKey();
+            for (Map.Entry<org.joml.Vector3i, Block> blockEntry : blocksMap.entrySet()) {
+                final org.joml.Vector3i position = blockEntry.getKey();
                 if (!support.isSufficientlySupported(position, Collections.unmodifiableMap(blocksMap))) {
                     placeBlocks.consume();
                     return;
@@ -105,12 +106,12 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
 
     private void validateSupportForBlockOnSide(Vector3i replacedBlockPosition, Side side) {
         final Vector3i blockPosition = side.getAdjacentPos(replacedBlockPosition);
-        if (worldProvider.isBlockRelevant(blockPosition)) {
+        if (worldProvider.isBlockRelevant(JomlUtil.from(blockPosition))) {
             final Side sideReverse = side.reverse();
 
             for (BlockStructuralSupport support : supports) {
-                if (support.shouldBeRemovedDueToChange(blockPosition, sideReverse)) {
-                    blockEntityRegistry.getBlockEntityAt(blockPosition).send(new DestroyEvent(gatheringEntity,
+                if (support.shouldBeRemovedDueToChange(JomlUtil.from(blockPosition), sideReverse)) {
+                    blockEntityRegistry.getBlockEntityAt(JomlUtil.from(blockPosition)).send(new DestroyEvent(gatheringEntity,
                             EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
                     break;
                 }
