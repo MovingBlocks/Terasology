@@ -42,19 +42,20 @@ public class BroadCastServer {
         BroadCastServer.turnOnBroadcast = true;
         try {
             sendBroadCast();
-            service = Executors.newSingleThreadScheduledExecutor();
-            Runnable runnable = new Runnable() {
+            Executors.newSingleThreadExecutor().execute(new Runnable() {
+                @Override
                 public void run() {
-                    logger.info("Listening to broadcast");
-                    try {
-                        while(turnOnBroadcast) {
-                            listenToBroadCast();
+                    while (true) {
+                        try {
+                            while (turnOnBroadcast) {
+                                listenToBroadCast();
+                            }
+                        } catch (Exception e) {
+                            logger.error("Broadcasting has been interrupted" + e.getMessage());
                         }
-                    } catch (Exception e) {
-                        logger.error("Broadcasting has been interrupted" + e.getMessage());
                     }
                 }
-            };
+            });
         } catch (Exception e) {
         logger.info("Broadcasting has been interrupted " + e.getMessage());
         }
