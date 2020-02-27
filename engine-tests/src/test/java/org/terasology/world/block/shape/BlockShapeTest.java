@@ -80,16 +80,23 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
 
         ObjectArrayList<javax.vecmath.Vector3f> points = ((com.bulletphysics.collision.shapes.ConvexHullShape) bulletConvexHullShape.underlyingShape).getPoints();
         for (int x = 0; x < points.size(); x++) {
-            fuzzVectorTest(test[x], VecMath.from(points.get(x)));
-
+            fuzzVectorTest(test[x], points);
         }
 
     }
 
-    private void fuzzVectorTest(Vector3f test, Vector3f actual) {
-        assertEquals(test.x, actual.x, .1f);
-        assertEquals(test.y, actual.y, .1f);
-        assertEquals(test.z, actual.z, .1f);
+    private void fuzzVectorTest(Vector3f test, ObjectArrayList<javax.vecmath.Vector3f> actual) {
+        boolean match = false;
+        for (javax.vecmath.Vector3f actually : actual) {
+            if (Math.abs(actually.x - test.x) < 0.1) {
+                if (Math.abs(actually.y - test.y) < 0.1) {
+                    if (Math.abs(actually.z - test.z) < 0.1) {
+                        match = true;
+                    }
+                }
+            }
+        }
+        assertTrue(match);
     }
 
 
