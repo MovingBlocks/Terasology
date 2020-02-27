@@ -254,6 +254,7 @@
     "motion-blur": "Motion Blur",
     "mouse-sensitivity": "Mouse Sensitivity",
     "movement-dead-zone": "Movement Axis Dead Zone",
+    "axis-sensitivity": "Axis Sensitivity",
     "multi-world-warning": "WARNING: Multi-world is not completed, only the final selected world will be available!",
     "music-volume": "Music Volume",
     "new-binding": "New binding",

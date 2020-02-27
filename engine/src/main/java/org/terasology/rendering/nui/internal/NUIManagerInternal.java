@@ -38,12 +38,10 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputSystem;
+import org.terasology.input.InputType;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseAxisEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.input.events.*;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
@@ -62,6 +60,7 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
+import org.terasology.rendering.nui.layers.mainMenu.inputSettings.UIInputBind;
 import org.terasology.utilities.Assets;
 
 import java.beans.PropertyChangeEvent;
@@ -662,6 +661,15 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 if (screen.isModal()) {
                     break;
                 }
+            }
+        }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void controllerButtonEvent(ControllerButtonEvent ev, EntityRef entity) {
+        if (focus instanceof UIInputBind && ev.getButton().getType().equals(InputType.CONTROLLER_BUTTON)) {
+            if (((UIInputBind) focus).onControllerButtonEvent(ev)) {
+                ev.consume();
             }
         }
     }

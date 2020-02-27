@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
+import com.google.common.collect.ImmutableMap;
+import net.java.games.input.Component;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.ControllerConfig;
 import org.terasology.config.facade.InputDeviceConfiguration;
@@ -106,7 +108,9 @@ public class ControllerSettingsScreen extends CoreScreenLayer {
         layout.addWidget(new UISpace(new Vector2i(0, 12)));
 
         for (ControllerConfig.Axis axis : info.getAxes()) {
-            addAxis(layout, columnRatio, axis);
+            if (!axis.getIdName().equals("pov")) {//pov is an axis, but has 8 distinct values
+                addAxis(layout, columnRatio, axis);
+            }
         }
         Map<ControllerInput, BindableButton> controllerBinds = bindsManager.getControllerBinds();
         controllerBinds.forEach((input, button) -> {
@@ -117,7 +121,6 @@ public class ControllerSettingsScreen extends CoreScreenLayer {
     }
 
     private void addAxis(ColumnLayout layout, float columnRatio, ControllerConfig.Axis axis) {
-
         layout.addWidget(new RowLayout(new UILabel(axis.getDisplayName()), new UISpace(new Vector2i(10, 0)))
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
@@ -135,6 +138,16 @@ public class ControllerSettingsScreen extends CoreScreenLayer {
         mvmtDeadZone.setPrecision(2);
         mvmtDeadZone.bindValue(BindHelper.bindBeanProperty("deadZone", axis, Float.TYPE));
         layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#movement-dead-zone}")), mvmtDeadZone)
+                .setColumnRatios(columnRatio)
+                .setHorizontalSpacing(horizontalSpacing));
+
+        UISlider sensitivity = new UISlider();
+        sensitivity.setIncrement(0.1f);
+        sensitivity.setMinimum(0);
+        sensitivity.setRange(30);
+        sensitivity.setPrecision(1 );
+        sensitivity.bindValue(BindHelper.bindBeanProperty("sensitivity", axis, Float.TYPE));
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#axis-sensitivity}")), sensitivity)//todo menu label
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 

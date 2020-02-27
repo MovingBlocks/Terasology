@@ -16,6 +16,8 @@
 
 package org.terasology.input;
 
+import net.java.games.input.Component;
+
 import java.util.Locale;
 
 /**
@@ -25,15 +27,32 @@ public enum ControllerInput implements Input {
 
     NONE(InputType.CONTROLLER_BUTTON, ControllerId.NONE, "CONTROLLER_NONE", "None"),
 
-    X_AXIS(InputType.CONTROLLER_AXIS, ControllerId.X_AXIS, "X_AXIS", "X-Axis"),
-    Y_AXIS(InputType.CONTROLLER_AXIS, ControllerId.Y_AXIS, "Y_AXIS", "Y-Axis"),
-    Z_AXIS(InputType.CONTROLLER_AXIS, ControllerId.Z_AXIS, "Z_AXIS", "Z-Axis"),
+    X_AXIS(InputType.CONTROLLER_AXIS, ControllerId.X_AXIS, "X_AXIS", "Left Joystick X-Axis"),
+    Y_AXIS(InputType.CONTROLLER_AXIS, ControllerId.Y_AXIS, "Y_AXIS", "Left Joystick Y-Axis"),
 
-    RX_AXIS(InputType.CONTROLLER_AXIS, ControllerId.RX_AXIS, "RX_AXIS", "Rotational X-Axis"),
-    RY_AXIS(InputType.CONTROLLER_AXIS, ControllerId.RY_AXIS, "RY_AXIS", "Rotational Y-Axis"),
+    RX_AXIS(InputType.CONTROLLER_AXIS, ControllerId.RX_AXIS, "RX_AXIS", "Right Joystick X-Axis"),
+    RY_AXIS(InputType.CONTROLLER_AXIS, ControllerId.RY_AXIS, "RY_AXIS", "Right Joystick X-Axis"),
 
-    POVX_AXIS(InputType.CONTROLLER_AXIS, ControllerId.POVX_AXIS, "POVX_AXIS", "Point-of-View X-Axis"),
-    POVY_AXIS(InputType.CONTROLLER_AXIS, ControllerId.POVY_AXIS, "POVY_AXIS", "Point-of-View Y-Axis"),
+    Z_AXIS(InputType.CONTROLLER_AXIS, ControllerId.Z_AXIS, "Z_AXIS", "Left Trigger"),
+    RZ_AXIS(InputType.CONTROLLER_AXIS, ControllerId.RZ_AXIS, "RZ_AXIS", "Right Trigger"),
+
+    POVX_AXIS(InputType.CONTROLLER_AXIS, ControllerId.POVX_AXIS, "POVX_AXIS", "D-Pad X-Axis"),
+    POVY_AXIS(InputType.CONTROLLER_AXIS, ControllerId.POVY_AXIS, "POVY_AXIS", "D-Pad Y-Axis"),
+
+    BUTTON_LEFT_THUMB3(InputType.CONTROLLER_BUTTON, ControllerId.LEFT_THUMB3, "BUTTON_LEFT_THUMB3", "Left Joystick Button"),
+    BUTTON_RIGHT_THUMB3(InputType.CONTROLLER_BUTTON, ControllerId.RIGHT_THUMB3, "BUTTON_RIGHT_THUMB3", "Right Joystick Button"),
+
+    BUTTON_LEFT_THUMB(InputType.CONTROLLER_BUTTON, ControllerId.LEFT_THUMB, "BUTTON_LEFT_THUMB", "Left Bumper"),
+    BUTTON_RIGHT_THUMB(InputType.CONTROLLER_BUTTON, ControllerId.RIGHT_THUMB, "BUTTON_RIGHT_THUMB", "Right Bumper"),
+
+    BUTTON_A(InputType.CONTROLLER_BUTTON, ControllerId.A, "BUTTON_A", "Controller Button A"),
+    BUTTON_B(InputType.CONTROLLER_BUTTON, ControllerId.B, "BUTTON_B", "Controller Button B"),
+    BUTTON_X(InputType.CONTROLLER_BUTTON, ControllerId.X, "BUTTON_X", "Controller Button X"),
+    BUTTON_Y(InputType.CONTROLLER_BUTTON, ControllerId.Y, "BUTTON_Y", "Controller Button Y"),
+
+    BUTTON_UNKNOWN(InputType.CONTROLLER_BUTTON, ControllerId.UNKNOWN, "BUTTON_UNKNOWN", "Controller Button Start"),
+    BUTTON_SELECT(InputType.CONTROLLER_BUTTON, ControllerId.SELECT, "BUTTON_SELECT", "Controller Button Back"),
+    BUTTON_MODE(InputType.CONTROLLER_BUTTON, ControllerId.MODE, "BUTTON_MODE", "Controller Button XBOX"),
 
     BUTTON_0(InputType.CONTROLLER_BUTTON, ControllerId.ZERO, "BUTTON_0", "Controller Button 0"),
     BUTTON_1(InputType.CONTROLLER_BUTTON, ControllerId.ONE, "BUTTON_1", "Controller Button 1"),

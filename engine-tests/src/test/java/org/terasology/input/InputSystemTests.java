@@ -1,9 +1,11 @@
 
 package org.terasology.input;
 
+import net.java.games.input.Controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.terasology.config.ControllerConfig;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -16,8 +18,10 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.input.Keyboard.Key;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
+import org.terasology.input.device.ControllerAction;
 import org.terasology.input.device.KeyboardAction;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.events.ControllerButtonEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.internal.BindableButtonImpl;
 import org.terasology.logic.players.LocalPlayer;
@@ -31,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,10 +51,14 @@ public class InputSystemTests {
 
     private TestKeyboard testKeyboard;
 
+    private TestController testController;
+
     private EntityRef clientEntity;
     private List<CapturedKeyEvent> clientEntityKeyEvents;
     private EntityRef characterEntity;
     private List<CapturedKeyEvent> characterEntityKeyEvents;
+    private List<CapturedControllerButtonEvent> characterEntityControllerButtonEvents;
+
 
     private BindsManager bindsManager;
 
@@ -70,8 +79,12 @@ public class InputSystemTests {
         testKeyboard = new TestKeyboard();
         inputSystem.setKeyboardDevice(testKeyboard);
 
+        testController = new TestController();
+        inputSystem.setControllerDevice(testController);
+
         clientEntityKeyEvents = new ArrayList<>();
         characterEntityKeyEvents = new ArrayList<>();
+        characterEntityControllerButtonEvents = new ArrayList<>();
     }
 
     private void setUpLocalPlayer(Context context) {
@@ -106,6 +119,8 @@ public class InputSystemTests {
             Event event = invocation.getArgument(0);
             if (event instanceof KeyEvent) {
                 characterEntityKeyEvents.add(new CapturedKeyEvent((KeyEvent) event));
+            } else if (event instanceof ControllerButtonEvent) {
+                characterEntityControllerButtonEvents.add(new CapturedControllerButtonEvent((ControllerButtonEvent) event));
             }
             return event;
         });
@@ -217,6 +232,15 @@ public class InputSystemTests {
         verify(clientEntity).send(Mockito.any(TestEventButton.class));
     }
 
+    @Test
+    public void testControllerButton() {
+        pressControllerButton(ControllerInput.BUTTON_A);
+
+        inputSystem.update(1f);
+
+        assertEquals(characterEntityControllerButtonEvents.get(0).button, ControllerInput.BUTTON_A);
+    }
+
     private void pressAndReleaseKey(Key key) {
         pressKey(key);
         releaseKey(key);
@@ -262,6 +286,39 @@ public class InputSystemTests {
 
     }
 
+    private void pressControllerButton(ControllerInput button) {
+        ControllerAction action = new ControllerAction(button, "testController", ButtonState.DOWN, 1.0f);
+        testController.add(action);
+    }
+
+    private static class TestController implements ControllerDevice {
+
+        private Queue<ControllerAction> queue = new LinkedBlockingQueue<>();
+
+        private final List<Controller> controllers = new CopyOnWriteArrayList<>();
+
+        @Override
+        public Queue<ControllerAction> getInputQueue() {
+            return queue;
+        }
+
+        @Override
+        public List<String> getControllers() {
+            List<String> controllerNames = new ArrayList<>();
+            controllers.forEach((controller) -> controllerNames.add(controller.getName()));
+            return controllerNames;
+        }
+
+        @Override
+        public ControllerConfig.ControllerInfo describeController(String name) {
+            return new ControllerConfig.ControllerInfo();
+        }
+
+        public void add(ControllerAction action) {
+            queue.add(action);
+        }
+    }
+
     @RegisterBindButton(id = "testEvent", description = "${engine-tests:menu#theTestEvent}", repeating = false, category = "tests")
     @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.T)
     public class TestEventButton extends BindButtonEvent {
@@ -279,6 +336,20 @@ public class InputSystemTests {
             key = event.getKey();
             delta = event.getDelta();
             keyCharacter = event.getKeyCharacter();
+            buttonState = event.getState();
+        }
+
+    }
+
+    private static class CapturedControllerButtonEvent {
+
+        public Input button;
+        public float delta;
+        private ButtonState buttonState;
+
+        public CapturedControllerButtonEvent(ControllerButtonEvent event) {
+            button = event.getButton();
+            delta = event.getDelta();
             buttonState = event.getState();
         }
 

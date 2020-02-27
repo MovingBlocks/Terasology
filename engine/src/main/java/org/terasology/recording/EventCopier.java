@@ -22,18 +22,12 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
-import org.terasology.input.events.InputEvent;
-import org.terasology.input.events.KeyUpEvent;
-import org.terasology.input.events.KeyRepeatEvent;
-import org.terasology.input.events.KeyDownEvent;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseAxisEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.input.events.*;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.GetMaxSpeedEvent;
 import org.terasology.logic.characters.events.AttackEvent;
 
+import javax.naming.ldap.Control;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -104,6 +98,11 @@ class EventCopier {
             AttackEvent originalEvent = (AttackEvent) toBeCopied;
             AttackEvent  newEvent = new AttackEvent(originalEvent.getInstigator(), originalEvent.getDirectCause());
             return newEvent;
+        } else if (toBeCopied instanceof ControllerButtonEvent) {
+            ControllerButtonEvent originalEvent = (ControllerButtonEvent) toBeCopied;
+            ControllerButtonEvent newEvent = createNewControllerButtonEvent(originalEvent);
+            inputEventSetup(newEvent, originalEvent);
+            return newEvent;
         } else {
             return null;
         }
@@ -143,6 +142,20 @@ class EventCopier {
             newEvent = KeyRepeatEvent.createCopy((KeyRepeatEvent) originalEvent);
         } else if (eventClass.equals(KeyUpEvent.class)) {
             newEvent = KeyUpEvent.createCopy((KeyUpEvent) originalEvent);
+        } else {
+            logger.error("ERROR!!! Event not Identified");
+        }
+        return newEvent;
+    }
+
+    private ControllerButtonEvent createNewControllerButtonEvent(ControllerButtonEvent originalEvent) {
+        ControllerButtonEvent newEvent = null;
+        Class eventClass = originalEvent.getClass();
+
+        if (eventClass.equals(ControllerButtonDownEvent.class)) {
+            newEvent = ControllerButtonDownEvent.createCopy((ControllerButtonDownEvent) originalEvent);
+            //todo handle ControllerButtonUpEvent
+            //todo handle ControllerButtonRepeatEvent
         } else {
             logger.error("ERROR!!! Event not Identified");
         }

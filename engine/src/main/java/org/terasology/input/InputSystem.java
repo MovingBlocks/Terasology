@@ -34,21 +34,8 @@ import org.terasology.input.device.MouseDevice;
 import org.terasology.input.device.nulldevices.NullControllerDevice;
 import org.terasology.input.device.nulldevices.NullKeyboardDevice;
 import org.terasology.input.device.nulldevices.NullMouseDevice;
-import org.terasology.input.events.InputEvent;
-import org.terasology.input.events.KeyDownEvent;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.KeyRepeatEvent;
-import org.terasology.input.events.KeyUpEvent;
-import org.terasology.input.events.LeftMouseDownButtonEvent;
-import org.terasology.input.events.LeftMouseUpButtonEvent;
-import org.terasology.input.events.MouseAxisEvent;
+import org.terasology.input.events.*;
 import org.terasology.input.events.MouseAxisEvent.MouseAxis;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseDownButtonEvent;
-import org.terasology.input.events.MouseUpButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.input.events.RightMouseDownButtonEvent;
-import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.input.internal.AbstractBindableAxis;
 import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.logic.players.LocalPlayer;
@@ -258,11 +245,9 @@ public class InputSystem extends BaseComponentSystem {
             return;
         }
         for (ControllerAction action : controllers.getInputQueue()) {
-            // TODO: send event to entity system
-            boolean consumed = false;
-
             Input input = action.getInput();
             if (input.getType() == InputType.CONTROLLER_BUTTON) {
+                boolean consumed = sendControllerButtonEvent(action.getInput(), action.getState(), delta);
                 processControllerButtonInput(delta, action, consumed, input);
             } else if (input.getType() == InputType.CONTROLLER_AXIS) {
                 processControllerAxisInput(action, input);
@@ -299,7 +284,8 @@ public class InputSystem extends BaseComponentSystem {
             int inputId = action.getInput().getId();
             boolean inverted = info.axisIsInverted(info.findAxisFromControllerId(inputId));
             float f = inverted ? -1 : 1;
-            axis.setTargetValue(action.getAxisValue() * f);
+            float axisSensitivity = info.getAxisSensitivity(info.findAxisFromControllerId(inputId));
+            axis.setTargetValue(action.getAxisValue() * axisSensitivity * f);
         }
     }
 
@@ -416,6 +402,28 @@ public class InputSystem extends BaseComponentSystem {
                     targetSystem.getHitNormal(),
                     time.getGameTimeInMs());
         }
+    }
+
+    private boolean sendControllerButtonEvent(Input button, ButtonState state, float delta) {
+        ControllerButtonEvent event;
+        switch (state) {
+            case DOWN:
+                event = ControllerButtonDownEvent.create(button, delta);
+                break;
+            //todo case UP and REPEAT
+            default:
+                return false;
+        }
+        boolean consumed = send(event);
+        event.reset();
+        return consumed;
+    }
+
+    private boolean sendControllerAxisEvent(Input axis, float axisValue, float delta) {
+        ControllerAxisEvent event = ControllerAxisEvent.create(axis, axisValue, delta);
+        boolean consumed = send(event);
+        event.reset();
+        return consumed;
     }
 
     /**

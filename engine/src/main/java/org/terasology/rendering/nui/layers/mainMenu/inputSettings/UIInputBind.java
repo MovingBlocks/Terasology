@@ -19,6 +19,8 @@ import org.terasology.audio.StaticSound;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
+import org.terasology.input.events.ControllerAxisEvent;
+import org.terasology.input.events.ControllerButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Vector2i;
@@ -96,6 +98,15 @@ public class UIInputBind extends CoreWidget {
         }
         List<String> lines = TextLineBuilder.getLines(font, text, areaHint.getX());
         return font.getSize(lines);
+    }
+
+    public boolean onControllerButtonEvent(ControllerButtonEvent event) {
+        if (capturingInput && event.isDown()) {
+            setNewInput(InputType.CONTROLLER_BUTTON.getInput(event.getButton().getId()));
+            capturingInput = false;
+            return true;
+        }
+        return false;
     }
 
     @Override

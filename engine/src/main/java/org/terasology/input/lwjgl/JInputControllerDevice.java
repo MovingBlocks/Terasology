@@ -22,6 +22,7 @@ import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier;
 import net.java.games.input.Component.Identifier.Button;
 import net.java.games.input.Component.Identifier.Axis;
+import net.java.games.input.Component.Identifier.Key;
 import net.java.games.input.Controller;
 import net.java.games.input.Controller.Type;
 import net.java.games.input.ControllerEnvironment;
@@ -33,11 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ControllerConfig;
 import org.terasology.config.ControllerConfig.ControllerInfo;
-import org.terasology.input.ButtonState;
-import org.terasology.input.ControllerDevice;
-import org.terasology.input.ControllerId;
-import org.terasology.input.Input;
-import org.terasology.input.InputType;
+import org.terasology.input.*;
 import org.terasology.input.device.ControllerAction;
 
 import java.util.ArrayDeque;
@@ -75,6 +72,18 @@ public class JInputControllerDevice implements ControllerDevice {
             .put(Button._9, ControllerId.NINE)
             .put(Button._10, ControllerId.TEN)
             .put(Button._11, ControllerId.ELEVEN)
+
+            .put(Button.LEFT_THUMB3, ControllerId.LEFT_THUMB3)
+            .put(Button.RIGHT_THUMB3, ControllerId.RIGHT_THUMB3)
+            .put(Button.LEFT_THUMB, ControllerId.LEFT_THUMB)
+            .put(Button.RIGHT_THUMB, ControllerId.RIGHT_THUMB)
+            .put(Key.UNKNOWN, ControllerId.UNKNOWN)
+            .put(Button.SELECT, ControllerId.SELECT)
+            .put(Button.MODE, ControllerId.MODE)
+            .put(Button.A, ControllerId.A)
+            .put(Button.B, ControllerId.B)
+            .put(Button.X, ControllerId.X)
+            .put(Button.Y, ControllerId.Y)
             .build();
 
     private ControllerConfig config;
@@ -134,7 +143,7 @@ public class JInputControllerDevice implements ControllerDevice {
                 Identifier identifier = c.getIdentifier();
                 if (identifier instanceof Axis) {
                     ControllerConfig.Axis axis =
-                            new ControllerConfig.Axis(c.getName(), identifier.getName(), false, 0.08f);
+                            new ControllerConfig.Axis(identifier.getName(), false, 0.08f, 10.0f);
                     info.getAxes().add(axis);
                 } else if (identifier instanceof Button) {
                     ControllerConfig.Button button = new ControllerConfig.Button(c.getName(), identifier.getName());
@@ -187,7 +196,7 @@ public class JInputControllerDevice implements ControllerDevice {
             return null;
         }
 
-        if (id instanceof Identifier.Button) {
+        if (id instanceof Identifier.Button || id instanceof Identifier.Key) {
             state = event.getValue() != 0 ? ButtonState.DOWN : ButtonState.UP;
             Integer buttonId = buttonMap.get(id);
             if (buttonId == null) {
@@ -221,7 +230,7 @@ public class JInputControllerDevice implements ControllerDevice {
                 return null; // unrecognized axis
             }
         } else {
-            return null; // unrecognized id (e.g. Identifier.Key)
+            return null; // unrecognized id
         }
 
         return new ControllerAction(input, c.getName(), state, axisValue);
@@ -234,6 +243,8 @@ public class JInputControllerDevice implements ControllerDevice {
             return ControllerId.Y_AXIS;
         } else if (axisId.equalsIgnoreCase("z")) {
             return ControllerId.Z_AXIS;
+        } else if (axisId.equalsIgnoreCase("rz")) {
+            return ControllerId.RZ_AXIS;
         } else if (axisId.equalsIgnoreCase("rx")) {
             return ControllerId.RX_AXIS;
         } else if (axisId.equalsIgnoreCase("ry")) {

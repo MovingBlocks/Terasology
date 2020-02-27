@@ -16,10 +16,13 @@
 
 package org.terasology.config;
 
+import com.google.common.collect.ImmutableMap;
+import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.input.ControllerId;
+import org.terasology.input.ControllerInput;
 import org.terasology.input.Input;
 
 import java.util.ArrayList;
@@ -139,27 +142,40 @@ public class ControllerConfig {
         public boolean axisIsInverted(Axis axis) {
             return axis != null && axis.inverted;
         }
+
+        public float getAxisSensitivity(Axis axis) {
+            return axis.sensitivity;
+        }
     }
 
+    private static final Map<String, ControllerInput> axisMap = ImmutableMap.<String, ControllerInput>builder()
+            .put(Component.Identifier.Axis.X.getName(), ControllerInput.X_AXIS)
+            .put(Component.Identifier.Axis.Y.getName(), ControllerInput.Y_AXIS)
+            .put(Component.Identifier.Axis.RX.getName(), ControllerInput.RX_AXIS)
+            .put(Component.Identifier.Axis.RY.getName(), ControllerInput.RY_AXIS)
+            .put(Component.Identifier.Axis.Z.getName(), ControllerInput.Z_AXIS)
+            .put(Component.Identifier.Axis.RZ.getName(), ControllerInput.RZ_AXIS)
+            .build();
+
     public static class Axis {
-        private String displayName;
         private String idName;
         private boolean inverted;
         private float deadZone = 0.08f;
+        private float sensitivity = 10.0f;
 
-        public Axis(String displayName, String idName, boolean inverted, float deadZone) {
-            this.displayName = displayName;
+        public Axis(String idName, boolean inverted, float deadZone, float sensitivity) {
             this.idName = idName;
             this.inverted = inverted;
             this.deadZone = deadZone;
+            this.sensitivity = sensitivity;
         }
 
         public String getDisplayName() {
-            return displayName;
-        }
-
-        public void setDisplayName(String displayName) {
-            this.displayName = displayName;
+            if (axisMap.containsKey(getIdName())) {
+                return axisMap.get(getIdName()).getDisplayName();
+            } else {
+                return getIdName();
+            }
         }
 
         public String getIdName() {
@@ -184,6 +200,14 @@ public class ControllerConfig {
 
         public void setDeadZone(float deadZone) {
             this.deadZone = deadZone;
+        }
+
+        public float getSensitivity() {
+            return sensitivity;
+        }
+
+        public void setSensitivity(float sensitivity) {
+            this.sensitivity = sensitivity;
         }
     }
 

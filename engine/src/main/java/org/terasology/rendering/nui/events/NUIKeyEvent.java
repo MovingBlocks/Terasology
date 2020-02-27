@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.events;
 
 import org.terasology.input.ButtonState;
+import org.terasology.input.ControllerDevice;
 import org.terasology.input.Input;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
