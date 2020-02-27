@@ -20,19 +20,18 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BroadCastServer {
 
-    private static DatagramSocket receiveSocket;
-    private static DatagramSocket sendSocket;
     private static boolean turnOnBroadcast;
     private static final Logger logger = LoggerFactory.getLogger(BroadCastServer.class);
-    private static ScheduledExecutorService service;
     private static final String DISCOVERY_REQUEST = "DISCOVERY_REQUEST";
     private static final String DISCOVERY_RESPONSE = "DISCOVERY_RESPONSE";
+    private  DatagramSocket receiveSocket;
+    private  DatagramSocket sendSocket;
+
 
     public boolean isBroadCastTurnedOn() {
         return turnOnBroadcast;
@@ -45,26 +44,29 @@ public class BroadCastServer {
             Executors.newSingleThreadExecutor().execute(new Runnable() {
                 @Override
                 public void run() {
-                    while (true) {
+                    while (!Thread.currentThread().isInterrupted()) {
                         try {
                             while (turnOnBroadcast) {
                                 listenToBroadCast();
                             }
                         } catch (Exception e) {
                             logger.error("Broadcasting has been interrupted" + e.getMessage());
+                            stopBroadCast();
                         }
                     }
                 }
             });
         } catch (Exception e) {
         logger.info("Broadcasting has been interrupted " + e.getMessage());
+        stopBroadCast();
         }
     }
 
     public void stopBroadCast() {
         BroadCastServer.turnOnBroadcast = false;
         logger.info("Shutting down BroadCasting");
-        service.shutdown();
+        this.sendSocket.close();
+        this.receiveSocket.close();
     }
 
     private void listenToBroadCast() throws Exception {
