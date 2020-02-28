@@ -496,6 +496,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         );
 
                         getManager().pushScreen(moduleDetailsScreen);
+
                     });
                 }
             }

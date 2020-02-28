@@ -16,6 +16,8 @@
 
 package org.terasology.core.world.generator;
 
+import org.joml.Math;
+
 /**
  * Climate simulation based on weighted distances
  *
