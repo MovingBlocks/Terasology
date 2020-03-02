@@ -36,6 +36,7 @@ import org.terasology.naming.Name;
 import org.terasology.naming.Version;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -251,12 +252,16 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         installedVersion.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
+                logger.error(installedVersion.getId());
                 if (dependencyInfoBinding.get() != null && moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()) != null) {
                     return String.valueOf(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()).getVersion());
                 }
                 return "";
+
+
             }
         });
+
 
         minSupportedVersion.bindText(new ReadOnlyBinding<String>() {
             @Override
@@ -300,6 +305,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
     }
     private boolean validateModuleDependencies(Name moduleName) {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+
         return resolver.resolve(moduleName).isSuccess();
     }
 
@@ -321,22 +327,25 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                     canvas.setMode("invalid");
 
                 }
-                else if(!validateModuleDependencies(value.getId()))
-                {
-                    canvas.setMode(("invalid"));
-                }
-
-
                 else{
 
                     canvas.setMode("available");
                 }
+
+                Version version = moduleManager.getRegistry().getLatestModuleVersion(value.getId()).getVersion();
+
+                if( !(value.versionRange().contains(version)))
+                {
+                    canvas.setMode("invalid");
+                }
+
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
             @Override
             public Vector2i getPreferredSize(DependencyInfo value, Canvas canvas) {
                 String text = getString(value);
+                canvas.getCurrentStyle().setTextColor(Color.RED);
                 return new Vector2i(
                         canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
