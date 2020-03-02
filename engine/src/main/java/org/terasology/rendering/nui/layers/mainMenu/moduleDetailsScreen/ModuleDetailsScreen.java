@@ -252,13 +252,10 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         installedVersion.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                logger.error(installedVersion.getId());
                 if (dependencyInfoBinding.get() != null && moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()) != null) {
                     return String.valueOf(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()).getVersion());
                 }
                 return "";
-
-
             }
         });
 

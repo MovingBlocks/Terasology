@@ -17,7 +17,10 @@ package org.terasology.rendering.nui.widgets;
 
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.Canvas;	import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -45,13 +48,11 @@ public class UILabel extends CoreWidget {
     public UILabel(String id, String text) {
         super(id);
         this.text.set(text);
-
     }
 
     public UILabel(String id, String family, String text) {
         super(id);
         this.text.set(text);
-
         setFamily(family);
     }
 
@@ -93,9 +94,6 @@ public class UILabel extends CoreWidget {
     public void onDraw(Canvas canvas) {
         canvas.drawText(getText());
     }
-
-
-
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {

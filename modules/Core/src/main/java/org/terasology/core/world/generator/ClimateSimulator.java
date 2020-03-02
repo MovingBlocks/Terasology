@@ -16,7 +16,6 @@
 
 package org.terasology.core.world.generator;
 
-
 /**
  * Climate simulation based on weighted distances
  *
