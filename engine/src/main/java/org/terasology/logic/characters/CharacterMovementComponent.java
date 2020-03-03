@@ -91,6 +91,8 @@ public final class CharacterMovementComponent implements Component {
         return velocity;
     }
 
+    public float getPlayerHeight(){ return height; }
+
     public void setVelocity(Vector3f newVelocity) {
         velocity.set(newVelocity);
     }
