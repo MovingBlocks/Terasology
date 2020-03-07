@@ -273,7 +273,9 @@ Contributors
  [aRealCyborg](https://github.com/aRealCyborg),
  [DarkWeird](https://github.com/DarkWeird),
  [PAndaContron](https://github.com/PAndaContron),
- [sin3point14](https://github.com/sin3point14)
+ [sin3point14](https://github.com/sin3point14),
+ [agent-q1](https://github.com/agent-q1),
+ [otradovec](https://github.com/otradovec)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
