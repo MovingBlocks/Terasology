@@ -14,9 +14,6 @@ buildscript {
         // Artifactory plugin
         classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.10.0')
 
-        // Git plugin for Gradle
-        classpath 'org.ajoberstar:gradle-git:0.6.3'
-
         // Needed for caching reflected data during builds
         classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
@@ -26,24 +23,18 @@ buildscript {
     }
 }
 
-// Separate build file for structure heavy stuff like using Git to fetch other repos to embed within the project
-apply from: 'config/gradle/utility.gradle'
+// Customization of IDE options
 apply from: 'config/gradle/ide.gradle'
 
 // Needed for extending the "clean" task to also delete custom stuff defined here like natives
 apply plugin: 'base'
 
-
 // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
 //apply plugin: 'eclipse'
-
-// Git plugin details at https://github.com/ajoberstar/gradle-git
-import org.ajoberstar.gradle.git.tasks.*
 
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
-
 
 // Test for right version of Java in use for running this script
 assert org.gradle.api.JavaVersion.current().isJava8Compatible()
@@ -135,8 +126,6 @@ task extractNatives {
     dependsOn extractMacOSXNatives
     dependsOn extractJNLuaNatives
 }
-
-// TODO: Test meta modules and other libs - not that there's really much to test other than being able to Git via Gradle
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Helper tasks                                                                                                      //
