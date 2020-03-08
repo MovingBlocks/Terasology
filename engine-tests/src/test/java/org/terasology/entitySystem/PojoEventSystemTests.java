@@ -82,7 +82,7 @@ public class PojoEventSystemTests {
 
     @Test
     public void testSendEventToEntity() {
-        StringComponent component = entity.addComponent(new StringComponent());
+        entity.addComponent(new StringComponent());
 
         TestEventHandler handler = new TestEventHandler();
         eventSystem.registerEventHandler(handler);
@@ -98,8 +98,8 @@ public class PojoEventSystemTests {
 
     @Test
     public void testSendEventToEntityWithMultipleComponents() {
-        StringComponent stringComponent = entity.addComponent(new StringComponent());
-        IntegerComponent intComponent = entity.addComponent(new IntegerComponent());
+        entity.addComponent(new StringComponent());
+        entity.addComponent(new IntegerComponent());
 
         TestEventHandler handler = new TestEventHandler();
         eventSystem.registerEventHandler(handler);
@@ -117,7 +117,7 @@ public class PojoEventSystemTests {
 
     @Test
     public void testSendEventToEntityComponent() {
-        StringComponent component = entity.addComponent(new StringComponent());
+        entity.addComponent(new StringComponent());
         IntegerComponent intComponent = entity.addComponent(new IntegerComponent());
 
         TestEventHandler handler = new TestEventHandler();
@@ -133,7 +133,7 @@ public class PojoEventSystemTests {
 
     @Test
     public void testNoReceiveEventWhenMissingComponents() {
-        StringComponent component = entity.addComponent(new StringComponent());
+        entity.addComponent(new StringComponent());
 
         TestCompoundComponentEventHandler handler = new TestCompoundComponentEventHandler();
         eventSystem.registerEventHandler(handler);
@@ -146,8 +146,8 @@ public class PojoEventSystemTests {
 
     @Test
     public void testReceiveEventRequiringMultipleComponents() {
-        StringComponent stringComponent = entity.addComponent(new StringComponent());
-        IntegerComponent intComponent = entity.addComponent(new IntegerComponent());
+        entity.addComponent(new StringComponent());
+        entity.addComponent(new IntegerComponent());
 
         TestCompoundComponentEventHandler handler = new TestCompoundComponentEventHandler();
         eventSystem.registerEventHandler(handler);
@@ -162,7 +162,7 @@ public class PojoEventSystemTests {
 
     @Test
     public void testPriorityAndCancel() {
-        StringComponent stringComponent = entity.addComponent(new StringComponent());
+        entity.addComponent(new StringComponent());
 
         TestEventHandler handlerNormal = new TestEventHandler();
         TestHighPriorityEventHandler handlerHigh = new TestHighPriorityEventHandler();
