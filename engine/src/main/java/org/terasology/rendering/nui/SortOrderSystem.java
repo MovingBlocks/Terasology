@@ -268,7 +268,6 @@ public class SortOrderSystem extends BaseComponentSystem {
 
     public static boolean containsConsole() {
         if (enabledWidgets != null) {
-            boolean containsConsole = false;
             for (CoreScreenLayer layer : enabledWidgets) {
                 if (layer instanceof ConsoleScreen) {
                     return true;
