@@ -27,6 +27,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.time.WorldTime;
 
 import java.math.RoundingMode;
+import java.util.Iterator;
 
 import static org.terasology.world.time.WorldTime.DAY_LENGTH;
 
@@ -127,9 +128,11 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
     }
 
     protected EntityRef getWorldEntity() {
-        for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
-            return entity;
+        Iterator<EntityRef> iterator  = entityManager.getEntitiesWith(WorldComponent.class).iterator();
+        if (iterator.hasNext()){
+            return iterator.next();
+        }else {
+            return EntityRef.NULL;
         }
-        return EntityRef.NULL;
     }
 }

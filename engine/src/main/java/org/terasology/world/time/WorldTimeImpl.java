@@ -15,6 +15,7 @@
  */
 package org.terasology.world.time;
 
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.terasology.engine.Time;
@@ -24,6 +25,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
+
+import static com.sun.org.apache.xml.internal.security.keys.keyresolver.KeyResolver.iterator;
 
 /**
  */
@@ -91,9 +94,11 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
     }
 
     private EntityRef getWorldEntity() {
-        for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
-            return entity;
+        Iterator<EntityRef> iterator  = entityManager.getEntitiesWith(WorldComponent.class).iterator();
+        if (iterator.hasNext()){
+            return iterator.next();
+        }else {
+            return EntityRef.NULL;
         }
-        return EntityRef.NULL;
     }
 }
