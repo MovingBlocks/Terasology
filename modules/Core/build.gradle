@@ -150,7 +150,7 @@ task syncAssets(type: Sync) {
 
 task syncOverrides(type: Sync) {
     from 'overrides'
-    into "${mainSourceSet.output.classesDirs.first()}overrides"
+    into "${mainSourceSet.output.classesDirs.first()}/overrides"
 }
 
 task syncDeltas(type: Sync) {
