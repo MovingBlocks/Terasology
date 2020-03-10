@@ -421,7 +421,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 boolean isUncategorizedSelected = selectModulesConfig.isUncategorizedSelected();
                 uncategorizedCheckbox.setChecked(isUncategorizedSelected);
                 for (CheckboxAssociationEnum checkboxAssociation : CheckboxAssociationEnum.values()) {
-                   final  String checkboxName = checkboxAssociation.getCheckboxName();
+                    final String checkboxName = checkboxAssociation.getCheckboxName();
                     UICheckbox checkbox = find(checkboxName, UICheckbox.class);
                     if (null != checkbox) {
                         checkbox.setEnabled(!isUncategorizedSelected);
