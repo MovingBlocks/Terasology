@@ -209,7 +209,6 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
             }
-
         });
     }
 
@@ -256,7 +255,6 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 return "";
             }
         });
-
 
         minSupportedVersion.bindText(new ReadOnlyBinding<String>() {
             @Override
