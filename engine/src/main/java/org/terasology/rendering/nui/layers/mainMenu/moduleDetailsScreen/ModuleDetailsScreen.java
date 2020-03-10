@@ -190,7 +190,6 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                     return value.getMetadata().getDisplayName().toString();
                 }
                 return "";
-
             }
 
             @Override
@@ -299,7 +298,6 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     private boolean validateModuleDependencies(Name moduleName) {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-
         return resolver.resolve(moduleName).isSuccess();
     }
 
@@ -313,23 +311,17 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 return "";
             }
 
-
             @Override
             public void draw(DependencyInfo value, Canvas canvas) {
                 if (moduleManager.getRegistry().getLatestModuleVersion(value.getId()) == null) {
                     canvas.setMode("invalid");
-
                 } else {
-
                     canvas.setMode("available");
                 }
-
                 Version version = moduleManager.getRegistry().getLatestModuleVersion(value.getId()).getVersion();
-
                 if (!(value.versionRange().contains(version))) {
                     canvas.setMode("invalid");
                 }
-
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
