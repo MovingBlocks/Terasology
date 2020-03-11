@@ -473,7 +473,7 @@ public class JoinGameScreen extends CoreScreenLayer {
     private void refreshPing() {
         String address = visibleList.getSelection().getAddress();
         int port = visibleList.getSelection().getPort();
-        String name= visibleList.getSelection().getName();
+        String name = visibleList.getSelection().getName();
         UILabel ping = find("ping", UILabel.class);
         ping.setText("Requested");
 
