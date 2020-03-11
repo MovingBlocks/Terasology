@@ -29,11 +29,14 @@ import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
+import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
+import org.terasology.naming.Name;
 import org.terasology.naming.Version;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -188,6 +191,23 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 }
                 return "";
             }
+
+            @Override
+            public void draw(Module value, Canvas canvas) {
+                if (!validateModuleDependencies(value.getId())) {
+                    canvas.setMode(("invalid"));
+                } else {
+                    canvas.setMode("available");
+                }
+                canvas.drawText(getString(value), canvas.getRegion());
+            }
+
+            @Override
+            public Vector2i getPreferredSize(Module value, Canvas canvas) {
+                String text = getString(value);
+                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                        canvas.getCurrentStyle().getFont().getLineHeight());
+            }
         });
     }
 
@@ -276,6 +296,11 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         });
     }
 
+    private boolean validateModuleDependencies(Name moduleName) {
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        return resolver.resolve(moduleName).isSuccess();
+    }
+
     private void setUpDependencies() {
         dependencies.setList(Collections.emptyList());
         dependencies.setItemRenderer(new AbstractItemRenderer<DependencyInfo>() {
@@ -293,12 +318,17 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 } else {
                     canvas.setMode("available");
                 }
+                Version version = moduleManager.getRegistry().getLatestModuleVersion(value.getId()).getVersion();
+                if (!(value.versionRange().contains(version))) {
+                    canvas.setMode("invalid");
+                }
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
             @Override
             public Vector2i getPreferredSize(DependencyInfo value, Canvas canvas) {
                 String text = getString(value);
+                canvas.getCurrentStyle().setTextColor(Color.RED);
                 return new Vector2i(
                         canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());

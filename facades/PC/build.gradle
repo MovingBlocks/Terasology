@@ -41,7 +41,7 @@ dependencies {
     implementation project(':engine')
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
 
-    /// TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
+    // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     // Dependency on CrashReporter, conditionally either from source or via binary
     File wouldBeSrcPath = new File(rootDir, 'libs/CrashReporter')
     println "Scanning for source CrashReporter at: " + wouldBeSrcPath.getAbsolutePath()
