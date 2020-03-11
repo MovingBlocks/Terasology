@@ -131,6 +131,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             find("customButton", UIButton.class).setFamily("highlight");
             find("onlineButton", UIButton.class).setFamily("default");
             visibleList = customServerList;
+            refresh();
         };
 
         WidgetUtil.trySubscribe(this, "customButton", activateCustom);
@@ -140,6 +141,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             find("customButton", UIButton.class).setFamily("default");
             find("onlineButton", UIButton.class).setFamily("highlight");
             visibleList = onlineServerList;
+            refresh();
         };
         WidgetUtil.trySubscribe(this, "onlineButton", activateOnline);
 
