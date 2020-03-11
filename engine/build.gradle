@@ -264,7 +264,6 @@ jar.dependsOn copyResourcesToClasses
 
 jar.dependsOn createVersionInfoFile
 jar.dependsOn cacheReflections
-//jar.finalizedBy cleanReflections
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //

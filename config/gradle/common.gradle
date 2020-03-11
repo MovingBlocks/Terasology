@@ -93,7 +93,6 @@ test {
     }
 
     jacoco {
-       // append = false
         excludes = ["org.terasology.protobuf.*",
                     "*MethodAccess","*FieldAccess"]
     }
