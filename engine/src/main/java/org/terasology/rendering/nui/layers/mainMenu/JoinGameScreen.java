@@ -475,6 +475,7 @@ public class JoinGameScreen extends CoreScreenLayer {
     private void refreshPing() {
         String address = visibleList.getSelection().getAddress();
         int port = visibleList.getSelection().getPort();
+        String name = visibleList.getSelection().getName();
         UILabel ping = find("ping", UILabel.class);
         ping.setText("Requested");
 
@@ -488,6 +489,8 @@ public class JoinGameScreen extends CoreScreenLayer {
                 }
             } catch (IOException e) {
                 String text = translationSystem.translate("${engine:menu#connection-failed}");
+                // Check if selection name is same as earlier when response is received before updating ping field
+                if (name.equals(visibleList.getSelection().getName()))
                 GameThread.asynch(() -> ping.setText(FontColor.getColored(text, Color.RED)));
             }
         });
