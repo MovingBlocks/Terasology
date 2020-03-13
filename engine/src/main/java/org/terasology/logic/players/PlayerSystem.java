@@ -210,7 +210,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         removeRelevanceEntity(entity);
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = {ClientComponent.class})
+//    @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = {ClientComponent.class})
     public void setSpawnLocationOnRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
         EntityRef character = clientComponent.character;
@@ -228,8 +228,9 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         character.saveComponent(loc);
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, components = {ClientComponent.class})
+    @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = {ClientComponent.class})
     public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
+        setSpawnLocationOnRespawnRequest(event,entity);
         Vector3f spawnPosition = entity.getComponent(LocationComponent.class).getWorldPosition();
 
         if (worldProvider.isBlockRelevant(spawnPosition)) {
