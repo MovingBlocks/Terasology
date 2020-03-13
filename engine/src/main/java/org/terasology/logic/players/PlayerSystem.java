@@ -210,7 +210,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         removeRelevanceEntity(entity);
     }
 
-//    @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = {ClientComponent.class})
+
+
     public void setSpawnLocationOnRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
         EntityRef character = clientComponent.character;
