@@ -31,6 +31,8 @@ import org.terasology.registry.InjectionHelper;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.generator.plugin.WorldGeneratorListenerLibrary;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -82,6 +84,8 @@ public class WorldGeneratorManager {
         }
         Collections.sort(infos);
         generatorInfo = ImmutableList.copyOf(infos);
+        logger.info("\n\nHERE {} \b\b", context.get(WorldGeneratorListenerLibrary.class));
+        logger.info("\n\nHERE {} \b\b", context.get(WorldGeneratorPluginLibrary.class));
     }
 
     public List<WorldGeneratorInfo> getWorldGenerators() {

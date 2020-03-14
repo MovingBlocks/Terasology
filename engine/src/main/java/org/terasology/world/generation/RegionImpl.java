@@ -16,10 +16,12 @@
 package org.terasology.world.generation;
 
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.terasology.math.Region3i;
 import org.terasology.utilities.collection.TypeMap;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,15 +32,39 @@ public class RegionImpl implements Region, GeneratingRegion {
     private final Region3i region;
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
+    private final List<FacetListener> facetListeners;
 
     private final TypeMap<WorldFacet> generatingFacets = TypeMap.create();
     private final Set<FacetProvider> processedProviders = Sets.newHashSet();
     private final TypeMap<WorldFacet> generatedFacets = TypeMap.create();
 
-    public RegionImpl(Region3i region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders) {
+    /**
+     * Add something like a FacetListener, which would be a System that wants to do something after chunk/region
+     * generation and its life would be easier if it had some information about the Facets of each chunk (e.g. what
+     * is the surface height). RegionImpl would be provided with a list of FacetListeners and would notify each of
+     * them when it had provided a facet for a region.
+     * @param region
+     * @param facetProviderChains
+     * @param borders
+     */
+
+    public RegionImpl(Region3i region,
+                      ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains,
+                      Map<Class<? extends WorldFacet>, Border3D> borders) {
         this.region = region;
         this.facetProviderChains = facetProviderChains;
         this.borders = borders;
+        this.facetListeners = Lists.newArrayList();
+    }
+
+    public RegionImpl(Region3i region,
+                      ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains,
+                      Map<Class<? extends WorldFacet>, Border3D> borders,
+                      List<FacetListener> facetListeners) {
+        this.region = region;
+        this.facetProviderChains = facetProviderChains;
+        this.borders = borders;
+        this.facetListeners = facetListeners;
     }
 
     @Override
@@ -51,6 +77,9 @@ public class RegionImpl implements Region, GeneratingRegion {
             });
             facet = generatingFacets.get(dataType);
             generatedFacets.put(dataType, facet);
+            for (FacetListener listener : facetListeners) {
+                listener.notify(this, facet);
+            }
         }
         return facet;
     }

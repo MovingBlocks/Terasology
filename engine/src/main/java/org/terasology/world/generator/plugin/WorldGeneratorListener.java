@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,18 +15,16 @@
  */
 package org.terasology.world.generator.plugin;
 
-import org.terasology.world.generation.FacetProvider;
-import org.terasology.world.generation.FacetProviderPlugin;
-import org.terasology.world.generation.WorldRasterizer;
-import org.terasology.world.generation.WorldRasterizerPlugin;
-
 /**
- * Represents a broad category of {@link Class}es that are relevant for world generation.
- * E.g.:
+ * A category of {@link Class}es that would like to know about certain aspects of world generation, but do not seek
+ * to <em>influence</em> world generation.
+ * <br/>
+ * Some examples may include:
  * <ul>
- * <li>{@link FacetProvider}s via {@link FacetProviderPlugin}</li>
- * <li>{@link WorldRasterizer}s via {@link WorldRasterizerPlugin}</li>
+ *     <li>Wanting to know the surface height to add buildings</li>
+ *     <li>Wanting to know where caves are to spawn monsters in those caves periodically</li>
+ *     <li>Wanting to know where the beaches (areas of sand near water) are to add buried treasure</li>
  * </ul>
  */
-public interface WorldGeneratorPlugin {
+public interface WorldGeneratorListener {
 }

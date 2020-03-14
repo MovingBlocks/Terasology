@@ -16,6 +16,7 @@
 package org.terasology.world.generation;
 
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.terasology.math.Region3i;
 import org.terasology.world.chunks.CoreChunk;
@@ -32,6 +33,7 @@ public class WorldImpl implements World {
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private final List<WorldRasterizer> worldRasterizers;
     private final List<EntityProvider> entityProviders;
+    private final List<FacetListener> facetListeners;
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
     private final int seaLevel;
 
@@ -44,12 +46,27 @@ public class WorldImpl implements World {
         this.worldRasterizers = worldRasterizers;
         this.entityProviders = entityProviders;
         this.borders = borders;
+        this.facetListeners = Lists.newArrayList();
+        this.seaLevel = seaLevel;
+    }
+
+    public WorldImpl(ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains,
+                     List<WorldRasterizer> worldRasterizers,
+                     List<EntityProvider> entityProviders,
+                     Map<Class<? extends WorldFacet>, Border3D> borders,
+                     List<FacetListener> facetListeners,
+                     int seaLevel) {
+        this.facetProviderChains = facetProviderChains;
+        this.worldRasterizers = worldRasterizers;
+        this.entityProviders = entityProviders;
+        this.borders = borders;
+        this.facetListeners = facetListeners;
         this.seaLevel = seaLevel;
     }
 
     @Override
     public Region getWorldData(Region3i region) {
-        return new RegionImpl(region, facetProviderChains, borders);
+        return new RegionImpl(region, facetProviderChains, borders, facetListeners);
     }
 
     @Override
@@ -61,8 +78,10 @@ public class WorldImpl implements World {
     public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer) {
         Region chunkRegion = getWorldData(chunk.getRegion());
         for (WorldRasterizer rasterizer : worldRasterizers) {
+            // chunkRegion can get facets, so maybe I don't need to listen to providers??
             rasterizer.generateChunk(chunk, chunkRegion);
         }
+        // maybe add PostGenerationRegionListener
         for (EntityProvider entityProvider : entityProviders) {
             entityProvider.process(chunkRegion, buffer);
         }
@@ -79,6 +98,8 @@ public class WorldImpl implements World {
         Collection<FacetProvider> facetProviders = new LinkedHashSet<>(facetProviderChains.values());
 
         facetProviders.forEach(FacetProvider::initialize);
+
+        facetListeners.forEach(FacetListener::initialize);
 
         worldRasterizers.forEach(WorldRasterizer::initialize);
 

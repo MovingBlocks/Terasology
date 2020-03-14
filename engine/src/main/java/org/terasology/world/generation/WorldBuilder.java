@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.world.generator.plugin.WorldGeneratorListenerLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import org.terasology.world.zones.ProviderStore;
 import org.terasology.world.zones.Zone;
@@ -47,12 +48,20 @@ public class WorldBuilder extends ProviderStore {
     private final Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
     private final List<EntityProvider> entityProviders = new ArrayList<>();
+    private final List<FacetListener> listenerList = Lists.newArrayList();
     private int seaLevel = 32;
 
     private WorldGeneratorPluginLibrary pluginLibrary;
+    private WorldGeneratorListenerLibrary listenerLibrary;
 
     public WorldBuilder(WorldGeneratorPluginLibrary pluginLibrary) {
         this.pluginLibrary = pluginLibrary;
+    }
+
+    public WorldBuilder(WorldGeneratorPluginLibrary pluginLibrary,
+                        WorldGeneratorListenerLibrary listenerLibrary) {
+        this.pluginLibrary = pluginLibrary;
+        this.listenerLibrary = listenerLibrary;
     }
 
     public WorldBuilder addProvider(FacetProvider provider) {
@@ -75,12 +84,24 @@ public class WorldBuilder extends ProviderStore {
         return this;
     }
 
+    public WorldBuilder addListener(FacetListener listener) {
+        listenerList.add(listener);
+        return this;
+    }
+
     public WorldBuilder addPlugins() {
         pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class).forEach(this::addProvider);
         pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class).forEach(this::addRasterizer);
         pluginLibrary.instantiateAllOfType(EntityProviderPlugin.class).forEach(this::addEntities);
         pluginLibrary.instantiateAllOfType(ZonePlugin.class).forEach(this::addZone);
 
+        return this;
+    }
+
+    public WorldBuilder addListeners() {
+        if (listenerLibrary != null) {
+            listenerLibrary.instantiateAllOfType(FacetProviderListener.class).forEach(this::addListener);
+        }
         return this;
     }
 
@@ -104,7 +125,13 @@ public class WorldBuilder extends ProviderStore {
         }
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
         List<WorldRasterizer> orderedRasterizers = ensureRasterizerOrdering();
-        return new WorldImpl(providerChains, orderedRasterizers, entityProviders, determineBorders(providerChains), seaLevel);
+        return new WorldImpl(
+                providerChains,
+                orderedRasterizers,
+                entityProviders,
+                determineBorders(providerChains),
+                listenerList,
+                seaLevel);
     }
 
     private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains) {
