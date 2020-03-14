@@ -13,3 +13,4 @@ new File(rootDir, 'modules').eachDir { possibleSubprojectDir ->
         println "***** WARNING: Found a module without a build.gradle, corrupt dir? NOT including $subprojectName *****"
     }
 }
+

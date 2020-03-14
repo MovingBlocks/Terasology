@@ -173,6 +173,11 @@ switch(cleanerArgs[0]) {
         }
         break
 
+    case "refresh":
+        println "We're refreshing Gradle for every $itemType"
+        common.refreshGradle()
+        break
+
     default:
         println "UNRECOGNIZED COMMAND '" + cleanerArgs[0] + "' - please try again or use 'groovyw usage' for help"
 }
@@ -230,6 +235,7 @@ def printUsage() {
     println "- 'add-remote (item) (name)' - adds a remote (name) to (item) with the default URL."
     println "- 'add-remote (item) (name) (URL)' - adds a remote with the given URL"
     println "- 'list-remotes (item)' - lists all remotes for (item) "
+    println "- 'refresh' - replaces the Gradle build file for all items of the given type from the latest template"
     println ""
     println "Available flags:"
     println "'-remote [someRemote]' to clone from an alternative remote, also adding the upstream org (like MovingBlocks) repo as 'origin'"

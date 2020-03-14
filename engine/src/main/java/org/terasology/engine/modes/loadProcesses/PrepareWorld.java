@@ -60,7 +60,7 @@ public class PrepareWorld extends VariableStepLoadProcess {
 
     @Override
     public float getProgress() {
-        return Math.max(1f, 5000f / (float) timeElapsed);
+        return (1/Math.max(1f, 5000f / (float) timeElapsed));
     }
 
     @Override

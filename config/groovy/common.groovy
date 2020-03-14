@@ -439,6 +439,23 @@ class common {
     void unCacheItemList() {
         itemListCached = false
     }
+
+    def refreshGradle() {
+        def localItems = []
+        targetDirectory.eachDir() { dir ->
+            String itemName = dir.getName()
+            // Don't consider excluded items
+            if (!(excludedItems.contains(itemName))) {
+                localItems << itemName
+            } else {
+                println "Skipping $dir as it is in the exclude list"
+            }
+        }
+
+        for (String item : localItems) {
+            itemTypeScript.refreshGradle(new File(targetDirectory, item))
+        }
+    }
 }
 
 /**

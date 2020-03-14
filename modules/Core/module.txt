@@ -1,6 +1,6 @@
 {
     "id" : "Core",
-    "version" : "2.2.1-SNAPSHOT",
+    "version" : "3.0.0-SNAPSHOT",
     "displayName" : "Core Content",
     "description" : "This module adds a set of base content for Terasology",
     "dependencies" : [
@@ -10,7 +10,7 @@
       },
       {
         "id": "BiomesAPI",
-        "minVersion": "1.0.0"
+        "minVersion": "3.0.0"
       },
       {
         "id" : "Health",
