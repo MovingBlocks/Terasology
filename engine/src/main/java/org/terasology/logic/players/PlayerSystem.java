@@ -33,6 +33,7 @@ import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.health.BeforeDestroyEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.event.BeforeRespawnEvent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
@@ -210,7 +211,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         removeRelevanceEntity(entity);
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = {ClientComponent.class})
+    @ReceiveEvent(components = {ClientComponent.class})
     public void setSpawnLocationOnRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
         EntityRef character = clientComponent.character;
@@ -226,11 +227,11 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         loc.setWorldPosition(spawnPosition);
         loc.setLocalRotation(new Quat4f());  // reset rotation
         character.saveComponent(loc);
-    }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, components = {ClientComponent.class})
-    public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
-        Vector3f spawnPosition = entity.getComponent(LocationComponent.class).getWorldPosition();
+        BeforeRespawnEvent beforeRespawnEvent = entity.send(new BeforeRespawnEvent(entity));
+        // Implement a listener for BeforeRespawnEvent to modify the default spawn location in a module
+
+        spawnPosition = entity.getComponent(LocationComponent.class).getWorldPosition();
 
         if (worldProvider.isBlockRelevant(spawnPosition)) {
             respawnPlayer(entity);
