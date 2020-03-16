@@ -112,11 +112,9 @@ public final class LocationComponent implements Component, ReplicationCheck {
         output.set(position);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
-            output.mul(parentLoc.scale)
-                .rotate(parentLoc.getLocalRotation())
-                .add(parentLoc.position);
-//            parentLoc.getLocalRotation().rotate(output, output);
-//            output.add(parentLoc.position);
+            output.mul(parentLoc.scale);
+            parentLoc.getLocalRotation().transform(output);
+            output.add(parentLoc.position);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return output;
@@ -138,7 +136,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
         output.set(rotation);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
-            output.mul(parentLoc.rotation, output);
+            parentLoc.rotation.mul(output,output);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return output;
@@ -161,9 +159,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
             this.position.sub(parentLoc.getWorldPosition());
             this.position.mul(1f / parentLoc.getWorldScale());
             this.position.rotate(new Quaternionf(parentLoc.getWorldRotation()).conjugate());
-//            Quaternionf rot = new Quaternionf(0, 0, 0, 1);
-//            rot.inverse(parentLoc.getWorldRotation());
-//            rot.rotate(this.position, this.position);
         }
     }
 
@@ -172,8 +167,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             Quaternionf worldRot = parentLoc.getWorldRotation();
-//            worldRot.inverse();
-            this.rotation.mul(worldRot.conjugate(), this.rotation);
+            worldRot.conjugate().mul(this.rotation,this.rotation);
         }
     }
 

@@ -419,8 +419,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quaternionf rotation) {
         playerCamera.getPosition().set(position);
         Vector3f viewDir = Direction.FORWARD.getVector3f();
-        viewDir.rotate(rotation,playerCamera.getViewingDirection());
-//        rotation.transform(JomlUtil.from(viewDir), playerCamera.getViewingDirection());
+        rotation.transform(viewDir, playerCamera.getViewingDirection());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {
