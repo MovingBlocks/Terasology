@@ -49,6 +49,7 @@ import org.terasology.logic.console.suggesters.CommandNameSuggester;
 import org.terasology.logic.console.suggesters.ScreenSuggester;
 import org.terasology.logic.console.suggesters.SkinSuggester;
 import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
@@ -83,15 +84,10 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import java.util.List;
-import java.util.Set;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Arrays;
 
 /**
  * Adds a series of useful commands to the game. Likely these could be moved to more fitting places over time.
@@ -253,10 +249,29 @@ public class CoreCommands extends BaseComponentSystem {
      * @return List of blocks that match searched string
      */
     private List<String> findBlockMatches(String searchLowercase) {
-        return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
-                .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
-                .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
-                .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
+        ResourceUrn curUrn;
+        List<String> l=new ArrayList<String>();
+        for (ResourceUrn urn : assetManager.getAvailableAssets(BlockFamilyDefinition.class)) {
+            // Current urn for logging purposes to find the broken urn
+            curUrn = urn;
+            try{
+                Optional<BlockFamilyDefinition> def = assetManager.getAsset(urn, BlockFamilyDefinition.class);
+                if (def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get())) {
+                    String s = new BlockUri(def.get().getUrn()).toString();
+                    l.add(s);
+                }
+            }
+            // If a prefab is broken , it will throw an exception
+            catch(Exception e){
+                List<String> EmptyList=new ArrayList<String>();
+                console.addMessage("Note : Search may not return results if invalid assets are present");
+                console.addMessage("Error parsing : "+curUrn.toString());
+                console.addMessage(e.toString());
+                return(EmptyList);
+            }
+        }
+        return l;
+
     }
 
     /**
@@ -523,17 +538,16 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             dir.set(Direction.FORWARD.getVector3f());
         }
-        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
-        Optional<Prefab> prefab = Assets.getPrefab(prefabName);
-        if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
-            entityManager.create(prefab.get(), spawnPos, rotation);
-            return "Done";
-        } else if (!prefab.isPresent()) {
-            return "Unknown prefab";
-        } else {
-            return "Prefab cannot be spawned (no location component)";
-        }
+        return Assets.getPrefab(prefabName).map(prefab -> {
+            LocationComponent loc = prefab.getComponent(LocationComponent.class);
+            if (loc != null) {
+                entityManager.create(prefab, spawnPos);
+                return "Done";
+            } else {
+                return "Prefab cannot be spawned (no location component)";
+            }
+        }).orElse("Unknown prefab");
     }
 
     /**
