@@ -31,11 +31,15 @@ buildscript {
         classpath 'dom4j:dom4j:1.6.1'
 
         //Spotbugs
-        classpath "com.github.spotbugs:spotbugs-gradle-plugin:3.0.0"
+        classpath "com.github.spotbugs:spotbugs:4.0.0"
     }
 }
 
-//detect
+// Handle some logic related to where what is
+sourceSets {
+    main.java.outputDir = new File("$buildDir/classes")
+    test.java.outputDir = new File("$buildDir/testClasses")
+}
 JavaPluginConvention convention = project.getConvention().getPlugin(JavaPluginConvention.class);
 SourceSet mainSourceSet = convention.getSourceSets().getByName("main");
 

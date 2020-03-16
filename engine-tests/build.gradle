@@ -29,6 +29,12 @@ group = 'org.terasology.engine'
 
 println "Version for $project.name loaded as $version for group $group"
 
+sourceSets {
+    // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
+    main.java.outputDir = new File("$buildDir/classes")
+    test.java.outputDir = new File("$buildDir/testClasses")
+}
+
 // Primary dependencies definition
 dependencies {
     // Dependency on the engine itself
@@ -63,3 +69,13 @@ task copyResourcesToClasses(type:Copy) {
 
 //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
 test.dependsOn copyResourcesToClasses
+
+idea {
+    module {
+        // Change around the output a bit
+        inheritOutputDirs = false
+        outputDir = file('build/classes')
+        testOutputDir = file('build/testClasses')
+        downloadSources = true
+    }
+}

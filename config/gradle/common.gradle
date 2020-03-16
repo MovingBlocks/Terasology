@@ -130,7 +130,7 @@ pmd {
 }
 
 spotbugs {
-    toolVersion = '4.0.0-beta4'
+    toolVersion = '4.0.0'
     ignoreFailures = true
     excludeFilter = new File(rootDir, "config/metrics/findbugs/findbugs-exclude.xml")
 }
