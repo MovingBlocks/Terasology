@@ -31,7 +31,7 @@ buildscript {
         classpath 'dom4j:dom4j:1.6.1'
 
         //Spotbugs
-        classpath "com.github.spotbugs:spotbugs:4.0.0"
+        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
     }
 }
 
