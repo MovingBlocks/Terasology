@@ -17,6 +17,7 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Lists;
+import org.joml.Quaternionf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -37,8 +38,8 @@ import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -178,7 +179,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             if (!character.hasComponent(AliveCharacterComponent.class)) {
                 character.addComponent(new AliveCharacterComponent());
             }
-            Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
+            Location.attachChild(character, entity, new Vector3f(), new Quaternionf(0, 0, 0, 1));
         } else {
             character.destroy();
             spawnPlayer(entity);
@@ -224,7 +225,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
         LocationComponent loc = character.getComponent(LocationComponent.class);
         loc.setWorldPosition(spawnPosition);
-        loc.setLocalRotation(new Quat4f());  // reset rotation
+        loc.setLocalRotation(new Quaternionf());  // reset rotation
         character.saveComponent(loc);
     }
 

@@ -42,7 +42,8 @@ import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
@@ -252,15 +253,15 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), RoundingMode.HALF_UP)));
+                    center.set(ChunkMath.calcChunkPos(JomlUtil.round(loc.getWorldPosition(), RoundingMode.HALF_UP)));
                 }
                 Vector3i pos = null;
                 int distance = Integer.MAX_VALUE;
                 for (Vector3i chunkPos : readyChunks.keySet()) {
-                    int chunkDistance = chunkPos.distanceSquared(center);
+                    long chunkDistance = chunkPos.distanceSquared(center);
                     if (pos == null || chunkDistance < distance) {
                         pos = chunkPos;
-                        distance = chunkDistance;
+                        distance = (int) chunkDistance;
                     }
                 }
                 Chunk chunk = readyChunks.remove(pos);
@@ -430,7 +431,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         List<NetData.BlockChangeMessage> blockChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBlockChanges.size());
         queuedOutgoingBlockChanges.drainTo(blockChanges);
         message.addAllBlockChange(blockChanges);
-        
+
         List<NetData.ExtraDataChangeMessage> extraDataChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingExtraDataChanges.size());
         queuedOutgoingExtraDataChanges.drainTo(extraDataChanges);
         message.addAllExtraDataChange(extraDataChanges);

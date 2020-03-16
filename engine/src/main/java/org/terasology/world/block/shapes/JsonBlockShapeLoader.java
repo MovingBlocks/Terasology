@@ -34,8 +34,8 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rotation;
 import org.terasology.math.Transform;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CompoundShape;
 import org.terasology.physics.shapes.ConvexHullShape;
@@ -207,7 +207,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             CompoundShape collisionShape = COLLISION_SHAPE_FACTORY.getNewCompoundShape();
 
             for (ColliderInfo collider : colliders) {
-                Transform transform = new Transform(collider.offset, Rotation.none().getQuat4f(), 1.0f);
+                Transform transform = new Transform(collider.offset, Rotation.none().getQuaternionf(), 1.0f);
                 collisionShape.addChildShape(transform, collider.collisionShape);
             }
             return new ColliderInfo(new Vector3f(), collisionShape);

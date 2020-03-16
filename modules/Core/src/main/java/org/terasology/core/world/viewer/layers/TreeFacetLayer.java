@@ -27,11 +27,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.joml.Vector3ic;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
 import org.terasology.world.generation.Region;
 import org.terasology.world.viewer.layers.AbstractFacetLayer;
 import org.terasology.world.viewer.layers.Renders;
@@ -57,10 +58,10 @@ public class TreeFacetLayer extends AbstractFacetLayer {
         Graphics2D g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        for (Entry<BaseVector3i, TreeGenerator> entry : treeFacet.getRelativeEntries().entrySet()) {
+        for (Entry<Vector3ic, TreeGenerator> entry : treeFacet.getRelativeEntries().entrySet()) {
             TreeGenerator treeGen = entry.getValue();
-            int wx = entry.getKey().getX();
-            int wz = entry.getKey().getZ();
+            int wx = entry.getKey().x();
+            int wz = entry.getKey().z();
             int r = radiusFunc.apply(treeGen);
             Color color = colorFunc.apply(treeGen);
 
@@ -88,11 +89,11 @@ public class TreeFacetLayer extends AbstractFacetLayer {
         Vector2f relCursor = new Vector2f(rx, rz);
         CirclePicker<TreeGenerator> picker = new CirclePickerAll<>(relCursor, radiusFunc);
 
-        for (Entry<BaseVector3i, TreeGenerator> entry : treeFacet.getRelativeEntries().entrySet()) {
+        for (Entry<Vector3ic, TreeGenerator> entry : treeFacet.getRelativeEntries().entrySet()) {
             TreeGenerator treeGen = entry.getValue();
-            BaseVector3i treePos = entry.getKey();
+            Vector3ic treePos = entry.getKey();
 
-            picker.offer(treePos.getX(), treePos.getZ(), treeGen);
+            picker.offer(treePos.x(), treePos.z(), treeGen);
         }
 
         Set<TreeGenerator> picked = picker.getAll();

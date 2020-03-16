@@ -15,7 +15,7 @@
  */
 package org.terasology.world.propagation;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.ChunkViewCore;
 

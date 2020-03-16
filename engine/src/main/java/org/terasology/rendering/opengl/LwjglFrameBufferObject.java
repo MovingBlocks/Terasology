@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.opengl;
 
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -41,11 +43,11 @@ import static org.lwjgl.opengl.GL11.glOrtho;
  */
 public class LwjglFrameBufferObject implements FrameBufferObject {
     private int frame;
-    private ImmutableVector2i size;
+    private Vector2i size;
     private IntBuffer vp;
 
-    public LwjglFrameBufferObject(ResourceUrn urn, BaseVector2i size) {
-        this.size = ImmutableVector2i.createOrUse(size);
+    public LwjglFrameBufferObject(ResourceUrn urn, Vector2ic size) {
+        this.size = new Vector2i(size);
 
         IntBuffer fboId = BufferUtils.createIntBuffer(1);
         GL30.glGenFramebuffers(fboId);

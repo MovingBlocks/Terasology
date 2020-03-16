@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Rect2i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.rendering.nui.Color;

@@ -15,6 +15,7 @@
  */
 package org.terasology.physics.shapes;
 
+import org.joml.Quaternionf;
 import org.terasology.math.AABB;
 import org.terasology.math.Transform;
 import org.terasology.math.geom.Quat4f;
@@ -37,5 +38,5 @@ public interface CollisionShape {
      * @param rot The quaternion representation of the rotation.
      * @return The rotated shape.
      */
-    CollisionShape rotate(Quat4f rot);
+    CollisionShape rotate(Quaternionf rot);
 }

@@ -33,7 +33,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.utilities.collection.CircularBuffer;

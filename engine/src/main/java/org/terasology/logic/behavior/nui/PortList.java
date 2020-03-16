@@ -16,7 +16,7 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.Canvas;
 
 import java.util.ArrayList;

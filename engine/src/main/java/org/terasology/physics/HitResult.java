@@ -17,8 +17,9 @@
 package org.terasology.physics;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.terasology.math.JomlUtil;
 
 import java.math.RoundingMode;
 
@@ -53,7 +54,7 @@ public class HitResult {
         this.hitPoint = hitPoint;
         this.hitNormal = hitNormal;
         //This is the block were the hitPoint is inside:
-        this.blockPosition = new Vector3i(hitPoint, RoundingMode.HALF_UP);
+        this.blockPosition = JomlUtil.round(hitPoint, RoundingMode.HALF_UP);
         this.worldHit = false;
     }
 

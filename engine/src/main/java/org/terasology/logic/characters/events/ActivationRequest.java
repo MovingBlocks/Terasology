@@ -17,7 +17,7 @@
 package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 

@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.layouts;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;
 

@@ -130,10 +130,10 @@ public class LightShaftsNode extends ConditionDependentNode {
         // This is a temporary solution to sun causing light shafts even at night.
 
         if (days < 0.25f || days > 0.75f) {
-            sunDirection = JomlUtil.from(backdropProvider.getSunDirection(true));
+            sunDirection = backdropProvider.getSunDirection(true);
             exposure = exposureNight;
         } else {
-            sunDirection = JomlUtil.from(backdropProvider.getSunDirection(false));
+            sunDirection = backdropProvider.getSunDirection(false);
             exposure = exposureDay;
         }
 

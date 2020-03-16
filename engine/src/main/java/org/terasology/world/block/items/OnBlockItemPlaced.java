@@ -17,7 +17,7 @@ package org.terasology.world.block.items;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 
 /**
  * This event gets called whenever a block item is placed in the world

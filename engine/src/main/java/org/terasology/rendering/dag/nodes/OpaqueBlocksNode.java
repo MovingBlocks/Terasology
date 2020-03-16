@@ -194,7 +194,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
             if (chunk.hasMesh()) {
                 final ChunkMesh chunkMesh = chunk.getMesh();
-                final Vector3f chunkPosition = JomlUtil.from(chunk.getPosition().toVector3f());
+                final Vector3f chunkPosition = new Vector3f(chunk.getPosition());
 
                 chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
                 numberOfRenderedTriangles += chunkMesh.render(OPAQUE, chunkPosition, cameraPosition);

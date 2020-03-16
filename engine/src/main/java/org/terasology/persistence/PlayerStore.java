@@ -16,7 +16,7 @@
 package org.terasology.persistence;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 /**
  */

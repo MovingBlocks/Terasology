@@ -16,6 +16,7 @@
 package org.terasology.input.lwjgl;
 
 import com.google.common.collect.Queues;
+import org.joml.Vector2f;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.config.Config;
@@ -25,10 +26,12 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.InputType;
 import org.terasology.input.device.MouseAction;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
+import org.terasology.math.JomlUtil;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.math.RoundingMode;
 import java.util.Queue;
 
 /**
@@ -46,7 +49,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
 
     @Override
     public Vector2i getPosition() {
-        return new Vector2i(Mouse.getX() / this.uiScale, (Display.getHeight() - Mouse.getY()) / this.uiScale);
+        return JomlUtil.round(new Vector2f(Mouse.getX() / this.uiScale, (Display.getHeight() - Mouse.getY()) / this.uiScale), RoundingMode.FLOOR);
     }
 
     @Override

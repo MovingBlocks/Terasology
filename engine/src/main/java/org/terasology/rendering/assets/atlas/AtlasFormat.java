@@ -27,9 +27,10 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
@@ -109,10 +110,10 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
         Vector2f min = new Vector2f((float) freeform.getMin().x / size.x, (float) freeform.getMin().y / size.y);
         if (freeform.getSize() != null) {
             Vector2f itemSize = new Vector2f((float) freeform.getSize().x / size.x, (float) freeform.getSize().y / size.y);
-            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndSize(min, itemSize)));
+            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndSize(JomlUtil.from(min), JomlUtil.from(itemSize))));
         } else if (freeform.getMax() != null) {
             Vector2f max = new Vector2f((float) freeform.getMax().x / size.x, (float) freeform.getMax().y / size.y);
-            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndMax(min, max)));
+            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndMax(JomlUtil.from(min), JomlUtil.from(max))));
         }
     }
 

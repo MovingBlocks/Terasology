@@ -18,7 +18,7 @@ package org.terasology.network.internal;
 
 import com.google.protobuf.ByteString;
 import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.protobuf.NetData;
 
 import java.math.BigInteger;

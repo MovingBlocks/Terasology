@@ -19,8 +19,8 @@ import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.nui.ActivatableWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -101,7 +101,7 @@ public class UIList<T> extends ActivatableWidget {
             yOffset += preferredSize.y - 1 / (double) optionListeners.size();
 
             if (i == list.get().size() - 1) {
-                itemSize = preferredSize.getY();
+                itemSize = preferredSize.y();
                 canvasSize = canvas.size().y;
             }
         }

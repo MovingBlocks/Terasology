@@ -20,8 +20,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -77,19 +77,19 @@ public class Vector3iTest {
         assertEquals(3, v.z);
     }
 
-    @Test
-    public void testOffsetConstructor() {
-        Vector3f vOrig = new Vector3f(0.1f, 0.6f, 7.2f);
-        Vector3i v = new Vector3i(vOrig, 0.5f);
-        assertEquals(new Vector3i(0, 1, 7), v);
-    }
-
-    @Test
-    public void testOffsetConstructorWithNegatives() {
-        Vector3f vOrig = new Vector3f(-0.1f, -0.6f, -1.4f);
-        Vector3i v = new Vector3i(vOrig, 0.5f);
-        assertEquals(new Vector3i(0, -1, -1), v);
-    }
+//    @Test
+//    public void testOffsetConstructor() {
+//        Vector3f vOrig = new Vector3f(0.1f, 0.6f, 7.2f);
+//        Vector3i v = new Vector3i(vOrig, 0.5f);
+//        assertEquals(new Vector3i(0, 1, 7), v);
+//    }
+//
+//    @Test
+//    public void testOffsetConstructorWithNegatives() {
+//        Vector3f vOrig = new Vector3f(-0.1f, -0.6f, -1.4f);
+//        Vector3i v = new Vector3i(vOrig, 0.5f);
+//        assertEquals(new Vector3i(0, -1, -1), v);
+//    }
 
     @Test
     public void testCopyConstructor() {
@@ -154,12 +154,12 @@ public class Vector3iTest {
 
     @Test
     public void testManhattanDistance() {
-        assertEquals(0, Vector3i.zero().gridDistance(Vector3i.zero()));
-        assertEquals(1, Vector3i.zero().gridDistance(Vector3i.west()));
-        assertEquals(1, Vector3i.zero().gridDistance(Vector3i.up()));
-        assertEquals(1, Vector3i.zero().gridDistance(Vector3i.north()));
-        assertEquals(3, Vector3i.zero().gridDistance(Vector3i.one()));
-        assertEquals(3, Vector3i.zero().gridDistance(new Vector3i(1, -1, 1)));
+        assertEquals(0, new Vector3i().gridDistance(new Vector3i()));
+        assertEquals(1, new Vector3i().gridDistance(new Vector3i(1,0,0)));
+        assertEquals(1, new Vector3i().gridDistance(new Vector3i(0,1,0)));
+        assertEquals(1, new Vector3i().gridDistance(new Vector3i(0,0,1)));
+        assertEquals(3, new Vector3i().gridDistance(new Vector3i(1,1,1)));
+        assertEquals(3, new Vector3i().gridDistance(new Vector3i(1, -1, 1)));
     }
 
     @Test

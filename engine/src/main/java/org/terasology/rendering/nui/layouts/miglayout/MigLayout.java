@@ -24,8 +24,8 @@ import net.miginfocom.layout.ConstraintParser;
 import net.miginfocom.layout.ContainerWrapper;
 import net.miginfocom.layout.Grid;
 import net.miginfocom.layout.LC;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreLayout;
@@ -185,7 +185,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
     @Override
     public Vector2i getMaxContentSize(Canvas canvas) {
-        return getPreferredContentSize(canvas, Vector2i.zero());
+        return getPreferredContentSize(canvas, new Vector2i());
     }
 
     private ComponentWrapper getWrapper(UIWidget comp) {

@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.world.selection;
 
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.JomlUtil;
 import org.terasology.utilities.Assets;
 import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
@@ -66,10 +66,10 @@ public class BlockSelectionRenderer {
 
     private void initialize() {
         Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), textureRegion.min(), textureRegion.size(), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), JomlUtil.from(textureRegion.min()), JomlUtil.from(textureRegion.size()), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
         tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), textureRegion.min(), textureRegion.size(), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), JomlUtil.from(textureRegion.min()), JomlUtil.from(textureRegion.size()), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh2 = tessellator.generateMesh();
         defaultTextured = Assets.getMaterial("engine:prog.defaultTextured").get();
     }
@@ -137,7 +137,7 @@ public class BlockSelectionRenderer {
     }
 
     private Vector3f getCameraPosition() {
-        return JomlUtil.from(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
+        return CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
     }
 
 }

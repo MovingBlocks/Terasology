@@ -19,6 +19,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Objects;
 
+import org.joml.Vector2ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.utilities.Assets;
@@ -95,7 +96,7 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
         Border3D border = region.getBorderForFacet(SurfaceHeightFacet.class);
         SurfaceHeightFacet facet = new SurfaceHeightFacet(region.getRegion(), border);
 
-        for (BaseVector2i pos : facet.getWorldRegion().contents()) {
+        for (Vector2ic pos : facet.getWorldRegion().contents()) {
             int xzScale = configuration.terrainScale;
 
             int mapX0;
@@ -104,14 +105,14 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
             int mapZ1;
             switch (configuration.wrapMode) {
                 case CLAMP:
-                    mapX0 = TeraMath.clamp(pos.getX(), 0, mapWidth * xzScale - 1) / xzScale;
-                    mapZ0 = TeraMath.clamp(pos.getY(), 0, mapHeight * xzScale - 1) / xzScale;
+                    mapX0 = TeraMath.clamp(pos.x(), 0, mapWidth * xzScale - 1) / xzScale;
+                    mapZ0 = TeraMath.clamp(pos.y(), 0, mapHeight * xzScale - 1) / xzScale;
                     mapX1 = TeraMath.clamp(mapX0 + 1, 0, mapWidth - 1);
                     mapZ1 = TeraMath.clamp(mapZ0 + 1, 0, mapHeight - 1);
                     break;
                 case REPEAT:
-                    mapX0 = IntMath.mod(pos.getX(), mapWidth * xzScale) / xzScale;
-                    mapZ0 = IntMath.mod(pos.getY(), mapHeight * xzScale) / xzScale;
+                    mapX0 = IntMath.mod(pos.x(), mapWidth * xzScale) / xzScale;
+                    mapZ0 = IntMath.mod(pos.y(), mapHeight * xzScale) / xzScale;
                     mapX1 = IntMath.mod(mapX0 + 1, mapWidth);
                     mapZ1 = IntMath.mod(mapZ0 + 1, mapHeight);
                     break;
@@ -124,8 +125,8 @@ public class HeightMapSurfaceHeightProvider implements ConfigurableFacetProvider
             double p11 = heightmap[mapX1][mapZ1];
             double p01 = heightmap[mapX0][mapZ1];
 
-            float relX = IntMath.mod(pos.getX(), xzScale) / (float) xzScale;
-            float relZ = IntMath.mod(pos.getY(), xzScale) / (float) xzScale;
+            float relX = IntMath.mod(pos.x(), xzScale) / (float) xzScale;
+            float relZ = IntMath.mod(pos.y(), xzScale) / (float) xzScale;
 
             float interpolatedHeight = (float) lerp(relX, lerp(relZ, p00, p01), lerp(relZ, p10, p11));
             float height = configuration.heightOffset + configuration.heightScale * interpolatedHeight;

@@ -15,10 +15,9 @@
  */
 package org.terasology.rendering.nui.events;
 
+import org.joml.Vector2i;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.math.geom.Vector2i;
-
 
 /**
  * Base class for mouse related input events that the NUI manager is working with.

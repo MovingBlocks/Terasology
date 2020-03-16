@@ -19,9 +19,9 @@ import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.LayoutConfig;
@@ -134,7 +134,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
             if (autoSizeRows) {
                 for (ColumnInfo column : columnInfos) {
                     for (int row = 0; row < column.widgetSizes.size(); row++) {
-                        minHeights[row] = Math.max(minHeights[row], column.widgetSizes.get(row).getY());
+                        minHeights[row] = Math.max(minHeights[row], column.widgetSizes.get(row).y());
                     }
                 }
 
@@ -221,7 +221,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
                 size.x += horizontalSpacing;
             }
             for (int i = 0; i < columnInfo.widgetSizes.size(); ++i) {
-                rowSizes[i] = Math.max(rowSizes[i], columnInfo.widgetSizes.get(i).getY());
+                rowSizes[i] = Math.max(rowSizes[i], columnInfo.widgetSizes.get(i).y());
             }
         }
         for (int rowSize : rowSizes) {

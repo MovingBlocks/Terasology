@@ -16,12 +16,12 @@
 
 package org.terasology.math;
 
+import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.lwjgl.BufferUtils;
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 import java.nio.FloatBuffer;
 
@@ -94,6 +94,28 @@ public final class MatrixUtils {
         return fb;
     }
 
+    public static FloatBuffer matrixToFloatBuffer(Matrix4fc m, FloatBuffer fb) {
+        fb.put(m.m00());
+        fb.put(m.m10());
+        fb.put(m.m20());
+        fb.put(m.m30());
+        fb.put(m.m01());
+        fb.put(m.m11());
+        fb.put(m.m21());
+        fb.put(m.m31());
+        fb.put(m.m02());
+        fb.put(m.m12());
+        fb.put(m.m22());
+        fb.put(m.m32());
+        fb.put(m.m03());
+        fb.put(m.m13());
+        fb.put(m.m23());
+        fb.put(m.m33());
+        fb.flip();
+        return fb;
+    }
+
+
     /**
      * Copies the given matrix into an existing FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).
@@ -103,22 +125,22 @@ public final class MatrixUtils {
      * @return The provided float buffer.
      */
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
-        fb.put(m.m00);
-        fb.put(m.m10);
-        fb.put(m.m20);
-        fb.put(m.m30);
-        fb.put(m.m01);
-        fb.put(m.m11);
-        fb.put(m.m21);
-        fb.put(m.m31);
-        fb.put(m.m02);
-        fb.put(m.m12);
-        fb.put(m.m22);
-        fb.put(m.m32);
-        fb.put(m.m03);
-        fb.put(m.m13);
-        fb.put(m.m23);
-        fb.put(m.m33);
+        fb.put(m.m00());
+        fb.put(m.m10());
+        fb.put(m.m20());
+        fb.put(m.m30());
+        fb.put(m.m01());
+        fb.put(m.m11());
+        fb.put(m.m21());
+        fb.put(m.m31());
+        fb.put(m.m02());
+        fb.put(m.m12());
+        fb.put(m.m22());
+        fb.put(m.m32());
+        fb.put(m.m03());
+        fb.put(m.m13());
+        fb.put(m.m23());
+        fb.put(m.m33());
 
         fb.flip();
         return fb;
@@ -243,15 +265,15 @@ public final class MatrixUtils {
 
     public static Matrix3f calcNormalMatrix(Matrix4f mv) {
         Matrix3f result = new Matrix3f();
-        result.m00 = mv.m00;
-        result.m10 = mv.m10;
-        result.m20 = mv.m20;
-        result.m01 = mv.m01;
-        result.m11 = mv.m11;
-        result.m21 = mv.m21;
-        result.m02 = mv.m02;
-        result.m12 = mv.m12;
-        result.m22 = mv.m22;
+        result.m00 = mv.m00();
+        result.m10 = mv.m10();
+        result.m20 = mv.m20();
+        result.m01 = mv.m01();
+        result.m11 = mv.m11();
+        result.m21 = mv.m21();
+        result.m02 = mv.m02();
+        result.m12 = mv.m12();
+        result.m22 = mv.m22();
 
         result.invert();
         result.transpose();

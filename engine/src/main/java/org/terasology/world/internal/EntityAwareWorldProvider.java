@@ -42,9 +42,10 @@ import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -213,7 +214,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getBlockEntityAt(Vector3f position) {
-        Vector3i pos = new Vector3i(position, RoundingMode.HALF_UP);
+        Vector3i pos = JomlUtil.round(position, RoundingMode.HALF_UP);
         return getBlockEntityAt(pos);
     }
 
@@ -325,7 +326,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
         EntityBuilder builder = entityManager.newBuilder(block.getPrefab().orElse(null));
-        builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
+        builder.addComponent(new LocationComponent(new Vector3f(blockPosition)));
         builder.addComponent(new BlockComponent(block, blockPosition));
         boolean isTemporary = isTemporaryBlock(builder, block);
         if (!isTemporary && !builder.hasComponent(NetworkComponent.class)) {

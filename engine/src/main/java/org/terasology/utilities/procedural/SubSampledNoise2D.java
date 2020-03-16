@@ -17,10 +17,10 @@ package org.terasology.utilities.procedural;
 
 import com.google.common.math.IntMath;
 
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 
 /**
  * @deprecated Use {@link SubSampledNoise} instead
@@ -68,7 +68,7 @@ public class SubSampledNoise2D implements Noise2D {
             float[] result = new float[subRegion.size().x * subRegion.size().y];
             Vector2i offset = new Vector2i(subRegion.minX() - fullRegion.minX(), subRegion.minY() - fullRegion.minY());
             for (int y = 0; y < subRegion.size().y; ++y) {
-                System.arraycopy(fullData, offset.getX() + fullRegion.size().x * (y + offset.getY()), result, subRegion.size().x * y, subRegion.size().x);
+                System.arraycopy(fullData, offset.x() + fullRegion.size().x * (y + offset.y()), result, subRegion.size().x * y, subRegion.size().x);
             }
             return result;
         } else {

@@ -31,8 +31,8 @@ import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.event.DoDamageEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
@@ -131,7 +131,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
                     EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     // allow explosions to chain together,  but do not chain on the instigating block
                     if (!blockEntity.equals(instigatingBlockEntity) && blockEntity.hasComponent(ExplosionActionComponent.class)) {
-                        doExplosion(blockEntity.getComponent(ExplosionActionComponent.class), blockPos.toVector3f(), blockEntity);
+                        doExplosion(blockEntity.getComponent(ExplosionActionComponent.class), new Vector3f(blockPos), blockEntity);
                     } else {
                         blockEntity.send(new DoDamageEvent(explosionComp.damageAmount, explosionComp.damageType));
                     }
@@ -165,7 +165,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
                 // always destroy the block that caused the explosion
                 worldProvider.setBlock(blockComponent.position, blockManager.getBlock(BlockManager.AIR_ID));
                 // create the explosion from the block's location
-                doExplosion(explosionActionComponent, blockComponent.position.toVector3f(), entityRef);
+                doExplosion(explosionActionComponent, new Vector3f(blockComponent.position), entityRef);
             } else if (entityRef.hasComponent(LocationComponent.class)) {
                 // get the position of the non-block entity to make it explode from there
                 Vector3f position = entityRef.getComponent(LocationComponent.class).getWorldPosition();

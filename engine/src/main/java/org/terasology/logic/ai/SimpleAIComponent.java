@@ -16,7 +16,7 @@
 package org.terasology.logic.ai;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 /**
  */

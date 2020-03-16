@@ -15,9 +15,10 @@
  */
 package org.terasology.world.block.shapes;
 
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkVertexFlag;
 
@@ -40,7 +41,7 @@ public class BlockMeshPart {
     public BlockMeshPart(Vector3f[] vertices, Vector3f[] normals, Vector2f[] texCoords, int[] indices) {
         this(vertices, normals, texCoords, indices, 1);
     }
-    
+
     private BlockMeshPart(Vector3f[] vertices, Vector3f[] normals, Vector2f[] texCoords, int[] indices, int texFrames) {
         this.vertices = Arrays.copyOf(vertices, vertices.length);
         this.normals = Arrays.copyOf(normals, normals.length);
@@ -72,7 +73,7 @@ public class BlockMeshPart {
     public int getIndex(int i) {
         return indices[i];
     }
-    
+
     public int getTexFrames() {
         return texFrames;
     }
@@ -116,13 +117,13 @@ public class BlockMeshPart {
         }
     }
 
-    public BlockMeshPart rotate(Quat4f rotation) {
+    public BlockMeshPart rotate(Quaternionf rotation) {
         Vector3f[] newVertices = new Vector3f[vertices.length];
         Vector3f[] newNormals = new Vector3f[normals.length];
 
         for (int i = 0; i < newVertices.length; ++i) {
-            newVertices[i] = rotation.rotate(vertices[i], new Vector3f());
-            newNormals[i] = rotation.rotate(normals[i], new Vector3f());
+            newVertices[i] = vertices[i].rotate(rotation,new Vector3f());
+            newNormals[i] = normals[i].rotate(rotation,new Vector3f());
             newNormals[i].normalize();
         }
 

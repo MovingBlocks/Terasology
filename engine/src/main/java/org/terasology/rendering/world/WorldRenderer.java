@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.world;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;

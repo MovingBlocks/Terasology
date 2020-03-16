@@ -17,7 +17,7 @@
 package org.terasology.physics.engine;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.Physics;
 import org.terasology.physics.shapes.CollisionShapeFactory;

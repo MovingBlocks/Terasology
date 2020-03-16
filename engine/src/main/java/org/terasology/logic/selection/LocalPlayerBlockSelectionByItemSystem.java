@@ -25,13 +25,16 @@ import org.terasology.input.events.LeftMouseDownButtonEvent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.world.selection.BlockSelectionComponent;
 import org.terasology.world.selection.event.SetBlockSelectionEndingPointEvent;
 import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
+
+import java.math.RoundingMode;
 
 /**
  * System to allow the use of BlockSelectionComponents. This system is a client only system, though no other player
@@ -98,7 +101,7 @@ public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
         if (blockSelectionComponent.isMovable) {
             Region3i region = blockSelectionComponent.currentSelection;
 
-            blockSelectionComponent.currentSelection = Region3i.createFromCenterExtents(new Vector3i(targetLocation.x, targetLocation.y, targetLocation.z),
+            blockSelectionComponent.currentSelection = Region3i.createFromCenterExtents(JomlUtil.round(targetLocation, RoundingMode.FLOOR),
                     new Vector3i(region.sizeX()/2, 0, region.sizeZ()/2));
             blockSelectionComponentEntity.saveComponent(blockSelectionComponent);
 

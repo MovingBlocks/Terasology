@@ -20,8 +20,8 @@ import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
@@ -133,8 +133,8 @@ public class UITreeView<T> extends CoreWidget {
 
             // Calculate the node's height and overall region.
             int nodeHeight = canvas.getCurrentStyle().getMargin()
-                .grow(itemRenderer.getPreferredSize(node.getValue(), canvas).addX(node.getDepth() * levelIndent.get()))
-                .getY();
+                .grow(itemRenderer.getPreferredSize(node.getValue(), canvas).add(node.getDepth() * levelIndent.get(),0))
+                .y();
 
             Rect2i nodeRegion = Rect2i.createFromMinAndSize((node.getDepth() + 1) * levelIndent.get(),
                 currentHeight,
@@ -190,14 +190,14 @@ public class UITreeView<T> extends CoreWidget {
             Tree<T> node = model.get().getNode(i);
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin()
                 .grow(itemRenderer.getPreferredSize(node.getValue(), canvas)
-                    .addX(node.getDepth() * levelIndent.get()));
+                    .add(node.getDepth() * levelIndent.get(),0));
             result.x = Math.max(result.x, preferredSize.x);
             result.y += preferredSize.y;
         }
         model.get().setEnumerateExpandedOnly(true);
 
         // Account for the expand/contract button!
-        result.addX(levelIndent.get());
+        result.add(levelIndent.get(),0);
 
         return result;
     }

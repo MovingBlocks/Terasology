@@ -21,7 +21,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.rendering.openvrprovider.ControllerListener;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
@@ -33,8 +33,8 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
 
     @Owns
     public EntityRef mountPointEntity = EntityRef.NULL;
-    public Vector3f rotateDegrees = Vector3f.zero();
-    public Vector3f translate = Vector3f.zero();
+    public Vector3f rotateDegrees = new Vector3f();
+    public Vector3f translate = new Vector3f();
     public Quat4f rotationQuaternion;
     public float scale = 1f;
 

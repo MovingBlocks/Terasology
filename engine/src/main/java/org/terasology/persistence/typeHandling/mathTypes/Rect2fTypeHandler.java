@@ -17,8 +17,9 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
@@ -45,8 +46,8 @@ public class Rect2fTypeHandler extends TypeHandler<Rect2f> {
     public PersistedData serializeNonNull(Rect2f value, PersistedDataSerializer serializer) {
         Map<String, PersistedData> map = Maps.newLinkedHashMap();
 
-        map.put(MIN_FIELD, vector2fTypeHandler.serialize(value.min(), serializer));
-        map.put(SIZE_FIELD, vector2fTypeHandler.serialize(value.size(), serializer));
+        map.put(MIN_FIELD, vector2fTypeHandler.serialize(JomlUtil.from(value.min()), serializer));
+        map.put(SIZE_FIELD, vector2fTypeHandler.serialize(JomlUtil.from(value.size()), serializer));
 
         return serializer.serialize(map);
     }
@@ -62,7 +63,7 @@ public class Rect2fTypeHandler extends TypeHandler<Rect2f> {
             Vector2f size = vector2fTypeHandler.deserializeOrThrow(map.get(SIZE_FIELD),
                     "Could not deserialize Rect2f." + SIZE_FIELD);
 
-            return Optional.ofNullable(Rect2f.createFromMinAndSize(min, size));
+            return Optional.ofNullable(Rect2f.createFromMinAndSize(JomlUtil.from(min),JomlUtil.from(size)));
         }
         return Optional.empty();
     }

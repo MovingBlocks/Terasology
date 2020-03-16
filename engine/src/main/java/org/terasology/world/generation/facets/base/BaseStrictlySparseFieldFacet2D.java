@@ -17,7 +17,7 @@ package org.terasology.world.generation.facets.base;
 
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.world.generation.Border3D;
 
 import java.util.*;
@@ -26,7 +26,7 @@ import java.util.*;
  * A strictly-sparse (not necessarily defined at all points) alternative to {@link BaseFieldFacet2D}
  */
 public abstract class BaseStrictlySparseFieldFacet2D extends BaseSparseFacet2D {
-    private HashMap<BaseVector2i, Float> data = new HashMap<>();
+    private HashMap<Vector2i, Float> data = new HashMap<>();
 
     public BaseStrictlySparseFieldFacet2D(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
@@ -36,7 +36,7 @@ public abstract class BaseStrictlySparseFieldFacet2D extends BaseSparseFacet2D {
         return get(new Vector2i(x, y));
     }
 
-    public Optional<Float> get(BaseVector2i pos) {
+    public Optional<Float> get(Vector2i pos) {
         validateCoord(pos.x(), pos.y(), getRelativeRegion());
 
         return Optional.ofNullable(data.getOrDefault(pos, null));
@@ -56,7 +56,7 @@ public abstract class BaseStrictlySparseFieldFacet2D extends BaseSparseFacet2D {
         set(new Vector2i(x, y), value);
     }
 
-    public void set(BaseVector2i pos, float value) {
+    public void set(Vector2i pos, float value) {
         validateCoord(pos.x(), pos.y(), getRelativeRegion());
 
         data.put(pos, value);
@@ -76,7 +76,7 @@ public abstract class BaseStrictlySparseFieldFacet2D extends BaseSparseFacet2D {
         unset(new Vector2i(x, y));
     }
 
-    public void unset(BaseVector2i pos) {
+    public void unset(Vector2i pos) {
         validateCoord(pos.x(), pos.y(), getRelativeRegion());
 
         data.remove(pos);

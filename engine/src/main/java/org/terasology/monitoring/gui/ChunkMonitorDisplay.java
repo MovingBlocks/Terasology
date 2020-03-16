@@ -24,7 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
@@ -48,6 +49,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
+import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -162,7 +164,7 @@ public class ChunkMonitorDisplay extends JPanel {
     private Vector3i calcPlayerChunkPos() {
         final LocalPlayer p = CoreRegistry.get(LocalPlayer.class);
         if (p != null) {
-            return ChunkMath.calcChunkPos(new Vector3i(p.getPosition()));
+            return ChunkMath.calcChunkPos(JomlUtil.round(p.getPosition(), RoundingMode.FLOOR));
         }
         return null;
     }

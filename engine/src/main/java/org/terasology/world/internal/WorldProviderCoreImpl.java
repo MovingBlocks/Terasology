@@ -27,7 +27,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
@@ -249,7 +249,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
         return result;
     }
-    
+
     private void setDirtyChunksNear(Vector3i pos0) {
         for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(pos0, 1)) {
             RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
@@ -268,7 +268,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
         }
     }
-    
+
     private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
         // TODO: Change to match block , if those changes are made.
         synchronized (listeners) {

@@ -33,8 +33,8 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.utilities.Assets;
@@ -83,7 +83,7 @@ public class TrunkSystem extends BaseComponentSystem {
         }
 
         Vector3f offset = new Vector3f(event.getHitPosition());
-        offset.sub(targetBlockComp.position.toVector3f());
+        offset.sub(new Vector3f(targetBlockComp.position));
         Side offsetDir = Side.inDirection(offset);
 
         Vector3i primePos = new Vector3i(targetBlockComp.position);
@@ -141,8 +141,8 @@ public class TrunkSystem extends BaseComponentSystem {
             EntityRef newTrunk = entityManager.create(trunk.trunkRegionPrefab);
             entity.removeComponent(MeshComponent.class);
             newTrunk.addComponent(new BlockRegionComponent(Region3i.createBounded(leftBlockPos, rightBlockPos)));
-            Vector3f doorCenter = leftBlockPos.toVector3f();
-            doorCenter.add(rightBlockPos.sub(leftBlockPos).toVector3f());
+            Vector3f doorCenter = new Vector3f(leftBlockPos);
+            doorCenter.add(new Vector3f(rightBlockPos.sub(leftBlockPos)));
             newTrunk.addComponent(new LocationComponent(doorCenter));
             TrunkComponent newDoorComp = newTrunk.getComponent(TrunkComponent.class);
             newTrunk.saveComponent(newDoorComp);

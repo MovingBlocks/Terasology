@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.LayoutConfig;
@@ -104,7 +104,7 @@ public class UIRadialSection extends WidgetWithOrder {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return sectionRegion == null ? Vector2i.zero() : sectionRegion.size();
+        return sectionRegion == null ? new Vector2i() : sectionRegion.size();
     }
 
     /**

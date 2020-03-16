@@ -16,7 +16,7 @@
 package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.block.Block;
 
 /**

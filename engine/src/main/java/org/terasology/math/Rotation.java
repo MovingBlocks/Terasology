@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Quat4f;
 import java.util.Arrays;
 import java.util.List;
@@ -183,8 +184,8 @@ public final class Rotation {
         return roll;
     }
 
-    public Quat4f getQuat4f() {
-        Quat4f rotation = new Quat4f(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
+    public Quaternionf getQuaternionf() {
+        Quaternionf rotation = new Quaternionf().rotationYXZ(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
         rotation.normalize();
         return rotation;
     }

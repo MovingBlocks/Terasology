@@ -17,7 +17,7 @@
 package org.terasology.world.block.tiles;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
 import org.terasology.module.sandbox.API;
 
 /**

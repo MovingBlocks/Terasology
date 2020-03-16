@@ -23,7 +23,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.particles.ParticlePool;
 import org.terasology.particles.ParticleSystemManager;
 import org.terasology.particles.components.ParticleDataSpriteComponent;
@@ -99,7 +99,7 @@ public class SpriteParticleRenderer implements RenderSystem {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             glBindTexture(GL11.GL_TEXTURE_2D, particleSystem.particleData.texture.getId());
 
-            material.setFloat2("texSize", particleSystem.particleData.textureSize.getX(), particleSystem.particleData.textureSize.getY());
+            material.setFloat2("texSize", particleSystem.particleData.textureSize.x(), particleSystem.particleData.textureSize.y());
         }
 
         glPushMatrix();
@@ -152,7 +152,7 @@ public class SpriteParticleRenderer implements RenderSystem {
         material.enable();
         org.joml.Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
 
-        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, JomlUtil.from(camPos)));
+        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, camPos));
     }
 
     @Override

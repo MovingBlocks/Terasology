@@ -18,8 +18,8 @@ package org.terasology.math;
 
 import java.math.RoundingMode;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
 
 /**
@@ -76,7 +76,7 @@ public final class ChunkMath {
     }
 
     public static Vector3i calcChunkPos(Vector3f pos) {
-        return calcChunkPos(new Vector3i(pos, RoundingMode.HALF_UP));
+        return calcChunkPos(JomlUtil.round(pos, RoundingMode.HALF_UP));
     }
 
     public static Vector3i calcChunkPos(Vector3i pos) {
@@ -181,7 +181,7 @@ public final class ChunkMath {
     // TODO: This doesn't belong in this class, move it.
     public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
         Side surfaceDir = Side.inDirection(normal);
-        Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
+        Vector3f attachDir = new Vector3f(surfaceDir.reverse().getVector3i());
         Vector3f rawDirection = new Vector3f(direction);
         float dot = rawDirection.dot(attachDir);
         rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));

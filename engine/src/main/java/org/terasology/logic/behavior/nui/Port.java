@@ -15,10 +15,11 @@
  */
 package org.terasology.logic.behavior.nui;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.utilities.Assets;
 import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2i;
+import org.joml.Vector2f;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -79,9 +80,9 @@ public abstract class Port extends CoreWidget {
     }
 
     public Vector2f mid() {
-        Vector2f mid = new Vector2f(rect.size());
-        mid.scale(0.5f);
-        mid.add(rect.min());
+        Vector2f mid = new Vector2f(JomlUtil.from(rect.size()));
+        mid.mul(0.5f);
+        mid.add(JomlUtil.from(rect.min()));
         return mid;
 
     }

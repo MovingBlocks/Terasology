@@ -17,10 +17,10 @@ package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2i;
+import org.joml.Vector2f;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
@@ -152,7 +152,7 @@ public class ZoomableLayout extends CoreLayout {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return Vector2i.zero();
+        return new Vector2i();
     }
 
     @Override

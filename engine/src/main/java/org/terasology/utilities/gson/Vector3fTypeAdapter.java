@@ -22,7 +22,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 import java.lang.reflect.Type;
 

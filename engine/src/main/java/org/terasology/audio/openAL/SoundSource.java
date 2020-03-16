@@ -16,7 +16,7 @@
 package org.terasology.audio.openAL;
 
 import org.terasology.audio.Sound;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 /**
  * Interface for a sound that includes the data required for relative sound positioning.

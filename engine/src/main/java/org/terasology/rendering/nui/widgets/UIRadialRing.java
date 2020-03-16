@@ -17,8 +17,8 @@ package org.terasology.rendering.nui.widgets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;

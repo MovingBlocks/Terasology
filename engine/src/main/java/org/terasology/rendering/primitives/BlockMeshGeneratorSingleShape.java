@@ -18,7 +18,7 @@ package org.terasology.rendering.primitives;
 import com.google.common.collect.Maps;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;

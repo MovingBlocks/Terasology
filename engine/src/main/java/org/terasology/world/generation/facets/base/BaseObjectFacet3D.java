@@ -19,7 +19,7 @@ import java.lang.reflect.Array;
 
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.generation.Border3D;
 
 import com.google.common.base.Preconditions;
@@ -44,7 +44,7 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public T get(BaseVector3i pos) {
+    public T get(Vector3i pos) {
         return get(pos.x(), pos.y(), pos.z());
     }
 
@@ -54,7 +54,7 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public T getWorld(BaseVector3i pos) {
+    public T getWorld(Vector3i pos) {
         return getWorld(pos.x(), pos.y(), pos.z());
     }
 
@@ -68,7 +68,7 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public void set(BaseVector3i pos, T value) {
+    public void set(Vector3i pos, T value) {
         set(pos.x(), pos.y(), pos.z(), value);
     }
 
@@ -78,7 +78,7 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public void setWorld(BaseVector3i pos, T value) {
+    public void setWorld(Vector3i pos, T value) {
         setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 

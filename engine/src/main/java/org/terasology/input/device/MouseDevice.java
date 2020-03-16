@@ -18,7 +18,7 @@ package org.terasology.input.device;
 import java.util.Queue;
 
 import org.terasology.module.sandbox.API;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 
 /**
  */

@@ -20,15 +20,15 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
@@ -47,16 +47,16 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
 
     private static final Logger logger = LoggerFactory.getLogger(MD5SkeletonLoader.class);
 
-    private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + MD5Patterns.INTEGER_PATTERN + 
+    private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + MD5Patterns.INTEGER_PATTERN +
             "\\s*" + MD5Patterns.VECTOR3_PATTERN + "\\s*" + MD5Patterns.VECTOR3_PATTERN);
-    private Pattern vertPatten = Pattern.compile("vert\\s+" + MD5Patterns.INTEGER_PATTERN + 
-            "\\s+" + MD5Patterns.VECTOR2_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN + 
+    private Pattern vertPatten = Pattern.compile("vert\\s+" + MD5Patterns.INTEGER_PATTERN +
+            "\\s+" + MD5Patterns.VECTOR2_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN +
             "\\s+" + MD5Patterns.INTEGER_PATTERN);
-    private Pattern triPattern = Pattern.compile("tri\\s+" + MD5Patterns.INTEGER_PATTERN + 
-            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN + 
+    private Pattern triPattern = Pattern.compile("tri\\s+" + MD5Patterns.INTEGER_PATTERN +
+            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN +
             "\\s+" + MD5Patterns.INTEGER_PATTERN);
-    private Pattern weightPattern = Pattern.compile("weight\\s+" + MD5Patterns.INTEGER_PATTERN + 
-            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.FLOAT_PATTERN + 
+    private Pattern weightPattern = Pattern.compile("weight\\s+" + MD5Patterns.INTEGER_PATTERN +
+            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.FLOAT_PATTERN +
             "\\s+" + MD5Patterns.VECTOR3_PATTERN);
 
     public MD5SkeletonLoader() {
@@ -224,7 +224,7 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
         String name;
         int parent;
         Vector3f position;
-        Quat4f orientation;
+        Quaternionf orientation;
     }
 
     private static class MD5Mesh {

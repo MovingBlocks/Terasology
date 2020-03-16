@@ -32,7 +32,7 @@ import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.ComponentSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;

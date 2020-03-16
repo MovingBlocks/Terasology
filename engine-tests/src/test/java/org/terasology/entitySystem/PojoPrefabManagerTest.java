@@ -32,7 +32,7 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;

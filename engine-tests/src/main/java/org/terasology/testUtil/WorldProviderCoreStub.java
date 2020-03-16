@@ -19,7 +19,7 @@ package org.terasology.testUtil;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.ChunkViewCore;
@@ -142,18 +142,18 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     public byte getTotalLight(int x, int y, int z) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
-    
+
     @Override
     public int setExtraData(int index, Vector3i pos, int value) {
         Integer prevValue = getExtraDataLayer(index).put(pos, value);
         return prevValue == null ? 0 : prevValue;
     }
-    
+
     @Override
     public int getExtraData(int index, int x, int y, int z) {
         return getExtraDataLayer(index).getOrDefault(new Vector3i(x, y, z), 0);
     }
-    
+
     private Map<Vector3i, Integer> getExtraDataLayer(int index) {
         while (extraData.size() <= index) {
             extraData.add(Maps.newHashMap());

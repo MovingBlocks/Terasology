@@ -17,6 +17,7 @@ package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
+import org.joml.Quaternionf;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -53,7 +54,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
@@ -514,7 +515,7 @@ public class CoreCommands extends BaseComponentSystem {
 
         Vector3f spawnPos = characterLocation.getWorldPosition();
         Vector3f offset = new Vector3f(characterLocation.getWorldDirection());
-        offset.scale(2);
+        offset.mul(2);
         spawnPos.add(offset);
         Vector3f dir = new Vector3f(characterLocation.getWorldDirection());
         dir.y = 0;
@@ -523,7 +524,8 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             dir.set(Direction.FORWARD.getVector3f());
         }
-        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
+        Quaternionf rotation = Direction.FORWARD.getVector3f().rotationTo(dir,new Quaternionf());
+//        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
         Optional<Prefab> prefab = Assets.getPrefab(prefabName);
         if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
@@ -551,7 +553,7 @@ public class CoreCommands extends BaseComponentSystem {
 
         Vector3f spawnPos = characterLocation.getWorldPosition();
         Vector3f offset = characterLocation.getWorldDirection();
-        offset.scale(3);
+        offset.mul(3);
         spawnPos.add(offset);
 
         BlockFamily block = blockManager.getBlockFamily(blockName);
@@ -578,7 +580,7 @@ public class CoreCommands extends BaseComponentSystem {
         Vector3f spawnPos = characterLocation.getWorldPosition();
         Vector3f offset = characterLocation.getWorldDirection();
 
-        offset.scale(3);
+        offset.mul(3);
         spawnPos.add(5, 10, 0);
         BlockFamily block = blockManager.getBlockFamily(blockName);
         if (block == null) {
@@ -610,7 +612,7 @@ public class CoreCommands extends BaseComponentSystem {
 
         Vector3f spawnPos = characterLocation.getWorldPosition();
         Vector3f offset = characterLocation.getWorldDirection();
-        offset.scale(5);
+        offset.mul(5);
         spawnPos.add(offset);
         BlockFamily block = blockManager.getBlockFamily(blockName);
         if (block == null) {

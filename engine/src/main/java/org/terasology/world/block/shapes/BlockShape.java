@@ -21,7 +21,7 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.world.block.BlockPart;
 
 /**

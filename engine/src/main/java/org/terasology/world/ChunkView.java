@@ -16,7 +16,7 @@
 package org.terasology.world;
 
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
@@ -122,7 +122,7 @@ public interface ChunkView {
      * @return The (index)th extra-data value at the given position
      */
     int getExtraData(int index, int x, int y, int z);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -131,7 +131,7 @@ public interface ChunkView {
      * @return The (index)th extra-data value at the given position
      */
     int getExtraData(int index, Vector3i pos);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -142,7 +142,7 @@ public interface ChunkView {
      * @param value
      */
     void setExtraData(int index, int x, int y, int z, int value);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *

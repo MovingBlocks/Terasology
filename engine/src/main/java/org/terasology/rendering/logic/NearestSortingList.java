@@ -434,7 +434,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
          * with the other operations on this container.
          */
         private void sort() {
-            comparator.setOrigin(JomlUtil.from(originCamera.getPosition()));
+            comparator.setOrigin(originCamera.getPosition());
             if (!commands.isEmpty()) {
                 logger.warn("The commands list was not emptied properly!");
                 commands.clear();
@@ -456,7 +456,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
                 return;
             } catch (ArrayIndexOutOfBoundsException e) {
                 // see https://github.com/MovingBlocks/Terasology/issues/2742
-                // This happens when the component lookup used for sorting is async with the game thread, 
+                // This happens when the component lookup used for sorting is async with the game thread,
                 // e.g. when a large amount of entities is destroyed or created in a short timespan.
                 // as long as this occurs rarely, it can be ignored.
                 logger.warn("Something went wrong during sorting process. Sorting is skipped this round.");

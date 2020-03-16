@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Quaternionf;
+import org.joml.Vector2ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.ComponentContainer;
@@ -25,13 +27,11 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.SpiralIterable;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.physics.components.shapes.BoxShapeComponent;
 import org.terasology.physics.components.shapes.CapsuleShapeComponent;
 import org.terasology.physics.components.shapes.CylinderShapeComponent;
@@ -81,7 +81,7 @@ public class PlayerFactory {
 
         EntityRef player = builder.build();
 
-        Location.attachChild(player, controller, new Vector3f(), new Quat4f(0, 0, 0, 1));
+        Location.attachChild(player, controller, new Vector3f(), new Quaternionf(0, 0, 0, 1));
 
         return player;
     }
@@ -96,7 +96,7 @@ public class PlayerFactory {
     private float getHeightOf(ComponentContainer prefab) {
         BoxShapeComponent box = prefab.getComponent(BoxShapeComponent.class);
         if (box != null) {
-            return box.extents.getY();
+            return box.extents.y();
         }
 
         CylinderShapeComponent cylinder = prefab.getComponent(CylinderShapeComponent.class);
@@ -129,12 +129,12 @@ public class PlayerFactory {
         int targetBlockY = TeraMath.floorToInt(targetPos.y);
         int targetBlockZ = TeraMath.floorToInt(targetPos.z);
         Vector2i center = new Vector2i(targetBlockX, targetBlockZ);
-        for (BaseVector2i pos : SpiralIterable.clockwise(center).maxRadius(32).scale(2).build()) {
+        for (Vector2ic pos : SpiralIterable.clockwise(center).maxRadius(32).scale(2).build()) {
 
-            Vector3i testPos = new Vector3i(pos.getX(), targetBlockY, pos.getY());
+            Vector3i testPos = new Vector3i(pos.x(), targetBlockY, pos.y());
             Vector3i spawnPos = findOpenVerticalPosition(testPos, entityHeight);
             if (spawnPos != null) {
-                return Optional.of(new Vector3f(spawnPos.getX(), spawnPos.getY() + entityHeight, spawnPos.getZ()));
+                return Optional.of(new Vector3f(spawnPos.x(), spawnPos.y() + entityHeight, spawnPos.z()));
             }
         }
         return Optional.empty();
@@ -160,7 +160,7 @@ public class PlayerFactory {
                 }
 
                 if (consecutiveAirBlocks >= height) {
-                    newSpawnPos.subY(consecutiveAirBlocks);
+                    newSpawnPos.sub(0,consecutiveAirBlocks,0);
                     return newSpawnPos;
                 }
                 newSpawnPos.add(0, 1, 0);

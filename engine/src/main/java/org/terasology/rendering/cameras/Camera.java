@@ -15,7 +15,9 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
@@ -205,8 +207,8 @@ public abstract class Camera {
      * Get the orientation of the camera.
      * @return the orientation direction, a quaternion.
      */
-    public Quat4f getOrientation() {
-        return new Quat4f(JomlUtil.from(viewingDirection), viewingAngle);
+    public Quaternionf getOrientation() {
+        return new Quaternionf().set(new AxisAngle4f(viewingAngle,viewingDirection));
     }
 
     /**

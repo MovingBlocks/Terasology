@@ -20,8 +20,8 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.mesh.MeshData;
 

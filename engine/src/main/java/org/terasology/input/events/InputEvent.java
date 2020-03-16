@@ -17,8 +17,8 @@ package org.terasology.input.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ConsumableEvent;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 
 public abstract class InputEvent implements ConsumableEvent {

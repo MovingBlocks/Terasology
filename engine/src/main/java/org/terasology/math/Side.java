@@ -17,8 +17,8 @@ package org.terasology.math;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -31,8 +31,8 @@ import java.util.EnumSet;
  *
  */
 public enum Side {
-    TOP(Vector3i.up(), true, false, true),
-    BOTTOM(Vector3i.down(), true, false, true),
+    TOP(new Vector3i(0,1,0), true, false, true),
+    BOTTOM(new Vector3i(0,-1,0), true, false, true),
     LEFT(new Vector3i(-1, 0, 0), false, true, true),
     RIGHT(new Vector3i(1, 0, 0), false, true, true),
     FRONT(new Vector3i(0, 0, -1), true, true, false),

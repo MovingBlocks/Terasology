@@ -17,7 +17,7 @@
 package org.terasology.physics.events;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.BroadcastEvent;
 
 /**

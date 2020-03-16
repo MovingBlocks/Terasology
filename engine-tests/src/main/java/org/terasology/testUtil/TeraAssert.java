@@ -16,8 +16,9 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Lists;
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.math.geom.Vector4f;
 
 import java.util.Collection;
@@ -74,7 +75,7 @@ public final class TeraAssert {
         }
     }
 
-    public static void assertEquals(Quat4f expected, Quat4f actual, float error) {
+    public static void assertEquals(Quaternionf expected, Quaternionf actual, float error) {
         if (expected == null) {
             assertNull(actual);
         } else {

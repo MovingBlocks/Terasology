@@ -21,7 +21,7 @@ import org.lwjgl.BufferUtils;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
@@ -107,7 +107,7 @@ public final class ChunkTessellator {
 
                 /* FLAGS - TEX DATA 0.z */
                 elements.finalVertices.put(Float.floatToIntBits(elements.flags.get(i)));
-                
+
                 /* ANIMATION FRAME COUNT - TEX DATA 0.w*/
                 elements.finalVertices.put(Float.floatToIntBits(elements.frames.get(i)));
 

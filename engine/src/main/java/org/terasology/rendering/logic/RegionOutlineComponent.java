@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.rendering.nui.Color;
 
 /**

@@ -18,7 +18,7 @@ package org.terasology.rendering.cameras;
 import org.lwjgl.BufferUtils;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.registry.CoreRegistry;
 
 import java.nio.FloatBuffer;

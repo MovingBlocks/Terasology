@@ -16,10 +16,12 @@
 
 package org.terasology.rendering.md5;
 
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.AxisAngle4f;
+import org.joml.Matrix3f;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.terasology.math.JomlUtil;
+import org.joml.Vector3f;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,15 +31,15 @@ import java.io.IOException;
 public final class MD5ParserCommon {
 
     public static final Matrix3f CORRECTION_MATRIX;
-    public static final Quat4f CORRECTION_QUATERNION;
+    public static final Quaternionf CORRECTION_QUATERNION;
 
     private MD5ParserCommon() {
     }
 
     static {
         CORRECTION_MATRIX = new Matrix3f(-1, 0, 0, 0, 0, 1, 0, 1, 0);
-        CORRECTION_QUATERNION = new Quat4f(0, 0, 0, 1);
-        CORRECTION_QUATERNION.set(CORRECTION_MATRIX);
+        CORRECTION_QUATERNION = new Quaternionf(0, 0, 0, 1);
+        CORRECTION_QUATERNION.set(CORRECTION_MATRIX.getRotation(new AxisAngle4f()));
     }
 
     public static Vector2f readUV(String u, String v) throws NumberFormatException {
@@ -49,37 +51,38 @@ public final class MD5ParserCommon {
     }
 
     public static Vector3f readVector3fAndCorrect(String x, String y, String z) throws NumberFormatException {
-        Vector3f result = new Vector3f(Float.parseFloat(x), Float.parseFloat(y), Float.parseFloat(z));
+       Vector3f result = new Vector3f(Float.parseFloat(x), Float.parseFloat(y), Float.parseFloat(z));
         CORRECTION_MATRIX.transform(result);
         return result;
     }
 
-    public static Quat4f readQuat4f(String xValue, String yValue, String zValue) throws NumberFormatException {
+    public static Quaternionf readQuat4f(String xValue, String yValue, String zValue) throws NumberFormatException {
         float x = Float.parseFloat(xValue);
         float y = Float.parseFloat(yValue);
         float z = Float.parseFloat(zValue);
         return correctQuat4f(completeQuat4f(x, y, z));
     }
 
-    public static Quat4f completeQuat4f(float x, float y, float z) {
+    public static Quaternionf completeQuat4f(float x, float y, float z) {
         float t = 1.0f - (x * x) - (y * y) - (z * z);
         float w = 0;
         if (t > 0.0f) {
             w = (float) -Math.sqrt(t);
         }
-        Quat4f result = new Quat4f(x, y, z, w);
+        Quaternionf result = new Quaternionf(x, y, z, w);
         result.normalize();
         return result;
     }
 
-    public static Quat4f correctQuat4f(Quat4f rot) {
-        Quat4f result = new Quat4f(CORRECTION_QUATERNION);
+    public static Quaternionf correctQuat4f(Quaternionf rot) {
+        Quaternionf result = new Quaternionf(CORRECTION_QUATERNION);
         result.mul(rot);
         return result;
     }
 
     public static Vector3f correctOffset(Vector3f offset) {
-        return CORRECTION_QUATERNION.rotate(offset, new Vector3f());
+        return offset.rotate(CORRECTION_QUATERNION,new Vector3f());
+//        return JomlUtil.from(CORRECTION_QUATERNION.rotate(JomlUtil.from(offset), new org.terasology.math.geom.Vector3f()));
     }
 
 

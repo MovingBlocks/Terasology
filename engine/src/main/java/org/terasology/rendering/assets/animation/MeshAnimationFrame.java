@@ -18,8 +18,9 @@ package org.terasology.rendering.assets.animation;
 
 import com.google.common.collect.Lists;
 
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,9 +29,9 @@ import java.util.List;
  */
 public class MeshAnimationFrame {
     private List<Vector3f> bonePositions;
-    private List<Quat4f> boneRotations;
+    private List<Quaternionf> boneRotations;
 
-    public MeshAnimationFrame(Collection<Vector3f> bonePositions, Collection<Quat4f> boneRotations) {
+    public MeshAnimationFrame(Collection<Vector3f> bonePositions, Collection<Quaternionf> boneRotations) {
         this.bonePositions = Lists.newArrayList(bonePositions);
         this.boneRotations = Lists.newArrayList(boneRotations);
     }
@@ -39,7 +40,7 @@ public class MeshAnimationFrame {
         return bonePositions.get(boneId);
     }
 
-    public Quat4f getRotation(int boneId) {
+    public Quaternionf getRotation(int boneId) {
         return boneRotations.get(boneId);
     }
 }

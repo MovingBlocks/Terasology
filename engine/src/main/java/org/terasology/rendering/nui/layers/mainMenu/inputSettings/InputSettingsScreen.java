@@ -35,7 +35,7 @@ import org.terasology.input.InputType;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.input.internal.BindCommands;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;

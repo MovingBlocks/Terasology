@@ -36,7 +36,7 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;

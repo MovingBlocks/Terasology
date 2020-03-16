@@ -16,8 +16,9 @@
 
 package org.terasology.physics.engine;
 
+import org.joml.Quaternionf;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 /**
  * A rigid body is a physics object whose movement and location is controlled by the physics engine. Rigid bodies move under gravity and bounce off each other and the world.
@@ -59,7 +60,7 @@ public interface RigidBody {
      * @param out output parameter to put the orientation in.
      * @return out, for easy of use.
      */
-    Quat4f getOrientation(Quat4f out);
+    Quaternionf getOrientation(Quaternionf out);
 
     /**
      * Returns the non interpolated location of this body. Note that the
@@ -118,7 +119,7 @@ public interface RigidBody {
      *
      * @param orientation the new rotation.
      */
-    void setOrientation(Quat4f orientation);
+    void setOrientation(Quaternionf orientation);
 
     /**
      * Sets the world location or position.
@@ -134,7 +135,7 @@ public interface RigidBody {
      * @param location
      * @param orientation
      */
-    void setTransform(Vector3f location, Quat4f orientation);
+    void setTransform(Vector3f location, Quaternionf orientation);
 
     /**
      * Active means that the entity is not sleeping, or requesting to sleep.

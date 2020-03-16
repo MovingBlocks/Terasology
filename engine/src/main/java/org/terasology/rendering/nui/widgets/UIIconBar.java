@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -109,7 +109,7 @@ public class UIIconBar extends CoreWidget {
             int columns = Math.min(maxIcons, maxHorizontalIcons);
             return new Vector2i(columns * iconSize.x + (columns - 1) * spacing, rows * iconSize.y + (rows - 1) * spacing);
         } else {
-            return Vector2i.zero();
+            return new Vector2i();
         }
 
     }

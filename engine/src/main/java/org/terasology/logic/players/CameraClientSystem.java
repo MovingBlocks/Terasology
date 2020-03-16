@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Quaternionf;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,7 +33,7 @@ import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.ResetCameraEvent;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 
@@ -127,9 +128,9 @@ public class CameraClientSystem extends BaseComponentSystem {
         LocationComponent cameraLocation = clientComponent.camera.getComponent(LocationComponent.class);
         // if the camera already has a location,  use that as the relative position of the camera
         if (cameraLocation != null) {
-            Location.attachChild(targetEntityForCamera, clientComponent.camera, cameraLocation.getLocalPosition(), new Quat4f(Quat4f.IDENTITY));
+            Location.attachChild(targetEntityForCamera, clientComponent.camera, cameraLocation.getLocalPosition(), new Quaternionf());
         } else {
-            Location.attachChild(targetEntityForCamera, clientComponent.camera, Vector3f.zero(), new Quat4f(Quat4f.IDENTITY));
+            Location.attachChild(targetEntityForCamera, clientComponent.camera, new Vector3f(), new Quaternionf());
         }
     }
 }

@@ -17,7 +17,7 @@ package org.terasology.persistence.internal;
 
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.game.GameManifest;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 
 import java.nio.file.Path;
 
@@ -116,7 +116,8 @@ public class StoragePathProvider {
 
     public Vector3i getChunkZipPosition(Vector3i chunkPos) {
         Vector3i result = new Vector3i(chunkPos);
-        result.div(CHUNK_ZIP_DIM);
+        result.set(result.x/CHUNK_ZIP_DIM,result.y/CHUNK_ZIP_DIM,result.z/CHUNK_ZIP_DIM);
+//        result.div(CHUNK_ZIP_DIM);
         if (chunkPos.x < 0) {
             result.x -= 1;
         }

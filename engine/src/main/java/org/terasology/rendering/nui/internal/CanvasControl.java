@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.internal;
 
 import org.terasology.input.MouseInput;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 
 /**

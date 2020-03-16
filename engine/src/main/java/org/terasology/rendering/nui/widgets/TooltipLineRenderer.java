@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;

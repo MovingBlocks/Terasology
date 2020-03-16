@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.animation;
 
 import java.util.function.Supplier;
 
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Rect2i;
 
 /**
  * Forwards all calls to a {@link MenuAnimationSystem} from a provider.

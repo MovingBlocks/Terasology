@@ -20,7 +20,7 @@ import com.google.common.collect.Maps;
 import org.terasology.utilities.Assets;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockBuilderHelper;
@@ -193,7 +193,7 @@ public class BlockBuilder implements BlockBuilderHelper {
             BlockPart targetPart = part.rotate(rot);
             textureAtlasPositions.put(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize(), frameCount));
+                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuaternionf()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize(), frameCount));
             }
         }
         return new BlockAppearance(meshParts, textureAtlasPositions);

@@ -18,8 +18,8 @@ package org.terasology.math;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3fc;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import java.util.EnumMap;
 
@@ -28,12 +28,12 @@ import java.util.EnumMap;
  *
  */
 public enum Direction {
-    UP(Vector3i.up(), new Vector3f(0, 1, 0)),
+    UP(new Vector3i(0,1,0), new Vector3f(0, 1, 0)),
     RIGHT(new Vector3i(-1, 0, 0), new Vector3f(-1, 0, 0)),
     LEFT(new Vector3i(1, 0, 0), new Vector3f(1, 0, 0)),
     BACKWARD(new Vector3i(0, 0, -1), new Vector3f(0, 0, -1)),
     FORWARD(new Vector3i(0, 0, 1), new Vector3f(0, 0, 1)),
-    DOWN(Vector3i.down(), new Vector3f(0, -1, 0));
+    DOWN(new Vector3i(0,-1,0), new Vector3f(0, -1, 0));
 
     private static final EnumMap<Direction, Direction> REVERSE_MAP;
     private static final EnumMap<Direction, Side> CONVERSION_MAP;

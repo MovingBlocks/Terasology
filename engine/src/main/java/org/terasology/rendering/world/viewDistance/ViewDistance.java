@@ -17,7 +17,7 @@ package org.terasology.rendering.world.viewDistance;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 
 /**
  * The possible view distance options, that can be selected by the user.
@@ -68,6 +68,6 @@ public enum ViewDistance {
 
     @Override
     public String toString() {
-        return String.format("%1s (%2$dx%3$dx%4$d)", displayName, chunkDistance.getX(), chunkDistance.getY(), chunkDistance.getZ());
+        return String.format("%1s (%2$dx%3$dx%4$d)", displayName, chunkDistance.x(), chunkDistance.y(), chunkDistance.z());
     }
 }

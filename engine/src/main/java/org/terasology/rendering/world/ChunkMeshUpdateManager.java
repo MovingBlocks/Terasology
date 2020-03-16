@@ -20,8 +20,9 @@ import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
@@ -33,6 +34,7 @@ import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.ShutdownChunkTask;
 
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -195,11 +197,11 @@ public final class ChunkMeshUpdateManager {
             if (task.isTerminateSignal()) {
                 return -1;
             }
-            return distFromRegion(task.getPosition(), new Vector3i(cameraChunkPosX, cameraChunkPosY, cameraChunkPosZ));
+            return distFromRegion(task.getPosition(), JomlUtil.round(new Vector3f(cameraChunkPosX,cameraChunkPosY,cameraChunkPosZ), RoundingMode.FLOOR));
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-            return pos.gridDistance(regionCenter);
+            return (int) pos.gridDistance(regionCenter);
         }
     }
 }

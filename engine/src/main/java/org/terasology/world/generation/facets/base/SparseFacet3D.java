@@ -17,7 +17,7 @@
 package org.terasology.world.generation.facets.base;
 
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet3D;
 

@@ -17,8 +17,8 @@ package org.terasology.rendering.nui.widgets;
 
 import org.terasology.engine.Time;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Rect2i;
+import org.joml.Vector2i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
@@ -72,7 +72,7 @@ public class UILoadBar extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return Vector2i.zero();
+        return new Vector2i();
     }
 
     @Override

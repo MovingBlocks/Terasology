@@ -15,7 +15,7 @@
  */
 package org.terasology.world.chunks.localChunkProvider;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.chunks.Chunk;
 
 import java.util.Collection;

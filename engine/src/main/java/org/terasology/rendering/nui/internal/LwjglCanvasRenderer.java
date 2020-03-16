@@ -17,6 +17,9 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector2ic;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -31,13 +34,12 @@ import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.Rect2i;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
 import org.terasology.rendering.assets.material.Material;
@@ -137,8 +139,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
 
+//        modelView = new Matrix4f();
+//        modelView.setIdentity();
+//        modelView.setTranslation(new Vector3f(0, 0, -1024f));
         modelView = new Matrix4f();
-        modelView.setIdentity();
         modelView.setTranslation(new Vector3f(0, 0, -1024f));
 
         MatrixUtils.matrixToFloatBuffer(modelView, matrixBuffer);
@@ -185,7 +189,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quat4f rotation, Vector3f offset, float scale, float alpha) {
+    public void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quaternionf rotation, Vector3f offset, float scale, float alpha) {
         if (!material.isRenderable()) {
             return;
         }
@@ -194,13 +198,19 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         Vector3f meshExtents = meshAABB.getExtents();
         float fitScale = 0.35f * Math.min(drawRegion.width(), drawRegion.height()) / Math.max(meshExtents.x, Math.max(meshExtents.y, meshExtents.z));
         Vector3f centerOffset = meshAABB.getCenter();
-        centerOffset.scale(-1.0f);
+        centerOffset.mul(-1.0f);
 
-        Matrix4f centerTransform = new Matrix4f(BaseQuat4f.IDENTITY, centerOffset, 1.0f);
-        Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
-        Matrix4f translateTransform = new Matrix4f(BaseQuat4f.IDENTITY,
-                new Vector3f((drawRegion.minX() + drawRegion.width() / 2) * uiScale,
-                    (drawRegion.minY() + drawRegion.height() / 2) * uiScale, 0), 1);
+        Matrix4f centerTransform = new Matrix4f().translationRotateScale(centerOffset,new Quaternionf(),1);//.translate(centerOffset);
+        Matrix4f userTransform = new Matrix4f().translationRotateScale(offset,rotation,-fitScale * scale);
+        Matrix4f translateTransform = new Matrix4f().translationRotateScale(
+            new Vector3f(drawRegion.minX() + drawRegion.width() / 2,
+                drawRegion.minY() + drawRegion.height() / 2, 0),new Quaternionf(),1);
+
+//        Matrix4f centerTransform = new Matrix4f(BaseQuat4f.IDENTITY, centerOffset, 1.0f);
+//        Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
+//        Matrix4f translateTransform = new Matrix4f(BaseQuat4f.IDENTITY,
+//                new Vector3f((drawRegion.minX() + drawRegion.width() / 2) * uiScale,
+//                    (drawRegion.minY() + drawRegion.height() / 2) * uiScale, 0), 1);
 
         userTransform.mul(centerTransform);
         translateTransform.mul(userTransform);
@@ -265,7 +275,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
     }
 
     @Override
-    public FrameBufferObject getFBO(ResourceUrn urn, BaseVector2i size) {
+    public FrameBufferObject getFBO(ResourceUrn urn, Vector2ic size) {
         LwjglFrameBufferObject frameBufferObject = fboMap.get(urn);
         if (frameBufferObject == null || !Assets.getTexture(urn).isPresent()) {
             // If a FBO exists, but no texture, then the texture was disposed

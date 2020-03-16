@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 import org.terasology.reflection.metadata.FieldMetadata;

@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Quaternionf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -51,7 +52,7 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
             entityRef.saveComponent(gazeMountPointComponent);
         }
         gazeMountPointComponent.translate.y = config.getPlayer().getEyeHeight();
-        Location.attachChild(entityRef, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+        Location.attachChild(entityRef, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quaternionf());
     }
 
     private EntityRef createGazeEntity() {

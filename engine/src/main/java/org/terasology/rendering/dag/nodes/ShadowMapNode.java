@@ -168,7 +168,7 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
 
                 if (chunk.hasMesh()) {
                     final ChunkMesh chunkMesh = chunk.getMesh();
-                    final Vector3f chunkPosition = new Vector3f(JomlUtil.from(chunk.getPosition()));
+                    final Vector3f chunkPosition = new Vector3f(chunk.getPosition());
 
                     numberOfRenderedTriangles += chunkMesh.render(OPAQUE, chunkPosition, cameraPosition);
 
