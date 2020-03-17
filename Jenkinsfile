@@ -6,7 +6,7 @@ node ("default-java") {
     }
     stage('Build') {
         // Oddly it seems the first execution of gradlew correctly runs in plain console mode, for later steps we have to force it?
-        sh './gradlew clean distForLauncher'
+        sh './gradlew clean extractConfig extractNatives distForLauncher'
         archiveArtifacts 'gradlew, gradle/wrapper/*, modules/Core/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, build/resources/main/org/terasology/version/versionInfo.properties, natives/**'
     }
     stage('Publish') {
