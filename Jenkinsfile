@@ -5,16 +5,17 @@ node ("default-java") {
         sh 'chmod +x gradlew'
     }
     stage('Build') {
+        // Oddly it seems the first execution of gradlew correctly runs in plain console mode, for later steps we have to force it?
         sh './gradlew clean distForLauncher'
         archiveArtifacts 'gradlew, gradle/wrapper/*, modules/Core/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, build/resources/main/org/terasology/version/versionInfo.properties, natives/**'
     }
-    stage('Analytics') {
-        sh "./gradlew --console=plain check"
-    }
     stage('Publish') {
         withCredentials([usernamePassword(credentialsId: 'artifactory-gooey', usernameVariable: 'artifactoryUser', passwordVariable: 'artifactoryPass')]) {
-            sh './gradlew publish -PmavenUser=${artifactoryUser} -PmavenPass=${artifactoryPass}'
+            sh './gradlew --console=plain publish -PmavenUser=${artifactoryUser} -PmavenPass=${artifactoryPass}'
         }
+    }
+    stage('Analytics') {
+        sh "./gradlew --console=plain check"
     }
     stage('Record') {
         junit testResults: 'build/test-results/test/*.xml'
