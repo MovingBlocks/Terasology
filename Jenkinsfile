@@ -18,12 +18,12 @@ node ("default-java") {
         sh "./gradlew --console=plain check"
     }
     stage('Record') {
-        junit testResults: 'build/test-results/test/*.xml'
+        junit testResults: '**/build/test-results/test/*.xml',  allowEmptyResults: true
         recordIssues tool: javaDoc()
         step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
-        recordIssues tool: checkStyle(pattern: 'build/reports/checkstyle/*.xml')
+        recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
         recordIssues tool: spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true)
-        recordIssues tool: pmdParser(pattern: '**/reports/pmd/*.xml')
+        recordIssues tool: pmdParser(pattern: '**/build/reports/pmd/*.xml')
         recordIssues tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
     }
 }
