@@ -4,15 +4,14 @@ apply plugin: 'java'
 // IDEs
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-// ?
-apply plugin: 'project-report'
 
-// Static code analyzers
+// Analytics
+apply plugin: 'project-report'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 apply plugin: 'com.github.spotbugs'
-// Computes code coverage of (unit) tests
 apply plugin: 'jacoco'
+apply plugin: 'org.sonarqube'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -129,7 +128,7 @@ pmd {
 }
 
 spotbugs {
-    toolVersion = '4.0.0-beta4'
+    toolVersion = '4.0.0'
     ignoreFailures = true
     excludeFilter = new File(rootDir, "config/metrics/findbugs/findbugs-exclude.xml")
 }

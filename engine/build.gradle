@@ -22,7 +22,7 @@ ext {
 
     // Stuff for our automatic version file setup
     startDateTimeString = dateTimeFormat.format(new Date())
-    versionInfoFileDir = new File(buildDir, 'classes/java/main/org/terasology/version')
+    versionInfoFileDir = new File(buildDir, 'classes/org/terasology/version')
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
     versionFileName = 'VERSION'
     versionBase = new File(templatesDir, "version.txt").text.trim()
@@ -45,6 +45,9 @@ def convertGitBranch = { gitBranch ->
 // Engine for now has two source sets
 sourceSets {
     dev
+
+    // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
+    main.java.outputDir = new File("$buildDir/classes")
 }
 
 // Customizations for the main compilation configuration
@@ -79,6 +82,7 @@ dependencies {
     apiElements group: 'java3d', name: 'vecmath', version: '1.3.1'
     // Light and Shadow use it
     apiElements group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
+    apiElements group: 'org.codehaus.plexus', name: 'plexus-utils', version: '1.5.6'
 
     // Storage and networking
     implementation group: 'com.google.guava', name: 'guava', version: '23.0'
