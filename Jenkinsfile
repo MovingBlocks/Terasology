@@ -9,7 +9,7 @@ node ("default-java") {
         archiveArtifacts 'gradlew, gradle/wrapper/*, modules/Core/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, build/resources/main/org/terasology/version/versionInfo.properties, natives/**'
     }
     stage('Analytics') {
-        sh "./gradlew check sonarqube -Dsonar.projectKey=MovingBlocks_Terasology -Dsonar.organization=movingblocks -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONARSOURCEKEY"
+        sh "./gradlew --console=plain check"
     }
     stage('Publish') {
         withCredentials([usernamePassword(credentialsId: 'artifactory-gooey', usernameVariable: 'artifactoryUser', passwordVariable: 'artifactoryPass')]) {
