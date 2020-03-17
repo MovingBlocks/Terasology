@@ -4,15 +4,14 @@ apply plugin: 'java'
 // IDEs
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-// ?
-apply plugin: 'project-report'
 
-// Static code analyzers
+// Analytics
+apply plugin: 'project-report'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 apply plugin: 'com.github.spotbugs'
-// Computes code coverage of (unit) tests
 apply plugin: 'jacoco'
+apply plugin: 'org.sonarqube'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

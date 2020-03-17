@@ -32,6 +32,9 @@ buildscript {
 
         //Spotbugs
         classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
+
+        // SonarQube / Cloud scanning
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
     }
 }
 
