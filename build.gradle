@@ -39,6 +39,16 @@ import java.nio.file.StandardCopyOption
 // Test for right version of Java in use for running this script
 assert org.gradle.api.JavaVersion.current().isJava8Compatible()
 
+import org.gradle.internal.logging.text.StyledTextOutput 
+import org.gradle.internal.logging.text.StyledTextOutputFactory
+import static org.gradle.internal.logging.text.StyledTextOutput.Style
+
+// Check for Java 8
+if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+    def out = services.get(StyledTextOutputFactory).create("an-ouput")
+    out.withStyle(Style.FailureHeader).println("Terasology supports only Java 8 as of now, kindly set your JAVA_HOME env variable accordingly")
+}
+
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
 ext {
     dirNatives = 'natives'
