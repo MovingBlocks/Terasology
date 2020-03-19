@@ -61,7 +61,7 @@ public final class ApiScraper {
                 location = apiClass.getResource('/' + apiClass.getName().replace('.', '/') + ".class");
             }
 
-            if (location == null) {
+            if (location == null ) {
                 System.out.println("Failed to get a class/package location, skipping " + apiClass);
                 continue;
             }

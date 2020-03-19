@@ -47,7 +47,8 @@ public class ChunkRelevanceRegion {
         this.relevanceDistance.set(relevanceDistance);
 
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc == null) {
+
+        if (loc == null||Float.isNaN(loc.getWorldPosition().x)) {
             dirty = false;
         } else {
             center.set(ChunkMath.calcChunkPos(loc.getWorldPosition()));
@@ -119,7 +120,7 @@ public class ChunkRelevanceRegion {
 
     private Region3i calculateRegion() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null) {
+        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)&& !Float.isNaN(loc.getWorldPosition().x)) {
             Vector3i extents = new Vector3i(relevanceDistance.x / 2, relevanceDistance.y / 2, relevanceDistance.z / 2);
             return Region3i.createFromCenterExtents(ChunkMath.calcChunkPos(loc.getWorldPosition()), extents);
         }
@@ -128,7 +129,7 @@ public class ChunkRelevanceRegion {
 
     private Vector3i calculateCenter() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null) {
+        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x) && !Float.isNaN(loc.getWorldPosition().x)) {
             return ChunkMath.calcChunkPos(loc.getWorldPosition());
         }
         return new Vector3i();

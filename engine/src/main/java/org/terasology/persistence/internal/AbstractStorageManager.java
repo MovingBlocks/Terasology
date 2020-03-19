@@ -187,7 +187,7 @@ public abstract class AbstractStorageManager implements StorageManager {
         for (EntityRef entity : getEntityManager().getEntitiesWith(LocationComponent.class)) {
             if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
-                if (loc != null) {
+                if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
                     if (aabb.contains(loc.getWorldPosition())) {
                         entitiesToStore.add(entity);
                     }

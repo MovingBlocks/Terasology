@@ -300,7 +300,7 @@ public class BulletPhysics implements PhysicsEngine {
         RigidBodyComponent rb = entity.getComponent(RigidBodyComponent.class);
         BulletRigidBody rigidBody = entityRigidBodies.get(entity);
 
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x) || Float.isNaN(location.getWorldPosition().x) || Float.isNaN(location.getWorldPosition().x)) {
             logger.warn("Updating rigid body of entity that has no "
                     + "LocationComponent?! Nothing is done, except log this"
                     + " warning instead. Entity: {}", entity);
@@ -365,7 +365,7 @@ public class BulletPhysics implements PhysicsEngine {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         PairCachingGhostObject triggerObj = entityTriggers.get(entity);
 
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x) || Float.isNaN(location.getWorldPosition().x)) {
             logger.warn("Trying to update or create trigger of entity that has no LocationComponent?! Entity: {}", entity);
             return false;
         }
@@ -453,7 +453,7 @@ public class BulletPhysics implements PhysicsEngine {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
         ConvexShape shape = getShapeFor(entity);
-        if (shape != null && location != null && trigger != null) {
+        if (shape != null && location != null && trigger != null && !Float.isNaN(location.getWorldPosition().x)) {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
@@ -508,7 +508,7 @@ public class BulletPhysics implements PhysicsEngine {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         RigidBodyComponent rigidBody = entity.getComponent(RigidBodyComponent.class);
         ConvexShape shape = getShapeFor(entity);
-        if (location != null && rigidBody != null && shape != null) {
+        if (location != null && rigidBody != null && shape != null && !Float.isNaN(location.getWorldPosition().x)) {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
 
