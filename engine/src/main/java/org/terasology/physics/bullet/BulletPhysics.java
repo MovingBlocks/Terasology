@@ -300,7 +300,7 @@ public class BulletPhysics implements PhysicsEngine {
         RigidBodyComponent rb = entity.getComponent(RigidBodyComponent.class);
         BulletRigidBody rigidBody = entityRigidBodies.get(entity);
 
-        if (location == null || Float.isNaN(location.getWorldPosition().x) || Float.isNaN(location.getWorldPosition().x) || Float.isNaN(location.getWorldPosition().x)) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             logger.warn("Updating rigid body of entity that has no "
                     + "LocationComponent?! Nothing is done, except log this"
                     + " warning instead. Entity: {}", entity);
@@ -365,7 +365,7 @@ public class BulletPhysics implements PhysicsEngine {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         PairCachingGhostObject triggerObj = entityTriggers.get(entity);
 
-        if (location == null || Float.isNaN(location.getWorldPosition().x) || Float.isNaN(location.getWorldPosition().x)) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             logger.warn("Trying to update or create trigger of entity that has no LocationComponent?! Entity: {}", entity);
             return false;
         }

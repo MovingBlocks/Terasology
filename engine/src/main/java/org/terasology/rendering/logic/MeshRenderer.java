@@ -191,7 +191,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                     LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                    if (isHidden(entity, meshComp) || location == null || Float.isNaN(location.getWorldPosition().x) || Float.isNaN(location.getWorldPosition().x)|| meshComp.mesh == null || !isRelevant(entity, location.getWorldPosition())) {
+                    if (isHidden(entity, meshComp) || location == null || Float.isNaN(location.getWorldPosition().x)|| meshComp.mesh == null || !isRelevant(entity, location.getWorldPosition())) {
                         continue;
                     }
                     if (meshComp.mesh.isDisposed()) {
