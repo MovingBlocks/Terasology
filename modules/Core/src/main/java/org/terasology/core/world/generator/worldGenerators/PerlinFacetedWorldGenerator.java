@@ -40,6 +40,7 @@ import org.terasology.registry.In;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
+import org.terasology.world.generator.plugin.WorldGeneratorListenerLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 /**
@@ -51,6 +52,9 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
     @In
     private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
+
+    @In
+    private WorldGeneratorListenerLibrary worldGeneratorListenerLibrary;
 
     public PerlinFacetedWorldGenerator(SimpleUri uri) {
         super(uri);
@@ -66,7 +70,7 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
         int seaLevel = 32;
         ImmutableVector2i spawnPos = new ImmutableVector2i(0, 0); // as used by the spawner
 
-        return new WorldBuilder(worldGeneratorPluginLibrary)
+        return new WorldBuilder(worldGeneratorPluginLibrary, worldGeneratorListenerLibrary)
                 .setSeaLevel(seaLevel)
                 .addProvider(new SeaLevelProvider(seaLevel))
                 .addProvider(new PerlinHumidityProvider())
@@ -84,6 +88,7 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
                         //.addRasterizer(new GroundRasterizer(blockManager))
                 .addRasterizer(new SolidRasterizer())
                 .addPlugins()
+                .addListeners()
                 .addRasterizer(new FloraRasterizer())
                 .addRasterizer(new TreeRasterizer());
     }

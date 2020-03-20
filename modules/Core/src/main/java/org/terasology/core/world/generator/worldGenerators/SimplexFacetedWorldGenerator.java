@@ -27,7 +27,6 @@ import org.terasology.core.world.generator.facetProviders.SimplexHumidityProvide
 import org.terasology.core.world.generator.facetProviders.SimplexOceanProvider;
 import org.terasology.core.world.generator.facetProviders.SimplexRiverProvider;
 import org.terasology.core.world.generator.facetProviders.SimplexSurfaceTemperatureProvider;
-import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
 import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
@@ -41,6 +40,7 @@ import org.terasology.registry.In;
 import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
+import org.terasology.world.generator.plugin.WorldGeneratorListenerLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 /**
@@ -52,6 +52,9 @@ public class SimplexFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
     @In
     private WorldGeneratorPluginLibrary worldGeneratorPluginLibrary;
+
+    @In
+    private WorldGeneratorListenerLibrary worldGeneratorListenerLibrary;
 
     public SimplexFacetedWorldGenerator(SimpleUri uri) {
         super(uri);
@@ -67,7 +70,7 @@ public class SimplexFacetedWorldGenerator extends BaseFacetedWorldGenerator {
         int seaLevel = 32;
         ImmutableVector2i spawnPos = new ImmutableVector2i(0, 0); // as used by the spawner
 
-        return new WorldBuilder(worldGeneratorPluginLibrary)
+        return new WorldBuilder(worldGeneratorPluginLibrary, worldGeneratorListenerLibrary)
                 .setSeaLevel(seaLevel)
                 .addProvider(new SeaLevelProvider(seaLevel))
                 .addProvider(new SimplexHumidityProvider())
@@ -85,6 +88,7 @@ public class SimplexFacetedWorldGenerator extends BaseFacetedWorldGenerator {
                         //.addRasterizer(new GroundRasterizer(blockManager))
                 .addRasterizer(new SolidRasterizer())
                 .addPlugins()
+                .addListeners()
                 .addRasterizer(new FloraRasterizer())
                 .addRasterizer(new TreeRasterizer());
     }
