@@ -267,11 +267,9 @@ public class CoreCommands extends BaseComponentSystem {
             }
             // If a prefab is broken , it will throw an exception
             catch(Exception e){
-                List<String> EmptyList=new ArrayList<String>();
                 console.addMessage("Note : Search may not return results if invalid assets are present");
                 console.addMessage("Error parsing : "+curUrn.toString());
                 console.addMessage(e.toString());
-                // return(EmptyList);
                 continue;
             }
         }
