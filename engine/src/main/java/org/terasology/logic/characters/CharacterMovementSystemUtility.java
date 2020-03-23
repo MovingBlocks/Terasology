@@ -17,6 +17,7 @@ package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector3f;
@@ -53,8 +54,8 @@ public final class CharacterMovementSystemUtility {
         if (location == null || movementComp == null) {
             return;
         }
-        location.setWorldPosition(state.getPosition());
-        location.setWorldRotation(state.getRotation());
+        location.setWorldPosition(JomlUtil.from(state.getPosition()));
+        location.setWorldRotation(JomlUtil.from(state.getRotation()));
         entity.saveComponent(location);
 
         movementComp.mode = state.getMode();
@@ -72,7 +73,7 @@ public final class CharacterMovementSystemUtility {
             // Only set the gaze entity rotation if it is not the same as the main entity.
             // The character is assumed to only rotate side to side, introducing pitch makes things act strangely
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
-            gazeLocation.setLocalRotation(rotation);
+            gazeLocation.setLocalRotation(JomlUtil.from(rotation));
             gazeEntity.saveComponent(gazeLocation);
         }
     }
@@ -82,8 +83,8 @@ public final class CharacterMovementSystemUtility {
         Vector3f newPos = BaseVector3f.lerp(a.getPosition(), b.getPosition(), t);
         Quat4f newRot = BaseQuat4f.interpolate(a.getRotation(), b.getRotation(), t);
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        location.setWorldPosition(newPos);
-        location.setWorldRotation(newRot);
+        location.setWorldPosition(JomlUtil.from(newPos));
+        location.setWorldRotation(JomlUtil.from(newRot));
         entity.saveComponent(location);
 
         CharacterMovementComponent movementComponent = entity.getComponent(CharacterMovementComponent.class);
@@ -117,8 +118,8 @@ public final class CharacterMovementSystemUtility {
 
     private void extrapolateLocationComponent(EntityRef entity, CharacterStateEvent state, Vector3f newPos) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        location.setWorldPosition(newPos);
-        location.setWorldRotation(state.getRotation());
+        location.setWorldPosition(JomlUtil.from(newPos));
+        location.setWorldRotation(JomlUtil.from(state.getRotation()));
         entity.saveComponent(location);
     }
 

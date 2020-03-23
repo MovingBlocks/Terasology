@@ -42,6 +42,7 @@ import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -252,7 +253,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), RoundingMode.HALF_UP)));
+                    center.set(ChunkMath.calcChunkPos(new Vector3i(JomlUtil.from(loc.getWorldPosition()), RoundingMode.HALF_UP)));
                 }
                 Vector3i pos = null;
                 int distance = Integer.MAX_VALUE;
@@ -430,7 +431,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         List<NetData.BlockChangeMessage> blockChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBlockChanges.size());
         queuedOutgoingBlockChanges.drainTo(blockChanges);
         message.addAllBlockChange(blockChanges);
-        
+
         List<NetData.ExtraDataChangeMessage> extraDataChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingExtraDataChanges.size());
         queuedOutgoingExtraDataChanges.drainTo(extraDataChanges);
         message.addAllExtraDataChange(extraDataChanges);

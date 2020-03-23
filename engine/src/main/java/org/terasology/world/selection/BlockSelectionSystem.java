@@ -49,7 +49,7 @@ public class BlockSelectionSystem extends BaseComponentSystem {
             return;
         }
 
-        Vector3f worldPosition = locationComponent.getWorldPosition();
+        org.joml.Vector3f worldPosition = locationComponent.getWorldPosition();
 
         Vector3i startPosition = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
         blockSelectionComponent.startPosition = startPosition;
@@ -72,7 +72,7 @@ public class BlockSelectionSystem extends BaseComponentSystem {
             return;
         }
 
-        Vector3f worldPosition = locationComponent.getWorldPosition();
+        org.joml.Vector3f worldPosition = locationComponent.getWorldPosition();
 
         Vector3i endPosition = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
         Vector3i startPosition = blockSelectionComponent.startPosition;

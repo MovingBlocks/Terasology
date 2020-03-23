@@ -27,6 +27,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
@@ -267,7 +268,7 @@ public class SaveTransaction extends AbstractTask {
                     && !entity.isAlwaysRelevant()) {
                 LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
-                    Vector3f loc = locationComponent.getWorldPosition();
+                    Vector3f loc = JomlUtil.from(locationComponent.getWorldPosition());
                     Vector3i chunkPos = ChunkMath.calcChunkPos((int) loc.x, (int) loc.y, (int) loc.z);
                     Collection<EntityRef> collection = chunkPosToEntitiesMap.get(chunkPos);
                     if (collection == null) {

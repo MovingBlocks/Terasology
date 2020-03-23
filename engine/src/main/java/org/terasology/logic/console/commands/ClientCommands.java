@@ -25,6 +25,7 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.StaticSpawnLocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -98,7 +99,7 @@ public class ClientCommands extends BaseComponentSystem {
         if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
             staticSpawnLocationComponent = clientInfo.getComponent(StaticSpawnLocationComponent.class);
         }
-        staticSpawnLocationComponent.position = sender.getComponent(ClientComponent.class).character.getComponent(LocationComponent.class).getWorldPosition();
+        staticSpawnLocationComponent.position = JomlUtil.from(sender.getComponent(ClientComponent.class).character.getComponent(LocationComponent.class).getWorldPosition());
         clientInfo.addOrSaveComponent(staticSpawnLocationComponent);
         return "Set spawn location to- " + staticSpawnLocationComponent.position;
     }

@@ -47,6 +47,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.PlayerCharacterComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -216,8 +217,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (!onItemUseEvent.isConsumed()) {
             EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
-            Vector3f direction = gazeLocation.getWorldDirection();
-            Vector3f originPos = gazeLocation.getWorldPosition();
+            Vector3f direction = JomlUtil.from(gazeLocation.getWorldDirection());
+            Vector3f originPos = JomlUtil.from(gazeLocation.getWorldPosition());
             if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
                 directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction, originPos);
             } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
@@ -320,14 +321,14 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
         LocationComponent location = camera.getComponent(LocationComponent.class);
-        Vector3f direction = location.getWorldDirection();
+        Vector3f direction = JomlUtil.from(location.getWorldDirection());
         if (!(vectorsAreAboutEqual(event.getDirection(), direction))) {
             logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
         }
         // Assume the exact same value in case there are rounding mistakes:
         direction = event.getDirection();
 
-        Vector3f originPos = location.getWorldPosition();
+        Vector3f originPos = JomlUtil.from(location.getWorldPosition());
         if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
             String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
             logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
@@ -430,8 +431,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private boolean isDistanceToLarge(LocationComponent characterLocation, LocationComponent targetLocation, float maxInteractionRange) {
         float maxInteractionRangeSquared = maxInteractionRange * maxInteractionRange;
         Vector3f positionDelta = new Vector3f();
-        positionDelta.add(characterLocation.getWorldPosition());
-        positionDelta.sub(targetLocation.getWorldPosition());
+        positionDelta.add(JomlUtil.from(characterLocation.getWorldPosition()));
+        positionDelta.sub(JomlUtil.from(targetLocation.getWorldPosition()));
         float interactionRangeSquared = positionDelta.lengthSquared();
         // add a small epsilon to have rounding mistakes be in favor of the player:
         float epsilon = 0.00001f;

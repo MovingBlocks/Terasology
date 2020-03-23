@@ -16,6 +16,7 @@
 package org.terasology.logic.location;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 
 import java.util.Comparator;
@@ -40,7 +41,7 @@ public class DistanceComparator implements Comparator<EntityRef> {
      * this vector pre-allocated saves a lot of memory allocations for new
      * vectors.
      */
-    private final Vector3f temp = new Vector3f();
+    private final org.joml.Vector3f temp = new org.joml.Vector3f();
 
     /**
      * The default constructor will set the location to calculate the
@@ -77,10 +78,10 @@ public class DistanceComparator implements Comparator<EntityRef> {
             return -1;
         }
         loc1.getWorldPosition(temp);
-        temp.sub(origin);
+        temp.sub(JomlUtil.from(origin));
         float dis1 = temp.lengthSquared();
         loc2.getWorldPosition(temp);
-        temp.sub(origin);
+        temp.sub(JomlUtil.from(origin));
         float dis2 = temp.lengthSquared();
         if (dis1 < dis2) {
             return -1;

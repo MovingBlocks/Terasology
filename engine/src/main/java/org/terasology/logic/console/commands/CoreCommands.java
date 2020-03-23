@@ -52,6 +52,7 @@ import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
@@ -512,11 +513,11 @@ public class CoreCommands extends BaseComponentSystem {
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = new Vector3f(characterLocation.getWorldDirection());
+        Vector3f spawnPos = JomlUtil.from(characterLocation.getWorldPosition());
+        Vector3f offset = new Vector3f(JomlUtil.from(characterLocation.getWorldDirection()));
         offset.scale(2);
         spawnPos.add(offset);
-        Vector3f dir = new Vector3f(characterLocation.getWorldDirection());
+        Vector3f dir = new Vector3f(JomlUtil.from(characterLocation.getWorldDirection()));
         dir.y = 0;
         if (dir.lengthSquared() > 0.001f) {
             dir.normalize();
@@ -549,8 +550,8 @@ public class CoreCommands extends BaseComponentSystem {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = characterLocation.getWorldDirection();
+        Vector3f spawnPos = JomlUtil.from(characterLocation.getWorldPosition());
+        Vector3f offset = JomlUtil.from(characterLocation.getWorldDirection());
         offset.scale(3);
         spawnPos.add(offset);
 
@@ -575,8 +576,8 @@ public class CoreCommands extends BaseComponentSystem {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = characterLocation.getWorldDirection();
+        Vector3f spawnPos = JomlUtil.from(characterLocation.getWorldPosition());
+        Vector3f offset = JomlUtil.from(characterLocation.getWorldDirection());
 
         offset.scale(3);
         spawnPos.add(5, 10, 0);
@@ -608,8 +609,8 @@ public class CoreCommands extends BaseComponentSystem {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = characterLocation.getWorldDirection();
+        Vector3f spawnPos = JomlUtil.from(characterLocation.getWorldPosition());
+        Vector3f offset = JomlUtil.from(characterLocation.getWorldDirection());
         offset.scale(5);
         spawnPos.add(offset);
         BlockFamily block = blockManager.getBlockFamily(blockName);

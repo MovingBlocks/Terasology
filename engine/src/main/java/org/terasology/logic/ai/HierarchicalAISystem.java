@@ -28,6 +28,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -66,7 +67,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
                 LocationComponent.class)) {
             LocationComponent location = entity
                     .getComponent(LocationComponent.class);
-            Vector3f worldPos = location.getWorldPosition();
+            Vector3f worldPos = JomlUtil.from(location.getWorldPosition());
 
             // Skip this AI if not in a loaded chunk
             if (!worldProvider.isBlockRelevant(worldPos)) {

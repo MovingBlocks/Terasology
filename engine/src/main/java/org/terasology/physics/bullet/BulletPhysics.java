@@ -57,6 +57,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.VecMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -375,8 +376,8 @@ public class BulletPhysics implements PhysicsEngine {
                 discreteDynamicsWorld.removeCollisionObject(triggerObj);
                 newTrigger(entity);
             } else {
-                Quat4f worldRotation = VecMath.to(location.getWorldRotation());
-                Vector3f worldPosition = VecMath.to(location.getWorldPosition());
+                Quat4f worldRotation = VecMath.to(JomlUtil.from(location.getWorldRotation()));
+                Vector3f worldPosition = VecMath.to(JomlUtil.from(location.getWorldPosition()));
                 triggerObj.setWorldTransform(new Transform(new Matrix4f(worldRotation, worldPosition, 1.0f)));
             }
             return true;
@@ -459,7 +460,7 @@ public class BulletPhysics implements PhysicsEngine {
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
             CollisionGroup collisionGroup = trigger.collisionGroup;
             PairCachingGhostObject triggerObj = createCollider(
-                    VecMath.to(location.getWorldPosition()),
+                    VecMath.to(JomlUtil.from(location.getWorldPosition())),
                     shape,
                     collisionGroup.getFlag(),
                     combineGroups(detectGroups),
@@ -494,7 +495,7 @@ public class BulletPhysics implements PhysicsEngine {
         if (locComp == null || movementComp == null) {
             throw new IllegalArgumentException("Expected an entity with a Location component and CharacterMovementComponent.");
         }
-        Vector3f pos = VecMath.to(locComp.getWorldPosition());
+        Vector3f pos = VecMath.to(JomlUtil.from(locComp.getWorldPosition()));
         final float worldScale = locComp.getWorldScale();
         final float height = (movementComp.height - 2 * movementComp.radius) * worldScale;
         final float width = movementComp.radius * worldScale;
@@ -534,7 +535,7 @@ public class BulletPhysics implements PhysicsEngine {
                 removeRigidBody(oldBody);
             }
             collider.setVelocity(rigidBody.velocity, rigidBody.angularVelocity);
-            collider.setTransform(location.getWorldPosition(), location.getWorldRotation());
+            collider.setTransform(JomlUtil.from(location.getWorldPosition()), JomlUtil.from(location.getWorldRotation()));
             return collider;
         } else {
             throw new IllegalArgumentException("Can only create a new rigid body for entities with a LocationComponent," +

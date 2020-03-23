@@ -31,6 +31,7 @@ import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.event.DoDamageEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
@@ -84,7 +85,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
             case Self:
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    origin = loc.getWorldPosition();
+                    origin = JomlUtil.from(loc.getWorldPosition());
                 }
                 break;
             case Instigator:
@@ -108,7 +109,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
 
     void doExplosion(ExplosionActionComponent explosionComp, Vector3f origin, EntityRef instigatingBlockEntity) {
         EntityBuilder builder = entityManager.newBuilder("CoreAssets:smokeExplosion");
-        builder.getComponent(LocationComponent.class).setWorldPosition(origin);
+        builder.getComponent(LocationComponent.class).setWorldPosition(JomlUtil.from(origin));
         EntityRef smokeEntity = builder.build();
 
         smokeEntity.send(new PlaySoundEvent(getRandomExplosionSound(), 1f));
@@ -168,7 +169,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
                 doExplosion(explosionActionComponent, blockComponent.position.toVector3f(), entityRef);
             } else if (entityRef.hasComponent(LocationComponent.class)) {
                 // get the position of the non-block entity to make it explode from there
-                Vector3f position = entityRef.getComponent(LocationComponent.class).getWorldPosition();
+                Vector3f position = JomlUtil.from(entityRef.getComponent(LocationComponent.class).getWorldPosition());
                 // destroy the non-block entity
                 entityRef.destroy();
                 // create the explosion from the non-block entity location

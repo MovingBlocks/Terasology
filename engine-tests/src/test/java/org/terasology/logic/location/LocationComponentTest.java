@@ -15,14 +15,14 @@
  */
 package org.terasology.logic.location;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.testUtil.TeraAssert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,9 +38,9 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
     Vector3f pos1 = new Vector3f(1, 2, 3);
     Vector3f pos2 = new Vector3f(2, 3, 4);
     Vector3f pos1plus2 = new Vector3f(3, 5, 7);
-    Quat4f yawRotation;
-    Quat4f pitchRotation;
-    Quat4f yawPitch;
+    Quaternionf yawRotation;
+    Quaternionf pitchRotation;
+    Quaternionf yawPitch;
     long nextFakeEntityId = 1;
 
     @BeforeEach
@@ -48,9 +48,9 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         loc = new LocationComponent();
         entity = createFakeEntityWith(loc);
 
-        yawRotation = new Quat4f(TeraMath.DEG_TO_RAD * 90, 0, 0);
-        pitchRotation = new Quat4f(0, TeraMath.DEG_TO_RAD * 45, 0);
-        yawPitch = new Quat4f(TeraMath.DEG_TO_RAD * 90, TeraMath.DEG_TO_RAD * 45, 0);
+        yawRotation = new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * 90, 0, 0);
+        pitchRotation = new Quaternionf().rotationYXZ(0, TeraMath.DEG_TO_RAD * 45, 0);
+        yawPitch = new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * 90, TeraMath.DEG_TO_RAD * 45, 0);
     }
 
     private EntityRef createFakeEntityWith(LocationComponent locationComponent) {

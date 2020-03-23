@@ -26,6 +26,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
@@ -76,12 +77,12 @@ public class AnimationScreen extends CoreScreenLayer {
             Vector3f localPlayerPosition = localPlayer.getPosition();
             Quat4f localPlayerRotation = localPlayer.getRotation();
             Vector3f offset = localPlayer.getViewDirection();
-            offset.scale(2.0f);
+            offset.mul(2.0f);
             offset.y = 0;
             localPlayerPosition.add(offset);
             Optional<Prefab> prefab = assetManager.getAsset(entityDropdown.getSelection(), Prefab.class);
             if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
-                entityRef = entityManager.create(prefab.get(), localPlayerPosition, localPlayerRotation);
+                entityRef = entityManager.create(prefab.get(),localPlayerPosition, localPlayerRotation);
 
                 SkeletalMeshComponent skeletalMeshComponent = entityRef.getComponent(SkeletalMeshComponent.class);
                 skeletalMeshComponent.animationRate = animationSpeedSlider.getValue();

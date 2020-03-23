@@ -27,6 +27,7 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -104,7 +105,7 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
                         DropParser dropParser = new DropParser(random, dropResult).invoke();
                         EntityRef dropItem = blockItemFactory.newInstance(blockManager.getBlockFamily(dropParser.getDrop()), dropParser.getCount());
                         if (shouldDropToWorld(event, blockDamageModifierComponent, dropItem)) {
-                            createDrop(dropItem, locationComp.getWorldPosition(), true);
+                            createDrop(dropItem, JomlUtil.from(locationComp.getWorldPosition()), true);
                         }
                     }
                 }
@@ -131,7 +132,7 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
                         }
                         EntityRef dropItem = dropEntity.build();
                         if (shouldDropToWorld(event, blockDamageModifierComponent, dropItem)) {
-                            createDrop(dropItem, locationComp.getWorldPosition(), false);
+                            createDrop(dropItem, JomlUtil.from(locationComp.getWorldPosition()), false);
                         }
                     }
                 }

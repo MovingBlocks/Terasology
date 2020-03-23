@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.CollisionGroup;
@@ -97,7 +98,7 @@ public class TargetSystem {
 
         LocationComponent location = target.getComponent(LocationComponent.class);
         if (location != null && targetBlockPos != null) {
-            location.setLocalPosition(targetBlockPos.toVector3f());
+            location.setLocalPosition(JomlUtil.from(targetBlockPos.toVector3f()));
         }
 
         return true;

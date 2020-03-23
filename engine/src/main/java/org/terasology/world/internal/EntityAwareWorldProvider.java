@@ -42,6 +42,7 @@ import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -325,7 +326,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
         EntityBuilder builder = entityManager.newBuilder(block.getPrefab().orElse(null));
-        builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
+        builder.addComponent(new LocationComponent(JomlUtil.from(blockPosition.toVector3f())));
         builder.addComponent(new BlockComponent(block, blockPosition));
         boolean isTemporary = isTemporaryBlock(builder, block);
         if (!isTemporary && !builder.hasComponent(NetworkComponent.class)) {

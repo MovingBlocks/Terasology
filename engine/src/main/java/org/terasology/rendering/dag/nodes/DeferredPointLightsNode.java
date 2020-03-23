@@ -188,7 +188,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
             if (lightComponent.lightType == LightComponent.LightType.POINT) {
                 LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-                final Vector3f lightPositionInTeraCoords = locationComponent.getWorldPosition();
+                final Vector3f lightPositionInTeraCoords = JomlUtil.from(locationComponent.getWorldPosition());
 
                 Vector3f lightPositionRelativeToCamera = new Vector3f();
                 lightPositionRelativeToCamera.sub(lightPositionInTeraCoords, JomlUtil.from(activeCamera.getPosition()));

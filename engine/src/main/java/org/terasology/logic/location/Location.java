@@ -16,14 +16,14 @@
 
 package org.terasology.logic.location;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Iterator;
 
@@ -41,7 +41,7 @@ public class Location extends BaseComponentSystem {
      * @param offset
      * @param relativeRotation
      */
-    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation, float relativeScale) {
+    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quaternionf relativeRotation, float relativeScale) {
         LocationComponent childLoc = child.getComponent(LocationComponent.class);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (childLoc != null && parentLoc != null && !childLoc.getParent().equals(parent)) {
@@ -60,7 +60,7 @@ public class Location extends BaseComponentSystem {
         }
     }
 
-    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation) {
+    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quaternionf relativeRotation) {
         attachChild(parent, child, offset, relativeRotation, 1f);
     }
 

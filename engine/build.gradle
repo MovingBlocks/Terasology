@@ -78,7 +78,7 @@ dependencies {
     apiElements(group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version: '0.8.0') {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
-    apiElements group: 'org.joml', name: 'joml', version: '1.9.19'
+    apiElements group: 'org.joml', name: 'joml', version: '1.9.22'
     apiElements group: 'java3d', name: 'vecmath', version: '1.3.1'
     // Light and Shadow use it
     apiElements group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
@@ -105,7 +105,7 @@ dependencies {
     implementation group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
     implementation group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
     implementation group: 'java3d', name: 'vecmath', version: '1.3.1'
-    implementation group: 'org.joml', name: 'joml', version: '1.9.19'
+    implementation group: 'org.joml', name: 'joml', version: '1.9.22'
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     implementation group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'

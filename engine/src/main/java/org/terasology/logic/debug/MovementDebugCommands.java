@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.debug;
 
+import org.joml.Quaternionf;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
@@ -244,9 +246,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 move.height = amount;
                 clientComp.character.saveComponent(move);
                 LocationComponent loc = client.getComponent(LocationComponent.class);
-                Vector3f currentPosition = loc.getWorldPosition();
+                org.joml.Vector3f currentPosition = loc.getWorldPosition();
                 clientComp.character
-                        .send(new CharacterTeleportEvent(new Vector3f(currentPosition.getX(), currentPosition.getY() + (amount - prevHeight) / 2, currentPosition.getZ())));
+                        .send(new CharacterTeleportEvent(new Vector3f(currentPosition.x(), currentPosition.y() + (amount - prevHeight) / 2, currentPosition.z())));
                 physics.removeCharacterCollider(clientComp.character);
                 physics.getCharacterCollider(clientComp.character);
                 return "Height of player set to " + amount + " (was " + prevHeight + ")";
@@ -268,7 +270,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 float prevHeight = gazeMountPointComponent.translate.y;
                 gazeMountPointComponent.translate.y = amount;
                 Location.removeChild(player, gazeMountPointComponent.gazeEntity);
-                Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                Location.attachChild(player, gazeMountPointComponent.gazeEntity, JomlUtil.from(gazeMountPointComponent.translate), new Quaternionf());
                 player.saveComponent(gazeMountPointComponent);
                 return "Eye-height of player set to " + amount + " (was " + prevHeight + ")";
             }
@@ -298,10 +300,10 @@ public class MovementDebugCommands extends BaseComponentSystem {
             if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = clientEntity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
-                    Vector3f vLocation = locationComponent.getWorldPosition();
+                    org.joml.Vector3f vLocation = locationComponent.getWorldPosition();
                     ClientComponent clientComp = sender.getComponent(ClientComponent.class);
                     if (clientComp != null) {
-                        clientComp.character.send(new CharacterTeleportEvent(vLocation));
+                        clientComp.character.send(new CharacterTeleportEvent(JomlUtil.from(vLocation)));
                         return "Teleporting you to " + username + " at " + vLocation.x + " " + vLocation.y + " " + vLocation.z;
                     }
                 }
@@ -322,10 +324,10 @@ public class MovementDebugCommands extends BaseComponentSystem {
             if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = sender.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
-                    Vector3f vLocation = locationComponent.getWorldPosition();
+                    org.joml.Vector3f vLocation = locationComponent.getWorldPosition();
                     ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
                     if (clientComp != null) {
-                        clientComp.character.send(new CharacterTeleportEvent(vLocation));
+                        clientComp.character.send(new CharacterTeleportEvent(JomlUtil.from(vLocation)));
                         return "Teleporting " + username + " to you at " + vLocation.x + " " + vLocation.y + " " + vLocation.z;
                     }
                 }
@@ -374,10 +376,10 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
         LocationComponent locationComponent = entityTo.getComponent(LocationComponent.class);
         if (locationComponent != null) {
-            Vector3f vLocation = locationComponent.getWorldPosition();
+            org.joml.Vector3f vLocation = locationComponent.getWorldPosition();
             ClientComponent clientComp = entityFrom.getComponent(ClientComponent.class);
             if (clientComp != null) {
-                clientComp.character.send(new CharacterTeleportEvent(vLocation));
+                clientComp.character.send(new CharacterTeleportEvent(JomlUtil.from(vLocation)));
                 return "Teleporting " + usernameFrom + " to " + usernameTo + " at " + vLocation.x + " " + vLocation.y + " " + vLocation.z;
             }
         }
@@ -414,7 +416,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = clientEntity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
-                    vPlayerLocation = locationComponent.getWorldPosition();
+                    vPlayerLocation = JomlUtil.from(locationComponent.getWorldPosition());
                     bPlayerLocationWasFound = true;
                     playerEntity = clientEntity;
                 }

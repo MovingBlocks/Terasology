@@ -34,6 +34,7 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
@@ -69,7 +70,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         List<StaticSound> footstepSounds = characterSounds.footstepSounds;
 
         // Check if the block the character is standing on has footstep sounds
-        Vector3i blockPos = new Vector3i(locationComponent.getLocalPosition());
+        Vector3i blockPos = new Vector3i(JomlUtil.from(locationComponent.getLocalPosition()));
         blockPos.y--; // The block *below* the character's feet is interesting to us
         Block block = worldProvider.getBlock(blockPos);
         if (block != null) {

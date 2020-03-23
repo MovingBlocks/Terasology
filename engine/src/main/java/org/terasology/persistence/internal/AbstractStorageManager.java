@@ -24,6 +24,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
@@ -188,7 +189,7 @@ public abstract class AbstractStorageManager implements StorageManager {
             if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    if (aabb.contains(loc.getWorldPosition())) {
+                    if (aabb.contains(JomlUtil.from(loc.getWorldPosition()))) {
                         entitiesToStore.add(entity);
                     }
                 }

@@ -18,6 +18,7 @@ package org.terasology.entitySystem.sectors;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.chunks.Chunk;
@@ -91,7 +92,7 @@ public final class SectorUtil {
         Set<Vector3i> chunks = new HashSet<>();
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            chunks.add(ChunkMath.calcChunkPos(loc.getWorldPosition()));
+            chunks.add(ChunkMath.calcChunkPos(JomlUtil.from(loc.getWorldPosition())));
         }
         SectorRegionComponent regionComponent = entity.getComponent(SectorRegionComponent.class);
         if (regionComponent != null) {

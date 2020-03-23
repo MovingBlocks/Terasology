@@ -20,6 +20,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableList;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.particles.ParticleDataMask;
@@ -193,7 +194,7 @@ class ParticleUpdaterImpl implements ParticleUpdater {
         );
 
         particleEmitter.particlePool.temporaryParticleData.position.add(
-                particleEmitter.locationComponent.getWorldPosition()
+            JomlUtil.from(particleEmitter.locationComponent.getWorldPosition())
         );
 
         particleEmitter.particlePool.storeTemporaryDataAt(index, ParticleDataMask.ALL.toInt());

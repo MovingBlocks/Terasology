@@ -91,7 +91,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
                 continue;
             }
 
-            Vector3f worldPos = location.getWorldPosition();
+            Vector3f worldPos = JomlUtil.from(location.getWorldPosition());
             if (!worldProvider.isBlockRelevant(worldPos)) {
                 continue;
             }

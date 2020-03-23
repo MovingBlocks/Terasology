@@ -31,6 +31,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.location.LocationResynchEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -300,7 +301,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 //TODO after implementing rigidbody interface
                 RigidBody body = physics.getRigidBody(entity);
                 if (body.isActive()) {
-                    entity.send(new LocationResynchEvent(body.getLocation(new Vector3f()), body.getOrientation(new Quat4f())));
+                    entity.send(new LocationResynchEvent(JomlUtil.from(body.getLocation(new Vector3f())), JomlUtil.from(body.getOrientation(new Quat4f()))));
                     entity.send(new PhysicsResynchEvent(body.getLinearVelocity(new Vector3f()), body.getAngularVelocity(new Vector3f())));
                 }
             }
@@ -318,7 +319,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     public void resynchLocation(LocationResynchEvent event, EntityRef entity) {
         logger.debug("Received location resynch event");
         RigidBody body = physics.getRigidBody(entity);
-        body.setTransform(event.getPosition(), event.getRotation());
+        body.setTransform(JomlUtil.from(event.getPosition()), JomlUtil.from(event.getRotation()));
     }
 
     public static class CollisionPair {

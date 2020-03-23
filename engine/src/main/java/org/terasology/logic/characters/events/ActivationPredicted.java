@@ -18,6 +18,7 @@ package org.terasology.logic.characters.events;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 
 /**
@@ -77,7 +78,7 @@ public class ActivationPredicted extends AbstractConsumableEvent {
     public Vector3f getTargetLocation() {
         LocationComponent loc = target.getComponent(LocationComponent.class);
         if (loc != null) {
-            return loc.getWorldPosition();
+            return JomlUtil.from(loc.getWorldPosition());
         }
         return null;
     }
@@ -85,7 +86,7 @@ public class ActivationPredicted extends AbstractConsumableEvent {
     public Vector3f getInstigatorLocation() {
         LocationComponent loc = instigator.getComponent(LocationComponent.class);
         if (loc != null) {
-            return loc.getWorldPosition();
+            return JomlUtil.from(loc.getWorldPosition());
         }
         return new Vector3f();
     }

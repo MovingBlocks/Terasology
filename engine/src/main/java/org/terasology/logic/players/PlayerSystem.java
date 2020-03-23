@@ -17,6 +17,7 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Lists;
+import org.joml.Quaternionf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -36,6 +37,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -132,7 +134,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         if (playerStore.hasCharacter()) {
 
             Vector3f storedLocation = playerStore.getRelevanceLocation();
-            loc.setWorldPosition(storedLocation);
+            loc.setWorldPosition(JomlUtil.from(storedLocation));
             entity.saveComponent(loc);
 
             if (worldProvider.isBlockRelevant(storedLocation)) {
@@ -149,7 +151,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             }
         } else {
             Vector3f spawnPosition = worldGenerator.getSpawnPosition(entity);
-            loc.setWorldPosition(spawnPosition);
+            loc.setWorldPosition(JomlUtil.from(spawnPosition));
             entity.saveComponent(loc);
 
             addRelevanceEntity(entity, minViewDist, owner);
@@ -178,7 +180,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             if (!character.hasComponent(AliveCharacterComponent.class)) {
                 character.addComponent(new AliveCharacterComponent());
             }
-            Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
+            Location.attachChild(character, entity, new org.joml.Vector3f(), new Quaternionf());
         } else {
             character.destroy();
             spawnPlayer(entity);
@@ -223,14 +225,14 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             spawnPosition = worldGenerator.getSpawnPosition(entity);
         }
         LocationComponent loc = character.getComponent(LocationComponent.class);
-        loc.setWorldPosition(spawnPosition);
-        loc.setLocalRotation(new Quat4f());  // reset rotation
+        loc.setWorldPosition(JomlUtil.from(spawnPosition));
+        loc.setLocalRotation(new Quaternionf());  // reset rotation
         character.saveComponent(loc);
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, components = {ClientComponent.class})
     public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
-        Vector3f spawnPosition = entity.getComponent(LocationComponent.class).getWorldPosition();
+        Vector3f spawnPosition = JomlUtil.from(entity.getComponent(LocationComponent.class).getWorldPosition());
 
         if (worldProvider.isBlockRelevant(spawnPosition)) {
             respawnPlayer(entity);

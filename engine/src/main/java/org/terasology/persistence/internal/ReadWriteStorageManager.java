@@ -36,6 +36,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.Module;
@@ -310,7 +311,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         LocationComponent location = character.getComponent(LocationComponent.class);
         Vector3f relevanceLocation;
         if (location != null) {
-            relevanceLocation = location.getWorldPosition();
+            relevanceLocation = JomlUtil.from(location.getWorldPosition());
         } else {
             relevanceLocation = new Vector3f();
         }

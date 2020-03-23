@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Quaternionf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.ComponentContainer;
@@ -25,6 +26,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Quat4f;
@@ -68,12 +70,12 @@ public class PlayerFactory {
 
         LocationComponent location = controller.getComponent(LocationComponent.class);
         Vector3f spawnPosition = findSpawnPositionFromLocationComponent(location);
-        location.setWorldPosition(spawnPosition);
+        location.setWorldPosition(JomlUtil.from(spawnPosition));
         controller.saveComponent(location);
 
         logger.debug("Spawing player at: {}", spawnPosition);
 
-        builder.getComponent(LocationComponent.class).setWorldPosition(spawnPosition);
+        builder.getComponent(LocationComponent.class).setWorldPosition(JomlUtil.from(spawnPosition));
         builder.setOwner(controller);
 
         CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);
@@ -81,7 +83,7 @@ public class PlayerFactory {
 
         EntityRef player = builder.build();
 
-        Location.attachChild(player, controller, new Vector3f(), new Quat4f(0, 0, 0, 1));
+        Location.attachChild(player, controller, new org.joml.Vector3f(), new Quaternionf());
 
         return player;
     }
@@ -90,7 +92,7 @@ public class PlayerFactory {
         EntityBuilder builder = entityManager.newBuilder("engine:player");
         float extraSpace = 0.5f;  // spawn a little bit above the ground
         float entityHeight = getHeightOf(builder) + extraSpace;
-        return findSpawnPos(locationComponent.getWorldPosition(), entityHeight).get(); // TODO: Handle Optional being empty
+        return findSpawnPos(JomlUtil.from(locationComponent.getWorldPosition()), entityHeight).get(); // TODO: Handle Optional being empty
     }
 
     private float getHeightOf(ComponentContainer prefab) {

@@ -28,6 +28,8 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -53,7 +55,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            Vector3f worldPos = location.getWorldPosition();
+            Vector3f worldPos = JomlUtil.from(location.getWorldPosition());
 
             // Skip this AI if not in a loaded chunk
             if (!worldProvider.isBlockRelevant(worldPos)) {
@@ -89,7 +91,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                 drive.set(targetDirection);
 
                 float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-                location.getLocalRotation().set(new Vector3f(0, 1, 0), yaw);
+                location.getLocalRotation().set(JomlUtil.from(new Quat4f(new Vector3f(0, 1, 0), yaw)));
                 entity.saveComponent(location);
             }
             entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, time.getGameDeltaInMs()));

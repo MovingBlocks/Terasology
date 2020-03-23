@@ -35,6 +35,7 @@ import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
@@ -202,7 +203,7 @@ public class BlockCommands extends BaseComponentSystem {
         EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity);
         LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
         Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
-        targetSystem.updateTarget(gazeLocation.getWorldPosition(), gazeLocation.getWorldDirection(), maxDistance);
+        targetSystem.updateTarget(JomlUtil.from(gazeLocation.getWorldPosition()), JomlUtil.from(gazeLocation.getWorldDirection()), maxDistance);
         EntityRef target = targetSystem.getTarget();
         BlockComponent targetLocation = target.getComponent(BlockComponent.class);
         if (matchingUris.size() == 1) {

@@ -31,6 +31,7 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
@@ -136,7 +137,7 @@ public class DoorSystem extends BaseComponentSystem {
             newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
             Vector3f doorCenter = bottomBlockPos.toVector3f();
             doorCenter.y += 0.5f;
-            newDoor.addComponent(new LocationComponent(doorCenter));
+            newDoor.addComponent(new LocationComponent(JomlUtil.from(doorCenter)));
             DoorComponent newDoorComp = newDoor.getComponent(DoorComponent.class);
             newDoorComp.closedSide = closedSide;
             newDoorComp.openSide = attachSide.reverse();

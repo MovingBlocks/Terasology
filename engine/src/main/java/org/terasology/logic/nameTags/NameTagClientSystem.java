@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.nameTags;
 
+import org.joml.Quaternionf;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,6 +28,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
@@ -68,7 +70,7 @@ public class NameTagClientSystem extends BaseComponentSystem {
             floatingText.scale = nameTagComponent.scale;
             nameTag.saveComponent(floatingText);
             LocationComponent nameTagLoc = nameTag.getComponent(LocationComponent.class);
-            nameTagLoc.setLocalPosition(offset);
+            nameTagLoc.setLocalPosition(JomlUtil.from(offset));
             nameTag.saveComponent(nameTagLoc);
         } else {
             EntityBuilder nameTagBuilder = entityManager.newBuilder();
@@ -85,7 +87,7 @@ public class NameTagClientSystem extends BaseComponentSystem {
             nameTag = nameTagBuilder.build();
             nameTagEntityToFloatingTextMap.put(entity, nameTag);
 
-            Location.attachChild(entity, nameTag, offset, new Quat4f(1, 0, 0, 0));
+            Location.attachChild(entity, nameTag, JomlUtil.from(offset), new Quaternionf(1, 0, 0, 0));
         }
     }
 

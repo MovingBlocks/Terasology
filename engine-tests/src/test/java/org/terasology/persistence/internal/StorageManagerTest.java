@@ -37,6 +37,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.ModuleEnvironment;
@@ -206,7 +207,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     @Test
     public void testPlayerRelevanceLocationSurvivesStorage() {
         Vector3f loc = new Vector3f(1, 2, 3);
-        character.addComponent(new LocationComponent(loc));
+        character.addComponent(new LocationComponent(JomlUtil.from(loc)));
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
@@ -338,7 +339,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         positionInChunk.x += 1;
         positionInChunk.y += 1;
         positionInChunk.z += 1;
-        locationComponent.setWorldPosition(positionInChunk);
+        locationComponent.setWorldPosition(JomlUtil.from(positionInChunk));
         entity.addComponent(locationComponent);
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();

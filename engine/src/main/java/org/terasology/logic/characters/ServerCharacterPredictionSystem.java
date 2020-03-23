@@ -31,6 +31,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
@@ -180,7 +181,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
+        return new CharacterStateEvent(time.getGameTimeInMs(), 0, JomlUtil.from(location.getWorldPosition()), JomlUtil.from(location.getWorldRotation()), new Vector3f(), 0, 0, MovementMode.WALKING, false);
     }
 
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {

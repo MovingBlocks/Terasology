@@ -30,6 +30,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.shapes.BoxShapeComponent;
@@ -59,13 +60,13 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
         for (Component component : itemComponent.pickupPrefab.iterateComponents()) {
             Component componentCopy = library.getComponentLibrary().copy(component);
             if (componentCopy instanceof LocationComponent) {
-                ((LocationComponent) componentCopy).setWorldPosition(event.getPosition());
+                ((LocationComponent) componentCopy).setWorldPosition(JomlUtil.from(event.getPosition()));
             }
             itemEntity.addOrSaveComponent(componentCopy);
         }
 
         if (!itemEntity.hasComponent(LocationComponent.class)) {
-            itemEntity.addComponent(new LocationComponent(event.getPosition()));
+            itemEntity.addComponent(new LocationComponent(JomlUtil.from(event.getPosition())));
         }
     }
 

@@ -36,6 +36,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -92,11 +93,11 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
         // Link the mount point entity to the camera
         Location.removeChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity);
         Location.attachChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity,
-                remotePersonHeldItemMountPointComponent.translate,
-                new Quat4f(
+            JomlUtil.from(remotePersonHeldItemMountPointComponent.translate),
+            JomlUtil.from(new Quat4f(
                         TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.y,
                         TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.x,
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.z),
+                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.z)),
                 remotePersonHeldItemMountPointComponent.scale);
 
     }
@@ -224,11 +225,11 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
                 }
 
                 Location.attachChild(mountPointComponent.mountPointEntity, currentHeldItem,
-                        heldItemTransformComponent.translate,
-                        new Quat4f(
+                    JomlUtil.from(heldItemTransformComponent.translate),
+                    JomlUtil.from(new Quat4f(
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.y,
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.x,
-                                TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.z),
+                                TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.z)),
                         heldItemTransformComponent.scale);
             }
         } else {
@@ -306,13 +307,13 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
             }
             float addPitch = 15f * animateAmount;
             float addYaw = 10f * animateAmount;
-            locationComponent.setLocalRotation(new Quat4f(
+            locationComponent.setLocalRotation(JomlUtil.from(new Quat4f(
                     TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.y + addYaw),
                     TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.x + addPitch),
-                    TeraMath.DEG_TO_RAD * mountPointComponent.rotateDegrees.z));
+                    TeraMath.DEG_TO_RAD * mountPointComponent.rotateDegrees.z)));
             Vector3f offset = new Vector3f(0.05f * animateAmount, -0.24f * animateAmount, 0f);
             offset.add(mountPointComponent.translate);
-            locationComponent.setLocalPosition(offset);
+            locationComponent.setLocalPosition(JomlUtil.from(offset));
 
             mountPointComponent.mountPointEntity.saveComponent(locationComponent);
         }

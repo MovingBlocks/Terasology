@@ -25,6 +25,7 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.ImmutableVector3f;
@@ -195,7 +196,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
         updateMode(state, newSwimming, newDiving, newClimbing, isCrouching);
     }
-    
+
     /**
      * Updates a character's movement mode and changes his vertical velocity accordingly.
      * @param state The current state of the character.
@@ -332,10 +333,10 @@ public class KinematicCharacterMover implements CharacterMover {
     private void followToParent(final CharacterStateEvent state, EntityRef entity) {
         LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
         if (!locationComponent.getParent().equals(EntityRef.NULL)) {
-            Vector3f velocity = new Vector3f(locationComponent.getWorldPosition());
+            Vector3f velocity = new Vector3f(JomlUtil.from(locationComponent.getWorldPosition()));
             velocity.sub(state.getPosition());
             state.getVelocity().set(velocity);
-            state.getPosition().set(locationComponent.getWorldPosition());
+            state.getPosition().set(JomlUtil.from(locationComponent.getWorldPosition()));
         }
     }
 

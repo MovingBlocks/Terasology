@@ -24,6 +24,7 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -110,7 +111,7 @@ public class LocalPlayer {
         if (location == null) {
             return out;
         }
-        return location.getWorldPosition(out);
+        return JomlUtil.from(location.getWorldPosition(JomlUtil.from(out)));
     }
 
     public Quat4f getRotation() {
@@ -118,7 +119,7 @@ public class LocalPlayer {
         if (location == null) {
             return new Quat4f(Quat4f.IDENTITY);
         }
-        return location.getWorldRotation();
+        return JomlUtil.from(location.getWorldRotation());
     }
 
     public Vector3f getViewPosition() {
@@ -135,7 +136,7 @@ public class LocalPlayer {
             return getPosition();
         }
 
-        return location.getWorldPosition(out);
+        return JomlUtil.from(location.getWorldPosition(JomlUtil.from(out)));
     }
 
     public Quat4f getViewRotation() {
@@ -148,7 +149,7 @@ public class LocalPlayer {
             return getRotation();
         }
 
-        return location.getWorldRotation();
+        return JomlUtil.from(location.getWorldRotation());
     }
 
     public Vector3f getViewDirection() {

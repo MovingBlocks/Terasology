@@ -16,6 +16,7 @@
 
 package org.terasology.audio.system;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -86,7 +87,7 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
     public void onPlaySound(PlaySoundEvent playSoundEvent, EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location != null) {
-            audioManager.playSound(playSoundEvent.getSound(), location.getWorldPosition(), playSoundEvent.getVolume(), AudioManager.PRIORITY_NORMAL);
+            audioManager.playSound(playSoundEvent.getSound(), JomlUtil.from(location.getWorldPosition()), playSoundEvent.getVolume(), AudioManager.PRIORITY_NORMAL);
         } else {
             audioManager.playSound(playSoundEvent.getSound(), playSoundEvent.getVolume());
         }

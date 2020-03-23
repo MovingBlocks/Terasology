@@ -31,6 +31,7 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
@@ -143,7 +144,7 @@ public class TrunkSystem extends BaseComponentSystem {
             newTrunk.addComponent(new BlockRegionComponent(Region3i.createBounded(leftBlockPos, rightBlockPos)));
             Vector3f doorCenter = leftBlockPos.toVector3f();
             doorCenter.add(rightBlockPos.sub(leftBlockPos).toVector3f());
-            newTrunk.addComponent(new LocationComponent(doorCenter));
+            newTrunk.addComponent(new LocationComponent(JomlUtil.from(doorCenter)));
             TrunkComponent newDoorComp = newTrunk.getComponent(TrunkComponent.class);
             newTrunk.saveComponent(newDoorComp);
             newTrunk.send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));

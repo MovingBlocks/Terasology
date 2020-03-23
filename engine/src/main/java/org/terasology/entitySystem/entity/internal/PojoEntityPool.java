@@ -27,6 +27,7 @@ import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -120,10 +121,10 @@ public class PojoEntityPool implements EngineEntityPool {
         }
 
         if (position != null) {
-            loc.setWorldPosition(position);
+            loc.setWorldPosition(JomlUtil.from(position));
         }
         if (rotation != null) {
-            loc.setWorldRotation(rotation);
+            loc.setWorldRotation(JomlUtil.from(rotation));
         }
 
         return builder.build();
