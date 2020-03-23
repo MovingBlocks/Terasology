@@ -208,7 +208,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     Transform toWorldSpace = new Transform(JomlUtil.from(worldPos), JomlUtil.from(worldRot), worldScale);
 
                     org.joml.Vector3f offsetFromCamera = new org.joml.Vector3f();
-                    offsetFromCamera.sub(worldPos, cameraPosition);
+                    worldPos.sub(cameraPosition,offsetFromCamera);
                     Matrix4f matrixCameraSpace = new Matrix4f(JomlUtil.from(worldRot), JomlUtil.from(offsetFromCamera), worldScale);
 
                     AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
