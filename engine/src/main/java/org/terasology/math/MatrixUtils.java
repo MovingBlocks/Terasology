@@ -94,6 +94,10 @@ public final class MatrixUtils {
         return fb;
     }
 
+    public static FloatBuffer matrixToFloatBuffer(Matrix3fc m, FloatBuffer fb) {
+        return m.getTransposed(fb);
+    }
+
     /**
      * Copies the given matrix into an existing FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).
@@ -122,6 +126,18 @@ public final class MatrixUtils {
 
         fb.flip();
         return fb;
+    }
+
+    /**
+     * Copies the given matrix into an existing FloatBuffer.
+     * The order of the elements is column major (as used by OpenGL).
+     *
+     * @param m  the matrix to copy
+     * @param fb the float buffer to copy the matrix into
+     * @return The provided float buffer.
+     */
+    public static FloatBuffer matrixToFloatBuffer(Matrix4fc m, FloatBuffer fb) {
+        return m.getTransposed(fb);
     }
 
     public static org.joml.Matrix4f createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
@@ -241,6 +257,10 @@ public final class MatrixUtils {
         return result;
     }
 
+    public static org.joml.Matrix4f calcModelViewMatrix(Matrix4fc m, Matrix4fc vm) {
+        return new org.joml.Matrix4f(m).mul(vm);
+    }
+
     public static Matrix3f calcNormalMatrix(Matrix4f mv) {
         Matrix3f result = new Matrix3f();
         result.m00 = mv.m00;
@@ -252,6 +272,23 @@ public final class MatrixUtils {
         result.m02 = mv.m02;
         result.m12 = mv.m12;
         result.m22 = mv.m22;
+
+        result.invert();
+        result.transpose();
+        return result;
+    }
+
+    public static org.joml.Matrix3f calcNormalMatrix(Matrix4fc mv) {
+        org.joml.Matrix3f result = new org.joml.Matrix3f();
+        result.m00 = mv.m00();
+        result.m10 = mv.m10();
+        result.m20 = mv.m20();
+        result.m01 = mv.m01();
+        result.m11 = mv.m11();
+        result.m21 = mv.m21();
+        result.m02 = mv.m02();
+        result.m12 = mv.m12();
+        result.m22 = mv.m22();
 
         result.invert();
         result.transpose();
