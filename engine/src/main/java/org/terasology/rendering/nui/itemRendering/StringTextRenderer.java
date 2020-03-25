@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.itemRendering;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
@@ -67,7 +68,7 @@ public abstract class StringTextRenderer<T> extends AbstractItemRenderer<T> {
         String text = getString(value);
         if (wrap) {
             List<String> lines = TextLineBuilder.getLines(font, text, canvas.size().x);
-            return font.getSize(lines);
+            return JomlUtil.from(font.getSize(lines));
         } else {
             return new Vector2i(font.getWidth(text), font.getLineHeight());
         }
