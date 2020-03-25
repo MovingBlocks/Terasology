@@ -152,7 +152,7 @@ public class DeferredMainLightNode extends AbstractNode {
         cameraPosition = activeCamera.getPosition();
         cameraPosition.sub(lightCamera.getPosition(),activeCameraToLightSpace);
 //        activeCameraToLightSpace.sub(cameraPosition, JomlUtil.from(lightCamera.getPosition()));
-        mainLightInViewSpace = JomlUtil.from(backdropProvider.getSunDirection(true));
+        mainLightInViewSpace = backdropProvider.getSunDirection(true);
         activeCamera.getViewMatrix().transformPosition(mainLightInViewSpace);
 
         // TODO: This is necessary right now because activateFeature removes all material parameters.
