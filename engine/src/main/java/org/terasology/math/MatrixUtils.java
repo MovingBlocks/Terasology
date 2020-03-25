@@ -258,7 +258,7 @@ public final class MatrixUtils {
     }
 
     public static org.joml.Matrix4f calcModelViewMatrix(Matrix4fc m, Matrix4fc vm) {
-        return new org.joml.Matrix4f(m).mul(vm);
+        return new org.joml.Matrix4f(vm).mul(m);
     }
 
     public static Matrix3f calcNormalMatrix(Matrix4f mv) {
@@ -279,19 +279,6 @@ public final class MatrixUtils {
     }
 
     public static org.joml.Matrix3f calcNormalMatrix(Matrix4fc mv) {
-        org.joml.Matrix3f result = new org.joml.Matrix3f();
-        result.m00 = mv.m00();
-        result.m10 = mv.m10();
-        result.m20 = mv.m20();
-        result.m01 = mv.m01();
-        result.m11 = mv.m11();
-        result.m21 = mv.m21();
-        result.m02 = mv.m02();
-        result.m12 = mv.m12();
-        result.m22 = mv.m22();
-
-        result.invert();
-        result.transpose();
-        return result;
+        return mv.get3x3(new org.joml.Matrix3f()).invert().transpose();
     }
 }

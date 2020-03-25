@@ -252,12 +252,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             Vector3f worldPositionCameraSpace = worldPos.sub(cameraPosition,new Vector3f());
 
             worldPos.y -= skeletalMesh.heightOffset;
+            Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace,new Quaternionf(), worldScale).transpose();
 
-            Matrix4f matrixCameraSpace = new Matrix4f()
-                .translate(worldPositionCameraSpace)
-                .scale(worldScale);
 
-            Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+            Matrix4f modelViewMatrix = new Matrix4f(matrixCameraSpace).mul(worldRenderer.getActiveCamera().getViewMatrix());
             MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
             skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
@@ -322,11 +320,9 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 Vector3f worldPositionCameraSpace =  worldPos.sub(cameraPosition,new Vector3f());
 
                 float worldScale = location.getWorldScale();
-                Matrix4f matrixCameraSpace = new Matrix4f()
-                    .translate(worldPositionCameraSpace)
-                    .scale(worldScale);
+                Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace,new Quaternionf(), worldScale).transpose();
 
-                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+                Matrix4f modelViewMatrix = new Matrix4f(matrixCameraSpace).mul(worldRenderer.getActiveCamera().getViewMatrix());
                 MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
                 material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);

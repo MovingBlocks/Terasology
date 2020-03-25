@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.logic;
 
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Transform;
 import com.google.common.collect.HashMultimap;
@@ -39,10 +42,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.VecMath;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -168,9 +167,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     }
 
     private void renderEntitiesByMaterial(SetMultimap<Material, EntityRef> meshByMaterial) {
-        Vector3f cameraPosition = JomlUtil.from(worldRenderer.getActiveCamera().getPosition());
+        Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-        Quat4f worldRot = new Quat4f();
+        Quaternionf worldRot = new Quaternionf();
         Vector3f worldPos = new Vector3f();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
@@ -191,7 +190,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                     LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                    if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null || !isRelevant(entity, location.getWorldPosition())) {
+                    if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null || !isRelevant(entity, JomlUtil.from(location.getWorldPosition()))) {
                         continue;
                     }
                     if (meshComp.mesh.isDisposed()) {
@@ -199,15 +198,14 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         continue;
                     }
 
-                    location.getWorldRotation(worldRot);
-                    location.getWorldPosition(worldPos);
+                    worldRot.set(JomlUtil.from(location.getWorldRotation()));
+                    worldPos.set(JomlUtil.from(location.getWorldPosition()));
                     float worldScale = location.getWorldScale();
 
-                    Transform toWorldSpace = new Transform(worldPos, worldRot, worldScale);
+                    Transform toWorldSpace = new Transform(JomlUtil.from(worldPos), JomlUtil.from(worldRot), worldScale);
 
-                    Vector3f offsetFromCamera = new Vector3f();
-                    offsetFromCamera.sub(worldPos, cameraPosition);
-                    Matrix4f matrixCameraSpace = new Matrix4f(worldRot, offsetFromCamera, worldScale);
+                    Vector3f offsetFromCamera = worldPos.sub(cameraPosition,new Vector3f());
+                    Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(offsetFromCamera,worldRot, worldScale).transpose();
 
                     AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
@@ -219,7 +217,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                             lastMesh.preRender();
                         }
 
-                        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
+                        Matrix4f modelViewMatrix = new Matrix4f(matrixCameraSpace).mul(worldRenderer.getActiveCamera().getViewMatrix());
                         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
                         MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
 
@@ -228,8 +226,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
                         material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
-                        material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
-                        material.setFloat("blockLight", Math.max(worldRenderer.getBlockLightIntensityAt(worldPos), meshComp.selfLuminance), true);
+                        material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(JomlUtil.from(worldPos)), true);
+                        material.setFloat("blockLight", Math.max(worldRenderer.getBlockLightIntensityAt(JomlUtil.from(worldPos)), meshComp.selfLuminance), true);
 
                         lastMesh.doRender();
                     }
@@ -253,7 +251,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
      * @return true if the entity itself or the block at the given position are relevant, false otherwise.
      */
     private boolean isRelevant(EntityRef entity, Vector3f position) {
-        return worldProvider.isBlockRelevant(position) || entity.isAlwaysRelevant();
+        return worldProvider.isBlockRelevant(JomlUtil.from(position)) || entity.isAlwaysRelevant();
     }
 
     @Override
