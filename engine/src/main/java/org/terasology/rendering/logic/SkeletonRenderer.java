@@ -252,7 +252,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             Vector3f worldPositionCameraSpace = worldPos.sub(cameraPosition,new Vector3f());
 
             worldPos.y -= skeletalMesh.heightOffset;
-            Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace,new Quaternionf(), worldScale).transpose();
+            Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace,worldRot, worldScale).transpose();
 
 
             Matrix4f modelViewMatrix = new Matrix4f(matrixCameraSpace).mul(worldRenderer.getActiveCamera().getViewMatrix());
