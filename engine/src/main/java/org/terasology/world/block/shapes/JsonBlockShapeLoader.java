@@ -39,8 +39,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CompoundShape;
 import org.terasology.physics.shapes.ConvexHullShape;
-import org.terasology.utilities.gson.Vector2fTypeAdapter;
-import org.terasology.utilities.gson.Vector3fTypeAdapter;
+import org.terasology.utilities.gson.legacy.LegacyVector2fTypeAdapter;
+import org.terasology.utilities.gson.legacy.LegacyVector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 
 import java.io.IOException;
@@ -64,8 +64,8 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 .setPrettyPrinting()
                 .registerTypeAdapter(BlockShapeData.class, new BlockShapeHandler())
                 .registerTypeAdapter(BlockMeshPart.class, new BlockMeshPartHandler())
-                .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
-                .registerTypeAdapter(Vector2f.class, new Vector2fTypeAdapter())
+                .registerTypeAdapter(Vector3f.class, new LegacyVector3fTypeAdapter())
+                .registerTypeAdapter(Vector2f.class, new LegacyVector2fTypeAdapter())
                 .create();
     }
 

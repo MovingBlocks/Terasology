@@ -34,8 +34,8 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyQuat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3fTypeHandler;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.utilities.Assets;
@@ -62,8 +62,8 @@ public class PojoPrefabManagerTest {
         Reflections reflections = new Reflections(getClass().getClassLoader());
         TypeHandlerLibrary lib = new TypeHandlerLibrary(reflections);
 
-        lib.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-        lib.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+        lib.addTypeHandler(Vector3f.class, new LegacyVector3fTypeHandler());
+        lib.addTypeHandler(Quat4f.class, new LegacyQuat4fTypeHandler());
 
         entitySystemLibrary = new EntitySystemLibrary(context, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();

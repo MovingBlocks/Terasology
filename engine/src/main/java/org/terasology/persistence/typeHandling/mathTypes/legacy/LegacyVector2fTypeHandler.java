@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeHandling.mathTypes;
+package org.terasology.persistence.typeHandling.mathTypes.legacy;
 
-import gnu.trove.list.TIntList;
-import org.joml.Vector3i;
+
+import gnu.trove.list.TFloatList;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
@@ -25,20 +26,20 @@ import java.util.Optional;
 
 /**
  */
-public class Vector3iTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector3i> {
+public class LegacyVector2fTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector2f> {
 
     @Override
-    public PersistedData serializeNonNull(Vector3i value, PersistedDataSerializer serializer) {
-        return serializer.serialize(value.x, value.y, value.z);
+    public PersistedData serializeNonNull(Vector2f value, PersistedDataSerializer serializer) {
+        return serializer.serialize(value.x, value.y);
     }
 
     @Override
-    public Optional<Vector3i> deserialize(PersistedData data) {
+    public Optional<Vector2f> deserialize(PersistedData data) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
-            if (dataArray.isNumberArray() && dataArray.size() > 2) {
-                TIntList ints = dataArray.getAsIntegerArray();
-                return Optional.of(new Vector3i(ints.get(0), ints.get(1), ints.get(2)));
+            if (dataArray.isNumberArray() && dataArray.size() > 1) {
+                TFloatList floats = dataArray.getAsFloatArray();
+                return Optional.of(new Vector2f(floats.get(0), floats.get(1)));
             }
         }
         return Optional.empty();
