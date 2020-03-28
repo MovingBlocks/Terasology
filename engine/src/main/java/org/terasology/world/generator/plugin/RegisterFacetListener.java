@@ -15,14 +15,26 @@
  */
 package org.terasology.world.generator.plugin;
 
+import org.terasology.world.generation.Facet;
+import org.terasology.world.generation.FacetProviderListener;
+import org.terasology.world.generation.GeneratingRegion;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Register a client class that wishes to be notified on the provision of a {@link Facet} to a {@link GeneratingRegion}.
+ * The annotated class should implement {@link FacetProviderListener}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RegisterListener {
+public @interface RegisterFacetListener {
+
+    /**
+     * An array of {@link Facet}s about which this listener will be notified.
+     * @return
+     */
+    Facet[] value();
 }

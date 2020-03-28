@@ -16,9 +16,10 @@
 package org.terasology.world.generator.plugin;
 
 import java.util.List;
+import java.util.Map;
 
 @FunctionalInterface
 public interface WorldGeneratorListenerLibrary {
 
-    <U extends WorldGeneratorListener> List<U> instantiateAllOfType(Class<U> ofType);
+    <U extends WorldGeneratorListener> Map<Class<?>, List<U>> instantiateAllOfType(Class<U> ofType);
 }

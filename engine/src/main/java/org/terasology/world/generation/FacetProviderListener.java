@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,50 @@
  */
 package org.terasology.world.generation;
 
+import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.generator.plugin.RegisterFacetListener;
 import org.terasology.world.generator.plugin.WorldGeneratorListener;
 
-public interface FacetProviderListener extends FacetListener, WorldGeneratorListener {
+/**
+ * <p>
+ * A {@code FacetProviderListener} is a class that wishes to be notified when certain {@link Facet}s are provided
+ * to a {@link GeneratingRegion} during chunk generation. It does so because it wants to know about certain
+ * details of the chunk that can be used for later decision making by other systems. Such as:
+ * <ul>
+ *     <li>Wanting to know the {@link SurfaceHeightFacet surface height} to add buildings or other features</li>
+ *     <li>Wanting to know where caves are to spawn monsters in those caves periodically</li>
+ *     <li>Wanting to know where the beaches (areas of sand near water) are to add buried treasure</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Implementing classes should be annotated with {@link RegisterFacetListener}, providing the facets they are interested in.
+ * </p>
+ */
+public interface FacetProviderListener extends WorldGeneratorListener {
+
+    default void initialize() {
+        // don't do anything
+    }
+
+    /**
+     * Has this listener been initialised. Because listeners can listen to multiple facets it's possible that
+     * initialise may be called more than once.
+     * @return true if this listener has already been initialised, false otherwise.
+     */
+    default boolean isInitialised() {
+        return false;
+    }
+
+    /**
+     * Notify the listener of a facet provided to a region.
+     * <br/>
+     * <strong>This call is made from the world generation thread, not the main thread</strong>. As such it should not
+     * do any long running processing and should be thread safe. Ideally it should check if the region-facet combination
+     * is of interest, and if so notify another system to do any actual processing <em>on a separate thread</em>.
+     *
+     * @param region A region that is undergoing generation.
+     * @param facet The facet that was provided to the region.
+     * @param <F>
+     */
+    <F extends WorldFacet> void notify(GeneratingRegion region, F facet);
 }

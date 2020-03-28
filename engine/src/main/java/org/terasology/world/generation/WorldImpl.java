@@ -16,7 +16,7 @@
 package org.terasology.world.generation;
 
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.math.Region3i;
 import org.terasology.world.chunks.CoreChunk;
@@ -33,7 +33,7 @@ public class WorldImpl implements World {
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private final List<WorldRasterizer> worldRasterizers;
     private final List<EntityProvider> entityProviders;
-    private final List<FacetListener> facetListeners;
+    private final Map<Class<?>, List<FacetProviderListener>> listenerMap;
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
     private final int seaLevel;
 
@@ -46,7 +46,7 @@ public class WorldImpl implements World {
         this.worldRasterizers = worldRasterizers;
         this.entityProviders = entityProviders;
         this.borders = borders;
-        this.facetListeners = Lists.newArrayList();
+        this.listenerMap = Maps.newLinkedHashMap();
         this.seaLevel = seaLevel;
     }
 
@@ -54,19 +54,19 @@ public class WorldImpl implements World {
                      List<WorldRasterizer> worldRasterizers,
                      List<EntityProvider> entityProviders,
                      Map<Class<? extends WorldFacet>, Border3D> borders,
-                     List<FacetListener> facetListeners,
+                     Map<Class<?>, List<FacetProviderListener>> listenerMap,
                      int seaLevel) {
         this.facetProviderChains = facetProviderChains;
         this.worldRasterizers = worldRasterizers;
         this.entityProviders = entityProviders;
         this.borders = borders;
-        this.facetListeners = facetListeners;
+        this.listenerMap = listenerMap;
         this.seaLevel = seaLevel;
     }
 
     @Override
     public Region getWorldData(Region3i region) {
-        return new RegionImpl(region, facetProviderChains, borders, facetListeners);
+        return new RegionImpl(region, facetProviderChains, borders, listenerMap);
     }
 
     @Override
@@ -99,7 +99,10 @@ public class WorldImpl implements World {
 
         facetProviders.forEach(FacetProvider::initialize);
 
-        facetListeners.forEach(FacetListener::initialize);
+        for (Map.Entry<Class<?>, List<FacetProviderListener>> entry : listenerMap.entrySet()) {
+            List<FacetProviderListener> value = entry.getValue();
+            value.forEach(FacetProviderListener::initialize);
+        }
 
         worldRasterizers.forEach(WorldRasterizer::initialize);
 

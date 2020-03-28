@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generator.plugin;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -24,8 +24,11 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassLibrary;
+import org.terasology.world.generation.Facet;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -37,7 +40,7 @@ public class DefaultWorldGeneratorListenerLibrary implements WorldGeneratorListe
 
     public DefaultWorldGeneratorListenerLibrary(ModuleEnvironment moduleEnvironment, Context context) {
         library = new DefaultClassLibrary<>(context);
-        for (Class entry : moduleEnvironment.getTypesAnnotatedWith(RegisterListener.class)) {
+        for (Class entry : moduleEnvironment.getTypesAnnotatedWith(RegisterFacetListener.class)) {
             if (WorldGeneratorListener.class.isAssignableFrom(entry)) {
                 library.register(
                         new SimpleUri(moduleEnvironment.getModuleProviding(entry), entry.getSimpleName()), entry);
@@ -46,21 +49,32 @@ public class DefaultWorldGeneratorListenerLibrary implements WorldGeneratorListe
     }
 
     @Override
-    public <U extends WorldGeneratorListener> List<U> instantiateAllOfType(Class<U> ofType) {
-        logger.info("Instantiating {}", ofType.getSimpleName());
-        List<U> result = Lists.newArrayList();
+    public <U extends WorldGeneratorListener> Map<Class<?>, List<U>> instantiateAllOfType(Class<U> ofType) {
+        Map<Class<?>, List<U>> listenerMap = Maps.newLinkedHashMap();
         for (ClassMetadata classMetadata : library) {
             if (ofType.isAssignableFrom(classMetadata.getType())
                     && classMetadata.isConstructable()
-                    && classMetadata.getType().getAnnotation(RegisterListener.class) != null) {
+                    && classMetadata.getType().getAnnotation(RegisterFacetListener.class) != null) {
 
                 U item = ofType.cast(classMetadata.newInstance());
                 if (item != null) {
-                    logger.info("Adding listener {}", ofType.getSimpleName());
-                    result.add(item);
+                    RegisterFacetListener annotation =
+                            (RegisterFacetListener) classMetadata.getType().getAnnotation(RegisterFacetListener.class);
+                    String listenerName = item.getClass().getSimpleName();
+                    logger.info("Registering FacetListener '{}'", listenerName);
+                    Facet[] facets = annotation.value();
+                    if (facets.length == 0) {
+                        logger.error("FacetListener '{}' does not specify any Facets", listenerName);
+                        continue;
+                    }
+                    for (Facet facet : facets) {
+                        logger.info("{} listens to {}", listenerName, facet.value());
+                        List<U> listeners = listenerMap.computeIfAbsent(facet.value(), k -> new LinkedList<>());
+                        listeners.add(item);
+                    }
                 }
             }
         }
-        return result;
+        return listenerMap;
     }
 }

@@ -15,16 +15,14 @@
  */
 package org.terasology.world.generator.plugin;
 
+import org.terasology.world.generation.FacetProviderListener;
+
 /**
  * A category of {@link Class}es that would like to know about certain aspects of world generation, but do not seek
  * to <em>influence</em> world generation.
  * <br/>
- * Some examples may include:
- * <ul>
- *     <li>Wanting to know the surface height to add buildings</li>
- *     <li>Wanting to know where caves are to spawn monsters in those caves periodically</li>
- *     <li>Wanting to know where the beaches (areas of sand near water) are to add buried treasure</li>
- * </ul>
+ * Current subclasses are:
+ * {@link FacetProviderListener}
  */
 public interface WorldGeneratorListener {
 }

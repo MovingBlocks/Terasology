@@ -48,7 +48,7 @@ public class WorldBuilder extends ProviderStore {
     private final Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
     private final List<EntityProvider> entityProviders = new ArrayList<>();
-    private final List<FacetListener> listenerList = Lists.newArrayList();
+    private final Map<Class<?>, List<FacetProviderListener>> listenerMap = Maps.newLinkedHashMap();
     private int seaLevel = 32;
 
     private WorldGeneratorPluginLibrary pluginLibrary;
@@ -84,11 +84,6 @@ public class WorldBuilder extends ProviderStore {
         return this;
     }
 
-    public WorldBuilder addListener(FacetListener listener) {
-        listenerList.add(listener);
-        return this;
-    }
-
     public WorldBuilder addPlugins() {
         pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class).forEach(this::addProvider);
         pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class).forEach(this::addRasterizer);
@@ -103,6 +98,10 @@ public class WorldBuilder extends ProviderStore {
             listenerLibrary.instantiateAllOfType(FacetProviderListener.class).forEach(this::addListener);
         }
         return this;
+    }
+
+    private void addListener(Class<?> aClass, List<FacetProviderListener> facetProviderListeners) {
+        listenerMap.put(aClass, facetProviderListeners);
     }
 
     /**
@@ -130,7 +129,7 @@ public class WorldBuilder extends ProviderStore {
                 orderedRasterizers,
                 entityProviders,
                 determineBorders(providerChains),
-                listenerList,
+                listenerMap,
                 seaLevel);
     }
 
