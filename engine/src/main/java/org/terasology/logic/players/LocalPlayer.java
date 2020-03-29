@@ -107,7 +107,7 @@ public class LocalPlayer {
 
     public Vector3f getPosition(Vector3f out) {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             return out;
         }
         return location.getWorldPosition(out);
@@ -115,7 +115,7 @@ public class LocalPlayer {
 
     public Quat4f getRotation() {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             return new Quat4f(Quat4f.IDENTITY);
         }
         return location.getWorldRotation();
@@ -131,7 +131,7 @@ public class LocalPlayer {
             return out;
         }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             return getPosition();
         }
 
@@ -144,7 +144,7 @@ public class LocalPlayer {
             return new Quat4f(Quat4f.IDENTITY);
         }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             return getRotation();
         }
 
