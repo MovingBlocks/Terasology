@@ -83,7 +83,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
         switch (explosionComp.relativeTo) {
             case Self:
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
-                if (loc != null) {
+                if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
                     origin = loc.getWorldPosition();
                 }
                 break;
