@@ -26,6 +26,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -47,16 +48,16 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
 
     private static final Logger logger = LoggerFactory.getLogger(MD5SkeletonLoader.class);
 
-    private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + MD5Patterns.INTEGER_PATTERN + 
+    private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + MD5Patterns.INTEGER_PATTERN +
             "\\s*" + MD5Patterns.VECTOR3_PATTERN + "\\s*" + MD5Patterns.VECTOR3_PATTERN);
-    private Pattern vertPatten = Pattern.compile("vert\\s+" + MD5Patterns.INTEGER_PATTERN + 
-            "\\s+" + MD5Patterns.VECTOR2_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN + 
+    private Pattern vertPatten = Pattern.compile("vert\\s+" + MD5Patterns.INTEGER_PATTERN +
+            "\\s+" + MD5Patterns.VECTOR2_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN +
             "\\s+" + MD5Patterns.INTEGER_PATTERN);
-    private Pattern triPattern = Pattern.compile("tri\\s+" + MD5Patterns.INTEGER_PATTERN + 
-            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN + 
+    private Pattern triPattern = Pattern.compile("tri\\s+" + MD5Patterns.INTEGER_PATTERN +
+            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN +
             "\\s+" + MD5Patterns.INTEGER_PATTERN);
-    private Pattern weightPattern = Pattern.compile("weight\\s+" + MD5Patterns.INTEGER_PATTERN + 
-            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.FLOAT_PATTERN + 
+    private Pattern weightPattern = Pattern.compile("weight\\s+" + MD5Patterns.INTEGER_PATTERN +
+            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.FLOAT_PATTERN +
             "\\s+" + MD5Patterns.VECTOR3_PATTERN);
 
     public MD5SkeletonLoader() {
@@ -71,7 +72,7 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
             List<Bone> bones = Lists.newArrayListWithCapacity(md5.numJoints);
             for (int i = 0; i < md5.numJoints; ++i) {
                 MD5Joint joint = md5.joints[i];
-                Bone bone = new Bone(i, joint.name, joint.position, joint.orientation);
+                Bone bone = new Bone(i, joint.name, JomlUtil.from(joint.position), JomlUtil.from(joint.orientation));
                 bones.add(bone);
                 if (joint.parent != -1) {
                     bones.get(joint.parent).addChild(bone);
@@ -82,14 +83,14 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
                 // TODO: Support multiple mesh somehow?
                 MD5Mesh mesh = md5.meshes[0];
                 for (MD5Weight weight : mesh.weightList) {
-                    skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
+                    skeletonBuilder.addWeight(new BoneWeight(JomlUtil.from(weight.position), weight.bias, weight.jointIndex));
                 }
 
-                List<Vector2f> uvs = Lists.newArrayList();
+                List<org.joml.Vector2f> uvs = Lists.newArrayList();
                 TIntList vertexStartWeight = new TIntArrayList(mesh.numVertices);
                 TIntList vertexWeightCount = new TIntArrayList(mesh.numVertices);
                 for (MD5Vertex vert : mesh.vertexList) {
-                    uvs.add(vert.uv);
+                    uvs.add(JomlUtil.from(vert.uv));
                     vertexStartWeight.add(vert.startWeight);
                     vertexWeightCount.add(vert.countWeight);
                 }

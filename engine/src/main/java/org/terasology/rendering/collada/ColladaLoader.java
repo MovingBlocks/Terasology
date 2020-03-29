@@ -27,6 +27,7 @@ import org.eaxy.NonMatchingPathException;
 import org.eaxy.Xml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -345,7 +346,7 @@ public class ColladaLoader {
                 throw new ColladaParseException("no joint orientation for joint with element id " + joint.element.id());
             }
             // index argument is not used for anything currently, so we'll just set it to -1
-            joint.bone = new Bone(-1, joint.name, joint.position, joint.orientation);
+            joint.bone = new Bone(-1, joint.name, JomlUtil.from(joint.position), JomlUtil.from(joint.orientation));
         }
 
         for (MD5Joint joint : md5JointList) {

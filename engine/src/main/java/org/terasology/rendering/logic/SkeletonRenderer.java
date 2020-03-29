@@ -18,6 +18,7 @@ package org.terasology.rendering.logic;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import jdk.nashorn.internal.scripts.JO;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -95,8 +96,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 EntityRef parent = (bone.getParent() != null) ? skeleton.boneEntities.get(bone.getParent().getName()) : entity;
                 EntityRef boneEntity = entityManager.create(loc);
                 Location.attachChild(parent, boneEntity);
-                loc.setLocalPosition(bone.getLocalPosition());
-                loc.setLocalRotation(bone.getLocalRotation());
+                loc.setLocalPosition(JomlUtil.from(bone.getLocalPosition()));
+                loc.setLocalRotation(JomlUtil.from(bone.getLocalRotation()));
 
                 if (bone.getParent() == null) {
                     skeleton.rootBone = boneEntity;
@@ -266,8 +267,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(JomlUtil.from(worldPos)), true);
             skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(JomlUtil.from(worldPos)), true);
 
-            List<org.terasology.math.geom.Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
-            List<Quat4f> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
+            List<Vector3f> bonePositions = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
+            List<Quaternionf> boneRotations = Lists.newArrayListWithCapacity(skeletalMesh.mesh.getVertexCount());
             for (Bone bone : skeletalMesh.mesh.getBones()) {
                 EntityRef boneEntity = skeletalMesh.boneEntities.get(bone.getName());
                 if (boneEntity == null) {
@@ -278,17 +279,17 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     Vector3f pos = JomlUtil.from(boneLocation.getWorldPosition());
                     pos.sub(worldPos);
                     inverseWorldRot.transform(pos, pos);
-                    bonePositions.add(JomlUtil.from(pos));
+                    bonePositions.add(pos);
                     Quaternionf rot = new Quaternionf(inverseWorldRot);
                     rot.mul(JomlUtil.from(boneLocation.getWorldRotation()));
-                    boneRotations.add(JomlUtil.from(rot));
+                    boneRotations.add(rot);
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());
-                    bonePositions.add(JomlUtil.from(new Vector3f()));
-                    boneRotations.add(new Quat4f());
+                    bonePositions.add(new Vector3f());
+                    boneRotations.add(new Quaternionf());
                 }
             }
-            ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
+            ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(JomlUtil.from(skeletalMesh.scale), JomlUtil.from(skeletalMesh.translate));
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(bonePositions, boneRotations);
         }
     }

@@ -19,9 +19,10 @@ import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.JomlUtil;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.mesh.MeshData;
 
@@ -75,7 +76,7 @@ public class SkeletalMeshDataBuilder {
     public SkeletalMeshDataBuilder addBox(Bone bone, Vector3f offset, Vector3f size, float u, float v) {
         MeshBuilder meshBuilder = new MeshBuilder();
         meshBuilder.setTextureMapper(textureMapper);
-        meshBuilder.addBox(offset, size, u, v);
+        meshBuilder.addBox(JomlUtil.from(offset), JomlUtil.from(size), u, v);
         return addMesh(bone, meshBuilder);
     }
 
@@ -141,7 +142,7 @@ public class SkeletalMeshDataBuilder {
         }
         AABB staticAabb;
         if (minOfAABB != null && maxOfAABB != null) {
-            staticAabb = AABB.createMinMax(minOfAABB, maxOfAABB);
+            staticAabb = AABB.createMinMax(JomlUtil.from(minOfAABB), JomlUtil.from(maxOfAABB));
         } else {
             staticAabb = AABB.createEmpty();
         }
