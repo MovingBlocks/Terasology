@@ -20,13 +20,14 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.JomlUtil;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 
@@ -117,7 +118,7 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
                 }
             }
 
-            List<Quat4f> rotations = rawRotations.stream().map(rot ->
+            List<Quaternionf> rotations = rawRotations.stream().map(rot ->
                     MD5ParserCommon.completeQuat4f(rot.x, rot.y, rot.z)).collect(Collectors.toCollection(ArrayList::new));
 
             // Rotate just the root bone to correct for coordinate system differences
@@ -224,7 +225,7 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
             max.x = Math.max(a.x, b.x);
             max.y = Math.max(a.y, b.y);
             max.z = Math.max(a.z, b.z);
-            md5.bounds[i] = AABB.createMinMax(min, max);
+            md5.bounds[i] = AABB.createMinMax(JomlUtil.from(min), JomlUtil.from(max));
         }
     }
 

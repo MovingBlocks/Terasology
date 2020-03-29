@@ -20,6 +20,9 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -27,9 +30,6 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
@@ -72,7 +72,7 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
             List<Bone> bones = Lists.newArrayListWithCapacity(md5.numJoints);
             for (int i = 0; i < md5.numJoints; ++i) {
                 MD5Joint joint = md5.joints[i];
-                Bone bone = new Bone(i, joint.name, JomlUtil.from(joint.position), JomlUtil.from(joint.orientation));
+                Bone bone = new Bone(i, joint.name, joint.position, joint.orientation);
                 bones.add(bone);
                 if (joint.parent != -1) {
                     bones.get(joint.parent).addChild(bone);
@@ -83,14 +83,14 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
                 // TODO: Support multiple mesh somehow?
                 MD5Mesh mesh = md5.meshes[0];
                 for (MD5Weight weight : mesh.weightList) {
-                    skeletonBuilder.addWeight(new BoneWeight(JomlUtil.from(weight.position), weight.bias, weight.jointIndex));
+                    skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
                 }
 
-                List<org.joml.Vector2f> uvs = Lists.newArrayList();
+                List<Vector2f> uvs = Lists.newArrayList();
                 TIntList vertexStartWeight = new TIntArrayList(mesh.numVertices);
                 TIntList vertexWeightCount = new TIntArrayList(mesh.numVertices);
                 for (MD5Vertex vert : mesh.vertexList) {
-                    uvs.add(JomlUtil.from(vert.uv));
+                    uvs.add(vert.uv);
                     vertexStartWeight.add(vert.startWeight);
                     vertexWeightCount.add(vert.countWeight);
                 }
@@ -225,7 +225,7 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
         String name;
         int parent;
         Vector3f position;
-        Quat4f orientation;
+        Quaternionf orientation;
     }
 
     private static class MD5Mesh {
