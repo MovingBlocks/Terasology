@@ -18,6 +18,7 @@ package org.terasology.world.block.shapes;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkVertexFlag;
 
@@ -30,6 +31,7 @@ import java.util.Arrays;
  */
 public class BlockMeshPart {
     private static final float BORDER = 1f / 128f;
+    private static final Vector4f plainColor = new Vector4f(1, 1, 1, 1);
 
     private Vector3f[] vertices;
     private Vector3f[] normals;
@@ -87,7 +89,7 @@ public class BlockMeshPart {
         return new BlockMeshPart(vertices, normals, newTexCoords, indices, frames);
     }
 
-    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
+    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, ChunkMesh.RenderType renderType, Vector4f colorResult, ChunkVertexFlag flags) {
         ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
         for (Vector2f texCoord : texCoords) {
             elements.tex.add(texCoord.x);
@@ -96,10 +98,10 @@ public class BlockMeshPart {
 
         int nextIndex = elements.vertexCount;
         for (int vIdx = 0; vIdx < vertices.length; ++vIdx) {
-            elements.color.add(1);
-            elements.color.add(1);
-            elements.color.add(1);
-            elements.color.add(1);
+            elements.color.add(colorResult.x);
+            elements.color.add(colorResult.y);
+            elements.color.add(colorResult.z);
+            elements.color.add(colorResult.w);
             elements.vertices.add(vertices[vIdx].x + offsetX);
             elements.vertices.add(vertices[vIdx].y + offsetY);
             elements.vertices.add(vertices[vIdx].z + offsetZ);
@@ -114,6 +116,10 @@ public class BlockMeshPart {
         for (int index : indices) {
             elements.indices.add(index + nextIndex);
         }
+    }
+
+    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
+        this.appendTo(chunk, offsetX, offsetY, offsetZ, renderType, plainColor, flags);
     }
 
     public BlockMeshPart rotate(Quat4f rotation) {
