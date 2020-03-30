@@ -19,7 +19,7 @@ node ("default-java") {
         }
     }
     stage('Analytics') {
-        sh "./gradlew --console=plain check"
+        sh "./gradlew --console=plain check javadoc"
     }
     stage('Record') {
         junit testResults: '**/build/test-results/test/*.xml',  allowEmptyResults: true
