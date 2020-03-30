@@ -23,19 +23,23 @@ buildscript {
     }
 
     dependencies {
-        // Artifactory plugin
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.0.0')
-
         // Needed for caching reflected data during builds
         classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
 
         //Spotbugs
-        classpath "com.github.spotbugs:spotbugs-gradle-plugin:3.0.0"
+        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
+
+        // SonarQube / Cloud scanning
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
     }
 }
 
-//detect
+// Handle some logic related to where what is
+sourceSets {
+    main.java.outputDir = new File("$buildDir/classes")
+    test.java.outputDir = new File("$buildDir/testClasses")
+}
 JavaPluginConvention convention = project.getConvention().getPlugin(JavaPluginConvention.class);
 SourceSet mainSourceSet = convention.getSourceSets().getByName("main");
 
