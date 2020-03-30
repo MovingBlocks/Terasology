@@ -1,15 +1,5 @@
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
-// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
-apply from: "$rootDir/config/gradle/publish.gradle"
-
-import groovy.json.JsonSlurper
-import org.reflections.Reflections
-import org.reflections.util.FilterBuilder
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.scanners.TypeAnnotationsScanner
-import org.reflections.util.ConfigurationBuilder
-
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
     repositories {
@@ -35,17 +25,25 @@ buildscript {
     }
 }
 
-// Handle some logic related to where what is
-sourceSets {
-    main.java.outputDir = new File("$buildDir/classes")
-    test.java.outputDir = new File("$buildDir/testClasses")
-}
-JavaPluginConvention convention = project.getConvention().getPlugin(JavaPluginConvention.class);
-SourceSet mainSourceSet = convention.getSourceSets().getByName("main");
+import groovy.json.JsonSlurper
+import org.reflections.Reflections
+import org.reflections.util.FilterBuilder
+import org.reflections.scanners.SubTypesScanner
+import org.reflections.scanners.TypeAnnotationsScanner
+import org.reflections.util.ConfigurationBuilder
 
 ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
     env = System.getenv()
+
+    // This is a fun one ... when versions switched to dynamic -SNAPSHOT or not based on branch existing modules using `master` would suddenly try publishing releases
+    // This won't work without additionally doing constant version bumps (perhaps via Git tags) - but too much work to switch around all modules at once
+    // Complicating things more the use of publish.gradle to centralize logic means modules and engine bits are treated the same, yet we need to vary modules
+    // Temporary workaround: default modules to bypass release management: master branch builds will still make snapshot builds for the snapshot repo
+    // If a module actually wants release management simply include `"isReleaseManaged" : true` in module.txt - this is needed for the engine repo embedded modules
+    // One option would be to slowly convert modulespace to default to a `develop` + `master` setup living in harmony with associated automation/github tweaks
+    // Alternatively one more round of refactoring could switch to Git tags, a single `master` branch, and possible other things to help match snaps/PR builds somehow?
+    bypassModuleReleaseManagement = "true"
 }
 
 def moduleDepends = [];
@@ -69,10 +67,43 @@ for (dependency in moduleConfig.dependencies) {
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
 version = moduleConfig.version
 
+import org.gradle.internal.logging.text.StyledTextOutputFactory
+import static org.gradle.internal.logging.text.StyledTextOutput.Style
+
+// The only case in which we make module non-snapshots is if release management is enabled and BRANCH_NAME is "master"
+if (moduleConfig.isReleaseManaged && env.BRANCH_NAME == "master") {
+    // This is mildly awkward since we need to bypass by default, yet if release management is on (true) then we set the bypass to false ..
+    ext.bypassModuleReleaseManagement = false
+    if (version.contains("-SNAPSHOT")) {
+        version -= "-SNAPSHOT"
+        def out = services.get(StyledTextOutputFactory).create("an-ouput")
+        out.withStyle(Style.FailureHeader).println("WARNING: Module " + project.name + " is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
+    }
+} else {
+    if (!version.contains("-SNAPSHOT")) {
+        version += "-SNAPSHOT"
+    } else {
+        def out = services.get(StyledTextOutputFactory).create("an-ouput")
+        out.withStyle(Style.FailureHeader).println("WARNING: Module " + project.name + " is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
+    }
+}
+
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.modules'
 
 println "Version for $project.name loaded as $version for group $group"
+
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
+// Note that this statement is down a ways because it is affected by the stuff higher in this file like setting versioning
+apply from: "$rootDir/config/gradle/publish.gradle"
+
+// Handle some logic related to where what is
+sourceSets {
+    main.java.outputDir = new File("$buildDir/classes")
+    test.java.outputDir = new File("$buildDir/testClasses")
+}
+JavaPluginConvention convention = project.getConvention().getPlugin(JavaPluginConvention.class);
+SourceSet mainSourceSet = convention.getSourceSets().getByName("main");
 
 // TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
 configurations.all {

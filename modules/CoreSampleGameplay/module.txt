@@ -7,5 +7,6 @@
         {"id": "Core", "minVersion": "3.0.0"}
     ],
     "isGameplay" : "true",
-    "defaultWorldGenerator" : "Core:FacetedPerlin"
+    "defaultWorldGenerator" : "Core:FacetedPerlin",
+    "isReleaseManaged" : true
 }

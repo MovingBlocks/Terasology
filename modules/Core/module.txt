@@ -24,5 +24,6 @@
         "id" : "CoreBlocks",
         "minVersion" : "1.0.0"
       }
-    ]
+    ],
+    "isReleaseManaged" : true
 }

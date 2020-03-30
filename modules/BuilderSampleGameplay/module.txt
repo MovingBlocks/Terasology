@@ -7,5 +7,6 @@
     "dependencies" : [],
     "serverSideOnly" : false,
     "isGameplay" : "true",
-    "defaultWorldGenerator" : "BuilderSampleGameplay:BuilderSampleWorld"
+    "defaultWorldGenerator" : "BuilderSampleGameplay:BuilderSampleWorld",
+    "isReleaseManaged" : true
 }
