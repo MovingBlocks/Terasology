@@ -17,15 +17,29 @@ publishing {
                 maven {
                     name = 'TerasologyOrg'
 
-                    def repoViaEnv = System.getenv()["PUBLISH_REPO"]
+                    String repoViaEnv = System.getenv()["PUBLISH_REPO"]
+                    String gitBranch = System.getenv()["BRANCH_NAME"]
                     if (rootProject.hasProperty("publishRepo")) {
+                        // This first option is good for local testing, you can set an explicit target repo in gradle.properties
                         url = "http://artifactory.terasology.org/artifactory/$publishRepo"
                         println "Changing PUBLISH repoKey set via property to $publishRepo"
                     } else if (repoViaEnv != null && repoViaEnv != "") {
+                        // Support varying publish target based on branch name
+                        if (gitBranch != null && gitBranch != "" && gitBranch.equals("master")) {
+                            println "We're working on a 'master' branch so replacing 'snapshot' with 'release' in the Artifactory repo"
+                            repoViaEnv = repoViaEnv.replace("snapshot", "release")
+                        }
+                        // Second one is aimed at Jenkins, where env vars can be set based on jobs/folders.
                         url = "http://artifactory.terasology.org/artifactory/$repoViaEnv"
                         println "Changing PUBLISH repoKey set via env var to $repoViaEnv"
                     } else {
-                        url = 'http://artifactory.terasology.org/artifactory/terasology-snapshot-local'
+                        // Finally this handles defaults while still supporting varying the publish target based on branch name
+                        if (gitBranch != null && gitBranch != "" && gitBranch.equals("master")) {
+                            println "We're working on a 'master' branch so using'release' in the Artifactory repo"
+                            url = 'http://artifactory.terasology.org/artifactory/terasology-release-local'
+                        } else {
+                            url = 'http://artifactory.terasology.org/artifactory/terasology-snapshot-local'
+                        }
                         println "PUBLISH repoKey is terasology-snapshot-local (default value)"
                     }
 

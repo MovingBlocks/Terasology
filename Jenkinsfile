@@ -5,13 +5,17 @@ node ("default-java") {
         sh 'chmod +x gradlew'
     }
     stage('Build') {
-        // Oddly it seems the first execution of gradlew correctly runs in plain console mode, for later steps we have to force it?
-        sh './gradlew clean extractConfig extractNatives distForLauncher'
+        // Jenkins sometimes doesn't run Gradle automatically in plain console mode, so make it explicit
+        sh './gradlew --console=plain clean extractConfig extractNatives distForLauncher'
         archiveArtifacts 'gradlew, gradle/wrapper/*, modules/Core/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, build/resources/main/org/terasology/version/versionInfo.properties, natives/**'
     }
     stage('Publish') {
-        withCredentials([usernamePassword(credentialsId: 'artifactory-gooey', usernameVariable: 'artifactoryUser', passwordVariable: 'artifactoryPass')]) {
-            sh './gradlew --console=plain publish -PmavenUser=${artifactoryUser} -PmavenPass=${artifactoryPass}'
+        if (env.BRANCH_NAME.equals("master") || env.BRANCH_NAME.equals("develop")) {
+            withCredentials([usernamePassword(credentialsId: 'artifactory-gooey', usernameVariable: 'artifactoryUser', passwordVariable: 'artifactoryPass')]) {
+                sh './gradlew --console=plain -Dorg.gradle.internal.publish.checksums.insecure=true publish -PmavenUser=${artifactoryUser} -PmavenPass=${artifactoryPass}'
+            }
+        } else {
+            println "Running on a branch other than 'master' or 'develop' bypassing publishing"
         }
     }
     stage('Analytics') {
