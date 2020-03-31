@@ -124,7 +124,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
         }
 
-        //refreshSelection();
         filterModules();
     }
 
