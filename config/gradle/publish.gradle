@@ -22,38 +22,21 @@ publishing {
                         url = "http://artifactory.terasology.org/artifactory/$publishRepo"
                         println "Changing PUBLISH repoKey set via Gradle property to $publishRepo"
                     } else {
-                        // In this case we are going to fletch the publish repo together from a few things
-                        // First if we have an override from the environment to use a different target publish org
+                        // Support override from the environment to use a different target publish org
                         String deducedPublishRepo = System.getenv()["PUBLISH_ORG"]
                         if (deducedPublishRepo == null || deducedPublishRepo == "") {
                             // If not then default
                             deducedPublishRepo = "terasology"
                         }
-                        String releaseRepoFragment = "-release-local"
-                        String snapshotRepoFragment = "-snapshot-local"
 
-                        // Secondly we're going to find out if we're doing a release or a snapshot - this gets a little more complicated
+                        // Check the active Git branch and some module logic to see whether we're doing a release or snapshot
                         String gitBranch = System.getenv()["BRANCH_NAME"]
-                        if (gitBranch != null && gitBranch != "" && gitBranch.equals("master")) {
-                            // Okay we're in an environment where a branch name is set to 'master' so we might be doing a release
-                            // This is the funny part. Modules aren't ready globally to accept master branch == release, so check a prop that defaults to bypass
-                            if (project.hasProperty("bypassModuleReleaseManagement")) {
-                                if (bypassModuleReleaseManagement == "true") {
-                                    println "Release management not enabled for " + project.name + ", using snapshot repo despite building 'master' branch"
-                                    deducedPublishRepo += snapshotRepoFragment
-                                } else {
-                                    println "Release management *is* enabled for " + project.name + ", using release repo since building 'master' branch"
-                                    deducedPublishRepo += releaseRepoFragment
-                                }
-                            } else {
-                                println "We're working on a 'master' branch with defaults so using the release publish repo"
-                                deducedPublishRepo += releaseRepoFragment
-                            }
+                        if (isMaster(gitBranch) && !shouldBypassModuleRelease()) {
+                            deducedPublishRepo += "-release-local"
                         } else {
-                            // No master branch so we for sure are just doing snapshots
-                            println "We're not working with a branch name set that's 'master' so assuming we're publishing snapshots"
                             deducedPublishRepo += "-snapshot-local"
                         }
+
                         println "The final deduced publish repo is $deducedPublishRepo"
                         url = "http://artifactory.terasology.org/artifactory/$deducedPublishRepo"
                     }
@@ -73,3 +56,11 @@ publishing {
     }
 }
 
+def isMaster(gitBranch) {
+    return gitBranch != null && gitBranch != "" && gitBranch.equals("master");
+}
+
+// Mildly awkward: Modules aren't ready globally to accept master branch == release, so make it opt-in by checking a prop that defaults to bypass
+def shouldBypassModuleRelease() {
+    return project.hasProperty("bypassModuleReleaseManagement") && bypassModuleReleaseManagement == "true";
+}

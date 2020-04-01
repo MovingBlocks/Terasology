@@ -70,22 +70,23 @@ version = moduleConfig.version
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
+// Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
+def undesiredSnapshotTag = version.endsWith("-SNAPSHOT")
+println "BiomesAPI version before the snapshot check: " + version
+if (undesiredSnapshotTag) {
+    println "Taking off undesired -SNAPSHOT"
+    version -= "-SNAPSHOT"
+    def out = services.get(StyledTextOutputFactory).create("an-ouput")
+    out.withStyle(Style.FailureHeader).println("WARNING: Module " + project.name + " is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
+}
+
 // The only case in which we make module non-snapshots is if release management is enabled and BRANCH_NAME is "master"
 if (moduleConfig.isReleaseManaged && env.BRANCH_NAME == "master") {
     // This is mildly awkward since we need to bypass by default, yet if release management is on (true) then we set the bypass to false ..
     ext.bypassModuleReleaseManagement = false
-    if (version.contains("-SNAPSHOT")) {
-        version -= "-SNAPSHOT"
-        def out = services.get(StyledTextOutputFactory).create("an-ouput")
-        out.withStyle(Style.FailureHeader).println("WARNING: Module " + project.name + " is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
-    }
 } else {
-    if (!version.contains("-SNAPSHOT")) {
-        version += "-SNAPSHOT"
-    } else {
-        def out = services.get(StyledTextOutputFactory).create("an-ouput")
-        out.withStyle(Style.FailureHeader).println("WARNING: Module " + project.name + " is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
-    }
+    // In the case where we actually are building a snapshot we load -SNAPSHOT into the version variable, even if it wasn't there in module.txt
+    version += "-SNAPSHOT"
 }
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
