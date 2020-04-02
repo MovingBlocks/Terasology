@@ -252,7 +252,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             ClientComponent clientComp = client.getComponent(ClientComponent.class);
             CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
             CharacterComponent charComp=clientComp.character.getComponent(CharacterComponent.class);
-            EntityRef player = client.getComponent(ClientComponent.class).character;
+            EntityRef player = clientComp.character;
             GazeMountPointComponent gazeMountPointComponent = player.getComponent(GazeMountPointComponent.class);
 
             float ratio = amount / 1.6f;
