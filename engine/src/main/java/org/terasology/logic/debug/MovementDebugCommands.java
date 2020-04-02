@@ -236,13 +236,18 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
-    private float function1(float parameter){
-        double p = (double)parameter;
-        return (float) pow(p,0.6) * 0.78f ;
+    private float getJumpSpeed(float amount){
+        double d = (double)amount;
+        return (float) pow(d,0.6) * 9.36f ;
+    }
+    
+    private float getInteractionRange(float amount){
+        double d = (double)amount;
+        return (float) pow(d,0.6) * 3.9f ;
     }
 
-    private float function2(float parameter){
-       return 0.15f + (0.64f * parameter) - (0.006f * parameter * parameter);
+    private float getRunfactor(float amount){
+       return 0.15f + (0.64f * amount) - (0.006f * amount * amount);
     }
 
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
@@ -251,23 +256,22 @@ public class MovementDebugCommands extends BaseComponentSystem {
         try {
             ClientComponent clientComp = client.getComponent(ClientComponent.class);
             CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
-            CharacterComponent charComp=clientComp.character.getComponent(CharacterComponent.class);
+            CharacterComponent charComp = clientComp.character.getComponent(CharacterComponent.class);
             EntityRef player = clientComp.character;
             GazeMountPointComponent gazeMountPointComponent = player.getComponent(GazeMountPointComponent.class);
 
             float ratio = amount / 1.6f;
-            float constant= function1(amount);
 
             if (move != null && gazeMountPointComponent != null) {
                 float prevHeight = move.height;
 
                 move.height = amount;
                 gazeMountPointComponent.translate.y = amount;
-                move.jumpSpeed = 12 * constant;
+                move.jumpSpeed = getJumpSpeed(amount);
                 move.stepHeight = 0.35f * ratio;
                 move.distanceBetweenFootsteps = ratio;
-                move.runFactor = function2(amount);
-                charComp.interactionRange = 5 * constant;
+                move.runFactor = getRunFactor(amount);
+                charComp.interactionRange = getInteractionRange(amount);
 
                 Location.removeChild(player, gazeMountPointComponent.gazeEntity);
                 Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
