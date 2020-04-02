@@ -246,7 +246,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return (float) pow(d,0.6) * 3.9f ;
     }
 
-    private float getRunfactor(float amount){
+    private float getRunFactor(float amount){
        return 0.15f + (0.64f * amount) - (0.006f * amount * amount);
     }
 
