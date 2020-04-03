@@ -72,7 +72,6 @@ import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 // Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
 def undesiredSnapshotTag = version.endsWith("-SNAPSHOT")
-println "BiomesAPI version before the snapshot check: " + version
 if (undesiredSnapshotTag) {
     println "Taking off undesired -SNAPSHOT"
     version -= "-SNAPSHOT"
