@@ -238,16 +238,16 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     private float getJumpSpeed(float amount){
         double d = (double)amount;
-        return (float) pow(d,0.6) * 9.36f ;
+        return Math.round(pow(d,0.55) * 8.45f);
     }
     
     private float getInteractionRange(float amount){
         double d = (double)amount;
-        return (float) pow(d,0.6) * 3.9f ;
+        return Math.round(pow(d,0.6) * 3.9f);
     }
 
     private float getRunFactor(float amount){
-       return 0.15f + (0.64f * amount) - (0.006f * amount * amount);
+       return Math.round(5.5f + (6.4f * amount) - (0.06f * amount * amount)) / 10f;
     }
 
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
@@ -260,7 +260,11 @@ public class MovementDebugCommands extends BaseComponentSystem {
             EntityRef player = clientComp.character;
             GazeMountPointComponent gazeMountPointComponent = player.getComponent(GazeMountPointComponent.class);
 
-            float ratio = amount / 1.6f;
+            float defaultHeight = move.height;
+            float defaultStepHeight = move.stepHeight;
+            float defaultFootSteps = move.distanceBetweenFootsteps;
+            
+            float ratio = amount / defaultHeight;
 
             if (move != null && gazeMountPointComponent != null) {
                 float prevHeight = move.height;
@@ -268,8 +272,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 move.height = amount;
                 gazeMountPointComponent.translate.y = amount;
                 move.jumpSpeed = getJumpSpeed(amount);
-                move.stepHeight = 0.35f * ratio;
-                move.distanceBetweenFootsteps = ratio;
+                move.stepHeight = defaultStepHeight * ratio;
+                move.distanceBetweenFootsteps = defaultFootSteps * ratio;
                 move.runFactor = getRunFactor(amount);
                 charComp.interactionRange = getInteractionRange(amount);
 
