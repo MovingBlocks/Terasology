@@ -260,9 +260,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
             EntityRef player = clientComp.character;
             GazeMountPointComponent gazeMountPointComponent = player.getComponent(GazeMountPointComponent.class);
 
-            float defaultHeight = move.height;
-            float defaultStepHeight = move.stepHeight;
-            float defaultFootSteps = move.distanceBetweenFootsteps;
+            float defaultHeight = 1.6f;
+            float defaultStepHeight = 0.35f;
+            float defaultFootSteps = 1f;
             
             float ratio = amount / defaultHeight;
 
