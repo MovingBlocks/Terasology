@@ -35,7 +35,7 @@ import java.util.List;
 public final class CharacterMovementComponent implements Component {
 
     // Collision settings
-    @Range(min = 0, max = 5)
+    @Range(min = 0, max = 100)
     public float height = 1.6f;
     @Range(min = 0, max = 5)
     public float radius = 0.3f;
