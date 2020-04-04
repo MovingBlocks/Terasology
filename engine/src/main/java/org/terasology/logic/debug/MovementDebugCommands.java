@@ -238,16 +238,16 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     private float getJumpSpeed(float amount){
         double d = (double)amount;
-        return Math.round(pow(d,0.55) * 8.45f);
+        return Math.round(Math.pow(d,0.5) * 8.3f);
     }
     
     private float getInteractionRange(float amount){
         double d = (double)amount;
-        return Math.round(pow(d,0.6) * 3.9f);
+        return Math.round(Math.pow(d,0.6) * 3.9f);
     }
 
     private float getRunFactor(float amount){
-       return Math.round(5.5f + (6.4f * amount) - (0.06f * amount * amount)) / 10f;
+       return Math.round(5.4f + (6.4f * amount) - (0.06f * amount * amount)) / 10f;
     }
 
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
