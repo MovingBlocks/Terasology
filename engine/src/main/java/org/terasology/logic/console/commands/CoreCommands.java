@@ -496,18 +496,18 @@ public class CoreCommands extends BaseComponentSystem {
         PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
         WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
         if (componentNames.length == 0) {
-            savedEntityCount = worldDumper .save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+            savedEntityCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
         } else {
             List<Class<? extends Component>> filterComponents = Arrays.stream(componentNames)
-                    .map(String::trim) //Trim off whitespace
-                    .filter(o -> !o.isEmpty()) //Remove empty strings
-                    .map(o -> o.toLowerCase().endsWith("component") ? o : o + "component") //All component class names finish with "component"
-                    .map(o -> Streams.stream(moduleManager.getEnvironment().getSubtypesOf(Component.class))
-                            .filter(e -> e.getSimpleName().equalsIgnoreCase(o))
-                            .findFirst())
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
+                .map(String::trim) //Trim off whitespace
+                .filter(o -> !o.isEmpty()) //Remove empty strings
+                .map(o -> o.toLowerCase().endsWith("component") ? o : o + "component") //All component class names finish with "component"
+                .map(o -> Streams.stream(moduleManager.getEnvironment().getSubtypesOf(Component.class))
+                    .filter(e -> e.getSimpleName().equalsIgnoreCase(o))
+                    .findFirst())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
             if (!filterComponents.isEmpty()) {
                 savedEntityCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), filterComponents);
             } else {

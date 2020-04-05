@@ -73,7 +73,11 @@ public class WorldSerializerImpl implements WorldSerializer {
         }
 
         for (Prefab prefab : prefabManager.listPrefabs()) {
-            world.addPrefab(prefabSerializer.serialize(prefab));
+            try {
+                world.addPrefab(prefabSerializer.serialize(prefab));
+            } catch (Throwable ex) {
+                logger.error("failed to serialize prefab: {}", prefab.getName(), ex);
+            }
         }
 
         for (EntityRef entity : entityManager.getAllEntities()) {
@@ -102,7 +106,11 @@ public class WorldSerializerImpl implements WorldSerializer {
 
         for (Prefab prefab : prefabManager.listPrefabs()) {
             if (prefab.hasAnyComponents(filterComponents)) {
-                world.addPrefab(prefabSerializer.serialize(prefab));
+                try {
+                    world.addPrefab(prefabSerializer.serialize(prefab));
+                } catch (Throwable ex) {
+                    logger.error("failed to serialize prefab: {}", prefab.getName(), ex);
+                }
             }
         }
 
