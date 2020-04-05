@@ -78,10 +78,9 @@ public class WorldImpl implements World {
     public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer) {
         Region chunkRegion = getWorldData(chunk.getRegion());
         for (WorldRasterizer rasterizer : worldRasterizers) {
-            // chunkRegion can get facets, so maybe I don't need to listen to providers??
             rasterizer.generateChunk(chunk, chunkRegion);
         }
-        // maybe add PostGenerationRegionListener
+
         for (EntityProvider entityProvider : entityProviders) {
             entityProvider.process(chunkRegion, buffer);
         }
