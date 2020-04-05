@@ -11,15 +11,15 @@ buildscript {
     }
 
     dependencies {
-        // Artifactory plugin
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.10.0')
-
         // Needed for caching reflected data during builds
         classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
 
         //Spotbugs
-        classpath "com.github.spotbugs:spotbugs-gradle-plugin:3.0.0"
+        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
+
+        // SonarQube / Cloud scanning
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
     }
 }
 
@@ -38,6 +38,15 @@ import java.nio.file.StandardCopyOption
 
 // Test for right version of Java in use for running this script
 assert org.gradle.api.JavaVersion.current().isJava8Compatible()
+
+import org.gradle.internal.logging.text.StyledTextOutputFactory
+import static org.gradle.internal.logging.text.StyledTextOutput.Style
+
+// Check for Java 8
+if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+    def out = services.get(StyledTextOutputFactory).create("an-ouput")
+    out.withStyle(Style.FailureHeader).println("WARNING: You're compiling with a JDK newer than Java 8, this may not be fully supported for Terasology, consider adjusting your JAVA_HOME accordingly")
+}
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
 ext {
