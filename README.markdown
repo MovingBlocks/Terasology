@@ -1,5 +1,6 @@
 # Terasology
 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/MovingBlocks/Terasology)
 [![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
 [![Release](https://img.shields.io/github/release/MovingBlocks/Terasology.svg)](../../releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/total.svg "Downloads")](../../releases/latest)
