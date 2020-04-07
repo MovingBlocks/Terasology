@@ -21,16 +21,22 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.joml.Vector2f;
+import org.joml.Quaternionf;
 
 import java.lang.reflect.Type;
 
 /**
  */
-public class Vector2fTypeAdapter implements JsonDeserializer<Vector2f> {
+public class QuaternionfTypeAdapter implements JsonDeserializer<Quaternionf> {
+
     @Override
-    public Vector2f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonArray jsonArray = json.getAsJsonArray();
-        return new Vector2f(jsonArray.get(0).getAsFloat(), jsonArray.get(1).getAsFloat());
+    public Quaternionf deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        if (json.isJsonArray()) {
+            JsonArray array = json.getAsJsonArray();
+            if (array.size() == 4) {
+                return new Quaternionf(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat(), array.get(3).getAsFloat());
+            }
+        }
+        return null;
     }
 }
