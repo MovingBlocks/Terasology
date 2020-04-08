@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.terasology.assets.ResourceUrn;
@@ -146,7 +147,7 @@ public class LightShaftsNode extends ConditionDependentNode {
 
         sunPositionWorldSpace4.set(sunDirection.x * 10000.0f, sunDirection.y * 10000.0f, sunDirection.z * 10000.0f, 1.0f);
         sunPositionScreenSpace.set(sunPositionWorldSpace4);
-        activeCamera.getViewProjectionMatrix().transform(sunPositionScreenSpace);
+        new Matrix4f(activeCamera.getViewProjectionMatrix()).transpose().transform(sunPositionScreenSpace);
 
         sunPositionScreenSpace.x /= sunPositionScreenSpace.w;
         sunPositionScreenSpace.y /= sunPositionScreenSpace.w;
