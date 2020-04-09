@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeHandling.mathTypes;
+package org.terasology.persistence.typeHandling.mathTypes.legacy;
 
 import gnu.trove.list.TIntList;
-import org.joml.Vector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
@@ -25,7 +25,7 @@ import java.util.Optional;
 
 /**
  */
-public class Vector3iTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector3i> {
+public class LegacyVector3iTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector3i> {
 
     @Override
     public PersistedData serializeNonNull(Vector3i value, PersistedDataSerializer serializer) {

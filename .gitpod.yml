@@ -1,0 +1,12 @@
+image: 
+  file: gitpod.dockerfile
+
+tasks:
+  - init: ./gradlew jar idea
+    command: ./gradlew jar game
+
+ports:
+  - port: 5900
+    onOpen: ignore
+  - port: 6080
+    onOpen: open-preview

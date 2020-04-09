@@ -16,7 +16,11 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Lists;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.joml.Vector4fc;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 
@@ -61,6 +65,41 @@ public final class TeraAssert {
         }
     }
 
+    public static void assertEquals(Vector2f expected, Vector2f actual, float error) {
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertNotNull(actual);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            org.junit.jupiter.api.Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+        }
+    }
+
+    public static void assertEquals(Vector2fc expected, Vector2fc actual, float error) {
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertNotNull(actual);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            org.junit.jupiter.api.Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+        }
+    }
+
+
+    public static void assertEquals(Vector3fc expected, Vector3fc actual, float error) {
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertNotNull(actual);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            org.junit.jupiter.api.Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
+        }
+    }
+
     public static void assertEquals(Vector4f expected, Vector4f actual, float error) {
         if (expected == null) {
             assertNull(actual);
@@ -71,6 +110,19 @@ public final class TeraAssert {
             org.junit.jupiter.api.Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
             org.junit.jupiter.api.Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
             org.junit.jupiter.api.Assertions.assertEquals(expected.w, actual.w, error, errorMessageSupplier);
+        }
+    }
+
+    public static void assertEquals(Vector4fc expected, Vector4fc actual, float error) {
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertNotNull(actual);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            org.junit.jupiter.api.Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
+            org.junit.jupiter.api.Assertions.assertEquals(expected.w(), actual.w(), error, errorMessageSupplier);
         }
     }
 

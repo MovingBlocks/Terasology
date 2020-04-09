@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.utilities.gson;
+package org.terasology.utilities.gson.legacy;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 
 /**
  */
-public class Quat4fTypeAdapter implements JsonDeserializer<Quat4f> {
+public class LegacyQuat4fTypeAdapter implements JsonDeserializer<Quat4f> {
 
     @Override
     public Quat4f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
