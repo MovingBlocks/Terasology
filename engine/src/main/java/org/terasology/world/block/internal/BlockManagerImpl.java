@@ -135,6 +135,13 @@ public class BlockManagerImpl extends BlockManager {
         return (short) nextId.getAndIncrement();
     }
 
+    /**
+     * Get cached instance of the air block.
+     *
+     * We do this for performance reasons because a lookup by BlockURI happens the first time a block is set when
+     * getting the previous block. This causes performance problems eventually down the line when it then uses the
+     * ResourceUrn's hashcode to do a lookup into the block map.
+     */
     private Block getAirBlock() {
         if (airBlock == null) {
             airBlock = getBlock(AIR_ID);
@@ -256,7 +263,7 @@ public class BlockManagerImpl extends BlockManager {
                 } catch (Exception ex) {
                     // A family can fail to register if the block is missing uri or list of categories,
                     // but can fail to register if the family throws an error for any reason
-                    logger.error("Failed to register block familiy '{}'", newFamily, ex);
+                    logger.error("Failed to register block family '{}'", newFamily, ex);
                 } finally {
                     lock.unlock();
                 }
