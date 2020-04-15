@@ -38,8 +38,6 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     public Quat4f rotationQuaternion;
     public float scale = 1f;
 
-    // TODO: @In
-    private final OpenVRProvider vrProvider = OpenVRProvider.getInstance();
     private boolean trackingDataReceived;
 
 
@@ -60,16 +58,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     public boolean isTracked() {
         return trackingDataReceived;
     }
-
-    /**
-     * If possible, make this object listen for controller pose updates. If the vrProvider is not active (i.e. no headset
-     * is connected), then the callback methods will not get called for the first time, and this component will act as
-     * it would in its default state (static location, activation triggered upon use of equipped object).
-     */
-    public void trySubscribeToControllerPoses() {
-        vrProvider.getState().addControllerListener(this);
-    }
-
+    
     /**
      * A callback target for the controller listener. This callback triggers when a button is pressed on the controllers.
      * It's currently ignored by this class. This method and the below method are both designed to be called in their

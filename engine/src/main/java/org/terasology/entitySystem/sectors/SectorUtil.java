@@ -90,7 +90,7 @@ public final class SectorUtil {
     public static Set<Vector3i> getWatchedChunks(EntityRef entity) {
         Set<Vector3i> chunks = new HashSet<>();
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null) {
+        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
             chunks.add(ChunkMath.calcChunkPos(loc.getWorldPosition()));
         }
         SectorRegionComponent regionComponent = entity.getComponent(SectorRegionComponent.class);

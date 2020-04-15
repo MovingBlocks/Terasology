@@ -73,7 +73,7 @@ final class PlayerStoreInternal implements PlayerStore {
         this.character = character;
         hasCharacter = character.exists();
         LocationComponent location = character.getComponent(LocationComponent.class);
-        if (location != null) {
+        if (location != null && !Float.isNaN(location.getWorldPosition().x)) {
             setRelevanceLocation(location.getWorldPosition());
         }
     }

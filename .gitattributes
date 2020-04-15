@@ -23,6 +23,8 @@
 *.jar          binary
 *.keystore     binary
 *.png          binary
+*.dll          binary
+*.pdb          binary
 
 gradlew        text eol=lf
 LICENSE        text

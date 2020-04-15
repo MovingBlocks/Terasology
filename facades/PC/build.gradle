@@ -30,6 +30,12 @@ ext {
     displayVersion = versionBase
 }
 
+// Adjust as the Gradle 6 upgrade changed this path a bit
+sourceSets {
+    main.java.outputDir = new File("$buildDir/classes")
+    test.java.outputDir = new File("$buildDir/testClasses")
+}
+
 // Base the engine tests on the same version number as the engine
 version = project(':engine').version
 println "PC VERSION: $version"
@@ -323,7 +329,7 @@ task distForLauncher (type: Sync) {
     from distPCZip
 
     into ("../resources/main/org/terasology/version") {
-        from ("$rootDir/engine/build/classes/java/main/org/terasology/version") {
+        from ("$rootDir/engine/build/classes/org/terasology/version") {
             include ('versionInfo.properties')
         }
     }

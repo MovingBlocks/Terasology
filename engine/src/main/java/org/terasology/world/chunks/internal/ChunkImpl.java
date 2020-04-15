@@ -35,6 +35,7 @@ import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
@@ -87,7 +88,7 @@ public class ChunkImpl implements Chunk {
 
     public ChunkImpl(Vector3i chunkPos, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this(chunkPos,
-                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
+                new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 blockManager);
     }
@@ -124,8 +125,8 @@ public class ChunkImpl implements Chunk {
     @Override
     public int getEstimatedMemoryConsumptionInBytes() {
         int extraDataSize = 0;
-        for (int i = 0; i < extraData.length; i++) {
-            extraDataSize += extraData[i].getEstimatedMemoryConsumptionInBytes();
+        for (TeraArray extraDatum : extraData) {
+            extraDataSize += extraDatum.getEstimatedMemoryConsumptionInBytes();
         }
         return blockData.getEstimatedMemoryConsumptionInBytes()
                 + sunlightData.getEstimatedMemoryConsumptionInBytes()
@@ -315,8 +316,8 @@ public class ChunkImpl implements Chunk {
             int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
             int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
             int extraSize = 0;
-            for (int i = 0; i < extraData.length; i++) {
-                extraSize += extraData[i].getEstimatedMemoryConsumptionInBytes();
+            for (TeraArray extraDatum : extraData) {
+                extraSize += extraDatum.getEstimatedMemoryConsumptionInBytes();
             }
             int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + extraSize;
 
@@ -329,8 +330,8 @@ public class ChunkImpl implements Chunk {
             int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
             int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
             int extraReduced = 0;
-            for (int i = 0; i < extraData.length; i++) {
-                extraReduced += extraData[i].getEstimatedMemoryConsumptionInBytes();
+            for (TeraArray extraDatum : extraData) {
+                extraReduced += extraDatum.getEstimatedMemoryConsumptionInBytes();
             }
             int totalReduced = blocksReduced + sunlightRegenSize + sunlightSize + lightReduced + extraReduced;
 
@@ -391,8 +392,8 @@ public class ChunkImpl implements Chunk {
                             "bytes, size-after: {} " +
                             "bytes, total-deflated-by: {}%, " +
                             "sunlight-deflated-by={}%, " +
-                            "sunlight-regen-deflated-by={}%, " +
-                            chunkPos,
+                            "sunlight-regen-deflated-by={}%",
+                    chunkPos,
                     SIZE_FORMAT.format(totalSize),
                     SIZE_FORMAT.format(totalReduced),
                     PERCENT_FORMAT.format(totalPercent),

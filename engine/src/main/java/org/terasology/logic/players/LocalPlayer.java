@@ -116,7 +116,7 @@ public class LocalPlayer {
 
     public Quaternionf getRotation() {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             return new Quaternionf();
         }
         return location.getWorldRotation();
@@ -132,7 +132,7 @@ public class LocalPlayer {
             return out;
         }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             return getPosition();
         }
 
@@ -145,7 +145,7 @@ public class LocalPlayer {
             return new Quaternionf();
         }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             return getRotation();
         }
 

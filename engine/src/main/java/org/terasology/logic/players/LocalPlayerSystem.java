@@ -377,7 +377,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         EntityRef target = event.getNewTarget();
         if (target.exists()) {
             LocationComponent location = target.getComponent(LocationComponent.class);
-            if (location != null) {
+            if (location != null && !Float.isNaN(location.getWorldPosition().x)) {
                 BlockComponent blockComp = target.getComponent(BlockComponent.class);
                 BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
                 if (blockComp != null || blockRegion != null) {

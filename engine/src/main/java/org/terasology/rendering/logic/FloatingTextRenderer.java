@@ -87,7 +87,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
 
         for (EntityRef entity : floatingTextEntities) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (location == null) {
+            if (location == null || Float.isNaN(location.getWorldPosition().x)) {
                 continue;
             }
 

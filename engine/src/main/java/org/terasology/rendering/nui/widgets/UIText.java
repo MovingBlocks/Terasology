@@ -23,6 +23,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Rect2i;
 import org.joml.Vector2i;
@@ -33,7 +34,6 @@ import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.SubRegion;
@@ -326,7 +326,7 @@ public class UIText extends WidgetWithOrder {
         Font font = canvas.getCurrentStyle().getFont();
         if (isMultiline()) {
             List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x);
-            return font.getSize(lines);
+            return JomlUtil.from(font.getSize(lines));
         } else {
             return new Vector2i(font.getWidth(getText()), font.getLineHeight());
         }

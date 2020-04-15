@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.itemRendering;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Rect2i;
 import org.joml.Vector2i;
 import org.terasology.rendering.assets.font.Font;
@@ -89,7 +90,7 @@ public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> 
         } else {
             int iconWidth = marginLeft + texture.getWidth() + marginRight;
             List<String> lines = TextLineBuilder.getLines(font, text, canvas.size().x - iconWidth);
-            return font.getSize(lines).add(iconWidth,0);
+            return font.getSize(lines).add(iconWidth, 0);
         }
     }
 

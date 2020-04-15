@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.assets.font;
 
+import org.joml.Vector2i;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.joml.Vector2i;
 
 import java.util.List;
 

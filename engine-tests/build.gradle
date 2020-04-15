@@ -5,6 +5,11 @@ apply from: "$rootDir/config/gradle/publish.gradle"
 
 import groovy.json.JsonSlurper
 
+ext {
+    // Read environment variables, including variables passed by jenkins continuous integration server
+    env = System.getenv()
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Java Section                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,10 +29,21 @@ def moduleConfig = slurper.parseText(moduleFile.text)
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
 version = moduleConfig.version
 
+// The only case in which we make non-snapshots is when BRANCH_NAME exists and contains "master" - otherwise snapshots
+if (env.BRANCH_NAME == null || !env.BRANCH_NAME.equals("master")) {
+    version += "-SNAPSHOT"
+}
+
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.engine'
 
 println "Version for $project.name loaded as $version for group $group"
+
+sourceSets {
+    // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
+    main.java.outputDir = new File("$buildDir/classes")
+    test.java.outputDir = new File("$buildDir/testClasses")
+}
 
 // Primary dependencies definition
 dependencies {
@@ -63,3 +79,13 @@ task copyResourcesToClasses(type:Copy) {
 
 //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
 test.dependsOn copyResourcesToClasses
+
+idea {
+    module {
+        // Change around the output a bit
+        inheritOutputDirs = false
+        outputDir = file('build/classes')
+        testOutputDir = file('build/testClasses')
+        downloadSources = true
+    }
+}

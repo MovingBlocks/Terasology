@@ -252,7 +252,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 chunkSendCounter -= 1.0f;
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
-                if (loc != null) {
+                if (loc != null && !Float.isNaN(loc.getWorldPosition().x)) {
                     center.set(ChunkMath.calcChunkPos(JomlUtil.round(loc.getWorldPosition(), RoundingMode.HALF_UP)));
                 }
                 Vector3i pos = null;

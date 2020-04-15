@@ -51,7 +51,7 @@ public final class CharacterMovementSystemUtility {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
 
-        if (location == null || movementComp == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x) || movementComp == null) {
             return;
         }
         location.setWorldPosition(state.getPosition());
