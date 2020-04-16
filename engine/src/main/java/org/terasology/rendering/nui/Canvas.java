@@ -16,13 +16,11 @@
 package org.terasology.rendering.nui;
 
 import org.joml.Quaternionf;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Border;
-import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.Rect2i;
-import org.joml.Vector2i;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;

@@ -15,11 +15,11 @@
  */
 package org.terasology.persistence.serializers;
 
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.junit.jupiter.api.Test;
 import org.terasology.ModuleEnvironmentTest;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -27,8 +27,6 @@ import org.terasology.reflection.TypeInfo;
 import org.terasology.testUtil.TeraAssert;
 
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
 
@@ -66,9 +64,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         a.v1 = new Vector3f(11.5f, 13.15f, 3);
         a.v2 = new Vector2f(12, 13f);
         a.v3 = new Vector4f(12, 12.2f, 3f, 15.5f);
-        a.v11 = new org.joml.Vector3f(11.5f, 13.15f, 3);
-        a.v22 = new org.joml.Vector2f(12, 13f);
-        a.v33 = new org.joml.Vector4f(12, 12.2f, 3f, 15.5f);
+        a.v11 = new Vector3f(11.5f, 13.15f, 3);
+        a.v22 = new Vector2f(12, 13f);
+        a.v33 = new Vector4f(12, 12.2f, 3f, 15.5f);
 
         String data = gsonSerializer.toJson(a, new TypeInfo<TestObject>() {
         });
@@ -76,9 +74,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TestObject1 o = gsonSerializer.fromJson(data, new TypeInfo<TestObject1>() {
         });
 
-        TeraAssert.assertEquals(o.v1, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
-        TeraAssert.assertEquals(o.v2, new org.joml.Vector2f(12f, 13f), .00001f);
-        TeraAssert.assertEquals(o.v3, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        TeraAssert.assertEquals(o.v1, new Vector3f(11.5f, 13.15f, 3), .00001f);
+        TeraAssert.assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
+        TeraAssert.assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
 
     }
 
@@ -88,9 +86,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         a.v1 = new Vector3f(11.5f, 13.15f, 3);
         a.v2 = new Vector2f(12, 13f);
         a.v3 = new Vector4f(12, 12.2f, 3f, 15.5f);
-        a.v11 = new org.joml.Vector3f(11.5f, 13.15f, 3);
-        a.v22 = new org.joml.Vector2f(12, 13f);
-        a.v33 = new org.joml.Vector4f(12, 12.2f, 3f, 15.5f);
+        a.v11 = new Vector3f(11.5f, 13.15f, 3);
+        a.v22 = new Vector2f(12, 13f);
+        a.v33 = new Vector4f(12, 12.2f, 3f, 15.5f);
 
         byte[] data = protobufSerializer.toBytes(a, new TypeInfo<TestObject>() {
         });
@@ -98,9 +96,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TestObject1 o = protobufSerializer.fromBytes(data, new TypeInfo<TestObject1>() {
         });
 
-        TeraAssert.assertEquals(o.v1, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
-        TeraAssert.assertEquals(o.v2, new org.joml.Vector2f(12f, 13f), .00001f);
-        TeraAssert.assertEquals(o.v3, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        TeraAssert.assertEquals(o.v1, new Vector3f(11.5f, 13.15f, 3), .00001f);
+        TeraAssert.assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
+        TeraAssert.assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
 
     }
 
@@ -110,9 +108,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         a.v1 = new Vector3f(11.5f, 13.15f, 3);
         a.v2 = new Vector2f(12, 13f);
         a.v3 = new Vector4f(12, 12.2f, 3f, 15.5f);
-        a.v11 = new org.joml.Vector3f(11.5f, 13.15f, 3);
-        a.v22 = new org.joml.Vector2f(12, 13f);
-        a.v33 = new org.joml.Vector4f(12, 12.2f, 3f, 15.5f);
+        a.v11 = new Vector3f(11.5f, 13.15f, 3);
+        a.v22 = new Vector2f(12, 13f);
+        a.v33 = new Vector4f(12, 12.2f, 3f, 15.5f);
 
         String data = gsonSerializer.toJson(a, new TypeInfo<TestObject>() {
         });
@@ -124,9 +122,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TeraAssert.assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
         TeraAssert.assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
 
-        TeraAssert.assertEquals(o.v11, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
-        TeraAssert.assertEquals(o.v22, new org.joml.Vector2f(12f, 13f), .00001f);
-        TeraAssert.assertEquals(o.v33, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        TeraAssert.assertEquals(o.v11, new Vector3f(11.5f, 13.15f, 3), .00001f);
+        TeraAssert.assertEquals(o.v22, new Vector2f(12f, 13f), .00001f);
+        TeraAssert.assertEquals(o.v33, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
     }
 
     @Test
@@ -135,9 +133,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         a.v1 = new Vector3f(11.5f, 13.15f, 3);
         a.v2 = new Vector2f(12, 13f);
         a.v3 = new Vector4f(12, 12.2f, 3f, 15.5f);
-        a.v11 = new org.joml.Vector3f(11.5f, 13.15f, 3);
-        a.v22 = new org.joml.Vector2f(12, 13f);
-        a.v33 = new org.joml.Vector4f(12, 12.2f, 3f, 15.5f);
+        a.v11 = new Vector3f(11.5f, 13.15f, 3);
+        a.v22 = new Vector2f(12, 13f);
+        a.v33 = new Vector4f(12, 12.2f, 3f, 15.5f);
 
         byte[] bytes = protobufSerializer.toBytes(a, new TypeInfo<TestObject>() {
         });
@@ -149,9 +147,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TeraAssert.assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
         TeraAssert.assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
 
-        TeraAssert.assertEquals(o.v11, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
-        TeraAssert.assertEquals(o.v22, new org.joml.Vector2f(12f, 13f), .00001f);
-        TeraAssert.assertEquals(o.v33, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        TeraAssert.assertEquals(o.v11, new Vector3f(11.5f, 13.15f, 3), .00001f);
+        TeraAssert.assertEquals(o.v22, new Vector2f(12f, 13f), .00001f);
+        TeraAssert.assertEquals(o.v33, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
     }
 
 }

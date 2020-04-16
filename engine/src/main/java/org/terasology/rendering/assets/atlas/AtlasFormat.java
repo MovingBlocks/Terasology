@@ -19,7 +19,8 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -29,12 +30,10 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Rect2f;
-import org.joml.Vector2f;
-import org.joml.Vector2i;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
-import org.terasology.utilities.gson.legacy.LegacyVector2iTypeAdapter;
+import org.terasology.utilities.gson.Vector2iTypeAdapter;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -56,7 +55,7 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
     public AtlasFormat(AssetManager assetManager) {
         super("atlas");
         this.assetManager = assetManager;
-        gson = new GsonBuilder().registerTypeAdapter(Vector2i.class, new LegacyVector2iTypeAdapter()).create();
+        gson = new GsonBuilder().registerTypeAdapter(Vector2i.class, new Vector2iTypeAdapter()).create();
     }
 
     @Override

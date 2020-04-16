@@ -16,21 +16,13 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Lists;
-import org.joml.Vector2fc;
-import org.joml.Vector3fc;
-import org.joml.Vector4fc;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
+import org.joml.*;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -126,7 +118,7 @@ public final class TeraAssert {
         }
     }
 
-    public static void assertEquals(Quat4f expected, Quat4f actual, float error) {
+    public static void assertEquals(Quaternionf expected, Quaternionf actual, float error) {
         if (expected == null) {
             assertNull(actual);
         } else {

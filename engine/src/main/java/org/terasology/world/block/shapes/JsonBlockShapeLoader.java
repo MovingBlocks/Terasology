@@ -18,29 +18,22 @@ package org.terasology.world.block.shapes;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rotation;
 import org.terasology.math.Transform;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CompoundShape;
 import org.terasology.physics.shapes.ConvexHullShape;
-import org.terasology.utilities.gson.legacy.LegacyVector2fTypeAdapter;
-import org.terasology.utilities.gson.legacy.LegacyVector3fTypeAdapter;
+import org.terasology.utilities.gson.Vector2fTypeAdapter;
+import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 
 import java.io.IOException;
@@ -64,8 +57,8 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 .setPrettyPrinting()
                 .registerTypeAdapter(BlockShapeData.class, new BlockShapeHandler())
                 .registerTypeAdapter(BlockMeshPart.class, new BlockMeshPartHandler())
-                .registerTypeAdapter(Vector3f.class, new LegacyVector3fTypeAdapter())
-                .registerTypeAdapter(Vector2f.class, new LegacyVector2fTypeAdapter())
+                .registerTypeAdapter(Vector2f.class, new Vector2fTypeAdapter())
+                .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
                 .create();
     }
 
@@ -198,7 +191,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 shape.setCollisionOffset(colliders.get(0).offset);
             } else {
                 shape.setCollisionShape(COLLISION_SHAPE_FACTORY.getNewUnitCube());
-                shape.setCollisionOffset(new Vector3f(0, 0, 0));
+                shape.setCollisionOffset(new Vector3f());
                 shape.setCollisionSymmetric(true);
             }
         }

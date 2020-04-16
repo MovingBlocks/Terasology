@@ -16,11 +16,9 @@
 package org.terasology.entitySystem.entity;
 
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.game.GameManifest;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 
 public interface EntityPool {
 
