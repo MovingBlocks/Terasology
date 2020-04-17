@@ -18,7 +18,6 @@ package org.terasology.rendering.logic;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import jdk.nashorn.internal.scripts.JO;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -41,7 +40,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;

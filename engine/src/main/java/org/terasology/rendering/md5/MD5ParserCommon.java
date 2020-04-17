@@ -38,7 +38,6 @@ public final class MD5ParserCommon {
         CORRECTION_MATRIX = new Matrix3f(-1, 0, 0, 0, 0, 1, 0, 1, 0);
         CORRECTION_QUATERNION = new Quaternionf(0, 0, 0, 1);
         CORRECTION_QUATERNION.setFromNormalized(CORRECTION_MATRIX);
-//        CORRECTION_QUATERNION.set(CORRECTION_MATRIX);
     }
 
     public static Vector2f readUV(String u, String v) throws NumberFormatException {

@@ -48,10 +48,18 @@ public final class MatrixUtils {
         return buffer;
     }
 
+    /**
+     *
+     * Copies the given matrix into a newly allocated FloatBuffer
+     * the other of the elements in row-major.
+     * transformation operations happen on the inverse in the library
+     *
+     * @param m the matrix to copy
+     * @return a new Float buffer containing the matrix in row-major form
+     */
     public static FloatBuffer matrixToFloatBuffer(Matrix4fc m) {
         return m.getTransposed(BufferUtils.createFloatBuffer(16));
     }
-
 
     /**
      * Copies the given matrix into a newly allocated FloatBuffer.
@@ -75,7 +83,7 @@ public final class MatrixUtils {
      * Copies the given matrix into an existing FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).
      *
-     * @param m  the matrix to copy
+     * @param m the matrix to copy
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
      */
@@ -134,7 +142,7 @@ public final class MatrixUtils {
      *
      * @param m  the matrix to copy
      * @param fb the float buffer to copy the matrix into
-     * @return The provided float buffer.
+     * @return the provided float buffer with matrix elements in column major order.
      */
     public static FloatBuffer matrixToFloatBuffer(Matrix4fc m, FloatBuffer fb) {
         return m.getTransposed(fb);
@@ -255,10 +263,6 @@ public final class MatrixUtils {
         Matrix4f result = new Matrix4f();
         result.mul(m, vm);
         return result;
-    }
-
-    public static org.joml.Matrix4f calcModelViewMatrix(Matrix4fc m, Matrix4fc vm) {
-        return new org.joml.Matrix4f(vm).mul(m);
     }
 
     public static Matrix3f calcNormalMatrix(Matrix4f mv) {

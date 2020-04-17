@@ -64,7 +64,6 @@ public class Bone {
             pos.sub(parent.getObjectPosition());
             Quaternionf inverseParentRot = new Quaternionf();
             parent.getObjectRotation().invert(inverseParentRot);
-//            inverseParentRot.inverse(parent.getObjectRotation());
             inverseParentRot.transform(pos, pos);
         }
         return pos;
@@ -83,9 +82,7 @@ public class Bone {
         if (parent != null) {
             Quaternionf inverseParentRot = new Quaternionf();
             parent.getObjectRotation().invert(inverseParentRot);
-//            inverseParentRot.inverse(parent.getObjectRotation());
             rot.premul(inverseParentRot);
-//            inverseParentRot.mul(rot,rot);
         }
         return rot;
     }
