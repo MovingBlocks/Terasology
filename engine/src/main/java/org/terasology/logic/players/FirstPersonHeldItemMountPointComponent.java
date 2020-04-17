@@ -17,14 +17,15 @@ package org.terasology.logic.players;
 
 import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
-import org.joml.Vector3f;
 import org.terasology.rendering.openvrprovider.ControllerListener;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.rendering.openvrprovider.OpenVRProvider;
+import org.terasology.rendering.openvrprovider.OpenVRUtil;
 
 /**
  * Only used by the client side so that held items can be positioned in line with the camera
@@ -34,8 +35,8 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     @Owns
     public EntityRef mountPointEntity = EntityRef.NULL;
     public Vector3f rotateDegrees = new Vector3f();
-    public Vector3f translate = new Vector3f();
-    public Quat4f rotationQuaternion;
+    public final Vector3f translate = new Vector3f();
+    public final Quaternionf rotationQuaternion = new Quaternionf();
     public float scale = 1f;
 
     private boolean trackingDataReceived;
@@ -86,12 +87,8 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
         }
         trackingDataReceived = true;
         Matrix4f adjustedPose = pose.mul(toolAdjustmentMatrix);
-        translate = new Vector3f(adjustedPose.m30(), adjustedPose.m31(), adjustedPose.m32());
-        org.joml.Vector4f jomlQuaternion = org.terasology.rendering.openvrprovider.OpenVRUtil.convertToQuaternion(adjustedPose);
-        if (rotationQuaternion == null) {
-            rotationQuaternion = new Quat4f(jomlQuaternion.x, jomlQuaternion.y, jomlQuaternion.z, jomlQuaternion.w);
-        } else {
-            rotationQuaternion.set(jomlQuaternion.x, jomlQuaternion.y, jomlQuaternion.z, jomlQuaternion.w);
-        }
+        translate.set(adjustedPose.m30(), adjustedPose.m31(), adjustedPose.m32());
+        Vector4f quatVector = OpenVRUtil.convertToQuaternion(adjustedPose);
+        rotationQuaternion.set(quatVector.x, quatVector.y, quatVector.z, quatVector.w);
     }
 }

@@ -21,10 +21,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * Provides global access to fonts.
@@ -38,9 +36,11 @@ import org.terasology.math.MatrixUtils;
 public abstract class Camera {
 
     /* CAMERA PARAMETERS */
-    protected final Vector3f position = new Vector3f(0, 0, 0);
+    protected final Vector3f position = new Vector3f();
     protected final Vector3f up = new Vector3f(0, 1, 0);
-    protected Vector3f viewingDirection = new Vector3f(1, 0, 0);
+    // FixMe this is clearly not the viewing direction, it's the rotation axis
+    // The usage of this value outside of this class should be thoroughly analyzed when fixing this.
+    protected final Vector3f viewingDirection = new Vector3f(1, 0, 0);
     protected float viewingAngle;
 
     protected float zNear = 0.1f;
@@ -208,16 +208,13 @@ public abstract class Camera {
      * @return the orientation direction, a quaternion.
      */
     public Quaternionf getOrientation() {
-        return new Quaternionf().set(new AxisAngle4f(viewingAngle,viewingDirection));
+        return new Quaternionf(new AxisAngle4f(viewingAngle, viewingDirection));
     }
 
-    /**
-     Try to set the viewing direction.
-     * @param direction
-     */
-    public void setOrientation(Quat4f direction) {
-        viewingDirection = new Vector3f(direction.x,direction.y,direction.z);
-        viewingAngle = direction.getAngle();
+    public void setOrientation(Quaternionf quaternion) {
+        AxisAngle4f axisAngle = new AxisAngle4f(quaternion);
+        viewingDirection.set(axisAngle.x, axisAngle.y, axisAngle.z);
+        viewingAngle = axisAngle.angle;
     }
 
     public ViewFrustum getViewFrustum() {

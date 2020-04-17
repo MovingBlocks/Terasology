@@ -15,11 +15,11 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 
 /**
  * Only used by the client side so that held items of other players can be positioned in line with them.
@@ -30,7 +30,7 @@ public class RemotePersonHeldItemMountPointComponent implements Component {
     public EntityRef mountPointEntity = EntityRef.NULL;
     public Vector3f rotateDegrees = new Vector3f();
     public Vector3f translate = new Vector3f();
-    public Quat4f rotationQuaternion;
+    public Quaternionf rotationQuaternion = new Quaternionf();
     public float scale = 1f;
 
 }
