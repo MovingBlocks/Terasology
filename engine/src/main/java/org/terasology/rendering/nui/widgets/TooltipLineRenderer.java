@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
@@ -44,7 +45,7 @@ public class TooltipLineRenderer extends AbstractItemRenderer<TooltipLine> {
     public Vector2i getPreferredSize(TooltipLine value, Canvas canvas) {
         Font font = getFont(value);
         List<String> lines = TextLineBuilder.getLines(font, value.getText(), canvas.size().x);
-        return font.getSize(lines);
+        return JomlUtil.from(font.getSize(lines));
     }
 
     private UISkin getSkin(TooltipLine value) {

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
@@ -60,7 +61,7 @@ public class UIScrollingText extends CoreWidget {
      */
     @LayoutConfig
     private int lineSpacing = 3;
-    
+
     /**
      * Maps text to their Y coordinates
      */
@@ -230,7 +231,7 @@ public class UIScrollingText extends CoreWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Font font = canvas.getCurrentStyle().getFont();
         List<String> lines = TextLineBuilder.getLines(font, getText(), areaHint.x);
-        return font.getSize(lines);
+        return JomlUtil.from(font.getSize(lines));
     }
 
     /**

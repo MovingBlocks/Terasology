@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets;
 
 import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
@@ -166,7 +167,7 @@ public class UIButton extends ActivatableWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Font font = canvas.getCurrentStyle().getFont();
         List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.getX());
-        return font.getSize(lines);
+        return JomlUtil.from(font.getSize(lines));
     }
 
     /**

@@ -45,7 +45,7 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         EntityRef chest = blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:chest"));
         chest.addComponent(new InventoryComponent(30));
 
-        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:companion"), 99));
+        inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("Core:companion"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Brick:engine:stair"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Tnt"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:fuseShort"));
