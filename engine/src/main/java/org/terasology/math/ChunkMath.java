@@ -16,11 +16,11 @@
 
 package org.terasology.math;
 
-import java.math.RoundingMode;
-
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
+
+import java.math.RoundingMode;
 
 /**
  * Collection of math functions.
@@ -167,9 +167,9 @@ public final class ChunkMath {
     }
 
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
-        Vector3i minPos = new Vector3i(-extent, -extent, -extent);
+        Vector3i minPos = new Vector3i(-extent);
         minPos.add(pos);
-        Vector3i maxPos = new Vector3i(extent, extent, extent);
+        Vector3i maxPos = new Vector3i(extent);
         maxPos.add(pos);
 
         Vector3i minChunk = calcChunkPos(minPos);
@@ -184,7 +184,7 @@ public final class ChunkMath {
         Vector3f attachDir = new Vector3f(surfaceDir.reverse().getVector3i());
         Vector3f rawDirection = new Vector3f(direction);
         float dot = rawDirection.dot(attachDir);
-        rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
+        rawDirection.sub(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z);
         return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
     }
 

@@ -15,17 +15,17 @@
  */
 package org.terasology.logic.behavior.nui;
 
-import org.terasology.math.JomlUtil;
-import org.terasology.utilities.Assets;
-import org.terasology.math.geom.Rect2f;
-import org.joml.Vector2i;
 import org.joml.Vector2f;
+import org.joml.Vector2i;
+import org.terasology.math.JomlUtil;
+import org.terasology.math.geom.Rect2f;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.utilities.Assets;
 
 /**
  * Represents a port at a RenderableNode. There are several types of ports:
@@ -80,9 +80,9 @@ public abstract class Port extends CoreWidget {
     }
 
     public Vector2f mid() {
-        Vector2f mid = new Vector2f(JomlUtil.from(rect.size()));
+        Vector2f mid = JomlUtil.from(rect.size());
         mid.mul(0.5f);
-        mid.add(JomlUtil.from(rect.min()));
+        mid.add(rect.minX(), rect.minY());
         return mid;
 
     }
