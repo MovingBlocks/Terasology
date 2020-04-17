@@ -15,8 +15,11 @@
  */
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
+import org.terasology.module.sandbox.API;
+
 /**
  */
+@API
 public abstract class MetricsMode {
 
     private String name;
