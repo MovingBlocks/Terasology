@@ -17,18 +17,12 @@ package org.terasology.world.block;
 
 import com.google.common.collect.Maps;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Transform;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
+import org.terasology.math.*;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -96,7 +90,7 @@ public final class Block {
     private boolean shadowCasting = true;
     private boolean waving;
     private byte luminance;
-    private Vector3f tint = new Vector3f(0, 0, 0);
+    private Vector3f tint = new Vector3f();
 
     // Collision related
     private boolean penetrable;
@@ -583,7 +577,7 @@ public final class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        bounds = shape.getAABB(new Transform(offset, new Quaternionf(0, 0, 0, 1), 1.0f));
+        bounds = shape.getAABB(new Transform(offset, new Quaternionf(), 1f));
     }
 
     public CollisionShape getCollisionShape() {

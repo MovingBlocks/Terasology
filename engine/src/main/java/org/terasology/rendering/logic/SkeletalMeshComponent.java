@@ -17,9 +17,9 @@
 package org.terasology.rendering.logic;
 
 import com.google.common.collect.Lists;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.joml.Vector3f;
 import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
@@ -66,7 +66,7 @@ public class SkeletalMeshComponent implements VisualComponent {
     public EntityRef rootBone = EntityRef.NULL;
     public float animationTime;
 
-    public Vector3f scale = new Vector3f(1, 1, 1);
+    public Vector3f scale = new Vector3f(1);
     public Vector3f translate = new Vector3f();
 
     @Replicate

@@ -17,16 +17,12 @@
 package org.terasology.network.internal;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -42,13 +38,8 @@ import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.joml.Vector3i;
 import org.terasology.math.JomlUtil;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.ColorComponent;
-import org.terasology.network.NetMetricSource;
-import org.terasology.network.NetworkComponent;
+import org.terasology.network.*;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
@@ -67,11 +58,7 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
 
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -258,10 +245,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 Vector3i pos = null;
                 int distance = Integer.MAX_VALUE;
                 for (Vector3i chunkPos : readyChunks.keySet()) {
-                    long chunkDistance = chunkPos.distanceSquared(center);
+                    int chunkDistance = (int) chunkPos.distanceSquared(center);
                     if (pos == null || chunkDistance < distance) {
                         pos = chunkPos;
-                        distance = (int) chunkDistance;
+                        distance = chunkDistance;
                     }
                 }
                 Chunk chunk = readyChunks.remove(pos);

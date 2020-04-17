@@ -15,6 +15,7 @@
  */
 package org.terasology.particles.rendering;
 
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -22,8 +23,6 @@ import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.math.JomlUtil;
-import org.joml.Vector3f;
 import org.terasology.particles.ParticlePool;
 import org.terasology.particles.ParticleSystemManager;
 import org.terasology.particles.components.ParticleDataSpriteComponent;
@@ -32,18 +31,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glDeleteLists;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * ParticleRenderer for basic sprite particle systems.
@@ -99,7 +87,10 @@ public class SpriteParticleRenderer implements RenderSystem {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             glBindTexture(GL11.GL_TEXTURE_2D, particleSystem.particleData.texture.getId());
 
-            material.setFloat2("texSize", particleSystem.particleData.textureSize.x(), particleSystem.particleData.textureSize.y());
+            material.setFloat2("texSize",
+                    particleSystem.particleData.textureSize.x(),
+                    particleSystem.particleData.textureSize.y()
+            );
         }
 
         glPushMatrix();
@@ -152,7 +143,8 @@ public class SpriteParticleRenderer implements RenderSystem {
         material.enable();
         org.joml.Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
 
-        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, camPos));
+        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class)
+                .forEach(p -> drawParticles(material, p, camPos));
     }
 
     @Override

@@ -16,13 +16,10 @@
 package org.terasology.logic.characters;
 
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseQuat4f;
-import org.terasology.math.geom.BaseVector3f;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 
@@ -80,8 +77,8 @@ public final class CharacterMovementSystemUtility {
 
     public void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
         float t = (float) (time - a.getTime()) / (b.getTime() - a.getTime());
-        Vector3f newPos = new Vector3f(a.getPosition()).lerp(b.getPosition(),t);
-        Quaternionf newRot = new Quaternionf(a.getRotation()).nlerp(b.getRotation(),t);
+        Vector3f newPos = new Vector3f(a.getPosition()).lerp(b.getPosition(), t);
+        Quaternionf newRot = new Quaternionf(a.getRotation()).nlerp(b.getRotation(), t);
         LocationComponent location = entity.getComponent(LocationComponent.class);
         location.setWorldPosition(newPos);
         location.setWorldRotation(newRot);
@@ -106,9 +103,9 @@ public final class CharacterMovementSystemUtility {
 
     public void setToExtrapolateState(EntityRef entity, CharacterStateEvent state, long time) {
         float t = (time - state.getTime()) * 0.0001f;
-        Vector3f newPos = new Vector3f(state.getVelocity());
-        newPos.mul(t);
-        newPos.add(state.getPosition());
+        Vector3f newPos = new Vector3f(state.getVelocity())
+                .mul(t)
+                .add(state.getPosition());
         extrapolateLocationComponent(entity, state, newPos);
 
         extrapolateCharacterMovementComponent(entity, state);

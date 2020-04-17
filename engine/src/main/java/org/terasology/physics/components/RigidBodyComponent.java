@@ -17,9 +17,8 @@
 package org.terasology.physics.components;
 
 import com.google.common.collect.Lists;
-
-import org.terasology.entitySystem.Component;
 import org.joml.Vector3f;
+import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
@@ -40,10 +39,10 @@ public class RigidBodyComponent implements Component {
     public Vector3f velocity = new Vector3f();
 
     @Replicate
-    public Vector3f angularFactor = new Vector3f(1f, 1f, 1f);
+    public Vector3f angularFactor = new Vector3f(1f);
 
     @Replicate
-    public Vector3f linearFactor = new Vector3f(1f, 1f, 1f);
+    public Vector3f linearFactor = new Vector3f(1f);
 
     @Replicate
     public float friction = 0.5f;
@@ -60,7 +59,9 @@ public class RigidBodyComponent implements Component {
 
     @Replicate
     public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;
+
     @Replicate
-    public List<CollisionGroup> collidesWith =
-            Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);
+    public List<CollisionGroup> collidesWith = Lists.newArrayList(
+            StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC
+    );
 }

@@ -15,7 +15,9 @@
  */
 package org.terasology.physics.engine;
 
+import com.google.common.collect.Lists;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -32,8 +34,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.location.LocationResynchEvent;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
@@ -42,21 +42,12 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
-import org.terasology.physics.events.ChangeVelocityEvent;
-import org.terasology.physics.events.CollideEvent;
-import org.terasology.physics.events.ForceEvent;
-import org.terasology.physics.events.ImpulseEvent;
-import org.terasology.physics.events.PhysicsResynchEvent;
-import org.terasology.physics.events.ImpactEvent;
-import org.terasology.physics.events.EntityImpactEvent;
-import org.terasology.physics.events.BlockImpactEvent;
+import org.terasology.physics.events.*;
 import org.terasology.registry.In;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
-
-import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.List;
@@ -168,9 +159,9 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             impactResult = vImpactSpeed.sub(impactResult.mul(2.0f));
             impactResult.normalize();
 
-            Vector3f vNewLocationVector = (new Vector3f(impactResult)).mul(event.getTravelDistance());
-            Vector3f vNewPosition = (new Vector3f(vImpactPoint)).add(vNewLocationVector);
-            Vector3f vNewVelocity = (new Vector3f(impactResult)).mul(speedFactor * COLLISION_DAMPENING_MULTIPLIER);
+            Vector3f vNewLocationVector = new Vector3f(impactResult).mul(event.getTravelDistance());
+            Vector3f vNewPosition = new Vector3f(vImpactPoint).add(vNewLocationVector);
+            Vector3f vNewVelocity = new Vector3f(impactResult).mul(speedFactor * COLLISION_DAMPENING_MULTIPLIER);
 
             rigidBody.setLocation(vNewPosition);
             rigidBody.setLinearVelocity(vNewVelocity);
@@ -257,7 +248,9 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 short bCollidesWith = getCollidesWithGroupFlag(pair.b);
                 if ((aCollisionGroup & bCollidesWith) != 0
                         || (pair.a.hasComponent(BlockComponent.class) && !pair.b.hasComponent(BlockComponent.class))) {
-                    pair.b.send(new CollideEvent(pair.a, pair.pointB, pair.pointA, pair.distance, new Vector3f(pair.normal).mul(-1)));
+                    pair.b.send(new CollideEvent(
+                        pair.a, pair.pointB, pair.pointA, pair.distance, new Vector3f(pair.normal).negate())
+                    );
                 }
             }
         }

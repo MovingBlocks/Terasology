@@ -20,16 +20,12 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
-import org.eaxy.Document;
-import org.eaxy.Element;
-import org.eaxy.ElementSet;
-import org.eaxy.NonMatchingPathException;
-import org.eaxy.Xml;
+import org.eaxy.*;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.joml.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
@@ -37,14 +33,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Importer for Collada data exchange model files.
@@ -194,7 +183,7 @@ public class ColladaLoader {
                     Source jointMatrixSource = parseSource(jointMatrixSourceElement);
                     inverseBindMatrixArray = jointMatrixSource.floatValues;
 
-                    rotationArray = quad4fArrayFromFloat16ArrayData(inverseBindMatrixArray);
+                    rotationArray = quat4fArrayFromFloat16ArrayData(inverseBindMatrixArray);
                 }
             }
 
@@ -437,7 +426,7 @@ public class ColladaLoader {
                 matrixDataArray[i] = Float.parseFloat(floatString);
             }
 
-            Quaternionf[] jointMatrix = quad4fArrayFromFloat16ArrayData(matrixDataArray);
+            Quaternionf[] jointMatrix = quat4fArrayFromFloat16ArrayData(matrixDataArray);
             Vector3f[] positionVectorArray = positionFromFloat16ArrayData(matrixDataArray);
             md5Joint.position = positionVectorArray[0];
             md5Joint.orientation = jointMatrix[0];
@@ -467,15 +456,14 @@ public class ColladaLoader {
         return md5Joint;
     }
 
-    private Quaternionf[] quad4fArrayFromFloat16ArrayData(float[] inverseBindMatrixArray) {
+    private Quaternionf[] quat4fArrayFromFloat16ArrayData(float[] inverseBindMatrixArray) {
         Quaternionf[] rotationArray = new Quaternionf[inverseBindMatrixArray.length / 16];
         for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
             int offset = i * 16;
-//            Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
-//            Quaternionf rotation = new Quaternionf();
-//            rotation.set(matrix4f);
-//            rotationArray[i] = rotation;
-            rotationArray[i] = new Matrix4f(FloatBuffer.wrap(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16))).getNormalizedRotation(new Quaternionf());
+            Matrix4f matrix = new Matrix4f(FloatBuffer.wrap(
+                    Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16)
+            ));
+            rotationArray[i] = matrix.getNormalizedRotation(new Quaternionf());
         }
 
         return rotationArray;
@@ -485,9 +473,10 @@ public class ColladaLoader {
         Vector3f[] translationVectorArray = new Vector3f[inverseBindMatrixArray.length / 16];
         for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
             int offset = i * 16;
-            Matrix4f matrix4f = new Matrix4f(FloatBuffer.wrap(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16)));
-            Vector3f translationVector = matrix4f.getTranslation(new Vector3f());
-            translationVectorArray[i] = translationVector;
+            Matrix4f matrix = new Matrix4f(
+                    FloatBuffer.wrap(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16))
+            );
+            translationVectorArray[i] = matrix.getTranslation(new Vector3f());
         }
 
         return translationVectorArray;

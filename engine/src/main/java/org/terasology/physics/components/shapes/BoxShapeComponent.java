@@ -16,13 +16,13 @@
 
 package org.terasology.physics.components.shapes;
 
-import org.terasology.entitySystem.Component;
 import org.joml.Vector3f;
+import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 
 /**
  */
 public class BoxShapeComponent implements Component {
     @Replicate
-    public Vector3f extents = new Vector3f(1, 1, 1);
+    public Vector3f extents = new Vector3f(1);
 }

@@ -109,10 +109,14 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
         Vector2f min = new Vector2f((float) freeform.getMin().x / size.x, (float) freeform.getMin().y / size.y);
         if (freeform.getSize() != null) {
             Vector2f itemSize = new Vector2f((float) freeform.getSize().x / size.x, (float) freeform.getSize().y / size.y);
-            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndSize(JomlUtil.from(min), JomlUtil.from(itemSize))));
+            out.put(new Name(freeform.getName()), new SubtextureData(
+                            texture, Rect2f.createFromMinAndSize(JomlUtil.from(min), JomlUtil.from(itemSize)))
+            );
         } else if (freeform.getMax() != null) {
             Vector2f max = new Vector2f((float) freeform.getMax().x / size.x, (float) freeform.getMax().y / size.y);
-            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndMax(JomlUtil.from(min), JomlUtil.from(max))));
+            out.put(new Name(freeform.getName()), new SubtextureData(
+                    texture, Rect2f.createFromMinAndMax(JomlUtil.from(min), JomlUtil.from(max)))
+            );
         }
     }
 
@@ -126,7 +130,7 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
             return;
         }
 
-        Vector2f offset = new Vector2f(0, 0);
+        Vector2f offset = new Vector2f();
         if (grid.getGridOffset() != null) {
             offset.set((float) grid.getGridOffset().x / size.x, (float) grid.getGridOffset().y / size.y);
         }

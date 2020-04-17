@@ -16,11 +16,10 @@
 package org.terasology.utilities.procedural;
 
 import com.google.common.math.IntMath;
-
-import org.terasology.math.Rect2i;
-import org.terasology.math.TeraMath;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
+import org.terasology.math.Rect2i;
+import org.terasology.math.TeraMath;
 
 /**
  * @deprecated Use {@link SubSampledNoise} instead
@@ -29,7 +28,7 @@ import org.joml.Vector2i;
 public class SubSampledNoise2D implements Noise2D {
 
     private Noise2D source;
-    private Vector2f zoom = new Vector2f(1, 1);
+    private Vector2f zoom = new Vector2f(1f);
     private int sampleRate = 1;
 
     public SubSampledNoise2D(Noise2D source, Vector2f zoom, int sampleRate) {

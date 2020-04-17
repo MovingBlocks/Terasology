@@ -16,7 +16,7 @@
 package org.terasology.rendering.animation;
 
 import com.google.common.base.Preconditions;
-import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Rect2i;
 
 import java.util.function.Consumer;
 

@@ -17,9 +17,9 @@ package org.terasology.logic.location;
 
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.entitySystem.event.Event;
-import org.joml.Vector3f;
 
 public class LocationChangedEvent implements Event {
     public final LocationComponent component;
@@ -61,22 +61,19 @@ public class LocationChangedEvent implements Event {
         this(newLocation, oPosition, oRotation, newLocation.position, nRotation);
     }
 
-    public LocationChangedEvent(LocationComponent nComponent, Vector3f oPosition, Quaternionf oRotation, Vector3f nPosition, Quaternionf nRotation)
-    {
+    public LocationChangedEvent(LocationComponent nComponent, Vector3f oPosition, Quaternionf oRotation, Vector3f nPosition, Quaternionf nRotation) {
         oldPosition = new Vector3f(oPosition);
-        oldRotation = new Quaternionf(oRotation.x, oRotation.y, oRotation.z, oRotation.w);
+        oldRotation = new Quaternionf(oRotation);
         newPosition = new Vector3f(nPosition);
-        newRotation = new Quaternionf(nRotation.x, nRotation.y, nRotation.z, nRotation.w);;
+        newRotation = new Quaternionf(nRotation);;
         component = nComponent;
     }
 
-    public Vector3fc vectorMoved()
-    {
+    public Vector3fc vectorMoved() {
         return oldPosition != null ? new Vector3f(newPosition).sub(oldPosition) : new Vector3f();
     }
 
-    public float distanceMoved()
-    {
+    public float distanceMoved() {
         return oldPosition != null ? newPosition.distance(oldPosition) : 0.0F;
     }
 }

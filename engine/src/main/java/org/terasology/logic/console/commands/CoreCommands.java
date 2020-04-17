@@ -18,6 +18,7 @@ package org.terasology.logic.console.commands;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -50,19 +51,11 @@ import org.terasology.logic.console.suggesters.CommandNameSuggester;
 import org.terasology.logic.console.suggesters.ScreenSuggester;
 import org.terasology.logic.console.suggesters.SkinSuggester;
 import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.naming.Name;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.JoinStatus;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.PingService;
-import org.terasology.network.Server;
+import org.terasology.network.*;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.In;
@@ -85,12 +78,7 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -531,19 +519,18 @@ public class CoreCommands extends BaseComponentSystem {
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = new Vector3f(characterLocation.getWorldDirection());
-        offset.mul(2);
-        spawnPos.add(offset);
-        Vector3f dir = new Vector3f(characterLocation.getWorldDirection());
+        Vector3f offset = characterLocation.getWorldDirection().mul(2);
+        Vector3f spawnPos = characterLocation.getWorldPosition().add(offset);
+
+        Vector3f forward = Direction.FORWARD.getVector3f();
+        Vector3f dir = characterLocation.getWorldDirection();
         dir.y = 0;
         if (dir.lengthSquared() > 0.001f) {
             dir.normalize();
         } else {
-            dir.set(Direction.FORWARD.getVector3f());
+            dir.set(forward);
         }
-        Quaternionf rotation = Direction.FORWARD.getVector3f().rotationTo(dir,new Quaternionf());
-//        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
+        Quaternionf rotation = new Quaternionf().rotationTo(forward, dir);
 
         Optional<Prefab> prefab = Assets.getPrefab(prefabName);
         if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
@@ -569,10 +556,8 @@ public class CoreCommands extends BaseComponentSystem {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = characterLocation.getWorldDirection();
-        offset.mul(3);
-        spawnPos.add(offset);
+        Vector3f offset = characterLocation.getWorldDirection().mul(3);
+        Vector3f spawnPos = characterLocation.getWorldPosition().add(offset);
 
         BlockFamily block = blockManager.getBlockFamily(blockName);
         if (block == null) {
@@ -595,11 +580,7 @@ public class CoreCommands extends BaseComponentSystem {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = characterLocation.getWorldDirection();
-
-        offset.mul(3);
-        spawnPos.add(5, 10, 0);
+        Vector3f spawnPos = characterLocation.getWorldPosition().add(5, 10, 0);
         BlockFamily block = blockManager.getBlockFamily(blockName);
         if (block == null) {
             return "Sorry, your block is not found";
@@ -628,10 +609,8 @@ public class CoreCommands extends BaseComponentSystem {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = characterLocation.getWorldDirection();
-        offset.mul(5);
-        spawnPos.add(offset);
+        Vector3f offset = characterLocation.getWorldDirection().mul(5);
+        Vector3f spawnPos = characterLocation.getWorldPosition().add(offset);
         BlockFamily block = blockManager.getBlockFamily(blockName);
         if (block == null) {
             return "Sorry, your block is not found";
@@ -741,7 +720,8 @@ public class CoreCommands extends BaseComponentSystem {
                     msg.append(Console.NEW_LINE);
                 }
                 if (!cmd.getRequiredPermission().isEmpty()) {
-                    msg.append("Required permission level - " + cmd.getRequiredPermission());
+                    msg.append("Required permission level - ");
+                    msg.append(cmd.getRequiredPermission());
                     msg.append(Console.NEW_LINE);
                     msg.append("=====================================================================================================================");
                     msg.append(Console.NEW_LINE);

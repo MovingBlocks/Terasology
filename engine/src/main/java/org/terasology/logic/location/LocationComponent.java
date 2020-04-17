@@ -17,11 +17,10 @@ package org.terasology.logic.location;
 
 import com.google.common.collect.Lists;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -51,13 +50,13 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @TextField
     Vector3f position = new Vector3f();
     @Replicate
-    Quaternionf rotation = new Quaternionf(0, 0, 0, 1);
+    Quaternionf rotation = new Quaternionf();
     @Replicate
     float scale = 1.0f;
     @Replicate
     Vector3f lastPosition = new Vector3f();
     @Replicate
-    Quaternionf lastRotation = new Quaternionf(0,0,0,1);
+    Quaternionf lastRotation = new Quaternionf();
 
     public LocationComponent() {
     }
@@ -79,8 +78,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public Vector3f getLocalDirection() {
-//        Vector3f result = Direction.FORWARD.getVector3f();
-//        getLocalRotation().rotate(result, result);
         return Direction.FORWARD.getVector3f().rotate(getLocalRotation());
     }
 
@@ -121,22 +118,18 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public Vector3f getWorldDirection() {
-//        Vector3f result = Direction.FORWARD.getVector3f();
-//        getWorldRotation().rotate(result, result);
-//        return result;
-        return Direction.FORWARD.getVector3f()
-            .rotate(getWorldRotation());
+        return Direction.FORWARD.getVector3f().rotate(getWorldRotation());
     }
 
     public Quaternionf getWorldRotation() {
-        return getWorldRotation(new Quaternionf(0, 0, 0, 1));
+        return getWorldRotation(new Quaternionf());
     }
 
     public Quaternionf getWorldRotation(Quaternionf output) {
         output.set(rotation);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
-            parentLoc.rotation.mul(output,output);
+            parentLoc.rotation.mul(output, output);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return output;
@@ -158,7 +151,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         if (parentLoc != null) {
             this.position.sub(parentLoc.getWorldPosition());
             this.position.mul(1f / parentLoc.getWorldScale());
-            this.position.rotate(new Quaternionf(parentLoc.getWorldRotation()).conjugate());
+            Quaternionf inverseWorldRotation = parentLoc.getWorldRotation().conjugate();
+            this.position.rotate(inverseWorldRotation);
         }
     }
 
@@ -166,8 +160,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         setLocalRotation(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
-            Quaternionf worldRot = parentLoc.getWorldRotation();
-            worldRot.conjugate().mul(this.rotation,this.rotation);
+            Quaternionf inverseWorldRotation = parentLoc.getWorldRotation().conjugate();
+            inverseWorldRotation.mul(rotation, rotation);
         }
     }
 

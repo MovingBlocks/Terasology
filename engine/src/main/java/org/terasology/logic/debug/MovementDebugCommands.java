@@ -16,34 +16,29 @@
 package org.terasology.logic.debug;
 
 import org.joml.Quaternionf;
-import org.terasology.entitySystem.entity.EntityManager;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.characters.CharacterImpulseEvent;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.CharacterTeleportEvent;
-import org.terasology.logic.characters.GazeMountPointComponent;
-import org.terasology.logic.characters.MovementMode;
-import org.terasology.logic.location.Location;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.registry.In;
-import org.terasology.registry.Share;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.characters.*;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.location.Location;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
-import org.joml.Vector3f;
 import org.terasology.network.ClientComponent;
+import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.registry.In;
+import org.terasology.registry.Share;
+import org.terasology.utilities.Assets;
 
 import java.util.Optional;
 
@@ -245,9 +240,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 move.height = amount;
                 clientComp.character.saveComponent(move);
                 LocationComponent loc = client.getComponent(LocationComponent.class);
-                Vector3f currentPosition = loc.getWorldPosition();
-                clientComp.character
-                        .send(new CharacterTeleportEvent(new Vector3f(currentPosition.x(), currentPosition.y() + (amount - prevHeight) / 2, currentPosition.z())));
+                Vector3f targetPosition = loc.getWorldPosition();
+                targetPosition.y += (amount - prevHeight) / 2;
+                clientComp.character.send(new CharacterTeleportEvent(targetPosition));
                 physics.removeCharacterCollider(clientComp.character);
                 physics.getCharacterCollider(clientComp.character);
                 return "Height of player set to " + amount + " (was " + prevHeight + ")";
@@ -415,7 +410,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = clientEntity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
-                    vPlayerLocation = locationComponent.getWorldPosition();
+                    locationComponent.getWorldPosition(vPlayerLocation);
                     bPlayerLocationWasFound = true;
                     playerEntity = clientEntity;
                 }

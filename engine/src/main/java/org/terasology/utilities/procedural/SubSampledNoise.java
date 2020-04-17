@@ -16,21 +16,20 @@
 package org.terasology.utilities.procedural;
 
 import com.google.common.math.IntMath;
-
-import org.terasology.math.Rect2i;
-import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
+import org.terasology.math.Rect2i;
+import org.terasology.math.Region3i;
+import org.terasology.math.TeraMath;
 
 /**
  */
 public class SubSampledNoise extends AbstractNoise {
 
     private Noise source;
-    private Vector3f zoom = new Vector3f(1, 1, 1);
+    private Vector3f zoom = new Vector3f(1f);
     private int sampleRate = 1;
 
     /**

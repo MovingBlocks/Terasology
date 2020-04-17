@@ -16,10 +16,10 @@
 package org.terasology.utilities.procedural;
 
 import com.google.common.math.IntMath;
-import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
+import org.terasology.math.Region3i;
+import org.terasology.math.TeraMath;
 
 /**
  * @deprecated Use {@link SubSampledNoise} instead
@@ -28,7 +28,7 @@ import org.joml.Vector3i;
 public class SubSampledNoise3D implements Noise3D {
 
     private Noise3D source;
-    private Vector3f zoom = new Vector3f(1, 1, 1);
+    private Vector3f zoom = new Vector3f(1f);
     private int sampleRate = 1;
 
     public SubSampledNoise3D(Noise3D source, Vector3f zoom, int sampleRate) {

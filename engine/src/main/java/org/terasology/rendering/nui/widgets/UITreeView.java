@@ -17,32 +17,18 @@ package org.terasology.rendering.nui.widgets;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.joml.Vector2i;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.math.Rect2i;
-import org.joml.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseDragEvent;
-import org.terasology.rendering.nui.events.NUIMouseOverEvent;
-import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
+import org.terasology.rendering.nui.events.*;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
-import org.terasology.rendering.nui.widgets.treeView.Tree;
-import org.terasology.rendering.nui.widgets.treeView.TreeKeyEventListener;
-import org.terasology.rendering.nui.widgets.treeView.TreeModel;
-import org.terasology.rendering.nui.widgets.treeView.TreeMouseClickListener;
-import org.terasology.rendering.nui.widgets.treeView.TreeViewState;
+import org.terasology.rendering.nui.widgets.treeView.*;
 
 import java.util.List;
 
@@ -190,14 +176,14 @@ public class UITreeView<T> extends CoreWidget {
             Tree<T> node = model.get().getNode(i);
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin()
                 .grow(itemRenderer.getPreferredSize(node.getValue(), canvas)
-                    .add(node.getDepth() * levelIndent.get(),0));
+                    .add(node.getDepth() * levelIndent.get(), 0));
             result.x = Math.max(result.x, preferredSize.x);
             result.y += preferredSize.y;
         }
         model.get().setEnumerateExpandedOnly(true);
 
         // Account for the expand/contract button!
-        result.add(levelIndent.get(),0);
+        result.x += levelIndent.get();
 
         return result;
     }

@@ -17,29 +17,11 @@ package org.terasology.math;
 
 import com.google.common.math.DoubleMath;
 import org.joml.Matrix3f;
-import org.joml.Matrix3fc;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
-import org.joml.Vector2f;
-import org.joml.Vector2fc;
 import org.joml.Vector2i;
-import org.joml.Vector2ic;
-import org.joml.Vector3fc;
 import org.joml.Vector3i;
-import org.joml.Vector3ic;
 import org.joml.Vector4f;
-import org.joml.Vector4fc;
-import org.joml.Vector4i;
-import org.terasology.math.geom.BaseMatrix3f;
-import org.terasology.math.geom.BaseMatrix4f;
-import org.terasology.math.geom.BaseQuat4f;
-import org.terasology.math.geom.BaseVector2f;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.BaseVector3f;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.BaseVector4f;
-import org.terasology.math.geom.Quat4f;
+import org.joml.*;
+import org.terasology.math.geom.*;
 
 import java.math.RoundingMode;
 
@@ -121,15 +103,27 @@ public class JomlUtil {
         return new Quaternionf(quat.getX(), quat.getY(), quat.getZ(), quat.getW());
     }
 
-    public static Vector3i round(Vector3fc vector, RoundingMode rm) {
-        return new Vector3i(DoubleMath.roundToInt(vector.x(), rm), DoubleMath.roundToInt(vector.y(), rm), DoubleMath.roundToInt(vector.z(), rm));
+    public static Vector2i round(Vector2fc vector, RoundingMode rm) {
+        return new Vector2i(
+                DoubleMath.roundToInt(vector.x(), rm),
+                DoubleMath.roundToInt(vector.y(), rm)
+        );
     }
 
-    public static Vector2i round(Vector2fc vector, RoundingMode rm) {
-        return new Vector2i(DoubleMath.roundToInt(vector.x(), rm), DoubleMath.roundToInt(vector.y(), rm));
+    public static Vector3i round(Vector3fc vector, RoundingMode rm) {
+        return new Vector3i(
+                DoubleMath.roundToInt(vector.x(), rm),
+                DoubleMath.roundToInt(vector.y(), rm),
+                DoubleMath.roundToInt(vector.z(), rm)
+        );
     }
 
     public static Vector4i round(Vector4fc vector, RoundingMode rm) {
-        return new Vector4i(DoubleMath.roundToInt(vector.x(), rm), DoubleMath.roundToInt(vector.y(), rm), DoubleMath.roundToInt(vector.z(), rm), DoubleMath.roundToInt(vector.w(), rm));
+        return new Vector4i(
+                DoubleMath.roundToInt(vector.x(), rm),
+                DoubleMath.roundToInt(vector.y(), rm),
+                DoubleMath.roundToInt(vector.z(), rm),
+                DoubleMath.roundToInt(vector.w(), rm)
+        );
     }
 }

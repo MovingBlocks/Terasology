@@ -17,9 +17,7 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector2ic;
+import org.joml.*;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -28,18 +26,8 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.math.AABB;
-import org.terasology.math.Border;
-import org.terasology.math.MatrixUtils;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseQuat4f;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Quat4f;
+import org.terasology.math.*;
 import org.terasology.math.geom.Rect2f;
-import org.terasology.math.Rect2i;
-import org.joml.Vector2f;
-import org.joml.Vector2i;
-import org.joml.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
 import org.terasology.rendering.assets.material.Material;
@@ -47,11 +35,7 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
-import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.TextLineBuilder;
-import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.opengl.FrameBufferObject;
 import org.terasology.rendering.opengl.LwjglFrameBufferObject;
 import org.terasology.utilities.Assets;
@@ -59,30 +43,11 @@ import org.terasology.utilities.Assets;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.nio.FloatBuffer;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glLoadMatrix;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glOrtho;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.*;
+
+import java.lang.Math;
 
 /**
  */
@@ -139,11 +104,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
 
-//        modelView = new Matrix4f();
-//        modelView.setIdentity();
-//        modelView.setTranslation(new Vector3f(0, 0, -1024f));
-        modelView = new Matrix4f();
-        modelView.setTranslation(new Vector3f(0, 0, -1024f));
+        modelView = new Matrix4f().translation(0, 0, -1024f);
 
         MatrixUtils.matrixToFloatBuffer(modelView, matrixBuffer);
         glLoadMatrix(matrixBuffer);
@@ -200,17 +161,13 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         Vector3f centerOffset = meshAABB.getCenter();
         centerOffset.mul(-1.0f);
 
-        Matrix4f centerTransform = new Matrix4f().translationRotateScale(centerOffset,new Quaternionf(),1);//.translate(centerOffset);
-        Matrix4f userTransform = new Matrix4f().translationRotateScale(offset,rotation,-fitScale * scale);
-        Matrix4f translateTransform = new Matrix4f().translationRotateScale(
-            new Vector3f(drawRegion.minX() + drawRegion.width() / 2,
-                drawRegion.minY() + drawRegion.height() / 2, 0),new Quaternionf(),1);
-
-//        Matrix4f centerTransform = new Matrix4f(BaseQuat4f.IDENTITY, centerOffset, 1.0f);
-//        Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
-//        Matrix4f translateTransform = new Matrix4f(BaseQuat4f.IDENTITY,
-//                new Vector3f((drawRegion.minX() + drawRegion.width() / 2) * uiScale,
-//                    (drawRegion.minY() + drawRegion.height() / 2) * uiScale, 0), 1);
+        Matrix4f centerTransform = new Matrix4f().translation(centerOffset);
+        Matrix4f userTransform = new Matrix4f()
+                .translationRotateScale(offset, rotation, -fitScale * scale);
+        Matrix4f translateTransform = new Matrix4f().translation(
+                (drawRegion.minX() + drawRegion.width() / 2) * uiScale,
+                (drawRegion.minY() + drawRegion.height() / 2) * uiScale, 0
+        );
 
         userTransform.mul(centerTransform);
         translateTransform.mul(userTransform);

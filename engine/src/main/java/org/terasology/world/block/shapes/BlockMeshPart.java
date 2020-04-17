@@ -16,7 +16,6 @@
 package org.terasology.world.block.shapes;
 
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Quat4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -122,8 +121,8 @@ public class BlockMeshPart {
         Vector3f[] newNormals = new Vector3f[normals.length];
 
         for (int i = 0; i < newVertices.length; ++i) {
-            newVertices[i] = vertices[i].rotate(rotation,new Vector3f());
-            newNormals[i] = normals[i].rotate(rotation,new Vector3f());
+            newVertices[i] = new Vector3f(vertices[i]).rotate(rotation);
+            newNormals[i] = new Vector3f(normals[i]).rotate(rotation);
             newNormals[i].normalize();
         }
 

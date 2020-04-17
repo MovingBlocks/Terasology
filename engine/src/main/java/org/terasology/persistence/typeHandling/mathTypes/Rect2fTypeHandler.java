@@ -17,10 +17,9 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector2f;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Rect2f;
-import org.joml.Vector2f;
-import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
@@ -63,7 +62,7 @@ public class Rect2fTypeHandler extends TypeHandler<Rect2f> {
             Vector2f size = vector2fTypeHandler.deserializeOrThrow(map.get(SIZE_FIELD),
                     "Could not deserialize Rect2f." + SIZE_FIELD);
 
-            return Optional.ofNullable(Rect2f.createFromMinAndSize(JomlUtil.from(min),JomlUtil.from(size)));
+            return Optional.ofNullable(Rect2f.createFromMinAndSize(JomlUtil.from(min), JomlUtil.from(size)));
         }
         return Optional.empty();
     }

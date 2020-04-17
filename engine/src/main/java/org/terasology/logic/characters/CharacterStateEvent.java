@@ -17,7 +17,6 @@
 package org.terasology.logic.characters;
 
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Quat4f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.network.BroadcastEvent;
@@ -28,7 +27,7 @@ public class CharacterStateEvent extends NetworkEvent {
     private long time;
     private int sequenceNumber;
     private Vector3f position = new Vector3f();
-    private Quaternionf rotation = new Quaternionf(0, 0, 0, 1);
+    private Quaternionf rotation = new Quaternionf();
     private MovementMode mode = MovementMode.WALKING;
     private boolean grounded;
     private Vector3f velocity = new Vector3f();

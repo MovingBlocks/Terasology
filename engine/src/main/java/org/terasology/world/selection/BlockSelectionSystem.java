@@ -15,6 +15,8 @@
  */
 package org.terasology.world.selection;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -23,8 +25,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.terasology.world.selection.event.SetBlockSelectionEndingPointEvent;
 import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
 
@@ -54,7 +54,7 @@ public class BlockSelectionSystem extends BaseComponentSystem {
 
         Vector3f worldPosition = locationComponent.getWorldPosition();
 
-        Vector3i startPosition = JomlUtil.round(worldPosition, RoundingMode.FLOOR);//new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
+        Vector3i startPosition = JomlUtil.round(worldPosition, RoundingMode.FLOOR);
         blockSelectionComponent.startPosition = startPosition;
         Vector3i endPosition = startPosition;
         blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
@@ -77,7 +77,7 @@ public class BlockSelectionSystem extends BaseComponentSystem {
 
         Vector3f worldPosition = locationComponent.getWorldPosition();
 
-        Vector3i endPosition = JomlUtil.round(worldPosition, RoundingMode.FLOOR);//new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
+        Vector3i endPosition = JomlUtil.round(worldPosition, RoundingMode.FLOOR);
         Vector3i startPosition = blockSelectionComponent.startPosition;
         if (null == startPosition) {
             startPosition = endPosition;

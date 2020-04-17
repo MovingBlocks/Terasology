@@ -32,9 +32,9 @@ public final class LightComponent implements VisualComponent, ReplicationCheck {
     }
 
     @Replicate
-    public Vector3f lightColorDiffuse = new Vector3f(1.0f, 1.0f, 1.0f);
+    public Vector3f lightColorDiffuse = new Vector3f(1f);
     @Replicate
-    public Vector3f lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
+    public Vector3f lightColorAmbient = new Vector3f(1f);
 
     @Replicate
     public float lightDiffuseIntensity = 1.0f;

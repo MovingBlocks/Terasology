@@ -16,12 +16,10 @@
 
 package org.terasology.math;
 
-import org.joml.Vector3fc;
-import org.joml.Vector3ic;
-import org.terasology.math.geom.BaseVector3f;
-import org.terasology.math.geom.BaseVector3i;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 import java.math.RoundingMode;
 import java.util.Iterator;
@@ -275,11 +273,8 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return The position at the center of the region
      */
     public Vector3f center() {
-        Vector3f result = new Vector3f(min);
-        Vector3f halfSize = new Vector3f(size);
-        halfSize.mul(0.5f);
-        result.add(halfSize);
-        return result;
+        Vector3f halfSize = new Vector3f(size).mul(0.5f);
+        return new Vector3f(min).add(halfSize);
     }
 
     /**
@@ -346,11 +341,7 @@ public final class Region3i implements Iterable<Vector3i> {
     }
 
     private class Region3iIterator implements Iterator<Vector3i> {
-        Vector3i pos;
-
-         Region3iIterator() {
-            this.pos = new Vector3i();
-        }
+        Vector3i pos = new Vector3i();
 
         @Override
         public boolean hasNext() {

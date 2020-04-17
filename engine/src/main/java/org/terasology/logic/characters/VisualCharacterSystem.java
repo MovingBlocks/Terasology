@@ -16,6 +16,7 @@
 package org.terasology.logic.characters;
 
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.modes.loadProcesses.AwaitedLocalCharacterSpawnEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
@@ -33,8 +34,6 @@ import org.terasology.logic.characters.events.CreateVisualCharacterEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.registry.In;
 
 /**
@@ -98,7 +97,7 @@ public class VisualCharacterSystem extends BaseComponentSystem {
         entityBuilder.addOrSaveComponent(new LocationComponent());
         EntityRef visualCharacterEntity = entityBuilder.build();
 
-        Location.attachChild(characterEntity, visualCharacterEntity, new Vector3f(), new Quaternionf(0, 0, 0, 1));
+        Location.attachChild(characterEntity, visualCharacterEntity, new Vector3f(), new Quaternionf());
         return visualCharacterEntity;
     }
 

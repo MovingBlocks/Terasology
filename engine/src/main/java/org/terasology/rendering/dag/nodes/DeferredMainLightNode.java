@@ -20,7 +20,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.math.JomlUtil;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -28,14 +27,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.BindFbo;
-import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
-import org.terasology.rendering.dag.stateChanges.EnableBlending;
-import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
-import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
+import org.terasology.rendering.dag.stateChanges.*;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -46,9 +38,7 @@ import org.terasology.world.WorldProvider;
 import static org.lwjgl.opengl.GL11.GL_ONE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
 import static org.terasology.rendering.dag.nodes.ShadowMapNode.SHADOW_MAP_FBO_URI;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.LightAccumulationTexture;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.*;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 // TODO: have this node and the shadowmap node handle multiple directional lights
@@ -150,8 +140,7 @@ public class DeferredMainLightNode extends AbstractNode {
         // Specific Shader Parameters
 
         cameraPosition = activeCamera.getPosition();
-        cameraPosition.sub(lightCamera.getPosition(),activeCameraToLightSpace);
-//        activeCameraToLightSpace.sub(cameraPosition, JomlUtil.from(lightCamera.getPosition()));
+        cameraPosition.sub(lightCamera.getPosition(), activeCameraToLightSpace);
         mainLightInViewSpace = backdropProvider.getSunDirection(true);
         activeCamera.getViewMatrix().transformPosition(mainLightInViewSpace);
 

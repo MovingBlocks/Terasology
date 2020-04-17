@@ -15,16 +15,12 @@
  */
 package org.terasology.world.block.shapes;
 
-import org.terasology.physics.shapes.CollisionShape;
 import com.google.common.collect.Maps;
+import org.joml.Vector3f;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.Pitch;
-import org.terasology.math.Roll;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
-import org.terasology.math.Yaw;
-import org.joml.Vector3f;
+import org.terasology.math.*;
+import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.BlockPart;
 
@@ -102,8 +98,7 @@ public class BlockShapeImpl extends BlockShape {
         if (simplifiedRot.equals(Rotation.none())) {
             return new Vector3f(baseCollisionOffset);
         }
-        return baseCollisionOffset.rotate(simplifiedRot.getQuaternionf(),new Vector3f());//.rotate(baseCollisionOffset, new Vector3f());
-//        return baseCollisionOffset.rotate(simplifiedRot.getQuaternionf(),new Vector3f()); //.rotate(baseCollisionOffset, new Vector3f());
+        return new Vector3f(baseCollisionOffset).rotate(simplifiedRot.getQuaternionf());
     }
 
     @Override

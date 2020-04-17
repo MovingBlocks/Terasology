@@ -15,8 +15,7 @@
  */
 package org.terasology.logic.players;
 
-import org.joml.Quaternionf;
-import org.joml.Vector2ic;
+import org.joml.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.ComponentContainer;
@@ -29,14 +28,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
-import org.joml.Vector2i;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
-import org.terasology.physics.components.shapes.BoxShapeComponent;
-import org.terasology.physics.components.shapes.CapsuleShapeComponent;
-import org.terasology.physics.components.shapes.CylinderShapeComponent;
-import org.terasology.physics.components.shapes.HullShapeComponent;
-import org.terasology.physics.components.shapes.SphereShapeComponent;
+import org.terasology.physics.components.shapes.*;
 import org.terasology.world.WorldProvider;
 
 import java.util.Optional;
@@ -81,7 +73,7 @@ public class PlayerFactory {
 
         EntityRef player = builder.build();
 
-        Location.attachChild(player, controller, new Vector3f(), new Quaternionf(0, 0, 0, 1));
+        Location.attachChild(player, controller, new Vector3f(), new Quaternionf());
 
         return player;
     }
