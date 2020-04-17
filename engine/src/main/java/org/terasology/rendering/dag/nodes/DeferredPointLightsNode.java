@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
@@ -25,37 +26,20 @@ import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
-import org.joml.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.BindFbo;
-import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
-import org.terasology.rendering.dag.stateChanges.EnableBlending;
-import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
-import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.LookThrough;
-import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
-import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
-import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
+import org.terasology.rendering.dag.stateChanges.*;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
 
@@ -177,7 +161,7 @@ public class DeferredPointLightsNode extends AbstractNode {
             lightGeometryMaterial.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
             lightGeometryMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
 
-            activeCameraToLightSpace.sub(cameraPosition, lightCamera.getPosition());
+            cameraPosition.sub(lightCamera.getPosition(), activeCameraToLightSpace);
             lightGeometryMaterial.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z, true);
         }
 
@@ -190,8 +174,8 @@ public class DeferredPointLightsNode extends AbstractNode {
                 LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
                 final Vector3f lightPositionInTeraCoords = locationComponent.getWorldPosition();
 
-                Vector3f lightPositionRelativeToCamera = new Vector3f();
-                lightPositionRelativeToCamera.sub(lightPositionInTeraCoords, activeCamera.getPosition());
+                Vector3f lightPositionRelativeToCamera = lightPositionInTeraCoords
+                        .sub(activeCamera.getPosition(), new Vector3f());
 
                 if (lightIsRenderable(lightComponent, lightPositionRelativeToCamera)) {
                     lightGeometryMaterial.setCamera(activeCamera);

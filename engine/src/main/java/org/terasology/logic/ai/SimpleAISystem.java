@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.ai;
 
-import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -29,7 +29,6 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -84,13 +83,12 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                     }
                 }
 
-                Vector3f targetDirection = new Vector3f();
-                targetDirection.sub(ai.movementTarget, worldPos);
+                Vector3f targetDirection = new Vector3f(ai.movementTarget).sub(worldPos);
                 targetDirection.normalize();
                 drive.set(targetDirection);
 
                 float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-                location.getLocalRotation().set(new AxisAngle4f(yaw, new Vector3f(0, 1, 0)));
+                location.getLocalRotation().rotationY(yaw);
                 entity.saveComponent(location);
             }
             entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, time.getGameDeltaInMs()));

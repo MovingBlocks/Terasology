@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.ai;
 
+import org.joml.Vector3f;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,7 +29,6 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -204,8 +204,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
             }
         }
 
-        Vector3f targetDirection = new Vector3f();
-        targetDirection.sub(ai.movementTarget, worldPos);
+        Vector3f targetDirection = new Vector3f(ai.movementTarget).sub(worldPos);
         targetDirection.normalize();
         drive.set(targetDirection);
 
@@ -227,10 +226,9 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
                     -tempTarget.z + random.nextFloat(-ai.forgiving, ai.forgiving)
             ));
         } else {
-            ai.movementTarget
-                .set(new Vector3f(tempTarget.x * -1,
-                        tempTarget.y * -1, tempTarget.z
-                         * -1));
+            ai.movementTarget.set(new Vector3f(
+                    tempTarget.x * -1, tempTarget.y * -1, tempTarget.z * -1)
+            );
         }
         entity.saveComponent(ai);
         ai.inDanger = true;

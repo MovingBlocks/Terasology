@@ -21,11 +21,10 @@ import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.joml.Quaternionf;
-import org.terasology.assets.AssetData;
-import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.terasology.assets.AssetData;
+import org.terasology.math.AABB;
 
 import java.util.Collection;
 import java.util.List;
@@ -102,9 +101,10 @@ public class SkeletalMeshData implements AssetData {
                 int weightIndex = vertexStartWeights.get(i) + weightIndexOffset;
                 BoneWeight weight = weights.get(weightIndex);
 
-                Vector3f current = weight.getPosition().rotate(boneRotations.get(weight.getBoneIndex()),new Vector3f());
-                current.add(bonePositions.get(weight.getBoneIndex()));
-                current.mul(weight.getBias());
+                Vector3f current = new Vector3f(weight.getPosition())
+                        .rotate(boneRotations.get(weight.getBoneIndex()))
+                        .add(bonePositions.get(weight.getBoneIndex()))
+                        .mul(weight.getBias());
                 vertexPos.add(current);
             }
             results.add(vertexPos);
@@ -120,8 +120,9 @@ public class SkeletalMeshData implements AssetData {
                 int weightIndex = vertexStartWeights.get(i) + weightIndexOffset;
                 BoneWeight weight = weights.get(weightIndex);
 
-                Vector3f current = weight.getNormal().rotate(boneRotations.get(weight.getBoneIndex()),new Vector3f());
-                current.mul(weight.getBias());
+                Vector3f current = new Vector3f(weight.getNormal())
+                        .rotate(boneRotations.get(weight.getBoneIndex()))
+                        .mul(weight.getBias());
                 vertexNorm.add(current);
             }
             results.add(vertexNorm);
@@ -161,8 +162,8 @@ public class SkeletalMeshData implements AssetData {
         Vector3f norm = new Vector3f();
         for (int i = 0; i < indices.size() / 3; ++i) {
             Vector3f baseVert = vertices.get(indices.get(i * 3));
-            v1.sub(vertices.get(indices.get(i * 3 + 1)), baseVert);
-            v2.sub(vertices.get(indices.get(i * 3 + 2)), baseVert);
+            vertices.get(indices.get(i * 3 + 1)).sub(baseVert, v1);
+            vertices.get(indices.get(i * 3 + 2)).sub(baseVert, v2);
             v1.normalize();
             v2.normalize();
             norm.cross(v1, v2);
@@ -173,14 +174,14 @@ public class SkeletalMeshData implements AssetData {
 
         normals.forEach(Vector3f::normalize);
 
-        Quaternionf inverseRot = new Quaternionf();
         for (int vertIndex = 0; vertIndex < vertices.size(); ++vertIndex) {
             Vector3f normal = normals.get(vertIndex);
             for (int weightIndex = 0; weightIndex < vertexWeightCounts.get(vertIndex); ++weightIndex) {
                 BoneWeight weight = weights.get(weightIndex + vertexStartWeights.get(vertIndex));
-//                inverseRot.inverse(bones.get(weight.getBoneIndex()).getObjectRotation());
-//                inverseRot.rotate(normal, norm);
-                normal.rotate(inverseRot.set(bones.get(weight.getBoneIndex()).getObjectRotation()).conjugate(),norm);
+                Quaternionf inverseRotation = new Quaternionf()
+                        .set(bones.get(weight.getBoneIndex()).getObjectRotation())
+                        .conjugate();
+                normal.rotate(inverseRotation, norm);
                 weight.setNormal(norm);
             }
         }

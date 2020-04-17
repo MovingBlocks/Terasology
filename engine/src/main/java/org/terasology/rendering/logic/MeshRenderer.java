@@ -15,15 +15,11 @@
  */
 package org.terasology.rendering.logic;
 
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import java.nio.FloatBuffer;
-import java.util.Arrays;
-import java.util.Set;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +37,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
-import org.joml.Vector3f;
+import org.terasology.math.Transform;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -49,6 +45,10 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
+
+import java.nio.FloatBuffer;
+import java.util.Arrays;
+import java.util.Set;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a module
@@ -169,9 +169,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     private void renderEntitiesByMaterial(SetMultimap<Material, EntityRef> meshByMaterial) {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-        Quaternionf worldRot = new Quaternionf();
-        Vector3f worldPos = new Vector3f();
-
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
 
@@ -198,18 +195,15 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         continue;
                     }
 
-                    location.getWorldRotation(worldRot);
-                    location.getWorldPosition(worldPos);
+                    Quaternionf worldRot = location.getWorldRotation();
+                    Vector3f worldPos = location.getWorldPosition();
                     float worldScale = location.getWorldScale();
 
                     Transform toWorldSpace = new Transform(worldPos, worldRot, worldScale);
 
-                    Vector3f offsetFromCamera = new Vector3f();
-                    offsetFromCamera.sub(worldPos, cameraPosition);
+                    Vector3f offsetFromCamera = new Vector3f(worldPos).sub(cameraPosition);
                     Matrix4f matrixCameraSpace = new Matrix4f()
-                        .rotate(worldRot)
-                        .translate(offsetFromCamera)
-                        .scale(worldScale);
+                        .translationRotateScale(offsetFromCamera, worldRot, worldScale);
 
                     AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
@@ -221,7 +215,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                             lastMesh.preRender();
                         }
 
-                        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+                        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(
+                                worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace
+                        );
                         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
                         MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
 
