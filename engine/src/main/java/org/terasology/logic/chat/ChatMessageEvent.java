@@ -26,7 +26,7 @@ import org.terasology.network.OwnerEvent;
 /**
  * Indicate that a message should be printed to the chat console.
  * <p>
- * Needs to be send against a client entity, e.g., the targeted entity should have a {@link org.terasology.network.ClientComponent}.
+ * Needs to be sent against a client entity, e.g., the targeted entity should have a {@link org.terasology.network.ClientComponent}.
  */
 @OwnerEvent
 public class ChatMessageEvent implements MessageEvent {
@@ -37,10 +37,10 @@ public class ChatMessageEvent implements MessageEvent {
     }
 
     /**
-     * A chat message is associated with an entity that sent it.
+     * A chat message is associated with the entity that sent it.
      * <p>
      * This entity may often be a player, but it can be any entity with a {@link org.terasology.logic.common.DisplayNameComponent}.
-     * If the entity also has a {@link org.terasology.network.ColorComponent} the sender's name will be colorized.
+     * If the entity also has a {@link org.terasology.network.ColorComponent}, the sender's name will be colorized.
      * <p>
      * Note: The exact representation of sender and message is up to the processing system.
      *
