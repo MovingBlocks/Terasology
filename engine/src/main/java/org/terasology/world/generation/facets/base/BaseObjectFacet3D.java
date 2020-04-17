@@ -15,14 +15,12 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import java.lang.reflect.Array;
-
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector3i;
+import com.google.common.base.Preconditions;
 import org.joml.Vector3i;
+import org.terasology.math.Region3i;
 import org.terasology.world.generation.Border3D;
 
-import com.google.common.base.Preconditions;
+import java.lang.reflect.Array;
 
 /**
  * Base class for storing objects of the specified type in a 3D grid for a facet.

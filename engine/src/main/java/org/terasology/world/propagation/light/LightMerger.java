@@ -17,29 +17,20 @@ package org.terasology.world.propagation.light;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Side;
-import org.joml.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
-import org.terasology.world.propagation.BatchPropagator;
-import org.terasology.world.propagation.LocalChunkView;
-import org.terasology.world.propagation.PropagationRules;
-import org.terasology.world.propagation.PropagatorWorldView;
-import org.terasology.world.propagation.StandardBatchPropagator;
-import org.terasology.world.propagation.SunlightRegenBatchPropagator;
+import org.terasology.world.propagation.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class LightMerger<T> {

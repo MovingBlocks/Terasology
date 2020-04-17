@@ -17,16 +17,15 @@ package org.terasology.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
@@ -40,11 +39,7 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * TODO: write javadoc unless this class gets slated for removal, which might be.

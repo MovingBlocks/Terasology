@@ -17,9 +17,8 @@ package org.terasology.physics.bullet.shapes;
 
 import com.bulletphysics.collision.shapes.BoxShape;
 import org.joml.Quaternionf;
-import org.terasology.math.VecMath;
-import org.terasology.math.geom.Quat4f;
 import org.joml.Vector3f;
+import org.terasology.math.VecMath;
 import org.terasology.physics.shapes.CollisionShape;
 
 public class BulletBoxShape extends BulletCollisionShape implements org.terasology.physics.shapes.BoxShape {

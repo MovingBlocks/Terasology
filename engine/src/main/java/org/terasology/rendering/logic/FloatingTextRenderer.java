@@ -17,6 +17,7 @@
 package org.terasology.rendering.logic;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3f;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,8 +29,6 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
-import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
@@ -44,13 +43,7 @@ import org.terasology.world.WorldProvider;
 import java.util.Arrays;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScaled;
-import static org.lwjgl.opengl.GL11.glTranslated;
+import static org.lwjgl.opengl.GL11.*;
 
 
 @RegisterSystem(RegisterMode.CLIENT)

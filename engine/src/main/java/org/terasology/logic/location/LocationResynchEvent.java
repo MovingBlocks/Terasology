@@ -16,9 +16,8 @@
 package org.terasology.logic.location;
 
 import org.joml.Quaternionf;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Quat4f;
 import org.joml.Vector3f;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
 
 @BroadcastEvent

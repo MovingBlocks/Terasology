@@ -15,9 +15,8 @@
  */
 package org.terasology.rendering.nui.itemRendering;
 
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Rect2i;
 import org.joml.Vector2i;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;

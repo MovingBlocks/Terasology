@@ -17,6 +17,7 @@ package org.terasology.logic.players;
 
 import com.google.common.collect.Sets;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -38,8 +39,6 @@ import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.VisualComponent;

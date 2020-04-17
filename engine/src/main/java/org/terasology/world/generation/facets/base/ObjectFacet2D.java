@@ -16,7 +16,6 @@
 package org.terasology.world.generation.facets.base;
 
 import org.joml.Vector2ic;
-import org.terasology.math.geom.BaseVector2i;
 import org.terasology.world.generation.WorldFacet2D;
 
 /**

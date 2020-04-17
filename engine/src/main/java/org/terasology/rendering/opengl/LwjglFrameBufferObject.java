@@ -21,22 +21,15 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.ImmutableVector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.utilities.Assets;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glOrtho;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * A OpenGL framebuffer. Generates the fbo and a backing texture.

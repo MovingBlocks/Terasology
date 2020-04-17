@@ -15,7 +15,6 @@
  */
 package org.terasology.world.generation;
 
-
 import org.terasology.math.Rect2i;
 
 /**

@@ -17,14 +17,13 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector3i;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;

@@ -16,6 +16,7 @@
 package org.terasology.logic.nameTags;
 
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,8 +29,6 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.FloatingTextComponent;
 

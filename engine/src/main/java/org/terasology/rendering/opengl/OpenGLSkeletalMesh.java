@@ -16,6 +16,8 @@
 package org.terasology.rendering.opengl;
 
 import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -27,9 +29,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -40,16 +39,7 @@ import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
-import static org.lwjgl.opengl.GL11.glDisableClientState;
-import static org.lwjgl.opengl.GL11.glEnableClientState;
-import static org.lwjgl.opengl.GL11.glNormalPointer;
-import static org.lwjgl.opengl.GL11.glTexCoordPointer;
-import static org.lwjgl.opengl.GL11.glVertexPointer;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,7 @@
 
 package org.terasology.utilities.gson;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-
+import com.google.gson.*;
 import org.joml.Vector2f;
 
 import java.lang.reflect.Type;

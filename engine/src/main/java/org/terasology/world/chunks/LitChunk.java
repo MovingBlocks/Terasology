@@ -16,7 +16,6 @@
 package org.terasology.world.chunks;
 
 import org.joml.Vector3ic;
-import org.terasology.math.geom.BaseVector3i;
 import org.terasology.module.sandbox.API;
 
 /**

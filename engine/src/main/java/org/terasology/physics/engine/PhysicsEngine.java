@@ -16,11 +16,10 @@
 
 package org.terasology.physics.engine;
 
-import org.terasology.entitySystem.entity.EntityRef;
 import org.joml.Vector3f;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.Physics;
-import org.terasology.physics.shapes.CollisionShapeFactory;
 
 import java.util.Iterator;
 import java.util.List;

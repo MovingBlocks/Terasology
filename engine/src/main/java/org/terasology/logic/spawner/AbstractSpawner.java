@@ -16,14 +16,13 @@
 
 package org.terasology.logic.spawner;
 
+import org.joml.Vector2i;
 import org.joml.Vector2ic;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.math.Region3i;
 import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseVector2i;
-import org.joml.Vector2i;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.facets.SeaLevelFacet;

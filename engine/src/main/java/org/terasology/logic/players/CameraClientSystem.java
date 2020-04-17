@@ -16,6 +16,7 @@
 package org.terasology.logic.players;
 
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,8 +33,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.ResetCameraEvent;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 

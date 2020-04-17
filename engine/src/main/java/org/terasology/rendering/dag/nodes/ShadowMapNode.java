@@ -21,7 +21,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.backdrop.BackdropProvider;

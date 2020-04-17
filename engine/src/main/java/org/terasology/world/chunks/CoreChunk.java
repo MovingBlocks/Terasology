@@ -15,10 +15,9 @@
  */
 package org.terasology.world.chunks;
 
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector3i;
-import org.joml.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.Block;
 

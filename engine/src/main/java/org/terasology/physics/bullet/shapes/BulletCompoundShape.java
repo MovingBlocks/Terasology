@@ -22,7 +22,6 @@ import com.bulletphysics.linearmath.Transform;
 import org.joml.Quaternionf;
 import org.terasology.math.Rotation;
 import org.terasology.math.VecMath;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
 
 import java.util.ArrayList;

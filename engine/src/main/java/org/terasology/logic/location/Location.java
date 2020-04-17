@@ -17,14 +17,13 @@
 package org.terasology.logic.location;
 
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 
 import java.util.Iterator;
 
