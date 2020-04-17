@@ -21,13 +21,12 @@ import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
-import org.joml.Vector3f;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 
@@ -217,14 +216,8 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
             }
             Vector3f a = MD5ParserCommon.readVector3fAndCorrect(matcher.group(1), matcher.group(2), matcher.group(3));
             Vector3f b = MD5ParserCommon.readVector3fAndCorrect(matcher.group(4), matcher.group(5), matcher.group(6));
-            Vector3f min = new Vector3f();
-            min.x = Math.min(a.x, b.x);
-            min.y = Math.min(a.y, b.y);
-            min.z = Math.min(a.z, b.z);
-            Vector3f max = new Vector3f();
-            max.x = Math.max(a.x, b.x);
-            max.y = Math.max(a.y, b.y);
-            max.z = Math.max(a.z, b.z);
+            Vector3f min = new Vector3f(a).min(b);
+            Vector3f max = new Vector3f(a).max(b);
             md5.bounds[i] = AABB.createMinMax(min, max);
         }
     }

@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.assets.management.AssetManager;
@@ -32,10 +32,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.Region3i;
-import org.joml.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
@@ -43,12 +41,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import java.nio.FloatBuffer;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glVertex3f;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Renderes region outlines for all entities with  {@link RegionOutlineComponent}s.
@@ -104,18 +97,9 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         material.setFloat("sunlight", 1.0f, true);
         material.setFloat("blockLight", 1.0f, true);
         material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
-        Vector3f worldPos = new Vector3f();
 
-        Vector3f worldPositionCameraSpace = new Vector3f();
-        worldPositionCameraSpace.sub(worldPos, cameraPosition);
-
-
-        Matrix4f matrixCameraSpace = new Matrix4f()
-            .rotate(new Quaternionf(0, 0, 0, 1))
-            .translate( worldPositionCameraSpace)
-            .scale(1.0f);
-
-//        Matrix4f matrixCameraSpace = new Matrix4f(new Quaternionf(0, 0, 0, 1), worldPositionCameraSpace, 1.0f);
+        Vector3f worldPositionCameraSpace = cameraPosition.negate(new Vector3f());
+        Matrix4f matrixCameraSpace = new Matrix4f().translation(worldPositionCameraSpace);
 
         Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);

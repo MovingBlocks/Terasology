@@ -16,11 +16,9 @@
 
 package org.terasology.rendering.md5;
 
-import org.joml.AxisAngle4f;
 import org.joml.Matrix3f;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
-import org.terasology.math.JomlUtil;
 import org.joml.Vector3f;
 
 import java.io.BufferedReader;
@@ -38,8 +36,8 @@ public final class MD5ParserCommon {
 
     static {
         CORRECTION_MATRIX = new Matrix3f(-1, 0, 0, 0, 0, 1, 0, 1, 0);
-        CORRECTION_QUATERNION = new Quaternionf(0, 0, 0, 1);
-        CORRECTION_QUATERNION.set(CORRECTION_MATRIX.getRotation(new AxisAngle4f()));
+        CORRECTION_QUATERNION = new Quaternionf();
+        CORRECTION_MATRIX.getNormalizedRotation(CORRECTION_QUATERNION);
     }
 
     public static Vector2f readUV(String u, String v) throws NumberFormatException {
@@ -51,7 +49,7 @@ public final class MD5ParserCommon {
     }
 
     public static Vector3f readVector3fAndCorrect(String x, String y, String z) throws NumberFormatException {
-       Vector3f result = new Vector3f(Float.parseFloat(x), Float.parseFloat(y), Float.parseFloat(z));
+        Vector3f result = new Vector3f(Float.parseFloat(x), Float.parseFloat(y), Float.parseFloat(z));
         CORRECTION_MATRIX.transform(result);
         return result;
     }
@@ -69,20 +67,15 @@ public final class MD5ParserCommon {
         if (t > 0.0f) {
             w = (float) -Math.sqrt(t);
         }
-        Quaternionf result = new Quaternionf(x, y, z, w);
-        result.normalize();
-        return result;
+        return new Quaternionf(x, y, z, w).normalize();
     }
 
     public static Quaternionf correctQuat4f(Quaternionf rot) {
-        Quaternionf result = new Quaternionf(CORRECTION_QUATERNION);
-        result.mul(rot);
-        return result;
+        return new Quaternionf(CORRECTION_QUATERNION).mul(rot);
     }
 
     public static Vector3f correctOffset(Vector3f offset) {
-        return offset.rotate(CORRECTION_QUATERNION,new Vector3f());
-//        return JomlUtil.from(CORRECTION_QUATERNION.rotate(JomlUtil.from(offset), new org.terasology.math.geom.Vector3f()));
+        return new Vector3f(offset).rotate(CORRECTION_QUATERNION);
     }
 
 

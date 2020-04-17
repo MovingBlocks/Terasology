@@ -19,6 +19,8 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,8 +29,6 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.world.block.BlockManager;
@@ -48,11 +48,7 @@ import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
 import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -231,7 +227,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
         Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, new Vector3i(1,1,1));
+            return createWorldView(region, new Vector3i(1));
         }
         return null;
     }
@@ -239,14 +235,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
         Region3i region = ChunkMath.getChunkRegionAroundWorldPos(blockPos, extent);
-        return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+        return createWorldView(region, new Vector3i(region.min()).negate());
     }
 
     @Override
     public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
         Region3i region = Region3i.createFromCenterExtents(chunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+            return createWorldView(region, new Vector3i(region.min()).negate());
         }
         return null;
     }
@@ -258,7 +254,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             if (chunk == null) {
                 return null;
             }
-            chunkPos.sub(region.minX(), region.minY(), region.minZ());
+            chunkPos.sub(region.min());
             int index = TeraMath.calculate3DArrayIndex(JomlUtil.from(chunkPos), JomlUtil.from(region.size()));
             chunks[index] = chunk;
         }
@@ -326,9 +322,9 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
 
         private float score(Vector3i chunkPos) {
-            Vector3f vec = new Vector3f(chunkPos);
-            vec.sub(localPlayer.getPosition());
-            return vec.lengthSquared();
+            return new Vector3f(chunkPos)
+                    .sub(localPlayer.getPosition())
+                    .lengthSquared();
         }
     }
 }

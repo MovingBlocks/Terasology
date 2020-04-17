@@ -17,6 +17,7 @@
 package org.terasology.logic.characters;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -31,13 +32,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.cameraTarget.PlayerTargetSystem;
-import org.terasology.logic.characters.events.ActivationRequest;
-import org.terasology.logic.characters.events.ActivationRequestDenied;
-import org.terasology.logic.characters.events.AttackEvent;
-import org.terasology.logic.characters.events.AttackRequest;
-import org.terasology.logic.characters.events.DeathEvent;
-import org.terasology.logic.characters.events.OnItemUseEvent;
-import org.terasology.logic.characters.events.PlayerDeathEvent;
+import org.terasology.logic.characters.events.*;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
@@ -47,7 +42,6 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.PlayerCharacterComponent;
-import org.joml.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
@@ -290,9 +284,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     private boolean vectorsAreAboutEqual(Vector3f v1, Vector3f v2) {
-        Vector3f delta = new Vector3f();
-        delta.add(v1);
-        delta.sub(v2);
+        Vector3f delta = new Vector3f(v1).sub(v2);
         float epsilon = 0.0001f;
         float deltaSquared = delta.lengthSquared();
         return deltaSquared < epsilon;
@@ -429,9 +421,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     private boolean isDistanceToLarge(LocationComponent characterLocation, LocationComponent targetLocation, float maxInteractionRange) {
         float maxInteractionRangeSquared = maxInteractionRange * maxInteractionRange;
-        Vector3f positionDelta = new Vector3f();
-        positionDelta.add(characterLocation.getWorldPosition());
-        positionDelta.sub(targetLocation.getWorldPosition());
+        Vector3f positionDelta = characterLocation.getWorldPosition()
+                .sub(targetLocation.getWorldPosition());
         float interactionRangeSquared = positionDelta.lengthSquared();
         // add a small epsilon to have rounding mistakes be in favor of the player:
         float epsilon = 0.00001f;

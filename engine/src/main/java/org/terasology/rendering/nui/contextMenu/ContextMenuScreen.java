@@ -16,9 +16,9 @@
 package org.terasology.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rect2i;
-import org.joml.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -79,7 +79,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
                 if (currentPosition == null) {
                     currentPosition = new Vector2i(position);
                 } else {
-                    currentPosition.add(currentWidth,0);
+                    currentPosition.x += currentWidth;
                 }
                 Rect2i region = Rect2i.createFromMinAndSize(currentPosition,
                     canvas.calculatePreferredSize(level));

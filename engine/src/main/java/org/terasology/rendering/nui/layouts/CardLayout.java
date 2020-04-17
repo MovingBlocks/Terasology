@@ -17,11 +17,7 @@ package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreLayout;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.LayoutHint;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.*;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -135,15 +131,13 @@ public class CardLayout extends CoreLayout<LayoutHint> {
      */
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        int maxX = 0;
-        int maxY = 0;
+        Vector2i max = new Vector2i();
         for (UIWidget uiWidget : widgets.values()) {
             Vector2i preferredContentSize = uiWidget.getPreferredContentSize(canvas, sizeHint);
-            maxX = Math.max(maxX, preferredContentSize.x);
-            maxY = Math.max(maxY, preferredContentSize.y);
+            max.max(preferredContentSize);
         }
 
-        return new Vector2i(maxX, maxY);
+        return max;
     }
 
     /**
@@ -154,15 +148,13 @@ public class CardLayout extends CoreLayout<LayoutHint> {
      */
     @Override
     public Vector2i getMaxContentSize(Canvas canvas) {
-        int maxX = 0;
-        int maxY = 0;
+        Vector2i max = new Vector2i();
         for (UIWidget uiWidget : widgets.values()) {
             Vector2i maxContentSize = uiWidget.getMaxContentSize(canvas);
-            maxX = Math.max(maxX, maxContentSize.x);
-            maxY = Math.max(maxY, maxContentSize.y);
+            max.max(maxContentSize);
         }
 
-        return new Vector2i(maxX, maxY);
+        return max;
     }
 
     /**

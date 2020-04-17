@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.joml.Quaternionf;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -34,32 +35,15 @@ import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.math.Border;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.Rect2i;
-import org.joml.Vector3f;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TabbingManager;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.VerticalAlign;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseDragEvent;
-import org.terasology.rendering.nui.events.NUIMouseOverEvent;
-import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
-import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
+import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.events.*;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -69,11 +53,7 @@ import org.terasology.utilities.Assets;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  */
@@ -491,9 +471,7 @@ public class CanvasImpl implements CanvasControl, PropertyChangeListener {
         if (region.isEmpty()) {
             return region;
         }
-        Vector2i size = applyStyleToSize(region.size(), style);
-        size.x = Math.min(size.x, maxSize.x);
-        size.y = Math.min(size.y, maxSize.y);
+        Vector2i size = applyStyleToSize(region.size(), style).min(maxSize);
 
         int minX = region.minX() + style.getHorizontalAlignment().getOffset(size.x, region.width());
         int minY = region.minY() + style.getVerticalAlignment().getOffset(size.y, region.height());

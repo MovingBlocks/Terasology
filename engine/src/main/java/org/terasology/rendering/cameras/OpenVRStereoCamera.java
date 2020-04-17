@@ -19,13 +19,11 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.MatrixUtils;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.openvrprovider.OpenVRUtil;
+import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.world.WorldProvider;
@@ -249,10 +247,8 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
                 + Math.pow(leftEyePose.m32() - rightEyePose.m32(), 2)) / 2.0f;
 
         // set camera orientation
-        Vector4f vecQuaternion = OpenVRUtil.convertToQuaternion(leftEyePose);
-        Quaternionf quaternion = new Quaternionf(vecQuaternion.x, vecQuaternion.y, vecQuaternion.z, vecQuaternion.w);
-        setOrientation(new Quat4f(quaternion.x, quaternion.y, quaternion.z, quaternion.w));
-
+        Quaternionf quaternion = leftEyePose.getNormalizedRotation(new Quaternionf());
+        setOrientation(quaternion);
 
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix
         rightEyePose = rightEyePose.invert();
