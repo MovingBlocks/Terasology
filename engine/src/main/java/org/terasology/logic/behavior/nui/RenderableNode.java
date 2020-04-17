@@ -16,14 +16,13 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
-import org.terasology.utilities.Assets;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.joml.Vector2i;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
-import org.joml.Vector2f;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -35,6 +34,7 @@ import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.rendering.nui.layouts.ZoomableLayout;
 import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.utilities.Assets;
 
 import java.util.List;
 
@@ -52,8 +52,8 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private PortList portList;
 
     private BehaviorNode node;
-    private Vector2f position;
-    private Vector2f size;
+    private Vector2f position = new Vector2f();
+    private Vector2f size = new Vector2f(10, 5);
     private TreeAccessor<RenderableNode> withoutModel;
     private TreeAccessor<RenderableNode> withModel;
     private BehaviorNodeComponent data;
@@ -111,8 +111,6 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
     public RenderableNode(BehaviorNodeComponent data) {
         this.data = data;
-        position = new Vector2f();
-        size = new Vector2f(10, 5);
         portList = new PortList(this);
         withoutModel = new ChainedTreeAccessor<>(this, portList);
         withModel = new ChainedTreeAccessor<>(this, portList, new NodeTreeAccessor());
@@ -174,15 +172,14 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     }
 
     public void setPosition(Vector2f position) {
-        this.position = position;
+        this.position.set(position);
     }
 
     public void setPosition(float x, float y) {
-        position = new Vector2f(x, y);
+        position.set(x, y);
     }
 
     public void move(Vector2f diff) {
-        position = new Vector2f(position);
         position.add(diff);
         for (RenderableNode child : children) {
             child.move(diff);
@@ -194,7 +191,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     }
 
     public void setSize(Vector2f size) {
-        this.size = size;
+        this.size.set(size);
     }
 
     public BehaviorNode getNode() {
@@ -269,12 +266,12 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
     @Override
     public Vector2f getPosition() {
-        return position;
+        return new Vector2f(position);
     }
 
     @Override
     public Vector2f getSize() {
-        return size;
+        return new Vector2f(size);
     }
 
     @Override

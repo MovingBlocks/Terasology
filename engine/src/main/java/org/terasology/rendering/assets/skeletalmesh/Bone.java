@@ -17,9 +17,7 @@
 package org.terasology.rendering.assets.skeletalmesh;
 
 import com.google.common.collect.Lists;
-
 import org.joml.Quaternionf;
-import org.terasology.math.geom.Quat4f;
 import org.joml.Vector3f;
 
 import java.util.Collection;
@@ -30,8 +28,8 @@ import java.util.List;
 public class Bone {
     private String name;
     private int index;
-    private Vector3f objectSpacePos = new Vector3f();
-    private Quaternionf rotation = new Quaternionf(0, 0, 0, 1);
+    private final Vector3f objectSpacePos = new Vector3f();
+    private final Quaternionf rotation = new Quaternionf();
 
     private Bone parent;
     private List<Bone> children = Lists.newArrayList();
@@ -56,7 +54,7 @@ public class Bone {
     }
 
     public void setObjectPos(Vector3f newObjectSpacePos) {
-        this.objectSpacePos = newObjectSpacePos;
+        this.objectSpacePos.set(newObjectSpacePos);
     }
 
     public Vector3f getLocalPosition() {
@@ -64,10 +62,6 @@ public class Bone {
         if (parent != null) {
             pos.sub(parent.getObjectPosition())
                 .rotate(new Quaternionf(parent.getObjectRotation()).conjugate());
-//            pos.sub(parent.getObjectPosition());
-//            Quat4f inverseParentRot = new Quat4f();
-//            inverseParentRot.inverse(parent.getObjectRotation());
-//            inverseParentRot.rotate(pos, pos);
         }
         return pos;
     }
@@ -77,14 +71,13 @@ public class Bone {
     }
 
     public void setObjectRotation(Quaternionf newRotation) {
-        this.rotation = newRotation;
+        this.rotation.set(newRotation);
     }
 
     public Quaternionf getLocalRotation() {
         Quaternionf rot = new Quaternionf(rotation);
         if (parent != null) {
             rot.mul(new Quaternionf(parent.getObjectRotation()).conjugate());
-
         }
         return rot;
     }
