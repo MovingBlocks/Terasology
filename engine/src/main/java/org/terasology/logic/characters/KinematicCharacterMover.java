@@ -25,6 +25,7 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.ImmutableVector3f;
@@ -195,7 +196,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
         updateMode(state, newSwimming, newDiving, newClimbing, isCrouching);
     }
-    
+
     /**
      * Updates a character's movement mode and changes his vertical velocity accordingly.
      * @param state The current state of the character.
@@ -382,7 +383,7 @@ public class KinematicCharacterMover implements CharacterMover {
         boolean hit = false;
         int iteration = 0;
         while (remainingDist > physics.getEpsilon() && iteration++ < 10) {
-            SweepCallback callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
+            SweepCallback callback = collider.sweep(JomlUtil.from(position), JomlUtil.from(targetPos), VERTICAL_PENETRATION, -1.0f);
             float actualDist = Math.max(0,
                     (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
@@ -465,7 +466,7 @@ public class KinematicCharacterMover implements CharacterMover {
         int iteration = 0;
         Vector3f lastHitNormal = new Vector3f(0, 1, 0);
         while (remainingFraction >= 0.01f && iteration++ < 10) {
-            SweepCallback callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
+            SweepCallback callback = collider.sweep(JomlUtil.from(position), JomlUtil.from(targetPos), HORIZONTAL_PENETRATION, slopeFactor);
 
             /* Note: this isn't quite correct (after the first iteration the closestHitFraction is only for part of the moment)
              but probably close enough */
@@ -538,7 +539,7 @@ public class KinematicCharacterMover implements CharacterMover {
     private float moveUp(float riseAmount, CharacterCollider collider, Vector3f position) {
         Vector3f to = new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z);
         if (collider != null) {
-            SweepCallback callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+            SweepCallback callback = collider.sweep(JomlUtil.from(position), JomlUtil.from(to), VERTICAL_PENETRATION_LEEWAY, -1f);
             if (callback.hasHit()) {
                 float actualDist = Math.max(0,
                         ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction()) - VERTICAL_PENETRATION_LEEWAY);

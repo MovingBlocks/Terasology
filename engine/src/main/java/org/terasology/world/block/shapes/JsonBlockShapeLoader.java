@@ -32,6 +32,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Rotation;
 import org.terasology.math.Transform;
 import org.terasology.math.geom.Vector2f;
@@ -49,6 +50,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static org.terasology.physics.engine.PhysicsEngineManager.COLLISION_SHAPE_FACTORY;
 
@@ -148,7 +150,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive()
                     && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
                 List<Vector3f> verts = buildVertList(shape);
-                ConvexHullShape convexHull = COLLISION_SHAPE_FACTORY.getNewConvexHull(verts);
+                ConvexHullShape convexHull = COLLISION_SHAPE_FACTORY.getNewConvexHull(verts.stream().map(JomlUtil::from).collect(Collectors.toList()));
                 shape.setCollisionShape(convexHull);
             } else if (collisionInfo.has(COLLIDERS) && collisionInfo.get(COLLIDERS).isJsonArray()
                     && collisionInfo.get(COLLIDERS).getAsJsonArray().size() > 0) {
@@ -224,7 +226,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             }
             extent.absolute();
 
-            return new ColliderInfo(offset, COLLISION_SHAPE_FACTORY.getNewBox(extent));
+            return new ColliderInfo(offset, COLLISION_SHAPE_FACTORY.getNewBox(JomlUtil.from(extent)));
         }
 
         private ColliderInfo processSphereShape(JsonDeserializationContext context, JsonObject colliderDef) {

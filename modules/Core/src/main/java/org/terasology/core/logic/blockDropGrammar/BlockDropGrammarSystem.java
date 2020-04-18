@@ -27,6 +27,7 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -151,7 +152,7 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
     private void createDrop(EntityRef item, Vector3f location, boolean applyMovement) {
         item.send(new DropItemEvent(location));
         if (applyMovement) {
-            item.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+            item.send(new ImpulseEvent(JomlUtil.from(random.nextVector3f(30.0f))));
         }
     }
 

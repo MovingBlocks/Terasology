@@ -20,6 +20,7 @@ import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.VecMath;
 
 /**
@@ -46,7 +47,7 @@ public class EntityMotionState extends MotionState {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
             // NOTE: JBullet ignores scale anyway
-            transform.set(new javax.vecmath.Matrix4f(VecMath.to(loc.getWorldRotation()), VecMath.to(loc.getWorldPosition()), 1));
+            transform.set(new javax.vecmath.Matrix4f(VecMath.to(JomlUtil.from(loc.getWorldRotation())), VecMath.to(JomlUtil.from(loc.getWorldPosition())), 1));
         }
         return transform;
     }
@@ -55,8 +56,8 @@ public class EntityMotionState extends MotionState {
     public void setWorldTransform(Transform transform) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
-            loc.setWorldPosition(VecMath.from(transform.origin));
-            loc.setWorldRotation(VecMath.from(transform.getRotation(new javax.vecmath.Quat4f())));
+            loc.setWorldPosition(JomlUtil.from(VecMath.from(transform.origin)));
+            loc.setWorldRotation(JomlUtil.from(VecMath.from(transform.getRotation(new javax.vecmath.Quat4f()))));
         }
     }
 

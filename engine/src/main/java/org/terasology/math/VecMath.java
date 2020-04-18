@@ -16,8 +16,9 @@
 
 package org.terasology.math;
 
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 /**
  * Some utilities for compatibility with VecMath.
@@ -32,15 +33,20 @@ public final class VecMath {
         return new Vector3f(v.x, v.y, v.z);
     }
 
-    public static javax.vecmath.Vector3f to(Vector3f v) {
-        return new javax.vecmath.Vector3f(v.x, v.y, v.z);
+//    public static javax.vecmath.Vector3f to(Vector3f v) {
+//        return new javax.vecmath.Vector3f(v.x, v.y, v.z);
+//    }
+
+    public static javax.vecmath.Vector3f to(Vector3fc v) {
+        return new javax.vecmath.Vector3f(v.x(), v.y(), v.z());
     }
 
-    public static Quat4f from(javax.vecmath.Quat4f v) {
-        return new Quat4f(v.x, v.y, v.z, v.w);
+
+    public static Quaternionf from(javax.vecmath.Quat4f v) {
+        return new Quaternionf(v.x, v.y, v.z, v.w);
     }
 
-    public static javax.vecmath.Quat4f to(Quat4f v) {
+    public static javax.vecmath.Quat4f to(Quaternionf v) {
         return new javax.vecmath.Quat4f(v.x, v.y, v.z, v.w);
     }
 

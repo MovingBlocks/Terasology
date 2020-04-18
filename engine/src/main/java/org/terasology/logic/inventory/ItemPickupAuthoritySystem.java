@@ -30,6 +30,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.shapes.BoxShapeComponent;
@@ -101,11 +102,11 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
 
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape) {
             BoxShape collisionShape = (BoxShape) blockFamily.getArchetypeBlock().getCollisionShape();
-            Vector3f extents = collisionShape.getExtents();
+            Vector3f extents = JomlUtil.from(collisionShape.getExtents());
             extents.x = Math.max(extents.x, 0.5f);
             extents.y = Math.max(extents.y, 0.5f);
             extents.z = Math.max(extents.z, 0.5f);
-            boxShapeComponent.extents.set(extents);
+            boxShapeComponent.extents.set(JomlUtil.from(extents));
             itemEntity.saveComponent(boxShapeComponent);
         }
     }

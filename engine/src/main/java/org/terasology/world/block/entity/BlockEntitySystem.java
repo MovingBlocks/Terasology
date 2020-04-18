@@ -29,6 +29,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -135,7 +136,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 if (blockDamageModifierComponent != null) {
                     impulsePower = blockDamageModifierComponent.impulsePower;
                 }
-                
+
                 processDropping(item, location, impulsePower);
             }
         }
@@ -182,7 +183,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
 
     private void processDropping(EntityRef item, Vector3i location, float impulsePower) {
         item.send(new DropItemEvent(location.toVector3f()));
-        item.send(new ImpulseEvent(random.nextVector3f(impulsePower)));
+        item.send(new ImpulseEvent(JomlUtil.from(random.nextVector3f(impulsePower))));
     }
 
 }

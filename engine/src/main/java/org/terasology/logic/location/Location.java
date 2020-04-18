@@ -22,6 +22,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -123,8 +124,8 @@ public class Location extends BaseComponentSystem {
 
     @ReceiveEvent(netFilter = RegisterMode.REMOTE_CLIENT)
     public void onResyncLocation(LocationResynchEvent event, EntityRef entityRef, LocationComponent locationComponent) {
-        locationComponent.setWorldPosition(event.getPosition());
-        locationComponent.setWorldRotation(event.getRotation());
+        locationComponent.setWorldPosition(JomlUtil.from(event.getPosition()));
+        locationComponent.setWorldRotation(JomlUtil.from(event.getRotation()));
         entityRef.saveComponent(locationComponent);
     }
 }

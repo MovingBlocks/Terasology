@@ -17,6 +17,7 @@ package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector3f;
@@ -138,6 +139,6 @@ public final class CharacterMovementSystemUtility {
      */
     private void setPhysicsLocation(EntityRef entity, Vector3f newPos) {
         CharacterCollider collider = physics.getCharacterCollider(entity);
-        collider.setLocation(newPos);
+        collider.setLocation(JomlUtil.from(newPos));
     }
 }

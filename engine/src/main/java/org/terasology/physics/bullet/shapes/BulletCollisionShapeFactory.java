@@ -15,7 +15,7 @@
  */
 package org.terasology.physics.bullet.shapes;
 
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.physics.shapes.BoxShape;
 import org.terasology.physics.shapes.CollisionShapeFactory;
 import org.terasology.physics.shapes.CompoundShape;

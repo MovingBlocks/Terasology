@@ -19,9 +19,10 @@ package org.terasology.physics.bullet.shapes;
 import com.bulletphysics.collision.shapes.CompoundShape;
 import com.bulletphysics.collision.shapes.CompoundShapeChild;
 import com.bulletphysics.linearmath.Transform;
+import org.joml.Quaternionf;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Rotation;
 import org.terasology.math.VecMath;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
 
 import java.util.ArrayList;
@@ -55,12 +56,12 @@ public class BulletCompoundShape extends BulletCollisionShape implements org.ter
     // TODO: Add removeChildShape if needed
 
     @Override
-    public CollisionShape rotate(Quat4f rot) {
+    public CollisionShape rotate(Quaternionf rot) {
         CompoundShape newShape = new CompoundShape();
         for (BulletCompoundShapeChild child : childList) {
             CollisionShape rotatedChild = child.childShape.rotate(rot);
             javax.vecmath.Vector3f offset = com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), child.transform.origin, new javax.vecmath.Vector3f());
-            newShape.addChildShape(new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), offset, 1.0f)), ((BulletCollisionShape) rotatedChild).underlyingShape);
+            newShape.addChildShape(new Transform(new javax.vecmath.Matrix4f(VecMath.to(JomlUtil.from(Rotation.none().getQuat4f())), offset, 1.0f)), ((BulletCollisionShape) rotatedChild).underlyingShape);
         }
         return new BulletCompoundShape(newShape);
     }

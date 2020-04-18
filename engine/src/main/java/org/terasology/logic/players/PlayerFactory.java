@@ -96,7 +96,7 @@ public class PlayerFactory {
     private float getHeightOf(ComponentContainer prefab) {
         BoxShapeComponent box = prefab.getComponent(BoxShapeComponent.class);
         if (box != null) {
-            return box.extents.getY();
+            return box.extents.y();
         }
 
         CylinderShapeComponent cylinder = prefab.getComponent(CylinderShapeComponent.class);

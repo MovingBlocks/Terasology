@@ -26,6 +26,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.event.DoDamageEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.CollisionGroup;
@@ -76,7 +77,7 @@ public class ArrowAction extends BaseComponentSystem {
             Vector3f dir = new Vector3f(event.getDirection());
 
             HitResult result;
-            result = physicsRenderer.rayTrace(position, dir, arrowActionComponent.maxDistance, filter);
+            result = physicsRenderer.rayTrace(JomlUtil.from(position), JomlUtil.from(dir), arrowActionComponent.maxDistance, filter);
 
             Block currentBlock = worldProvider.getBlock(blockPos);
 

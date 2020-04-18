@@ -162,6 +162,10 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         return builder.toString();
     }
 
+    public Name name() {
+        return new Name(toString());
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
