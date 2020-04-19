@@ -263,7 +263,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
                 Prefab playerDefaults = Assets.getPrefab("engine:player").get();
                 CharacterMovementComponent moveDefault = playerDefaults.getComponent(CharacterMovementComponent.class);
-                CharacterComponent characterDefault = playerDefaults.getComponent(CharacterComponent.class)
+                CharacterComponent characterDefault = playerDefaults.getComponent(CharacterComponent.class);
 
                 if (move != null && gazeMountPointComponent != null) {
                     float prevHeight = move.height;
