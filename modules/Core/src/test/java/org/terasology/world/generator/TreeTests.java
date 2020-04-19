@@ -17,6 +17,7 @@
 package org.terasology.world.generator;
 
 import org.joml.Vector2ic;
+import org.joml.Vector3i;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,9 +30,7 @@ import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
 import org.terasology.core.world.generator.trees.TreeGenerator;
 import org.terasology.core.world.generator.trees.Trees;
-import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.Rect2i;
-import org.joml.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.MersenneRandom;
 import org.terasology.utilities.random.Random;
@@ -102,7 +101,7 @@ public class TreeTests {
 
         for (int i = 0; i < 100; i++) {
             Vector3i ext = computeAABB(treeGen, i * 37);
-            maximize(maxExt, ext);
+            maxExt.max(ext);
         }
 
         return maxExt;
@@ -120,9 +119,8 @@ public class TreeTests {
                 @Override
                 public Block setBlock(int x, int y, int z, Block block) {
                     Vector3i world = chunkToWorldPosition(x, y, z);
-                    minimize(min, world);
-                    maximize(max, world);
-
+                    min.min(world);
+                    max.max(world);
                     return null;
                 }
             };
@@ -137,17 +135,5 @@ public class TreeTests {
 //        logger.info(String.format("Min: %12s  Max: %12s  Extent: %s", min, max, ext));
 
         return ext;
-    }
-
-    private void minimize(Vector3i v, Vector3i other) {
-        v.x = Math.min(v.x, other.x);
-        v.y = Math.min(v.y, other.y);
-        v.z = Math.min(v.z, other.z);
-    }
-
-    private void maximize(Vector3i v, Vector3i other) {
-        v.x = Math.max(v.x, other.x);
-        v.y = Math.max(v.y, other.y);
-        v.z = Math.max(v.z, other.z);
     }
 }

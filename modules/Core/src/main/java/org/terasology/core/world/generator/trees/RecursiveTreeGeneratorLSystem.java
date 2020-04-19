@@ -16,18 +16,17 @@
 
 package org.terasology.core.world.generator.trees;
 
-import java.util.Map;
-
-import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.math.LSystemRule;
 import org.terasology.math.TeraMath;
-import org.joml.Vector3f;
 import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.CoreChunk;
+
+import java.util.Map;
 
 /**
  * Encapsulates the recursive algorithm for the generation of trees
@@ -81,7 +80,7 @@ public class RecursiveTreeGeneratorLSystem {
                     }
 
                     Vector3f dir = new Vector3f(1f, 0f, 0f);
-                    rotation.transformPosition(dir);
+                    rotation.transformDirection(dir);
 
                     position.add(dir);
                     break;
@@ -91,32 +90,39 @@ public class RecursiveTreeGeneratorLSystem {
                 case ']':
                     return;
                 case '+':
-                    tempRotation = new Matrix4f().translationRotateScale(new Vector3f(),new Quaternionf(new AxisAngle4f( angle + angleOffset,new Vector3f(0f, 0f, 1f))), 1.0f);
+                    tempRotation = new Matrix4f().rotation(
+                            new Quaternionf().fromAxisAngleRad(0f, 0f, 1f, angle + angleOffset)
+                    );
                     rotation.mul(tempRotation);
                     break;
                 case '-':
-                    tempRotation = new Matrix4f().translationRotateScale(new Vector3f(),new Quaternionf(new AxisAngle4f( angle + angleOffset,new Vector3f(0f, 0f, -1f))), 1.0f);
-//                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(0f, 0f, -1f), angle + angleOffset), Vector3f.ZERO, 1.0f);
+                    tempRotation = new Matrix4f().rotation(
+                            new Quaternionf().fromAxisAngleRad(0f, 0f, -1f, angle + angleOffset)
+                    );
                     rotation.mul(tempRotation);
                     break;
                 case '&':
-                    tempRotation = new Matrix4f().translationRotateScale(new Vector3f(),new Quaternionf(new AxisAngle4f( angle + angleOffset,new Vector3f(0f, 1f, 0f))), 1.0f);
-//                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(0f, 1f, 0f), angle + angleOffset), Vector3f.ZERO, 1.0f);
+                    tempRotation = new Matrix4f().rotation(
+                            new Quaternionf().fromAxisAngleRad(0f, 1f, 0f, angle + angleOffset)
+                    );
                     rotation.mul(tempRotation);
                     break;
                 case '^':
-                    tempRotation = new Matrix4f().translationRotateScale(new Vector3f(),new Quaternionf(new AxisAngle4f( angle + angleOffset,new Vector3f(0f, -1f, 0f))), 1.0f);
-//                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(0f, -1f, 0f), angle + angleOffset), Vector3f.ZERO, 1.0f);
+                    tempRotation = new Matrix4f().rotation(
+                            new Quaternionf().fromAxisAngleRad(0f, -1f, 0f, angle + angleOffset)
+                    );
                     rotation.mul(tempRotation);
                     break;
                 case '*':
-                    tempRotation = new Matrix4f().translationRotateScale(new Vector3f(),new Quaternionf(new AxisAngle4f( angle + angleOffset,new Vector3f(1f, 0f, 0f))), 1.0f);
-//                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(1f, 0f, 0f), angle), Vector3f.ZERO, 1.0f);
+                    tempRotation = new Matrix4f().rotation(
+                            new Quaternionf().fromAxisAngleRad(1f, 0f, 0f, angle)
+                    );
                     rotation.mul(tempRotation);
                     break;
                 case '/':
-                    tempRotation = new Matrix4f().translationRotateScale(new Vector3f(),new Quaternionf(new AxisAngle4f( angle + angleOffset,new Vector3f(-1f, 0f, 0f))), 1.0f);
-//                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(-1f, 0f, 0f), angle), Vector3f.ZERO, 1.0f);
+                    tempRotation = new Matrix4f().rotation(
+                            new Quaternionf().fromAxisAngleRad(-1f, 0f, 0f, angle)
+                    );
                     rotation.mul(tempRotation);
                     break;
                 default:
