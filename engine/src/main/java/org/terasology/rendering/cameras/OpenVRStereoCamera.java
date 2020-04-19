@@ -247,7 +247,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
                 + Math.pow(leftEyePose.m32() - rightEyePose.m32(), 2)) / 2.0f;
 
         // set camera orientation
-        Quaternionf quaternion = leftEyePose.getNormalizedRotation(new Quaternionf());
+        Quaternionf quaternion = leftEyePose.getUnnormalizedRotation(new Quaternionf());
         setOrientation(quaternion);
 
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix
@@ -271,12 +271,10 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f)));
         reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
         reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-
-
-        viewMatrix.mul(reflectionMatrix,viewMatrixReflected);
+        viewMatrix.mul(reflectionMatrix, viewMatrixReflected);
 
         reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+        normViewMatrix.mul(reflectionMatrix, normViewMatrixReflected);
 
         viewTranslationLeftEye.identity();
         viewTranslationLeftEye.setTranslation(new Vector3f(halfIPD, 0.0f, 0.0f));
