@@ -51,7 +51,7 @@ public final class MatrixUtils {
      * @return The provided float buffer.
      */
     public static FloatBuffer matrixToFloatBuffer(Matrix3fc m, FloatBuffer fb) {
-        return m.getTransposed(fb);
+        return m.get(fb);
     }
 
     /**
@@ -75,7 +75,7 @@ public final class MatrixUtils {
      * @return The provided float buffer.
      */
     public static FloatBuffer matrixToFloatBuffer(Matrix4fc m, FloatBuffer fb) {
-        return m.getTransposed(fb);
+        return m.get(fb);
     }
 
     public static Matrix4f createViewMatrix(
@@ -87,13 +87,11 @@ public final class MatrixUtils {
                 eyeX, eyeY, eyeZ,
                 centerX, centerY, centerZ,
                 upX, upY, upZ
-        ).setTranslation(-eyeX, -eyeY, -eyeZ).transpose();
+        );
     }
 
     public static Matrix4f createViewMatrix(Vector3f eye, Vector3f center, Vector3f up) {
-        return new Matrix4f().setLookAt(eye, center, up)
-                .setTranslation(-eye.x, -eye.y, -eye.z)
-                .transpose();
+        return new Matrix4f().setLookAt(eye, center, up);
     }
 
     public static Matrix4f createOrthogonalProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
@@ -101,11 +99,11 @@ public final class MatrixUtils {
     }
 
     public static Matrix4f createPerspectiveProjectionMatrix(float fovY, float aspectRatio, float zNear, float zFar) {
-        return new Matrix4f().setPerspective(fovY, aspectRatio, zNear, zFar).transpose();
+        return new Matrix4f().setPerspective(fovY, aspectRatio, zNear, zFar);
     }
 
     public static Matrix4f calcViewProjectionMatrix(Matrix4f view, Matrix4f projection) {
-        return new Matrix4f(view).mul(projection);
+        return new Matrix4f(projection).mul(view);
     }
 
     public static Matrix4f calcModelViewMatrix(Matrix4f model, Matrix4f view) {

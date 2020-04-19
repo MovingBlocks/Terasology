@@ -462,8 +462,8 @@ public class ColladaLoader {
             int offset = i * 16;
             Matrix4f matrix = new Matrix4f(FloatBuffer.wrap(
                     Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16)
-            ));
-            rotationArray[i] = matrix.getNormalizedRotation(new Quaternionf());
+            )).transpose();
+            rotationArray[i] = matrix.getUnnormalizedRotation(new Quaternionf());
         }
 
         return rotationArray;
@@ -475,7 +475,7 @@ public class ColladaLoader {
             int offset = i * 16;
             Matrix4f matrix = new Matrix4f(
                     FloatBuffer.wrap(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16))
-            );
+            ).transpose();
             translationVectorArray[i] = matrix.getTranslation(new Vector3f());
         }
 

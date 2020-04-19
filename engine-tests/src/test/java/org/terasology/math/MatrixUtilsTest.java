@@ -8,6 +8,7 @@ import java.lang.Math;
 import java.nio.FloatBuffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MatrixUtilsTest {
 
@@ -16,9 +17,9 @@ public class MatrixUtilsTest {
     @Test
     public void testMatrix3ToFloatBuffer() {
         Matrix3f matrix = new Matrix3f(
-            1f, 4f, 7f,
-            2f, 5f, 8f,
-            3f, 6f, 9f
+            1f, 2f, 3f,
+            4f, 5f, 6f,
+            7f, 8f, 9f
         );
 
         FloatBuffer buffer = MatrixUtils.matrixToFloatBuffer(matrix);
@@ -39,10 +40,10 @@ public class MatrixUtilsTest {
     @Test
     public void testMatrix4ToFloatBuffer() {
         Matrix4f matrix = new Matrix4f(
-            1f, 5f, 9f, 13f,
-            2f, 6f, 10f, 14f,
-            3f, 7f, 11f, 15f,
-            4f, 8f, 12f, 16f
+            1f, 2f, 3f, 4f,
+            5f, 6f, 7f, 8f,
+            9f, 10f, 11f, 12f,
+            13f, 14f, 15f, 16f
         );
 
         FloatBuffer buffer = MatrixUtils.matrixToFloatBuffer(matrix);
@@ -78,10 +79,10 @@ public class MatrixUtilsTest {
 
         Matrix4f expected = new Matrix4f(
             0.9999f, 0f, 0f, 0f,
-            0f, 0.7071f, -0.7071f, -10f,
-            0f, 0.7071f, 0.7071f, -10f,
+            0f, 0.7071f, -0.7071f, 0f,
+            0f, 0.7071f, 0.7071f, -14.1421f,
             0f, 0f, 0f, 1f
-        );
+        ).transpose();
 
         assertMatricesAreRoughlyEqual(expected, MatrixUtils.createViewMatrix(eye, center, up));
         assertMatricesAreRoughlyEqual(expected, MatrixUtils.createViewMatrix(
@@ -110,11 +111,13 @@ public class MatrixUtilsTest {
             0f, 1.732f, 0f, 0f,
             0f, 0f, -1f, -0.2f,
             0f, 0f, -1f, 0f
+        ).transpose();
+
+        Matrix4f actual = MatrixUtils.createPerspectiveProjectionMatrix(
+                (float) Math.toRadians(60.0), 16f / 9f, 0.1f, 5000f
         );
 
-        assertMatricesAreRoughlyEqual(expected, MatrixUtils.createPerspectiveProjectionMatrix(
-            (float) Math.toRadians(60.0), 16f / 9f, 0.1f, 5000f
-        ));
+        assertMatricesAreRoughlyEqual(expected, actual);
     }
 
     @Test
@@ -137,7 +140,6 @@ public class MatrixUtilsTest {
             0f, 1f, 0f
         );
 
-
         Matrix4f modelView = view.mul(model, new Matrix4f());
 
         assertMatricesAreRoughlyEqual(
@@ -145,39 +147,11 @@ public class MatrixUtilsTest {
         );
     }
 
-    private void assertMatricesAreRoughlyEqual(Matrix4f matrix1, Matrix4f matrix2) {
-        assertEquals(matrix1.m00(), matrix2.m00(), EPSILON);
-        assertEquals(matrix1.m01(), matrix2.m01(), EPSILON);
-        assertEquals(matrix1.m02(), matrix2.m02(), EPSILON);
-        assertEquals(matrix1.m03(), matrix2.m03(), EPSILON);
-
-        assertEquals(matrix1.m10(), matrix2.m10(), EPSILON);
-        assertEquals(matrix1.m11(), matrix2.m11(), EPSILON);
-        assertEquals(matrix1.m12(), matrix2.m12(), EPSILON);
-        assertEquals(matrix1.m13(), matrix2.m13(), EPSILON);
-
-        assertEquals(matrix1.m20(), matrix2.m20(), EPSILON);
-        assertEquals(matrix1.m21(), matrix2.m21(), EPSILON);
-        assertEquals(matrix1.m22(), matrix2.m22(), EPSILON);
-        assertEquals(matrix1.m23(), matrix2.m23(), EPSILON);
-
-        assertEquals(matrix1.m30(), matrix2.m30(), EPSILON);
-        assertEquals(matrix1.m31(), matrix2.m31(), EPSILON);
-        assertEquals(matrix1.m32(), matrix2.m32(), EPSILON);
-        assertEquals(matrix1.m33(), matrix2.m33(), EPSILON);
+    private void assertMatricesAreRoughlyEqual(Matrix4f expected, Matrix4f actual) {
+        assertTrue(expected.equals(actual, EPSILON));
     }
 
-    private void assertMatricesAreRoughlyEqual(Matrix3f matrix1, Matrix3f matrix2) {
-        assertEquals(matrix1.m00(), matrix2.m00(), EPSILON);
-        assertEquals(matrix1.m01(), matrix2.m01(), EPSILON);
-        assertEquals(matrix1.m02(), matrix2.m02(), EPSILON);
-
-        assertEquals(matrix1.m10(), matrix2.m10(), EPSILON);
-        assertEquals(matrix1.m11(), matrix2.m11(), EPSILON);
-        assertEquals(matrix1.m12(), matrix2.m12(), EPSILON);
-
-        assertEquals(matrix1.m20(), matrix2.m20(), EPSILON);
-        assertEquals(matrix1.m21(), matrix2.m21(), EPSILON);
-        assertEquals(matrix1.m22(), matrix2.m22(), EPSILON);
+    private void assertMatricesAreRoughlyEqual(Matrix3f expected, Matrix3f actual) {
+        assertTrue(expected.equals(actual, EPSILON));
     }
 }

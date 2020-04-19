@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.MatrixUtils;
 
@@ -93,8 +92,7 @@ public class OrthographicCamera extends Camera {
         viewMatrix = MatrixUtils.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
-
-        viewProjectionMatrix  = new Matrix4f(viewMatrix).mul(projectionMatrix);
+        viewProjectionMatrix  = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
         viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks

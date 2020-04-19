@@ -155,17 +155,16 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
                 up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        reflectionMatrix.setColumn(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
-        reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
-        reflectionMatrix.setColumn(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
-        reflectionMatrix.setColumn(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-        reflectionMatrix.mul(viewMatrix, viewMatrixReflected);
+        reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
+        reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
+        reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+        viewMatrix.mul(reflectionMatrix, viewMatrixReflected);
 
-        reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        reflectionMatrix.mul(normViewMatrix,normViewMatrixReflected);
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
+        normViewMatrix.mul(reflectionMatrix, normViewMatrixReflected);
 
-//        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
-        viewProjectionMatrix = new Matrix4f(viewMatrix).mul(projectionMatrix);
+        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
 
         projectionMatrix.invert(inverseProjectionMatrix);
         viewProjectionMatrix.invert(inverseViewProjectionMatrix);
