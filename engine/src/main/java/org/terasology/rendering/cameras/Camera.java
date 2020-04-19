@@ -208,7 +208,7 @@ public abstract class Camera {
      * @return the orientation direction, a quaternion.
      */
     public Quaternionf getOrientation() {
-        return new Quaternionf(new AxisAngle4f(viewingAngle, viewingDirection));
+        return new Quaternionf().fromAxisAngleRad(viewingDirection, viewingAngle);
     }
 
     public void setOrientation(Quaternionf quaternion) {
