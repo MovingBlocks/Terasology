@@ -63,6 +63,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component {
      * @param pose - the controller pose - a homogenous transformation matrix.
      * @param handIndex - the hand index - 0 for left and 1 for right.
      */
+    /* commented out due to a natives issue and VR not working at the moment anyway
     public void poseChanged(Matrix4f pose, int handIndex) {
         // do nothing for the second controller
         // TODO: put a hand for the second controller.
@@ -79,4 +80,5 @@ public class FirstPersonHeldItemMountPointComponent implements Component {
             rotationQuaternion.set(jomlQuaternion.x, jomlQuaternion.y, jomlQuaternion.z, jomlQuaternion.w);
         }
     }
+    */
 }
