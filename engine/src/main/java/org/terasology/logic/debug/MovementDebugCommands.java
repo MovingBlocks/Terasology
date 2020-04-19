@@ -238,16 +238,16 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
-    private float getJumpSpeed(float ratio) {
-        return (float) Math.pow(ratio, 0.74f) * 6f + 4f;
+    private float getJumpSpeed(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.74f) * 0.4f * defaultValue + 0.6f * defaultValue;
     }
 
-    private float getInteractionRange(float ratio) {
-        return (float) Math.pow(ratio, 0.62f) * 5f;
+    private float getInteractionRange(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.62f) * defaultValue;
     }
 
-    private float getRunFactor(float ratio) {
-        return (float) Math.pow(ratio, 0.68f) * 1.5f;
+    private float getRunFactor(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.68f) * defaultValue;
     }
 
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
@@ -260,8 +260,10 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 CharacterComponent charComp = clientComp.character.getComponent(CharacterComponent.class);
                 EntityRef player = clientComp.character;
                 GazeMountPointComponent gazeMountPointComponent = player.getComponent(GazeMountPointComponent.class);
-                Optional<Prefab> prefab = Assets.get(new ResourceUrn("engine:player"), Prefab.class);
-                CharacterMovementComponent moveDefault = prefab.get().getComponent(CharacterMovementComponent.class);
+
+                Prefab playerDefaults = Assets.getPrefab("engine:player").get();
+                CharacterMovementComponent moveDefault = playerDefaults.getComponent(CharacterMovementComponent.class);
+                CharacterComponent characterDefault = playerDefaults.getComponent(CharacterComponent.class)
 
                 if (move != null && gazeMountPointComponent != null) {
                     float prevHeight = move.height;
@@ -270,11 +272,11 @@ public class MovementDebugCommands extends BaseComponentSystem {
                     float ratio = amount / moveDefault.height;
 
                     move.height = amount;
-                    move.jumpSpeed = getJumpSpeed(ratio);
-                    move.stepHeight = moveDefault.stepHeight * ratio;
-                    move.distanceBetweenFootsteps = moveDefault.distanceBetweenFootsteps * ratio;
-                    move.runFactor = getRunFactor(ratio);
-                    charComp.interactionRange = getInteractionRange(ratio);
+                    move.jumpSpeed = getJumpSpeed(ratio, moveDefault.jumpSpeed);
+                    move.stepHeight = ratio * moveDefault.stepHeight;
+                    move.distanceBetweenFootsteps = ratio * moveDefault.distanceBetweenFootsteps;
+                    move.runFactor = getRunFactor(ratio, moveDefault.runFactor);
+                    charComp.interactionRange = getInteractionRange(ratio, characterDefault.interactionRange);
                     gazeMountPointComponent.translate.y = amount - foreHeadSize;
                     Location.removeChild(player, gazeMountPointComponent.gazeEntity);
                     Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));

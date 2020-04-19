@@ -36,7 +36,7 @@ public final class CharacterMovementComponent implements Component {
 
     // Collision settings
     @Range(min = 1, max = 25)
-    public float height = 1.8f;
+    public float height = 1.6f;
     @Range(min = 0, max = 5)
     public float radius = 0.3f;
     public CollisionGroup collisionGroup = StandardCollisionGroup.CHARACTER;
