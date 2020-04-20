@@ -15,13 +15,13 @@
  */
 package org.terasology.core.debug;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.BaseInteractionScreen;
 import org.terasology.rendering.nui.UIWidget;
@@ -147,13 +147,13 @@ public class BenchmarkScreen extends BaseInteractionScreen {
     static Region3i getChunkRegionAbove(Vector3f location) {
         Vector3i charecterPos = new Vector3i(JomlUtil.round(location, RoundingMode.FLOOR));
         Vector3i chunkAboveCharacter = ChunkMath.calcChunkPos(charecterPos);
-        chunkAboveCharacter.add(0,1,0);
+        chunkAboveCharacter.y += 1;
         Vector3i chunkRelativePos = ChunkMath.calcBlockPos(charecterPos);
         Vector3i characterChunkOriginPos = new Vector3i(charecterPos);
         characterChunkOriginPos.sub(chunkRelativePos);
 
         Vector3i chunkAboveOrigin = new Vector3i(characterChunkOriginPos);
-        chunkAboveOrigin.add(0,ChunkConstants.CHUNK_SIZE.y(),0);
+        chunkAboveOrigin.y += ChunkConstants.CHUNK_SIZE.y();
         return ChunkConstants.CHUNK_REGION.move(chunkAboveOrigin);
     }
 

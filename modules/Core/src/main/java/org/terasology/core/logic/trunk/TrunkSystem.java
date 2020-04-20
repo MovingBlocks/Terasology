@@ -16,6 +16,8 @@
 
 package org.terasology.core.logic.trunk;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.audio.AudioManager;
@@ -33,8 +35,6 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.utilities.Assets;
@@ -142,7 +142,8 @@ public class TrunkSystem extends BaseComponentSystem {
             entity.removeComponent(MeshComponent.class);
             newTrunk.addComponent(new BlockRegionComponent(Region3i.createBounded(leftBlockPos, rightBlockPos)));
             Vector3f doorCenter = new Vector3f(leftBlockPos);
-            doorCenter.add(new Vector3f(rightBlockPos.sub(leftBlockPos)));
+            Vector3i deltaBlockPos = new Vector3i(rightBlockPos).sub(leftBlockPos);
+            doorCenter.add(new Vector3f(deltaBlockPos));
             newTrunk.addComponent(new LocationComponent(doorCenter));
             TrunkComponent newDoorComp = newTrunk.getComponent(TrunkComponent.class);
             newTrunk.saveComponent(newDoorComp);

@@ -127,7 +127,7 @@ public class TreeTests {
 
             Random random = new MersenneRandom(seed);
             BlockManager blockManagerLocal = CoreRegistry.get(BlockManager.class);
-            Vector3i relPos = chunk.chunkToWorldPosition(0, 0, 0).sub(pos).mul(-1);
+            Vector3i relPos = chunk.chunkToWorldPosition(0, 0, 0).sub(pos).negate();
             treeGen.generate(blockManagerLocal, chunk, random, relPos.x, relPos.y, relPos.z);
         }
 

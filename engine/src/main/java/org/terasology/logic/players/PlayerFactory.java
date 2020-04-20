@@ -152,7 +152,7 @@ public class PlayerFactory {
                 }
 
                 if (consecutiveAirBlocks >= height) {
-                    newSpawnPos.sub(0,consecutiveAirBlocks,0);
+                    newSpawnPos.y -= consecutiveAirBlocks;
                     return newSpawnPos;
                 }
                 newSpawnPos.add(0, 1, 0);

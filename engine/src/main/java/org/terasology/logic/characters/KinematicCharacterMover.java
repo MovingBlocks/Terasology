@@ -560,7 +560,7 @@ public class KinematicCharacterMover implements CharacterMover {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
             result.getRotation().rotationY(yaw);
         } else {
-            result.getRotation().rotationYXZ(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0);
+            result.getRotation().rotationY(TeraMath.DEG_TO_RAD * input.getYaw());
         }
     }
 
@@ -746,7 +746,7 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3i climbDir3i = state.getClimbDirection();
         Vector3f climbDir3f = new Vector3f(climbDir3i);
 
-        Quaternionf rotation = new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+        Quaternionf rotation = new Quaternionf().rotationY(TeraMath.DEG_TO_RAD * state.getYaw());
         Vector3f tmp = new Vector3f(0f, 0f, -1f).rotate(rotation);
         float angleToClimbDirection = tmp.angle(climbDir3f);
 
@@ -773,7 +773,7 @@ public class KinematicCharacterMover implements CharacterMover {
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             if (jumpOrCrouchActive) {
-                rotation.rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+                rotation.rotationY(TeraMath.DEG_TO_RAD * state.getYaw());
             } else {
                 rotation.rotationYXZ(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
                         TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
@@ -783,7 +783,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
             // facing away from ladder
         } else {
-            rotation.rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+            rotation.rotationY(TeraMath.DEG_TO_RAD * state.getYaw());
             desiredVelocity.rotate(rotation);
             clearMovementToDirection = false;
         }

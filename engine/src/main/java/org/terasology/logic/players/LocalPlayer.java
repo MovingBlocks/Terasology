@@ -107,7 +107,7 @@ public class LocalPlayer {
 
     public Vector3f getPosition(Vector3f out) {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             return out;
         }
         return location.getWorldPosition(out);
