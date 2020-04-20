@@ -109,7 +109,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
 
     @Override
     public Block setBlock(Vector3ic pos, Block type) {
-        return null;
+        return base.setBlock(pos, type);
     }
 
     @Override
