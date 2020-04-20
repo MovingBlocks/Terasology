@@ -31,12 +31,35 @@ public interface WorldProvider extends WorldProviderCore {
     /**
      * An active block is in a chunk that is available and fully generated.
      *
-     * @param pos
+     * @param pos The position
      * @return Whether the given block is active
+     * @deprecated
      */
     boolean isBlockRelevant(Vector3i pos);
 
+    /**
+     *
+     * @param pos The position
+     * @return Whether the given block is active
+     */
+    boolean isBlockRelevant(Vector3ic pos);
+
+    /**
+     * An active block is in a chunk that is available and fully generated.
+     *
+     * @param pos The position
+     * @return Whether the given block is active
+     * @deprecated
+     */
     boolean isBlockRelevant(Vector3f pos);
+
+    /**
+     * An active block is in a chunk that is available and fully generated.
+     *
+     * @param pos The position
+     * @return Whether the given block is active
+     */
+    boolean isBlockRelevant(Vector3fc pos);
 
     /**
      * Returns the block value at the given position.
