@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
@@ -92,7 +93,7 @@ public class MapWorldProvider implements WorldProviderCore {
 
     @Override
     public Block setBlock(Vector3ic pos, Block type) {
-        return null;
+        return blocks.put(JomlUtil.from(pos), type);
     }
 
     @Override
