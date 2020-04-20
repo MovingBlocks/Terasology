@@ -160,8 +160,8 @@ public class SkeletalMeshData implements AssetData {
         Vector3f norm = new Vector3f();
         for (int i = 0; i < indices.size() / 3; ++i) {
             Vector3f baseVert = vertices.get(indices.get(i * 3));
-            v1.sub(vertices.get(indices.get(i * 3 + 1)), baseVert);
-            v2.sub(vertices.get(indices.get(i * 3 + 2)), baseVert);
+            vertices.get(indices.get(i * 3 + 1)).sub(baseVert, v1);
+            vertices.get(indices.get(i * 3 + 2)).sub(baseVert, v2);
             v1.normalize();
             v2.normalize();
             norm.cross(v1, v2);
