@@ -149,7 +149,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
 
     @Override
     public int setExtraData(int index, Vector3ic pos, int value) {
-        return 0;
+        return base.setExtraData(index, pos, value);
     }
 
     @Override

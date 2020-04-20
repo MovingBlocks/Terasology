@@ -116,11 +116,16 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public Block setBlock(Vector3i pos, Block type) {
+       return this.setBlock(JomlUtil.from(pos),type);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic pos, Block type) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getBlockEntityAt(pos);
             Block oldType = super.setBlock(pos, type);
             if (oldType != null) {
-                updateBlockEntity(blockEntity, JomlUtil.from(pos), oldType, type, false, Collections.<Class<? extends Component>>emptySet());
+                updateBlockEntity(blockEntity, pos, oldType, type, false, Collections.<Class<? extends Component>>emptySet());
             }
             return oldType;
         }
