@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static final TestClass OBJECT = new TestClass(
             new Color(0xDEADBEEF),
-            ImmutableSet.of(new Vector4f(), new Vector4f(1)),
+            ImmutableSet.of(new Vector4f(0), new Vector4f(1)),
             ImmutableMap.of(
                     "someRect",
                     Rect2i.createFromMinAndSize(-3, -3, 10, 10)
