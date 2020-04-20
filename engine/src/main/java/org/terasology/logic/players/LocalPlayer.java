@@ -24,6 +24,7 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -162,7 +163,7 @@ public class LocalPlayer {
     public Vector3f getVelocity() {
         CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
         if (movement != null) {
-            return new Vector3f(movement.getVelocity());
+            return new Vector3f(JomlUtil.from(movement.getVelocity()));
         }
         return new Vector3f();
     }

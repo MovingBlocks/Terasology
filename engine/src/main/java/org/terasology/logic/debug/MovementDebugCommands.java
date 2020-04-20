@@ -28,6 +28,7 @@ import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
@@ -59,9 +60,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
-    
+
     @In
-    private Config config; 
+    private Config config;
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -101,7 +102,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     public String pushCharacterCommand(@Sender EntityRef sender,
                                        @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
-        clientComponent.character.send(new CharacterImpulseEvent(new Vector3f(x, y, z)));
+        clientComponent.character.send(new CharacterImpulseEvent(new org.joml.Vector3f(x, y, z)));
         return "Pushing character with " + x + " " + y + " " + z;
     }
 
@@ -279,7 +280,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                     charComp.interactionRange = getInteractionRange(ratio, characterDefault.interactionRange);
                     gazeMountPointComponent.translate.y = amount - foreHeadSize;
                     Location.removeChild(player, gazeMountPointComponent.gazeEntity);
-                    Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                    Location.attachChild(player, gazeMountPointComponent.gazeEntity, JomlUtil.from(gazeMountPointComponent.translate), new Quat4f(Quat4f.IDENTITY));
 
                     player.saveComponent(gazeMountPointComponent);
                     clientComp.character.saveComponent(move);
@@ -306,7 +307,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 float prevHeight = gazeMountPointComponent.translate.y;
                 gazeMountPointComponent.translate.y = amount;
                 Location.removeChild(player, gazeMountPointComponent.gazeEntity);
-                Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                Location.attachChild(player, gazeMountPointComponent.gazeEntity, JomlUtil.from(gazeMountPointComponent.translate), new Quat4f(Quat4f.IDENTITY));
                 player.saveComponent(gazeMountPointComponent);
                 return "Eye-height of player set to " + amount + " (was " + prevHeight + ")";
             }

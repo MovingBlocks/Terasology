@@ -17,6 +17,7 @@ package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector3f;
@@ -58,7 +59,7 @@ public final class CharacterMovementSystemUtility {
         entity.saveComponent(location);
 
         movementComp.mode = state.getMode();
-        movementComp.setVelocity(state.getVelocity());
+        movementComp.setVelocity(JomlUtil.from(state.getVelocity()));
         movementComp.grounded = state.isGrounded();
         movementComp.footstepDelta = state.getFootstepDelta();
         entity.saveComponent(movementComp);
@@ -88,7 +89,7 @@ public final class CharacterMovementSystemUtility {
 
         CharacterMovementComponent movementComponent = entity.getComponent(CharacterMovementComponent.class);
         movementComponent.mode = a.getMode();
-        movementComponent.setVelocity(a.getVelocity());
+        movementComponent.setVelocity(JomlUtil.from(a.getVelocity()));
         movementComponent.grounded = a.isGrounded();
         if (b.getFootstepDelta() < a.getFootstepDelta()) {
             movementComponent.footstepDelta = t * (1 + b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
@@ -125,7 +126,7 @@ public final class CharacterMovementSystemUtility {
     private void extrapolateCharacterMovementComponent(EntityRef entity, CharacterStateEvent state) {
         CharacterMovementComponent movementComponent = entity.getComponent(CharacterMovementComponent.class);
         movementComponent.mode = state.getMode();
-        movementComponent.setVelocity(state.getVelocity());
+        movementComponent.setVelocity(JomlUtil.from(state.getVelocity()));
         movementComponent.grounded = state.isGrounded();
         entity.saveComponent(movementComponent);
     }

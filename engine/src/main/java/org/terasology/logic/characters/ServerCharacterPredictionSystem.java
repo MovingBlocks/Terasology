@@ -31,6 +31,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
@@ -166,7 +167,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onImpulse(CharacterImpulseEvent event, EntityRef entity) {
-        Vector3f impulse = event.getDirection();
+        Vector3f impulse = JomlUtil.from(event.getDirection());
 
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();

@@ -195,7 +195,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
         updateMode(state, newSwimming, newDiving, newClimbing, isCrouching);
     }
-    
+
     /**
      * Updates a character's movement mode and changes his vertical velocity accordingly.
      * @param state The current state of the character.
