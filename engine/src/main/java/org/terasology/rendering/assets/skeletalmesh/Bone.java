@@ -77,7 +77,8 @@ public class Bone {
     public Quaternionf getLocalRotation() {
         Quaternionf rot = new Quaternionf(rotation);
         if (parent != null) {
-            rot.mul(new Quaternionf(parent.getObjectRotation()).conjugate());
+            Quaternionf inverseParentRotation = new Quaternionf(parent.getObjectRotation()).conjugate();
+            rot.premul(inverseParentRotation);
         }
         return rot;
     }
