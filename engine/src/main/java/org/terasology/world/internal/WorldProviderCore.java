@@ -16,6 +16,7 @@
 package org.terasology.world.internal;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
@@ -72,14 +73,29 @@ public interface WorldProviderCore {
     /**
      * @param chunkPos
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
+     * @deprecated
      */
     ChunkViewCore getLocalView(Vector3i chunkPos);
+
+    /**
+     * @param chunkPos
+     * @return A world view centered on the desired chunk, with the surrounding chunks present.
+     */
+    ChunkViewCore getLocalView(Vector3ic chunkPos);
+
+    /**
+     * @param chunk
+     * @return A world view of the chunks around the desired chunk, uncentered.
+     * @deprecated
+     */
+    ChunkViewCore getWorldViewAround(Vector3i chunk);
 
     /**
      * @param chunk
      * @return A world view of the chunks around the desired chunk, uncentered.
      */
-    ChunkViewCore getWorldViewAround(Vector3i chunk);
+    ChunkViewCore getWorldViewAround(Vector3ic chunk);
+
 
 
     /**
@@ -100,8 +116,18 @@ public interface WorldProviderCore {
      * @param pos  The world position to change
      * @param type The type of the block to set
      * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
+     * @deprecated
      */
     Block setBlock(Vector3i pos, Block type);
+
+    /**
+     * Places a block of a specific type at a given position
+     *
+     * @param pos  The world position to change
+     * @param type The type of the block to set
+     * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
+     */
+    Block setBlock(Vector3ic pos, Block type);
 
     /**
      * Places all given blocks of specific types at their corresponding positions
@@ -111,6 +137,7 @@ public interface WorldProviderCore {
      * @param blocks A mapping from world position to change to the type of block to set
      * @return A mapping from world position to previous block type.
      * The value of a map entry is Null if the change failed (because the necessary chunk was not loaded)
+     * @deprecated
      */
     default Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
         Map<Vector3i, Block> resultMap = Maps.newHashMap();
@@ -152,7 +179,7 @@ public interface WorldProviderCore {
     byte getSunlight(int x, int y, int z);
 
     byte getTotalLight(int x, int y, int z);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -163,7 +190,18 @@ public interface WorldProviderCore {
      * @return The (index)th extra-data value at the given position
      */
     int getExtraData(int index, int x, int y, int z);
-    
+
+    /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param index The index of the extra data field
+     * @param pos
+     * @param value
+     * @return The replaced value
+     * @deprecated
+     */
+    int setExtraData(int index, Vector3i pos, int value);
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -172,7 +210,8 @@ public interface WorldProviderCore {
      * @param value
      * @return The replaced value
      */
-    int setExtraData(int index, Vector3i pos, int value);
+    int setExtraData(int index, Vector3ic pos, int value);
+
 
     /**
      * Disposes this world provider.

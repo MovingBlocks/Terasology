@@ -15,6 +15,8 @@
  */
 package org.terasology.world;
 
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
@@ -45,8 +47,30 @@ public interface BlockEntityRegistry {
      *
      * @param blockPosition
      * @return The block entity for the location if it exists, or the null entity
+     * @deprecated
      */
     EntityRef getExistingBlockEntityAt(Vector3i blockPosition);
+
+    /**
+     * This method returns the block entity at the given location, but will not produce a temporary entity if
+     * one isn't currently in memory.
+     *
+     * @param blockPosition
+     * @return The block entity for the location if it exists, or the null entity
+     */
+    EntityRef getExistingBlockEntityAt(Vector3ic blockPosition);
+
+
+    /**
+     * This method is the same as setBlock, except if the old and new block types are part of the same family the
+     * entity will be force updated (usually they are not in this situation).
+     *
+     * @param position
+     * @param type
+     * @return The previous block type, or null if the change failed due to the chunk not being available
+     * @deprecated
+     */
+    Block setBlockForceUpdateEntity(Vector3i position, Block type);
 
     /**
      * This method is the same as setBlock, except if the old and new block types are part of the same family the
@@ -56,7 +80,19 @@ public interface BlockEntityRegistry {
      * @param type
      * @return The previous block type, or null if the change failed due to the chunk not being available
      */
-    Block setBlockForceUpdateEntity(Vector3i position, Block type);
+    Block setBlockForceUpdateEntity(Vector3ic position, Block type);
+
+
+    /**
+     * This method is the same as setBlock, except the specified components are not altered during the update
+     *
+     * @param position
+     * @param type
+     * @param components
+     * @return The previous block type, or null if the change failed due to the chunk not being available
+     * @deprecated
+     */
+    Block setBlockRetainComponent(Vector3i position, Block type, Class<? extends Component>... components);
 
     /**
      * This method is the same as setBlock, except the specified components are not altered during the update
@@ -66,35 +102,75 @@ public interface BlockEntityRegistry {
      * @param components
      * @return The previous block type, or null if the change failed due to the chunk not being available
      */
-    Block setBlockRetainComponent(Vector3i position, Block type, Class<? extends Component>... components);
+    Block setBlockRetainComponent(Vector3ic position, Block type, Class<? extends Component>... components);
+
+
+    /**
+     * @param position
+     * @return The block entity for the location, creating it if it doesn't exist
+     * @deprecated
+     */
+    EntityRef getBlockEntityAt(Vector3f position);
 
     /**
      * @param position
      * @return The block entity for the location, creating it if it doesn't exist
      */
-    EntityRef getBlockEntityAt(Vector3f position);
+    EntityRef getBlockEntityAt(Vector3fc position);
+
 
     /**
      * @param blockPosition
      * @return The block entity for the location, creating it if it doesn't exist
+     * @deprecated
      */
     EntityRef getBlockEntityAt(Vector3i blockPosition);
 
     /**
      * @param blockPosition
+     * @return The block entity for the location, creating it if it doesn't exist
+     */
+    EntityRef getBlockEntityAt(Vector3ic blockPosition);
+
+
+    /**
+     * @param blockPosition
      * @return The block controller entity for this location, or block entity if it exists.
+     * @deprecated
      */
     EntityRef getExistingEntityAt(Vector3i blockPosition);
 
     /**
      * @param blockPosition
+     * @return The block controller entity for this location, or block entity if it exists.
+     */
+    EntityRef getExistingEntityAt(Vector3ic blockPosition);
+
+
+    /**
+     * @param blockPosition
      * @return The block controller entity for this location, or block entity.
+     * @deprecated
      */
     EntityRef getEntityAt(Vector3i blockPosition);
+
+    /**
+     * @param blockPosition
+     * @return The block controller entity for this location, or block entity.
+     */
+    EntityRef getEntityAt(Vector3ic blockPosition);
+
+
+    /**
+     * @param blockPos
+     * @return Whether the entity at this position is permanent
+     * @deprecated
+     */
+    boolean hasPermanentBlockEntity(Vector3i blockPos);
 
     /**
      * @param blockPos
      * @return Whether the entity at this position is permanent
      */
-    boolean hasPermanentBlockEntity(Vector3i blockPos);
+    boolean hasPermanentBlockEntity(Vector3ic blockPos);
 }

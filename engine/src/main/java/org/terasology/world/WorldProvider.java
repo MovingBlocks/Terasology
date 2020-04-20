@@ -15,10 +15,13 @@
  */
 package org.terasology.world;
 
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.WorldProviderCore;
+
 
 /**
  * Provides the basic interface for all world providers.
@@ -29,18 +32,41 @@ public interface WorldProvider extends WorldProviderCore {
     /**
      * An active block is in a chunk that is available and fully generated.
      *
-     * @param pos
+     * @param pos position of block in the world
      * @return Whether the given block is active
+     * @deprecated
      */
     boolean isBlockRelevant(Vector3i pos);
 
+    /**
+     * An active block is in a chunk that is available and fully generated.
+     *
+     * @param pos position of block in the world
+     * @return Whether the given block is active
+     */
+    boolean isBlockRelevant(Vector3ic pos);
+
+    /**
+     * An active block is in a chunk that is available and fully generated.
+     * @param pos position of block in the world rounded {@link java.math.RoundingMode.HALF_UP}
+     * @return Whether the given block is active
+     * @deprecated
+     */
     boolean isBlockRelevant(Vector3f pos);
+
+    /**
+     * An active block is in a chunk that is available and fully generated.
+     * @param pos position of block in world rounded {@link org.joml.RoundingMode.HALF_UP}
+     * @return Whether the given block is active
+     */
+    boolean isBlockRelevant(Vector3fc pos);
 
     /**
      * Returns the block value at the given position.
      *
      * @param pos The position
      * @return The block value at the given position
+     * @deprecated
      */
     Block getBlock(Vector3f pos);
 
@@ -50,15 +76,52 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
+    Block getBlock(Vector3fc pos);
+
+    /**
+     * Returns the block value at the given position.
+     *
+     * @param pos The position
+     * @return The block value at the given position
+     * @deprecated
+     */
     Block getBlock(Vector3i pos);
+
+    /**
+     * Returns the block value at the given position.
+     *
+     * @param pos The position
+     * @return The block value at the given position
+     */
+    Block getBlock(Vector3ic pos);
+
 
     /**
      * Returns the light value at the given position.
      *
      * @param pos The position
      * @return The block value at the given position
+     * @deprecated
      */
     byte getLight(Vector3f pos);
+
+    /**
+     * Returns the light value at the given position.
+     *
+     * @param pos The position
+     * @return The block value at the given position
+     *
+     */
+    byte getLight(Vector3fc pos);
+
+    /**
+     * Returns the sunlight value at the given position.
+     *
+     * @param pos The position
+     * @return The block value at the given position
+     * @deprecated
+     */
+    byte getSunlight(Vector3f pos);
 
     /**
      * Returns the sunlight value at the given position.
@@ -66,9 +129,16 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
-    byte getSunlight(Vector3f pos);
+    byte getSunlight(Vector3fc pos);
 
-    byte getTotalLight(Vector3f pos);
+    /**
+     * Returns the light value at the given position.
+     *
+     * @param pos The position
+     * @return The block value at the given position
+     * @deprecated
+     */
+    byte getLight(Vector3i pos);
 
     /**
      * Returns the light value at the given position.
@@ -76,7 +146,8 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
-    byte getLight(Vector3i pos);
+    byte getLight(Vector3ic pos);
+
 
     /**
      * Returns the sunlight value at the given position.
@@ -86,8 +157,48 @@ public interface WorldProvider extends WorldProviderCore {
      */
     byte getSunlight(Vector3i pos);
 
+    /**
+     * Returns the sunlight value at the given position.
+     *
+     * @param pos The position
+     * @return The block value at the given position
+     * @deprecated
+     */
+    byte getSunlight(Vector3ic pos);
+
+    /**
+     * @deprecated
+     * @param pos
+     * @return
+     */
     byte getTotalLight(Vector3i pos);
-    
+
+    byte getTotalLight(Vector3ic pos);
+
+    /**
+     * @deprecated
+     * @param pos
+     * @return
+     */
+    byte getTotalLight(Vector3f pos);
+
+    /**
+     *
+     * @param pos
+     * @return
+     */
+    byte getTotalLight(Vector3fc pos);
+
+    /**
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
+     *
+     * @param index The index of the extra data field
+     * @param pos
+     * @return The (index)th extra-data value at the given position
+     * @deprecated
+     */
+    int getExtraData(int index, Vector3i pos);
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -95,8 +206,8 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos
      * @return The (index)th extra-data value at the given position
      */
-    int getExtraData(int index, Vector3i pos);
-    
+    int getExtraData(int index, Vector3ic pos);
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -108,7 +219,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @return The replaced value
      */
     int setExtraData(int index, int x, int y, int z, int value);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -119,7 +230,17 @@ public interface WorldProvider extends WorldProviderCore {
      * @return The named extra-data value at the given position
      */
     int getExtraData(String fieldName, int x, int y, int z);
-    
+
+    /**
+     * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
+     *
+     * @param fieldName The name of the extra-data field
+     * @param pos
+     * @return The named extra-data value at the given position
+     * @deprecated
+     */
+    int getExtraData(String fieldName, Vector3i pos);
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -127,8 +248,8 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos
      * @return The named extra-data value at the given position
      */
-    int getExtraData(String fieldName, Vector3i pos);
-    
+    int getExtraData(String fieldName, Vector3ic pos);
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -140,7 +261,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @return The replaced value
      */
     int setExtraData(String fieldName, int x, int y, int z, int value);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -148,6 +269,18 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos
      * @param value
      * @return The replaced value
+     * @deprecated
      */
     int setExtraData(String fieldName, Vector3i pos, int value);
+
+    /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param fieldName The name of the extra-data field
+     * @param pos
+     * @param value
+     * @return The replaced value
+     *
+     */
+    int setExtraData(String fieldName, Vector3ic pos, int value);
 }

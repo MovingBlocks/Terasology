@@ -21,11 +21,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.OnChangedBlock;
@@ -163,8 +165,18 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
+    public ChunkViewCore getLocalView(Vector3ic chunkPos) {
+        return chunkProvider.getLocalView(JomlUtil.from(chunkPos));
+    }
+
+    @Override
     public ChunkViewCore getWorldViewAround(Vector3i chunk) {
         return chunkProvider.getSubviewAroundChunk(chunk);
+    }
+
+    @Override
+    public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
+        return null;
     }
 
     @Override
@@ -210,6 +222,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
+    public Block setBlock(Vector3ic pos, Block type) {
+        return null;
+    }
+
+    @Override
     public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
         /*
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
@@ -249,7 +266,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
         return result;
     }
-    
+
     private void setDirtyChunksNear(Vector3i pos0) {
         for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(pos0, 1)) {
             RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
@@ -268,7 +285,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
         }
     }
-    
+
     private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
         // TODO: Change to match block , if those changes are made.
         synchronized (listeners) {
@@ -343,6 +360,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
             return oldValue;
         }
+        return 0;
+    }
+
+    @Override
+    public int setExtraData(int index, Vector3ic pos, int value) {
         return 0;
     }
 
