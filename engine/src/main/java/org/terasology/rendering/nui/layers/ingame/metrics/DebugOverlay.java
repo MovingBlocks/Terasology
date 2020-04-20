@@ -36,7 +36,9 @@ import java.util.Locale;
 
 /**
  * Displays the content of the MetricsMode instances provided by the {@link DebugMetricsSystem}.
- *
+ * <p>
+ * Only a single {@link MetricsMode} is displayed on the screen.
+ * <p>
  * See the {@link #toggleMetricsMode()} method to iterate through the MetricsMode instances available for display.
  */
 public class DebugOverlay extends CoreScreenLayer {
