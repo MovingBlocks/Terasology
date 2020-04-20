@@ -16,6 +16,7 @@
 
 package org.terasology.world.internal;
 
+import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
@@ -66,8 +67,18 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
+    public Block getBlock(Vector3fc pos) {
+        return getBlock(new org.joml.Vector3i(pos, org.joml.RoundingMode.HALF_UP));
+    }
+
+    @Override
     public Block getBlock(Vector3i pos) {
         return core.getBlock(pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public Block getBlock(Vector3ic pos) {
+        return core.getBlock(pos.x(), pos.y(), pos.z());
     }
 
     @Override

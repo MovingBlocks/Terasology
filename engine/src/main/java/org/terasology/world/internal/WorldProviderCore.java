@@ -197,4 +197,5 @@ public interface WorldProviderCore {
      * @return an unmodifiable view on the generated relevant regions
      */
     Collection<Region3i> getRelevantRegions();
+
 }
