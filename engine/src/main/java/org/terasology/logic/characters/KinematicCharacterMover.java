@@ -15,6 +15,9 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -25,12 +28,11 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.ImmutableVector3f;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
@@ -104,8 +106,8 @@ public class KinematicCharacterMover implements CharacterMover {
 
             if (input.isFirstRun()) {
                 checkBlockEntry(entity,
-                        new Vector3i(initial.getPosition(), RoundingMode.HALF_UP),
-                        new Vector3i(result.getPosition(), RoundingMode.HALF_UP),
+                        new Vector3i(JomlUtil.from(initial.getPosition()), org.joml.RoundingMode.HALF_UP),
+                        new Vector3i(JomlUtil.from(result.getPosition()), org.joml.RoundingMode.HALF_UP),
                         characterMovementComponent.height);
             }
             if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
@@ -137,7 +139,7 @@ public class KinematicCharacterMover implements CharacterMover {
             Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
             Vector3i currentPosition = new Vector3i(oldPosition);
             for (int currentHeight = 0; currentHeight < oldBlocks.length; currentHeight++) {
-                oldBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
+                oldBlocks[currentHeight] = worldProvider.getBlock(JomlUtil.from(currentPosition));
                 currentPosition.add(0, 1, 0);
             }
 
@@ -145,13 +147,13 @@ public class KinematicCharacterMover implements CharacterMover {
             Block[] newBlocks = new Block[(int) Math.ceil(characterHeight)];
             currentPosition = new Vector3i(newPosition);
             for (int currentHeight = 0; currentHeight < characterHeight; currentHeight++) {
-                newBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
+                newBlocks[currentHeight] = worldProvider.getBlock(JomlUtil.from(currentPosition));
                 currentPosition.add(0, 1, 0);
             }
 
             for (int i = 0; i < characterHeight; i++) {
                 // send a block enter/leave event for this character
-                entity.send(new OnEnterBlockEvent(oldBlocks[i], newBlocks[i], new Vector3i(0, i, 0)));
+                entity.send(new OnEnterBlockEvent(oldBlocks[i], newBlocks[i], JomlUtil.from(new Vector3i(0, i, 0))));
             }
         }
     }
@@ -171,14 +173,14 @@ public class KinematicCharacterMover implements CharacterMover {
         if (!state.getMode().respondToEnvironment) {
             return;
         }
-        Vector3f worldPos = state.getPosition();
+        Vector3f worldPos = JomlUtil.from(state.getPosition());
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
         top.y += 0.5f * movementComp.height;
         bottom.y -= 0.5f * movementComp.height;
 
-        final boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
-        final boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
+        final boolean topUnderwater = worldProvider.getBlock(JomlUtil.from(top)).isLiquid();
+        final boolean bottomUnderwater = worldProvider.getBlock(JomlUtil.from(bottom)).isLiquid();
 
         final boolean newSwimming = !topUnderwater && bottomUnderwater;
         final boolean newDiving = topUnderwater && bottomUnderwater;
@@ -189,13 +191,13 @@ public class KinematicCharacterMover implements CharacterMover {
             finalDir = findClimbable(movementComp, worldPos, newSwimming, newDiving);
             if (finalDir != null) {
                 newClimbing = true;
-                state.setClimbDirection(finalDir);
+                state.setClimbDirection(JomlUtil.from(finalDir));
             }
         }
 
         updateMode(state, newSwimming, newDiving, newClimbing, isCrouching);
     }
-    
+
     /**
      * Updates a character's movement mode and changes his vertical velocity accordingly.
      * @param state The current state of the character.
@@ -247,12 +249,12 @@ public class KinematicCharacterMover implements CharacterMover {
         float distance = 100f;
 
         for (Vector3f side : sides) {
-            Block block = worldProvider.getBlock(side);
+            Block block = worldProvider.getBlock(JomlUtil.from(side));
             if (block.isClimbable()) {
                 //If any of our sides are near a climbable block, check if we are near to the side
-                Vector3i myPos = new Vector3i(worldPos, RoundingMode.HALF_UP);
-                Vector3i climbBlockPos = new Vector3i(side, RoundingMode.HALF_UP);
-                Vector3i dir = new Vector3i(block.getDirection().getVector3i());
+                Vector3i myPos = new Vector3i(worldPos, org.joml.RoundingMode.HALF_UP);
+                Vector3i climbBlockPos = new Vector3i(side, org.joml.RoundingMode.HALF_UP);
+                Vector3i dir = new Vector3i(JomlUtil.from(block.getDirection().getVector3i()));
                 float currentDistance = 10f;
 
                 if (dir.x != 0 && Math.abs(worldPos.x - climbBlockPos.x + dir.x * .5f) < movementComp.radius + 0.1f) {
@@ -299,7 +301,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (!stepped) {
             stepped = true;
 
-            boolean moveUpStep = callback.checkForStep(direction, stepHeight, slopeFactor, CHECK_FORWARD_DIST);
+            boolean moveUpStep = callback.checkForStep(JomlUtil.from(direction), stepHeight, slopeFactor, CHECK_FORWARD_DIST);
 
             if (moveUpStep) {
                 steppedUpDist = moveUp(stepHeight, collider, position);
@@ -317,12 +319,12 @@ public class KinematicCharacterMover implements CharacterMover {
         float movementLength = direction.length();
         if (movementLength > physics.getEpsilon()) {
             direction.normalize();
-            Vector3f reflectDir = Vector3fUtil.reflect(direction, hitNormal, new Vector3f());
+            Vector3f reflectDir = JomlUtil.from(Vector3fUtil.reflect(JomlUtil.from(direction), JomlUtil.from(hitNormal), JomlUtil.from(new Vector3f())));
             reflectDir.normalize();
-            Vector3f perpendicularDir = Vector3fUtil.getPerpendicularComponent(reflectDir, hitNormal, new Vector3f());
+            Vector3f perpendicularDir = JomlUtil.from(Vector3fUtil.getPerpendicularComponent(JomlUtil.from(reflectDir), JomlUtil.from(hitNormal), JomlUtil.from(new Vector3f())));
             if (normalMag != 0.0f) {
                 Vector3f perpComponent = new Vector3f(perpendicularDir);
-                perpComponent.scale(normalMag * movementLength);
+                perpComponent.mul(normalMag * movementLength);
                 direction.set(perpComponent);
             }
         }
@@ -332,9 +334,9 @@ public class KinematicCharacterMover implements CharacterMover {
     private void followToParent(final CharacterStateEvent state, EntityRef entity) {
         LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
         if (!locationComponent.getParent().equals(EntityRef.NULL)) {
-            Vector3f velocity = new Vector3f(locationComponent.getWorldPosition());
-            velocity.sub(state.getPosition());
-            state.getVelocity().set(velocity);
+            Vector3f velocity = new Vector3f(JomlUtil.from(locationComponent.getWorldPosition()));
+            velocity.sub(JomlUtil.from(state.getPosition()));
+            state.getVelocity().set(JomlUtil.from(velocity));
             state.getPosition().set(locationComponent.getWorldPosition());
         }
     }
@@ -382,14 +384,14 @@ public class KinematicCharacterMover implements CharacterMover {
         boolean hit = false;
         int iteration = 0;
         while (remainingDist > physics.getEpsilon() && iteration++ < 10) {
-            SweepCallback callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
+            SweepCallback callback = collider.sweep(JomlUtil.from(position), JomlUtil.from(targetPos), VERTICAL_PENETRATION, -1.0f);
             float actualDist = Math.max(0,
                     (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
             expectedMove.sub(position);
             if (expectedMove.lengthSquared() > physics.getEpsilon()) {
                 expectedMove.normalize();
-                expectedMove.scale(actualDist);
+                expectedMove.mul(actualDist);
                 position.add(expectedMove);
             }
             remainingDist -= actualDist;
@@ -397,14 +399,14 @@ public class KinematicCharacterMover implements CharacterMover {
                 break;
             }
             if (callback.hasHit()) {
-                float originalSlope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
+                float originalSlope = callback.getHitNormalWorld().dot(JomlUtil.from(new Vector3f(0, 1, 0)));
                 if (originalSlope < slopeFactor) {
                     float slope = callback.calculateAverageSlope(originalSlope, CHECK_FORWARD_DIST);
                     if (slope < slopeFactor) {
                         remainingDist -= actualDist;
                         expectedMove.set(targetPos);
                         expectedMove.sub(position);
-                        extractResidualMovement(callback.getHitNormalWorld(), expectedMove);
+                        extractResidualMovement(JomlUtil.from(callback.getHitNormalWorld()), expectedMove);
                         float sqrDist = expectedMove.lengthSquared();
                         if (sqrDist > physics.getEpsilon()) {
                             expectedMove.normalize();
@@ -421,7 +423,7 @@ public class KinematicCharacterMover implements CharacterMover {
                             break;
                         }
                         normalizedDir.set(expectedMove);
-                        expectedMove.scale(-remainingDist / expectedMove.y + HORIZONTAL_PENETRATION_LEEWAY);
+                        expectedMove.mul(-remainingDist / expectedMove.y + HORIZONTAL_PENETRATION_LEEWAY);
                         targetPos.set(position);
                         targetPos.add(expectedMove);
                     } else {
@@ -450,22 +452,22 @@ public class KinematicCharacterMover implements CharacterMover {
             return false;
         }
         boolean horizontalHit = false;
-        Vector3f normalizedDir = Vector3fUtil.safeNormalize(horizMove, new Vector3f());
+        Vector3f normalizedDir = JomlUtil.from(Vector3fUtil.safeNormalize(JomlUtil.from(horizMove), JomlUtil.from(new Vector3f())));
 
         if (collider == null) {
             // ignore collision
-            normalizedDir.scale(dist);
+            normalizedDir.mul(dist);
             position.add(normalizedDir);
             return false;
         }
 
         Vector3f targetPos = new Vector3f(normalizedDir);
-        targetPos.scale(dist + HORIZONTAL_PENETRATION_LEEWAY);
+        targetPos.mul(dist + HORIZONTAL_PENETRATION_LEEWAY);
         targetPos.add(position);
         int iteration = 0;
         Vector3f lastHitNormal = new Vector3f(0, 1, 0);
         while (remainingFraction >= 0.01f && iteration++ < 10) {
-            SweepCallback callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
+            SweepCallback callback = collider.sweep(JomlUtil.from(position), JomlUtil.from(targetPos), HORIZONTAL_PENETRATION, slopeFactor);
 
             /* Note: this isn't quite correct (after the first iteration the closestHitFraction is only for part of the moment)
              but probably close enough */
@@ -477,13 +479,13 @@ public class KinematicCharacterMover implements CharacterMover {
             if (callback.hasHit()) {
                 if (actualDist > physics.getEpsilon()) {
                     Vector3f actualMove = new Vector3f(normalizedDir);
-                    actualMove.scale(actualDist);
+                    actualMove.mul(actualDist);
                     position.add(actualMove);
                 }
                 dist -= actualDist;
                 Vector3f newDir = new Vector3f(normalizedDir);
-                newDir.scale(dist);
-                float slope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
+                newDir.mul(dist);
+                float slope = callback.getHitNormalWorld().dot(JomlUtil.from(new Vector3f(0, 1, 0)));
 
                 // We step up if we're hitting a big slope, or if we're grazing
                 // the ground, otherwise we move up a shallow slope.
@@ -507,10 +509,10 @@ public class KinematicCharacterMover implements CharacterMover {
                 } else {
                     // Hitting a shallow slope, move up it
                     Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
-                    extractResidualMovement(callback.getHitNormalWorld(), newDir);
+                    extractResidualMovement(JomlUtil.from(callback.getHitNormalWorld()), newDir);
                     Vector3f modHorizDir = new Vector3f(newDir);
                     modHorizDir.y = 0;
-                    newDir.scale(newHorizDir.length() / modHorizDir.length());
+                    newDir.mul(newHorizDir.length() / modHorizDir.length());
                 }
                 float sqrDist = newDir.lengthSquared();
                 if (sqrDist > physics.getEpsilon()) {
@@ -524,10 +526,10 @@ public class KinematicCharacterMover implements CharacterMover {
                 dist = (float) Math.sqrt(sqrDist);
                 normalizedDir.set(newDir);
                 targetPos.set(normalizedDir);
-                targetPos.scale(dist + HORIZONTAL_PENETRATION_LEEWAY);
+                targetPos.mul(dist + HORIZONTAL_PENETRATION_LEEWAY);
                 targetPos.add(position);
             } else {
-                normalizedDir.scale(dist);
+                normalizedDir.mul(dist);
                 position.add(normalizedDir);
                 break;
             }
@@ -538,7 +540,7 @@ public class KinematicCharacterMover implements CharacterMover {
     private float moveUp(float riseAmount, CharacterCollider collider, Vector3f position) {
         Vector3f to = new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z);
         if (collider != null) {
-            SweepCallback callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+            SweepCallback callback = collider.sweep(JomlUtil.from(position), JomlUtil.from(to), VERTICAL_PENETRATION_LEEWAY, -1f);
             if (callback.hasHit()) {
                 float actualDist = Math.max(0,
                         ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction()) - VERTICAL_PENETRATION_LEEWAY);
@@ -567,7 +569,7 @@ public class KinematicCharacterMover implements CharacterMover {
                                 CharacterMoveInputEvent input) {
         if (movementComp.faceMovementDirection && result.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
-            result.getRotation().set(new Vector3f(0, 1, 0), yaw);
+            result.getRotation().set(JomlUtil.from(new Vector3f(0, 1, 0)), yaw);
         } else {
             result.getRotation().set(new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0));
         }
@@ -575,7 +577,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
     private void walk(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
                       CharacterMoveInputEvent input, EntityRef entity) {
-        Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
+        Vector3f desiredVelocity = new Vector3f(JomlUtil.from(input.getMovementDirection()));
 
         float lengthSquared = desiredVelocity.lengthSquared();
 
@@ -584,7 +586,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (lengthSquared > 1) {
             desiredVelocity.normalize();
         }
-        desiredVelocity.scale(movementComp.speedMultiplier);
+        desiredVelocity.mul(movementComp.speedMultiplier);
 
         float maxSpeed = getMaxSpeed(entity, movementComp);
         if (input.isRunning()) {
@@ -597,10 +599,10 @@ public class KinematicCharacterMover implements CharacterMover {
             desiredVelocity.y = 0;
             if (desiredVelocity.x != 0 || desiredVelocity.z != 0) {
                 desiredVelocity.normalize();
-                desiredVelocity.scale(speed);
+                desiredVelocity.mul(speed);
             }
         }
-        desiredVelocity.scale(maxSpeed);
+        desiredVelocity.mul(maxSpeed);
 
         if (movementComp.mode == MovementMode.CLIMBING) {
             climb(state, input, desiredVelocity);
@@ -613,9 +615,9 @@ public class KinematicCharacterMover implements CharacterMover {
 
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
-        velocityDiff.sub(state.getVelocity());
-        velocityDiff.scale(Math.min(movementComp.mode.scaleInertia * input.getDelta(), 1.0f));
-        Vector3f endVelocity = new Vector3f(state.getVelocity());
+        velocityDiff.sub(JomlUtil.from(state.getVelocity()));
+        velocityDiff.mul(Math.min(movementComp.mode.scaleInertia * input.getDelta(), 1.0f));
+        Vector3f endVelocity = new Vector3f(JomlUtil.from(state.getVelocity()));
         endVelocity.x += velocityDiff.x;
         endVelocity.z += velocityDiff.z;
         if (movementComp.mode.scaleGravity == 0) {
@@ -627,16 +629,16 @@ public class KinematicCharacterMover implements CharacterMover {
             endVelocity.y = Math.max(-TERMINAL_VELOCITY, state.getVelocity().y - (GRAVITY * movementComp.mode.scaleGravity) * input.getDelta());
         }
         Vector3f moveDelta = new Vector3f(endVelocity);
-        moveDelta.scale(input.getDelta());
+        moveDelta.mul(input.getDelta());
         CharacterCollider collider = movementComp.mode.useCollision ? physics.getCharacterCollider(entity) : null;
-        MoveResult moveResult = move(state.getPosition(), moveDelta,
+        MoveResult moveResult = move(JomlUtil.from(state.getPosition()), moveDelta,
                 (state.getMode() != MovementMode.CLIMBING && state.isGrounded() && movementComp.mode.canBeGrounded) ? movementComp.stepHeight : 0,
                 movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
-        distanceMoved.sub(state.getPosition());
-        state.getPosition().set(moveResult.getFinalPosition());
+        distanceMoved.sub(JomlUtil.from(state.getPosition()));
+        state.getPosition().set(JomlUtil.from(moveResult.getFinalPosition()));
         if (input.isFirstRun() && distanceMoved.length() > 0) {
-            entity.send(new MovedEvent(new ImmutableVector3f(distanceMoved), new ImmutableVector3f(state.getPosition())));
+            entity.send(new MovedEvent(new ImmutableVector3f(JomlUtil.from(distanceMoved)), new ImmutableVector3f(state.getPosition())));
         }
 
         // Upon hitting solid ground, reset the number of jumps back to the maximum value.
@@ -647,10 +649,10 @@ public class KinematicCharacterMover implements CharacterMover {
         if (moveResult.isBottomHit()) {
             if (!state.isGrounded() && movementComp.mode.canBeGrounded) {
                 if (input.isFirstRun()) {
-                    Vector3f landVelocity = new Vector3f(state.getVelocity());
+                    Vector3f landVelocity = new Vector3f(JomlUtil.from(state.getVelocity()));
                     landVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
                     logger.debug("Landed at " + landVelocity);
-                    entity.send(new VerticalCollisionEvent(state.getPosition(), landVelocity));
+                    entity.send(new VerticalCollisionEvent(state.getPosition(), JomlUtil.from(landVelocity)));
                 }
                 state.setGrounded(true);
                 movementComp.numberOfJumpsLeft = movementComp.numberOfJumpsMax;
@@ -680,10 +682,10 @@ public class KinematicCharacterMover implements CharacterMover {
         } else {
             if (moveResult.isTopHit() && endVelocity.y > 0) {
                 if (input.isFirstRun()) {
-                    Vector3f hitVelocity = new Vector3f(state.getVelocity());
+                    Vector3f hitVelocity = new Vector3f(JomlUtil.from(state.getVelocity()));
                     hitVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
                     logger.debug("Hit at " + hitVelocity);
-                    entity.send(new VerticalCollisionEvent(state.getPosition(), hitVelocity));
+                    entity.send(new VerticalCollisionEvent(state.getPosition(), JomlUtil.from(hitVelocity)));
                 }
                 endVelocity.y = -0.0f * endVelocity.y;
             }
@@ -714,13 +716,13 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         }
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
-            Vector3f hitVelocity = new Vector3f(state.getVelocity());
+            Vector3f hitVelocity = new Vector3f(JomlUtil.from(state.getVelocity()));
             hitVelocity.x += (distanceMoved.x / moveDelta.x) * (endVelocity.x - state.getVelocity().x);
             hitVelocity.z += (distanceMoved.z / moveDelta.z) * (endVelocity.z - state.getVelocity().z);
             logger.debug("Hit at " + hitVelocity);
-            entity.send(new HorizontalCollisionEvent(state.getPosition(), hitVelocity));
+            entity.send(new HorizontalCollisionEvent(state.getPosition(), JomlUtil.from(hitVelocity)));
         }
-        state.getVelocity().set(endVelocity);
+        state.getVelocity().set(JomlUtil.from(endVelocity));
         if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
             state.setFootstepDelta(
                     state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
@@ -753,12 +755,13 @@ public class KinematicCharacterMover implements CharacterMover {
         }
         Vector3f tmp;
 
-        Vector3i climbDir3i = state.getClimbDirection();
-        Vector3f climbDir3f = climbDir3i.toVector3f();
+        Vector3i climbDir3i = JomlUtil.from(state.getClimbDirection());
+        Vector3f climbDir3f = new Vector3f(climbDir3i);
 
-        Quat4f rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+        Quaternionf rotation = JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0));
         tmp = new Vector3f(0.0f, 0.0f, -1.0f);
-        rotation.rotate(tmp, tmp);
+//        rotation.rotate(tmp, tmp);
+        tmp.rotate(rotation);
         float angleToClimbDirection = tmp.angle(climbDir3f);
 
         boolean clearMovementToDirection = !state.isGrounded();
@@ -773,30 +776,34 @@ public class KinematicCharacterMover implements CharacterMover {
             } else {
                 float pitchAmount = state.isGrounded() ? 45f : 90f;
                 float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
-                rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
-                rotation.rotate(desiredVelocity, desiredVelocity);
+                rotation = JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0));
+//                rotation.rotate(desiredVelocity, desiredVelocity);
+                desiredVelocity.rotate(rotation);
             }
 
             // looking sidewards from ladder
         } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
             float rollAmount = state.isGrounded() ? 45f : 90f;
             tmp = new Vector3f();
-            rotation.rotate(climbDir3f, tmp);
+            climbDir3f.rotate(rotation,tmp);
+//            rotation.rotate(climbDir3f, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             if (jumpOrCrouchActive) {
-                rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+                rotation = JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0));
             } else {
-                rotation = new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
-                        TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
+                rotation =  JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
+                        TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus)
                 );
             }
-            rotation.rotate(desiredVelocity, desiredVelocity);
+            desiredVelocity.rotate(rotation);
+//            rotation.rotate(desiredVelocity, desiredVelocity);
 
             // facing away from ladder
         } else {
-            rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
-            rotation.rotate(desiredVelocity, desiredVelocity);
+            rotation = JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0));
+            desiredVelocity.rotate(rotation);
+//            rotation.rotate(desiredVelocity, desiredVelocity);
             clearMovementToDirection = false;
         }
 
