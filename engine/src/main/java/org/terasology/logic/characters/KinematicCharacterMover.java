@@ -760,7 +760,6 @@ public class KinematicCharacterMover implements CharacterMover {
 
         Quaternionf rotation = new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
         tmp = new Vector3f(0.0f, 0.0f, -1.0f);
-//        rotation.rotate(tmp, tmp);
         tmp.rotate(rotation);
         float angleToClimbDirection = tmp.angle(climbDir3f);
 
@@ -776,8 +775,7 @@ public class KinematicCharacterMover implements CharacterMover {
             } else {
                 float pitchAmount = state.isGrounded() ? 45f : 90f;
                 float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
-                rotation =  new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
-//                rotation.rotate(desiredVelocity, desiredVelocity);
+                rotation.rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
                 desiredVelocity.rotate(rotation);
             }
 
@@ -786,23 +784,19 @@ public class KinematicCharacterMover implements CharacterMover {
             float rollAmount = state.isGrounded() ? 45f : 90f;
             tmp = new Vector3f();
             climbDir3f.rotate(rotation,tmp);
-//            rotation.rotate(climbDir3f, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             if (jumpOrCrouchActive) {
-                rotation =  new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+                rotation.rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             } else {
-                rotation =  new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
+                rotation.rotationYXZ(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
                         TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus);
             }
             desiredVelocity.rotate(rotation);
-//            rotation.rotate(desiredVelocity, desiredVelocity);
-
             // facing away from ladder
         } else {
-            rotation =  new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+            rotation.rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             desiredVelocity.rotate(rotation);
-//            rotation.rotate(desiredVelocity, desiredVelocity);
             clearMovementToDirection = false;
         }
 
