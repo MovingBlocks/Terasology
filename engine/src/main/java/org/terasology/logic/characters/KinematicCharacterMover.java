@@ -30,7 +30,6 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.ImmutableVector3f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.engine.CharacterCollider;
@@ -319,9 +318,10 @@ public class KinematicCharacterMover implements CharacterMover {
         float movementLength = direction.length();
         if (movementLength > physics.getEpsilon()) {
             direction.normalize();
-            Vector3f reflectDir = JomlUtil.from(Vector3fUtil.reflect(JomlUtil.from(direction), JomlUtil.from(hitNormal), JomlUtil.from(new Vector3f())));
+            Vector3f reflectDir = direction.reflect(hitNormal,new Vector3f());
             reflectDir.normalize();
-            Vector3f perpendicularDir = JomlUtil.from(Vector3fUtil.getPerpendicularComponent(JomlUtil.from(reflectDir), JomlUtil.from(hitNormal), JomlUtil.from(new Vector3f())));
+
+            Vector3f perpendicularDir = hitNormal.mul(reflectDir.dot(hitNormal),new Vector3f()).mul(-1).add(reflectDir);
             if (normalMag != 0.0f) {
                 Vector3f perpComponent = new Vector3f(perpendicularDir);
                 perpComponent.mul(normalMag * movementLength);
@@ -452,7 +452,9 @@ public class KinematicCharacterMover implements CharacterMover {
             return false;
         }
         boolean horizontalHit = false;
-        Vector3f normalizedDir = JomlUtil.from(Vector3fUtil.safeNormalize(JomlUtil.from(horizMove), JomlUtil.from(new Vector3f())));
+        Vector3f normalizedDir = horizMove.normalize();
+        if(!normalizedDir.isFinite())
+            normalizedDir.set(0);
 
         if (collider == null) {
             // ignore collision
