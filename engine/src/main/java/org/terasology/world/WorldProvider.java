@@ -33,8 +33,10 @@ public interface WorldProvider extends WorldProviderCore {
      *
      * @param pos The position
      * @return Whether the given block is active
-     * @deprecated
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #isBlockRelevant(Vector3ic)}.
      */
+    @Deprecated
     boolean isBlockRelevant(Vector3i pos);
 
     /**
@@ -49,8 +51,10 @@ public interface WorldProvider extends WorldProviderCore {
      *
      * @param pos The position
      * @return Whether the given block is active
-     * @deprecated
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #isBlockRelevant(Vector3fc)}.
      */
+    @Deprecated
     boolean isBlockRelevant(Vector3f pos);
 
     /**
@@ -66,8 +70,10 @@ public interface WorldProvider extends WorldProviderCore {
      *
      * @param pos The position
      * @return The block value at the given position
-     * @deprecated
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #getBlock(Vector3fc)}.
      */
+    @Deprecated
     Block getBlock(Vector3f pos);
 
     /**
@@ -83,8 +89,10 @@ public interface WorldProvider extends WorldProviderCore {
      *
      * @param pos The position
      * @return The block value at the given position
-     * @deprecated
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #getBlock(Vector3ic)}.
      */
+    @Deprecated
     Block getBlock(Vector3i pos);
 
     /**

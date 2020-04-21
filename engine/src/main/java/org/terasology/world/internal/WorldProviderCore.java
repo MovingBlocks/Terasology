@@ -101,8 +101,10 @@ public interface WorldProviderCore {
      * @param pos  The world position to change
      * @param type The type of the block to set
      * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
-     * @deprecated
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #setBlock(Vector3ic, Block)}.
      */
+    @Deprecated
     Block setBlock(Vector3i pos, Block type);
 
 
