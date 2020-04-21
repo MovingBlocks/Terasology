@@ -758,7 +758,7 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3i climbDir3i = JomlUtil.from(state.getClimbDirection());
         Vector3f climbDir3f = new Vector3f(climbDir3i);
 
-        Quaternionf rotation = JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0));
+        Quaternionf rotation = new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
         tmp = new Vector3f(0.0f, 0.0f, -1.0f);
 //        rotation.rotate(tmp, tmp);
         tmp.rotate(rotation);
@@ -776,7 +776,7 @@ public class KinematicCharacterMover implements CharacterMover {
             } else {
                 float pitchAmount = state.isGrounded() ? 45f : 90f;
                 float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
-                rotation = JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0));
+                rotation =  new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
 //                rotation.rotate(desiredVelocity, desiredVelocity);
                 desiredVelocity.rotate(rotation);
             }
@@ -790,18 +790,17 @@ public class KinematicCharacterMover implements CharacterMover {
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             if (jumpOrCrouchActive) {
-                rotation = JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0));
+                rotation =  new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             } else {
-                rotation =  JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
-                        TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus)
-                );
+                rotation =  new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
+                        TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus);
             }
             desiredVelocity.rotate(rotation);
 //            rotation.rotate(desiredVelocity, desiredVelocity);
 
             // facing away from ladder
         } else {
-            rotation = JomlUtil.from(new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0));
+            rotation =  new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             desiredVelocity.rotate(rotation);
 //            rotation.rotate(desiredVelocity, desiredVelocity);
             clearMovementToDirection = false;
