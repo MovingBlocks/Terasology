@@ -47,6 +47,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     private PerspectiveCameraSettings cameraSettings;
 
+    private final Vector3f viewingDirection = new Vector3f(0f, 0f, 1f);
     private float bobbingRotationOffsetFactor;
     private float bobbingVerticalOffsetFactor;
     private float cachedBobbingRotationOffsetFactor;
@@ -89,6 +90,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     @Override
     public void update(float deltaT) {
+        viewingDirection.set(getViewingDirection());
         applyCinematicEffect();
 
         super.update(deltaT);
@@ -106,7 +108,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         }
 
         position.set(calculateVector(previousPositions));
-        viewingDirection.set(calculateVector(previousViewingDirections));
+        setViewingDirection(calculateVector(previousViewingDirections));
     }
 
     private Vector3f calculateVector(Deque<Vector3f> vectors) {
@@ -136,7 +138,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void updateMatrices(float fov) {
         // Nothing to do...
-        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
                 && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
                 && cachedFov == fov
                 && cachedZFar == getzFar() && cachedZNear == getzNear()
@@ -144,7 +146,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
             return;
         }
 
-        viewingDirection.cross(up,tempRightVector);
+        viewingDirection.cross(up, tempRightVector);
         tempRightVector.mul(bobbingRotationOffsetFactor);
 
         projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar(),this.displayDevice);
@@ -172,7 +174,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
         // Used for dirty checks
         cachedPosition.set(getPosition());
-        cachedViewigDirection.set(getViewingDirection());
+        cachedViewigDirection.set(viewingDirection);
         cachedBobbingVerticalOffsetFactor = bobbingVerticalOffsetFactor;
         cachedBobbingRotationOffsetFactor = bobbingRotationOffsetFactor;
         cachedFov = fov;

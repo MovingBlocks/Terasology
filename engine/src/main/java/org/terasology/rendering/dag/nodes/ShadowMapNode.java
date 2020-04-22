@@ -209,7 +209,7 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
         // Finally, we adjust the shadow map camera to look toward the player
         Vector3f fromLightToPlayerDirection = new Vector3f(quantizedMainLightDirection);
         fromLightToPlayerDirection.mul(-1.0f);
-        shadowMapCamera.getViewingDirection().set(fromLightToPlayerDirection);
+        shadowMapCamera.setViewingDirection(fromLightToPlayerDirection);
 
         shadowMapCamera.update(worldRenderer.getSecondsSinceLastFrame());
     }

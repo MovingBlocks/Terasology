@@ -15,14 +15,18 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
+import org.terasology.math.Direction;
+import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.math.MatrixUtils;
+
+import static org.terasology.math.JomlUtil.from;
 
 /**
  * Provides global access to fonts.
@@ -37,8 +41,8 @@ public abstract class Camera {
 
     /* CAMERA PARAMETERS */
     protected final Vector3f position = new Vector3f(0, 0, 0);
-    protected final Vector3f up = new Vector3f(0, 1, 0);
-    protected Vector3f viewingDirection = new Vector3f(1, 0, 0);
+    protected final Vector3f up = from(Direction.UP.getVector3f());
+    protected Vector3f viewingAxis = from(Direction.LEFT.getVector3f());
     protected float viewingAngle;
 
     protected float zNear = 0.1f;
@@ -197,25 +201,32 @@ public abstract class Camera {
         return position;
     }
 
-    public Vector3f getViewingDirection() {
-        return viewingDirection;
+    public Vector3f  getViewingDirection() {
+        Quaternionf rotation = new Quaternionf().fromAxisAngleRad(viewingAxis, viewingAngle);
+        return from(Direction.FORWARD.getVector3f()).rotate(rotation);
+    }
+
+    /**
+     * Sets viewing direction of the camera.
+     * @param direction new viewing direction
+     */
+    public void setViewingDirection(Vector3f direction) {
+        Quaternionf orientation = new Quaternionf().lookAlong(direction, new Vector3f(0, 1, 0));
+        setOrientation(from(orientation));
     }
 
     /**
      * Get the orientation of the camera.
-     * @return the orientation direction, a quaternion.
+     * @return the orientation
      */
     public Quat4f getOrientation() {
-        return new Quat4f(JomlUtil.from(viewingDirection), viewingAngle);
+        return new Quat4f(from(viewingAxis), viewingAngle);
     }
 
-    /**
-     Try to set the viewing direction.
-     * @param direction
-     */
-    public void setOrientation(Quat4f direction) {
-        viewingDirection = new Vector3f(direction.x,direction.y,direction.z);
-        viewingAngle = direction.getAngle();
+    public void setOrientation(Quat4f orientation) {
+        AxisAngle4f axisAngle = new AxisAngle4f(from(orientation));
+        viewingAxis.set(axisAngle.x, axisAngle.y, axisAngle.z);
+        viewingAngle = axisAngle.angle;
     }
 
     public ViewFrustum getViewFrustum() {
