@@ -137,7 +137,6 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
     public void checkBiomeChangeEvent(MovedEvent event, EntityRef entity) {
         final Vector3i newPosition = new Vector3i(event.getPosition());
         final Vector3i oldPosition = new Vector3i(new Vector3f(event.getPosition()).sub(event.getDelta()));
-        LOGGER.info("moved into " + worldProvider.getExtraData("BiomesAPI.biomeHash", oldPosition.x, oldPosition.y, oldPosition.z));
         if (!newPosition.equals(oldPosition)) {
             final Optional<Biome> newBiomeOptional = getBiome(newPosition);
             final Optional<Biome> oldBiomeOptional = getBiome(oldPosition);
