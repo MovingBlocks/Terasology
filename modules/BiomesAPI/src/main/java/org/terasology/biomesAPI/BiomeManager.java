@@ -85,15 +85,12 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
     public void setBiome(Biome biome, int x, int y, int z) {
         Preconditions.checkArgument(biomeMap.containsKey(biome.biomeHash()), "Trying to use non-registered biome!");
         worldProvider.setExtraData("BiomesAPI.biomeHash", x, y, z, biome.biomeHash());
-        // LOGGER.info("BiomesAPI.biomeHash," +x+"," +y+"," +z+","+ biome.biomeHash());
-        // metricsMode.setBiome(x + "," + y + "," + z + " rendered, belongs to " + biome.getId() + " with hash " + biome.biomeHash());
     }
 
     @Override
     public void setBiome(Biome biome, CoreChunk chunk, int relX, int relY, int relZ) {
         Preconditions.checkArgument(biomeMap.containsKey(biome.biomeHash()), "Trying to use non-registered biome!");
         worldProvider.setExtraData("BiomesAPI.biomeHash", chunk, new Vector3i(relX, relY, relZ), biome.biomeHash());
-        //setBiome(biome, chunk.chunkToWorldPosition(relX, relY, relZ));
     }
 
     @Override
@@ -103,8 +100,8 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
 
     @Override
     public void setBiome(Biome biome, CoreChunk chunk, Vector3i pos) {
-        Vector3i p = chunk.chunkToWorldPosition(pos);
-        setBiome(biome, chunk, p.x, p.y, p.z);
+        Vector3i position = chunk.chunkToWorldPosition(pos);
+        setBiome(biome, chunk, position.x, position.y, position.z);
     }
 
     @Override
@@ -140,7 +137,6 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
     public void checkBiomeChangeEvent(MovedEvent event, EntityRef entity) {
         final Vector3i newPosition = new Vector3i(event.getPosition());
         final Vector3i oldPosition = new Vector3i(new Vector3f(event.getPosition()).sub(event.getDelta()));
-        // LOGGER.info("Test extra data for this position is "+worldProvider.getExtraData("test", oldPosition.x , oldPosition.y , oldPosition.z));
         LOGGER.info("moved into " + worldProvider.getExtraData("BiomesAPI.biomeHash", oldPosition.x, oldPosition.y, oldPosition.z));
         if (!newPosition.equals(oldPosition)) {
             final Optional<Biome> newBiomeOptional = getBiome(newPosition);
@@ -153,11 +149,10 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
             }
 
             Biome newBiome = newBiomeOptional.get();
-            //metricsMode.setBiome(newBiome.getId());
             Biome oldBiome = oldBiomeOptional.get();
             if (oldBiome != newBiome) {
                 entity.send(new OnBiomeChangedEvent(oldBiome, newBiome));
-                metricsMode.setBiome("biome is " + newBiome.getId());
+                metricsMode.setBiome(newBiome.getId());
             }
         }
     }

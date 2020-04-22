@@ -167,6 +167,7 @@ public interface WorldProviderCore {
 
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
+     * Do not use this method with world gen code, pass the chunk as an argument instead.
      *
      * @param index The index of the extra data field
      * @param pos
@@ -175,6 +176,15 @@ public interface WorldProviderCore {
      */
     int setExtraData(int index, Vector3i pos, int value);
 
+    /**
+     * Sets one of the per-block custom data values at the given position, if it is within the view.
+     *
+     * @param index The index of the extra data field
+     * @param chunk The chunk in which the block is present
+     * @param pos Chunk relative position of the block
+     * @param value
+     * @return The replaced value
+     */
     int setExtraData(int index, CoreChunk chunk, Vector3i pos, int value);
 
     /**
