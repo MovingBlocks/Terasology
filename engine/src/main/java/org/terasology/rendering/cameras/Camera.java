@@ -23,11 +23,10 @@ import org.joml.Vector3fc;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
-
-import static org.terasology.math.JomlUtil.from;
 
 /**
  * Provides global access to fonts.
@@ -40,13 +39,13 @@ import static org.terasology.math.JomlUtil.from;
  */
 public abstract class Camera {
 
-    protected static final Vector3fc FORWARD = from(Direction.FORWARD.getVector3f());
+    protected static final Vector3fc FORWARD = JomlUtil.from(Direction.FORWARD.getVector3f());
 
     /* CAMERA PARAMETERS */
     protected final Vector3f position = new Vector3f(0, 0, 0);
-    protected final Vector3f up = from(Direction.UP.getVector3f());
+    protected final Vector3f up = JomlUtil.from(Direction.UP.getVector3f());
     protected final Vector3f viewingDirection = new Vector3f(FORWARD);
-    protected final Vector3f viewingAxis = from(Direction.LEFT.getVector3f());
+    protected final Vector3f viewingAxis = JomlUtil.from(Direction.LEFT.getVector3f());
     protected float viewingAngle;
 
     protected float zNear = 0.1f;
@@ -214,11 +213,11 @@ public abstract class Camera {
      * @return the orientation
      */
     public Quat4f getOrientation() {
-        return new Quat4f(from(viewingAxis), viewingAngle);
+        return new Quat4f(JomlUtil.from(viewingAxis), viewingAngle);
     }
 
     public void setOrientation(Quat4f orientation) {
-        Quaternionf newOrientation = from(orientation);
+        Quaternionf newOrientation = JomlUtil.from(orientation);
         newOrientation.transform(FORWARD, viewingDirection);
         AxisAngle4f axisAngle = new AxisAngle4f(newOrientation);
         viewingAxis.set(axisAngle.x, axisAngle.y, axisAngle.z);
