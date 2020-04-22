@@ -47,7 +47,6 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     private PerspectiveCameraSettings cameraSettings;
 
-    private final Vector3f viewingDirection = new Vector3f(0f, 0f, 1f);
     private float bobbingRotationOffsetFactor;
     private float bobbingVerticalOffsetFactor;
     private float cachedBobbingRotationOffsetFactor;
@@ -90,7 +89,6 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     @Override
     public void update(float deltaT) {
-        viewingDirection.set(getViewingDirection());
         applyCinematicEffect();
 
         super.update(deltaT);
@@ -108,7 +106,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         }
 
         position.set(calculateVector(previousPositions));
-        setViewingDirection(calculateVector(previousViewingDirections));
+        viewingDirection.set(calculateVector(previousViewingDirections));
     }
 
     private Vector3f calculateVector(Deque<Vector3f> vectors) {

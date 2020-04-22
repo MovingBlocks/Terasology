@@ -19,6 +19,7 @@ import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
@@ -39,10 +40,13 @@ import static org.terasology.math.JomlUtil.from;
  */
 public abstract class Camera {
 
+    protected static final Vector3fc FORWARD = from(Direction.FORWARD.getVector3f());
+
     /* CAMERA PARAMETERS */
     protected final Vector3f position = new Vector3f(0, 0, 0);
     protected final Vector3f up = from(Direction.UP.getVector3f());
-    protected Vector3f viewingAxis = from(Direction.LEFT.getVector3f());
+    protected final Vector3f viewingDirection = new Vector3f(FORWARD);
+    protected final Vector3f viewingAxis = from(Direction.LEFT.getVector3f());
     protected float viewingAngle;
 
     protected float zNear = 0.1f;
@@ -201,18 +205,8 @@ public abstract class Camera {
         return position;
     }
 
-    public Vector3f  getViewingDirection() {
-        Quaternionf rotation = new Quaternionf().fromAxisAngleRad(viewingAxis, viewingAngle);
-        return from(Direction.FORWARD.getVector3f()).rotate(rotation);
-    }
-
-    /**
-     * Sets viewing direction of the camera.
-     * @param direction new viewing direction
-     */
-    public void setViewingDirection(Vector3f direction) {
-        Quaternionf orientation = new Quaternionf().lookAlong(direction, new Vector3f(0, 1, 0));
-        setOrientation(from(orientation));
+    public Vector3f getViewingDirection() {
+        return viewingDirection;
     }
 
     /**
@@ -224,7 +218,9 @@ public abstract class Camera {
     }
 
     public void setOrientation(Quat4f orientation) {
-        AxisAngle4f axisAngle = new AxisAngle4f(from(orientation));
+        Quaternionf newOrientation = from(orientation);
+        newOrientation.transform(FORWARD, viewingDirection);
+        AxisAngle4f axisAngle = new AxisAngle4f(newOrientation);
         viewingAxis.set(axisAngle.x, axisAngle.y, axisAngle.z);
         viewingAngle = axisAngle.angle;
     }

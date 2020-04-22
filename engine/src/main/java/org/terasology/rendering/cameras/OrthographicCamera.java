@@ -16,7 +16,6 @@
 package org.terasology.rendering.cameras;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.MatrixUtils;
 
@@ -83,7 +82,6 @@ public class OrthographicCamera extends Camera {
     @Override
     public void updateMatrices(float fov) {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
-        Vector3f viewingDirection = getViewingDirection();
 
         // Nothing to do...
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
