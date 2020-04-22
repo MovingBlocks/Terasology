@@ -85,8 +85,14 @@ public final class EnvironmentSwitchHandler {
             }
         }
 
-        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        //TODO: find a permanent fix over just creating a new typehandler
+        // https://github.com/Terasology/JoshariasSurvival/issues/31
+        // TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        // typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager,typeRegistry);
         typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         // Entity System Library
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
