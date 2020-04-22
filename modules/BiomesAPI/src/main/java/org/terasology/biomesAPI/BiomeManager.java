@@ -85,14 +85,15 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
     public void setBiome(Biome biome, int x, int y, int z) {
         Preconditions.checkArgument(biomeMap.containsKey(biome.biomeHash()), "Trying to use non-registered biome!");
         worldProvider.setExtraData("BiomesAPI.biomeHash", x, y, z, biome.biomeHash());
-        // worldProvider.setExtraData("test",x,y,z,123);
         // LOGGER.info("BiomesAPI.biomeHash," +x+"," +y+"," +z+","+ biome.biomeHash());
-        metricsMode.setBiome(x + "," + y + "," + z + " rendered, belongs to " + biome.getId() + " with hash " + biome.biomeHash());
+        // metricsMode.setBiome(x + "," + y + "," + z + " rendered, belongs to " + biome.getId() + " with hash " + biome.biomeHash());
     }
 
     @Override
     public void setBiome(Biome biome, CoreChunk chunk, int relX, int relY, int relZ) {
-        setBiome(biome, chunk.chunkToWorldPosition(relX, relY, relZ));
+        Preconditions.checkArgument(biomeMap.containsKey(biome.biomeHash()), "Trying to use non-registered biome!");
+        worldProvider.setExtraData("BiomesAPI.biomeHash", chunk, new Vector3i(relX, relY, relZ), biome.biomeHash());
+        //setBiome(biome, chunk.chunkToWorldPosition(relX, relY, relZ));
     }
 
     @Override
@@ -102,7 +103,8 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
 
     @Override
     public void setBiome(Biome biome, CoreChunk chunk, Vector3i pos) {
-        setBiome(biome, chunk.chunkToWorldPosition(pos));
+        Vector3i p = chunk.chunkToWorldPosition(pos);
+        setBiome(biome, chunk, p.x, p.y, p.z);
     }
 
     @Override
@@ -151,10 +153,11 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
             }
 
             Biome newBiome = newBiomeOptional.get();
+            //metricsMode.setBiome(newBiome.getId());
             Biome oldBiome = oldBiomeOptional.get();
             if (oldBiome != newBiome) {
                 entity.send(new OnBiomeChangedEvent(oldBiome, newBiome));
-                metricsMode.setBiome("worked maybe ,biome is " + newBiome.getId());
+                metricsMode.setBiome("biome is " + newBiome.getId());
             }
         }
     }

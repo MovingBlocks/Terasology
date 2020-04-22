@@ -21,6 +21,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.time.WorldTime;
 
 import java.util.Collection;
@@ -114,7 +115,7 @@ public interface WorldProviderCore {
      */
     default Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
         Map<Vector3i, Block> resultMap = Maps.newHashMap();
-        for (Map.Entry<Vector3i, Block> entry: blocks.entrySet()) {
+        for (Map.Entry<Vector3i, Block> entry : blocks.entrySet()) {
             Block oldBlock = setBlock(entry.getKey(), entry.getValue());
             resultMap.put(entry.getKey(), oldBlock);
         }
@@ -152,7 +153,7 @@ public interface WorldProviderCore {
     byte getSunlight(int x, int y, int z);
 
     byte getTotalLight(int x, int y, int z);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -163,7 +164,7 @@ public interface WorldProviderCore {
      * @return The (index)th extra-data value at the given position
      */
     int getExtraData(int index, int x, int y, int z);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -173,6 +174,8 @@ public interface WorldProviderCore {
      * @return The replaced value
      */
     int setExtraData(int index, Vector3i pos, int value);
+
+    int setExtraData(int index, CoreChunk chunk, Vector3i pos, int value);
 
     /**
      * Disposes this world provider.

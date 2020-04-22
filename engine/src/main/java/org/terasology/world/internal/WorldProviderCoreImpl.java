@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ *
  */
 public class WorldProviderCoreImpl implements WorldProviderCore {
 
@@ -249,7 +250,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
         return result;
     }
-    
+
     private void setDirtyChunksNear(Vector3i pos0) {
         for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(pos0, 1)) {
             RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
@@ -268,7 +269,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
         }
     }
-    
+
     private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
         // TODO: Change to match block , if those changes are made.
         synchronized (listeners) {
@@ -333,6 +334,22 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     public int setExtraData(int index, Vector3i worldPos, int value) {
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        if (chunk != null) {
+            Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
+            int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);
+            chunk.setExtraData(index, blockPos.x, blockPos.y, blockPos.z, value);
+            if (oldValue != value) {
+                setDirtyChunksNear(worldPos);
+                notifyExtraDataChanged(index, worldPos, value, oldValue);
+            }
+            return oldValue;
+        }
+        return 0;
+    }
+
+    @Override
+    public int setExtraData(int index, CoreChunk chunk, Vector3i worldPos, int value) {
+        Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         if (chunk != null) {
             Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
             int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);

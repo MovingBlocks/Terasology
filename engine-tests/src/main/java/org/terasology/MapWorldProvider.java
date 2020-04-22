@@ -24,6 +24,7 @@ import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.generation.impl.EntityBufferImpl;
@@ -154,6 +155,11 @@ public class MapWorldProvider implements WorldProviderCore {
     
     @Override
     public int setExtraData(int index, Vector3i pos, int value) {
+        return 0;
+    }
+
+    @Override
+    public int setExtraData(int index, CoreChunk chunk, Vector3i pos, int value) {
         return 0;
     }
     
