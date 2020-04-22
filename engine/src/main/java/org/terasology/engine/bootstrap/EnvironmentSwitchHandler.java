@@ -32,11 +32,7 @@ import org.terasology.entitySystem.prefab.internal.PrefabDeltaFormat;
 import org.terasology.entitySystem.prefab.internal.PrefabFormat;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.persistence.typeHandling.RegisterTypeHandler;
-import org.terasology.persistence.typeHandling.RegisterTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerFactory;
-import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.*;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
@@ -85,8 +81,14 @@ public final class EnvironmentSwitchHandler {
             }
         }
 
-        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        //TODO: find a permanent fix over just creating a new typehandler
+        // https://github.com/Terasology/JoshariasSurvival/issues/31
+        // TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        // typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager,typeRegistry);
         typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         // Entity System Library
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);

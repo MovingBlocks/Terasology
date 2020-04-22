@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.players;
 
-import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -23,12 +22,11 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.openvrprovider.ControllerListener;
 
 /**
  * Only used by the client side so that held items can be positioned in line with the camera
  */
-public class FirstPersonHeldItemMountPointComponent implements Component, ControllerListener {
+public class FirstPersonHeldItemMountPointComponent implements Component {
 
     @Owns
     public EntityRef mountPointEntity = EntityRef.NULL;
@@ -56,18 +54,6 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
      */
     public boolean isTracked() {
         return trackingDataReceived;
-    }
-    
-    /**
-     * A callback target for the controller listener. This callback triggers when a button is pressed on the controllers.
-     * It's currently ignored by this class. This method and the below method are both designed to be called in their
-     * roles as listeners, and not really part of the public interface of this class.
-     * @param stateBefore - the state before the state change.
-     * @param stateAfter - the state after the state change.
-     * @param nController - the hand index, 0 for left and 1 for right.
-     */
-    public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController) {
-        // nothing for now
     }
 
     /**
