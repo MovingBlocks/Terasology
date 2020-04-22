@@ -85,8 +85,11 @@ public final class EnvironmentSwitchHandler {
             }
         }
 
-        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        // Resolved typeHandler bug with inventory disappearing
+        // https://github.com/Terasology/JoshariasSurvival/issues/31
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager,typeRegistry);
         typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         // Entity System Library
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
