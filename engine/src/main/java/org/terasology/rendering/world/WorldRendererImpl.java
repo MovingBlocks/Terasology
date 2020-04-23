@@ -33,6 +33,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayerSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -217,6 +218,13 @@ public final class WorldRendererImpl implements WorldRenderer {
             // Switch module's context from gamecreation subcontext to gamerunning context
             renderingModuleRegistry.updateModulesContext(context);
         }
+        /*
+        TODO: work out where to put this.
+
+        renderGraph.connect(opaqueObjectsNode, overlaysNode);
+        renderGraph.connect(opaqueBlocksNode, overlaysNode);
+        renderGraph.connect(alphaRejectBlocksNode, overlaysNode);
+        */
 
         for (ModuleRendering moduleRenderingInstance : renderingModuleRegistry.getOrderedRenderingModules()) {
             if (moduleRenderingInstance.isEnabled()) {
@@ -236,9 +244,11 @@ public final class WorldRendererImpl implements WorldRenderer {
         blurredAmbientOcclusionNode.addOutputFboConnection(1);
         renderGraph.addNode(blurredAmbientOcclusionNode);
 
+
         Node prePostCompositeNode = new DummyNode("prePostCompositeNode", context);
         renderGraph.addNode(prePostCompositeNode);
         */
+
     }
 
 
@@ -303,7 +313,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.
         if (isFirstRenderingStageForCurrentFrame) {
-            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
+            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(JomlUtil.from(playerCamera.getPosition())), secondsSinceLastFrame);
 
             playerCamera.update(secondsSinceLastFrame);
 

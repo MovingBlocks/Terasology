@@ -16,9 +16,9 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -54,11 +54,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
@@ -71,7 +71,7 @@ public class PojoEntityManagerTest {
     private PojoEntityManager entityManager;
     private Prefab prefab;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() throws Exception {
         context = new ContextImpl();
         ModuleManager moduleManager = ModuleManagerFactory.create();
@@ -85,7 +85,7 @@ public class PojoEntityManagerTest {
         CoreRegistry.setContext(context);
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.put(NetworkSystem.class, mock(NetworkSystem.class));
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
@@ -386,7 +386,6 @@ public class PojoEntityManagerTest {
     @Test
     public void testDestructionOfUnloadedEntitiesPrevented() {
         EntityRef entity = entityManager.create();
-        long id = entity.getId();
         entityManager.deactivateForStorage(entity);
         assertTrue(entity.exists());
         entity.destroy();

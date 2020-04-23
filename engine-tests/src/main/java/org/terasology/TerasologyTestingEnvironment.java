@@ -19,9 +19,9 @@ package org.terasology;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
@@ -68,7 +68,7 @@ public abstract class TerasologyTestingEnvironment {
     protected EngineTime mockTime;
     private EngineEntityManager engineEntityManager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupEnvironment() throws Exception {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
@@ -83,7 +83,7 @@ public abstract class TerasologyTestingEnvironment {
 
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         context.put(ModuleManager.class, moduleManager);
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
@@ -125,7 +125,7 @@ public abstract class TerasologyTestingEnvironment {
         context.put(Console.class, new ConsoleImpl(context));
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
         env.close();
     }

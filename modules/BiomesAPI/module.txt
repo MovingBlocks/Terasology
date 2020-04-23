@@ -1,10 +1,11 @@
 {
     "id" : "BiomesAPI",
-    "version" : "1.0.0-SNAPSHOT",
+    "version" : "3.1.1",
     "author" : "",
     "displayName" : "BiomesAPI",
     "description" : "Provides API for working with biomes - thematical sections of world. Previously part of engine.",
     "dependencies" : [],
     "serverSideOnly" : false,
-    "isLibrary": true
+    "isLibrary" : true,
+    "isReleaseManaged" : true
 }

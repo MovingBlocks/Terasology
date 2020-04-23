@@ -16,7 +16,7 @@
 package org.terasology.persistence.typeHandling.extensionTypes.factories;
 
 import com.google.common.collect.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.Asset;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StreamingSound;
@@ -30,7 +30,7 @@ import org.terasology.rendering.nui.asset.UIElement;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AssetTypeHandlerFactoryTest {
     @Test

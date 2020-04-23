@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.logic;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -167,7 +168,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     }
 
     private void renderEntitiesByMaterial(SetMultimap<Material, EntityRef> meshByMaterial) {
-        Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
+        Vector3f cameraPosition = JomlUtil.from(worldRenderer.getActiveCamera().getPosition());
 
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
@@ -190,7 +191,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                     LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                    if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null || !isRelevant(entity, location.getWorldPosition())) {
+                    if (isHidden(entity, meshComp) || location == null || Float.isNaN(location.getWorldPosition().x)|| meshComp.mesh == null || !isRelevant(entity, location.getWorldPosition())) {
                         continue;
                     }
                     if (meshComp.mesh.isDisposed()) {
@@ -218,7 +219,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                             lastMesh.preRender();
                         }
 
-                        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+                        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
                         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
                         MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
 

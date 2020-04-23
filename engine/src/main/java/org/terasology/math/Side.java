@@ -40,78 +40,78 @@ public enum Side {
 
     private static final EnumSet<Side> ALL_SIDES = EnumSet.allOf(Side.class);
 
-    private static final EnumMap<Side, Side> reverseMap;
-    private static final ImmutableList<Side> horizontalSides;
-    private static final ImmutableList<Side> verticalSides;
-    private static final EnumMap<Side, Side> clockwiseYawSide;
-    private static final EnumMap<Side, Side> anticlockwiseYawSide;
-    private static final EnumMap<Side, Side> clockwisePitchSide;
-    private static final EnumMap<Side, Side> anticlockwisePitchSide;
-    private static final EnumMap<Side, Side> clockwiseRollSide;
-    private static final EnumMap<Side, Side> anticlockwiseRollSide;
-    private static final EnumMap<Side, Direction> conversionMap;
-    private static final EnumMap<Side, ImmutableList<Side>> tangents;
+    private static final EnumMap<Side, Side> REVERSE_MAP;
+    private static final ImmutableList<Side> HORIZONTAL_SIDES;
+    private static final ImmutableList<Side> VERTICAL_SIDES;
+    private static final EnumMap<Side, Side> CLOCKWISE_YAW_SIDE;
+    private static final EnumMap<Side, Side> ANTICLOCKWISE_YAW_SIDE;
+    private static final EnumMap<Side, Side> CLOCKWISE_PITCH_SIDE;
+    private static final EnumMap<Side, Side> ANTICLOCKWISE_PITCH_SIDE;
+    private static final EnumMap<Side, Side> CLOCKWISE_ROLL_SIDE;
+    private static final EnumMap<Side, Side> ANTICLOCKWISE_ROLL_SIDE;
+    private static final EnumMap<Side, Direction> CONVERSION_MAP;
+    private static final EnumMap<Side, ImmutableList<Side>> TANGENTS;
 
     static {
-        tangents = new EnumMap<>(Side.class);
-        tangents.put(TOP, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
-        tangents.put(BOTTOM, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
-        tangents.put(LEFT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
-        tangents.put(RIGHT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
-        tangents.put(FRONT, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
-        tangents.put(BACK, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
+        TANGENTS = new EnumMap<>(Side.class);
+        TANGENTS.put(TOP, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
+        TANGENTS.put(BOTTOM, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
+        TANGENTS.put(LEFT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
+        TANGENTS.put(RIGHT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
+        TANGENTS.put(FRONT, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
+        TANGENTS.put(BACK, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
 
-        reverseMap = new EnumMap<>(Side.class);
-        reverseMap.put(TOP, BOTTOM);
-        reverseMap.put(LEFT, RIGHT);
-        reverseMap.put(RIGHT, LEFT);
-        reverseMap.put(FRONT, BACK);
-        reverseMap.put(BACK, FRONT);
-        reverseMap.put(BOTTOM, TOP);
+        REVERSE_MAP = new EnumMap<>(Side.class);
+        REVERSE_MAP.put(TOP, BOTTOM);
+        REVERSE_MAP.put(LEFT, RIGHT);
+        REVERSE_MAP.put(RIGHT, LEFT);
+        REVERSE_MAP.put(FRONT, BACK);
+        REVERSE_MAP.put(BACK, FRONT);
+        REVERSE_MAP.put(BOTTOM, TOP);
 
-        conversionMap = new EnumMap<>(Side.class);
-        conversionMap.put(TOP, Direction.UP);
-        conversionMap.put(BOTTOM, Direction.DOWN);
-        conversionMap.put(BACK, Direction.FORWARD);
-        conversionMap.put(FRONT, Direction.BACKWARD);
-        conversionMap.put(RIGHT, Direction.LEFT);
-        conversionMap.put(LEFT, Direction.RIGHT);
+        CONVERSION_MAP = new EnumMap<>(Side.class);
+        CONVERSION_MAP.put(TOP, Direction.UP);
+        CONVERSION_MAP.put(BOTTOM, Direction.DOWN);
+        CONVERSION_MAP.put(BACK, Direction.FORWARD);
+        CONVERSION_MAP.put(FRONT, Direction.BACKWARD);
+        CONVERSION_MAP.put(RIGHT, Direction.LEFT);
+        CONVERSION_MAP.put(LEFT, Direction.RIGHT);
 
-        clockwiseYawSide = new EnumMap<>(Side.class);
-        anticlockwiseYawSide = new EnumMap<>(Side.class);
-        clockwiseYawSide.put(Side.FRONT, Side.LEFT);
-        anticlockwiseYawSide.put(Side.FRONT, Side.RIGHT);
-        clockwiseYawSide.put(Side.RIGHT, Side.FRONT);
-        anticlockwiseYawSide.put(Side.RIGHT, Side.BACK);
-        clockwiseYawSide.put(Side.BACK, Side.RIGHT);
-        anticlockwiseYawSide.put(Side.BACK, Side.LEFT);
-        clockwiseYawSide.put(Side.LEFT, Side.BACK);
-        anticlockwiseYawSide.put(Side.LEFT, Side.FRONT);
+        CLOCKWISE_YAW_SIDE = new EnumMap<>(Side.class);
+        ANTICLOCKWISE_YAW_SIDE = new EnumMap<>(Side.class);
+        CLOCKWISE_YAW_SIDE.put(Side.FRONT, Side.LEFT);
+        ANTICLOCKWISE_YAW_SIDE.put(Side.FRONT, Side.RIGHT);
+        CLOCKWISE_YAW_SIDE.put(Side.RIGHT, Side.FRONT);
+        ANTICLOCKWISE_YAW_SIDE.put(Side.RIGHT, Side.BACK);
+        CLOCKWISE_YAW_SIDE.put(Side.BACK, Side.RIGHT);
+        ANTICLOCKWISE_YAW_SIDE.put(Side.BACK, Side.LEFT);
+        CLOCKWISE_YAW_SIDE.put(Side.LEFT, Side.BACK);
+        ANTICLOCKWISE_YAW_SIDE.put(Side.LEFT, Side.FRONT);
 
-        clockwisePitchSide = Maps.newEnumMap(Side.class);
-        anticlockwisePitchSide = Maps.newEnumMap(Side.class);
-        clockwisePitchSide.put(Side.FRONT, Side.TOP);
-        anticlockwisePitchSide.put(Side.FRONT, Side.BOTTOM);
-        clockwisePitchSide.put(Side.BOTTOM, Side.FRONT);
-        anticlockwisePitchSide.put(Side.BOTTOM, Side.BACK);
-        clockwisePitchSide.put(Side.BACK, Side.BOTTOM);
-        anticlockwisePitchSide.put(Side.BACK, Side.TOP);
-        clockwisePitchSide.put(Side.TOP, Side.BACK);
-        anticlockwisePitchSide.put(Side.TOP, Side.FRONT);
+        CLOCKWISE_PITCH_SIDE = Maps.newEnumMap(Side.class);
+        ANTICLOCKWISE_PITCH_SIDE = Maps.newEnumMap(Side.class);
+        CLOCKWISE_PITCH_SIDE.put(Side.FRONT, Side.TOP);
+        ANTICLOCKWISE_PITCH_SIDE.put(Side.FRONT, Side.BOTTOM);
+        CLOCKWISE_PITCH_SIDE.put(Side.BOTTOM, Side.FRONT);
+        ANTICLOCKWISE_PITCH_SIDE.put(Side.BOTTOM, Side.BACK);
+        CLOCKWISE_PITCH_SIDE.put(Side.BACK, Side.BOTTOM);
+        ANTICLOCKWISE_PITCH_SIDE.put(Side.BACK, Side.TOP);
+        CLOCKWISE_PITCH_SIDE.put(Side.TOP, Side.BACK);
+        ANTICLOCKWISE_PITCH_SIDE.put(Side.TOP, Side.FRONT);
 
-        clockwiseRollSide = Maps.newEnumMap(Side.class);
-        anticlockwiseRollSide = Maps.newEnumMap(Side.class);
-        clockwiseRollSide.put(Side.TOP, Side.LEFT);
-        anticlockwiseRollSide.put(Side.TOP, Side.RIGHT);
-        clockwiseRollSide.put(Side.LEFT, Side.BOTTOM);
-        anticlockwiseRollSide.put(Side.LEFT, Side.TOP);
-        clockwiseRollSide.put(Side.BOTTOM, Side.RIGHT);
-        anticlockwiseRollSide.put(Side.BOTTOM, Side.LEFT);
-        clockwiseRollSide.put(Side.RIGHT, Side.TOP);
-        anticlockwiseRollSide.put(Side.RIGHT, Side.BOTTOM);
+        CLOCKWISE_ROLL_SIDE = Maps.newEnumMap(Side.class);
+        ANTICLOCKWISE_ROLL_SIDE = Maps.newEnumMap(Side.class);
+        CLOCKWISE_ROLL_SIDE.put(Side.TOP, Side.LEFT);
+        ANTICLOCKWISE_ROLL_SIDE.put(Side.TOP, Side.RIGHT);
+        CLOCKWISE_ROLL_SIDE.put(Side.LEFT, Side.BOTTOM);
+        ANTICLOCKWISE_ROLL_SIDE.put(Side.LEFT, Side.TOP);
+        CLOCKWISE_ROLL_SIDE.put(Side.BOTTOM, Side.RIGHT);
+        ANTICLOCKWISE_ROLL_SIDE.put(Side.BOTTOM, Side.LEFT);
+        CLOCKWISE_ROLL_SIDE.put(Side.RIGHT, Side.TOP);
+        ANTICLOCKWISE_ROLL_SIDE.put(Side.RIGHT, Side.BOTTOM);
 
-        horizontalSides = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
-        verticalSides = ImmutableList.of(TOP, BOTTOM);
+        HORIZONTAL_SIDES = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
+        VERTICAL_SIDES = ImmutableList.of(TOP, BOTTOM);
     }
 
     private final Vector3i vector3iDir;
@@ -130,14 +130,14 @@ public enum Side {
      * @return The horizontal sides, for iteration
      */
     public static ImmutableList<Side> horizontalSides() {
-        return horizontalSides;
+        return HORIZONTAL_SIDES;
     }
 
     /**
      * @return The vertical sides, for iteration
      */
     public static ImmutableList<Side> verticalSides() {
-        return verticalSides;
+        return VERTICAL_SIDES;
     }
 
     public static Side inDirection(int x, int y, int z) {
@@ -224,7 +224,7 @@ public enum Side {
      * @return The opposite side to this side.
      */
     public Side reverse() {
-        return reverseMap.get(this);
+        return REVERSE_MAP.get(this);
     }
 
     public Side yawClockwise(int turns) {
@@ -238,11 +238,11 @@ public enum Side {
         steps = steps % 4;
         switch (steps) {
             case 1:
-                return clockwiseYawSide.get(this);
+                return CLOCKWISE_YAW_SIDE.get(this);
             case 2:
-                return reverseMap.get(this);
+                return REVERSE_MAP.get(this);
             case 3:
-                return anticlockwiseYawSide.get(this);
+                return ANTICLOCKWISE_YAW_SIDE.get(this);
             default:
                 return this;
         }
@@ -259,18 +259,18 @@ public enum Side {
         steps = steps % 4;
         switch (steps) {
             case 1:
-                return clockwisePitchSide.get(this);
+                return CLOCKWISE_PITCH_SIDE.get(this);
             case 2:
-                return reverseMap.get(this);
+                return REVERSE_MAP.get(this);
             case 3:
-                return anticlockwisePitchSide.get(this);
+                return ANTICLOCKWISE_PITCH_SIDE.get(this);
             default:
                 return this;
         }
     }
 
     public Direction toDirection() {
-        return conversionMap.get(this);
+        return CONVERSION_MAP.get(this);
     }
 
     public Side rollClockwise(int turns) {
@@ -284,11 +284,11 @@ public enum Side {
         steps = steps % 4;
         switch (steps) {
             case 1:
-                return clockwiseRollSide.get(this);
+                return CLOCKWISE_ROLL_SIDE.get(this);
             case 2:
-                return reverseMap.get(this);
+                return REVERSE_MAP.get(this);
             case 3:
-                return anticlockwiseRollSide.get(this);
+                return ANTICLOCKWISE_ROLL_SIDE.get(this);
             default:
                 return this;
         }
@@ -317,6 +317,6 @@ public enum Side {
     }
 
     public Iterable<Side> tangents() {
-        return tangents.get(this);
+        return TANGENTS.get(this);
     }
 }

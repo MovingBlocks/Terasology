@@ -163,7 +163,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
         if (blockDamageModifierComponent == null || !blockDamageModifierComponent.skipPerBlockEffects) {
             // dust particle effect
             if (entity.hasComponent(LocationComponent.class) && block.isDebrisOnDestroy()) {
-                EntityBuilder dustBuilder = entityManager.newBuilder("core:dustEffect");
+                EntityBuilder dustBuilder = entityManager.newBuilder("CoreAssets:dustEffect");
                 // TODO: particle system stuff should be split out better - this is effectively a stealth dependency on Core from the engine
                 if (dustBuilder.hasComponent(LocationComponent.class)) {
                     dustBuilder.getComponent(LocationComponent.class).setWorldPosition(entity.getComponent(LocationComponent.class).getWorldPosition());

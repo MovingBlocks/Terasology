@@ -15,74 +15,78 @@
  */
 package org.terasology.config.flexible.internal;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import com.google.common.collect.Lists;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.SettingChangeListener;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
-import java.beans.PropertyChangeListener;
+import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(Enclosed.class)
 public class SettingImplTest {
     private static final SimpleUri SETTING_ID = new SimpleUri("engine-tests:TestSetting");
 
-    public static class SetValue {
+    @Nested
+    public class SetValue {
         private Setting<Integer> setting;
 
         private int eventResult;
 
-        @Before
+        @BeforeEach
         public void setUp() {
-            setting = new SettingImpl<>(SETTING_ID,
+            setting = new SettingImpl<>(
                 TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
                     "", "");
 
             eventResult = -1;
 
-            setting.subscribe(propertyChangeEvent -> eventResult = (int) propertyChangeEvent.getNewValue());
+            setting.subscribe((setting1, oldValue) -> eventResult = setting1.get());
         }
 
         @Test
         public void testSetsValue() {
-            assertTrue(setting.setValue(25));
+            assertTrue(setting.set(25));
 
             assertEquals(25, eventResult);
         }
 
         @Test
         public void testDoesNotSetValue() {
-            assertFalse(setting.setValue(101));
+            assertFalse(setting.set(101));
 
             assertEquals(-1, eventResult);
         }
     }
 
-    public static class Subscribers {
+    @Nested
+    public class Subscribers {
         private Setting<Integer> setting;
 
-        private PropertyChangeListener listener;
+        private SettingChangeListener<Integer> listener;
 
         private int eventCallCount;
 
-        @Before
+        @BeforeEach
         public void setUp() {
-            setting = new SettingImpl<>(SETTING_ID,
+            setting = new SettingImpl<>(
                 TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
                     "", "");
 
             eventCallCount = 0;
 
-            listener = propertyChangeEvent -> eventCallCount++;
+            listener = (setting, oldValue) -> eventCallCount++;
         }
 
         @Test
@@ -107,7 +111,7 @@ public class SettingImplTest {
 
             for (int i = 0; i < maxSetValueCount; i++) {
                 int randomInt = random.nextInt(-50, 150);
-                expectedEventCallCount += setting.setValue(randomInt) ? 1 : 0;
+                expectedEventCallCount += setting.set(randomInt) ? 1 : 0;
             }
 
             assertEquals(expectedEventCallCount, eventCallCount);
@@ -118,10 +122,10 @@ public class SettingImplTest {
             final int subscriberCount = 10;
 
             for (int i = 0; i < subscriberCount; i++) {
-                setting.subscribe(propertyChangeEvent -> eventCallCount++);
+                setting.subscribe((setting1, oldValue) -> eventCallCount++);
             }
 
-            setting.setValue(30);
+            setting.set(30);
 
             assertEquals(subscriberCount, eventCallCount);
         }
@@ -130,19 +134,20 @@ public class SettingImplTest {
         public void testUnsubscribe() {
             int subscriberCount = 10;
 
-            PropertyChangeListener[] listeners = new PropertyChangeListener[subscriberCount];
+            List<SettingChangeListener<Integer>> listeners = Lists.newArrayListWithCapacity(subscriberCount);
 
             for (int i = 0; i < subscriberCount; i++) {
-                listeners[i] = propertyChangeEvent -> eventCallCount++;
-                setting.subscribe(listeners[i]);
+                SettingChangeListener<Integer> listener = (setting1, oldValue) -> eventCallCount++;
+                listeners.add(listener);
+                setting.subscribe(listener);
             }
 
             for (int i = 0; i < new FastRandom().nextInt(subscriberCount / 2); i++) {
-                setting.unsubscribe(listeners[i]);
+                setting.unsubscribe(listeners.get(i));
                 subscriberCount--;
             }
 
-            setting.setValue(30);
+            setting.set(30);
 
             assertEquals(subscriberCount, eventCallCount);
         }

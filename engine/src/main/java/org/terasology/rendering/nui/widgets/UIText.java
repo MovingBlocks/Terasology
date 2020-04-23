@@ -23,6 +23,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
@@ -33,7 +34,6 @@ import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.SubRegion;
@@ -45,6 +45,7 @@ import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
+import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
 import org.terasology.utilities.Assets;
 
 import java.awt.Toolkit;
@@ -148,6 +149,23 @@ public class UIText extends WidgetWithOrder {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 dragging = false;
             }
+        }
+
+        /**
+         * Defines what to do when the user double-clicks a mouse button while pointing at the widget. More specifically,
+         * it selects all the text, if there is any.
+         *
+         * @param event The event corresponding to the mouse double-click
+         * @return      Whether a left mouse double-click was successfully detected and handled
+         */
+        @Override
+        public boolean onMouseDoubleClick(NUIMouseDoubleClickEvent event) {
+            if (!getText().isEmpty() && event.getMouseButton() == MouseInput.MOUSE_LEFT){
+                setCursorPosition(getText().length());
+                selectionStart = 0;
+                return true;
+            }
+            return false;
         }
     };
 
@@ -326,7 +344,7 @@ public class UIText extends WidgetWithOrder {
         Font font = canvas.getCurrentStyle().getFont();
         if (isMultiline()) {
             List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x);
-            return font.getSize(lines);
+            return JomlUtil.from(font.getSize(lines));
         } else {
             return new Vector2i(font.getWidth(getText()), font.getLineHeight());
         }

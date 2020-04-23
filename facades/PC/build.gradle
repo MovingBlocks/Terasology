@@ -1,7 +1,7 @@
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
-apply from: "$rootDir/config/gradle/artifactory.gradle"
+apply from: "$rootDir/config/gradle/publish.gradle"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import java.text.SimpleDateFormat;
@@ -30,6 +30,12 @@ ext {
     displayVersion = versionBase
 }
 
+// Adjust as the Gradle 6 upgrade changed this path a bit
+sourceSets {
+    main.java.outputDir = new File("$buildDir/classes")
+    test.java.outputDir = new File("$buildDir/testClasses")
+}
+
 // Base the engine tests on the same version number as the engine
 version = project(':engine').version
 println "PC VERSION: $version"
@@ -38,9 +44,10 @@ println "PC VERSION: $version"
 group = 'org.terasology.facades'
 
 dependencies {
-    compile project(':engine')
+    implementation project(':engine')
+    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
 
-    /* TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
+    // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     // Dependency on CrashReporter, conditionally either from source or via binary
     File wouldBeSrcPath = new File(rootDir, 'libs/CrashReporter')
     println "Scanning for source CrashReporter at: " + wouldBeSrcPath.getAbsolutePath()
@@ -53,19 +60,18 @@ dependencies {
         println "Found the project? " + targetProject
         //compile targetProject
 
-        compile project(':libs:CrashReporter:cr-terasology')
+        implementation project(':libs:CrashReporter:cr-terasology')
     } else {
         println "*** Setting a CrashReporter binary dependency, not present as source"
-        compile group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.0.0'
+        implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.0.0'
     }
-    */
 }
 
 // Instructions for packaging a jar file for the PC facade
 jar {
     manifest {
         //TODO: Maybe later add the engine's version number into here?
-        def manifestClasspath = configurations.runtime.collect { it.getName() }.join(" ")
+        def manifestClasspath = configurations.runtimeClasspath.collect { it.getName() }.join(" ")
         attributes("Main-Class": mainClassName)
         attributes("Class-Path" : manifestClasspath)
         attributes("Implementation-Title": "Terasology-" + project.name)
@@ -82,6 +88,7 @@ configurations {
 
 task game(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application"
+    group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
@@ -91,18 +98,44 @@ task game(type:JavaExec) {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
+    args "-homedir"
+    jvmArgs ["-Xmx1536m"]
+
+    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
+    classpath sourceSets.main.output.classesDirs
+    classpath sourceSets.main.output.resourcesDir
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').sourceSets.main.output.resourcesDir
+    classpath project(':engine').configurations.runtimeClasspath
+}
+
+task profile(type:JavaExec) {
+    description = "Run 'Terasology' to play the game as a standard PC application (with Java FlightRecorder profiling)"
+    group = "terasology run"
+
+    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
+    dependsOn rootProject.extractNatives
+    dependsOn rootProject.moduleClasses
+    dependsOn classes
+
+    // Run arguments
+    jvmArgs = ["-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"]
+    main = mainClassName
+    workingDir = rootDir
     String[] runArgs = ["-homedir"]
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath sourceSets.main.output.classesDir
+    classpath sourceSets.main.output.classesDirs
     classpath sourceSets.main.output.resourcesDir
-    classpath project(':engine').sourceSets.main.output.classesDir
-    classpath project(':engine').configurations.runtime
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').sourceSets.main.output.resourcesDir
+    classpath project(':engine').configurations.runtimeClasspath
 }
 
 task debug(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application (in debug mode)"
+    group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
@@ -110,22 +143,23 @@ task debug(type:JavaExec) {
     dependsOn classes
 
     // Run arguments
-    jvmArgs = ["-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"]
+    jvmArgs = ["-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"]
     main = mainClassName
     workingDir = rootDir
     String[] runArgs = ["-homedir"]
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath sourceSets.main.output.classesDir
+    classpath sourceSets.main.output.classesDirs
     classpath sourceSets.main.output.resourcesDir
-    classpath project(':engine').sourceSets.main.output.classesDir
-    classpath project(':engine').configurations.runtime
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').sourceSets.main.output.resourcesDir
+    classpath project(':engine').configurations.runtimeClasspath
 }
 
 // By delaying this task to doLast (the << bit) we don't get the headless server dir set up unless actually wanting it
 // TODO: This is not the Gradle Way. Needs more declared output-fu to determine up-to-date instead of the if
-task setupServerConfig() << {
+task setupServerConfig {
     description "Parses parameters passed via Gradle and writes them to the local run-from-source server dir's config.cfg"
 
     def json = new JsonBuilder()
@@ -161,7 +195,7 @@ task setupServerConfig() << {
 }
 
 // TODO: Seems to always be up to date so no modules get copied
-task setupServerModules(type: Sync) << {
+task setupServerModules(type: Sync) {
     description 'Parses "extraModules" - a comma-separated list of modules and puts them into ' + localServerDataPath
 
     if (project.hasProperty('extraModules')) {
@@ -181,6 +215,7 @@ task setupServerModules(type: Sync) << {
 // TODO: Make a task to reset server / game data
 task server(type:JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
+    group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
@@ -194,12 +229,14 @@ task server(type:JavaExec) {
     workingDir = rootDir
     String[] runArgs = ["-headless", "-homedir=$localServerDataPath"]
     args runArgs
+    jvmArgs ["-Xmx1536"]
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath sourceSets.main.output.classesDir
+    classpath sourceSets.main.output.classesDirs
     classpath sourceSets.main.output.resourcesDir
-    classpath project(':engine').sourceSets.main.output.classesDir
-    classpath project(':engine').configurations.runtime
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').sourceSets.main.output.resourcesDir
+    classpath project(':engine').configurations.runtimeClasspath
 }
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
@@ -224,6 +261,7 @@ task copyCreditsFile(type: Copy) {
 // Main application dist target. Does NOT include any modules.
 task distApp (type: Sync) {
     description = "Creates an application package for distribution"
+    group = "terasology dist"
 
     dependsOn createVersionFile
     dependsOn copyCreditsFile
@@ -248,7 +286,7 @@ task distApp (type: Sync) {
     from("$buildDir/$versionFileName") {}
 
     into(subDirLibs) {
-        from configurations.runtime
+        from configurations.runtimeClasspath
         from project(':engine').jar
         from ("$buildDir/libs") {
             include "*.jar"
@@ -277,6 +315,7 @@ task distModules (type: Sync) {
 }
 
 task distPCZip (type: Zip) {
+    group = "terasology dist"
     dependsOn distApp
     dependsOn distModules
     from "$distsDir/app"
@@ -284,6 +323,7 @@ task distPCZip (type: Zip) {
 }
 
 task distForLauncher (type: Sync) {
+    group = "terasology dist"
 
     into rootDirDist
     from distPCZip

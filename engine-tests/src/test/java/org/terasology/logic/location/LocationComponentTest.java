@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.location;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -25,7 +25,7 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.testUtil.TeraAssert;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +43,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
     Quat4f yawPitch;
     long nextFakeEntityId = 1;
 
-    @Before
+    @BeforeEach
     public void setup() {
         loc = new LocationComponent();
         entity = createFakeEntityWith(loc);

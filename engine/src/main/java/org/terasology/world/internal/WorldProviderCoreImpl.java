@@ -28,6 +28,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;

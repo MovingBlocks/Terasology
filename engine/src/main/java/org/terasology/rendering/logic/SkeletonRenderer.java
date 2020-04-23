@@ -35,6 +35,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector3f;
@@ -209,7 +210,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
     @Override
     public void renderOpaque() {
-        Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
+        Vector3f cameraPosition = JomlUtil.from(worldRenderer.getActiveCamera().getPosition());
 
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
@@ -258,7 +259,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
             Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
 
-            Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+            Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
             MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
             skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
@@ -304,7 +305,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     public void renderOverlay() {
         if (config.getRendering().getDebug().isRenderSkeletons()) {
             glDisable(GL_DEPTH_TEST);
-            Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
+            Vector3f cameraPosition = JomlUtil.from(worldRenderer.getActiveCamera().getPosition());
             Material material = Assets.getMaterial("engine:white").get();
             material.setFloat("sunlight", 1.0f, true);
             material.setFloat("blockLight", 1.0f, true);
@@ -326,7 +327,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 float worldScale = location.getWorldScale();
                 Matrix4f matrixCameraSpace = new Matrix4f(new Quat4f(0, 0, 0, 1), worldPositionCameraSpace, worldScale);
 
-                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
+                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
                 MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
                 material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);

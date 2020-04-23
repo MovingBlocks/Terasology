@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 
 import org.junit.Test;
 import org.terasology.context.Context;
+import org.junit.jupiter.api.Test;
 import org.terasology.engine.SimpleUri;
 import org.terasology.naming.Name;
 import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
@@ -33,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RenderTaskListGeneratorTest {
 

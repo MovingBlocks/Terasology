@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
@@ -99,6 +100,6 @@ public class UILabel extends CoreWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Font font = canvas.getCurrentStyle().getFont();
         List<String> lines = TextLineBuilder.getLines(font, getText(), areaHint.x);
-        return font.getSize(lines);
+        return JomlUtil.from(font.getSize(lines));
     }
 }

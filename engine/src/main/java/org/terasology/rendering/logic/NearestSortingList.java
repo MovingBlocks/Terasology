@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.DistanceComparator;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.rendering.cameras.Camera;
 
 import java.util.Collections;
@@ -433,7 +434,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
          * with the other operations on this container.
          */
         private void sort() {
-            comparator.setOrigin(originCamera.getPosition());
+            comparator.setOrigin(JomlUtil.from(originCamera.getPosition()));
             if (!commands.isEmpty()) {
                 logger.warn("The commands list was not emptied properly!");
                 commands.clear();

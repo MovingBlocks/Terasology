@@ -45,7 +45,6 @@ public class WorldCommands extends BaseComponentSystem {
         int worldCount = entityManager.getWorldPools().size();
         StringBuilder message = new StringBuilder();
         message.append("Number of worlds is " + worldCount + "\n");
-        Map<EngineEntityPool, Long> poolCounts = entityManager.getPoolCounts();
         for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
             message.append("Pool for " + entry.getKey().getTitle() + " has " + entry.getValue().getActiveEntityCount() + " entities \n");
         }

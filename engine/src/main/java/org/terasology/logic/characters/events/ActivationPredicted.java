@@ -76,7 +76,7 @@ public class ActivationPredicted extends AbstractConsumableEvent {
 
     public Vector3f getTargetLocation() {
         LocationComponent loc = target.getComponent(LocationComponent.class);
-        if (loc != null) {
+        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
             return loc.getWorldPosition();
         }
         return null;
@@ -84,7 +84,7 @@ public class ActivationPredicted extends AbstractConsumableEvent {
 
     public Vector3f getInstigatorLocation() {
         LocationComponent loc = instigator.getComponent(LocationComponent.class);
-        if (loc != null) {
+        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
             return loc.getWorldPosition();
         }
         return new Vector3f();

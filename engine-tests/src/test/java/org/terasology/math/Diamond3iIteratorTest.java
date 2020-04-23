@@ -18,16 +18,17 @@ package org.terasology.math;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.Iterator;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
+ *
  */
 public class Diamond3iIteratorTest {
 
@@ -44,9 +45,9 @@ public class Diamond3iIteratorTest {
                 new Vector3i(0, -1, 0), new Vector3i(0, 0, 1), new Vector3i(0, 0, -1));
         while (iter.hasNext()) {
             Vector3i next = iter.next();
-            assertTrue("Received Unexpected: " + next, expected.remove(next));
+            assertTrue(expected.remove(next), () -> "Received Unexpected: " + next);
         }
-        assertTrue("Missing: " + expected, expected.isEmpty());
+        assertTrue(expected.isEmpty(), () -> "Missing: " + expected);
     }
 
     @Test
@@ -63,7 +64,7 @@ public class Diamond3iIteratorTest {
         Set<Vector3i> iter = Sets.newHashSet(Diamond3iIterator.iterateAtDistance(new Vector3i(), 3));
         assertEquals(38, iter.size());
         for (Vector3i pos : iter) {
-            assertTrue(pos.gridDistance(new Vector3i()) == 3);
+            assertEquals(3, pos.gridDistance(new Vector3i()));
         }
     }
 }

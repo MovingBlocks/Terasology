@@ -49,13 +49,13 @@ public class SolidRasterizer implements WorldRasterizer {
     public void initialize() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         biomeRegistry = CoreRegistry.get(BiomeRegistry.class);
-        stone = blockManager.getBlock("core:stone");
-        water = blockManager.getBlock("core:water");
-        ice = blockManager.getBlock("core:Ice");
-        sand = blockManager.getBlock("core:Sand");
-        grass = blockManager.getBlock("core:Grass");
-        snow = blockManager.getBlock("core:Snow");
-        dirt = blockManager.getBlock("core:Dirt");
+        stone = blockManager.getBlock("CoreBlocks:Stone");
+        water = blockManager.getBlock("CoreBlocks:Water");
+        ice = blockManager.getBlock("CoreBlocks:Ice");
+        sand = blockManager.getBlock("CoreBlocks:Sand");
+        grass = blockManager.getBlock("CoreBlocks:Grass");
+        snow = blockManager.getBlock("CoreBlocks:Snow");
+        dirt = blockManager.getBlock("CoreBlocks:Dirt");
     }
 
     @Override

@@ -40,8 +40,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.utilities.gson.legacy.LegacyVector3fTypeAdapter;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
-import org.terasology.utilities.gson.Vector4fTypeAdapter;
+import org.terasology.utilities.gson.legacy.LegacyVector4fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyLibrary;
@@ -81,8 +82,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new AssetTypeAdapterFactory(assetManager))
                 .registerTypeAdapter(BlockFamilyDefinitionData.class, new BlockFamilyDefinitionDataHandler())
-                .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
-                .registerTypeAdapter(Vector4f.class, new Vector4fTypeAdapter())
+                .registerTypeAdapter(Vector3f.class, new LegacyVector3fTypeAdapter())
+                .registerTypeAdapter(Vector4f.class, new LegacyVector4fTypeAdapter())
                 .registerTypeAdapter(Class.class, new BlockFamilyHandler())
                 .create();
     }

@@ -15,15 +15,17 @@
  */
 package org.terasology.logic.debug;
 
+import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.characters.CharacterImpulseEvent;
-import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
-import org.terasology.logic.characters.GazeMountPointComponent;
+import org.terasology.logic.characters.CharacterImpulseEvent;
 import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
@@ -57,6 +59,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
+    
+    @In
+    private Config config; 
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -233,28 +238,61 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
+    private float getJumpSpeed(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.74f) * 0.4f * defaultValue + 0.6f * defaultValue;
+    }
+
+    private float getInteractionRange(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.62f) * defaultValue;
+    }
+
+    private float getRunFactor(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.68f) * defaultValue;
+    }
+
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String playerHeight(@Sender EntityRef client, @CommandParam("height") float amount) {
-        try {
-            ClientComponent clientComp = client.getComponent(ClientComponent.class);
-            CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
-            if (move != null) {
-                float prevHeight = move.height;
-                move.height = amount;
-                clientComp.character.saveComponent(move);
-                LocationComponent loc = client.getComponent(LocationComponent.class);
-                Vector3f currentPosition = loc.getWorldPosition();
-                clientComp.character
-                        .send(new CharacterTeleportEvent(new Vector3f(currentPosition.getX(), currentPosition.getY() + (amount - prevHeight) / 2, currentPosition.getZ())));
-                physics.removeCharacterCollider(clientComp.character);
-                physics.getCharacterCollider(clientComp.character);
-                return "Height of player set to " + amount + " (was " + prevHeight + ")";
+        if (amount >= 1 && amount <= 25) {
+            try {
+                ClientComponent clientComp = client.getComponent(ClientComponent.class);
+                CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
+                CharacterComponent charComp = clientComp.character.getComponent(CharacterComponent.class);
+                EntityRef player = clientComp.character;
+                GazeMountPointComponent gazeMountPointComponent = player.getComponent(GazeMountPointComponent.class);
+
+                Prefab playerDefaults = Assets.getPrefab("engine:player").get();
+                CharacterMovementComponent moveDefault = playerDefaults.getComponent(CharacterMovementComponent.class);
+                CharacterComponent characterDefault = playerDefaults.getComponent(CharacterComponent.class);
+
+                if (move != null && gazeMountPointComponent != null) {
+                    float prevHeight = move.height;
+                    float defaultEyeHeight = config.getPlayer().getEyeHeight();
+                    float foreHeadSize = moveDefault.height - defaultEyeHeight;
+                    float ratio = amount / moveDefault.height;
+
+                    move.height = amount;
+                    move.jumpSpeed = getJumpSpeed(ratio, moveDefault.jumpSpeed);
+                    move.stepHeight = ratio * moveDefault.stepHeight;
+                    move.distanceBetweenFootsteps = ratio * moveDefault.distanceBetweenFootsteps;
+                    move.runFactor = getRunFactor(ratio, moveDefault.runFactor);
+                    charComp.interactionRange = getInteractionRange(ratio, characterDefault.interactionRange);
+                    gazeMountPointComponent.translate.y = amount - foreHeadSize;
+                    Location.removeChild(player, gazeMountPointComponent.gazeEntity);
+                    Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+
+                    player.saveComponent(gazeMountPointComponent);
+                    clientComp.character.saveComponent(move);
+
+                    return "Height of player set to " + amount + " (was " + prevHeight + ")";
+                }
+                return "";
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                return "";
             }
-            return "";
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            return "";
+        } else {
+            return "Invalid input. Accepted values: [1 to 25]";
         }
     }
 

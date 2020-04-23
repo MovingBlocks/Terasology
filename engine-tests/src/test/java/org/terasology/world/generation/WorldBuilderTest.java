@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.math.Region3i;
@@ -23,9 +23,9 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.facets.base.BaseFacet3D;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WorldBuilderTest {
 

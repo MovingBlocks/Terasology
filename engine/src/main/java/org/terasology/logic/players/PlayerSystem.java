@@ -164,6 +164,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     private void restoreCharacter(EntityRef entity, EntityRef character) {
 
         Client clientListener = networkSystem.getOwner(entity);
+        System.out.println(clientListener);
         updateRelevanceEntity(entity, clientListener.getViewDistance().getChunkDistance());
 
         ClientComponent client = entity.getComponent(ClientComponent.class);
@@ -212,17 +213,20 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = {ClientComponent.class})
     public void setSpawnLocationOnRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
-        EntityRef clientInfo = entity.getComponent(ClientComponent.class).clientInfo;
+        ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
+        EntityRef character = clientComponent.character;
+        EntityRef clientInfo = clientComponent.clientInfo;
+
         Vector3f spawnPosition;
         if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
             spawnPosition = clientInfo.getComponent(StaticSpawnLocationComponent.class).position;
         } else {
             spawnPosition = worldGenerator.getSpawnPosition(entity);
         }
-        LocationComponent loc = entity.getComponent(LocationComponent.class);
+        LocationComponent loc = character.getComponent(LocationComponent.class);
         loc.setWorldPosition(spawnPosition);
         loc.setLocalRotation(new Quat4f());  // reset rotation
-        entity.saveComponent(loc);
+        character.saveComponent(loc);
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, components = {ClientComponent.class})
@@ -242,11 +246,9 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
         ClientComponent client = clientEntity.getComponent(ClientComponent.class);
         EntityRef playerCharacter = client.character;
-        LocationComponent location = clientEntity.getComponent(LocationComponent.class);
+        LocationComponent location = playerCharacter.getComponent(LocationComponent.class);
         PlayerFactory playerFactory = new PlayerFactory(entityManager, worldProvider);
         Vector3f spawnPosition = playerFactory.findSpawnPositionFromLocationComponent(location);
-        location.setWorldPosition(spawnPosition);
-        clientEntity.saveComponent(location);
 
         playerCharacter.addComponent(new AliveCharacterComponent());
         playerCharacter.send(new CharacterTeleportEvent(spawnPosition));

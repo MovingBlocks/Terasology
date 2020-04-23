@@ -15,16 +15,16 @@
  */
 package org.terasology.config.flexible.constraints;
 
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(Enclosed.class)
 public class NumberRangeConstraintTest {
-    public static class IntegerConstraint {
+
+    @Nested
+    public class IntegerConstraint {
         private NumberRangeConstraint<Integer> constraint;
 
         private void initConstraint(Integer min, Integer max, boolean minInclusive, boolean maxInclusive) {
@@ -35,10 +35,10 @@ public class NumberRangeConstraintTest {
         public void testAllInclusive() {
             initConstraint(0, 100, true, true);
 
-            assertTrue(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0));
-            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12));
-            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83));
-            assertTrue(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100));
+            assertTrue(constraint.isSatisfiedBy(0), () -> String.format("%d returned invalid", 0));
+            assertTrue(constraint.isSatisfiedBy(12), () -> String.format("%d returned invalid", 12));
+            assertTrue(constraint.isSatisfiedBy(83), () -> String.format("%d returned invalid", 83));
+            assertTrue(constraint.isSatisfiedBy(100), () -> String.format("%d returned invalid", 100));
 
 
             assertFalse(constraint.isSatisfiedBy(0 - 1));
@@ -49,30 +49,30 @@ public class NumberRangeConstraintTest {
         public void testMinExclusive() {
             initConstraint(0, 100, false, true);
 
-            assertFalse(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0));
-            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12));
-            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83));
-            assertTrue(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100));
+            assertFalse(constraint.isSatisfiedBy(0), () -> String.format("%d returned invalid", 0));
+            assertTrue(constraint.isSatisfiedBy(12), () -> String.format("%d returned invalid", 12));
+            assertTrue(constraint.isSatisfiedBy(83), () -> String.format("%d returned invalid", 83));
+            assertTrue(constraint.isSatisfiedBy(100), () -> String.format("%d returned invalid", 100));
         }
 
         @Test
         public void testMaxExclusive() {
             initConstraint(0, 100, true, false);
 
-            assertTrue(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0));
-            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12));
-            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83));
-            assertFalse(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100));
+            assertTrue(constraint.isSatisfiedBy(0), () -> String.format("%d returned invalid", 0));
+            assertTrue(constraint.isSatisfiedBy(12), () -> String.format("%d returned invalid", 12));
+            assertTrue(constraint.isSatisfiedBy(83), () -> String.format("%d returned invalid", 83));
+            assertFalse(constraint.isSatisfiedBy(100), () -> String.format("%d returned invalid", 100));
         }
 
         @Test
         public void testAllExclusive() {
             initConstraint(0, 100, false, false);
 
-            assertFalse(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0));
-            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12));
-            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83));
-            assertFalse(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100));
+            assertFalse(constraint.isSatisfiedBy(0), () -> String.format("%d returned invalid", 0));
+            assertTrue(constraint.isSatisfiedBy(12), () -> String.format("%d returned invalid", 12));
+            assertTrue(constraint.isSatisfiedBy(83), () -> String.format("%d returned invalid", 83));
+            assertFalse(constraint.isSatisfiedBy(100), () -> String.format("%d returned invalid", 100));
         }
 
         @Test
@@ -112,7 +112,8 @@ public class NumberRangeConstraintTest {
         }
     }
 
-    public static class DoubleConstraint {
+    @Nested
+    public class DoubleConstraint {
         private static final double MAX_ALLOWED_ERROR = 0.000001d;
 
         private NumberRangeConstraint<Double> constraint;
@@ -125,10 +126,10 @@ public class NumberRangeConstraintTest {
         public void testAllInclusive() {
             initConstraint(0d, 100d, true, true);
 
-            assertTrue(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0d));
-            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12d));
-            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83d));
-            assertTrue(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100d));
+            assertTrue(constraint.isSatisfiedBy(0d), () -> String.format("%d returned invalid", 0));
+            assertTrue(constraint.isSatisfiedBy(12d), () -> String.format("%d returned invalid", 12));
+            assertTrue(constraint.isSatisfiedBy(83d), () -> String.format("%d returned invalid", 83));
+            assertTrue(constraint.isSatisfiedBy(100d), () -> String.format("%d returned invalid", 100));
 
             assertFalse(constraint.isSatisfiedBy(0 - MAX_ALLOWED_ERROR));
             assertFalse(constraint.isSatisfiedBy(100 + MAX_ALLOWED_ERROR));
@@ -138,30 +139,30 @@ public class NumberRangeConstraintTest {
         public void testMinExclusive() {
             initConstraint(0d, 100d, false, true);
 
-            assertFalse(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0d));
-            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12d));
-            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83d));
-            assertTrue(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100d));
+            assertFalse(constraint.isSatisfiedBy(0d), () -> String.format("%d returned invalid", 0));
+            assertTrue(constraint.isSatisfiedBy(12d), () -> String.format("%d returned invalid", 12));
+            assertTrue(constraint.isSatisfiedBy(83d), () -> String.format("%d returned invalid", 83));
+            assertTrue(constraint.isSatisfiedBy(100d), () -> String.format("%d returned invalid", 100));
         }
 
         @Test
         public void testMaxExclusive() {
             initConstraint(0d, 100d, true, false);
 
-            assertTrue(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0d));
-            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12d));
-            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83d));
-            assertFalse(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100d));
+            assertTrue(constraint.isSatisfiedBy(0d), () -> String.format("%d returned invalid", 0));
+            assertTrue(constraint.isSatisfiedBy(12d), () -> String.format("%d returned invalid", 12));
+            assertTrue(constraint.isSatisfiedBy(83d), () -> String.format("%d returned invalid", 83));
+            assertFalse(constraint.isSatisfiedBy(100d), () -> String.format("%d returned invalid", 100));
         }
 
         @Test
         public void testAllExclusive() {
             initConstraint(0d, 100d, false, false);
 
-            assertFalse(String.format("%d returned invalid", 0), constraint.isSatisfiedBy(0d));
-            assertTrue(String.format("%d returned invalid", 12), constraint.isSatisfiedBy(12d));
-            assertTrue(String.format("%d returned invalid", 83), constraint.isSatisfiedBy(83d));
-            assertFalse(String.format("%d returned invalid", 100), constraint.isSatisfiedBy(100d));
+            assertFalse(constraint.isSatisfiedBy(0d), () -> String.format("%d returned invalid", 0));
+            assertTrue(constraint.isSatisfiedBy(12d), () -> String.format("%d returned invalid", 12));
+            assertTrue(constraint.isSatisfiedBy(83d), () -> String.format("%d returned invalid", 83));
+            assertFalse(constraint.isSatisfiedBy(100d), () -> String.format("%d returned invalid", 100));
         }
 
         @Test

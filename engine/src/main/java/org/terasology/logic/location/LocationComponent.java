@@ -53,12 +53,16 @@ public final class LocationComponent implements Component, ReplicationCheck {
     Quat4f rotation = new Quat4f(0, 0, 0, 1);
     @Replicate
     float scale = 1.0f;
+    @Replicate
+    Vector3f lastPosition = new Vector3f();
+    @Replicate
+    Quat4f lastRotation = new Quat4f(0,0,0,1);
 
     public LocationComponent() {
     }
 
     public LocationComponent(Vector3f position) {
-        this.position.set(position);
+        setLocalPosition(position);
     }
 
     /**
@@ -69,6 +73,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public void setLocalPosition(Vector3f newPos) {
+        lastPosition.set(position);
         position.set(newPos);
     }
 
@@ -83,6 +88,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public void setLocalRotation(Quat4f newQuat) {
+        lastRotation.set(rotation);
         rotation.set(newQuat);
     }
 
@@ -144,7 +150,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public void setWorldPosition(Vector3f value) {
-        this.position.set(value);
+        setLocalPosition(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             this.position.sub(parentLoc.getWorldPosition());
@@ -156,7 +162,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public void setWorldRotation(Quat4f value) {
-        this.rotation.set(value);
+        setLocalRotation(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             Quat4f worldRot = parentLoc.getWorldRotation();

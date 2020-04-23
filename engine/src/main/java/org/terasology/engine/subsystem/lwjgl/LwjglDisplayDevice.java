@@ -134,6 +134,16 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     @Override
+    public int getDisplayWidth() {
+        return Display.getWidth();
+    }
+
+    @Override
+    public int getDisplayHeight() {
+        return Display.getHeight();
+    }
+
+    @Override
     public void setResolution(Resolution resolution) {
         config.setResolution(resolution);
         if (DisplayModeSetting.FULLSCREEN == config.getDisplayModeSetting()) {

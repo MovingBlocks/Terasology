@@ -267,7 +267,17 @@ Contributors
  [Loonride](https://github.com/Loonride),
  [casals](https://github.com/casals),
  [Prafful 'profgrammer' Javare](https://github.com/profgrammer),
- [AahzBrut](https://github.com/AahzBrut)
+ [AahzBrut](https://github.com/AahzBrut),
+ [Qwertygiy](https://github.com/Qwertygiy),
+ [praj-foss](https://github.com/praj-foss),
+ [aRealCyborg](https://github.com/aRealCyborg),
+ [DarkWeird](https://github.com/DarkWeird),
+ [PAndaContron](https://github.com/PAndaContron),
+ [sin3point14](https://github.com/sin3point14),
+ [agent-q1](https://github.com/agent-q1),
+ [otradovec](https://github.com/otradovec),
+ [jankeromnes](https://github.com/jankeromnes),
+ [wytrem](https://github.com/wytrem)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

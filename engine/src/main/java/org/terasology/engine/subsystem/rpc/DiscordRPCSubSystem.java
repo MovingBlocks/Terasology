@@ -53,7 +53,6 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     private boolean reconnecting;
     private int reconnectTries = 1;
     private boolean connectedBefore;
-    private int lastPing;
     private Config config;
     private String lastState;
     private boolean dontTryAgain;
@@ -121,22 +120,22 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     if (ready) {
                         getInstance().ipcClient.close();
                     }
-                    Thread.sleep(1);
+                    Thread.sleep(1000);
                     continue;
                 }
 
                 // Don't retry to do any connect to the RPC till something happen to do it
                 if (dontTryAgain) {
-                    Thread.sleep(1);
+                    Thread.sleep(1000);
                     continue;
                 }
 
                 // Connect if the connect on init didn't connect successfully
                 if (!connectedBefore && !ready) {
-                    lastPing = 0;
                     try {
                         ipcClient.connect();
-                    } catch (Exception ex) { } // Ignore the not able to connect to continue our process
+                    } catch (Exception ex) {
+                    } // Ignore the not able to connect to continue our process
                     Thread.sleep(15 * 1000);
                     if (!ready) {
                         reconnectTries += 1;
@@ -147,17 +146,11 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
                     continue;
                 }
 
-
                 // Ping to make sure that the RPC is alive
                 if (ready) {
-                    Thread.sleep(1);
-                    lastPing += 1;
-                    if (lastPing >= RECONNECT_TRIES * 1000) {
-                        ipcClient.sendRichPresence(this.lastRichPresence);
-                        this.lastPing = 0;
-                    }
+                    Thread.sleep(5000);
+                    ipcClient.sendRichPresence(this.lastRichPresence);
                 } else {
-                    lastPing = 0;
                     reconnecting = true;
                     int timeout = (reconnectTries * 2) * 1000;
                     logger.info("Discord RPC >> Reconnecting... (Timeout: " + timeout + "ms)");

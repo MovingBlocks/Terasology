@@ -58,6 +58,7 @@ class module {
         }
 
         // TODO: Copy in a module readme template soon
+        // TODO : Add in the logback.groovy from engine\src\test\resources\logback.groovy ? Local dev only, Jenkins will use the one inside engine-tests.jar. Also add to .gitignore
     }
 
     /**
@@ -74,5 +75,13 @@ class module {
         }.collect {it.key}
 
         return itemList
+    }
+
+    def refreshGradle(File targetDir) {
+        // Copy in the template build.gradle for modules
+        println "In refreshGradle for module $targetDir - copying in a fresh build.gradle"
+        File targetBuildGradle = new File(targetDir, 'build.gradle')
+        targetBuildGradle.delete()
+        targetBuildGradle << new File('templates/build.gradle').text
     }
 }

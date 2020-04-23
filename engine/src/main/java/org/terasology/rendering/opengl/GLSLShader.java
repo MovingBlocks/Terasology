@@ -164,7 +164,7 @@ public class GLSLShader extends Shader {
 
         StringBuilder builder = new StringBuilder().append(preProcessorPreamble);
         if (renderConfig.isVolumetricFog()) {
-            builder.append("#define VOLUMETRIC_FOG");
+            builder.append("#define VOLUMETRIC_FOG \n");
         }
 
         if (renderConfig.isAnimateGrass()) {
@@ -266,6 +266,9 @@ public class GLSLShader extends Shader {
                 disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
                 disposalAction.vertexPrograms.put(featureHash, vertShaderId);
             } else {
+                dumpCode(GL20.GL_FRAGMENT_SHADER,permutation,assembleShader(GL20.GL_FRAGMENT_SHADER,permutation));
+                dumpCode(GL20.GL_VERTEX_SHADER,permutation,assembleShader(GL20.GL_VERTEX_SHADER,permutation));
+
                 throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.%n%n"
                                 + "Vertex Shader Info: %n%s%n"
                                 + "Fragment Shader Info: %n%s",
@@ -318,6 +321,7 @@ public class GLSLShader extends Shader {
         // example: fragment_shader-engine-font_0.glsl
         String fname = debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl";
         Path path = PathManager.getInstance().getShaderLogPath().resolve(fname);
+        logger.info("Dumped Shader Path: {}", path);
         try (BufferedWriter writer = Files.newBufferedWriter(path, TerasologyConstants.CHARSET)) {
             writer.write(sourceCode);
         } catch (IOException e) {
