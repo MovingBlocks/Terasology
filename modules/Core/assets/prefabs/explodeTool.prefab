@@ -9,8 +9,5 @@
     },
     "ExplosionAction": {
         "relativeTo": "Target"
-    },
-    "PlaySoundAction": {
-        "sounds": ["CoreAssets:Explode1", "CoreAssets:Explode2", "CoreAssets:Explode3", "CoreAssets:Explode4", "CoreAssets:Explode5"]
     }
 }
