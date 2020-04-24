@@ -15,6 +15,7 @@
  */
 package org.terasology.audio.openAL;
 
+import org.joml.Vector3fc;
 import org.terasology.audio.Sound;
 import org.terasology.math.geom.Vector3f;
 
@@ -79,46 +80,70 @@ public interface SoundSource<T extends Sound<?>> {
      *
      * @param pos
      * @return
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #setPosition(Vector3fc)}.
      */
+    @Deprecated
     SoundSource<T> setPosition(Vector3f pos);
+    SoundSource<T> setPosition(Vector3fc pos);
 
     /**
      * Returns sound position in space
      *
      * @return
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #getPosition(org.joml.Vector3f)}.
      */
+    @Deprecated
     Vector3f getPosition();
+    org.joml.Vector3f getPosition(org.joml.Vector3f dest);
 
     /**
      * Set sound source velocity
      * Sound source velocity used for doppler effect calculation
      *
      * @param velocity
-     * @return
+     * @return the sound source
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #setVelocity(Vector3fc)}.
      */
+    @Deprecated
     SoundSource<T> setVelocity(Vector3f velocity);
+    SoundSource<T> setVelocity(Vector3fc velocity);
 
     /**
      * Returns sound source velocity
      *
      * @return
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #getVelocity(org.joml.Vector3f)}.
      */
+    @Deprecated
     Vector3f getVelocity();
+    org.joml.Vector3f getVelocity(org.joml.Vector3f dest);
 
     /**
      * Set sound source direction in cartesian coordinates
      *
      * @param direction
      * @return
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #setDirection(Vector3fc)}.
      */
+    @Deprecated
     SoundSource<T> setDirection(Vector3f direction);
+    SoundSource<T> setDirection(Vector3fc direction);
 
     /**
      * Returns sound source direction in cartesian coordinates
      *
      * @return
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #getDirection(org.joml.Vector3f)}.
      */
+    @Deprecated
     Vector3f getDirection();
+    org.joml.Vector3f getDirection(org.joml.Vector3f dest);
 
     /**
      * Returns sound source pitch

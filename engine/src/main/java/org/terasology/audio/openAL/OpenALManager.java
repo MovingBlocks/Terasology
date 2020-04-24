@@ -16,6 +16,8 @@
 package org.terasology.audio.openAL;
 
 import com.google.common.collect.Maps;
+import org.joml.Quaternionf;
+import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
@@ -40,6 +42,7 @@ import org.terasology.audio.openAL.streamingSound.OpenALStreamingSound;
 import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.config.AudioConfig;
 import org.terasology.math.Direction;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -62,7 +65,7 @@ public class OpenALManager implements AudioManager {
 
     protected Map<String, SoundPool<? extends Sound<?>, ?>> pools = Maps.newHashMap();
 
-    private Vector3f listenerPosition = new Vector3f();
+    private final org.joml.Vector3f listenerPosition = new org.joml.Vector3f();
 
     private Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
 
@@ -143,36 +146,56 @@ public class OpenALManager implements AudioManager {
 
     @Override
     public void playSound(StaticSound sound) {
-        playSound(sound, null, 1.0f, PRIORITY_NORMAL);
+        playSound(sound, (Vector3fc) null, 1.0f, PRIORITY_NORMAL);
     }
 
     @Override
     public void playSound(StaticSound sound, float volume) {
-        playSound(sound, null, volume, PRIORITY_NORMAL);
+        playSound(sound, (Vector3fc) null, volume, PRIORITY_NORMAL);
     }
 
     @Override
     public void playSound(StaticSound sound, float volume, int priority) {
-        playSound(sound, null, volume, priority);
+        playSound(sound, (Vector3fc) null, volume, priority);
     }
 
     @Override
     public void playSound(StaticSound sound, Vector3f position) {
+        playSound(sound, JomlUtil.from(position));
+    }
+
+    @Override
+    public void playSound(StaticSound sound, Vector3fc position) {
         playSound(sound, position, 1.0f, PRIORITY_NORMAL);
     }
 
     @Override
     public void playSound(StaticSound sound, Vector3f position, float volume) {
+        playSound(sound, JomlUtil.from(position), volume);
+    }
+
+    @Override
+    public void playSound(StaticSound sound, Vector3fc position, float volume) {
         playSound(sound, position, volume, PRIORITY_NORMAL);
     }
 
     @Override
     public void playSound(StaticSound sound, Vector3f position, float volume, int priority) {
+        playSound(sound, JomlUtil.from(position), volume, priority);
+    }
+
+    @Override
+    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority) {
         playSound(sound, position, volume, priority, null);
     }
 
     @Override
     public void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
+        playSound(sound, JomlUtil.from(position), volume, priority, endListener);
+    }
+
+    @Override
+    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority, AudioEndListener endListener) {
         if (position != null && !checkDistance(position)) {
             return;
         }
@@ -245,23 +268,28 @@ public class OpenALManager implements AudioManager {
 
     @Override
     public void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity) {
+        updateListener(JomlUtil.from(position), JomlUtil.from(orientation), JomlUtil.from(velocity));
+    }
 
-        AL10.alListener3f(AL10.AL_VELOCITY, velocity.x, velocity.y, velocity.z);
+    @Override
+    public void updateListener(Vector3fc position, Quaternionf orientation, Vector3fc velocity) {
+        AL10.alListener3f(AL10.AL_VELOCITY, velocity.x(), velocity.y(), velocity.z());
 
         OpenALException.checkState("Setting listener velocity");
 
-        Vector3f dir = orientation.rotate(Direction.FORWARD.getVector3f(), new Vector3f());
-        Vector3f up = orientation.rotate(Direction.UP.getVector3f(), new Vector3f());
+        org.joml.Vector3f dir = JomlUtil.from(Direction.FORWARD.getVector3f())
+                .rotate(orientation);
+        org.joml.Vector3f up = JomlUtil.from(Direction.UP.getVector3f())
+                .rotate(orientation);
 
-        FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6).put(new float[]{dir.x, dir.y, dir.z, up.x, up.y, up.z});
+        FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6)
+                .put(new float[] {dir.x, dir.y, dir.z, up.x, up.y, up.z});
         listenerOri.flip();
         AL10.alListener(AL10.AL_ORIENTATION, listenerOri);
-
         OpenALException.checkState("Setting listener orientation");
-        this.listenerPosition.set(position);
 
-        AL10.alListener3f(AL10.AL_POSITION, position.x, position.y, position.z);
-
+        listenerPosition.set(position);
+        AL10.alListener3f(AL10.AL_POSITION, position.x(), position.y(), position.z());
         OpenALException.checkState("Setting listener position");
     }
 
@@ -289,9 +317,14 @@ public class OpenALManager implements AudioManager {
         }
     }
 
+    @Deprecated
     protected boolean checkDistance(Vector3f soundPosition) {
-        Vector3f distance = new Vector3f(soundPosition);
-        distance.sub(listenerPosition);
+        return checkDistance(JomlUtil.from(soundPosition));
+    }
+
+    protected boolean checkDistance(Vector3fc soundPosition) {
+        org.joml.Vector3f distance = new org.joml.Vector3f(soundPosition)
+                .sub(listenerPosition);
 
         return distance.lengthSquared() < MAX_DISTANCE_SQUARED;
     }
@@ -311,5 +344,4 @@ public class OpenALManager implements AudioManager {
             pool.purge(sound);
         }
     }
-
 }

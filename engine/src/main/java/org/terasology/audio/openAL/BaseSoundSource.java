@@ -15,9 +15,11 @@
  */
 package org.terasology.audio.openAL;
 
+import org.joml.Vector3fc;
 import org.lwjgl.openal.AL10;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 
 import static org.lwjgl.openal.AL10.AL_FALSE;
@@ -44,9 +46,9 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
     private float targetGain = 1.0f;
     private boolean fade;
 
-    private Vector3f position = new Vector3f();
-    private Vector3f velocity = new Vector3f();
-    private Vector3f direction = new Vector3f();
+    private final org.joml.Vector3f position = new org.joml.Vector3f();
+    private final org.joml.Vector3f velocity = new org.joml.Vector3f();
+    private final org.joml.Vector3f direction = new org.joml.Vector3f();
 
     private boolean absolutePosition;
 
@@ -146,19 +148,27 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
 
     @Override
     public Vector3f getVelocity() {
-        return velocity;
+        return JomlUtil.from(velocity);
+    }
+
+    @Override
+    public org.joml.Vector3f getVelocity(org.joml.Vector3f dest) {
+        return dest.set(velocity);
     }
 
     @Override
     public SoundSource<T> setVelocity(Vector3f value) {
-        if (value == null || this.velocity.equals(value)) {
+        return setVelocity(JomlUtil.from(value));
+    }
+
+    @Override
+    public SoundSource<T> setVelocity(Vector3fc value) {
+        if (velocity.equals(value)) {
             return this;
         }
 
-        this.velocity.set(value);
-
-        AL10.alSource3f(getSourceId(), AL10.AL_VELOCITY, value.x, value.y, value.z);
-
+        velocity.set(value);
+        AL10.alSource3f(getSourceId(), AL10.AL_VELOCITY, velocity.x, velocity.y, velocity.z);
         OpenALException.checkState("Setting sound source velocity");
 
         return this;
@@ -166,18 +176,26 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
 
     @Override
     public Vector3f getPosition() {
-        return position;
+        return JomlUtil.from(position);
+    }
+
+    public org.joml.Vector3f getPosition(org.joml.Vector3f dest) {
+        return dest.set(position);
     }
 
     @Override
-    public SoundSource<T> setPosition(Vector3f value) {
-        if (value == null || this.position.equals(value)) {
+    public SoundSource<T> setPosition(Vector3f position) {
+        return setPosition(JomlUtil.from(position));
+    }
+
+    @Override
+    public SoundSource<T> setPosition(Vector3fc value) {
+        if (position.equals(value)) {
             return this;
         }
 
-        this.position.set(value);
-        alSource3f(getSourceId(), AL10.AL_POSITION, value.x, value.y, value.z);
-
+        position.set(value);
+        alSource3f(getSourceId(), AL10.AL_POSITION, position.x, position.y, position.z);
         OpenALException.checkState("Changing sound position");
 
         return this;
@@ -185,22 +203,30 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
 
     @Override
     public SoundSource<T> setDirection(Vector3f value) {
-        if (value == null || this.direction.equals(value)) {
+        return setDirection(JomlUtil.from(value));
+    }
+
+    @Override
+    public SoundSource<T> setDirection(Vector3fc value) {
+        if (direction.equals(value)) {
             return this;
         }
 
-        AL10.alSource3f(getSourceId(), AL10.AL_DIRECTION, value.x, value.y, value.z);
-
+        direction.set(value);
+        AL10.alSource3f(getSourceId(), AL10.AL_DIRECTION, direction.x, direction.y, direction.z);
         OpenALException.checkState("Setting sound source direction");
-
-        this.direction.set(value);
 
         return this;
     }
 
     @Override
     public Vector3f getDirection() {
-        return direction;
+        return JomlUtil.from(direction);
+    }
+
+    @Override
+    public org.joml.Vector3f getDirection(org.joml.Vector3f dest) {
+        return dest.set(direction);
     }
 
     @Override
