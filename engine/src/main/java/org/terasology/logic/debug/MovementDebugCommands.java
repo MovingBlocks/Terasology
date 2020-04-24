@@ -25,6 +25,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.CharacterImpulseEvent;
 import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.characters.events.ScaleCharacterEvent;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
@@ -252,48 +253,26 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String playerHeight(@Sender EntityRef client, @CommandParam("height") float amount) {
-        if (amount >= 1 && amount <= 25) {
-            try {
-                ClientComponent clientComp = client.getComponent(ClientComponent.class);
-                CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
-                CharacterComponent charComp = clientComp.character.getComponent(CharacterComponent.class);
-                EntityRef player = clientComp.character;
-                GazeMountPointComponent gazeMountPointComponent = player.getComponent(GazeMountPointComponent.class);
+    public String playerHeight(@Sender EntityRef entity, @CommandParam("height") float newHeight) {
+        if (newHeight >= 1 && newHeight <= 25) {
+            ClientComponent client = entity.getComponent(ClientComponent.class);
+            if (client != null) {
+                EntityRef character = client.character;
+                CharacterMovementComponent movement = client.character.getComponent(CharacterMovementComponent.class);
+                if (movement != null) {
+                    float currentHeight = movement.height;
+                    float factor = newHeight / movement.height;
 
-                Prefab playerDefaults = Assets.getPrefab("engine:player").get();
-                CharacterMovementComponent moveDefault = playerDefaults.getComponent(CharacterMovementComponent.class);
-                CharacterComponent characterDefault = playerDefaults.getComponent(CharacterComponent.class);
+                    ScaleCharacterEvent scaleEvent = new ScaleCharacterEvent(factor);
+                    character.send(scaleEvent);
 
-                if (move != null && gazeMountPointComponent != null) {
-                    float prevHeight = move.height;
-                    float defaultEyeHeight = config.getPlayer().getEyeHeight();
-                    float foreHeadSize = moveDefault.height - defaultEyeHeight;
-                    float ratio = amount / moveDefault.height;
-
-                    move.height = amount;
-                    move.jumpSpeed = getJumpSpeed(ratio, moveDefault.jumpSpeed);
-                    move.stepHeight = ratio * moveDefault.stepHeight;
-                    move.distanceBetweenFootsteps = ratio * moveDefault.distanceBetweenFootsteps;
-                    move.runFactor = getRunFactor(ratio, moveDefault.runFactor);
-                    charComp.interactionRange = getInteractionRange(ratio, characterDefault.interactionRange);
-                    gazeMountPointComponent.translate.y = amount - foreHeadSize;
-                    Location.removeChild(player, gazeMountPointComponent.gazeEntity);
-                    Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
-
-                    player.saveComponent(gazeMountPointComponent);
-                    clientComp.character.saveComponent(move);
-
-                    return "Height of player set to " + amount + " (was " + prevHeight + ")";
+                    return "Height of player set to " + newHeight + " (was " + currentHeight + ")";
                 }
-                return "";
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-                return "";
             }
         } else {
             return "Invalid input. Accepted values: [1 to 25]";
         }
+        return "";
     }
 
     @Command(shortDescription = "Sets the eye-height of the player", runOnServer = true,

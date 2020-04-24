@@ -23,7 +23,9 @@ import org.terasology.network.Replicate;
 
 public class GazeMountPointComponent implements Component {
     /**
-     * Holds an entity that will have its location linked to the character entity.  Created and configured at runtime when this component is added
+     * Holds an entity that will have its location linked to the character entity.
+     *
+     * Created and configured at runtime when this component is added.
      */
     @Owns
     @Replicate
