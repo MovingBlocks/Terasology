@@ -62,10 +62,6 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume) {
-    }
-
-    @Override
     public void playSound(StaticSound sound, Vector3fc position, float volume) {
     }
 

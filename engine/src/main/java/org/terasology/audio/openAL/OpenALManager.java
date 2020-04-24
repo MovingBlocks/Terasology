@@ -170,11 +170,6 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume) {
-        playSound(sound, JomlUtil.from(position), volume);
-    }
-
-    @Override
     public void playSound(StaticSound sound, Vector3fc position, float volume) {
         playSound(sound, position, volume, PRIORITY_NORMAL);
     }
@@ -315,11 +310,6 @@ public class OpenALManager implements AudioManager {
                 }
             }
         }
-    }
-
-    @Deprecated
-    protected boolean checkDistance(Vector3f soundPosition) {
-        return checkDistance(JomlUtil.from(soundPosition));
     }
 
     protected boolean checkDistance(Vector3fc soundPosition) {

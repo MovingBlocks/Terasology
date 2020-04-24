@@ -17,7 +17,6 @@ package org.terasology.audio.openAL;
 
 import org.joml.Vector3fc;
 import org.terasology.audio.Sound;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * Interface for a sound that includes the data required for relative sound positioning.
@@ -80,23 +79,15 @@ public interface SoundSource<T extends Sound<?>> {
      *
      * @param pos
      * @return
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setPosition(Vector3fc)}.
      */
-    @Deprecated
-    SoundSource<T> setPosition(Vector3f pos);
     SoundSource<T> setPosition(Vector3fc pos);
 
     /**
      * Returns sound position in space
      *
      * @return
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getPosition(org.joml.Vector3f)}.
      */
-    @Deprecated
-    Vector3f getPosition();
-    org.joml.Vector3f getPosition(org.joml.Vector3f dest);
+    Vector3fc getPosition();
 
     /**
      * Set sound source velocity
@@ -104,46 +95,30 @@ public interface SoundSource<T extends Sound<?>> {
      *
      * @param velocity
      * @return the sound source
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setVelocity(Vector3fc)}.
      */
-    @Deprecated
-    SoundSource<T> setVelocity(Vector3f velocity);
     SoundSource<T> setVelocity(Vector3fc velocity);
 
     /**
      * Returns sound source velocity
      *
      * @return
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getVelocity(org.joml.Vector3f)}.
      */
-    @Deprecated
-    Vector3f getVelocity();
-    org.joml.Vector3f getVelocity(org.joml.Vector3f dest);
+    Vector3fc getVelocity();
 
     /**
      * Set sound source direction in cartesian coordinates
      *
      * @param direction
-     * @return
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setDirection(Vector3fc)}.
+     * @return the sound source
      */
-    @Deprecated
-    SoundSource<T> setDirection(Vector3f direction);
     SoundSource<T> setDirection(Vector3fc direction);
 
     /**
      * Returns sound source direction in cartesian coordinates
      *
      * @return
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getDirection(org.joml.Vector3f)}.
      */
-    @Deprecated
-    Vector3f getDirection();
-    org.joml.Vector3f getDirection(org.joml.Vector3f dest);
+    Vector3fc getDirection();
 
     /**
      * Returns sound source pitch
@@ -156,7 +131,7 @@ public interface SoundSource<T extends Sound<?>> {
      * Sets sound source pitch
      *
      * @param pitch
-     * @return
+     * @return the sound source
      */
     SoundSource<T> setPitch(float pitch);
 
@@ -176,7 +151,7 @@ public interface SoundSource<T extends Sound<?>> {
      * Set sound source gain
      *
      * @param gain
-     * @return
+     * @return the sound source
      */
     SoundSource<T> setGain(float gain);
 
@@ -192,7 +167,7 @@ public interface SoundSource<T extends Sound<?>> {
      * WARNING! This will cause UnsupportedOperationException on streaming sounds
      *
      * @param looping
-     * @return
+     * @return the sound source
      */
     SoundSource<T> setLooping(boolean looping);
 
@@ -200,7 +175,7 @@ public interface SoundSource<T extends Sound<?>> {
      * Set source of sound (samples)
      *
      * @param sound
-     * @return
+     * @return the sound source
      */
     SoundSource<T> setAudio(T sound);
 
@@ -215,7 +190,7 @@ public interface SoundSource<T extends Sound<?>> {
      * Fade source smoothly
      *
      * @param targetGain
-     * @return
+     * @return the sound source
      */
     SoundSource<T> fade(float targetGain);
 

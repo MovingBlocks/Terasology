@@ -53,8 +53,6 @@ public interface AudioManager {
     void playSound(StaticSound sound, Vector3f position);
     void playSound(StaticSound sound, Vector3fc position);
 
-    @Deprecated
-    void playSound(StaticSound sound, Vector3f position, float volume);
     void playSound(StaticSound sound, Vector3fc position, float volume);
 
     @Deprecated

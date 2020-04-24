@@ -15,12 +15,11 @@
  */
 package org.terasology.audio.openAL;
 
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.openal.AL10;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_GAIN;
@@ -46,9 +45,9 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
     private float targetGain = 1.0f;
     private boolean fade;
 
-    private final org.joml.Vector3f position = new org.joml.Vector3f();
-    private final org.joml.Vector3f velocity = new org.joml.Vector3f();
-    private final org.joml.Vector3f direction = new org.joml.Vector3f();
+    private final Vector3f position = new Vector3f();
+    private final Vector3f velocity = new Vector3f();
+    private final Vector3f direction = new Vector3f();
 
     private boolean absolutePosition;
 
@@ -147,18 +146,8 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
     }
 
     @Override
-    public Vector3f getVelocity() {
-        return JomlUtil.from(velocity);
-    }
-
-    @Override
-    public org.joml.Vector3f getVelocity(org.joml.Vector3f dest) {
-        return dest.set(velocity);
-    }
-
-    @Override
-    public SoundSource<T> setVelocity(Vector3f value) {
-        return setVelocity(JomlUtil.from(value));
+    public Vector3fc getVelocity() {
+        return velocity;
     }
 
     @Override
@@ -174,18 +163,8 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
         return this;
     }
 
-    @Override
-    public Vector3f getPosition() {
-        return JomlUtil.from(position);
-    }
-
-    public org.joml.Vector3f getPosition(org.joml.Vector3f dest) {
-        return dest.set(position);
-    }
-
-    @Override
-    public SoundSource<T> setPosition(Vector3f position) {
-        return setPosition(JomlUtil.from(position));
+    public Vector3fc getPosition() {
+        return position;
     }
 
     @Override
@@ -202,11 +181,6 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
     }
 
     @Override
-    public SoundSource<T> setDirection(Vector3f value) {
-        return setDirection(JomlUtil.from(value));
-    }
-
-    @Override
     public SoundSource<T> setDirection(Vector3fc value) {
         if (direction.equals(value)) {
             return this;
@@ -220,13 +194,8 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
     }
 
     @Override
-    public Vector3f getDirection() {
-        return JomlUtil.from(direction);
-    }
-
-    @Override
-    public org.joml.Vector3f getDirection(org.joml.Vector3f dest) {
-        return dest.set(direction);
+    public Vector3fc getDirection() {
+        return direction;
     }
 
     @Override
