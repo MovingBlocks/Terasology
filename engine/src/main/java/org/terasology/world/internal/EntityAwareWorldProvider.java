@@ -41,6 +41,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
@@ -135,7 +136,13 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             for (Vector3i vec : oldBlocks.keySet()) {
                 if (oldBlocks.get(vec) != null) {
                     EntityRef blockEntity = getBlockEntityAt(vec);
-                    updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, Collections.<Class<? extends Component>>emptySet());
+
+                    Set<Class<? extends Component>> retainComponents = Collections.<Class<? extends Component>>emptySet();
+                    if (blockEntity.hasComponent(RetainComponentsComponent.class)) {
+                        retainComponents = blockEntity.getComponent(RetainComponentsComponent.class).components;
+                    }
+
+                    updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
                 }
             }
             return oldBlocks;
