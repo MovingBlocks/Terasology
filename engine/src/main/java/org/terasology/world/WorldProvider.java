@@ -132,6 +132,7 @@ public interface WorldProvider extends WorldProviderCore {
 
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
+     * Do not use this method with world gen code, pass the chunk as an argument instead.
      *
      * @param fieldName The name of the extra-data field
      * @param x
@@ -157,7 +158,7 @@ public interface WorldProvider extends WorldProviderCore {
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
      * @param fieldName The name of the extra-data field
-     * @param chunk Chunk which the position belongs to
+     * @param chunk     Chunk which the position belongs to
      * @param pos
      * @param value
      * @return The replaced value

@@ -334,11 +334,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     public int setExtraData(int index, Vector3i worldPos, int value) {
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
-        return setExtraData(index, chunk, worldPos,value);
+        return setExtraData(index, chunk, worldPos, value);
     }
 
     @Override
-    public int setExtraData(int index, CoreChunk chunk, Vector3i worldPos, int value) {
+    public int setExtraData(int index, CoreChunk chunk, Vector3i relPos, int value) {
+        Vector3i worldPos = chunk.chunkToWorldPosition(relPos);
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         if (chunk != null) {
             Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);

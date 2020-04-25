@@ -66,6 +66,8 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
 
     private BiomesMetricsMode metricsMode;
 
+    private static boolean movedFlag = false;
+
     @Override
     public Optional<Biome> getBiome(Vector3i pos) {
         return getBiome(pos.x, pos.y, pos.z);
@@ -100,8 +102,7 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
 
     @Override
     public void setBiome(Biome biome, CoreChunk chunk, Vector3i pos) {
-        Vector3i position = chunk.chunkToWorldPosition(pos);
-        setBiome(biome, chunk, position.x, position.y, position.z);
+        setBiome(biome, chunk, pos.x, pos.y, pos.z);
     }
 
     @Override
@@ -149,6 +150,10 @@ public class BiomeManager extends BaseComponentSystem implements BiomeRegistry {
 
             Biome newBiome = newBiomeOptional.get();
             Biome oldBiome = oldBiomeOptional.get();
+            if (movedFlag == false) {
+                metricsMode.setBiome(newBiome.getId());
+                movedFlag = true;
+            }
             if (oldBiome != newBiome) {
                 entity.send(new OnBiomeChangedEvent(oldBiome, newBiome));
                 metricsMode.setBiome(newBiome.getId());
