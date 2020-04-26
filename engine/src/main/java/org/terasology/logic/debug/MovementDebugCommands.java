@@ -254,16 +254,15 @@ public class MovementDebugCommands extends BaseComponentSystem {
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String playerHeight(@Sender EntityRef entity, @CommandParam("height") float newHeight) {
-        if (newHeight >= 1 && newHeight <= 25) {
+        if (newHeight > 0 && newHeight <= 20) {
             ClientComponent client = entity.getComponent(ClientComponent.class);
             if (client != null) {
                 EntityRef character = client.character;
                 CharacterMovementComponent movement = client.character.getComponent(CharacterMovementComponent.class);
                 if (movement != null) {
                     float currentHeight = movement.height;
-                    float factor = newHeight / movement.height;
 
-                    ScaleCharacterEvent scaleEvent = new ScaleCharacterEvent(factor);
+                    ScaleCharacterEvent scaleEvent = ScaleCharacterEvent.scaleToValue(character, newHeight);
                     character.send(scaleEvent);
 
                     return "Height of player set to " + newHeight + " (was " + currentHeight + ")";
