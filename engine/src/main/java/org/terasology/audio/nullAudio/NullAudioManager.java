@@ -16,7 +16,7 @@
 
 package org.terasology.audio.nullAudio;
 
-import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.terasology.assets.AssetFactory;
 import org.terasology.audio.AudioEndListener;
@@ -106,7 +106,7 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void updateListener(Vector3fc position, Quaternionf orientation, Vector3fc velocity) {
+    public void updateListener(Vector3fc position, Quaternionfc orientation, Vector3fc velocity) {
     }
 
     @Override

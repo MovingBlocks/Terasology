@@ -15,7 +15,7 @@
  */
 package org.terasology.audio;
 
-import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.terasology.assets.AssetFactory;
 import org.terasology.math.geom.Quat4f;
@@ -134,11 +134,11 @@ public interface AudioManager {
      * @param orientation The new orientation (in a quaternion)
      * @param velocity The new velocity
      * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #updateListener(Vector3fc, Quaternionf, Vector3fc)}.
+     *             Use the JOML implementation instead: {@link #updateListener(Vector3fc, Quaternionfc, Vector3fc)}.
      */
     @Deprecated
     void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity);
-    void updateListener(Vector3fc position, Quaternionf orientation, Vector3fc velocity);
+    void updateListener(Vector3fc position, Quaternionfc orientation, Vector3fc velocity);
 
     /**
      * Gracefully destroy audio subsystem.

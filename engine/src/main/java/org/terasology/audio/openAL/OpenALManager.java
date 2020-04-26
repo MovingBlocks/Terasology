@@ -16,7 +16,7 @@
 package org.terasology.audio.openAL;
 
 import com.google.common.collect.Maps;
-import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -267,7 +267,7 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void updateListener(Vector3fc position, Quaternionf orientation, Vector3fc velocity) {
+    public void updateListener(Vector3fc position, Quaternionfc orientation, Vector3fc velocity) {
         AL10.alListener3f(AL10.AL_VELOCITY, velocity.x(), velocity.y(), velocity.z());
 
         OpenALException.checkState("Setting listener velocity");
