@@ -137,6 +137,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                 if (oldBlocks.get(vec) != null) {
                     EntityRef blockEntity = getBlockEntityAt(vec);
 
+                    // check for components to be retained when updating the block entity
                     Set<Class<? extends Component>> retainComponents = Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
                             .map(retainComponentsComponent -> retainComponentsComponent.components)
                             .orElse(Collections.emptySet());
@@ -260,10 +261,19 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     /**
      * Transforms a block entity with the change of block type. This is driven from the delta between the old and new
      * block type prefabs, but takes into account changes made to the block entity.
+     * Components contained in `blockEntity` that
+     * <ul>
+     *     <li>are not "common block components" (e.g. `NetworkComponent`)</li>
+     *     <li>don't have `reatinUnalteredOnBlockChange` metadata</li>
+     *     <li>are not listed in the block prefab</li>
+     *     <li>are not listed in the set of components to be retained</li>
+     * </ul>
+     * will be removed.
      *
-     * @param blockEntity The entity to update
-     * @param oldType     The previous type of the block
-     * @param type        The new type of the block
+     * @param blockEntity      The entity to update
+     * @param oldType          The previous type of the block
+     * @param type             The new type of the block
+     * @param retainComponents List of components to be retained
      */
     private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type, Set<Class<? extends Component>> retainComponents) {
         BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
