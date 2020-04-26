@@ -461,18 +461,20 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 Optional.ofNullable(parent.getComponent(CharacterMovementComponent.class))
                         .orElse(new CharacterMovementComponent());
 
-        movement.height = event.factor * movement.height;
-        movement.jumpSpeed = getJumpSpeed(event.factor, defaultMovement.jumpSpeed);
-        movement.stepHeight = event.factor * movement.stepHeight;
-        movement.distanceBetweenFootsteps = event.factor * movement.distanceBetweenFootsteps;
-        movement.runFactor = getRunFactor(event.factor, defaultMovement.runFactor);
+        final float factor = event.getFactor();
+
+        movement.height = factor * movement.height;
+        movement.jumpSpeed = getJumpSpeed(factor, defaultMovement.jumpSpeed);
+        movement.stepHeight = factor * movement.stepHeight;
+        movement.distanceBetweenFootsteps = factor * movement.distanceBetweenFootsteps;
+        movement.runFactor = getRunFactor(factor, defaultMovement.runFactor);
         entity.saveComponent(movement);
 
         // adjust character parameters
         CharacterComponent defaultCharacter =
                 Optional.ofNullable(parent.getComponent(CharacterComponent.class))
                         .orElse(new CharacterComponent());
-        character.interactionRange = getInteractionRange(event.factor, defaultCharacter.interactionRange);
+        character.interactionRange = getInteractionRange(factor, defaultCharacter.interactionRange);
         entity.saveComponent(character);
 
         // adjust character eye level

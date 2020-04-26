@@ -25,24 +25,42 @@ import java.util.Optional;
  * Indicate that a character entity should be scaled by some factor.
  */
 public class ScaleCharacterEvent implements Event {
-    /**
-     * The factor by which the target entity should be scaled.
-     */
-    public float factor;
 
-    /**
-     * Create a new scale event with the given factor.
-     * <p>
-     * The factor cannot be zero or negative. To scale a character down, choose a value in (0, 1), to scale it up use
-     * a factor greater 1.
-     *
-     * @param factor the scaling factor
-     */
-    public ScaleCharacterEvent(final float factor) {
+    private float targetValue;
+    private final float originalValue;
+
+    public ScaleCharacterEvent(final float originalValue, final float targetValue) {
+        if (targetValue <= 0) {
+            throw new IllegalArgumentException("zero or negative target height");
+        }
+        this.originalValue = originalValue;
+        this.targetValue = targetValue;
+    }
+
+    public float getOriginalValue() {
+        return originalValue;
+    }
+
+    public float getFactor() {
+        return targetValue / originalValue;
+    }
+
+    public void setFactor(float factor) {
         if (factor <= 0) {
             throw new IllegalArgumentException("zero or negative factor");
         }
-        this.factor = factor;
+        this.targetValue = originalValue * factor;
+    }
+
+    public float getTargetValue() {
+        return targetValue;
+    }
+
+    public void setTargetValue(float targetValue) {
+        if (targetValue <= 0) {
+            throw new IllegalArgumentException("zero or negative target height");
+        }
+        this.targetValue = targetValue;
     }
 
     /**
@@ -60,7 +78,11 @@ public class ScaleCharacterEvent implements Event {
             throw new IllegalArgumentException("zero or negative factor");
         }
 
-        return new ScaleCharacterEvent(factor);
+        CharacterMovementComponent movementComponent =
+                Optional.ofNullable(entity.getComponent(CharacterMovementComponent.class))
+                        .orElse(new CharacterMovementComponent());
+
+        return new ScaleCharacterEvent(movementComponent.height, movementComponent.height * factor);
     }
 
     /**
@@ -81,6 +103,6 @@ public class ScaleCharacterEvent implements Event {
         CharacterMovementComponent movementComponent =
                 Optional.ofNullable(entity.getComponent(CharacterMovementComponent.class))
                         .orElse(new CharacterMovementComponent());
-        return new ScaleCharacterEvent(targetHeight / movementComponent.height);
+        return new ScaleCharacterEvent(movementComponent.height, targetHeight);
     }
 }
