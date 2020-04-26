@@ -254,7 +254,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String playerHeight(@Sender EntityRef entity, @CommandParam("height") float newHeight) {
-        if (newHeight > 0 && newHeight <= 20) {
+        if (newHeight > 0.5 && newHeight <= 20) {
             ClientComponent client = entity.getComponent(ClientComponent.class);
             if (client != null) {
                 EntityRef character = client.character;

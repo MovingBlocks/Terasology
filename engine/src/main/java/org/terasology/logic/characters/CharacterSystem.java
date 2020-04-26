@@ -477,17 +477,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         character.interactionRange = getInteractionRange(factor, defaultCharacter.interactionRange);
         entity.saveComponent(character);
 
-        // adjust character eye level
-        //TODO: Move this to a system closer to the gaze mount point
-        GazeMountPointComponent gazeMountPoint = entity.getComponent(GazeMountPointComponent.class);
-        if (gazeMountPoint != null) {
-            // set eye level based on "average" body decomposition for human-like figures into 7.5 "heads".
-            gazeMountPoint.translate.y = (movement.height / 7.5f) * 7f * 0.5f;
-            Location.removeChild(entity, gazeMountPoint.gazeEntity);
-            Location.attachChild(entity, gazeMountPoint.gazeEntity, gazeMountPoint.translate, new Quat4f(Quat4f.IDENTITY));
-            entity.saveComponent(gazeMountPoint);
-        }
-
         // refresh the entity collider - by retrieving the character collider after removing it we force recreation
         physicsEngine.removeCharacterCollider(entity);
         physicsEngine.getCharacterCollider(entity);
