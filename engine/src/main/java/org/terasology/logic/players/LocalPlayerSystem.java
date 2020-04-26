@@ -61,7 +61,6 @@ import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
-import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
@@ -416,8 +415,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quaternionf rotation) {
         playerCamera.getPosition().set(JomlUtil.from(position));
-        Vector3f viewDir = Direction.FORWARD.getVector3f();
-        rotation.transform(JomlUtil.from(viewDir), playerCamera.getViewingDirection());
+        playerCamera.setOrientation(JomlUtil.from(rotation));
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {
