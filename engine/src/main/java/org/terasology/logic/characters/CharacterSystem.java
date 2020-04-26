@@ -57,6 +57,7 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
@@ -77,6 +78,9 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private Physics physics;
+
+    @In
+    private PhysicsEngine physicsEngine;
 
     @In
     private NetworkSystem networkSystem;
@@ -448,6 +452,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
     public void onScaleCharacter(ScaleCharacterEvent event, EntityRef entity, CharacterComponent character, CharacterMovementComponent movement) {
+        //TODO: We should catch and consume this event somewhere in case there is no space for the character to grow
 
         Prefab parent = entity.getParentPrefab();
 
@@ -455,6 +460,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         CharacterMovementComponent defaultMovement =
                 Optional.ofNullable(parent.getComponent(CharacterMovementComponent.class))
                         .orElse(new CharacterMovementComponent());
+
         movement.height = event.factor * movement.height;
         movement.jumpSpeed = getJumpSpeed(event.factor, defaultMovement.jumpSpeed);
         movement.stepHeight = event.factor * movement.stepHeight;
@@ -470,14 +476,22 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         entity.saveComponent(character);
 
         // adjust character eye level
+        //TODO: Move this to a system closer to the gaze mount point
         GazeMountPointComponent gazeMountPoint = entity.getComponent(GazeMountPointComponent.class);
         if (gazeMountPoint != null) {
             // set eye level based on "average" body decomposition for human-like figures into 7.5 "heads".
-            gazeMountPoint.translate.y = movement.height * 7f / 7.5f;
+            gazeMountPoint.translate.y = (movement.height / 7.5f) * 7f * 0.5f;
             Location.removeChild(entity, gazeMountPoint.gazeEntity);
             Location.attachChild(entity, gazeMountPoint.gazeEntity, gazeMountPoint.translate, new Quat4f(Quat4f.IDENTITY));
             entity.saveComponent(gazeMountPoint);
         }
+
+        // refresh the entity collider - by retrieving the character collider after removing it we force recreation
+        physicsEngine.removeCharacterCollider(entity);
+        physicsEngine.getCharacterCollider(entity);
+
+        //TODO: Scaling a character up will grow them into the ground. We would need to adjust the vertical position
+        //      to be safely above ground.
     }
 
     private float getJumpSpeed(float ratio, float defaultValue) {

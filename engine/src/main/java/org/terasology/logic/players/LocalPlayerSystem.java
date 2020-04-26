@@ -238,10 +238,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             // Change height as per PlayerSettings
             Float height = config.getPlayer().getHeight();
             movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height);
-            // Change eyeHeight as per PlayerSettings
-//            Float eyeHeight = config.getPlayer().getEyeHeight();
-//            GazeMountPointComponent gazeMountPointComponent = character.getComponent(GazeMountPointComponent.class);
-//            gazeMountPointComponent.translate = new Vector3f(0, eyeHeight, 0);
 
             // Trigger updating the player camera position as soon as the local player is spawned.
             // This is not done while the game is still loading, since systems are not updated.
