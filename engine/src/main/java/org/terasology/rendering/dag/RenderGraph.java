@@ -539,18 +539,15 @@ public class RenderGraph {
         logger.info("Attempting reconnection of " + toNode.getUri() + " to " + fromConnection.getParentNode() + "'s output.");
         Node fromNode;
 
-        if (fromConnection != null) {
-            fromNode = findNode(fromConnection.getParentNode());
-            if (!fromConnection.getConnectedConnections().isEmpty()) {
-                logger.warn("WARNING: destination connection (" + fromConnection + ") is already connected to ("
-                        + fromConnection.getConnectedConnections());
-                // TODO update the hashmap to string to be pretty
-                // throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
-                // + fromConnection.getConnectedConnections() + "). Remove connection first.");
-            } // TODO                                   make it getInputConnection
-        } else {
-            throw new RuntimeException("Source connection null. Cannot reconnect node " + toNode + "'s input id " + inputId + ".\n");
-        }
+        fromNode = findNode(fromConnection.getParentNode());
+        if (!fromConnection.getConnectedConnections().isEmpty()) {
+            logger.warn("WARNING: destination connection (" + fromConnection + ") is already connected to ("
+                    + fromConnection.getConnectedConnections());
+            // TODO update the hashmap to string to be pretty
+            // throw new RuntimeException("Could not reconnect, destination connection (" + fromConnection + ") is already connected to ("
+            // + fromConnection.getConnectedConnections() + "). Remove connection first.");
+        } // TODO                                   make it getInputConnection
+
         DependencyConnection connectionToReconnect;
 
         switch (connectionType) {
