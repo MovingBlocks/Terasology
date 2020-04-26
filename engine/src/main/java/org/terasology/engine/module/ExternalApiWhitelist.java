@@ -32,7 +32,6 @@ public final class ExternalApiWhitelist {
             .add("java.lang.invoke")
             .add("java.lang.ref")
             .add("java.math")
-            .add("java.nio")
             .add("java.util")
             .add("java.util.concurrent")
             .add("java.util.concurrent.atomic")

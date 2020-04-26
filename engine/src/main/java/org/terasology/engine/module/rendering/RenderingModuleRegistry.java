@@ -26,13 +26,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RenderingModuleRegistry {
-
-    // TODO need this? not implemented
-    private List<Module> activeRenderingModules;
 
     private List<ModuleRendering> orderedModuleRenderingInstances = new ArrayList<>();
 
@@ -117,8 +116,7 @@ public class RenderingModuleRegistry {
      * @param activeModuleRenderingInstances List of {@link ModuleRendering} instances
      * @return Ordered list of {@link ModuleRendering} instances
      */
-    private List<ModuleRendering> calculateModuleOrder(List<ModuleRendering> activeModuleRenderingInstances) {
-        // Sorted copy of activeRenderingModules
+    private List<ModuleRendering> calculateModuleOrder(Set<ModuleRendering> activeModuleRenderingInstances) {
         orderedModuleRenderingInstances = activeModuleRenderingInstances.stream()
                 .sorted(Comparator.comparing(ModuleRendering::getInitPriority)) // sort ascending by initializationPriority attribute
                 .collect(Collectors.toList()); //convert stream to List again
@@ -132,8 +130,8 @@ public class RenderingModuleRegistry {
      * @param context
      * @return list of {@link ModuleRendering} instances
      */
-    private List<ModuleRendering> fetchRenderingModules(ModuleEnvironment moduleEnvironment, Context context) {
-        List<ModuleRendering> moduleList = new ArrayList<>();
+    private Set<ModuleRendering> fetchRenderingModules(ModuleEnvironment moduleEnvironment, Context context) {
+        Set<ModuleRendering> moduleSet = new HashSet<>();
 
         for (Class<? extends ModuleRendering> renderingClass : moduleEnvironment.getSubtypesOf(ModuleRendering.class)) {
             ModuleRendering moduleRenderingInstance = null;
@@ -141,9 +139,7 @@ public class RenderingModuleRegistry {
                 if (renderingClass.isInstance(moduleRendering)) {
                     moduleRenderingInstance = moduleRendering;
                     // TODO there's marginal scenarios where you could have more instances of same class moduleRendering
-                    if (!moduleList.contains(moduleRenderingInstance)) {
-                        moduleList.add(moduleRenderingInstance);
-                    }
+                    moduleSet.add(moduleRenderingInstance);
                 }
             }
             if (moduleRenderingInstance == null) {
@@ -154,10 +150,10 @@ public class RenderingModuleRegistry {
                     e.printStackTrace();
                 }
                 if (moduleRenderingInstance != null) {
-                    moduleList.add(moduleRenderingInstance);
+                    moduleSet.add(moduleRenderingInstance);
                 }
             }
         }
-        return moduleList;
+        return moduleSet;
     }
 }
