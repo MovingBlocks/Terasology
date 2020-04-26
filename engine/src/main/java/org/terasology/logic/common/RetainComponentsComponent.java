@@ -15,8 +15,9 @@
  */
 package org.terasology.logic.common;
 
-import com.google.api.client.util.Sets;
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
+import org.terasology.network.Replicate;
 
 import java.util.Set;
 
@@ -27,5 +28,6 @@ import java.util.Set;
  * the block entity still having this component afterwards. If not retained, it is likely to be removed instead.
  */
 public class RetainComponentsComponent implements Component {
+    @Replicate
     public Set<Class<? extends Component>> components = Sets.newHashSet();
 }
