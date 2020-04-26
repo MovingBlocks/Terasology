@@ -142,6 +142,10 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             return false;
         }
 
+        if (currentBlock.isWater() && (side == Side.TOP) && !blockToCheck.isWater()){
+            return true;
+        }
+
         return currentBlock.isWaving() != blockToCheck.isWaving() || blockToCheck.getMeshGenerator() == null
                 || !blockToCheck.isFullSide(side.reverse()) || (!currentBlock.isTranslucent() && blockToCheck.isTranslucent());
 
