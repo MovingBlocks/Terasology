@@ -217,14 +217,8 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
             }
             Vector3f a = MD5ParserCommon.readVector3fAndCorrect(matcher.group(1), matcher.group(2), matcher.group(3));
             Vector3f b = MD5ParserCommon.readVector3fAndCorrect(matcher.group(4), matcher.group(5), matcher.group(6));
-            Vector3f min = new Vector3f();
-            min.x = Math.min(a.x, b.x);
-            min.y = Math.min(a.y, b.y);
-            min.z = Math.min(a.z, b.z);
-            Vector3f max = new Vector3f();
-            max.x = Math.max(a.x, b.x);
-            max.y = Math.max(a.y, b.y);
-            max.z = Math.max(a.z, b.z);
+            Vector3f min = new Vector3f(a).min(b);
+            Vector3f max = new Vector3f(a).max(b);
             md5.bounds[i] = AABB.createMinMax(JomlUtil.from(min), JomlUtil.from(max));
         }
     }
