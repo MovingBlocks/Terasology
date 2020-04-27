@@ -15,6 +15,12 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Quaternionf;
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.ComponentContainer;
@@ -25,13 +31,9 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
+import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.SpiralIterable;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.components.shapes.BoxShapeComponent;
 import org.terasology.physics.components.shapes.CapsuleShapeComponent;
 import org.terasology.physics.components.shapes.CylinderShapeComponent;
@@ -68,12 +70,12 @@ public class PlayerFactory {
 
         LocationComponent location = controller.getComponent(LocationComponent.class);
         Vector3f spawnPosition = findSpawnPositionFromLocationComponent(location);
-        location.setWorldPosition(spawnPosition);
+        location.setWorldPosition(JomlUtil.from(spawnPosition));
         controller.saveComponent(location);
 
         logger.debug("Spawing player at: {}", spawnPosition);
 
-        builder.getComponent(LocationComponent.class).setWorldPosition(spawnPosition);
+        builder.getComponent(LocationComponent.class).setWorldPosition(JomlUtil.from(spawnPosition));
         builder.setOwner(controller);
 
         CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);
@@ -81,7 +83,7 @@ public class PlayerFactory {
 
         EntityRef player = builder.build();
 
-        Location.attachChild(player, controller, new Vector3f(), new Quat4f(0, 0, 0, 1));
+        Location.attachChild(player, controller, new Vector3f(), new Quaternionf(0, 0, 0, 1));
 
         return player;
     }
@@ -90,7 +92,7 @@ public class PlayerFactory {
         EntityBuilder builder = entityManager.newBuilder("engine:player");
         float extraSpace = 0.5f;  // spawn a little bit above the ground
         float entityHeight = getHeightOf(builder) + extraSpace;
-        return findSpawnPos(locationComponent.getWorldPosition(), entityHeight).get(); // TODO: Handle Optional being empty
+        return findSpawnPos(JomlUtil.from(locationComponent.getWorldPosition()), entityHeight).get(); // TODO: Handle Optional being empty
     }
 
     private float getHeightOf(ComponentContainer prefab) {
@@ -124,17 +126,17 @@ public class PlayerFactory {
         return 1.0f;
     }
 
-    private Optional<Vector3f> findSpawnPos(Vector3f targetPos, float entityHeight) {
-        int targetBlockX = TeraMath.floorToInt(targetPos.x);
-        int targetBlockY = TeraMath.floorToInt(targetPos.y);
-        int targetBlockZ = TeraMath.floorToInt(targetPos.z);
+    private Optional<Vector3f> findSpawnPos(Vector3fc targetPos, float entityHeight) {
+        int targetBlockX = TeraMath.floorToInt(targetPos.x());
+        int targetBlockY = TeraMath.floorToInt(targetPos.y());
+        int targetBlockZ = TeraMath.floorToInt(targetPos.z());
         Vector2i center = new Vector2i(targetBlockX, targetBlockZ);
-        for (BaseVector2i pos : SpiralIterable.clockwise(center).maxRadius(32).scale(2).build()) {
+        for (Vector2ic pos : SpiralIterable.clockwise(center).maxRadius(32).scale(2).build()) {
 
-            Vector3i testPos = new Vector3i(pos.getX(), targetBlockY, pos.getY());
+            Vector3i testPos = new Vector3i(pos.x(), targetBlockY, pos.y());
             Vector3i spawnPos = findOpenVerticalPosition(testPos, entityHeight);
             if (spawnPos != null) {
-                return Optional.of(new Vector3f(spawnPos.getX(), spawnPos.getY() + entityHeight, spawnPos.getZ()));
+                return Optional.of(new Vector3f(spawnPos.x(), spawnPos.y() + entityHeight, spawnPos.z()));
             }
         }
         return Optional.empty();
@@ -152,15 +154,15 @@ public class PlayerFactory {
 
         // TODO: also start looking downwards if initial spawn pos is in the air
         for (int i = 1; i < 20; i++) {
-            if (worldProvider.isBlockRelevant(newSpawnPos)) {
-                if (worldProvider.getBlock(newSpawnPos).isPenetrable()) {
+            if (worldProvider.isBlockRelevant(JomlUtil.from(newSpawnPos))) {
+                if (worldProvider.getBlock(JomlUtil.from(newSpawnPos)).isPenetrable()) {
                     consecutiveAirBlocks++;
                 } else {
                     consecutiveAirBlocks = 0;
                 }
 
                 if (consecutiveAirBlocks >= height) {
-                    newSpawnPos.subY(consecutiveAirBlocks);
+                    newSpawnPos.sub(0,consecutiveAirBlocks,0);
                     return newSpawnPos;
                 }
                 newSpawnPos.add(0, 1, 0);

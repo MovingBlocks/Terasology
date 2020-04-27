@@ -16,12 +16,15 @@
 
 package org.terasology.logic.location;
 
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -60,8 +63,21 @@ public class Location extends BaseComponentSystem {
         }
     }
 
+    /**
+     * attaches a child entity relative to another entity based off of the relative location
+     * @param parent
+     * @param child
+     * @param offset
+     * @param relativeRotation
+     * @deprecated
+     */
+    @Deprecated
     public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation) {
         attachChild(parent, child, offset, relativeRotation, 1f);
+    }
+
+    public static void attachChild(EntityRef parent, EntityRef child, Vector3fc offset, Quaternionfc relativeRotation) {
+        attachChild(parent, child, JomlUtil.from(offset), JomlUtil.from(relativeRotation), 1f);
     }
 
     /**
