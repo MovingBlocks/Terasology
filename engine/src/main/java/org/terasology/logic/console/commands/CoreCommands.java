@@ -19,6 +19,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -55,7 +56,12 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
 import org.terasology.naming.Name;
-import org.terasology.network.*;
+import org.terasology.network.ClientComponent;
+import org.terasology.network.JoinStatus;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
+import org.terasology.network.PingService;
+import org.terasology.network.Server;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.In;
@@ -78,7 +84,12 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -522,7 +533,7 @@ public class CoreCommands extends BaseComponentSystem {
         Vector3f offset = characterLocation.getWorldDirection().mul(2);
         Vector3f spawnPos = characterLocation.getWorldPosition().add(offset);
 
-        Vector3f forward = Direction.FORWARD.getVector3f();
+        Vector3fc forward = Direction.FORWARD.getVector3f();
         Vector3f dir = characterLocation.getWorldDirection();
         dir.y = 0;
         if (dir.lengthSquared() > 0.001f) {

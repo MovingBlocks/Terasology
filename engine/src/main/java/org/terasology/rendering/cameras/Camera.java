@@ -36,9 +36,9 @@ public abstract class Camera {
 
     /* CAMERA PARAMETERS */
     protected final Vector3f position = new Vector3f();
-    protected final Vector3f up = Direction.UP.getVector3f();
+    protected final Vector3f up = new Vector3f(Direction.UP.getVector3f());
     protected final Vector3f viewingDirection = new Vector3f(FORWARD);
-    protected final Vector3f viewingAxis = Direction.LEFT.getVector3f();
+    protected final Vector3f viewingAxis = new Vector3f(Direction.LEFT.getVector3f());
     protected float viewingAngle;
 
     protected float zNear = 0.1f;

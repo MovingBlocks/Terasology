@@ -20,11 +20,22 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.openal.*;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.ALC10;
+import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALCcontext;
+import org.lwjgl.openal.ALCdevice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
-import org.terasology.audio.*;
+import org.terasology.audio.AudioEndListener;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StaticSoundData;
+import org.terasology.audio.StreamingSound;
+import org.terasology.audio.StreamingSoundData;
 import org.terasology.audio.openAL.staticSound.OpenALSound;
 import org.terasology.audio.openAL.staticSound.OpenALSoundPool;
 import org.terasology.audio.openAL.streamingSound.OpenALStreamingSound;
@@ -239,11 +250,11 @@ public class OpenALManager implements AudioManager {
 
         OpenALException.checkState("Setting listener velocity");
 
-        Vector3f dir = Direction.FORWARD.getVector3f().rotate(orientation);
-        Vector3f up = Direction.UP.getVector3f().rotate(orientation);
+        Vector3f dir = new Vector3f(Direction.FORWARD.getVector3f()).rotate(orientation);
+        Vector3f up = new Vector3f(Direction.UP.getVector3f()).rotate(orientation);
 
         FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6)
-                .put(new float[] {dir.x, dir.y, dir.z, up.x, up.y, up.z});
+                .put(new float[] { dir.x, dir.y, dir.z, up.x, up.y, up.z });
         listenerOri.flip();
         AL10.alListener(AL10.AL_ORIENTATION, listenerOri);
 

@@ -154,7 +154,8 @@ public class LocalPlayer {
     public Vector3f getViewDirection() {
         // TODO: Put a generator for direction vectors in a util class somewhere
         // And just put quaternion -> vector somewhere too
-        return Direction.FORWARD.getVector3f().rotate(getViewRotation());
+        return new Vector3f(Direction.FORWARD.getVector3f())
+                .rotate(getViewRotation());
     }
 
     public Vector3f getVelocity() {

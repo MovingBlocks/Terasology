@@ -78,7 +78,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public Vector3f getLocalDirection() {
-        return Direction.FORWARD.getVector3f().rotate(getLocalRotation());
+        return new Vector3f(Direction.FORWARD.getVector3f())
+                .rotate(getLocalRotation());
     }
 
     public Quaternionf getLocalRotation() {
@@ -118,7 +119,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public Vector3f getWorldDirection() {
-        return Direction.FORWARD.getVector3f().rotate(getWorldRotation());
+        return new Vector3f(Direction.FORWARD.getVector3f())
+                .rotate(getWorldRotation());
     }
 
     public Quaternionf getWorldRotation() {

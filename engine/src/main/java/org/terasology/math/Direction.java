@@ -18,7 +18,9 @@ package org.terasology.math;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 import java.util.EnumMap;
 
@@ -37,8 +39,8 @@ public enum Direction {
     private static final EnumMap<Direction, Direction> REVERSE_MAP;
     private static final EnumMap<Direction, Side> CONVERSION_MAP;
 
-    private final Vector3i vector3iDir;
-    private final Vector3f vector3fDir;
+    private final Vector3ic iDirection;
+    private final Vector3fc fDirection;
 
     static {
         REVERSE_MAP = new EnumMap<>(Direction.class);
@@ -57,9 +59,9 @@ public enum Direction {
         CONVERSION_MAP.put(RIGHT, Side.LEFT);
     }
 
-    Direction(Vector3i vector3i, Vector3f vector3f) {
-        this.vector3iDir = vector3i;
-        this.vector3fDir = vector3f;
+    Direction(Vector3ic vector3i, Vector3fc vector3f) {
+        iDirection = vector3i;
+        fDirection = vector3f;
     }
 
     public static Direction inDirection(int x, int y, int z) {
@@ -117,12 +119,12 @@ public enum Direction {
     /**
      * @return The vector3i in the direction of the side. Do not modify.
      */
-    public Vector3i getVector3i() {
-        return new Vector3i(vector3iDir);
+    public Vector3ic getVector3i() {
+        return iDirection;
     }
 
-    public Vector3f getVector3f() {
-        return new Vector3f(vector3fDir);
+    public Vector3fc getVector3f() {
+        return fDirection;
     }
 
     /**
@@ -131,5 +133,4 @@ public enum Direction {
     public Direction reverse() {
         return REVERSE_MAP.get(this);
     }
-
 }
