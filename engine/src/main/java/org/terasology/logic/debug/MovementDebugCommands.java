@@ -19,13 +19,13 @@ import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.CharacterImpulseEvent;
 import org.terasology.logic.characters.MovementMode;
-import org.terasology.logic.characters.events.ScaleCharacterEvent;
+import org.terasology.logic.characters.events.OnScaleEvent;
+import org.terasology.logic.characters.events.ScaleToRequest;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
@@ -60,9 +60,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
-    
+
     @In
-    private Config config; 
+    private Config config;
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -129,8 +129,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
             return "Your SpeedMultiplier:" + move.speedMultiplier + " JumpSpeed:"
-                   + move.jumpSpeed + " SlopeFactor:"
-                   + move.slopeFactor + " RunFactor:" + move.runFactor;
+                    + move.jumpSpeed + " SlopeFactor:"
+                    + move.slopeFactor + " RunFactor:" + move.runFactor;
         }
         return "You're dead I guess.";
     }
@@ -262,8 +262,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 if (movement != null) {
                     float currentHeight = movement.height;
 
-                    ScaleCharacterEvent scaleEvent = ScaleCharacterEvent.scaleToValue(character, newHeight);
-                    character.send(scaleEvent);
+                    ScaleToRequest scaleRequest = new ScaleToRequest(newHeight);
+                    character.send(scaleRequest);
 
                     return "Height of player set to " + newHeight + " (was " + currentHeight + ")";
                 }

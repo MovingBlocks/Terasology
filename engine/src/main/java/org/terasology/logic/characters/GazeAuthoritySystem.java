@@ -27,7 +27,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.events.ScaleCharacterEvent;
+import org.terasology.logic.characters.events.OnScaleEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
@@ -65,11 +65,11 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
-    public void onScaleCharacter(ScaleCharacterEvent event, EntityRef entity, GazeMountPointComponent gazeMountPoint) {
+    public void onScaleCharacter(OnScaleEvent event, EntityRef entity, GazeMountPointComponent gazeMountPoint) {
         // adjust character eye level
         // set eye level based on "average" body decomposition for human-like figures into 7.5 "heads".
         //TODO: this glitches for some values (look through ceiling)
-        gazeMountPoint.translate.y = (event.getTargetValue() / 7.5f) * 7f - event.getTargetValue() * 0.5f;
+        gazeMountPoint.translate.y = (event.getNewValue() / 7.5f) * 7f - event.getNewValue() * 0.5f;
 
         Location.removeChild(entity, gazeMountPoint.gazeEntity);
         Location.attachChild(entity, gazeMountPoint.gazeEntity, gazeMountPoint.translate, new Quat4f(Quat4f.IDENTITY));

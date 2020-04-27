@@ -37,8 +37,8 @@ import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.characters.events.OnItemUseEvent;
+import org.terasology.logic.characters.events.OnScaleEvent;
 import org.terasology.logic.characters.events.PlayerDeathEvent;
-import org.terasology.logic.characters.events.ScaleCharacterEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
@@ -46,10 +46,8 @@ import org.terasology.logic.health.BeforeDestroyEvent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.PlayerCharacterComponent;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -451,7 +449,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
-    public void onScaleCharacter(ScaleCharacterEvent event, EntityRef entity, CharacterComponent character, CharacterMovementComponent movement) {
+    public void onScaleCharacter(OnScaleEvent event, EntityRef entity, CharacterComponent character, CharacterMovementComponent movement) {
         //TODO: We should catch and consume this event somewhere in case there is no space for the character to grow
 
         Prefab parent = entity.getParentPrefab();
