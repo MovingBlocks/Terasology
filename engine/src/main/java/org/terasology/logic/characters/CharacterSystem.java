@@ -448,7 +448,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         return interactionRangeSquared > maxInteractionRangeSquared + epsilon;
     }
 
-    @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
+    @ReceiveEvent
     public void onScaleCharacter(OnScaleEvent event, EntityRef entity, CharacterComponent character, CharacterMovementComponent movement) {
         //TODO: We should catch and consume this event somewhere in case there is no space for the character to grow
 
@@ -479,8 +479,12 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         physicsEngine.removeCharacterCollider(entity);
         physicsEngine.getCharacterCollider(entity);
 
-        //TODO: Scaling a character up will grow them into the ground. We would need to adjust the vertical position
-        //      to be safely above ground.
+        // Scaling a character up will grow them into the ground. We would need to adjust the vertical position to be
+        // safely above ground.
+        Optional.ofNullable(entity.getComponent(LocationComponent.class))
+                .map(LocationComponent::getWorldPosition)
+                .map(location -> location.addY((event.getNewValue() - event.getOldValue()) / 2f))
+                .ifPresent(location -> entity.send(new CharacterTeleportEvent(location)));
     }
 
     private float getJumpSpeed(float ratio, float defaultValue) {
