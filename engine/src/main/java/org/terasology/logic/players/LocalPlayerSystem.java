@@ -33,10 +33,28 @@ import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
-import org.terasology.input.binds.movement.*;
+import org.terasology.input.binds.movement.AutoMoveButton;
+import org.terasology.input.binds.movement.CrouchButton;
+import org.terasology.input.binds.movement.CrouchModeButton;
+import org.terasology.input.binds.movement.ForwardsMovementAxis;
+import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
+import org.terasology.input.binds.movement.JumpButton;
+import org.terasology.input.binds.movement.RotationPitchAxis;
+import org.terasology.input.binds.movement.RotationYawAxis;
+import org.terasology.input.binds.movement.StrafeMovementAxis;
+import org.terasology.input.binds.movement.StrafeRealMovementAxis;
+import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
+import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
+import org.terasology.input.binds.movement.VerticalMovementAxis;
+import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseAxisEvent.MouseAxis;
-import org.terasology.logic.characters.*;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterHeldItemComponent;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.GazeMountPointComponent;
+import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
@@ -44,7 +62,6 @@ import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
-import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
@@ -397,8 +414,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quaternionf rotation) {
         playerCamera.getPosition().set(position);
-        Vector3f viewDir = Direction.FORWARD.getVector3f().rotate(rotation);
-        playerCamera.getViewingDirection().set(viewDir);
+        playerCamera.setOrientation(rotation);
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {

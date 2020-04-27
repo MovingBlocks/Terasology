@@ -19,15 +19,12 @@ import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
+import org.terasology.math.Direction;
 import org.terasology.math.MatrixUtils;
 import org.terasology.registry.CoreRegistry;
-
-/**
- * Provides global access to fonts.
- *
- */
 
 /**
  * Camera base class.
@@ -35,12 +32,13 @@ import org.terasology.registry.CoreRegistry;
  */
 public abstract class Camera {
 
+    protected static final Vector3fc FORWARD = Direction.FORWARD.getVector3f();
+
     /* CAMERA PARAMETERS */
     protected final Vector3f position = new Vector3f();
-    protected final Vector3f up = new Vector3f(0, 1, 0);
-    // FixMe this is clearly not the viewing direction, it's the rotation axis
-    // The usage of this value outside of this class should be thoroughly analyzed when fixing this.
-    protected final Vector3f viewingDirection = new Vector3f(1, 0, 0);
+    protected final Vector3f up = Direction.UP.getVector3f();
+    protected final Vector3f viewingDirection = new Vector3f(FORWARD);
+    protected final Vector3f viewingAxis = Direction.LEFT.getVector3f();
     protected float viewingAngle;
 
     protected float zNear = 0.1f;
@@ -205,15 +203,16 @@ public abstract class Camera {
 
     /**
      * Get the orientation of the camera.
-     * @return the orientation direction, a quaternion.
+     * @return the orientation
      */
     public Quaternionf getOrientation() {
-        return new Quaternionf().fromAxisAngleRad(viewingDirection, viewingAngle);
+        return new Quaternionf().fromAxisAngleRad(viewingAxis, viewingAngle);
     }
 
-    public void setOrientation(Quaternionf quaternion) {
-        AxisAngle4f axisAngle = new AxisAngle4f(quaternion);
-        viewingDirection.set(axisAngle.x, axisAngle.y, axisAngle.z);
+    public void setOrientation(Quaternionf orientation) {
+        orientation.transform(FORWARD, viewingDirection);
+        AxisAngle4f axisAngle = new AxisAngle4f(orientation);
+        viewingAxis.set(axisAngle.x, axisAngle.y, axisAngle.z);
         viewingAngle = axisAngle.angle;
     }
 

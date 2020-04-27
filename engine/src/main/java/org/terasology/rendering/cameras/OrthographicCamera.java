@@ -83,7 +83,7 @@ public class OrthographicCamera extends Camera {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
 
         // Nothing to do...
-        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
                 && cachedZFar == zFar && cachedZNear == zNear) {
             return;
         }
@@ -97,7 +97,7 @@ public class OrthographicCamera extends Camera {
 
         // Used for dirty checks
         cachedPosition.set(getPosition());
-        cachedViewigDirection.set(getViewingDirection());
+        cachedViewigDirection.set(viewingDirection);
         cachedZFar = zFar;
         cachedZNear = zNear;
 
