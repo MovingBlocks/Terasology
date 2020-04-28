@@ -62,6 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
@@ -138,10 +139,18 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                     EntityRef blockEntity = getBlockEntityAt(vec);
 
                     // check for components to be retained when updating the block entity
-                    Set<Class<? extends Component>> retainComponents = Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
-                            .map(retainComponentsComponent -> retainComponentsComponent.components)
-                            .orElse(Collections.emptySet());
+                    final Set<String> classNamesToRetain =
+                            Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
+                                    .map(retainComponentsComponent -> retainComponentsComponent.componentTypeNames)
+                                    .orElse(Collections.emptySet());
 
+
+                    final Set<Class<? extends Component>> retainComponents =
+                            classNamesToRetain.stream()
+                                    .map(className -> classFromName(className, Component.class))
+                                    .filter(Optional::isPresent)
+                                    .map(Optional::get)
+                                    .collect(Collectors.toSet());
 
                     updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
                 }
@@ -149,6 +158,16 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             return oldBlocks;
         }
         return null;
+    }
+
+    private <T> Optional<Class<? extends T>> classFromName(final String className, Class<T> interfaceClass) {
+        Class<? extends T> clazz = null;
+        try {
+            clazz = Class.forName(className).asSubclass(interfaceClass);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return Optional.ofNullable(clazz);
     }
 
     @Override

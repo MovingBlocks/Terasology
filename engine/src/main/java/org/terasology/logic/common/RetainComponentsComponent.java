@@ -29,5 +29,5 @@ import java.util.Set;
  */
 public class RetainComponentsComponent implements Component {
     @Replicate
-    public Set<Class<? extends Component>> components = Sets.newHashSet();
+    public Set<String> componentTypeNames = Sets.newHashSet();
 }
