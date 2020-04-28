@@ -103,6 +103,9 @@ public class KinematicCharacterMover implements CharacterMover {
             updatePosition(characterMovementComponent, result, input, entity);
 
             if (input.isFirstRun()) {
+                //TODO: Only the character height is considered here, but not other properties denoting the extent.
+                //      The CharacterMovementComponent also has a 'radius' which may be used here.
+                //      Question: Is this connected with _shapes_ or bounding boxes in some way?
                 checkBlockEntry(entity,
                         new Vector3i(initial.getPosition(), RoundingMode.HALF_UP),
                         new Vector3i(result.getPosition(), RoundingMode.HALF_UP),
@@ -127,31 +130,33 @@ public class KinematicCharacterMover implements CharacterMover {
     }
 
     /*
-    * Figure out if our position has put us into a new set of blocks and fire the appropriate events.
-    */
+     * Figure out if our position has put us into a new set of blocks and fire the appropriate events.
+     */
     private void checkBlockEntry(EntityRef entity, Vector3i oldPosition, Vector3i newPosition, float characterHeight) {
-        // TODO: This will only work for tall mobs/players and single block mobs
-        // is this a different position than previously
+        // TODO: This will only work for mobs/players with a ground area of a single block as horizontal extents are
+        //       not considered.
+        //       Maybe the simple `characterHeight` value should be replaced by a vector of extents, or rather provide
+        //       a method overload to allow for both.
+        //          private void checkBlockEntry(EntityRef entity, Vector3i oldPosition, Vector3i newPosition, Vector3f characterExtents) {
+
         if (!oldPosition.equals(newPosition)) {
+            int characterHeightInBlocks = (int) Math.ceil(characterHeight);
+
             // get the old position's blocks
-            Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
-            Vector3i currentPosition = new Vector3i(oldPosition);
-            for (int currentHeight = 0; currentHeight < oldBlocks.length; currentHeight++) {
-                oldBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
-                currentPosition.add(0, 1, 0);
+            Block[] oldBlocks = new Block[characterHeightInBlocks];
+            for (int y = 0; y < characterHeightInBlocks; y++) {
+                oldBlocks[y] = worldProvider.getBlock(oldPosition.x, oldPosition.y + y, oldPosition.z);
             }
 
             // get the new position's blocks
-            Block[] newBlocks = new Block[(int) Math.ceil(characterHeight)];
-            currentPosition = new Vector3i(newPosition);
-            for (int currentHeight = 0; currentHeight < characterHeight; currentHeight++) {
-                newBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
-                currentPosition.add(0, 1, 0);
+            Block[] newBlocks = new Block[characterHeightInBlocks];
+            for (int y = 0; y < characterHeightInBlocks; y++) {
+                newBlocks[y] = worldProvider.getBlock(newPosition.x, newPosition.y + y, newPosition.z);
             }
 
-            for (int i = 0; i < characterHeight; i++) {
+            for (int y = 0; y < characterHeightInBlocks; y++) {
                 // send a block enter/leave event for this character
-                entity.send(new OnEnterBlockEvent(oldBlocks[i], newBlocks[i], new Vector3i(0, i, 0)));
+                entity.send(new OnEnterBlockEvent(oldBlocks[y], newBlocks[y], new Vector3i(0, y, 0)));
             }
         }
     }
@@ -195,12 +200,13 @@ public class KinematicCharacterMover implements CharacterMover {
 
         updateMode(state, newSwimming, newDiving, newClimbing, isCrouching);
     }
-    
+
     /**
      * Updates a character's movement mode and changes his vertical velocity accordingly.
-     * @param state The current state of the character.
+     *
+     * @param state       The current state of the character.
      * @param newSwimming True if the top of the character's body isn't in a liquid block but his bottom is.
-     * @param newDiving True if the character's body is fully inside liquid blocks.
+     * @param newDiving   True if the character's body is fully inside liquid blocks.
      * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
      */
     static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing, boolean isCrouching) {

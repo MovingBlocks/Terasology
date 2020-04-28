@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,11 +52,10 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.OnItemUseEvent;
+import org.terasology.logic.characters.events.ScaleToRequest;
 import org.terasology.logic.characters.interactions.InteractionUtil;
-import org.terasology.logic.debug.MovementDebugCommands;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -93,9 +92,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private LocalPlayer localPlayer;
     @In
     private WorldProvider worldProvider;
-    private Camera playerCamera;
-    @In
-    private MovementDebugCommands movementDebugCommands;
     @In
     private PhysicsEngine physics;
     @In
@@ -108,6 +104,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @In
     private BindsManager bindsManager;
+
+    private Camera playerCamera;
 
     private float bobFactor;
     private float lastStepDelta;
@@ -233,14 +231,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         if (character.equals(localPlayer.getCharacterEntity())) {
-
-            // Change height as per PlayerSettings
-            Float height = config.getPlayer().getHeight();
-            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height);
-            // Change eyeHeight as per PlayerSettings
-            Float eyeHeight = config.getPlayer().getEyeHeight();
-            GazeMountPointComponent gazeMountPointComponent = character.getComponent(GazeMountPointComponent.class);
-            gazeMountPointComponent.translate = new Vector3f(0, eyeHeight, 0);
+            // update character height as given in player settings
+            ScaleToRequest scaleRequest = new ScaleToRequest(config.getPlayer().getHeight());
+            localPlayer.getCharacterEntity().send(scaleRequest);
 
             // Trigger updating the player camera position as soon as the local player is spawned.
             // This is not done while the game is still loading, since systems are not updated.

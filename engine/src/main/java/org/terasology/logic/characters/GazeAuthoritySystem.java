@@ -22,17 +22,21 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.characters.events.OnScaleEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.In;
 
 /**
- * Gaze describes where the character is looking.  This direction is accessible to all clients and could be hooked up to part of the rendered character.
+ * Gaze describes where the character is looking.
+ *
+ * This direction is accessible to all clients and could be hooked up to part of the rendered character.
  * Also, this can be used to allow the server to correctly perform actions based on where the character is looking.
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
@@ -58,6 +62,18 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
         EntityBuilder gazeContainerBuilder = entityManager.newBuilder("engine:gaze");
         EntityRef gazeEntity = gazeContainerBuilder.build();
         return gazeEntity;
+    }
+
+    @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
+    public void onScaleCharacter(OnScaleEvent event, EntityRef entity, GazeMountPointComponent gazeMountPoint) {
+        // adjust character eye level
+        // set eye level based on "average" body decomposition for human-like figures into 7.5 "heads".
+        //TODO: this glitches for some values (look through ceiling)
+        gazeMountPoint.translate.y = (event.getNewValue() / 7.5f) * 7f - event.getNewValue() * 0.5f;
+
+        Location.removeChild(entity, gazeMountPoint.gazeEntity);
+        Location.attachChild(entity, gazeMountPoint.gazeEntity, gazeMountPoint.translate, new Quat4f(Quat4f.IDENTITY));
+        entity.saveComponent(gazeMountPoint);
     }
 
     /**
