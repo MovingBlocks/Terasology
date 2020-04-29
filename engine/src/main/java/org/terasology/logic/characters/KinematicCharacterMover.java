@@ -795,7 +795,7 @@ public class KinematicCharacterMover implements CharacterMover {
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             if (jumpOrCrouchActive) {
-                rotation.rotationYXZ(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+                rotation.rotationY(TeraMath.DEG_TO_RAD * state.getYaw());
             } else {
                 rotation.rotationYXZ(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
                         TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus);
