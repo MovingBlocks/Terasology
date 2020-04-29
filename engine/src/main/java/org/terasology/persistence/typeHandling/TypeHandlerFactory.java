@@ -42,39 +42,4 @@ public interface TypeHandlerFactory {
      * if the type is not supported by this {@link TypeHandlerFactory}.
      */
     <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerContext context);
-
-    /**
-     * Creates a {@link TypeHandlerFactory} that only produces type handlers for the given type
-     * using the given {@link TypeHandler} producer method.
-     * @param type The {@link TypeInfo} describing the type for which the factory generates type handlers
-     * @param handlerProducer The {@link TypeHandler} producer method
-     * @param <R> The type for which the factory generates type handlers
-     * @return The created {@link TypeHandlerFactory}.
-     */
-    static <R> TypeHandlerFactory of(TypeInfo<R> type,
-                                     BiFunction<TypeInfo<R>, TypeHandlerContext, TypeHandler<R>> handlerProducer) {
-        return new TypeHandlerFactory() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public <T> Optional<TypeHandler<T>> create(TypeInfo<T> typeInfo, TypeHandlerContext context) {
-                if (typeInfo.equals(type)) {
-                    return Optional.of((TypeHandler<T>) handlerProducer.apply(type, context));
-                }
-                return Optional.empty();
-            }
-        };
-    }
-
-    /**
-     * Creates a {@link TypeHandlerFactory} that only produces type handlers for the given type
-     * using the given {@link TypeHandler} producer method.
-     * @param clazz The {@link Class} of the type for which the factory generates type handlers
-     * @param handlerProducer The {@link TypeHandler} producer method
-     * @param <R> The type for which the factory generates type handlers
-     * @return The created {@link TypeHandlerFactory}.
-     */
-    static <R> TypeHandlerFactory of(Class<R> clazz,
-                                     BiFunction<TypeInfo<R>, TypeHandlerContext, TypeHandler<R>> handlerProducer) {
-        return of(TypeInfo.of(clazz), handlerProducer);
-    }
 }

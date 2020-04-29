@@ -278,7 +278,12 @@ public class TypeHandlerLibrary {
             return false;
         }
 
-        addTypeHandlerFactory(TypeHandlerFactory.of(type, (_t, _c) -> typeHandler));
+        addTypeHandlerFactory(new SpecificTypeHandlerFactory<T>(type) {
+            @Override
+            protected TypeHandler<T> createHandler(TypeHandlerContext context) {
+                return typeHandler;
+            }
+        });
 
         return true;
     }
