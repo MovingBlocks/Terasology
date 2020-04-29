@@ -40,6 +40,7 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -201,7 +202,7 @@ public final class EnvironmentSwitchHandler {
                 if (opt.isPresent()) {
                     TypeHandler instance = InjectionHelper.createWithConstructorInjection(handler, context);
                     InjectionHelper.inject(instance, context);
-                    library.addTypeHandler((Class) opt.get(), instance);
+                    library.addTypeHandler(TypeInfo.of(opt.get()), instance);
                 }
             }
         }

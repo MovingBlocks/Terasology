@@ -18,6 +18,7 @@ package org.terasology.persistence.typeHandling;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 /**
  * Creates type handlers for a set of types. Type handler factories are generally used when a set of types
