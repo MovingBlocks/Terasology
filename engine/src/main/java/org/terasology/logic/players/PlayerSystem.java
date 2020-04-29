@@ -36,6 +36,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -248,7 +249,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         EntityRef playerCharacter = client.character;
         LocationComponent location = playerCharacter.getComponent(LocationComponent.class);
         PlayerFactory playerFactory = new PlayerFactory(entityManager, worldProvider);
-        Vector3f spawnPosition = playerFactory.findSpawnPositionFromLocationComponent(location);
+        Vector3f spawnPosition = JomlUtil.from(playerFactory.findSpawnPositionFromLocationComponent(location));
 
         playerCharacter.addComponent(new AliveCharacterComponent());
         playerCharacter.send(new CharacterTeleportEvent(spawnPosition));
