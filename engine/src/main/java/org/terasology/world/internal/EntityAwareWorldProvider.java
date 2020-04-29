@@ -139,18 +139,10 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                     EntityRef blockEntity = getBlockEntityAt(vec);
 
                     // check for components to be retained when updating the block entity
-                    final Set<String> classNamesToRetain =
-                            Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
-                                    .map(retainComponentsComponent -> retainComponentsComponent.componentTypeNames)
-                                    .orElse(Collections.emptySet());
-
-
                     final Set<Class<? extends Component>> retainComponents =
-                            classNamesToRetain.stream()
-                                    .map(className -> classFromName(className, Component.class))
-                                    .filter(Optional::isPresent)
-                                    .map(Optional::get)
-                                    .collect(Collectors.toSet());
+                            Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
+                                    .map(retainComponentsComponent -> retainComponentsComponent.components)
+                                    .orElse(Collections.emptySet());
 
                     updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
                 }

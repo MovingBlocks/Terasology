@@ -23,6 +23,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.IntegerRange;
 import org.terasology.math.geom.Quat4f;
@@ -36,6 +37,7 @@ import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteArrayTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.CharacterTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.ComponentClassTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.FloatTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
@@ -53,6 +55,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.extensionTypes.factories.ComponentClassTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
@@ -141,6 +144,8 @@ public class TypeHandlerLibrary {
         addTypeHandlerFactory(new ArrayTypeHandlerFactory());
         addTypeHandler(byte[].class, new ByteArrayTypeHandler());
 
+        //addTypeHandler(new TypeInfo<Class<? extends Component>>() {},new ComponentClassTypeHandler());
+
         addTypeHandlerFactory(new EnumTypeHandlerFactory());
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new StringMapTypeHandlerFactory());
@@ -210,11 +215,12 @@ public class TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(org.joml.Vector3i.class, new Vector3iTypeHandler());
         serializationLibrary.addTypeHandler(org.joml.Vector2i.class, new Vector2iTypeHandler());
 
-
         serializationLibrary.addTypeHandlerFactory(new Rect2iTypeHandlerFactory());
         serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());
         serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
+
+        //serializationLibrary.addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());
     }
 
     /**
