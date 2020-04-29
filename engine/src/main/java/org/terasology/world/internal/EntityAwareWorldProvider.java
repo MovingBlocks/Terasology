@@ -62,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
@@ -150,16 +149,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             return oldBlocks;
         }
         return null;
-    }
-
-    private <T> Optional<Class<? extends T>> classFromName(final String className, Class<T> interfaceClass) {
-        Class<? extends T> clazz = null;
-        try {
-            clazz = Class.forName(className).asSubclass(interfaceClass);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return Optional.ofNullable(clazz);
     }
 
     @Override
