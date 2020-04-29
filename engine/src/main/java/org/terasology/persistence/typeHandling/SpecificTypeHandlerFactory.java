@@ -19,6 +19,11 @@ import org.terasology.reflection.TypeInfo;
 
 import java.util.Optional;
 
+/**
+ * Represents a {@link TypeHandlerFactory} that generates type handlers for a specific type.
+ *
+ * @param <T> The type for which this {@link TypeHandlerFactory} generates type handlers.
+ */
 public abstract class SpecificTypeHandlerFactory<T> implements TypeHandlerFactory {
     protected final TypeInfo<T> type;
 
