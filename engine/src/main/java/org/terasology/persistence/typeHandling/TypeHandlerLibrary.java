@@ -278,15 +278,12 @@ public class TypeHandlerLibrary {
             return false;
         }
 
-        TypeHandlerFactory factory = new TypeHandlerFactory() {
-            @SuppressWarnings("unchecked")
+        addTypeHandlerFactory(new SpecificTypeHandlerFactory<T>(type) {
             @Override
-            public <R> Optional<TypeHandler<R>> create(TypeInfo<R> typeInfo, TypeHandlerContext context) {
-                return typeInfo.equals(type) ? Optional.of((TypeHandler<R>) typeHandler) : Optional.empty();
+            protected TypeHandler<T> createHandler(TypeHandlerContext context) {
+                return typeHandler;
             }
-        };
-
-        addTypeHandlerFactory(factory);
+        });
 
         return true;
     }
