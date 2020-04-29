@@ -21,6 +21,7 @@ import org.joml.Vector2ic;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.ComponentContainer;
@@ -148,7 +149,7 @@ public class PlayerFactory {
      * @param height the height of the entity to spawn
      * @return the topmost solid block <code>null</code> if none was found
      */
-    private Vector3i findOpenVerticalPosition(Vector3i spawnPos, float height) {
+    private Vector3i findOpenVerticalPosition(Vector3ic spawnPos, float height) {
         int consecutiveAirBlocks = 0;
         Vector3i newSpawnPos = new Vector3i(spawnPos);
 
@@ -162,7 +163,7 @@ public class PlayerFactory {
                 }
 
                 if (consecutiveAirBlocks >= height) {
-                    newSpawnPos.sub(0,consecutiveAirBlocks,0);
+                    newSpawnPos.y -= consecutiveAirBlocks;
                     return newSpawnPos;
                 }
                 newSpawnPos.add(0, 1, 0);

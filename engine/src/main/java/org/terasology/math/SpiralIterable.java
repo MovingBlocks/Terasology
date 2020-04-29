@@ -28,7 +28,6 @@ import java.util.NoSuchElementException;
  * The iteration starts in positive x direction.
  * <br><br>
  * The iterating vector is reused. <b>Do not attempt to store the instance</b> e.g. in a collection.
- * @author Martin Steiger
  */
 public class SpiralIterable implements Iterable<Vector2ic>{
 
@@ -89,7 +88,7 @@ public class SpiralIterable implements Iterable<Vector2ic>{
             private int y;
             private int index;
 
-            private Vector2i pos = new Vector2i();
+            private final Vector2i pos = new Vector2i();
 
             @Override
             public Vector2ic next() {

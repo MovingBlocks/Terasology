@@ -37,13 +37,16 @@ public class Location extends BaseComponentSystem {
 
     /**
      * Attaches an entity to another entity. Both must have location components.
-     * This method sets the child's relative offset and rotation to the
+     * This method sets the child's relative offset and rotation to the parent {@link LocationComponent}
      *
-     * @param parent
-     * @param child
-     * @param offset
-     * @param relativeRotation
+     * @param parent           entity that will be the parent Location to the child
+     * @param child            entity will be attached relative to the parent
+     * @param offset           relative position from parent
+     * @param relativeRotation relative rotation from parent
+     * @deprecated This is scheduled for removal in an upcoming version
+     * method will be replaced with JOML implementation {@link #attachChild(EntityRef, EntityRef, Vector3fc, Quaternionfc, float)}.
      */
+    @Deprecated
     public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation, float relativeScale) {
         LocationComponent childLoc = child.getComponent(LocationComponent.class);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
@@ -64,20 +67,46 @@ public class Location extends BaseComponentSystem {
     }
 
     /**
-     * attaches a child entity relative to another entity based off of the relative location
-     * @param parent
-     * @param child
-     * @param offset
-     * @param relativeRotation
-     * @deprecated
+     * Attaches an entity to another entity. Both must have location components.
+     * This method sets the child's relative offset and rotation to the parent {@link LocationComponent}
+     *
+     * @param parent           entity with a {@link LocationComponent}
+     * @param child            entity with a {@link LocationComponent} attach to the parent
+     * @param offset           relative position from parent
+     * @param relativeRotation relative rotation from parent
+     * @deprecated This is scheduled for removal in an upcoming version
+     * method will be replaced with JOML implementation {@link #attachChild(EntityRef, EntityRef, Vector3fc, Quaternionfc)}.
      */
     @Deprecated
     public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation) {
         attachChild(parent, child, offset, relativeRotation, 1f);
     }
 
+    /**
+     * Attaches an entity to another entity. Both must have location components.
+     * This method sets the child's relative offset and rotation to the parent {@link LocationComponent}
+     *
+     * @param parent           entity with a {@link LocationComponent}
+     * @param child            entity with a {@link LocationComponent} attach to the parent
+     * @param offset           relative position from parent
+     * @param relativeRotation relative rotation from parent
+     **/
     public static void attachChild(EntityRef parent, EntityRef child, Vector3fc offset, Quaternionfc relativeRotation) {
         attachChild(parent, child, JomlUtil.from(offset), JomlUtil.from(relativeRotation), 1f);
+    }
+
+    /**
+     * Attaches an entity to another entity. Both must have location components.
+     * This method sets the child's relative offset and rotation to the parent {@link LocationComponent}
+     *
+     * @param parent           entity with a {@link LocationComponent}
+     * @param child            entity with a {@link LocationComponent} attach to the parent
+     * @param offset           relative position from parent
+     * @param relativeRotation relative rotation from parent
+     * @param relativeScale    relative scale from parent
+     **/
+    public static void attachChild(EntityRef parent, EntityRef child, Vector3fc offset, Quaternionfc relativeRotation, float relativeScale) {
+        attachChild(parent, child, JomlUtil.from(offset), JomlUtil.from(relativeRotation), relativeScale);
     }
 
     /**
