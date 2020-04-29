@@ -43,5 +43,11 @@ public abstract class SpecificTypeHandlerFactory<T> implements TypeHandlerFactor
         return Optional.empty();
     }
 
+    /**
+     * Creates the {@link TypeHandler} for the specific type.
+     *
+     * @param context The context in which to create the {@link TypeHandler}.
+     * @return The created type handler.
+     */
     protected abstract TypeHandler<T> createHandler(TypeHandlerContext context);
 }
