@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -43,6 +44,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -114,11 +116,16 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public Block setBlock(Vector3i pos, Block type) {
+        return this.setBlock(JomlUtil.from(pos),type);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic pos, Block type) {
         if (GameThread.isCurrentThread()) {
-            EntityRef blockEntity = getBlockEntityAt(pos);
-            Block oldType = super.setBlock(pos, type);
+            EntityRef blockEntity = getBlockEntityAt(JomlUtil.from(pos));
+            Block oldType = super.setBlock(JomlUtil.from(pos), type);
             if (oldType != null) {
-                updateBlockEntity(blockEntity, pos, oldType, type, false, Collections.<Class<? extends Component>>emptySet());
+                updateBlockEntity(blockEntity, JomlUtil.from(pos), oldType, type, false, Collections.<Class<? extends Component>>emptySet());
             }
             return oldType;
         }
