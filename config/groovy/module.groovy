@@ -71,8 +71,8 @@ class module {
 
         // Modules just consider the item name and excludes those in a specific list
         itemList = possibleItems.findAll {
-            !excludedItems.contains (it.key)
-        }.collect {it.key}
+            !excludedItems.contains(it.key)
+        }.collect { it.key }
 
         return itemList
     }

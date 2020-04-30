@@ -38,12 +38,12 @@ excludedItems = common.excludedItems
 targetDirectory = common.targetDirectory
 
 def recurse = false
-switch(cleanerArgs[0]) {
+switch (cleanerArgs[0]) {
     case "recurse":
         recurse = true
         println "We're retrieving recursively (all the things depended on too)"
-    // We just fall through here to the get logic after setting a boolean
-    //noinspection GroovyFallthrough
+// We just fall through here to the get logic after setting a boolean
+//noinspection GroovyFallthrough
     case "get":
         println "Preparing to get $itemType"
         //println "cleanerArgs is $cleanerArgs"
@@ -70,7 +70,7 @@ switch(cleanerArgs[0]) {
             }
             common.unCacheItemList()
 
-            common.retrieve(((String[])selectedItems.toArray()), recurse)
+            common.retrieve(((String[]) selectedItems.toArray()), recurse)
         }
         break
     case "get-all":
@@ -79,7 +79,7 @@ switch(cleanerArgs[0]) {
         common.cacheItemList()
         selectedItems.addAll(common.retrieveAvalibleItemsWithWildcardMatch("*"));
         common.unCacheItemList()
-        common.retrieve(((String[])selectedItems.toArray()), recurse)
+        common.retrieve(((String[]) selectedItems.toArray()), recurse)
         break
     case "create":
         println "We're doing a create"
@@ -117,7 +117,7 @@ switch(cleanerArgs[0]) {
     case "update-all":
         println "We're updating every $itemType"
         println "List of local entries: ${common.retrieveLocalItems()}"
-        for(item in common.retrieveLocalItems()){
+        for (item in common.retrieveLocalItems()) {
             common.updateItem(item)
         }
         break
@@ -153,7 +153,7 @@ switch(cleanerArgs[0]) {
         break
 
     case "list":
-        ListFormat listFormat  = determineListFormat(cleanerArgs)
+        ListFormat listFormat = determineListFormat(cleanerArgs)
         String[] availableItems = common.retrieveAvailableItems()
         String[] localItems = common.retrieveLocalItems()
         String[] downloadableItems = availableItems.minus(localItems)
@@ -166,7 +166,7 @@ switch(cleanerArgs[0]) {
             printListItems(downloadableItems, listFormat)
         }
         println "\nThe following items are already downloaded:"
-        if(localItems.size() == 0) {
+        if (localItems.size() == 0) {
             println "No items downloaded."
         } else {
             printListItems(localItems, listFormat)
@@ -218,7 +218,11 @@ switch(cleanerArgs[0]) {
         println "UNRECOGNIZED COMMAND '" + cleanerArgs[0] + "' - please try again or use 'groovyw usage' for help"
 }
 
-enum ListFormat { DEFAULT, SIMPLE, CONDENSED };
+enum ListFormat {
+    DEFAULT, SIMPLE, CONDENSED
+}
+
+;
 
 private ListFormat determineListFormat(String[] args) {
     for (listFormat in ListFormat.values()) {
@@ -234,8 +238,8 @@ private void printListItems(String[] items, ListFormat listFormat) {
         case ListFormat.SIMPLE: printListItemsSimple(items); break;
         case ListFormat.CONDENSED: printListItemsCondensed(items); break;
         default: items.size() < DEFAULT_FORMAT_CONDENSATION_THRESHOLD ?
-            printListItemsSimple(items) :
-            printListItemsCondensed(items)
+                printListItemsSimple(items) :
+                printListItemsCondensed(items)
     }
 }
 
@@ -246,7 +250,7 @@ private void printListItemsSimple(String[] items) {
 }
 
 private void printListItemsCondensed(String[] items) {
-    for (group in items.groupBy {it[0].toUpperCase()}) {
+    for (group in items.groupBy { it[0].toUpperCase() }) {
         println "--" + group.key + ": " + group.value.sort().join(", ")
     }
 }
