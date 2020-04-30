@@ -28,7 +28,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
@@ -60,8 +59,6 @@ public class TrunkSystem extends BaseComponentSystem {
     private EntityManager entityManager;
     @In
     private AudioManager audioManager;
-    @In
-    private InventoryManager inventoryManager;
     @In
     private EntitySystemLibrary entitySystemLibrary;
 
