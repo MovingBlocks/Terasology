@@ -99,7 +99,7 @@ public class SpriteParticleRenderer implements RenderSystem {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             glBindTexture(GL11.GL_TEXTURE_2D, particleSystem.particleData.texture.getId());
 
-            material.setFloat2("texSize", particleSystem.particleData.textureSize.getX(), particleSystem.particleData.textureSize.getY());
+            material.setFloat2("texSize", particleSystem.particleData.textureSize.x(), particleSystem.particleData.textureSize.y());
         }
 
         glPushMatrix();
