@@ -440,6 +440,38 @@ class common {
         itemListCached = false
     }
 
+    void writeDependencyDotFileForModule(File dependencyFile, File module) {
+        if (module.name.contains(".")) {
+            println "\"" + module.name + "\" is not a valid source (non-jar) module - skipping"
+        } else if (itemsRetrieved.contains(module.name)) {
+            println "Module \"" + module.name + "\" was already handled - skipping"
+        } else if (!module.exists()) {
+            println "Module \"" + module.name + "\" is not locally available - skipping"
+            itemsRetrieved << module.name
+        } else {
+            def foundDependencies = itemTypeScript.findDependencies(module, false)
+            if (foundDependencies.length == 0) {
+                // if no other dependencies exist, depend on engine
+                dependencyFile.append("  \"" + module.name + "\" -> \"engine\"\n")
+                itemsRetrieved << module.name
+            } else {
+                // add each of $foundDependencies as item -> foundDependency lines
+                for (dependency in foundDependencies) {
+                    dependencyFile.append("  \"" + module.name + "\" -> \"$dependency\"\n")
+                }
+                itemsRetrieved << module.name
+
+                // find dependencies to progress with
+                String[] uniqueDependencies = foundDependencies - itemsRetrieved
+                if (uniqueDependencies.length > 0) {
+                    for (dependency in uniqueDependencies) {
+                        writeDependencyDotFileForModule(dependencyFile, new File("modules/$dependency"))
+                    }
+                }
+            }
+        }
+    }
+
     def refreshGradle() {
         def localItems = []
         targetDirectory.eachDir() { dir ->

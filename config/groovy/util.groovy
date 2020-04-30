@@ -178,6 +178,42 @@ switch(cleanerArgs[0]) {
         common.refreshGradle()
         break
 
+    case "createDependencyDotFile":
+        if (itemType != "module") {
+            println "Dependency dot file can only be created for modules"
+            break
+        }
+        String source = ""
+        if (cleanerArgs.length == 1 || cleanerArgs[1] == "*") {
+            // getting dependency dot file for all modules
+            source = "all"
+        } else if (cleanerArgs.length > 2) {
+            println "Please enter only one module or none to create a dependency dot file showing all modules"
+        } else if (cleanerArgs[1].contains('*') || cleanerArgs[1].contains('?')) {
+            println "Please enter a fully specified item instead of " + cleanerArgs[1] + " - CapiTaliZation MatterS"
+        } else {
+            // getting dependency dot file for specified module only
+            source = cleanerArgs[1]
+        }
+
+        if (source != "") {
+            def dependencyFile = new File("dependency.dot")
+            dependencyFile.write "digraph moduleDependencies {\n"
+            if (source == "all") {
+                println "Creating the dependency dot file for all modules as \"dependencies.dot\""
+                def modules = new File("modules")
+                modules.eachFile {
+                    common.writeDependencyDotFileForModule(dependencyFile, it)
+                }
+            } else {
+                println "Creating the dependency dot file for module \"$source\" as \"dependencies.dot\""
+                common.writeDependencyDotFileForModule(dependencyFile, new File("modules/$source"))
+            }
+            dependencyFile.append("}")
+        }
+
+        break
+
     default:
         println "UNRECOGNIZED COMMAND '" + cleanerArgs[0] + "' - please try again or use 'groovyw usage' for help"
 }
@@ -236,6 +272,7 @@ def printUsage() {
     println "- 'add-remote (item) (name) (URL)' - adds a remote with the given URL"
     println "- 'list-remotes (item)' - lists all remotes for (item) "
     println "- 'refresh' - replaces the Gradle build file for all items of the given type from the latest template"
+    println "- 'createDependencyDotFile' - creates a dot file recursively listing dependencies of given locally available module, can be visualized with e.g. graphviz"
     println ""
     println "Available flags:"
     println "'-remote [someRemote]' to clone from an alternative remote, also adding the upstream org (like MovingBlocks) repo as 'origin'"
@@ -253,6 +290,7 @@ def printUsage() {
     println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source"
     println "Example: 'groovyw lib list' - would list library projects compatible with being embedded in a Terasology workspace"
+    println "Example: 'groovyw module createDependencyDotFile JoshariasSurvival' - would create a dot file with JS' dependencies and all their dependencies - if locally available"
     println ""
     println "*NOTE*: Item names are case sensitive. If you add items then `gradlew idea` or similar may be needed to refresh your IDE"
     println ""
