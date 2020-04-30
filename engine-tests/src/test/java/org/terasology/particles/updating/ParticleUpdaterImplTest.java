@@ -15,6 +15,7 @@
  */
 package org.terasology.particles.updating;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.module.ModuleManager;
@@ -50,15 +51,18 @@ public class ParticleUpdaterImplTest {
 
     @Test
     public void testNullEmitterRegistration() {
-        particleUpdater.addEmitter(null);
+        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+            particleUpdater.addEmitter(null);
+        });
     }
 
     @Test
     public void testNonEmitterRegistration() {
         EntityRef emitterEntity = mock(EntityRef.class);
         when(emitterEntity.getComponent(ParticleEmitterComponent.class)).thenReturn(null);
-
-        particleUpdater.addEmitter(emitterEntity);
+        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+            particleUpdater.addEmitter(emitterEntity);
+        });
     }
 
     @Test
