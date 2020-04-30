@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.rendering.RenderingModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -214,6 +216,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         // registry not populated by new ModuleRendering instances in UI, populate now
         if (renderingModuleRegistry.getOrderedRenderingModules().isEmpty()) {
             renderingModuleRegistry.updateRenderingModulesOrder(context.get(ModuleManager.class).getEnvironment(), context);
+            if(renderingModuleRegistry.getOrderedRenderingModules().isEmpty()) {
+                GameEngine gameEngine = context.get(GameEngine.class);
+                gameEngine.changeState(new StateMainMenu("No rendering module loaded, unable to render. Try enabling BasicRendering."));
+            }
         } else { // registry populated by new ModuleRendering instances in UI
             // Switch module's context from gamecreation subcontext to gamerunning context
             renderingModuleRegistry.updateModulesContext(context);
