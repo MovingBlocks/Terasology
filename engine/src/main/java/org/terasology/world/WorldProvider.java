@@ -40,7 +40,7 @@ public interface WorldProvider extends WorldProviderCore {
     boolean isBlockRelevant(Vector3i pos);
 
     /**
-     *
+     * An active block is in a chunk that is available and fully generated.
      * @param pos The position
      * @return Whether the given block is active
      */
