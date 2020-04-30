@@ -48,14 +48,14 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("Core:companion"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Brick:engine:stair"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Tnt"), 99));
-        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:fuseShort"));
-        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:fuseLong"));
-        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:shallowRailgunTool"));
-        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:thoroughRailgunTool"));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("CoreItems:fuseShort"));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("CoreItems:fuseLong"));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("CoreItems:shallowRailgunTool"));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("CoreItems:thoroughRailgunTool"));
 
-        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:railgunTool"));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("CoreItems:railgunTool"));
 
-        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("core:mrbarsack"));
+        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("CoreItems:mrbarsack"));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Brick"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Ice"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Plank"), 99));
@@ -81,12 +81,12 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         // Place inner chest into outer chest
         inventoryManager.giveItem(chest, EntityRef.NULL, innerChest);
 
-        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:pickaxe"));
-        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:axe"));
-        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:shovel"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:pickaxe"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:axe"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:shovel"));
         inventoryManager.giveItem(player, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Torch"), 99));
-        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:explodeTool"));
-        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:railgunTool"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:explodeTool"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:railgunTool"));
         inventoryManager.giveItem(player, EntityRef.NULL, chest);
     }
 }

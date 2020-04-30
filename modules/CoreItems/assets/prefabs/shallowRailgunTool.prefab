@@ -8,7 +8,7 @@
         "usage": "IN_DIRECTION"
     },
     "TunnelAction": {
-        "damageType": "Core:NonDestructiveExplosiveDamage",
+        "damageType": "CoreItems:NonDestructiveExplosiveDamage",
         "maxDestroyedBlocks": 300
     },
     "PlaySoundAction": {

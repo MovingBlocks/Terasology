@@ -5,7 +5,8 @@
     "displayName" : "Core Items",
     "description" : "This module adds a basic set of items",
     "dependencies" : [
-        {"id" : "CoreAssets", "minVersion" : "1.0.1"}
+        {"id" : "CoreAssets", "minVersion" : "1.0.1"},
+        {"id" : "Health", "minVersion" : "0.1.0"}
     ],
     "serverSideOnly" : false,
     "isAsset": true,
