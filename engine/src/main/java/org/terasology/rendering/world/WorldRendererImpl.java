@@ -206,8 +206,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         context.put(RenderTaskListGenerator.class, renderTaskListGenerator);
-
-        addDummyNodes();
     }
 
     private void initRenderingModules() {
@@ -242,19 +240,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         }
 
         requestTaskListRefresh();
-    }
-
-    public void addDummyNodes() {
-        /*
-        Node blurredAmbientOcclusionNode = new DummyNode ("blurredAmbientOcclusionNode", context);
-        blurredAmbientOcclusionNode.addOutputFboConnection(1);
-        renderGraph.addNode(blurredAmbientOcclusionNode);
-
-
-        Node prePostCompositeNode = new DummyNode("prePostCompositeNode", context);
-        renderGraph.addNode(prePostCompositeNode);
-        */
-
     }
 
 
