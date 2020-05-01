@@ -18,7 +18,6 @@ extensions
 /modules/*
 !/modules/BiomesAPI
 !/modules/Core
-!/modules/CoreItems
 !/modules/CoreSampleGameplay
 !/modules/BuilderSampleGameplay
 !/modules/subprojects.gradle
