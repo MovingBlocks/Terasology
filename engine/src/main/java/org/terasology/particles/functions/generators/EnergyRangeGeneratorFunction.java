@@ -18,15 +18,17 @@ package org.terasology.particles.functions.generators;
 import org.terasology.particles.ParticleData;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.components.generators.EnergyRangeGeneratorComponent;
+import org.terasology.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 11-3-2015.
  */
+@RegisterParticleSystemFunction()
 public final class EnergyRangeGeneratorFunction extends GeneratorFunction<EnergyRangeGeneratorComponent> {
 
     public EnergyRangeGeneratorFunction() {
-        super(EnergyRangeGeneratorComponent.class, ParticleDataMask.ENERGY);
+        super(ParticleDataMask.ENERGY);
     }
 
     @Override
