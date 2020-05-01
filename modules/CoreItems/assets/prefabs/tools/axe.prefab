@@ -4,7 +4,7 @@
         "name": "Axe"
     },
     "Item": {
-        "icon": "engine:items#axe",
+        "icon": "CoreAssets:items#axeStone",
         "damageType": "CoreItems:axeDamage"
     }
 }

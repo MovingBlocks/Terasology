@@ -1,0 +1,10 @@
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Improved Pickaxe"
+    },
+    "Item": {
+        "icon": "CoreAssets:items#pickaxeMetal",
+        "damageType": "CoreItems:pickaxeTier2Damage"
+    }
+}

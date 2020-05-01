@@ -2,10 +2,10 @@
     "parent": "engine:physicalDamage",
     "blockDamageModifier": {
         "materialDamageMultiplier": {
-            "rock": 2,
+            "rock": 10,
             "rock2": 10,
             "rock3": 10,
-            "mineral": 2,
+            "mineral": 10,
             "mineral2": 10,
             "mineral3": 10
         }
