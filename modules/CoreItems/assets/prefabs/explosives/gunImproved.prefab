@@ -1,15 +1,15 @@
 {
     "parent": "engine:iconItem",
     "DisplayName": {
-        "name": "Thorough Railgun"
+        "name": "Improved Gun"
     },
     "Item": {
-        "icon": "engine:items#dynamite",
+        "icon": "CoreAssets:explosives#gunStrong",
         "usage": "IN_DIRECTION"
     },
     "TunnelAction": {
         "damageType": "CoreItems:DestructiveExplosiveDamage",
-        "thoroughness": 1
+        "thoroughness": 0.75
     },
     "PlaySoundAction": {
         "sounds": [

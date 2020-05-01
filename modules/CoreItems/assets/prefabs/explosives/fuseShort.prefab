@@ -4,7 +4,7 @@
         "name": "Short Fuse"
     },
     "Item": {
-        "icon": "engine:items#pole"
+        "icon": "CoreAssets:explosives#fuseShort"
     },
     "TimedExplosion": {
         "fuseTimeMs": 2000

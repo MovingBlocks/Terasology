@@ -4,7 +4,7 @@
         "name": "Long Fuse"
     },
     "Item": {
-        "icon": "engine:items#pole"
+        "icon": "CoreAssets:explosives#fuseLong"
     },
     "TimedExplosion": {
         "fuseTimeMs": 10000

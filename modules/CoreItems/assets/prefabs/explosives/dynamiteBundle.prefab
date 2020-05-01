@@ -1,0 +1,15 @@
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Dynamite Bundle"
+    },
+    "Item": {
+        "icon": "CoreAssets:explosives#dynamiteBundle",
+        "usage": "ON_BLOCK"
+    },
+    "ExplosionAction": {
+        "relativeTo": "Target",
+        "maxRange": 256,
+        "damageType": "CoreItems:DestructiveExplosiveDamage"
+    }
+}

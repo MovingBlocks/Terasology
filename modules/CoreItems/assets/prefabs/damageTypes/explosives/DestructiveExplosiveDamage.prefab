@@ -1,6 +1,6 @@
 {
     "parent": "engine:explosiveDamage",
     "blockDamageModifier": {
-        "blockAnnihilationChance": 1
+        "blockAnnihilationChance": 0.75
     }
 }
