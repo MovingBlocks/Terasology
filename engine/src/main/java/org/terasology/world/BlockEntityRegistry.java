@@ -45,10 +45,11 @@ public interface BlockEntityRegistry {
      * This method returns the block entity at the given location, but will not produce a temporary entity if
      * one isn't currently in memory.
      *
-     * @param blockPosition
+     * @param blockPosition absolute position of the block
      * @return The block entity for the location if it exists, or the null entity
-     * @deprecated
-     */
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #getExistingBlockEntityAt(Vector3ic)}.
+     **/
     @Deprecated
     EntityRef getExistingBlockEntityAt(Vector3i blockPosition);
 
@@ -57,7 +58,7 @@ public interface BlockEntityRegistry {
      * This method returns the block entity at the given location, but will not produce a temporary entity if
      * one isn't currently in memory.
      *
-     * @param blockPosition
+     * @param blockPosition absolute position of the block
      * @return The block entity for the location if it exists, or the null entity
      */
     EntityRef getExistingBlockEntityAt(Vector3ic blockPosition);
@@ -167,7 +168,7 @@ public interface BlockEntityRegistry {
 
     /**
      * retrieves an entity associated with the given block else create a new entity
-     * @param blockPosition absolute position of the block in.
+     * @param blockPosition absolute position of the block.
      * @return The block {@link EntityRef} for this location.
      * @deprecated This is scheduled for removal in an upcoming version
      *             method will be replaced with JOML implementation {@link #getEntityAt(Vector3ic)}.
@@ -183,10 +184,24 @@ public interface BlockEntityRegistry {
     EntityRef getEntityAt(Vector3ic blockPosition);
 
     /**
-     * @param blockPos
+     * tell if the entity assigned to a given block is permanent. non-permanent
+     * block entities are cleaned up at the end of the update.
+     *
+     * @param blockPos absolute position of the block.
      * @return Whether the entity at this position is permanent
-     */
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #hasPermanentBlockEntity(Vector3ic)}.
+     **/
+    @Deprecated
     boolean hasPermanentBlockEntity(Vector3i blockPos);
 
+    /**
+     * tell if the entity assigned to a given block is permanent. non-permanent
+     * block entities are cleaned up at the end of the update.
+     *
+     * @param blockPos absolute position of the block.
+     * @return Whether the entity at this position is permanent
+     *
+     **/
     boolean hasPermanentBlockEntity(Vector3ic blockPos);
 }
