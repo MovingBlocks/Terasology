@@ -18,6 +18,7 @@ package org.terasology.math;
 
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
+import org.joml.Vector3ic;
 import org.lwjgl.BufferUtils;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -40,8 +41,10 @@ public final class MatrixUtils {
      *
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
-     * @deprecated used JOML method that uses Matrix4fc
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #matrixToFloatBuffer(Matrix4fc)}.
      */
+    @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         matrixToFloatBuffer(m, buffer);
@@ -67,7 +70,8 @@ public final class MatrixUtils {
      *
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
-     * @deprecated used JOML method that uses Matrix3fc
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #matrixToFloatBuffer(Matrix3fc)}.
      */
     public static FloatBuffer matrixToFloatBuffer(Matrix3f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(9);
@@ -75,6 +79,13 @@ public final class MatrixUtils {
         return buffer;
     }
 
+    /**
+     * Copies the given matrix into a newly allocated FloatBuffer.
+     * The order of the elements is column major (as used by OpenGL).
+     *
+     * @param m the matrix to copy
+     * @return A new FloatBuffer containing the matrix in column-major form.
+     */
     public static FloatBuffer matrixToFloatBuffer(Matrix3fc m) {
         return m.getTransposed(BufferUtils.createFloatBuffer(9));
     }
@@ -86,7 +97,10 @@ public final class MatrixUtils {
      * @param m the matrix to copy
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #matrixToFloatBuffer(Matrix3fc, FloatBuffer)}.
      */
+    @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix3f m, FloatBuffer fb) {
         fb.put(m.m00);
         fb.put(m.m10);
@@ -102,6 +116,14 @@ public final class MatrixUtils {
         return fb;
     }
 
+    /**
+     * Copies the given matrix into an existing buffer.
+     * The order of the elements is column major (as used by OpenGL).
+     *
+     * @param m  the matrix to copy
+     * @param fb the float buffer to copy the matrix into
+     * @return The provided float buffer.
+     */
     public static FloatBuffer matrixToFloatBuffer(Matrix3fc m, FloatBuffer fb) {
         return m.getTransposed(fb);
     }
@@ -113,7 +135,10 @@ public final class MatrixUtils {
      * @param m  the matrix to copy
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #matrixToFloatBuffer(Matrix4fc, FloatBuffer)}.
      */
+    @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
         fb.put(m.m00);
         fb.put(m.m10);
@@ -282,6 +307,11 @@ public final class MatrixUtils {
         return result;
     }
 
+    /**
+     * Calculated normal view matrix from a modelViewMatrix
+     * @param mv ModelViewMatrix
+     * @return 3x3 normal matrix
+     */
     public static org.joml.Matrix3f calcNormalMatrix(Matrix4fc mv) {
         return mv.get3x3(new org.joml.Matrix3f()).invert().transpose();
     }
