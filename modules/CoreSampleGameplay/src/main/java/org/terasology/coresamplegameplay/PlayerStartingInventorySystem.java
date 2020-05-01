@@ -55,7 +55,6 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
 
         inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("CoreItems:railgunTool"));
 
-        inventoryManager.giveItem(chest, EntityRef.NULL, entityManager.create("CoreItems:mrbarsack"));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Brick"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Ice"), 99));
         inventoryManager.giveItem(chest, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Plank"), 99));
@@ -82,8 +81,12 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         inventoryManager.giveItem(chest, EntityRef.NULL, innerChest);
 
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:pickaxe"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:pickaxeImproved"));
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:axe"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:axeImproved"));
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:shovel"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:shovelImproved"));
+        inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:gooeysFist"));
         inventoryManager.giveItem(player, EntityRef.NULL, blockFactory.newInstance(blockManager.getBlockFamily("CoreBlocks:Torch"), 99));
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:explodeTool"));
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("CoreItems:railgunTool"));
