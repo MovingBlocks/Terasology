@@ -38,6 +38,6 @@ public class TextureOffsetGeneratorFunction extends GeneratorFunction<TextureOff
 
         final int randomOffsetIndex = random.nextInt(component.validOffsets.size());
         final Vector2f randomOffset = component.validOffsets.get(randomOffsetIndex);
-        particleData.textureOffset.set(randomOffset.x(), randomOffset.y());
+        particleData.textureOffset.set(randomOffset);
     }
 }
