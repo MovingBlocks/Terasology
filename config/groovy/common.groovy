@@ -290,7 +290,8 @@ class common {
                 println "Added the remote '$remoteName' for $itemType '$itemName' - but the URL $url failed a test lookup. Typo? Not created yet?"
             }
         } else {
-            println "Remote already exists"
+            println "Remote already exists, fetching latest"
+            remoteGit.fetch remote: remoteName
         }
     }
 
