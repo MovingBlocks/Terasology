@@ -16,12 +16,30 @@
 
 package org.terasology.rendering;
 
+import org.joml.AABBf;
 import org.terasology.math.AABB;
 
 /**
+ * overlay rendering for a block based off the
+ * containing region of an {@link AABB}
  */
 public interface BlockOverlayRenderer {
+    /**
+     * set aabb that will be used for {@link BlockOverlayRenderer} to render region
+     *
+     * @param aabb contains region
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     * Use the JOML implementation instead: {@link #setAABB(AABBf)}.
+     **/
+    @Deprecated
     void setAABB(AABB aabb);
+
+    /**
+     * set aabb that will be used for {@link BlockOverlayRenderer} to render region
+     *
+     * @param aabb contains region
+     */
+    void setAABB(AABBf aabb);
 
     /**
      * Maintained for API compatibility

@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.AABBf;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -131,7 +133,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private int inputSequenceNumber = 1;
 
-    private AABB aabb;
+    private AABBf aabb;
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -373,12 +375,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 if (blockComp != null || blockRegion != null) {
                     Vector3f blockPos = location.getWorldPosition();
                     Block block = worldProvider.getBlock(blockPos);
-                    aabb = block.getBounds(blockPos);
+                    aabb = block.getBounds(JomlUtil.from(blockPos));
                 } else {
                     MeshComponent mesh = target.getComponent(MeshComponent.class);
                     if (mesh != null && mesh.mesh != null) {
-                        aabb = mesh.mesh.getAABB();
-                        aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(), location.getWorldScale());
+                        aabb = JomlUtil.from(mesh.mesh.getAABB());
+                        aabb.transform(new Matrix4f().translationRotateScale(JomlUtil.from(location.getWorldPosition()),JomlUtil.from(location.getWorldRotation()),location.getWorldScale()));
+//                        aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(), location.getWorldScale());
                     }
                 }
             }

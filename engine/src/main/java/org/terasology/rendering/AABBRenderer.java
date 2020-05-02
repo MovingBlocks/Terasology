@@ -16,9 +16,11 @@
 
 package org.terasology.rendering;
 
+import org.joml.AABBf;
 import org.lwjgl.opengl.GL11;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
@@ -60,6 +62,14 @@ public class AABBRenderer implements BlockOverlayRenderer {
     public void setAABB(AABB from) {
         if (from != null && !from.equals(this.aabb)) {
             this.aabb = from;
+            dispose();
+        }
+    }
+
+    @Override
+    public void setAABB(AABBf from) {
+        if (from != null && !from.equals(JomlUtil.from(this.aabb))) {
+            this.aabb = JomlUtil.from(from);
             dispose();
         }
     }
