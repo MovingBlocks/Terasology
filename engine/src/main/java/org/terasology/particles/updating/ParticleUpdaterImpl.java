@@ -17,77 +17,97 @@ package org.terasology.particles.updating;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.ParticlePool;
 import org.terasology.particles.components.ParticleEmitterComponent;
+import org.terasology.particles.functions.ParticleSystemFunction;
+import org.terasology.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.particles.functions.affectors.AffectorFunction;
 import org.terasology.particles.functions.generators.GeneratorFunction;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.random.FastRandom;
 
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * See ParticleUpdater for more information.
  */
-class ParticleUpdaterImpl implements ParticleUpdater {
+public class ParticleUpdaterImpl implements ParticleUpdater {
 
+    private static final Logger logger = LoggerFactory.getLogger(ParticleUpdaterImpl.class);
+
+    /**
+     * Number used in determining how many particles to skip in each collision update step, as updating all particles is costly.
+     */
     private static final int PHYSICS_SKIP_NR = 100;
+
+    private ModuleManager moduleManager;
+
+    /**
+     * Map of Generators to the functions that process them.
+     */
+    private BiMap<Class<? extends Component>, GeneratorFunction> registeredGeneratorFunctions = HashBiMap.create();
+
+    /**
+     * Map of Affectors to the functions that process them.
+     */
+    private BiMap<Class<? extends Component>, AffectorFunction> registeredAffectorFunctions = HashBiMap.create();
 
     /**
      * Set of all particle emitters
      */
     private final Set<ParticleEmitterComponent> registeredParticleSystems = new HashSet<>();
 
-    /**
-     * Map of ParticleDataComponent type to emitters of that type.
-     */
-    //private final Map<Class<? extends ParticleDataComponent>, ParticleEmitterComponent> particleSystemsLookup = new HashMap<>();
-
     private final FastRandom random = new FastRandom();
     private final Physics physics;
-    private float movingAvgDelta = 1.0f / 60.0f; //Starting guess average physics updateParticleSystem delta
+    private float movingAvgDelta = 1.0f / 60.0f; // Starting guess average physics updateParticleSystem delta
 
-    //== public ========================================================================================================
-
-    ParticleUpdaterImpl(final Physics physics) {
+    public ParticleUpdaterImpl(final Physics physics, final ModuleManager moduleManager) {
         this.physics = physics;
+        this.moduleManager = moduleManager;
     }
 
     @Override
-    public void register(final EntityRef emitter) {
+    public void addEmitter(final EntityRef emitter) {
         Preconditions.checkArgument(emitter != null,
-                "Argument can not be null"
+            "Argument can not be null"
         );
 
         ParticleEmitterComponent emitterComponent = emitter.getComponent(ParticleEmitterComponent.class);
 
         Preconditions.checkArgument(emitterComponent != null,
-                "Entity %s does not have a ParticleEmitterComponent", emitter
+            "Entity %s does not have a ParticleEmitterComponent", emitter
         );
 
         registeredParticleSystems.add(emitterComponent);
     }
 
     @Override
-    public void dispose(final EntityRef emitter) {
+    public void removeEmitter(final EntityRef emitter) {
         Preconditions.checkArgument(emitter != null,
-                "Argument can not be null"
+            "Argument can not be null"
         );
 
         ParticleEmitterComponent emitterComponent = emitter.getComponent(ParticleEmitterComponent.class);
 
         Preconditions.checkState(registeredParticleSystems.contains(emitterComponent),
-                "Entity %s is not a registered entity", emitter
+            "Entity %s is not a registered entity", emitter
         );
 
         registeredParticleSystems.remove(emitterComponent);
@@ -108,9 +128,38 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     }
 
     @Override
-    public void configureEmitter(final ParticleEmitterComponent emitter,
-                                 final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
-                                 final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions) {
+    public void initialize() {
+        ModuleEnvironment environment = moduleManager.getEnvironment();
+
+        for (Class<?> type : environment.getTypesAnnotatedWith(RegisterParticleSystemFunction.class)) {
+            RegisterParticleSystemFunction annotation = type.getAnnotation(RegisterParticleSystemFunction.class);
+
+            if (!ParticleSystemFunction.class.isAssignableFrom(type)) {
+                logger.error("Cannot register particle system function {}, must be a subclass of ParticleSystemFunction", type.getSimpleName());
+            } else {
+                try {
+                    ParticleSystemFunction function = (ParticleSystemFunction) type.newInstance();
+                    if (function instanceof GeneratorFunction) {
+                        Type componentClass = ReflectionUtil.getTypeParameterForSuper(type, GeneratorFunction.class, 0);
+                        mapGeneratorFunction((GeneratorFunction) function, (Class<? extends Component>) componentClass);
+
+                    } else if (function instanceof AffectorFunction) {
+                        Type componentClass = ReflectionUtil.getTypeParameterForSuper(type, AffectorFunction.class, 0);
+                        mapAffectorFunction((AffectorFunction) function, (Class<? extends Component>) componentClass);
+                    }
+                } catch (InstantiationException | IllegalAccessException e) {
+                    logger.error("Failed to register particle system", e);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void dispose() {
+    }
+
+    @Override
+    public void configureEmitter(final ParticleEmitterComponent emitter) {
 
         emitter.generatorFunctionMap.clear();
         emitter.affectorFunctionMap.clear();
@@ -124,7 +173,35 @@ class ParticleUpdaterImpl implements ParticleUpdater {
         }
     }
 
-    //== particles =====================================================================================================
+    /**
+     * Maps a Generator function to the component it will be called on when new particles are emitted.
+     *
+     * @param generatorFunction The generator function to be used.
+     * @param componentClass    The component class this function is being mapped to.
+     */
+    private void mapGeneratorFunction(GeneratorFunction generatorFunction, Class<? extends Component> componentClass) {
+        Preconditions.checkArgument(!registeredGeneratorFunctions.containsKey(componentClass),
+            "Tried to register an GeneratorFunction for %s twice", generatorFunction
+        );
+
+        logger.info("Registering GeneratorFunction for Component class {}", componentClass);
+        registeredGeneratorFunctions.put(componentClass, generatorFunction);
+    }
+
+    /**
+     * Maps an Affector function to the component it will be called on when updating particles.
+     *
+     * @param affectorFunction The affector function to be used.
+     * @param componentClass   The component class this function is being mapped to.
+     */
+    private void mapAffectorFunction(AffectorFunction affectorFunction, Class<? extends Component> componentClass) {
+        Preconditions.checkArgument(!registeredAffectorFunctions.containsKey(componentClass),
+            "Tried to register an AffectorFunction for %s twice", affectorFunction
+        );
+
+        logger.info("Registering AffectorFunction for Component class {}", componentClass);
+        registeredAffectorFunctions.put(componentClass, affectorFunction);
+    }
 
     private void checkCollision(final ParticlePool pool, final int offset) {
         final Vector3f vel = new Vector3f();
@@ -160,28 +237,26 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     }
 
     /*
-    * Updates particle life and processes particle affectors
-    * */
+     * Updates particle life and processes particle affectors
+     * */
     private void updateParticles(final ParticleEmitterComponent particleSystem, final float delta) {
         updateLifeRemaining(particleSystem.particlePool, delta);
 
         particleSystem.affectorFunctionMap.forEach(
-                (component, affector) -> affector.beforeUpdates(component, random, delta)
+            (component, affector) -> affector.beforeUpdates(component, random, delta)
         );
 
         for (int i = 0; i < particleSystem.particlePool.livingParticles(); i++) {
             particleSystem.particlePool.loadTemporaryDataFrom(i, ParticleDataMask.ALL.toInt());
 
             particleSystem.affectorFunctionMap.forEach(
-                    (component, affector) ->
-                            affector.update(component, particleSystem.particlePool.temporaryParticleData, random, delta)
+                (component, affector) ->
+                    affector.update(component, particleSystem.particlePool.temporaryParticleData, random, delta)
             );
 
             particleSystem.particlePool.storeTemporaryDataAt(i, ParticleDataMask.ALL.toInt());
         }
     }
-
-    //== emission ======================================================================================================
 
     private void emitParticle(final ParticleEmitterComponent particleEmitter) {
         int index = particleEmitter.particlePool.reviveParticle();
@@ -189,8 +264,8 @@ class ParticleUpdaterImpl implements ParticleUpdater {
         particleEmitter.particlePool.loadTemporaryDataFrom(index, ParticleDataMask.ALL.toInt());
 
         particleEmitter.generatorFunctionMap.forEach(
-                (component, generator) ->
-                        generator.onEmission(component, particleEmitter.particlePool.temporaryParticleData, random)
+            (component, generator) ->
+                generator.onEmission(component, particleEmitter.particlePool.temporaryParticleData, random)
         );
 
         particleEmitter.particlePool.temporaryParticleData.position.add(
@@ -201,8 +276,8 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     }
 
     /*
-    * Emits particles from emitter
-    * */
+     * Emits particles from emitter
+     * */
     private void updateEmitter(final ParticleEmitterComponent particleEmitter, final int particleReviveLimit, final float delta) {
         float deltaLeft = delta;
 
@@ -225,8 +300,6 @@ class ParticleUpdaterImpl implements ParticleUpdater {
         }
     }
 
-    //== general =======================================================================================================
-
     private void updateParticleSystem(final ParticleEmitterComponent partSys, final float delta) {
         if (partSys.enabled && (partSys.particleSpawnsLeft == ParticleEmitterComponent.INFINITE_PARTICLE_SPAWNS || partSys.particleSpawnsLeft > 0)) {
             updateEmitter(partSys, 0, delta); // Emit particles
@@ -239,7 +312,6 @@ class ParticleUpdaterImpl implements ParticleUpdater {
             partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
         }
 
-        // System ran out of lifetime -> stop emission -> dispose
         if (partSys.lifeTime != ParticleEmitterComponent.INDEFINITE_EMITTER_LIFETIME) {
             partSys.lifeTime = Math.max(0, partSys.lifeTime - delta);
 

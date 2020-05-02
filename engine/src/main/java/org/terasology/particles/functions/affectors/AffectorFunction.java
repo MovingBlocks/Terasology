@@ -28,8 +28,8 @@ import org.terasology.utilities.random.Random;
 
 @API
 public abstract class AffectorFunction<T extends Component> extends ParticleSystemFunction<T> implements Cloneable {
-    public AffectorFunction(Class<T> affectorComponent, ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
-        super(affectorComponent, dataMask, dataMasks);
+    public AffectorFunction(ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
+        super(dataMask, dataMasks);
     }
 
     public abstract void update(T component, ParticleData particleData, Random random, float delta);

@@ -21,11 +21,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.OnChangedBlock;
@@ -184,24 +186,29 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Block setBlock(Vector3i worldPos, Block type) {
+       return this.setBlock(JomlUtil.from(worldPos),type);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic worldPos, Block type) {
         /*
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
          * command "showSCreen BenchmarkScreen".
          */
-        Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(JomlUtil.from(worldPos));
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
+            Vector3i blockPos = ChunkMath.calcBlockPos(JomlUtil.from(worldPos));
             Block oldBlockType = chunk.setBlock(blockPos, type);
             if (oldBlockType != type) {
                 BlockChange oldChange = blockChanges.get(worldPos);
                 if (oldChange == null) {
-                    blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
+                    blockChanges.put(JomlUtil.from(worldPos), new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
                 } else {
                     oldChange.setTo(type);
                 }
-                setDirtyChunksNear(worldPos);
-                notifyBlockChanged(worldPos, type, oldBlockType);
+                setDirtyChunksNear(JomlUtil.from(worldPos));
+                notifyBlockChanged(JomlUtil.from(worldPos), type, oldBlockType);
             }
             return oldBlockType;
 
@@ -249,7 +256,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
         return result;
     }
-    
+
     private void setDirtyChunksNear(Vector3i pos0) {
         for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(pos0, 1)) {
             RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
@@ -268,7 +275,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
         }
     }
-    
+
     private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
         // TODO: Change to match block , if those changes are made.
         synchronized (listeners) {
