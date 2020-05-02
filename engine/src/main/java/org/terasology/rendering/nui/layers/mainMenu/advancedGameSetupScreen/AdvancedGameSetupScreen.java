@@ -515,7 +515,6 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 universeWrapper.setSeed(seed.getText());
                 saveConfiguration();
                 final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
-                gameManifest.setSeed(seed.getText());
                 if (gameManifest != null) {
                     gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 } else {
