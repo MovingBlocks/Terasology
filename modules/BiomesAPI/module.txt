@@ -1,6 +1,6 @@
 {
     "id" : "BiomesAPI",
-    "version" : "3.1.1",
+    "version" : "3.2.0",
     "author" : "",
     "displayName" : "BiomesAPI",
     "description" : "Provides API for working with biomes - thematical sections of world. Previously part of engine.",
