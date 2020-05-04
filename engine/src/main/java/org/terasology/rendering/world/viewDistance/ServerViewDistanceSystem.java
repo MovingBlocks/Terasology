@@ -20,6 +20,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -43,7 +44,7 @@ public class ServerViewDistanceSystem extends BaseComponentSystem {
         Client client = networkSystem.getOwner(entity);
         if (client != null) {
             client.setViewDistanceMode(request.getNewViewRange());
-            chunkProvider.updateRelevanceEntity(entity, client.getViewDistance().getChunkDistance());
+            chunkProvider.updateRelevanceEntity(entity, JomlUtil.from(client.getViewDistance().getChunkDistance()));
         }
     }
 

@@ -96,7 +96,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
     private float hazeThreshold = 0.8f;
-    
+
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
     private float volumetricFogGlobalDensity = 0.005f;
@@ -170,7 +170,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
 
         // Shader Parameters
 
-        prePostMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
+        prePostMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x() * 8.0f, true);
         prePostMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
 
         if (localReflectionsAreEnabled) {

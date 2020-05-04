@@ -155,8 +155,8 @@ public class PlayerFactory {
 
         // TODO: also start looking downwards if initial spawn pos is in the air
         for (int i = 1; i < 20; i++) {
-            if (worldProvider.isBlockRelevant(JomlUtil.from(newSpawnPos))) {
-                if (worldProvider.getBlock(JomlUtil.from(newSpawnPos)).isPenetrable()) {
+            if (worldProvider.isBlockRelevant(newSpawnPos)) {
+                if (worldProvider.getBlock(newSpawnPos).isPenetrable()) {
                     consecutiveAirBlocks++;
                 } else {
                     consecutiveAirBlocks = 0;
