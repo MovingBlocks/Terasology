@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,10 @@ import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Quat4f;
 
+/**
+ * Temporary conversion utility from joml -- Teramath
+ * will be remove at a later point
+ */
 public class JomlUtil {
 
 

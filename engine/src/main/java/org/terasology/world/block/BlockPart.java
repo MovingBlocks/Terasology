@@ -17,8 +17,8 @@
 package org.terasology.world.block;
 
 import com.google.common.collect.ImmutableList;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Rotation;
+import org.terasology.math.legacy.Side;
 
 import java.util.EnumMap;
 import java.util.List;

@@ -18,7 +18,7 @@ package org.terasology.logic.location;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.Direction;
+import org.terasology.math.legacy.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Replicate;

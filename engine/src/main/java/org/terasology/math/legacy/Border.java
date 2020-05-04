@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.math;
+package org.terasology.math.legacy;
 
 import java.util.Objects;
 
+import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Rect2i;
 
@@ -92,7 +93,7 @@ public class Border {
                 region.width() - getTotalWidth(), region.height() - getTotalHeight());
     }
 
-    public Vector2i shrink(org.terasology.math.geom.Vector2i size) {
+    public Vector2i shrink(Vector2i size) {
         return new Vector2i(size.x - getTotalWidth(), size.y - getTotalHeight());
     }
 
@@ -100,12 +101,12 @@ public class Border {
         return new Vector2i(getTotalWidth(), getTotalHeight());
     }
 
-    public Vector2i grow(org.terasology.math.geom.Vector2i size) {
+    public Vector2i grow(Vector2i size) {
         // Note protection against overflow
         return new Vector2i(TeraMath.addClampAtMax(size.x, getTotalWidth()), TeraMath.addClampAtMax(size.y, getTotalHeight()));
     }
 
-    public Rect2i grow(org.terasology.math.geom.Rect2i region) {
+    public Rect2i grow(Rect2i region) {
         // Note protection against overflow of the size
         return Rect2i.createFromMinAndSize(region.minX() - getLeft(), region.minY() - getTop(),
                 TeraMath.addClampAtMax(region.width(), getTotalWidth()), TeraMath.addClampAtMax(region.height(), getTotalHeight()));

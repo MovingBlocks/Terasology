@@ -37,7 +37,7 @@ import org.terasology.entitySystem.stubs.ListOfObjectComponent;
 import org.terasology.entitySystem.stubs.MappedContainerComponent;
 import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;

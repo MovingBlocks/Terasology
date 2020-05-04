@@ -16,7 +16,7 @@
 package org.terasology.world.block.structure;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;

@@ -16,7 +16,7 @@
 
 package org.terasology.logic.spawner;
 
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.SpiralIterable;
@@ -57,7 +57,7 @@ public abstract class AbstractSpawner implements Spawner {
         // check if generation uses sea level and surface height facets
         SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
         SpawnHeightFacet spawnHeightFacet = worldRegion.getFacet(SpawnHeightFacet.class);
-        
+
         if (spawnHeightFacet != null) {
             getWorld = v -> spawnHeightFacet.getWorld(v.getX(), v.getY());
         }

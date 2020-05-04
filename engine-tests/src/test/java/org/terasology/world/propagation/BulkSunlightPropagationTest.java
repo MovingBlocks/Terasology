@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;

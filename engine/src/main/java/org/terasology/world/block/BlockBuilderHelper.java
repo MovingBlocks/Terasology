@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block;
 
-import org.terasology.math.Rotation;
+import org.terasology.math.legacy.Rotation;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.SectionDefinitionData;

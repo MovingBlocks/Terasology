@@ -19,8 +19,8 @@ package org.terasology.physics.bullet.shapes;
 import com.bulletphysics.collision.shapes.CompoundShape;
 import com.bulletphysics.collision.shapes.CompoundShapeChild;
 import com.bulletphysics.linearmath.Transform;
-import org.terasology.math.Rotation;
-import org.terasology.math.VecMath;
+import org.terasology.math.legacy.Rotation;
+import org.terasology.math.legacy.VecMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
 
@@ -43,7 +43,7 @@ public class BulletCompoundShape extends BulletCollisionShape implements org.ter
     }
 
     @Override
-    public void addChildShape(org.terasology.math.Transform transform, CollisionShape collisionShape) {
+    public void addChildShape(org.terasology.math.legacy.Transform transform, CollisionShape collisionShape) {
         BulletCollisionShape bulletCollisionShape = (BulletCollisionShape) collisionShape;
         Transform bulletTransform = toBulletTransform(transform);
         compoundShape.addChildShape(bulletTransform, bulletCollisionShape.underlyingShape);

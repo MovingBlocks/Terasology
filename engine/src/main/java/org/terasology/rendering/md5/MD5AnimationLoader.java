@@ -24,7 +24,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.math.AABB;
+import org.terasology.math.legacy.AABB;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.animation.MeshAnimationData;

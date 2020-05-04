@@ -20,7 +20,7 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.ChunkMath;
+import org.terasology.math.legacy.ChunkMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;

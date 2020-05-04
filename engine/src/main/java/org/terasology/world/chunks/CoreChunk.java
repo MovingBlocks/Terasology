@@ -15,7 +15,7 @@
  */
 package org.terasology.world.chunks;
 
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
@@ -90,7 +90,7 @@ public interface CoreChunk {
      * @param value New value to set the block to
      */
     void setExtraData(int index, int x, int y, int z, int value);
-    
+
     /**
      * Sets one of the per-block custom data values at a given position relative to the chunk.
      * The given value is downcast from int to the appropriate type for the array. It is not
@@ -101,7 +101,7 @@ public interface CoreChunk {
      * @param value New value to set the block to
      */
     void setExtraData(int index, BaseVector3i pos, int value);
-    
+
     /**
      * Returns one of the per-block custom data values at a given position relative to the chunk.
      *
@@ -112,7 +112,7 @@ public interface CoreChunk {
      * @return Selected extra data value at the given location
      */
     int getExtraData(int index, int x, int y, int z);
-    
+
     /**
      * Returns one of the per-block custom data values at a given position relative to the chunk.
      *

@@ -16,7 +16,7 @@
 package org.terasology.entitySystem.stubs;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 
 import java.util.ArrayList;
 import java.util.List;

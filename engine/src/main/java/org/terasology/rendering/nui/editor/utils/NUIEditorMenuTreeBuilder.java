@@ -21,7 +21,7 @@ import com.google.gson.annotations.SerializedName;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Border;
+import org.terasology.math.legacy.Border;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.AbstractWidget;

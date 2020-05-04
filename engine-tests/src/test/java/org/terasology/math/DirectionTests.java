@@ -17,6 +17,7 @@ package org.terasology.math;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.terasology.math.legacy.Direction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -29,31 +30,31 @@ public class DirectionTests {
             Direction dir = Direction.inDirection(1, 0, 0);
             assertEquals(Direction.LEFT, dir);
         }
-        
+
         @Test
         public void right() {
             Direction dir = Direction.inDirection(-1, 0, 0);
             assertEquals(Direction.RIGHT, dir);
         }
-        
+
         @Test
         public void up() {
             Direction dir = Direction.inDirection(0, 1, 0);
             assertEquals(Direction.UP, dir);
         }
-        
+
         @Test
         public void down() {
             Direction dir = Direction.inDirection(0, -1, 0);
             assertEquals(Direction.DOWN, dir);
         }
-        
+
         @Test
         public void forward() {
             Direction dir = Direction.inDirection(0, 0, 1);
             assertEquals(Direction.FORWARD, dir);
         }
-        
+
         @Test
         public void backward() {
             Direction dir = Direction.inDirection(0, 0, -1);
@@ -68,19 +69,19 @@ public class DirectionTests {
             Direction dir = Direction.inHorizontalDirection((float) 1, (float) 0);
             assertEquals(Direction.LEFT, dir);
         }
-        
+
         @Test
         public void right() {
             Direction dir = Direction.inHorizontalDirection((float) -1, (float) 0);
             assertEquals(Direction.RIGHT, dir);
         }
-        
+
         @Test
         public void forward() {
             Direction dir = Direction.inHorizontalDirection((float) 0, (float) 1);
             assertEquals(Direction.FORWARD, dir);
         }
-        
+
         @Test
         public void backward() {
             Direction dir = Direction.inHorizontalDirection((float) 0, (float) -1);

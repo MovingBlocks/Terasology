@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.location;
 
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 import org.terasology.math.geom.Vector3i;
 
 public class ImmutableBlockLocation {

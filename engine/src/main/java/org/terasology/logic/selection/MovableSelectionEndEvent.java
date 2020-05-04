@@ -17,7 +17,7 @@ package org.terasology.logic.selection;
 
 import org.terasology.module.sandbox.API;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 
 /**
  * This event is sent when the player finalizes the position of a moving selection by clicking the left mouse button.

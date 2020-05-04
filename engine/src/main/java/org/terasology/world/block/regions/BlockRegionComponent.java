@@ -17,7 +17,7 @@
 package org.terasology.world.block.regions;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.network.Replicate;
 
 /**

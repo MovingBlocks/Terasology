@@ -18,8 +18,8 @@ package org.terasology.world.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.ChunkMath;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;

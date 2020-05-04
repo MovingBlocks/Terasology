@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 import org.terasology.core.world.generator.facets.FloraFacet;
 import org.terasology.core.world.generator.rasterizers.FloraType;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.generation.Region;

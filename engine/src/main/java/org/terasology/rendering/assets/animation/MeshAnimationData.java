@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.assets.AssetData;
-import org.terasology.math.AABB;
+import org.terasology.math.legacy.AABB;
 
 import java.util.List;
 

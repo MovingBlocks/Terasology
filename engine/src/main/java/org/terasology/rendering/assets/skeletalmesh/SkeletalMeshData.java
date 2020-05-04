@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.assets.AssetData;
-import org.terasology.math.AABB;
+import org.terasology.math.legacy.AABB;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;

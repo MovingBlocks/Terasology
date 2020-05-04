@@ -32,7 +32,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;

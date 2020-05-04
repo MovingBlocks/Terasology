@@ -19,7 +19,7 @@ import gnu.trove.list.TFloatList;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.AABB;
+import org.terasology.math.legacy.AABB;
 
 public abstract class Mesh extends Asset<MeshData> {
 

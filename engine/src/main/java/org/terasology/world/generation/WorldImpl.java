@@ -17,7 +17,7 @@ package org.terasology.world.generation;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.world.chunks.CoreChunk;
 
 import java.util.Collection;

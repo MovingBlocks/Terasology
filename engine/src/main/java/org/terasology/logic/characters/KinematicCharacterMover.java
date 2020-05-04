@@ -26,7 +26,7 @@ import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3fUtil;
+import org.terasology.math.legacy.Vector3fUtil;
 import org.terasology.math.geom.ImmutableVector3f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;

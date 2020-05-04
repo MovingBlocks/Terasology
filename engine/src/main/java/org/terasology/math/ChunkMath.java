@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package org.terasology.math;
 
-import java.math.RoundingMode;
-
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.RoundingMode;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.chunks.ChunkConstants;
+
 
 /**
  * Collection of math functions.
@@ -71,11 +73,11 @@ public final class ChunkMath {
         return calcChunkPosZ(z, ChunkConstants.CHUNK_POWER.z);
     }
 
-    public static Vector3i calcChunkPos(Vector3i pos, Vector3i chunkPower) {
-        return calcChunkPos(pos.x, pos.y, pos.z, chunkPower);
+    public static Vector3i calcChunkPos(Vector3ic pos, Vector3ic chunkPower) {
+        return calcChunkPos(pos.x(), pos.y(), pos.z(), chunkPower);
     }
 
-    public static Vector3i calcChunkPos(Vector3f pos) {
+    public static Vector3i calcChunkPos(Vector3fc pos) {
         return calcChunkPos(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
@@ -84,15 +86,15 @@ public final class ChunkMath {
     }
 
     public static Vector3i calcChunkPos(int x, int y, int z) {
-        return calcChunkPos(x, y, z, ChunkConstants.CHUNK_POWER);
+        return calcChunkPos(x, y, z, JomlUtil.from(ChunkConstants.CHUNK_POWER));
     }
 
     public static Vector3i[] calcChunkPos(Region3i region) {
-        return calcChunkPos(region, ChunkConstants.CHUNK_POWER);
+        return calcChunkPos(region, JomlUtil.from(ChunkConstants.CHUNK_POWER));
     }
 
-    public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
-        return new Vector3i(calcChunkPosX(x, chunkPower.x), calcChunkPosY(y, chunkPower.y), calcChunkPosZ(z, chunkPower.z));
+    public static Vector3i calcChunkPos(int x, int y, int z, Vector3ic chunkPower) {
+        return new Vector3i(calcChunkPosX(x, chunkPower.x()), calcChunkPosY(y, chunkPower.y()), calcChunkPosZ(z, chunkPower.z()));
     }
 
     public static Vector3i[] calcChunkPos(Region3i region, Vector3i chunkPower) {
@@ -155,11 +157,11 @@ public final class ChunkMath {
     }
 
     public static Vector3i calcBlockPos(Vector3i worldPos) {
-        return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
+        return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, JomlUtil.from(ChunkConstants.INNER_CHUNK_POS_FILTER));
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z) {
-        return calcBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER);
+        return calcBlockPos(x, y, z, JomlUtil.from(ChunkConstants.INNER_CHUNK_POS_FILTER));
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
@@ -179,9 +181,9 @@ public final class ChunkMath {
     }
 
     // TODO: This doesn't belong in this class, move it.
-    public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
+    public static Side getSecondaryPlacementDirection(Vector3fc direction, Vector3fc normal) {
         Side surfaceDir = Side.inDirection(normal);
-        Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
+        Vector3f attachDir = new Vector3f(surfaceDir.reverse().getVector3i());
         Vector3f rawDirection = new Vector3f(direction);
         float dot = rawDirection.dot(attachDir);
         rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));

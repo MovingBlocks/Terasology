@@ -17,8 +17,8 @@ package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.Pitch;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Rotation;
+import org.terasology.math.legacy.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.world.block.Block;

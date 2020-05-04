@@ -15,7 +15,7 @@
  */
 package org.terasology.world.propagation.light;
 
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.propagation.PropagationComparison;
 import org.terasology.world.propagation.PropagationRules;

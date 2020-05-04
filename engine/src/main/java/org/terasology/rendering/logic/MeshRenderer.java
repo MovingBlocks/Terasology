@@ -16,7 +16,7 @@
 package org.terasology.rendering.logic;
 
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Transform;
+import org.terasology.math.legacy.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import java.nio.FloatBuffer;
@@ -37,9 +37,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.AABB;
+import org.terasology.math.legacy.AABB;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.VecMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;

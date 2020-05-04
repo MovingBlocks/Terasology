@@ -18,14 +18,14 @@ package org.terasology.physics.bullet.shapes;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
-import org.terasology.math.AABB;
-import org.terasology.math.VecMath;
+import org.terasology.math.legacy.AABB;
+import org.terasology.math.legacy.VecMath;
 
 public abstract class BulletCollisionShape implements org.terasology.physics.shapes.CollisionShape {
     public CollisionShape underlyingShape;
 
     @Override
-    public AABB getAABB(org.terasology.math.Transform transform) {
+    public AABB getAABB(org.terasology.math.legacy.Transform transform) {
         Transform t = toBulletTransform(transform);
 
         javax.vecmath.Vector3f min = new javax.vecmath.Vector3f();
@@ -35,7 +35,7 @@ public abstract class BulletCollisionShape implements org.terasology.physics.sha
         return AABB.createMinMax(VecMath.from(min), VecMath.from(max));
     }
 
-    protected static Transform toBulletTransform(org.terasology.math.Transform transform) {
+    protected static Transform toBulletTransform(org.terasology.math.legacy.Transform transform) {
         return new Transform(
                 new javax.vecmath.Matrix4f(VecMath.to(transform.rotation),
                         VecMath.to(transform.origin), transform.scale)

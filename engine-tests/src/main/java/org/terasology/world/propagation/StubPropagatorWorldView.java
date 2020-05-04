@@ -18,7 +18,7 @@ package org.terasology.world.propagation;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 

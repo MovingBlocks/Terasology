@@ -19,7 +19,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
-import org.terasology.math.Border;
+import org.terasology.math.legacy.Border;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Color;

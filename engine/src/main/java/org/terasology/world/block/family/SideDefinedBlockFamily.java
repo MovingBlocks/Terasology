@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.family;
 
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 import org.terasology.world.block.Block;
 
 public interface SideDefinedBlockFamily extends BlockFamily {

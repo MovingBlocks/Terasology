@@ -19,7 +19,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;

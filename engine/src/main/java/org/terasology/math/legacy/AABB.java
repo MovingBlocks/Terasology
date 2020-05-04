@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.math;
+package org.terasology.math.legacy;
 
 import com.google.common.base.Objects;
 import gnu.trove.list.TFloatList;
@@ -29,7 +29,10 @@ import java.util.List;
 
 /**
  * An axis-aligned bounding box. Provides basic support for inclusion and intersection tests.
+ * @deprecated this class is schedules for removal in an upcoming version
+ *             Use the JOML implementation instead: {@link org.joml.AABBf}
  */
+@Deprecated
 public final class AABB {
 
     public static final float DEFAULT_MARGIN = 0.01f;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,12 @@
  */
 package org.terasology.math;
 
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+
+import org.joml.Matrix3f;
+import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 /**
  * Represents a space transformation. Used for transforming points from one space to another space and
@@ -31,7 +34,7 @@ public class Transform {
     /**
      * The rotation of this transform.
      */
-    public final Quat4f rotation;
+    public final Quaternionf rotation;
     /**
      * The scale of this transform.
      */
@@ -44,8 +47,8 @@ public class Transform {
      * @param rotation The rotation of the transform.
      * @param scale The scale of the transform.
      */
-    public Transform(Vector3f origin, Quat4f rotation, float scale) {
-        this.origin = origin;
+    public Transform(Vector3f origin, Quaternionf rotation, float scale) {
+        this.origin =  origin;
         this.rotation = rotation;
         this.scale = scale;
     }
@@ -56,12 +59,7 @@ public class Transform {
      * @return The basis matrix.
      */
     public Matrix3f getBasis() {
-        Matrix3f basis = new Matrix3f();
-
-        basis.set(rotation);
-        basis.mul(scale);
-
-        return basis;
+        return new Matrix3f().rotate(rotation).scale(scale);
     }
 
     /**

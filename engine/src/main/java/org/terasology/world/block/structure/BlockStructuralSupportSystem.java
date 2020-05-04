@@ -23,7 +23,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DestroyEvent;
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;

@@ -23,7 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;

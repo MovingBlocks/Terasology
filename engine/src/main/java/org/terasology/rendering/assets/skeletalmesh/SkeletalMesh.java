@@ -19,7 +19,7 @@ package org.terasology.rendering.assets.skeletalmesh;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.AABB;
+import org.terasology.math.legacy.AABB;
 
 import java.util.Collection;
 

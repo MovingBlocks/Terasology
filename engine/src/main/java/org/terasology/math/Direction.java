@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package org.terasology.math;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+import org.terasology.math.legacy.Side;
 
 import java.util.EnumMap;
 
@@ -28,15 +30,15 @@ import java.util.EnumMap;
  *
  */
 public enum Direction {
-    UP(Vector3i.up(), new Vector3f(0, 1, 0)),
+    UP(new Vector3i(0, 1, 0), new Vector3f(0, 1, 0)),
     RIGHT(new Vector3i(-1, 0, 0), new Vector3f(-1, 0, 0)),
     LEFT(new Vector3i(1, 0, 0), new Vector3f(1, 0, 0)),
     BACKWARD(new Vector3i(0, 0, -1), new Vector3f(0, 0, -1)),
     FORWARD(new Vector3i(0, 0, 1), new Vector3f(0, 0, 1)),
-    DOWN(Vector3i.down(), new Vector3f(0, -1, 0));
+    DOWN(new Vector3i(0, -1, 0), new Vector3f(0, -1, 0));
 
     private static final EnumMap<Direction, Direction> REVERSE_MAP;
-    private static final EnumMap<Direction, Side> CONVERSION_MAP;
+    private static final EnumMap<Direction, org.terasology.math.legacy.Side> CONVERSION_MAP;
 
     private final Vector3i vector3iDir;
     private final Vector3f vector3fDir;
@@ -50,12 +52,12 @@ public enum Direction {
         REVERSE_MAP.put(BACKWARD, FORWARD);
         REVERSE_MAP.put(DOWN, UP);
         CONVERSION_MAP = Maps.newEnumMap(Direction.class);
-        CONVERSION_MAP.put(UP, Side.TOP);
-        CONVERSION_MAP.put(DOWN, Side.BOTTOM);
-        CONVERSION_MAP.put(FORWARD, Side.BACK);
-        CONVERSION_MAP.put(BACKWARD, Side.FRONT);
-        CONVERSION_MAP.put(LEFT, Side.RIGHT);
-        CONVERSION_MAP.put(RIGHT, Side.LEFT);
+        CONVERSION_MAP.put(UP, org.terasology.math.legacy.Side.TOP);
+        CONVERSION_MAP.put(DOWN, org.terasology.math.legacy.Side.BOTTOM);
+        CONVERSION_MAP.put(FORWARD, org.terasology.math.legacy.Side.BACK);
+        CONVERSION_MAP.put(BACKWARD, org.terasology.math.legacy.Side.FRONT);
+        CONVERSION_MAP.put(LEFT, org.terasology.math.legacy.Side.RIGHT);
+        CONVERSION_MAP.put(RIGHT, org.terasology.math.legacy.Side.LEFT);
     }
 
     Direction(Vector3i vector3i, Vector3f vector3f) {
@@ -118,12 +120,12 @@ public enum Direction {
     /**
      * @return The vector3i in the direction of the side. Do not modify.
      */
-    public Vector3i getVector3i() {
-        return new Vector3i(vector3iDir);
+    public Vector3ic getVector3i() {
+        return vector3iDir;
     }
 
-    public Vector3f getVector3f() {
-        return new Vector3f(vector3fDir);
+    public Vector3fc getVector3f() {
+        return vector3fDir;
     }
 
     /**
@@ -132,5 +134,4 @@ public enum Direction {
     public Direction reverse() {
         return REVERSE_MAP.get(this);
     }
-
 }

@@ -15,8 +15,8 @@
  */
 package org.terasology.physics.shapes;
 
-import org.terasology.math.AABB;
-import org.terasology.math.Transform;
+import org.terasology.math.legacy.AABB;
+import org.terasology.math.legacy.Transform;
 import org.terasology.math.geom.Quat4f;
 
 /**

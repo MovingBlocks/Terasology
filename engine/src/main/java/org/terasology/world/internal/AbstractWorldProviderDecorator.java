@@ -18,7 +18,7 @@ package org.terasology.world.internal;
 
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;

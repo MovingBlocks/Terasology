@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package org.terasology.math;
+package org.terasology.math.legacy;
 
+import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.Iterator;
 
 /**
+ * @deprecated this class is schedules for removal in an upcoming version
+ *             Use the JOML implementation instead: {@link org.terasology.math.iterator.Diamond3iIterator}
  */
+@Deprecated
 public final class Diamond3iIterator implements Iterator<Vector3i> {
 
     private final Vector3i origin;

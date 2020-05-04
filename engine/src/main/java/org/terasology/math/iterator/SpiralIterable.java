@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.math;
+package org.terasology.math.iterator;
 
 import com.google.common.base.Preconditions;
 import org.joml.Vector2i;
@@ -80,7 +80,6 @@ public class SpiralIterable implements Iterable<Vector2ic>{
 
     @Override
     public Iterator<Vector2ic> iterator() {
-
         return new Iterator<Vector2ic>() {
             private int radius = 1;
             private int leg;

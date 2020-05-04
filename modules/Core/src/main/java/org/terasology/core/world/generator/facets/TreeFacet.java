@@ -16,7 +16,7 @@
 package org.terasology.core.world.generator.facets;
 
 import org.terasology.core.world.generator.trees.TreeGenerator;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.SparseObjectFacet3D;
 

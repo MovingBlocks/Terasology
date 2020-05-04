@@ -26,7 +26,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.ChunkMath;
+import org.terasology.math.legacy.ChunkMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;

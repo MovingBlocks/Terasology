@@ -19,6 +19,9 @@ import com.google.common.collect.Iterables;
 import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.legacy.Direction;
+import org.terasology.math.legacy.Rotation;
+import org.terasology.math.legacy.Side;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

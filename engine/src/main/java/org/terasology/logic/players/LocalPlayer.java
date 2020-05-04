@@ -23,7 +23,7 @@ import org.terasology.logic.characters.CharacterSystem;
 import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Direction;
+import org.terasology.math.legacy.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;

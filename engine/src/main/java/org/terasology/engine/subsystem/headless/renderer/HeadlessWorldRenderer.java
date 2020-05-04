@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayerSystem;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;

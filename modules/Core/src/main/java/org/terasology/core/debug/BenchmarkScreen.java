@@ -17,8 +17,8 @@ package org.terasology.core.debug;
 
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.ChunkMath;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;

@@ -20,7 +20,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 
 /**
  * Impact event is called whenever an item has enough speed to detect

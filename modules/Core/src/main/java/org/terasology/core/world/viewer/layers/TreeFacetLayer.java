@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.core.world.generator.trees.TreeGenerator;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.world.generation.Region;

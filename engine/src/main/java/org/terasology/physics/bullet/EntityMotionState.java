@@ -20,7 +20,7 @@ import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.VecMath;
+import org.terasology.math.legacy.VecMath;
 
 /**
  * This motion state is used to connect rigid body entities to their rigid body in the bullet physics engine.

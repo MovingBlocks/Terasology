@@ -17,7 +17,7 @@ package org.terasology.rendering.primitives;
 
 import com.google.common.collect.Maps;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.ChunkView;
@@ -141,7 +141,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         if (currentBlock.isLiquid() && blockToCheck.isLiquid()) {
             return false;
         }
-        
+
         //TODO: This only fixes the "water under block" issue of the top side not being rendered. (see bug #3889)
         //Note: originally tried .isLiquid() instead of isWater for both checks, but IntelliJ was warning that
         //      !blockToCheck.isWater() is always true, may need further investigation

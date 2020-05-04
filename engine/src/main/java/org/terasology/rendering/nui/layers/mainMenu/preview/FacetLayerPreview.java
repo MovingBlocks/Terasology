@@ -19,7 +19,7 @@ package org.terasology.rendering.nui.layers.mainMenu.preview;
 import com.google.common.math.IntMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.ImmutableVector2i;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector3i;

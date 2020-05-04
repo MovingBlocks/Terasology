@@ -41,7 +41,7 @@ import org.terasology.audio.openAL.staticSound.OpenALSoundPool;
 import org.terasology.audio.openAL.streamingSound.OpenALStreamingSound;
 import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.config.AudioConfig;
-import org.terasology.math.Direction;
+import org.terasology.math.legacy.Direction;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;

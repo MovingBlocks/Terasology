@@ -59,7 +59,7 @@ import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
-import org.terasology.math.AABB;
+import org.terasology.math.legacy.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;

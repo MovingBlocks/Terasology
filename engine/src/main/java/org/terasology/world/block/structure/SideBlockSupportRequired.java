@@ -21,7 +21,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.DestroyEvent;
-import org.terasology.math.Side;
+import org.terasology.math.legacy.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;

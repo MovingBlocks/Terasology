@@ -16,7 +16,7 @@
 
 package org.terasology.rendering;
 
-import org.terasology.math.AABB;
+import org.terasology.math.legacy.AABB;
 
 /**
  */

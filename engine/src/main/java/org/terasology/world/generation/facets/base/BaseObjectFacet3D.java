@@ -17,7 +17,7 @@ package org.terasology.world.generation.facets.base;
 
 import java.lang.reflect.Array;
 
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;

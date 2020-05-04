@@ -25,7 +25,7 @@ import org.terasology.input.events.LeftMouseDownButtonEvent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;

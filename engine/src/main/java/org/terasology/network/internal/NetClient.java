@@ -41,7 +41,7 @@ import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.ChunkMath;
+import org.terasology.math.legacy.ChunkMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -430,7 +430,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         List<NetData.BlockChangeMessage> blockChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBlockChanges.size());
         queuedOutgoingBlockChanges.drainTo(blockChanges);
         message.addAllBlockChange(blockChanges);
-        
+
         List<NetData.ExtraDataChangeMessage> extraDataChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingExtraDataChanges.size());
         queuedOutgoingExtraDataChanges.drainTo(extraDataChanges);
         message.addAllExtraDataChange(extraDataChanges);

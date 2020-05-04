@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -183,8 +184,8 @@ public final class Rotation {
         return roll;
     }
 
-    public Quat4f getQuat4f() {
-        Quat4f rotation = new Quat4f(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
+    public Quaternionf getQuat4f() {
+        Quaternionf rotation = new Quaternionf().rotationYXZ(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
         rotation.normalize();
         return rotation;
     }

@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.math.Region3i;
+import org.terasology.math.legacy.Region3i;
 import org.terasology.world.chunks.CoreChunk;
 
 import java.util.Set;
