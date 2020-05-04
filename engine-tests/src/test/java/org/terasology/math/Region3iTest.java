@@ -17,9 +17,8 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.legacy.Region3i;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +35,7 @@ public class Region3iTest {
 
     @Test
     public void testEmptyRegion() {
-        assertEquals(Region3i.empty().size(), Vector3i.zero());
+        assertEquals(Region3i.empty().size(), new Vector3i());
         assertTrue(Region3i.empty().isEmpty());
     }
 

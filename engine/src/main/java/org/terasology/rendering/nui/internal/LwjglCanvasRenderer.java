@@ -26,7 +26,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.math.legacy.AABB;
-import org.terasology.math.legacy.Border;
+import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseQuat4f;

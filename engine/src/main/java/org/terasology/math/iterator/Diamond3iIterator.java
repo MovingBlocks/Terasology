@@ -105,7 +105,7 @@ public final class Diamond3iIterator implements Iterable<Vector3ic> {
         }
 
         public Diamond3iIterator.Builder start(int start) {
-            this.startDistance = start;
+            this.startDistance = start + 1;
             return this;
         }
 

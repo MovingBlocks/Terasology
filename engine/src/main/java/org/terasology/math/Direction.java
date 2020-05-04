@@ -21,7 +21,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.legacy.Side;
 
 import java.util.EnumMap;
 
@@ -38,7 +37,7 @@ public enum Direction {
     DOWN(new Vector3i(0, -1, 0), new Vector3f(0, -1, 0));
 
     private static final EnumMap<Direction, Direction> REVERSE_MAP;
-    private static final EnumMap<Direction, org.terasology.math.legacy.Side> CONVERSION_MAP;
+    private static final EnumMap<Direction, Side> CONVERSION_MAP;
 
     private final Vector3i vector3iDir;
     private final Vector3f vector3fDir;
@@ -52,12 +51,12 @@ public enum Direction {
         REVERSE_MAP.put(BACKWARD, FORWARD);
         REVERSE_MAP.put(DOWN, UP);
         CONVERSION_MAP = Maps.newEnumMap(Direction.class);
-        CONVERSION_MAP.put(UP, org.terasology.math.legacy.Side.TOP);
-        CONVERSION_MAP.put(DOWN, org.terasology.math.legacy.Side.BOTTOM);
-        CONVERSION_MAP.put(FORWARD, org.terasology.math.legacy.Side.BACK);
-        CONVERSION_MAP.put(BACKWARD, org.terasology.math.legacy.Side.FRONT);
-        CONVERSION_MAP.put(LEFT, org.terasology.math.legacy.Side.RIGHT);
-        CONVERSION_MAP.put(RIGHT, org.terasology.math.legacy.Side.LEFT);
+        CONVERSION_MAP.put(UP, Side.TOP);
+        CONVERSION_MAP.put(DOWN, Side.BOTTOM);
+        CONVERSION_MAP.put(FORWARD, Side.BACK);
+        CONVERSION_MAP.put(BACKWARD, Side.FRONT);
+        CONVERSION_MAP.put(LEFT, Side.RIGHT);
+        CONVERSION_MAP.put(RIGHT, Side.LEFT);
     }
 
     Direction(Vector3i vector3i, Vector3f vector3f) {

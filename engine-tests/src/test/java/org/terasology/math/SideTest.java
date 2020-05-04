@@ -16,9 +16,6 @@
 package org.terasology.math;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.math.legacy.Direction;
-import org.terasology.math.legacy.Side;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**

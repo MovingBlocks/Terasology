@@ -16,12 +16,9 @@
 package org.terasology.math;
 
 import com.google.common.collect.Iterables;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.legacy.Direction;
-import org.terasology.math.legacy.Rotation;
-import org.terasology.math.legacy.Side;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,8 +34,8 @@ public class RotationTest {
     @Test
     public void testRotateSideYaw() {
         Rotation rotation = Rotation.rotate(Yaw.CLOCKWISE_90);
-        Quat4f rot = rotation.getQuat4f();
-        Vector3f dir = rot.rotate(Side.FRONT.toDirection().getVector3f(), new Vector3f());
+        Quaternionf rot = rotation.getQuat4f();
+        Vector3f dir = rot.transform(Side.FRONT.toDirection().getVector3f(), new Vector3f());
         assertEquals(Direction.inDirection(dir).toSide(), rotation.rotate(Side.FRONT));
 
         assertEquals(Side.LEFT, Rotation.rotate(Yaw.CLOCKWISE_90).rotate(Side.FRONT));
@@ -48,8 +45,8 @@ public class RotationTest {
     @Test
     public void testRotateSidePitch() {
         Rotation rotation = Rotation.rotate(Pitch.CLOCKWISE_90);
-        Quat4f rot = rotation.getQuat4f();
-        Vector3f dir = rot.rotate(Side.FRONT.toDirection().getVector3f(), new Vector3f());
+        Quaternionf rot = rotation.getQuat4f();
+        Vector3f dir = rot.transform(Side.FRONT.toDirection().getVector3f(), new Vector3f());
         assertEquals(Direction.inDirection(dir).toSide(), rotation.rotate(Side.FRONT));
 
         assertEquals(Side.TOP, Rotation.rotate(Pitch.CLOCKWISE_90).rotate(Side.FRONT));
@@ -59,8 +56,8 @@ public class RotationTest {
     @Test
     public void testRotateSideRoll() {
         Rotation rotation = Rotation.rotate(Roll.CLOCKWISE_90);
-        Quat4f rot = rotation.getQuat4f();
-        Vector3f dir = rot.rotate(Side.TOP.toDirection().getVector3f(), new Vector3f());
+        Quaternionf rot = rotation.getQuat4f();
+        Vector3f dir = rot.transform(Side.TOP.toDirection().getVector3f(), new Vector3f());
         assertEquals(Direction.inDirection(dir).toSide(), rotation.rotate(Side.TOP));
 
         assertEquals(Side.LEFT, Rotation.rotate(Roll.CLOCKWISE_90).rotate(Side.TOP));
@@ -70,8 +67,8 @@ public class RotationTest {
     @Test
     public void testRotateMixed() {
         Rotation rotation = Rotation.rotate(Yaw.CLOCKWISE_180, Pitch.CLOCKWISE_90, Roll.CLOCKWISE_90);
-        Quat4f rot = rotation.getQuat4f();
-        Vector3f dir = rot.rotate(Side.FRONT.toDirection().getVector3f(), new Vector3f());
+        Quaternionf rot = rotation.getQuat4f();
+        Vector3f dir = rot.transform(Side.FRONT.toDirection().getVector3f(), new Vector3f());
         assertEquals(Direction.inDirection(dir).toSide(), rotation.rotate(Side.FRONT));
     }
 

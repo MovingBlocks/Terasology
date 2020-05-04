@@ -15,14 +15,11 @@
  */
 package org.terasology.math;
 
+import org.joml.Vector3i;
 import org.junit.jupiter.api.Test;
 import org.terasology.config.Config;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.legacy.ChunkMath;
-import org.terasology.math.legacy.Region3i;
-import org.terasology.math.legacy.Side;
 import org.terasology.registry.CoreRegistry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

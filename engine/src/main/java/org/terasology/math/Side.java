@@ -17,10 +17,8 @@ package org.terasology.math;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
-import org.terasology.math.legacy.Direction;
 
 import java.util.EnumMap;
 import java.util.EnumSet;

@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.skin;
 
 import org.terasology.utilities.Assets;
-import org.terasology.math.legacy.Border;
+import org.terasology.math.Border;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Color;

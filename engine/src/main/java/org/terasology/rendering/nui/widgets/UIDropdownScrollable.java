@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
-import org.terasology.math.legacy.Border;
+import org.terasology.math.Border;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
