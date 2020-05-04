@@ -18,9 +18,7 @@ package org.terasology.math;
 
 import org.joml.Matrix3f;
 import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 /**
  * Represents a space transformation. Used for transforming points from one space to another space and
@@ -59,7 +57,7 @@ public class Transform {
      * @return The basis matrix.
      */
     public Matrix3f getBasis() {
-        return new Matrix3f().rotate(rotation).scale(scale);
+        return new Matrix3f().rotate(rotation).scale(scale).transpose();
     }
 
     /**
