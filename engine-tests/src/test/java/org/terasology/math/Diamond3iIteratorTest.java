@@ -21,7 +21,6 @@ import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.iterator.Diamond3iIterable;
 
 import java.util.Iterator;
 import java.util.Set;

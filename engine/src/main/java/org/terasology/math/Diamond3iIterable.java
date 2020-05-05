@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.math.iterator;
+package org.terasology.math;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.TeraMath;
 
 import java.util.Iterator;
 

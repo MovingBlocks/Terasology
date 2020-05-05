@@ -33,7 +33,7 @@ import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.iterator.SpiralIterable;
+import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
 import org.terasology.physics.components.shapes.BoxShapeComponent;
 import org.terasology.physics.components.shapes.CapsuleShapeComponent;

@@ -22,7 +22,7 @@ import java.util.Iterator;
 
 /**
  * @deprecated this class is schedules for removal in an upcoming version
- *             Use the JOML implementation instead: {@link org.terasology.math.iterator.Diamond3iIterable}
+ *             Use the JOML implementation instead: {@link Diamond3iIterable}
  **/
 @Deprecated
 public final class Diamond3iIterator implements Iterator<Vector3i> {
