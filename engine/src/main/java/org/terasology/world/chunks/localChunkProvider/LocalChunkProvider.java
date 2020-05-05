@@ -24,6 +24,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -32,6 +33,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -180,13 +182,14 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
         Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
-        for (Vector3i chunkPos : region) {
-            Chunk chunk = chunkCache.get(chunkPos);
+        for (Vector3ic chunkPos : region) {
+            org.joml.Vector3i pos = new org.joml.Vector3i(chunkPos);
+            Chunk chunk = chunkCache.get(JomlUtil.from(pos));
             if (chunk == null) {
                 return null;
             }
-            chunkPos.sub(region.minX(), region.minY(), region.minZ());
-            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
+            pos.sub(region.minX(), region.minY(), region.minZ());
+            int index = TeraMath.calculate3DArrayIndex(JomlUtil.from(pos), region.size());
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
@@ -227,12 +230,12 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         } finally {
             regionLock.writeLock().unlock();
         }
-        for (Vector3i pos : region.getCurrentRegion()) {
-            Chunk chunk = getChunk(pos);
+        for (Vector3ic pos : region.getCurrentRegion()) {
+            Chunk chunk = getChunk(JomlUtil.from(pos));
             if (chunk != null) {
                 region.checkIfChunkIsRelevant(chunk);
             } else {
-                createOrLoadChunk(pos);
+                createOrLoadChunk(JomlUtil.from(pos));
             }
         }
     }
@@ -496,8 +499,8 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         if (chunk == null) {
             return false;
         }
-        for (Vector3i pos : Region3i.createFromCenterExtents(readyChunkInfo.getPos(), 1)) {
-            if (chunkCache.get(pos) == null) {
+        for (Vector3ic pos : Region3i.createFromCenterExtents(readyChunkInfo.getPos(), 1)) {
+            if (chunkCache.get(JomlUtil.from(pos)) == null) {
                 return false;
             }
         }
@@ -622,8 +625,8 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         ChunkMonitor.fireChunkProviderInitialized(this);
 
         for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
-            for (Vector3i pos : chunkRelevanceRegion.getCurrentRegion()) {
-                createOrLoadChunk(pos);
+            for (Vector3ic pos : chunkRelevanceRegion.getCurrentRegion()) {
+                createOrLoadChunk(JomlUtil.from(pos));
             }
             chunkRelevanceRegion.setUpToDate();
         }

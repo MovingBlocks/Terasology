@@ -15,12 +15,14 @@
  */
 package org.terasology.world.propagation;
 
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Diamond3iIterator;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
@@ -305,8 +307,8 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     @Test
     public void testRemoveSolidAllowsLight() {
         StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
-        for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(1, 0, 0), new Vector3i(0, 30, 30))) {
-            worldView.setBlockAt(pos, solid);
+        for (Vector3ic pos : Region3i.createFromCenterExtents(new Vector3i(1, 0, 0), new Vector3i(0, 30, 30))) {
+            worldView.setBlockAt(JomlUtil.from(pos), solid);
         }
         worldView.setBlockAt(new Vector3i(0, 0, 0), fullLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
@@ -324,8 +326,8 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     @Test
     public void testRemoveSolidAndLight() {
         StubPropagatorWorldView worldView = new StubPropagatorWorldView(testingRegion, air);
-        for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(1, 0, 0), new Vector3i(0, 30, 30))) {
-            worldView.setBlockAt(pos, solid);
+        for (Vector3ic pos : Region3i.createFromCenterExtents(new Vector3i(1, 0, 0), new Vector3i(0, 30, 30))) {
+            worldView.setBlockAt(JomlUtil.from(pos), solid);
         }
         worldView.setBlockAt(new Vector3i(0, 0, 0), fullLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);

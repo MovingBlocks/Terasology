@@ -258,8 +258,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     private void setDirtyChunksNear(Vector3i pos0) {
-        for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(pos0, 1)) {
-            RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
+        for (Vector3ic pos : ChunkMath.getChunkRegionAroundWorldPos(pos0, 1)) {
+            RenderableChunk dirtiedChunk = chunkProvider.getChunk(JomlUtil.from(pos));
             if (dirtiedChunk != null) {
                 dirtiedChunk.setDirty(true);
             }

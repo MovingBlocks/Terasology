@@ -15,12 +15,14 @@
  */
 package org.terasology.world.generator;
 
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Diamond3iIterator;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
@@ -84,44 +86,44 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, extraDataManager);
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z))) {
-            byte expectedRegen = (byte) Math.min(ChunkConstants.SIZE_Y - pos.y - 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            assertEquals(expectedRegen, chunk.getSunlightRegen(pos));
+        for (Vector3ic pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z))) {
+            byte expectedRegen = (byte) Math.min(ChunkConstants.SIZE_Y - pos.y() - 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
+            assertEquals(expectedRegen, chunk.getSunlightRegen(JomlUtil.from(pos)));
         }
     }
 
     @Test
     public void testBlockedSunlightRegenPropagationResets() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, extraDataManager);
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 60, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            chunk.setBlock(pos, solidBlock);
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 60, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            chunk.setBlock(JomlUtil.from(pos), solidBlock);
         }
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 61, 0), new Vector3i(ChunkConstants.SIZE_X, 3, ChunkConstants.SIZE_Z))) {
-            byte expectedRegen = (byte) Math.min(ChunkConstants.SIZE_Y - pos.y - 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            assertEquals(expectedRegen, chunk.getSunlightRegen(pos));
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 61, 0), new Vector3i(ChunkConstants.SIZE_X, 3, ChunkConstants.SIZE_Z))) {
+            byte expectedRegen = (byte) Math.min(ChunkConstants.SIZE_Y - pos.y() - 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
+            assertEquals(expectedRegen, chunk.getSunlightRegen(JomlUtil.from(pos)));
         }
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 60, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            assertEquals(0, chunk.getSunlightRegen(pos));
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 60, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            assertEquals(0, chunk.getSunlightRegen(JomlUtil.from(pos)));
         }
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 59, ChunkConstants.SIZE_Z))) {
-            byte expectedRegen = (byte) Math.min(60 - pos.y - 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            assertEquals(expectedRegen, chunk.getSunlightRegen(pos));
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 59, ChunkConstants.SIZE_Z))) {
+            byte expectedRegen = (byte) Math.min(60 - pos.y() - 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
+            assertEquals(expectedRegen, chunk.getSunlightRegen(JomlUtil.from(pos)));
         }
     }
 
     @Test
     public void testBlockedAtTopSunlightRegenPropagationResets() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, extraDataManager);
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 63, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            chunk.setBlock(pos, solidBlock);
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 63, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            chunk.setBlock(JomlUtil.from(pos), solidBlock);
         }
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z))) {
-            byte expectedRegen = (byte) Math.min(ChunkConstants.SIZE_Y - pos.y - 2, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            assertEquals(expectedRegen, chunk.getSunlightRegen(pos));
+        for (Vector3ic pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z))) {
+            byte expectedRegen = (byte) Math.min(ChunkConstants.SIZE_Y - pos.y() - 2, ChunkConstants.MAX_SUNLIGHT_REGEN);
+            assertEquals(expectedRegen, chunk.getSunlightRegen(JomlUtil.from(pos)));
         }
     }
 
@@ -130,29 +132,29 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, extraDataManager);
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - 15,
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - 15,
                 ChunkConstants.SIZE_Z))) {
-            assertEquals(0, chunk.getSunlight(pos));
+            assertEquals(0, chunk.getSunlight(JomlUtil.from(pos)));
         }
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - ChunkConstants.MAX_SUNLIGHT_REGEN,
+        for (Vector3ic pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - ChunkConstants.MAX_SUNLIGHT_REGEN,
                 ChunkConstants.SIZE_Z))) {
-            byte expectedSunlight = (byte) Math.min(ChunkConstants.SIZE_Y - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD - pos.y - 1, ChunkConstants.MAX_SUNLIGHT);
-            assertEquals(expectedSunlight, chunk.getSunlight(pos), () -> "Incorrect lighting at " + pos);
+            byte expectedSunlight = (byte) Math.min(ChunkConstants.SIZE_Y - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD - pos.y() - 1, ChunkConstants.MAX_SUNLIGHT);
+            assertEquals(expectedSunlight, chunk.getSunlight(JomlUtil.from(pos)), () -> "Incorrect lighting at " + pos);
         }
     }
 
     @Test
     public void testBlockedSunlightPropagation() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, extraDataManager);
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 4, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            chunk.setBlock(pos, solidBlock);
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 4, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            chunk.setBlock(JomlUtil.from(pos), solidBlock);
         }
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 5,
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 5,
                 ChunkConstants.SIZE_Z))) {
-            assertEquals(0, chunk.getSunlight(pos), () -> "Incorrect lighting at " + pos);
+            assertEquals(0, chunk.getSunlight(JomlUtil.from(pos)), () -> "Incorrect lighting at " + pos);
         }
     }
 
@@ -161,17 +163,17 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, extraDataManager);
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 15,
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 15,
                 ChunkConstants.SIZE_Z))) {
-            assertEquals(15 - pos.y, chunk.getSunlight(pos), () -> "Incorrect lighting at " + pos);
+            assertEquals(15 - pos.y(), chunk.getSunlight(JomlUtil.from(pos)), () -> "Incorrect lighting at " + pos);
         }
     }
 
     @Test
     public void testHorizontalSunlightPropagation() {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, extraDataManager);
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 4, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            chunk.setBlock(pos, solidBlock);
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 4, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            chunk.setBlock(JomlUtil.from(pos), solidBlock);
         }
         chunk.setBlock(new Vector3i(16, 4, 16), airBlock);
         InternalLightProcessor.generateInternalLighting(chunk);

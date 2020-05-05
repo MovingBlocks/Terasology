@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.entity;
 
+import org.joml.Vector3ic;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -29,6 +30,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -101,9 +103,9 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 BlockRegionComponent blockRegion = entity.getComponent(BlockRegionComponent.class);
                 if (blockComponent.dropBlocksInRegion) {
                     // loop through all the blocks in this region and drop them
-                    for (Vector3i location : blockRegion.region) {
+                    for (Vector3ic location : blockRegion.region) {
                         Block blockInWorld = worldProvider.getBlock(location);
-                        commonDefaultDropsHandling(event, entity, location, blockInWorld.getBlockFamily().getArchetypeBlock());
+                        commonDefaultDropsHandling(event, entity, JomlUtil.from(location), blockInWorld.getBlockFamily().getArchetypeBlock());
                     }
                 } else {
                     // just drop the ActAsBlock block
@@ -135,7 +137,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 if (blockDamageModifierComponent != null) {
                     impulsePower = blockDamageModifierComponent.impulsePower;
                 }
-                
+
                 processDropping(item, location, impulsePower);
             }
         }

@@ -16,11 +16,13 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
@@ -88,15 +90,15 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testAllowSunlightVertical() {
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            lightWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT);
+        for (Vector3ic pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
+            regenWorldView.setValueAt(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT_REGEN);
+            lightWorldView.setValueAt(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT);
         }
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setBlockAt(pos, solid);
+        for (Vector3ic pos : Region3i.createBounded(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
+            regenWorldView.setBlockAt(JomlUtil.from(pos), solid);
         }
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 14, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, (byte) (14 - pos.y));
+        for (Vector3ic pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 14, ChunkConstants.SIZE_Z - 1))) {
+            regenWorldView.setValueAt(JomlUtil.from(pos), (byte) (14 - pos.y()));
         }
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), air);
@@ -114,15 +116,15 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testStopSunlightVertical() {
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            lightWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT);
+        for (Vector3ic pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
+            regenWorldView.setValueAt(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT_REGEN);
+            lightWorldView.setValueAt(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT);
         }
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setBlockAt(pos, solid);
+        for (Vector3ic pos : Region3i.createBounded(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
+            regenWorldView.setBlockAt(JomlUtil.from(pos), solid);
         }
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 14, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, (byte) (14 - pos.y));
+        for (Vector3ic pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 14, ChunkConstants.SIZE_Z - 1))) {
+            regenWorldView.setValueAt(JomlUtil.from(pos), (byte) (14 - pos.y()));
         }
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), air);
@@ -133,9 +135,9 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
         propagator.process(new BlockChange(new Vector3i(16, 15, 16), air, solid));
         sunlightPropagator.process(new BlockChange(new Vector3i(16, 15, 16), air, solid));
 
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
-            assertEquals(Math.max(0, 14 - pos.y), regenWorldView.getValueAt(pos), "Incorrect value at " + pos);
-            assertEquals(0, lightWorldView.getValueAt(pos), "Incorrect value at " + pos);
+        for (Vector3ic pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
+            assertEquals(Math.max(0, 14 - pos.y()), regenWorldView.getValueAt(JomlUtil.from(pos)), "Incorrect value at " + pos);
+            assertEquals(0, lightWorldView.getValueAt(JomlUtil.from(pos)), "Incorrect value at " + pos);
         }
     }
 

@@ -15,10 +15,12 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
+import org.joml.Vector3ic;
 import org.terasology.biomesAPI.Biome;
 import org.terasology.biomesAPI.BiomeRegistry;
 import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3i;
@@ -68,9 +70,9 @@ public class SolidRasterizer implements WorldRasterizer {
         int seaLevel = seaLevelFacet.getSeaLevel();
 
         Vector2i pos2d = new Vector2i();
-        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            pos2d.set(pos.x, pos.z);
-            int posY = pos.y + chunk.getChunkWorldOffsetY();
+        for (Vector3ic pos : ChunkConstants.CHUNK_REGION) {
+            pos2d.set(pos.x(), pos.z());
+            int posY = pos.y() + chunk.getChunkWorldOffsetY();
 
             // Check for an optional depth for this layer - if defined stop generating below that level
             if (surfaceDepthFacet != null && posY < surfaceDepthFacet.get(pos2d)) {
@@ -78,24 +80,24 @@ public class SolidRasterizer implements WorldRasterizer {
             }
 
             Biome biome = biomeFacet.get(pos2d);
-            biomeRegistry.setBiome(biome, chunk, pos.x, pos.y, pos.z);
+            biomeRegistry.setBiome(biome, chunk, pos.x(), pos.y(), pos.z());
 
-            float density = solidityFacet.get(pos);
+            float density = solidityFacet.get(JomlUtil.from(pos));
 
             if (density >= 32) {
-                chunk.setBlock(pos, stone);
+                chunk.setBlock(JomlUtil.from(pos), stone);
             } else if (density >= 0) {
                 int depth = TeraMath.floorToInt(surfaceFacet.get(pos2d)) - posY;
                 Block block = getSurfaceBlock(depth, posY,
                         biome,
                         seaLevel);
-                chunk.setBlock(pos, block);
+                chunk.setBlock(JomlUtil.from(pos), block);
             } else {
                 // fill up terrain up to sealevel height with water or ice
                 if (posY == seaLevel && CoreBiome.SNOW == biome) {
-                    chunk.setBlock(pos, ice);
+                    chunk.setBlock(JomlUtil.from(pos), ice);
                 } else if (posY <= seaLevel) {         // either OCEAN or SNOW
-                    chunk.setBlock(pos, water);
+                    chunk.setBlock(JomlUtil.from(pos), water);
 //                }
                 }
             }

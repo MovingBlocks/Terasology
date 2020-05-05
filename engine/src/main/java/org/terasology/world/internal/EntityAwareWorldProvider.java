@@ -471,29 +471,29 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     public void onBlockRegionActivated(OnActivatedComponent event, EntityRef entity) {
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         blockRegions.put(entity, regionComp.region);
-        for (Vector3i pos : regionComp.region) {
-            blockRegionLookup.put(pos, entity);
+        for (Vector3ic pos : regionComp.region) {
+            blockRegionLookup.put(JomlUtil.from(pos), entity);
         }
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
     public void onBlockRegionChanged(OnChangedComponent event, EntityRef entity) {
         Region3i oldRegion = blockRegions.get(entity);
-        for (Vector3i pos : oldRegion) {
-            blockRegionLookup.remove(pos);
+        for (Vector3ic pos : oldRegion) {
+            blockRegionLookup.remove(JomlUtil.from(pos));
         }
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         blockRegions.put(entity, regionComp.region);
-        for (Vector3i pos : regionComp.region) {
-            blockRegionLookup.put(pos, entity);
+        for (Vector3ic pos : regionComp.region) {
+            blockRegionLookup.put(JomlUtil.from(pos), entity);
         }
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
     public void onBlockRegionDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
         Region3i oldRegion = blockRegions.get(entity);
-        for (Vector3i pos : oldRegion) {
-            blockRegionLookup.remove(pos);
+        for (Vector3ic pos : oldRegion) {
+            blockRegionLookup.remove(JomlUtil.from(pos));
         }
         blockRegions.remove(entity);
     }

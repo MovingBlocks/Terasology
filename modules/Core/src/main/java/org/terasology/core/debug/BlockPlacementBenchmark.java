@@ -18,8 +18,10 @@ package org.terasology.core.debug;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.joml.Vector3ic;
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldProvider;
@@ -53,12 +55,12 @@ class BlockPlacementBenchmark extends AbstractBenchmarkInstance {
     public void runStep() {
         if (useSetBlocksInsteadOfSetBlock) {
             Map<Vector3i, Block> blocksToPlace = new HashMap<>();
-            for (Vector3i v : region3i) {
-                blocksToPlace.put(v, blockToPlace);
+            for (Vector3ic v : region3i) {
+                blocksToPlace.put(JomlUtil.from(v), blockToPlace);
             }
             worldProvider.setBlocks(blocksToPlace);
         } else {
-            for (Vector3i v : region3i) {
+            for (Vector3ic v : region3i) {
                 worldProvider.setBlock(v, blockToPlace);
             }
         }

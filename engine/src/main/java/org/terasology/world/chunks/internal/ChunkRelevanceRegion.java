@@ -18,9 +18,11 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.Chunk;
@@ -198,7 +200,7 @@ public class ChunkRelevanceRegion {
 
     private class NeededChunksIterator implements Iterator<Vector3i> {
         Vector3i nextChunkPos;
-        Iterator<Vector3i> regionPositions = currentRegion.iterator();
+        Iterator<Vector3ic> regionPositions = currentRegion.iterator();
 
         NeededChunksIterator() {
             calculateNext();
@@ -224,9 +226,9 @@ public class ChunkRelevanceRegion {
         private void calculateNext() {
             nextChunkPos = null;
             while (regionPositions.hasNext() && nextChunkPos == null) {
-                Vector3i candidate = regionPositions.next();
+                Vector3ic candidate = regionPositions.next();
                 if (!relevantChunks.contains(candidate)) {
-                    nextChunkPos = candidate;
+                    nextChunkPos = JomlUtil.from(candidate);
                 }
             }
         }

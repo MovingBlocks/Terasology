@@ -17,6 +17,7 @@ package org.terasology.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -142,12 +143,12 @@ class RenderableWorldImpl implements RenderableWorld {
         RenderableChunk chunk;
         ChunkMesh newMesh;
         ChunkView localView;
-        for (Vector3i chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
-            chunk = chunkProvider.getChunk(chunkCoordinates);
+        for (Vector3ic chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
+            chunk = chunkProvider.getChunk(JomlUtil.from(chunkCoordinates));
             if (chunk == null) {
                 pregenerationIsComplete = false;
             } else if (chunk.isDirty()) {
-                localView = worldProvider.getLocalView(chunkCoordinates);
+                localView = worldProvider.getLocalView(JomlUtil.from(chunkCoordinates));
                 if (localView == null) {
                     continue;
                 }
@@ -200,9 +201,9 @@ class RenderableWorldImpl implements RenderableWorld {
             Vector3i chunkPosition;
             RenderableChunk chunk;
 
-            Iterator<Vector3i> chunksToRemove = renderableRegion.subtract(newRenderableRegion);
+            Iterator<Vector3ic> chunksToRemove = renderableRegion.subtract(newRenderableRegion);
             while (chunksToRemove.hasNext()) {
-                chunkPosition = chunksToRemove.next();
+                chunkPosition = JomlUtil.from(chunksToRemove.next());
                 Iterator<RenderableChunk> nearbyChunks = chunksInProximityOfCamera.iterator();
                 while (nearbyChunks.hasNext()) {
                     chunk = nearbyChunks.next();
@@ -215,9 +216,9 @@ class RenderableWorldImpl implements RenderableWorld {
             }
 
             boolean chunksHaveBeenAdded = false;
-            Iterator<Vector3i> chunksToAdd = newRenderableRegion.subtract(renderableRegion);
+            Iterator<Vector3ic> chunksToAdd = newRenderableRegion.subtract(renderableRegion);
             while (chunksToAdd.hasNext()) {
-                chunkPosition = chunksToAdd.next();
+                chunkPosition = JomlUtil.from(chunksToAdd.next());
                 chunk = chunkProvider.getChunk(chunkPosition);
                 if (chunk != null) {
                     chunksInProximityOfCamera.add(chunk);

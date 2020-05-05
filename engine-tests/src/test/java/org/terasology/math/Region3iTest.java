@@ -17,6 +17,7 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Vector3i;
 
@@ -108,9 +109,9 @@ public class Region3iTest {
             }
         }
 
-        for (Vector3i pos : region) {
-            assertTrue(expected.contains(pos));
-            expected.remove(pos);
+        for (Vector3ic pos : region) {
+            assertTrue(expected.contains(JomlUtil.from(pos)), JomlUtil.from(pos).toString());
+            expected.remove(JomlUtil.from(pos));
         }
 
         assertEquals(0, expected.size(), "All vectors provided");

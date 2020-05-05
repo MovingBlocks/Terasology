@@ -17,7 +17,9 @@ package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -332,13 +334,13 @@ public class StandardBatchPropagator implements BatchPropagator {
             }
         }
 
-        for (Vector3i pos : edgeRegion) {
-            int depthIndex = indexProvider.getIndexFor(pos);
+        for (Vector3ic pos : edgeRegion) {
+            int depthIndex = indexProvider.getIndexFor(JomlUtil.from(pos));
             int adjacentDepth = adjDepth[depthIndex];
             for (int i = adjacentDepth; i < depths[depthIndex]; ++i) {
                 adjPos.set(side.getVector3i());
                 adjPos.mul(i + 1);
-                adjPos.add(pos);
+                adjPos.add(JomlUtil.from(pos));
                 adjPos.add(chunkEdgeDeltas.get(side));
                 byte value = rules.getValue(adjChunk, adjPos);
                 if (value > 1) {

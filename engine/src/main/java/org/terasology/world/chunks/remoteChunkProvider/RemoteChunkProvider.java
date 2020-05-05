@@ -19,11 +19,13 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
@@ -164,8 +166,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     private boolean makeChunkAvailable(final Chunk chunk) {
-        for (Vector3i pos : Region3i.createFromCenterExtents(chunk.getPosition(), 1)) {
-            if (chunkCache.get(pos) == null) {
+        for (Vector3ic pos : Region3i.createFromCenterExtents(chunk.getPosition(), 1)) {
+            if (chunkCache.get(JomlUtil.from(pos)) == null) {
                 return false;
             }
         }
@@ -252,13 +254,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
         Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
-        for (Vector3i chunkPos : region) {
-            Chunk chunk = chunkCache.get(chunkPos);
+        for (Vector3ic chunkPos : region) {
+            org.joml.Vector3i pos = new org.joml.Vector3i(chunkPos);
+            Chunk chunk = chunkCache.get(JomlUtil.from(chunkPos));
             if (chunk == null) {
                 return null;
             }
-            chunkPos.sub(region.minX(), region.minY(), region.minZ());
-            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
+            pos.sub(region.minX(), region.minY(), region.minZ());
+            int index = TeraMath.calculate3DArrayIndex(JomlUtil.from(pos), region.size());
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));

@@ -16,12 +16,14 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -104,17 +106,17 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            topChunk.setSunlight(pos, ChunkConstants.MAX_SUNLIGHT);
-            topChunk.setSunlightRegen(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            topChunk.setSunlight(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT);
+            topChunk.setSunlightRegen(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT_REGEN);
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
         propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, true);
         propagator.process();
         sunlightPropagator.process();
-        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            assertEquals(ChunkConstants.MAX_SUNLIGHT, bottomChunk.getSunlight(pos), () -> "Incorrect at position " + pos);
-            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos), () -> "Incorrect at position " + pos);
+        for (Vector3ic pos : ChunkConstants.CHUNK_REGION) {
+            assertEquals(ChunkConstants.MAX_SUNLIGHT, bottomChunk.getSunlight(JomlUtil.from(pos)), () -> "Incorrect at position " + pos);
+            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(JomlUtil.from(pos)), () -> "Incorrect at position " + pos);
         }
     }
 
@@ -126,15 +128,15 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            topChunk.setSunlight(pos, ChunkConstants.MAX_SUNLIGHT);
-            topChunk.setSunlightRegen(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            topChunk.setSunlight(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT);
+            topChunk.setSunlightRegen(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT_REGEN);
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
         propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, true);
         propagator.process();
-        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos), () -> "Incorrect at position " + pos);
+        for (Vector3ic pos : ChunkConstants.CHUNK_REGION) {
+            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(JomlUtil.from(pos)), () -> "Incorrect at position " + pos);
         }
     }
 
@@ -146,12 +148,12 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            topChunk.setSunlight(pos, ChunkConstants.MAX_SUNLIGHT);
-            topChunk.setSunlightRegen(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            topChunk.setSunlight(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT);
+            topChunk.setSunlightRegen(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT_REGEN);
         }
-        for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(16, 48, 0), new Vector3i(31, 48, 31))) {
-            bottomChunk.setBlock(pos, solid);
+        for (Vector3ic pos : Region3i.createFromMinMax(new Vector3i(16, 48, 0), new Vector3i(31, 48, 31))) {
+            bottomChunk.setBlock(JomlUtil.from(pos), solid);
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
 
@@ -174,13 +176,13 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            topChunk.setSunlight(pos, (byte) 0);
-            topChunk.setSunlightRegen(pos, (byte) 0);
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            topChunk.setSunlight(JomlUtil.from(pos), (byte) 0);
+            topChunk.setSunlightRegen(JomlUtil.from(pos), (byte) 0);
         }
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(8, 0, 8), new Vector3i(ChunkConstants.SIZE_X - 16, 1, ChunkConstants.SIZE_Z - 16))) {
-            topChunk.setSunlight(pos, (byte) 0);
-            topChunk.setSunlightRegen(pos, (byte) 32);
+        for (Vector3ic pos : Region3i.createFromMinAndSize(new Vector3i(8, 0, 8), new Vector3i(ChunkConstants.SIZE_X - 16, 1, ChunkConstants.SIZE_Z - 16))) {
+            topChunk.setSunlight(JomlUtil.from(pos), (byte) 0);
+            topChunk.setSunlightRegen(JomlUtil.from(pos), (byte) 32);
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
 

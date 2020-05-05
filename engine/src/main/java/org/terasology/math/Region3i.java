@@ -16,10 +16,11 @@
 
 package org.terasology.math;
 
+import org.joml.Vector2i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.Iterator;
 
@@ -27,7 +28,7 @@ import java.util.Iterator;
  * Describes an axis-aligned bounded space in 3D integer.
  *
  */
-public final class Region3i implements Iterable<Vector3i> {
+public final class Region3i implements Iterable<Vector3ic> {
 
     /**
      * @deprecated As of 24 sep 2018, because it is error prone.
@@ -37,18 +38,78 @@ public final class Region3i implements Iterable<Vector3i> {
     @Deprecated
     public static final Region3i EMPTY = Region3i.empty();
 
-    private final Vector3i min = new Vector3i();
-    private final Vector3i size = new Vector3i();
-
     /**
-     * Constructs an empty Region with size (0,0,0).
+     * The x coordinate of the minimum corner.
      */
-    private Region3i() {
+    public int minX = Integer.MAX_VALUE;
+    /**
+     * The y coordinate of the minimum corner.
+     */
+    public int minY = Integer.MAX_VALUE;
+    /**
+     * The z coordinate of the minimum corner.
+     */
+    public int minZ = Integer.MAX_VALUE;
+    /**
+     * The x coordinate of the maximum corner.
+     */
+    public int maxX = Integer.MIN_VALUE;
+    /**
+     * The y coordinate of the maximum corner.
+     */
+    public int maxY = Integer.MIN_VALUE;
+    /**
+     * The z coordinate of the maximum corner.
+     */
+    public int maxZ = Integer.MIN_VALUE;
+
+
+    @Deprecated
+    private Region3i(BaseVector3i min, BaseVector3i size) {
+        this.minX = min.x();
+        this.minY = min.y();
+        this.minZ = min.z();
+
+        this.maxX = min.x() + size.x();
+        this.maxY = min.y() + size.y();
+        this.maxZ = min.z() + size.z();
     }
 
-    private Region3i(BaseVector3i min, BaseVector3i size) {
-        this.min.set(min);
-        this.size.set(size);
+    public Region3i(Region3i source) {
+        this.minX = source.minX;
+        this.minY = source.minY;
+        this.minZ = source.minZ;
+
+        this.maxX = source.maxX;
+        this.maxY = source.maxY;
+        this.maxZ = source.maxZ;
+    }
+
+    public Region3i(Vector3ic min, Vector3ic max){
+        this.minX = min.x();
+        this.minY = min.y();
+        this.minZ = min.z();
+
+        this.maxX = max.x();
+        this.maxY = max.y();
+        this.maxZ = max.z();
+    }
+
+    public Region3i(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
+    }
+
+    public boolean isValid() {
+        return (minX < maxX) && (minY < maxY) && (minZ < maxZ);
+    }
+
+    public boolean isEmpty() {
+        return (maxX - minX) == 0 && (maxY - minY) == 0 && (maxZ - minZ) == 0;
     }
 
     /**
@@ -56,7 +117,7 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return An empty Region3i
      */
     public static Region3i empty() {
-        return new Region3i();
+        return new Region3i(0,0,0,0,0,0);
     }
 
     /**
@@ -78,12 +139,12 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return a new region base on the center point and extents size
      */
     public static Region3i createFromCenterExtents(BaseVector3f center, BaseVector3f extents) {
-        Vector3f min = new Vector3f(center.x() - extents.x(), center.y() - extents.y(), center.z() - extents.z());
-        Vector3f max = new Vector3f(center.x() + extents.x(), center.y() + extents.y(), center.z() + extents.z());
+        org.terasology.math.geom.Vector3f min = new org.terasology.math.geom.Vector3f(center.x() - extents.x(), center.y() - extents.y(), center.z() - extents.z());
+        org.terasology.math.geom.Vector3f max = new org.terasology.math.geom.Vector3f(center.x() + extents.x(), center.y() + extents.y(), center.z() + extents.z());
         max.x = max.x - Math.ulp(max.x);
         max.y = max.y - Math.ulp(max.y);
         max.z = max.z - Math.ulp(max.z);
-        return createFromMinMax(new Vector3i(min), new Vector3i(max));
+        return createFromMinMax(new org.terasology.math.geom.Vector3i(min), new org.terasology.math.geom.Vector3i(max));
     }
 
     /**
@@ -93,8 +154,8 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return a new region base on the center point and extents size
      */
     public static Region3i createFromCenterExtents(BaseVector3i center, BaseVector3i extents) {
-        Vector3i min = new Vector3i(center.x() - extents.x(), center.y() - extents.y(), center.z() - extents.z());
-        Vector3i max = new Vector3i(center.x() + extents.x(), center.y() + extents.y(), center.z() + extents.z());
+        org.terasology.math.geom.Vector3i min = new org.terasology.math.geom.Vector3i(center.x() - extents.x(), center.y() - extents.y(), center.z() - extents.z());
+        org.terasology.math.geom.Vector3i max = new org.terasology.math.geom.Vector3i(center.x() + extents.x(), center.y() + extents.y(), center.z() + extents.z());
         return createFromMinMax(min, max);
     }
 
@@ -105,8 +166,8 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return a new region base on the center point and extents size
      */
     public static Region3i createFromCenterExtents(BaseVector3i center, int extent) {
-        Vector3i min = new Vector3i(center.x() - extent, center.y() - extent, center.z() - extent);
-        Vector3i max = new Vector3i(center.x() + extent, center.y() + extent, center.z() + extent);
+        org.terasology.math.geom.Vector3i min = new org.terasology.math.geom.Vector3i(center.x() - extent, center.y() - extent, center.z() - extent);
+        org.terasology.math.geom.Vector3i max = new org.terasology.math.geom.Vector3i(center.x() + extent, center.y() + extent, center.z() + extent);
         return createFromMinMax(min, max);
     }
 
@@ -117,9 +178,9 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return a new region base on vertex a and b
      */
     public static Region3i createBounded(BaseVector3i a, BaseVector3i b) {
-        Vector3i min = new Vector3i(a);
+        org.terasology.math.geom.Vector3i min = new org.terasology.math.geom.Vector3i(a);
         min.min(b);
-        Vector3i max = new Vector3i(a);
+        org.terasology.math.geom.Vector3i max = new org.terasology.math.geom.Vector3i(a);
         max.max(b);
         return createFromMinMax(min, max);
     }
@@ -131,7 +192,7 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return a new region base on min and max point
      */
     public static Region3i createFromMinMax(BaseVector3i min, BaseVector3i max) {
-        Vector3i size = new Vector3i(max.x() - min.x() + 1, max.y() - min.y() + 1, max.z() - min.z() + 1);
+        org.terasology.math.geom.Vector3i size = new org.terasology.math.geom.Vector3i(max.x() - min.x() + 1, max.y() - min.y() + 1, max.z() - min.z() + 1);
         if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
             return empty();
         }
@@ -139,81 +200,86 @@ public final class Region3i implements Iterable<Vector3i> {
     }
 
     public static Region3i createEncompassing(Region3i a, Region3i b) {
-        if (a.isEmpty()) {
+        if (a.isValid()) {
             return b;
         }
-        if (b.isEmpty()) {
+        if (b.isValid()) {
             return a;
         }
-        Vector3i min = a.min();
-        min.min(b.min());
-        Vector3i max = a.max();
-        max.max(b.max());
-        return createFromMinMax(min, max);
+
+        return new Region3i(a).union(b.minX, b.minY, b.minZ).union(b.maxX, b.maxY, b.maxZ);
+//
+//        if (a.isEmpty()) {
+//            return b;
+//        }
+//        if (b.isEmpty()) {
+//            return a;
+//        }
+//        Vector3i min = a.min();
+//        min.min(b.min());
+//        Vector3i max = a.max();
+//        max.max(b.max());
+//        return createFromMinMax(min, max);
     }
 
-    public boolean isEmpty() {
-        return size.x + size.y + size().z == 0;
-    }
 
     /**
      * @return The smallest vector in the region
      */
-    public Vector3i min() {
-        return new Vector3i(min);
+    public org.terasology.math.geom.Vector3i min() {
+        return new org.terasology.math.geom.Vector3i(minX, minY, minZ);
     }
 
     public int minX() {
-        return min.x;
+        return minX;
     }
 
     public int minY() {
-        return min.y;
+        return minY;
     }
 
     public int minZ() {
-        return min.z;
+        return minZ;
     }
 
     /**
      * @return The size of the region
+     * @deprecated
      */
-    public Vector3i size() {
-        return new Vector3i(size);
+    @Deprecated
+    public org.terasology.math.geom.Vector3i size() {
+        return new org.terasology.math.geom.Vector3i(sizeX(), sizeY(), sizeZ());
     }
 
     public int sizeX() {
-        return size.x;
+        return maxX - minX;
     }
 
     public int sizeY() {
-        return size.y;
+        return maxY - minY;
     }
 
     public int sizeZ() {
-        return size.z;
+        return maxZ - minZ;
     }
 
     /**
      * @return The largest vector in the region
      */
-    public Vector3i max() {
-        Vector3i max = new Vector3i(min);
-        max.add(size);
-        max.sub(1, 1, 1);
-        return max;
+    public org.terasology.math.geom.Vector3i max() {
+        return new org.terasology.math.geom.Vector3i(maxX(),maxY(),maxZ());
     }
 
     public int maxX() {
-        return min.x + size.x - 1;
+        return maxX - 1;
     }
 
     public int maxY() {
-        return min.y + size.y - 1;
+        return maxY - 1;
     }
 
     public int maxZ() {
-        return min.z + size.z - 1;
+        return maxZ - 1;
     }
 
     /**
@@ -222,21 +288,72 @@ public final class Region3i implements Iterable<Vector3i> {
      * do not overlap then the empty region is returned
      */
     public Region3i intersect(Region3i other) {
-        Vector3i intersectMin = min();
+        org.terasology.math.geom.Vector3i intersectMin = min();
         intersectMin.max(other.min());
-        Vector3i intersectMax = max();
+        org.terasology.math.geom.Vector3i intersectMax = max();
         intersectMax.min(other.max());
 
         return createFromMinMax(intersectMin, intersectMax);
     }
 
-    /**
-     * @param other
-     * @return An iterator over the positions in this region that aren't in other
-     */
-    public Iterator<Vector3i> subtract(Region3i other) {
-        return new SubtractiveIterator(other);
+
+
+    public Region3i inflate(int x, int y, int z, Region3i dest) {
+        dest.minX = (this.minX - x);
+        dest.minY = (this.minY - y);
+        dest.minZ = (this.minZ - z);
+        dest.maxX = (this.minX + x);
+        dest.maxY = (this.minY + y);
+        dest.maxZ = (this.minZ + z);
+        return this;
     }
+
+    public Region3i inflate(Vector3ic pos, Region3i dest) {
+        return inflate(pos.x(), pos.y(), pos.z(), dest);
+    }
+
+    public Region3i inflate(Vector3ic pos) {
+        return inflate(pos.x(), pos.y(), pos.z(), this);
+    }
+
+    public Region3i inflate(int amount, Region3i dest) {
+        return inflate(amount, amount, amount, dest);
+    }
+
+    public Region3i inflate(int amount) {
+        return inflate(amount, amount, amount, this);
+    }
+
+    public Region3i union(Vector3ic pos, Region3i dest) {
+        return union(pos.x(), pos.y(), pos.z(), dest);
+    }
+
+    public Region3i union(Vector3ic pos) {
+        return union(pos.x(), pos.y(), pos.z(), this);
+    }
+
+    public Region3i union(int x, int y, int z, Region3i dest) {
+        dest.minX = this.minX < x ? this.minX : x;
+        dest.minY = this.minY < y ? this.minY : y;
+        dest.minZ = this.minZ < z ? this.minZ : z;
+        dest.maxX = this.maxX > x ? this.maxX : x;
+        dest.maxY = this.maxY > y ? this.maxY : y;
+        dest.maxZ = this.maxZ > z ? this.maxZ : z;
+        return dest;
+    }
+
+    public Region3i union(int x, int y, int z) {
+        return union(x, y, z, this);
+    }
+
+
+    public boolean testPoint(Vector3ic p) {
+        return testPoint(p.x(), p.y(), p.z());
+    }
+    public boolean testPoint(int x, int y, int z){
+        return (x >= minX) && (y >= minY) && (z >= minZ) && (x < maxX) && (y < maxY) && (z < maxZ);
+    }
+
 
     /**
      * Creates a new region that is the same as this region but expanded in all directions by the given amount
@@ -245,25 +362,25 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return A new region
      */
     public Region3i expand(int amount) {
-        Vector3i expandedMin = min();
+        org.terasology.math.geom.Vector3i expandedMin = min();
         expandedMin.sub(amount, amount, amount);
-        Vector3i expandedMax = max();
+        org.terasology.math.geom.Vector3i expandedMax = max();
         expandedMax.add(amount, amount, amount);
         return createFromMinMax(expandedMin, expandedMax);
     }
 
     public Region3i expand(BaseVector3i amount) {
-        Vector3i expandedMin = min();
+        org.terasology.math.geom.Vector3i expandedMin = min();
         expandedMin.sub(amount);
-        Vector3i expandedMax = max();
+        org.terasology.math.geom.Vector3i expandedMax = max();
         expandedMax.add(amount);
         return createFromMinMax(expandedMin, expandedMax);
     }
 
     public Region3i expandToContain(BaseVector3i adjPos) {
-        Vector3i expandedMin = min();
+        org.terasology.math.geom.Vector3i expandedMin = min();
         expandedMin.min(adjPos);
-        Vector3i expandedMax = max();
+        org.terasology.math.geom.Vector3i expandedMax = max();
         expandedMax.max(adjPos);
         return createFromMinMax(expandedMin, expandedMax);
     }
@@ -271,22 +388,25 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * @return The position at the center of the region
      */
-    public Vector3f center() {
-        Vector3f result = min.toVector3f();
-        Vector3f halfSize = size.toVector3f();
+    public org.terasology.math.geom.Vector3f center() {
+        org.terasology.math.geom.Vector3f result = new org.terasology.math.geom.Vector3f(minX, minY, minZ);
+        org.terasology.math.geom.Vector3f halfSize = new org.terasology.math.geom.Vector3f(sizeX(), sizeY(), sizeZ());
         halfSize.scale(0.5f);
         result.add(halfSize);
         return result;
     }
+
+
 
     /**
      * @param offset
      * @return A copy of the region offset by the given value
      */
     public Region3i move(BaseVector3i offset) {
-        Vector3i newMin = min();
+        org.terasology.math.geom.Vector3i newMin = min();
         newMin.add(offset);
-        return Region3i.createFromMinAndSize(newMin, size);
+        return Region3i.createFromMinAndSize(newMin,
+            new org.terasology.math.geom.Vector3i(sizeX(), sizeY(), sizeZ()));
     }
 
     /**
@@ -298,28 +418,84 @@ public final class Region3i implements Iterable<Vector3i> {
     }
 
     public boolean encompasses(int x, int y, int z) {
-        return (x >= min.x) && (y >= min.y) && (z >= min.z) && (x < min.x + size.x) && (y < min.y + size.y) && (z < min.z + size.z);
+        return (x >= minX) && (y >= minY) && (z >= minZ) && (x < maxX) && (y < maxY) && (z < maxZ);
+//        return (x >= min.x) && (y >= min.y) && (z >= min.z) && (x < min.x + size.x) && (y < min.y + size.y) && (z < min.z + size.z);
     }
 
     /**
      * @param pos
      * @return The nearest position within the region to the given pos.
      */
-    public Vector3i getNearestPointTo(BaseVector3i pos) {
-        Vector3i result = new Vector3i(pos);
+    public org.terasology.math.geom.Vector3i getNearestPointTo(BaseVector3i pos) {
+        org.terasology.math.geom.Vector3i result = new org.terasology.math.geom.Vector3i(pos);
         result.min(max());
-        result.max(min);
+        result.max(new org.terasology.math.geom.Vector3i(minX, minY, minZ));
         return result;
     }
 
     @Override
-    public Iterator<Vector3i> iterator() {
-        return new Region3iIterator();
+    public Iterator<Vector3ic> iterator() {
+        return new Iterator<Vector3ic>() {
+            private final Vector3i pos = new Vector3i(minX,minY,minZ);
+            private final int[] p = {minX,minY,minZ};
+            @Override
+            public boolean hasNext() {
+                return p[0] < maxX;
+            }
+
+            @Override
+            public Vector3ic next() {
+                pos.set(p[0],p[1],p[2]);
+                p[2]++;
+                if (p[2] >= maxZ) {
+                    p[2] = minZ;
+                    p[1]++;
+                    if (p[1] >= maxY) {
+                        p[1] = minY;
+                        p[0]++;
+                    }
+                }
+                return pos;
+            }
+        };
+    }
+
+    /**
+     * @param other
+     * @return An iterator over the positions in this region that aren't in other
+     */
+    public Iterator<Vector3ic> subtract(Region3i other) {
+        Iterator<Vector3ic> it =  new Iterator<Vector3ic>() {
+            private final Region3i region = new Region3i(other);
+            private Vector3i current = new Vector3i();
+            private Vector3ic next = null;
+            private Iterator<Vector3ic> innerIterator = iterator();
+
+            @Override
+            public boolean hasNext() {
+                return next != null;
+            }
+
+            @Override
+            public Vector3ic next() {
+                if(next != null) current.set(next);
+                while (innerIterator.hasNext()) {
+                    next = innerIterator.next();
+                    if (!region.testPoint(next)) {
+                        return current;
+                    }
+                }
+                next = null;
+                return current;
+            }
+        };
+        it.next();
+        return it;
     }
 
     @Override
     public String toString() {
-        return "(Min: " + min + ", Size: " + size + ")";
+        return "(Min: [" + minX + "," + minY + "," + minZ + "], Max: [" + maxX + "," + maxY + "," + maxZ + "])";
     }
 
     @Override
@@ -329,7 +505,8 @@ public final class Region3i implements Iterable<Vector3i> {
         }
         if (obj instanceof Region3i) {
             Region3i other = (Region3i) obj;
-            return min.equals(other.min) && size.equals(other.size);
+            return other.minX == this.minX && other.minY == this.minY && other.minZ == this.minZ
+                && other.maxX == this.maxX && other.maxY == this.maxY && other.maxZ == this.maxZ;
         }
         return false;
     }
@@ -337,80 +514,12 @@ public final class Region3i implements Iterable<Vector3i> {
     @Override
     public int hashCode() {
         int hash = 37;
-        hash += 37 * hash + min.hashCode();
-        hash += 37 * hash + size.hashCode();
+        hash += 37 * hash + minX;
+        hash += 37 * hash + minY;
+        hash += 37 * hash + minZ;
+        hash += 37 * hash + maxX;
+        hash += 37 * hash + maxY;
+        hash += 37 * hash + maxZ;
         return hash;
-    }
-
-    private class Region3iIterator implements Iterator<Vector3i> {
-        Vector3i pos;
-
-         Region3iIterator() {
-            this.pos = new Vector3i();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return pos.x < size.x;
-        }
-
-        @Override
-        public Vector3i next() {
-            Vector3i result = new Vector3i(pos.x + min.x, pos.y + min.y, pos.z + min.z);
-            pos.z++;
-            if (pos.z >= size.z) {
-                pos.z = 0;
-                pos.y++;
-                if (pos.y >= size.y) {
-                    pos.y = 0;
-                    pos.x++;
-                }
-            }
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
-    }
-
-    private class SubtractiveIterator implements Iterator<Vector3i> {
-        private Iterator<Vector3i> innerIterator;
-        private Vector3i next;
-        private Region3i other;
-
-         SubtractiveIterator(Region3i other) {
-            this.other = other;
-            innerIterator = iterator();
-            updateNext();
-        }
-
-        private void updateNext() {
-            while (innerIterator.hasNext()) {
-                next = innerIterator.next();
-                if (!other.encompasses(next)) {
-                    return;
-                }
-            }
-            next = null;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return next != null;
-        }
-
-        @Override
-        public Vector3i next() {
-            Vector3i result = new Vector3i(next);
-            updateNext();
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
     }
 }

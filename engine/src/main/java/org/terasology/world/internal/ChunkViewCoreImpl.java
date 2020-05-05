@@ -16,6 +16,7 @@
 
 package org.terasology.world.internal;
 
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
@@ -201,8 +202,8 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public void setDirtyAround(Vector3i blockPos) {
-        for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(blockPos, 1)) {
-            chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);
+        for (Vector3ic pos : ChunkMath.getChunkRegionAroundWorldPos(blockPos, 1)) {
+            chunks[pos.x() + offset.x + chunkRegion.size().x * (pos.z() + offset.z)].setDirty(true);
         }
     }
 
@@ -216,8 +217,8 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         Vector3i minChunk = ChunkMath.calcChunkPos(minPos, chunkPower);
         Vector3i maxChunk = ChunkMath.calcChunkPos(maxPos, chunkPower);
 
-        for (Vector3i pos : Region3i.createFromMinMax(minChunk, maxChunk)) {
-            chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);
+        for (Vector3ic pos : Region3i.createFromMinMax(minChunk, maxChunk)) {
+            chunks[pos.x() + offset.x + chunkRegion.size().x * (pos.z() + offset.z)].setDirty(true);
         }
     }
 
