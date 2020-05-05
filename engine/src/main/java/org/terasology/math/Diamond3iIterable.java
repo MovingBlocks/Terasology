@@ -33,12 +33,23 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
     private final int endDistance;
     private int startDistance = 0;
 
+    /**
+     *
+     * @param origin center point of Diamond3iIterator
+     * @param maxDistance maxDistance away
+     */
     private Diamond3iIterable(Vector3ic origin, int maxDistance) {
         Preconditions.checkArgument(maxDistance >= 0, "maxDistance must be > 0");
         this.origin.set(origin);
         this.endDistance = maxDistance;
     }
 
+    /**
+     *
+     * @param origin center point of Diamond3iIterator
+     * @param startDistance inner distance outwards
+     * @param maxDistance maxDistance away
+     */
     private Diamond3iIterable(Vector3ic origin, int startDistance, int maxDistance) {
         Preconditions.checkArgument(startDistance < maxDistance, "startDistance must be < maxDistance");
         Preconditions.checkArgument(maxDistance >= 0, "maxDistance must be >= 0");
@@ -49,14 +60,30 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
         this.startDistance = startDistance;
     }
 
+    /**
+     * solid diamond shape from the center to a radius
+     * @param origin center of diamond iterator
+     * @param radius distance to iterate out to
+     */
     public static Diamond3iIterable.Builder region(Vector3ic origin, int radius) {
         return new Diamond3iIterable.Builder(origin, radius);
     }
 
+    /**
+     * hollow shape with an inner and outer distance to iterate over
+     * @param origin  center of diamond iterator
+     * @param start distance to start iterating from
+     * @param end distance to iterate out to
+     */
     public static Diamond3iIterable.Builder hollow(Vector3ic origin, int start, int end) {
         return new Diamond3iIterable.Builder(origin, end).start(start);
     }
 
+    /**
+     * iterates in a shell that is 1 block wide
+     * @param origin center of shell
+     * @param radius distance for 1 block wide shell
+     */
     public static Diamond3iIterable.Builder shell(Vector3ic origin, int radius) {
         return new Diamond3iIterable.Builder(origin, radius).start(radius - 1);
     }
@@ -107,11 +134,20 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
         private final int endDistance;
         private int startDistance = 0;
 
+        /**
+         * Default endDistance starts at 1
+         * @param origin center region for iterator
+         * @param endDistance maximums radius
+         */
         private Builder(Vector3ic origin, int endDistance){
             this.origin = origin;
             this.endDistance = endDistance + 1;
         }
 
+        /**
+         * Default start distance is 0
+         * @param start  the minimum radius
+         */
         public Diamond3iIterable.Builder start(int start) {
             this.startDistance = start + 1;
             return this;
