@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.math;
+package org.terasology.math.iterator;
 
 import com.google.common.base.Preconditions;
 import org.joml.Vector2i;

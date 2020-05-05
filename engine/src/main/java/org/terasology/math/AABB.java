@@ -29,7 +29,10 @@ import java.util.List;
 
 /**
  * An axis-aligned bounding box. Provides basic support for inclusion and intersection tests.
- */
+ * @deprecated this class is schedules for removal in an upcoming version
+ *             Use the JOML implementation instead: {@link org.joml.AABBf}
+ **/
+@Deprecated
 public final class AABB {
 
     public static final float DEFAULT_MARGIN = 0.01f;
