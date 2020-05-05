@@ -16,12 +16,16 @@
 
 package org.terasology.math;
 
+import com.google.common.base.Preconditions;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
 import java.util.Iterator;
 
 /**
+ * Diamond3Iterable iterates in a diamond shape hull where the manhattan distance is the same for that level.
+ * for each group of iterations the manhattan distance decreases. inner and outer radiuses can be set where
+ * the shape can be an hull with distance 1 to a full solid.
  */
 public final class Diamond3iIterable implements Iterable<Vector3ic> {
 
@@ -30,11 +34,16 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
     private int startDistance = 0;
 
     private Diamond3iIterable(Vector3ic origin, int maxDistance) {
+        Preconditions.checkArgument(maxDistance >= 0, "maxDistance must be > 0");
         this.origin.set(origin);
         this.endDistance = maxDistance;
     }
 
     private Diamond3iIterable(Vector3ic origin, int startDistance, int maxDistance) {
+        Preconditions.checkArgument(startDistance < maxDistance, "startDistance must be < maxDistance");
+        Preconditions.checkArgument(maxDistance >= 0, "maxDistance must be >= 0");
+        Preconditions.checkArgument(startDistance >= 0, "maxDistance must be >= 0");
+
         this.origin.set(origin);
         this.endDistance = maxDistance;
         this.startDistance = startDistance;
