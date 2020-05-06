@@ -72,6 +72,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
      * Set of all particle emitters
      */
     private final Set<ParticleEmitterComponent> registeredParticleSystems = new HashSet<>();
+    private final HashSet<ParticlePool> updatedParticlePools = new HashSet<>();
 
     private final FastRandom random = new FastRandom();
     private final Physics physics;
@@ -116,9 +117,8 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
     public void update(final float delta) {
         movingAvgDelta = TeraMath.lerp(movingAvgDelta, delta, 0.05f);
 
-        for (ParticleEmitterComponent registeredParticleSystem : ImmutableList.copyOf(registeredParticleSystems)) {
-            updateParticleSystem(registeredParticleSystem, delta);
-        }
+        ImmutableList.copyOf(registeredParticleSystems).forEach(x -> updateParticleSystem(x, delta));
+        updatedParticlePools.clear();
     }
 
     @Override
@@ -304,24 +304,31 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
             updateEmitter(partSys, 0, delta); // Emit particles
         }
 
-        updateParticles(partSys, delta); // Update particle lifetime and Affectors
+        if (!updatedParticlePools.contains(partSys.particlePool)) {
+            updateParticles(partSys, delta); // Update particle lifetime and Affectors
+            updatedParticlePools.add(partSys.particlePool);
+        }
 
         if (partSys.particleCollision) {
             checkCollision(partSys.particlePool, partSys.collisionUpdateIteration);
             partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
         }
 
-        if (partSys.lifeTime != ParticleEmitterComponent.INDEFINITE_EMITTER_LIFETIME) {
-            partSys.lifeTime = Math.max(0, partSys.lifeTime - delta);
+        updateEmitterLifeTime(partSys, delta);
+    }
 
-            if (partSys.lifeTime == 0) {
-                partSys.enabled = false;
+    private void updateEmitterLifeTime(ParticleEmitterComponent emitter, float delta) {
+        if (emitter.lifeTime != ParticleEmitterComponent.INDEFINITE_EMITTER_LIFETIME) {
+            emitter.lifeTime = Math.max(0, emitter.lifeTime - delta);
 
-                if (partSys.particlePool.deadParticles() == partSys.maxParticles) {
-                    if (partSys.destroyEntityWhenDead) {
-                        partSys.ownerEntity.destroy();
+            if (emitter.lifeTime == 0) {
+                emitter.enabled = false;
+
+                if (emitter.particlePool.deadParticles() == emitter.maxParticles) {
+                    if (emitter.destroyEntityWhenDead) {
+                        emitter.ownerEntity.destroy();
                     } else {
-                        partSys.ownerEntity.removeComponent(ParticleEmitterComponent.class);
+                        emitter.ownerEntity.removeComponent(ParticleEmitterComponent.class);
                     }
                 }
             }
