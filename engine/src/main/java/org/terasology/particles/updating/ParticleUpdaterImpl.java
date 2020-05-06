@@ -41,6 +41,7 @@ import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.random.FastRandom;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -117,7 +118,9 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
     public void update(final float delta) {
         movingAvgDelta = TeraMath.lerp(movingAvgDelta, delta, 0.05f);
 
-        ImmutableList.copyOf(registeredParticleSystems).forEach(x -> updateParticleSystem(x, delta));
+        Collection<ParticleEmitterComponent> particleEmitters = ImmutableList.copyOf(registeredParticleSystems);
+        particleEmitters.forEach(x -> updateParticleEmitters(x, delta));
+        particleEmitters.forEach(x -> updateParticleData(x, delta));
         updatedParticlePools.clear();
     }
 
@@ -299,19 +302,22 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         }
     }
 
-    private void updateParticleSystem(final ParticleEmitterComponent partSys, final float delta) {
+    private void updateParticleData(final ParticleEmitterComponent particleSystem, float delta) {
+        if (!updatedParticlePools.contains(particleSystem.particlePool)) {
+            updateParticles(particleSystem, delta); // Update particle lifetime and Affectors
+
+            if (particleSystem.particleCollision) {
+                checkCollision(particleSystem.particlePool, particleSystem.collisionUpdateIteration);
+                particleSystem.collisionUpdateIteration = (particleSystem.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
+            }
+
+            updatedParticlePools.add(particleSystem.particlePool);
+        }
+    }
+
+    private void updateParticleEmitters(final ParticleEmitterComponent partSys, final float delta) {
         if (partSys.enabled && (partSys.particleSpawnsLeft == ParticleEmitterComponent.INFINITE_PARTICLE_SPAWNS || partSys.particleSpawnsLeft > 0)) {
             updateEmitter(partSys, 0, delta); // Emit particles
-        }
-
-        if (!updatedParticlePools.contains(partSys.particlePool)) {
-            updateParticles(partSys, delta); // Update particle lifetime and Affectors
-            updatedParticlePools.add(partSys.particlePool);
-        }
-
-        if (partSys.particleCollision) {
-            checkCollision(partSys.particlePool, partSys.collisionUpdateIteration);
-            partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
         }
 
         updateEmitterLifeTime(partSys, delta);
