@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.logic;
 
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -171,6 +172,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
         Quaternionf worldRot = new Quaternionf();
         Vector3f worldPos = new Vector3f();
+        Matrix3f normalMatrix = new Matrix3f();
+        Matrix4f matrixCameraSpace = new Matrix4f();
+        Matrix4f modelViewMatrix = new Matrix4f();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
@@ -205,7 +209,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     Transform toWorldSpace = new Transform(JomlUtil.from(worldPos), JomlUtil.from(worldRot), worldScale);
 
                     Vector3f offsetFromCamera = worldPos.sub(cameraPosition,new Vector3f());
-                    Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(offsetFromCamera,worldRot, worldScale).transpose();
+                    matrixCameraSpace.identity().translationRotateScale(offsetFromCamera,worldRot, worldScale);
 
                     AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
@@ -217,9 +221,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                             lastMesh.preRender();
                         }
 
-                        Matrix4f modelViewMatrix = new Matrix4f(matrixCameraSpace).mul(worldRenderer.getActiveCamera().getViewMatrix());
-                        MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
-                        MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+                        modelViewMatrix.set(worldRenderer.getActiveCamera().getViewMatrix()).transpose().mul(matrixCameraSpace);
+                        modelViewMatrix.get(tempMatrixBuffer44);
+                        modelViewMatrix.get3x3(normalMatrix).invert().get(tempMatrixBuffer33);
 
                         material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix(), true);
                         material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
