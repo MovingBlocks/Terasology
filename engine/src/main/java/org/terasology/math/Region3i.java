@@ -382,6 +382,13 @@ public final class Region3i implements Iterable<Vector3ic> {
         return maxZ - 1;
     }
 
+    /**
+     * Get the minimum corner of the given component
+     *
+     * @param component the component within <code>[0..2]</code>
+     * @return the minimum coordinate
+     * @throws IllegalArgumentException if <code>component</code> is not within [0..2]
+     */
     public int getMin(int component) throws IllegalArgumentException {
         switch (component) {
             case 0:
@@ -398,9 +405,10 @@ public final class Region3i implements Iterable<Vector3ic> {
 
     /**
      * get component for maximum coordinate
-     * @param component
-     * @return
-     * @throws IllegalArgumentException
+     *
+     * @param component the component within <code>[0..2]</code>
+     * @return the maximum coordinate
+     * @throws IllegalArgumentException if <code>component</code> is not within [0..2]
      */
     public int getMax(int component) throws IllegalArgumentException {
         switch (component) {
@@ -419,6 +427,7 @@ public final class Region3i implements Iterable<Vector3ic> {
      * @param other
      * @return The region that is encompassed by both this and other. If they
      * do not overlap then the empty region is returned
+     * @deprecated
      */
     public Region3i intersect(Region3i other) {
         org.terasology.math.geom.Vector3i intersectMin = min();
@@ -497,6 +506,12 @@ public final class Region3i implements Iterable<Vector3ic> {
         return inflate(pos.x(), pos.y(), pos.z(), dest);
     }
 
+    /**
+     * inflate region from each surface by (+x, +y, +z) from pos
+     *
+     * @param pos components used for inflate
+     * @return this
+     */
     public Region3i inflate(Vector3ic pos) {
         return inflate(pos.x(), pos.y(), pos.z(), this);
     }
@@ -505,13 +520,18 @@ public final class Region3i implements Iterable<Vector3ic> {
      * inflate region by the amount and write to dest
      *
      * @param amount amount to inflate region
-     * @param dest
-     * @return
+     * @param dest region to write to
+     * @return dest
      */
     public Region3i inflate(int amount, Region3i dest) {
         return inflate(amount, amount, amount, dest);
     }
 
+    /**
+     *
+     * @param amount amount to inflate region
+     * @return this
+     */
     public Region3i inflate(int amount) {
         return inflate(amount, amount, amount, this);
     }
@@ -702,6 +722,7 @@ public final class Region3i implements Iterable<Vector3ic> {
      *
      * @param x    the x coordinate to translate by
      * @param y    the y coordinate to translate by
+     * @param z    the z coordinate to translate by
      * @param dest will hold the result
      * @return dest
      */
@@ -713,6 +734,20 @@ public final class Region3i implements Iterable<Vector3ic> {
         dest.maxY = maxY + y;
         dest.maxZ = maxZ + z;
         return dest;
+    }
+
+    public Region3i translate(Vector3ic pos, Region3i dest) {
+        return this.translate(pos.x(), pos.y(), pos.z(), dest);
+    }
+
+    /**
+     * Translate <code>this</code> by the vector <code>(x, y, z)</code> and store the result in <code>dest</code>.
+     *
+     * @param pos the vector to translate by
+     * @return this
+     */
+    public Region3i translate(Vector3ic pos) {
+        return this.translate(pos.x(), pos.y(), pos.z(), this);
     }
 
     /**
@@ -732,7 +767,8 @@ public final class Region3i implements Iterable<Vector3ic> {
      * @param offset
      * @return A copy of the region offset by the given value
      * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #translate(int, int, int)}.
+     *             Use the JOML implementation instead: {@link #translate(Vector3ic)}.
+     *             Note: {@link #translate(Vector3ic)} modifies this
      */
     @Deprecated
     public Region3i move(BaseVector3i offset) {
@@ -745,7 +781,10 @@ public final class Region3i implements Iterable<Vector3ic> {
     /**
      * @param pos
      * @return Whether this region includes pos
-     */
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #testPoint(Vector3ic)}.
+     **/
+    @Deprecated
     public boolean encompasses(BaseVector3i pos) {
         return encompasses(pos.getX(), pos.getY(), pos.getZ());
     }
@@ -758,7 +797,7 @@ public final class Region3i implements Iterable<Vector3ic> {
      * @return
      * @deprecated This method is scheduled for removal in an upcoming version.
      *              Use the JOML implementation instead: {@link #testPoint(int, int, int)}.
-     */
+     **/
     @Deprecated
     public boolean encompasses(int x, int y, int z) {
         return (x >= minX) && (y >= minY) && (z >= minZ) && (x < maxX) && (y < maxY) && (z < maxZ);
