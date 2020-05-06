@@ -227,7 +227,7 @@ public class ChunkRelevanceRegion {
             nextChunkPos = null;
             while (regionPositions.hasNext() && nextChunkPos == null) {
                 Vector3ic candidate = regionPositions.next();
-                if (!relevantChunks.contains(candidate)) {
+                if (!relevantChunks.contains(JomlUtil.from(candidate))) {
                     nextChunkPos = JomlUtil.from(candidate);
                 }
             }
