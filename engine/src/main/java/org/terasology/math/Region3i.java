@@ -20,8 +20,6 @@ import org.joml.Math;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.audio.AudioEndListener;
-import org.terasology.audio.StaticSound;
 import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
