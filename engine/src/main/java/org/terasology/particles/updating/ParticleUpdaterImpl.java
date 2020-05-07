@@ -302,6 +302,14 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         }
     }
 
+    private void updateParticleEmitters(final ParticleEmitterComponent emitter, final float delta) {
+        if (emitter.enabled && (emitter.particleSpawnsLeft == ParticleEmitterComponent.INFINITE_PARTICLE_SPAWNS || emitter.particleSpawnsLeft > 0)) {
+            updateEmitter(emitter, 0, delta); // Emit particles
+        }
+
+        updateEmitterLifeTime(emitter, delta);
+    }
+
     private void updateParticleData(final ParticleEmitterComponent particleSystem, float delta) {
         if (!updatedParticlePools.contains(particleSystem.particlePool)) {
             updateParticles(particleSystem, delta); // Update particle lifetime and Affectors
@@ -313,14 +321,6 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
 
             updatedParticlePools.add(particleSystem.particlePool);
         }
-    }
-
-    private void updateParticleEmitters(final ParticleEmitterComponent partSys, final float delta) {
-        if (partSys.enabled && (partSys.particleSpawnsLeft == ParticleEmitterComponent.INFINITE_PARTICLE_SPAWNS || partSys.particleSpawnsLeft > 0)) {
-            updateEmitter(partSys, 0, delta); // Emit particles
-        }
-
-        updateEmitterLifeTime(partSys, delta);
     }
 
     private void updateEmitterLifeTime(ParticleEmitterComponent emitter, float delta) {
