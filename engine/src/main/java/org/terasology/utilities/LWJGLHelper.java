@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
 
+import java.nio.file.Path;
+
 /**
  * Helper class to have LWJGL loading logic in a central spot
  *
@@ -40,18 +42,21 @@ public final class LWJGLHelper {
     }
 
     private static void initLibraryPaths() {
+        final Path path;
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("macosx"));
+                path = PathManager.getInstance().getNativesPath().resolve("macosx");
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("linux"));
+                path = PathManager.getInstance().getNativesPath().resolve("linux");
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("windows"));
+                path = PathManager.getInstance().getNativesPath().resolve("windows");
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported operating system: " + LWJGLUtil.getPlatformName());
         }
+
+        System.setProperty("org.lwjgl.librarypath", path.toAbsolutePath().toString());
     }
 }
