@@ -118,6 +118,8 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
     public void update(final float delta) {
         movingAvgDelta = TeraMath.lerp(movingAvgDelta, delta, 0.05f);
 
+        // It's important to update all emitters before the particle data inside the pools gets updated.
+        // This ensures that all freshly revived particles are also being updated.
         Collection<ParticleEmitterComponent> particleEmitters = ImmutableList.copyOf(registeredParticleSystems);
         particleEmitters.forEach(x -> updateParticleEmitters(x, delta));
         particleEmitters.forEach(x -> updateParticleData(x, delta));
@@ -277,9 +279,9 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         particleEmitter.particlePool.storeTemporaryDataAt(index, ParticleDataMask.ALL.toInt());
     }
 
-    /*
+    /**
      * Emits particles from emitter
-     * */
+     */
     private void updateEmitter(final ParticleEmitterComponent particleEmitter, final int particleReviveLimit, final float delta) {
         float deltaLeft = delta;
 
@@ -302,6 +304,12 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         }
     }
 
+    /**
+     * Updates the specified particle emitter.
+     * Might cause the emitter to emit new particles or to be disabled once its lifetime runs out.
+     * @param emitter the emitter to update
+     * @param delta delta time
+     */
     private void updateParticleEmitters(final ParticleEmitterComponent emitter, final float delta) {
         if (emitter.enabled && (emitter.particleSpawnsLeft == ParticleEmitterComponent.INFINITE_PARTICLE_SPAWNS || emitter.particleSpawnsLeft > 0)) {
             updateEmitter(emitter, 0, delta); // Emit particles
@@ -310,6 +318,14 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         updateEmitterLifeTime(emitter, delta);
     }
 
+    /**
+     * Updates the particle data inside the particle pool, referenced by the specified particle emitter.
+     * During a single update cycle, each pool is only updated once.
+     * In case multiple particle emitters are referencing it, it is only updated the first time it's encountered.
+     * The update involves updating the trajectory and life time (optionally dependent on collisions)
+     * @param particleSystem the particle system referencing the pool to update
+     * @param delta delta time
+     */
     private void updateParticleData(final ParticleEmitterComponent particleSystem, float delta) {
         if (!updatedParticlePools.contains(particleSystem.particlePool)) {
             updateParticles(particleSystem, delta); // Update particle lifetime and Affectors
@@ -323,6 +339,13 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         }
     }
 
+    /**
+     * Updates the particle emitters lifetime and disables or removes it potentially.
+     * In case the life time runs out, the emitter is disabled.
+     * In case no more particles in the pool are alive, the emitter is destroyed.
+     * @param emitter emitter to update
+     * @param delta delta time
+     */
     private void updateEmitterLifeTime(ParticleEmitterComponent emitter, float delta) {
         if (emitter.lifeTime != ParticleEmitterComponent.INDEFINITE_EMITTER_LIFETIME) {
             emitter.lifeTime = Math.max(0, emitter.lifeTime - delta);
