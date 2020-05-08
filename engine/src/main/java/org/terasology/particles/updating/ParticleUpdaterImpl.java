@@ -41,6 +41,7 @@ import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.random.FastRandom;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,6 +73,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
      * Set of all particle emitters
      */
     private final Set<ParticleEmitterComponent> registeredParticleSystems = new HashSet<>();
+    private final HashSet<ParticlePool> updatedParticlePools = new HashSet<>();
 
     private final FastRandom random = new FastRandom();
     private final Physics physics;
@@ -116,9 +118,12 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
     public void update(final float delta) {
         movingAvgDelta = TeraMath.lerp(movingAvgDelta, delta, 0.05f);
 
-        for (ParticleEmitterComponent registeredParticleSystem : ImmutableList.copyOf(registeredParticleSystems)) {
-            updateParticleSystem(registeredParticleSystem, delta);
-        }
+        // It's important to update all emitters before the particle data inside the pools gets updated.
+        // This ensures that all freshly revived particles are also being updated.
+        Collection<ParticleEmitterComponent> particleEmitters = ImmutableList.copyOf(registeredParticleSystems);
+        particleEmitters.forEach(x -> updateParticleEmitters(x, delta));
+        particleEmitters.forEach(x -> updateParticleData(x, delta));
+        updatedParticlePools.clear();
     }
 
     @Override
@@ -274,9 +279,9 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         particleEmitter.particlePool.storeTemporaryDataAt(index, ParticleDataMask.ALL.toInt());
     }
 
-    /*
+    /**
      * Emits particles from emitter
-     * */
+     */
     private void updateEmitter(final ParticleEmitterComponent particleEmitter, final int particleReviveLimit, final float delta) {
         float deltaLeft = delta;
 
@@ -299,29 +304,60 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         }
     }
 
-    private void updateParticleSystem(final ParticleEmitterComponent partSys, final float delta) {
-        if (partSys.enabled && (partSys.particleSpawnsLeft == ParticleEmitterComponent.INFINITE_PARTICLE_SPAWNS || partSys.particleSpawnsLeft > 0)) {
-            updateEmitter(partSys, 0, delta); // Emit particles
+    /**
+     * Updates the specified particle emitter.
+     * Might cause the emitter to emit new particles or to be disabled once its lifetime runs out.
+     * @param emitter the emitter to update
+     * @param delta delta time
+     */
+    private void updateParticleEmitters(final ParticleEmitterComponent emitter, final float delta) {
+        if (emitter.enabled && (emitter.particleSpawnsLeft == ParticleEmitterComponent.INFINITE_PARTICLE_SPAWNS || emitter.particleSpawnsLeft > 0)) {
+            updateEmitter(emitter, 0, delta); // Emit particles
         }
 
-        updateParticles(partSys, delta); // Update particle lifetime and Affectors
+        updateEmitterLifeTime(emitter, delta);
+    }
 
-        if (partSys.particleCollision) {
-            checkCollision(partSys.particlePool, partSys.collisionUpdateIteration);
-            partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
+    /**
+     * Updates the particle data inside the particle pool, referenced by the specified particle emitter.
+     * During a single update cycle, each pool is only updated once.
+     * In case multiple particle emitters are referencing it, it is only updated the first time it's encountered.
+     * The update involves updating the trajectory and life time (optionally dependent on collisions)
+     * @param particleSystem the particle system referencing the pool to update
+     * @param delta delta time
+     */
+    private void updateParticleData(final ParticleEmitterComponent particleSystem, float delta) {
+        if (!updatedParticlePools.contains(particleSystem.particlePool)) {
+            updateParticles(particleSystem, delta); // Update particle lifetime and Affectors
+
+            if (particleSystem.particleCollision) {
+                checkCollision(particleSystem.particlePool, particleSystem.collisionUpdateIteration);
+                particleSystem.collisionUpdateIteration = (particleSystem.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
+            }
+
+            updatedParticlePools.add(particleSystem.particlePool);
         }
+    }
 
-        if (partSys.lifeTime != ParticleEmitterComponent.INDEFINITE_EMITTER_LIFETIME) {
-            partSys.lifeTime = Math.max(0, partSys.lifeTime - delta);
+    /**
+     * Updates the particle emitters lifetime and disables or removes it potentially.
+     * In case the life time runs out, the emitter is disabled.
+     * In case no more particles in the pool are alive, the emitter is destroyed.
+     * @param emitter emitter to update
+     * @param delta delta time
+     */
+    private void updateEmitterLifeTime(ParticleEmitterComponent emitter, float delta) {
+        if (emitter.lifeTime != ParticleEmitterComponent.INDEFINITE_EMITTER_LIFETIME) {
+            emitter.lifeTime = Math.max(0, emitter.lifeTime - delta);
 
-            if (partSys.lifeTime == 0) {
-                partSys.enabled = false;
+            if (emitter.lifeTime == 0) {
+                emitter.enabled = false;
 
-                if (partSys.particlePool.deadParticles() == partSys.maxParticles) {
-                    if (partSys.destroyEntityWhenDead) {
-                        partSys.ownerEntity.destroy();
+                if (emitter.particlePool.deadParticles() == emitter.maxParticles) {
+                    if (emitter.destroyEntityWhenDead) {
+                        emitter.ownerEntity.destroy();
                     } else {
-                        partSys.ownerEntity.removeComponent(ParticleEmitterComponent.class);
+                        emitter.ownerEntity.removeComponent(ParticleEmitterComponent.class);
                     }
                 }
             }
