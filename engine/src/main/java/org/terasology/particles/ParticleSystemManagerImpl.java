@@ -36,6 +36,10 @@ import org.terasology.physics.Physics;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -107,11 +111,16 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     @Override
     public Stream<ParticleRenderingData> getParticleEmittersByDataComponent(Class<? extends Component> particleDataComponent) {
         return particleUpdater.getParticleEmitters().stream()
-                .filter(p -> p.ownerEntity.hasComponent(particleDataComponent))
-                .map(particleEmitterComponent ->
-                        new ParticleRenderingData<>(
-                                particleEmitterComponent.ownerEntity.getComponent(particleDataComponent),
-                                particleEmitterComponent.particlePool
-                        ));
+                .filter(emitter -> emitter.ownerEntity.hasComponent(particleDataComponent))  // filter emitters, whose owning entity has a particleDataComponent
+                .filter(distinctByKey(emitter -> emitter.particlePool))  // filter emitters referencing a unique particle pool
+                .map(emitter -> new ParticleRenderingData<>(
+                        emitter.ownerEntity.getComponent(particleDataComponent),
+                        emitter.particlePool
+                ));
+    }
+
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return element -> seen.add(keyExtractor.apply(element));
     }
 }
