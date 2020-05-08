@@ -59,5 +59,4 @@ For more on developing/modding see the [wiki!](https://github.com/MovingBlocks/T
 * [Reddit](http://www.reddit.com/r/Terasology)
 * [Twitter](https://twitter.com/Terasology)
 * [Facebook](http://www.facebook.com/pages/Terasology/248329655219905)
-* [G+](https://plus.google.com/b/103835217961917018533)
 * [Discord](https://discord.gg/4uKbB8J)
