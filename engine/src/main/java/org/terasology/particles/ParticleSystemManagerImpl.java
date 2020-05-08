@@ -111,8 +111,8 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     @Override
     public Stream<ParticleRenderingData> getParticleEmittersByDataComponent(Class<? extends Component> particleDataComponent) {
         return particleUpdater.getParticleEmitters().stream()
-                .filter(emitter -> emitter.ownerEntity.hasComponent(particleDataComponent))
-                .filter(distinctByKey(emitter -> emitter.particlePool))
+                .filter(emitter -> emitter.ownerEntity.hasComponent(particleDataComponent))  // filter emitters, whose owning entity has a particleDataComponent
+                .filter(distinctByKey(emitter -> emitter.particlePool))  // filter emitters referencing a unique particle pool
                 .map(emitter -> new ParticleRenderingData<>(
                         emitter.ownerEntity.getComponent(particleDataComponent),
                         emitter.particlePool
