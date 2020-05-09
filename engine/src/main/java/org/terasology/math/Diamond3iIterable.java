@@ -39,7 +39,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
      * @param maxDistance maxDistance away
      */
     private Diamond3iIterable(Vector3ic origin, int maxDistance) {
-        Preconditions.checkArgument(maxDistance >= 0, "maxDistance must be > 0");
+        Preconditions.checkArgument(maxDistance >= 0, "maxDistance must be >= 0");
         this.origin.set(origin);
         this.endDistance = maxDistance;
     }
@@ -53,7 +53,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
     private Diamond3iIterable(Vector3ic origin, int startDistance, int maxDistance) {
         Preconditions.checkArgument(startDistance < maxDistance, "startDistance must be < maxDistance");
         Preconditions.checkArgument(maxDistance >= 0, "maxDistance must be >= 0");
-        Preconditions.checkArgument(startDistance >= 0, "maxDistance must be >= 0");
+        Preconditions.checkArgument(startDistance >= 0, "startDistance must be >= 0");
 
         this.origin.set(origin);
         this.endDistance = maxDistance;
@@ -135,13 +135,12 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
         private int startDistance = 0;
 
         /**
-         * Default endDistance starts at 1
          * @param origin center region for iterator
          * @param endDistance maximums radius
          */
         private Builder(Vector3ic origin, int endDistance){
             this.origin = origin;
-            this.endDistance = endDistance + 1;
+            this.endDistance = endDistance;
         }
 
         /**
@@ -149,7 +148,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
          * @param start  the minimum radius
          */
         public Diamond3iIterable.Builder start(int start) {
-            this.startDistance = start + 1;
+            this.startDistance = start;
             return this;
         }
 
