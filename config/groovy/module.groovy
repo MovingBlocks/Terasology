@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurper
 
 class module {
-    def excludedItems = ["engine", "BuilderSampleGameplay", "BiomesAPI", "Index", "terasology.github.io"]
+    def excludedItems = ["engine", "BuilderSampleGameplay", "Index", "terasology.github.io"]
 
     def getGithubDefaultHome(Properties properties) {
         return properties.alternativeGithubHome ?: "Terasology"
