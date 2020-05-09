@@ -92,7 +92,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
     public Iterator<Vector3ic> iterator() {
         Vector3i pos = new Vector3i();
         final int[] level = {this.startDistance};
-        final int[] offset = {-this.startDistance,0,0};
+        final Vector3i offset = new Vector3i(-this.startDistance,0,0);
 
         return new Iterator<Vector3ic>() {
             @Override
@@ -102,26 +102,26 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
 
             @Override
             public Vector3ic next() {
-                pos.set(origin.x + offset[0], origin.y + offset[1], origin.z + offset[2]);
-                if (offset[2] < 0) {
-                    offset[2] *= -1;
-                } else if (offset[1] < 0) {
-                    offset[1] *= -1;
-                    offset[2] = -(level[0] - TeraMath.fastAbs(offset[0]) - TeraMath.fastAbs(offset[1]));
+                pos.set(origin.x + offset.x, origin.y + offset.y, origin.z + offset.z);
+                if (offset.z < 0) {
+                    offset.z *= -1;
+                } else if (offset.y() < 0) {
+                    offset.y *= -1;
+                    offset.z = -(level[0] - TeraMath.fastAbs(offset.x()) - TeraMath.fastAbs(offset.y()));
                 } else {
-                    offset[1] = -offset[1] + 1;
-                    if (offset[1] > 0) {
-                        if (++offset[0] <= level[0]) {
-                            offset[1] = TeraMath.fastAbs(offset[0]) - level[0];
-                            offset[2] = 0;
+                    offset.y = -offset.y() + 1;
+                    if (offset.y > 0) {
+                        if (++offset.x <= level[0]) {
+                            offset.y = TeraMath.fastAbs(offset.x) - level[0];
+                            offset.z = 0;
                         } else {
                             level[0]++;
-                            offset[0] = -level[0];
-                            offset[1] = 0;
-                            offset[2] = 0;
+                            offset.x = -level[0];
+                            offset.y = 0;
+                            offset.z = 0;
                         }
                     } else {
-                        offset[2] = -(level[0] - TeraMath.fastAbs(offset[0]) - TeraMath.fastAbs(offset[1]));
+                        offset.z = -(level[0] - TeraMath.fastAbs(offset.x) - TeraMath.fastAbs(offset.y));
                     }
                 }
                 return pos;
