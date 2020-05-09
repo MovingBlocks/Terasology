@@ -102,7 +102,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
 
             @Override
             public Vector3ic next() {
-                pos.set(origin.x + offset.x, origin.y + offset.y, origin.z + offset.z);
+                origin.add(offset, pos);
                 if (offset.z < 0) {
                     offset.z *= -1;
                 } else if (offset.y() < 0) {
