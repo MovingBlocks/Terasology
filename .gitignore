@@ -17,7 +17,6 @@ extensions
 !/facades/subprojects.gradle
 /modules/*
 !/modules/BiomesAPI
-!/modules/Core
 !/modules/BuilderSampleGameplay
 !/modules/subprojects.gradle
 /metas/*
@@ -32,7 +31,6 @@ build/
 
 # Ignore IntelliJ - could use "/**/*.iml" to catch all .iml files, but that requires a somewhat recent Git version
 /out/
-modules/Core/Core.iml
 modules/BuilderSampleGameplay/BuilderSampleGameplay.iml
 facades/PC/PC.iml
 facades/TeraEd/TeraEd.iml
