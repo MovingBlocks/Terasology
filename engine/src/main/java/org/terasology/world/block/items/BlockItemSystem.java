@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.items;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.telemetry.GamePlayStatsComponent;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
@@ -90,7 +91,7 @@ public class BlockItemSystem extends BaseComponentSystem {
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
 
-        Block block = type.getBlockForPlacement(placementPos, surfaceSide, secondaryDirection);
+        Block block = type.getBlockForPlacement(JomlUtil.from(placementPos), surfaceSide, secondaryDirection);
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.

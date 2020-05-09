@@ -18,12 +18,12 @@ package org.terasology.world.block.family;
 import com.google.common.collect.Sets;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
@@ -50,15 +50,15 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     @In
     protected WorldProvider worldProvider;
-    
+
     @In
     protected BlockEntityRegistry blockEntityRegistry;
 
     protected TByteObjectMap<Block> blocks = new TByteObjectHashMap<>();
-    
+
     /**
      * Constructor for a block with a specified shape
-     * 
+     *
      * @param definition Family definition
      * @param shape The shape of the block
      * @param blockBuilder The builder to make the blocks for the family
@@ -69,7 +69,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     /**
      * Constructor for a regular block
-     * 
+     *
      * @param definition Family definition
      * @param blockBuilder The builder to make the blocks for the family
      */
@@ -79,10 +79,10 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     /**
      * A condition to return true if the block should have a connection on the given side
-     * 
+     *
      * @param blockLocation The position of the block in question
      * @param connectSide The side to determine connection for
-     * 
+     *
      * @return A boolean indicating if the block should connect on the given side
      */
     protected abstract boolean connectionCondition(Vector3i blockLocation, Side connectSide);
@@ -92,7 +92,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * Example: In a family like RomanColumn, this method only returns SideBitFlag.getSides(Side.TOP, Side.BOTTOM)
      * because a column should only connect on the top and bottom.
      * Example 2: In the signalling module, this returns all of the possible sides because a cable can connect in any direction.
-     * 
+     *
      * @return The sides of the block that can be connected to
      */
     public abstract byte getConnectionSides();
@@ -104,7 +104,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     public abstract Block getArchetypeBlock();
 
     /**
-     * 
+     *
      * @param root The root block URI of the family
      * @param definition The definition of the block family as passed down from the engine
      * @param blockBuilder The block builder to make the blocks in the family
@@ -158,11 +158,11 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     /**
      * Using the location of the block, the side the block is being attached to and the direction the block is being placed in,
      * determine what block should be placed.
-     * 
+     *
      * @param location The location of where the block will be placed
      * @param attachmentSide The side that the new block is being placed on
      * @param direction The direction the block is being placed in
-     * 
+     *
      * @return The block from the family to be placed
      */
     @Override
@@ -178,10 +178,10 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     /**
      * Update the block then a neighbor changes
-     * 
+     *
      * @param location The location of the block
      * @param oldBlock What the block was before the neighbor updated
-     * 
+     *
      * @return The block from the family to be placed
      */
     @Override
