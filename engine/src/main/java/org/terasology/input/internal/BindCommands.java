@@ -58,7 +58,6 @@ public class BindCommands extends BaseComponentSystem {
         AZERTY.put(KeyId.Z, new SimpleUri("engine:forwards"));
         AZERTY.put(KeyId.S, new SimpleUri("engine:backwards"));
         AZERTY.put(KeyId.Q, new SimpleUri("engine:left"));
-        AZERTY.put(KeyId.A, new SimpleUri("Core:dropItem"));
         AZERTY = Collections.unmodifiableMap(AZERTY);
 
         DVORAK = new HashMap<>();
