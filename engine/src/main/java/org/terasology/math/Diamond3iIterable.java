@@ -85,7 +85,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
      * @param radius distance for 1 block wide shell
      */
     public static Diamond3iIterable.Builder shell(Vector3ic origin, int radius) {
-        return new Diamond3iIterable.Builder(origin, radius).start(radius - 1);
+        return new Diamond3iIterable.Builder(origin, radius).start(radius);
     }
 
     @Override
@@ -140,7 +140,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
          */
         private Builder(Vector3ic origin, int endDistance){
             this.origin = origin;
-            this.endDistance = endDistance;
+            this.endDistance = endDistance + 1;
         }
 
         /**
