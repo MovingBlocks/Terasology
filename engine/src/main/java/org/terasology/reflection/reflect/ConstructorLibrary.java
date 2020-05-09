@@ -28,6 +28,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -75,17 +77,19 @@ public class ConstructorLibrary {
             return () -> rawTypeCreator.createInstance(type);
         }
 
-        ObjectConstructor<T> defaultConstructor = newDefaultConstructor(rawType);
-        if (defaultConstructor != null) {
-            return defaultConstructor;
-        }
+        return AccessController.doPrivileged((PrivilegedAction<ObjectConstructor<T>>) () -> {
+            ObjectConstructor<T> defaultConstructor = newDefaultConstructor(rawType);
+            if (defaultConstructor != null) {
+                return defaultConstructor;
+            }
 
-        ObjectConstructor<T> defaultImplementation = newDefaultImplementationConstructor(type, rawType);
-        if (defaultImplementation != null) {
-            return defaultImplementation;
-        }
+            ObjectConstructor<T> defaultImplementation = newDefaultImplementationConstructor(type, rawType);
+            if (defaultImplementation != null) {
+                return defaultImplementation;
+            }
 
-        return newUnsafeAllocator(typeInfo);
+            return newUnsafeAllocator(typeInfo);
+        });
     }
 
     private <T> ObjectConstructor<T> newUnsafeAllocator(TypeInfo<T> typeInfo) {
@@ -148,83 +152,39 @@ public class ConstructorLibrary {
         final Type type, Class<? super T> rawType) {
         if (Collection.class.isAssignableFrom(rawType)) {
             if (SortedSet.class.isAssignableFrom(rawType)) {
-                return new ObjectConstructor<T>() {
-                    @Override
-                    public T construct() {
-                        return (T) new TreeSet<Object>();
-                    }
-                };
+                return () -> (T) new TreeSet<>();
             } else if (EnumSet.class.isAssignableFrom(rawType)) {
-                return new ObjectConstructor<T>() {
-                    @SuppressWarnings("rawtypes")
-                    @Override
-                    public T construct() {
-                        if (type instanceof ParameterizedType) {
-                            Type elementType = ((ParameterizedType) type).getActualTypeArguments()[0];
-                            if (elementType instanceof Class) {
-                                return (T) EnumSet.noneOf((Class) elementType);
-                            } else {
-                                throw new SerializationException("Invalid EnumSet type: " + type.toString());
-                            }
+                return () -> {
+                    if (type instanceof ParameterizedType) {
+                        Type elementType = ((ParameterizedType) type).getActualTypeArguments()[0];
+                        if (elementType instanceof Class) {
+                            return (T) EnumSet.noneOf((Class) elementType);
                         } else {
                             throw new SerializationException("Invalid EnumSet type: " + type.toString());
                         }
+                    } else {
+                        throw new SerializationException("Invalid EnumSet type: " + type.toString());
                     }
                 };
             } else if (Set.class.isAssignableFrom(rawType)) {
-                return new ObjectConstructor<T>() {
-                    @Override
-                    public T construct() {
-                        return (T) new LinkedHashSet<Object>();
-                    }
-                };
+                return () -> (T) new LinkedHashSet<>();
             } else if (Queue.class.isAssignableFrom(rawType)) {
-                return new ObjectConstructor<T>() {
-                    @Override
-                    public T construct() {
-                        return (T) new LinkedList<Object>();
-                    }
-                };
+                return () -> (T) new LinkedList<>();
             } else {
-                return new ObjectConstructor<T>() {
-                    @Override
-                    public T construct() {
-                        return (T) new ArrayList<Object>();
-                    }
-                };
+                return () -> (T) new ArrayList<>();
             }
         }
 
         if (Map.class.isAssignableFrom(rawType)) {
             if (ConcurrentNavigableMap.class.isAssignableFrom(rawType)) {
-                return new ObjectConstructor<T>() {
-                    @Override
-                    public T construct() {
-                        return (T) new ConcurrentSkipListMap<Object, Object>();
-                    }
-                };
+                return () -> (T) new ConcurrentSkipListMap<>();
             } else if (ConcurrentMap.class.isAssignableFrom(rawType)) {
-                return new ObjectConstructor<T>() {
-                    @Override
-                    public T construct() {
-                        return (T) new ConcurrentHashMap<Object, Object>();
-                    }
-                };
+                return () -> (T) new ConcurrentHashMap<>();
             } else if (SortedMap.class.isAssignableFrom(rawType)) {
-                return new ObjectConstructor<T>() {
-                    @Override
-                    public T construct() {
-                        return (T) new TreeMap<Object, Object>();
-                    }
-                };
+                return () -> (T) new TreeMap<>();
             } else if (type instanceof ParameterizedType && !(String.class.isAssignableFrom(
                 TypeInfo.of(((ParameterizedType) type).getActualTypeArguments()[0]).getRawType()))) {
-                return new ObjectConstructor<T>() {
-                    @Override
-                    public T construct() {
-                        return (T) new LinkedHashMap<Object, Object>();
-                    }
-                };
+                return () -> (T) new LinkedHashMap<>();
             }
         }
 

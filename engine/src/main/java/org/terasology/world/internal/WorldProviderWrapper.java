@@ -16,6 +16,8 @@
 
 package org.terasology.world.internal;
 
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -45,12 +47,27 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
+    public boolean isBlockRelevant(Vector3ic pos) {
+        return core.isBlockRelevant(pos.x(), pos.y(), pos.z());
+    }
+
+    @Override
     public boolean isBlockRelevant(Vector3f pos) {
         return isBlockRelevant(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
     @Override
+    public boolean isBlockRelevant(Vector3fc pos) {
+        return isBlockRelevant(new org.joml.Vector3i(pos, org.joml.RoundingMode.HALF_UP));
+    }
+
+    @Override
     public Block setBlock(Vector3i pos, Block type) {
+        return core.setBlock(pos, type);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic pos, Block type) {
         return core.setBlock(pos, type);
     }
 
@@ -60,8 +77,18 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
+    public Block getBlock(Vector3fc pos) {
+        return getBlock(new org.joml.Vector3i(pos, org.joml.RoundingMode.HALF_UP));
+    }
+
+    @Override
     public Block getBlock(Vector3i pos) {
         return core.getBlock(pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public Block getBlock(Vector3ic pos) {
+        return core.getBlock(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -94,27 +121,27 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     public byte getTotalLight(Vector3i pos) {
         return core.getTotalLight(pos.x, pos.y, pos.z);
     }
-    
+
     public int getExtraData(int index, Vector3i pos) {
         return core.getExtraData(index, pos.x, pos.y, pos.z);
     }
-    
+
     public int setExtraData(int index, int x, int y, int z, int value) {
         return core.setExtraData(index, new Vector3i(x, y, z), value);
     }
-    
+
     public int getExtraData(String fieldName, int x, int y, int z) {
         return core.getExtraData(extraDataManager.getSlotNumber(fieldName), x, y, z);
     }
-    
+
     public int getExtraData(String fieldName, Vector3i pos) {
         return core.getExtraData(extraDataManager.getSlotNumber(fieldName), pos.x, pos.y, pos.z);
     }
-    
+
     public int setExtraData(String fieldName, int x, int y, int z, int value) {
         return core.setExtraData(extraDataManager.getSlotNumber(fieldName), new Vector3i(x, y, z), value);
     }
-    
+
     public int setExtraData(String fieldName, Vector3i pos, int value) {
         return core.setExtraData(extraDataManager.getSlotNumber(fieldName), pos, value);
     }
