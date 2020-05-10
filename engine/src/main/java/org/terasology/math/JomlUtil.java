@@ -20,6 +20,7 @@ import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector2ic;
@@ -102,7 +103,7 @@ public class JomlUtil {
         return new org.joml.Vector3i(vec.x(), vec.y(), vec.z());
     }
 
-    public static Quat4f from(Quaternionf quat) {
+    public static Quat4f from(Quaternionfc quat) {
         return new Quat4f(quat.x(), quat.y(), quat.z(), quat.w());
     }
 

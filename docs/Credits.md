@@ -276,7 +276,8 @@ Contributors
  [sin3point14](https://github.com/sin3point14),
  [agent-q1](https://github.com/agent-q1),
  [otradovec](https://github.com/otradovec),
- [jankeromnes](https://github.com/jankeromnes)
+ [jankeromnes](https://github.com/jankeromnes),
+ [wytrem](https://github.com/wytrem)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

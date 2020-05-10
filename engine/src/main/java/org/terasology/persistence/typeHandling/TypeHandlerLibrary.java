@@ -53,6 +53,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.extensionTypes.factories.ComponentClassTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
@@ -61,14 +62,14 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyQuat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
 import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
@@ -145,6 +146,7 @@ public class TypeHandlerLibrary {
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new StringMapTypeHandlerFactory());
 
+        addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());
     }
 
     /**
@@ -209,7 +211,6 @@ public class TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(org.joml.Vector2f.class, new Vector2fTypeHandler());
         serializationLibrary.addTypeHandler(org.joml.Vector3i.class, new Vector3iTypeHandler());
         serializationLibrary.addTypeHandler(org.joml.Vector2i.class, new Vector2iTypeHandler());
-
 
         serializationLibrary.addTypeHandlerFactory(new Rect2iTypeHandlerFactory());
         serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());
@@ -278,15 +279,12 @@ public class TypeHandlerLibrary {
             return false;
         }
 
-        TypeHandlerFactory factory = new TypeHandlerFactory() {
-            @SuppressWarnings("unchecked")
+        addTypeHandlerFactory(new SpecificTypeHandlerFactory<T>(type) {
             @Override
-            public <R> Optional<TypeHandler<R>> create(TypeInfo<R> typeInfo, TypeHandlerContext context) {
-                return typeInfo.equals(type) ? Optional.of((TypeHandler<R>) typeHandler) : Optional.empty();
+            protected TypeHandler<T> createHandler(TypeHandlerContext context) {
+                return typeHandler;
             }
-        };
-
-        addTypeHandlerFactory(factory);
+        });
 
         return true;
     }
@@ -414,7 +412,7 @@ public class TypeHandlerLibrary {
      *
      * @param typeInfo The {@link TypeInfo} describing the base type for which to return a
      *                 {@link TypeHandler}.
-     * @param <T> The base type for which to return a {@link TypeHandler}.
+     * @param <T>      The base type for which to return a {@link TypeHandler}.
      */
     public <T> TypeHandler<T> getBaseTypeHandler(TypeInfo<T> typeInfo) {
         TypeHandler<T> delegateHandler = getTypeHandler(typeInfo).orElse(null);

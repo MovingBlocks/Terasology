@@ -17,7 +17,9 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
@@ -104,7 +106,12 @@ public class WorldProviderCoreStub implements WorldProviderCore {
 
     @Override
     public Block setBlock(Vector3i pos, Block type) {
-        Block old = blocks.put(pos, type);
+        return this.setBlock(JomlUtil.from(pos), type);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic pos, Block type) {
+        Block old = blocks.put(JomlUtil.from(pos), type);
         if (old == null) {
             return air;
         }
@@ -151,12 +158,15 @@ public class WorldProviderCoreStub implements WorldProviderCore {
         return prevValue == null ? 0 : prevValue;
     }
 
+<<<<<<< HEAD
     @Override
     public int setExtraData(int index, CoreChunk chunk, Vector3i pos, int value) {
         Integer prevValue = getExtraDataLayer(index).put(pos, value);
         return prevValue == null ? 0 : prevValue;
     }
 
+=======
+>>>>>>> bd162d4c9b6f6c61997c782daee5104e28576d4a
     @Override
     public int getExtraData(int index, int x, int y, int z) {
         return getExtraDataLayer(index).getOrDefault(new Vector3i(x, y, z), 0);

@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
@@ -49,6 +50,8 @@ import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UITabBox;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.time.DateTimeHelper;
+import org.terasology.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
 
 import java.text.DateFormat;
@@ -78,6 +81,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private List<String> errors;
     private Map<String, List<String>> blockFamilyIds;
 
+    @In
+    private WorldGeneratorManager worldGeneratorManager;
     @In
     private ModuleManager moduleManager;
     @In
@@ -253,7 +258,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
         }
         return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldInfo.getWorldGenerator().toString() + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldGeneratorManager.getWorldGeneratorInfo(worldInfo.getWorldGenerator()).getDisplayName() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-duration} ")
                 + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
     }
@@ -392,13 +397,19 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private String getGeneralInfo(final GameInfo theGameInfo) {
+        SimpleUri name = theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator();
+        WorldGeneratorInfo wgi = worldGeneratorManager.getWorldGeneratorInfo(name);
+        String display = "ERROR: generator " + name + " not found.";
+        if (wgi != null) {
+            display = wgi.getDisplayName();
+        }
         return translationSystem.translate("${engine:menu#game-details-game-title} ") + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-last-play}: ") + DATE_FORMAT.format(theGameInfo.getTimestamp()) + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper
                 .getDeltaBetweenTimestamps(new Date(0).getTime(), theGameInfo.getManifest().getTime()) + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-seed} ") + theGameInfo.getManifest().getSeed() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-world-generator}: ") + '\t'
-                + theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator().getObjectName().toString();
+                + display;
     }
 
     private void loadGameWorlds() {
