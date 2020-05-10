@@ -16,8 +16,9 @@
 
 package org.terasology.world.generation.facets.base;
 
+import org.joml.Vector3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet3D;
 
@@ -86,9 +87,9 @@ public abstract class SparseFacet3D implements WorldFacet3D {
 
     @Override
     public String toString() {
-        Vector3i worldMin = getWorldRegion().min();
-        Vector3i relMin = getRelativeRegion().min();
-        Vector3i size = getRelativeRegion().size();
+        Vector3i worldMin = JomlUtil.from(getWorldRegion().min());
+        Vector3i relMin = JomlUtil.from(getRelativeRegion().min());
+        Vector3i size = JomlUtil.from(getRelativeRegion().size());
         return String.format("SparseFacet3D [worldMin=%s, relativeMin=%s, size=%s]", worldMin, relMin, size);
     }
 }

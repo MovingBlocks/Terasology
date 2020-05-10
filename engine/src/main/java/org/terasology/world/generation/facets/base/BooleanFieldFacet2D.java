@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2ic;
 import org.terasology.world.generation.WorldFacet2D;
 
 /**
@@ -29,17 +29,17 @@ public interface BooleanFieldFacet2D extends WorldFacet2D {
 
     boolean get(int x, int y);
 
-    boolean get(Vector2i pos);
+    boolean get(Vector2ic pos);
 
     boolean getWorld(int x, int y);
 
-    boolean getWorld(Vector2i pos);
+    boolean getWorld(Vector2ic pos);
 
     void set(int x, int y, boolean value);
 
-    void set(Vector2i pos, boolean value);
+    void set(Vector2ic pos, boolean value);
 
     void setWorld(int x, int y, boolean value);
 
-    void setWorld(Vector2i pos, boolean value);
+    void setWorld(Vector2ic pos, boolean value);
 }

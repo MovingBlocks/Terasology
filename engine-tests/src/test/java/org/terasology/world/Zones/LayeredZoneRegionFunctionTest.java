@@ -19,6 +19,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector3i;
@@ -68,7 +69,7 @@ public class LayeredZoneRegionFunctionTest {
                             generatingRegion.getBorderForFacet(SurfaceHeightFacet.class));
 
                     for (BaseVector2i pos : facet.getRelativeRegion().contents()) {
-                        facet.set(pos, 100);
+                        facet.set(JomlUtil.from(pos), 100);
                     }
 
                     generatingRegion.setRegionFacet(SurfaceHeightFacet.class, facet);

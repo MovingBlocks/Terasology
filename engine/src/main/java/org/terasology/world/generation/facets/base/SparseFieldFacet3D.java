@@ -17,8 +17,9 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 
 import java.util.Collections;
@@ -52,10 +53,10 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
     }
 
     @Override
-    public float get(Vector3i pos) {
-        checkRelativeCoords(pos.x, pos.y, pos.z);
+    public float get(Vector3ic pos) {
+        checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
-        Number n = relData.get(pos);
+        Number n = relData.get(new Vector3i(pos));
         return (n != null) ? n.floatValue() : defValue;
     }
 
@@ -65,7 +66,7 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
     }
 
     @Override
-    public void set(Vector3i pos, float value) {
+    public void set(Vector3ic pos, float value) {
         set(pos, Float.valueOf(value));
     }
 
@@ -73,17 +74,17 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
         set(new Vector3i(x, y, z), value);
     }
 
-    public void set(Vector3i pos, Number value) {
-        checkRelativeCoords(pos.x, pos.y, pos.z);
+    public void set(Vector3ic pos, Number value) {
+        checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
         if (value.floatValue() != defValue) {
-            relData.put(pos, value);
+            relData.put(new Vector3i(pos), value);
         }
     }
 
     @Override
-    public float getWorld(Vector3i pos) {
-        return getWorld(pos.x, pos.y, pos.z);
+    public float getWorld(Vector3ic pos) {
+        return getWorld(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -96,8 +97,8 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
     }
 
     @Override
-    public void setWorld(Vector3i pos, float value) {
-        setWorld(pos.x, pos.y, pos.z, value);
+    public void setWorld(Vector3ic pos, float value) {
+        setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 
     @Override
@@ -121,16 +122,16 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
     /**
      * @return an unmodifiable view on the relative entries
      */
-    public Map<Vector3i, Number> getRelativeEntries() {
+    public Map<Vector3ic, Number> getRelativeEntries() {
         return Collections.unmodifiableMap(relData);
     }
 
     /**
      * @return a <b>new</b> map with world-based position entries
      */
-    public Map<Vector3i, Number> getWorldEntries() {
+    public Map<Vector3ic, Number> getWorldEntries() {
 
-        Map<Vector3i, Number> result = Maps.newLinkedHashMap();
+        Map<Vector3ic, Number> result = Maps.newLinkedHashMap();
 
         for (Entry<Vector3i, Number> entry : relData.entrySet()) {
             Vector3i relPos = entry.getKey();

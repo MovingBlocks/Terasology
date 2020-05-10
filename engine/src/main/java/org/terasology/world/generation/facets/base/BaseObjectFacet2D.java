@@ -17,6 +17,7 @@ package org.terasology.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
 
+import org.joml.Vector2ic;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector2i;
@@ -42,7 +43,7 @@ public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements Object
     }
 
     @Override
-    public T get(BaseVector2i pos) {
+    public T get(Vector2ic pos) {
         return get(pos.x(), pos.y());
     }
 
@@ -52,7 +53,7 @@ public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements Object
     }
 
     @Override
-    public T getWorld(BaseVector2i pos) {
+    public T getWorld(Vector2ic pos) {
         return getWorld(pos.x(), pos.y());
     }
 
@@ -66,8 +67,8 @@ public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements Object
     }
 
     @Override
-    public void set(BaseVector2i pos, T value) {
-        set(pos.getX(), pos.getY(), value);
+    public void set(Vector2ic pos, T value) {
+        set(pos.x(), pos.y(), value);
     }
 
     @Override
@@ -76,7 +77,7 @@ public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements Object
     }
 
     @Override
-    public void setWorld(BaseVector2i pos, T value) {
+    public void setWorld(Vector2ic pos, T value) {
         setWorld(pos.x(), pos.y(), value);
     }
 

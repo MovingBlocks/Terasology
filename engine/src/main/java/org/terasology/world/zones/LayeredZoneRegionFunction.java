@@ -15,6 +15,7 @@
  */
 package org.terasology.world.zones;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.chunks.ChunkConstants;
@@ -93,7 +94,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private LayerRange getLayerRange(int x, int z, Region region) {
         Vector2i pos = new Vector2i(x, z);
         if (!layerRangeMap.containsKey(pos)) {
-            int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos));
+            int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(JomlUtil.from(pos)));
 
             boolean aboveground = ordering > 0;
             int cumulativeDistanceSmall = 0;

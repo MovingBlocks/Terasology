@@ -17,8 +17,9 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
 
 import java.util.Collections;
@@ -51,8 +52,8 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
     }
 
     @Override
-    public boolean get(Vector3i pos) {
-        checkRelativeCoords(pos.x, pos.y, pos.z);
+    public boolean get(Vector3ic pos) {
+        checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
         Boolean boxed = relData.get(pos);
         return (boxed != null) ? boxed : defValue;
@@ -64,17 +65,17 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
     }
 
     @Override
-    public void set(Vector3i pos, boolean value) {
-        checkRelativeCoords(pos.x, pos.y, pos.z);
+    public void set(Vector3ic pos, boolean value) {
+        checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
         if (value != defValue) {
-            relData.put(pos, value);
+            relData.put(new Vector3i(pos), value);
         }
     }
 
     @Override
-    public boolean getWorld(Vector3i pos) {
-        return getWorld(pos.x, pos.y, pos.z);
+    public boolean getWorld(Vector3ic pos) {
+        return getWorld(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -87,8 +88,8 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
     }
 
     @Override
-    public void setWorld(Vector3i pos, boolean value) {
-        setWorld(pos.x, pos.y, pos.z, value);
+    public void setWorld(Vector3ic pos, boolean value) {
+        setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 
     @Override
@@ -111,9 +112,9 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
     /**
      * @return a <b>new</b> map with world-based position entries
      */
-    public Map<Vector3i, Boolean> getWorldEntries() {
+    public Map<Vector3ic, Boolean> getWorldEntries() {
 
-        Map<Vector3i, Boolean> result = Maps.newLinkedHashMap();
+        Map<Vector3ic, Boolean> result = Maps.newLinkedHashMap();
 
         for (Entry<Vector3i, Boolean> entry : relData.entrySet()) {
             Vector3i relPos = entry.getKey();

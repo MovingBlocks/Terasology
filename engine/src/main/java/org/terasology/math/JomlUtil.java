@@ -32,6 +32,7 @@ import org.terasology.math.geom.BaseMatrix3f;
 import org.terasology.math.geom.BaseMatrix4f;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector2f;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.BaseVector4f;
@@ -98,6 +99,11 @@ public class JomlUtil {
     public static org.joml.Vector2f from(BaseVector2f vec) {
         return new org.joml.Vector2f(vec.x(), vec.y());
     }
+
+    public static org.joml.Vector2i from(BaseVector2i vec) {
+        return new org.joml.Vector2i(vec.x(), vec.y());
+    }
+
 
     public static org.joml.Vector3i from(BaseVector3i vec) {
         return new org.joml.Vector3i(vec.x(), vec.y(), vec.z());
