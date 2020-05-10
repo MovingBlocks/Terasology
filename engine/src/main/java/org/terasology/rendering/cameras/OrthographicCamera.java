@@ -89,7 +89,7 @@ public class OrthographicCamera extends Camera {
             return;
         }
 
-        projectionMatrix = MatrixUtils.createOrthogonalProjectionMatrix(left, right, top, bottom, zNear, zFar);
+        projectionMatrix = new Matrix4f().ortho(left,right,top,bottom,zNear,zFar).transpose();
         viewMatrix = MatrixUtils.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
