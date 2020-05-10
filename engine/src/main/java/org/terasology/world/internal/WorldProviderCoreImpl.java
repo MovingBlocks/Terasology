@@ -78,7 +78,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
+    private final Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
     private Block unloadedBlock;
@@ -200,7 +200,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = ChunkMath.calcBlockPos(JomlUtil.from(worldPos));
             Block oldBlockType = chunk.setBlock(blockPos, type);
             if (oldBlockType != type) {
-                BlockChange oldChange = blockChanges.get(worldPos);
+                BlockChange oldChange = blockChanges.get(JomlUtil.from(worldPos));
                 if (oldChange == null) {
                     blockChanges.put(JomlUtil.from(worldPos), new BlockChange(worldPos, oldBlockType, type));
                 } else {
