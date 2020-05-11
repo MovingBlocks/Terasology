@@ -198,7 +198,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 Vector3f newPos = new Vector3f(frameA.getPosition(i)).lerp(frameB.getPosition(i), interpolationVal);
                 boneLoc.setLocalPosition(JomlUtil.from(newPos));
                 Quaternionf newRot = new Quaternionf(frameA.getRotation(i)).nlerp(frameB.getRotation(i),interpolationVal);
-                newRot.normalize();
                 boneLoc.setLocalRotation(JomlUtil.from(newRot));
                 boneEntity.saveComponent(boneLoc);
             }

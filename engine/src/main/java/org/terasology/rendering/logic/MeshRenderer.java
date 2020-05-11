@@ -223,7 +223,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
                         modelViewMatrix.set(worldRenderer.getActiveCamera().getViewMatrix()).transpose().mul(matrixCameraSpace);
                         modelViewMatrix.get(tempMatrixBuffer44);
-                        modelViewMatrix.get3x3(normalMatrix).invert().get(tempMatrixBuffer33);
+                        modelViewMatrix.get3x3(normalMatrix).invert().getTransposed(tempMatrixBuffer33);
 
                         material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix(), true);
                         material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
