@@ -174,8 +174,8 @@ public class DeferredPointLightsNode extends AbstractNode {
         }
 
         if (renderingConfig.isDynamicShadows()) {
-            lightGeometryMaterial.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
-            lightGeometryMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
+            lightGeometryMaterial.setMatrix4("lightViewProjMatrix", new org.joml.Matrix4f(lightCamera.getViewProjectionMatrix()).transpose(), true);
+            lightGeometryMaterial.setMatrix4("invViewProjMatrix", new org.joml.Matrix4f(activeCamera.getInverseViewProjectionMatrix()).transpose(), true);
 
             activeCameraToLightSpace.sub(cameraPosition, JomlUtil.from(lightCamera.getPosition()));
             lightGeometryMaterial.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z, true);
