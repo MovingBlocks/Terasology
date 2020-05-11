@@ -97,8 +97,7 @@ public final class MatrixUtils {
      * @param m the matrix to copy
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #matrixToFloatBuffer(Matrix3fc, FloatBuffer)}.
+     * @deprecated This is scheduled for removal. Use JOML matrices.
      */
     @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix3f m, FloatBuffer fb) {
@@ -117,26 +116,13 @@ public final class MatrixUtils {
     }
 
     /**
-     * Copies the given matrix into an existing buffer.
-     * The order of the elements is column major (as used by OpenGL).
-     *
-     * @param m  the matrix to copy
-     * @param fb the float buffer to copy the matrix into
-     * @return The provided float buffer.
-     */
-    public static FloatBuffer matrixToFloatBuffer(Matrix3fc m, FloatBuffer fb) {
-        return m.getTransposed(fb);
-    }
-
-    /**
      * Copies the given matrix into an existing FloatBuffer.
      * The order of the elements is column major (as used by OpenGL).
      *
      * @param m  the matrix to copy
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #matrixToFloatBuffer(Matrix4fc, FloatBuffer)}.
+     * @deprecated This is scheduled for removal. Use JOML matrices.
      */
     @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
@@ -159,18 +145,6 @@ public final class MatrixUtils {
 
         fb.flip();
         return fb;
-    }
-
-    /**
-     * Copies the given matrix into an existing FloatBuffer.
-     * The order of the elements is column major (as used by OpenGL).
-     *
-     * @param m  the matrix to copy
-     * @param fb the float buffer to copy the matrix into
-     * @return the provided float buffer with matrix elements in column major order.
-     */
-    public static FloatBuffer matrixToFloatBuffer(Matrix4fc m, FloatBuffer fb) {
-        return m.getTransposed(fb);
     }
 
     public static org.joml.Matrix4f createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {

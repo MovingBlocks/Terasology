@@ -18,6 +18,7 @@ package org.terasology.rendering.logic;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -250,15 +251,15 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             Vector3f worldPositionCameraSpace = worldPos.sub(cameraPosition,new Vector3f());
 
             worldPos.y -= skeletalMesh.heightOffset;
-            Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace,worldRot, worldScale).transpose();
+            Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace,worldRot, worldScale);
 
 
             Matrix4f modelViewMatrix = new Matrix4f(matrixCameraSpace).mul(worldRenderer.getActiveCamera().getViewMatrix());
-            MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
+            modelViewMatrix.get(tempMatrixBuffer44);
 
             skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
 
-            MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+            modelViewMatrix.get3x3(new Matrix3f()).invert().getTransposed(tempMatrixBuffer33);
             skeletalMesh.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
             skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(JomlUtil.from(worldPos)), true);
@@ -318,14 +319,14 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 Vector3f worldPositionCameraSpace =  worldPos.sub(cameraPosition,new Vector3f());
 
                 float worldScale = location.getWorldScale();
-                Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace,new Quaternionf(), worldScale).transpose();
+                Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace,new Quaternionf(), worldScale);
 
                 Matrix4f modelViewMatrix = new Matrix4f(matrixCameraSpace).mul(worldRenderer.getActiveCamera().getViewMatrix());
-                MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
+                modelViewMatrix.get(tempMatrixBuffer44);
 
                 material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
 
-                MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
+                modelViewMatrix.get3x3(new Matrix3f()).invert().getTransposed(tempMatrixBuffer33);
                 material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
                 SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
