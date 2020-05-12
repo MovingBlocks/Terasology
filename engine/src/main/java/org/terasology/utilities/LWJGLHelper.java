@@ -57,6 +57,8 @@ public final class LWJGLHelper {
                 throw new UnsupportedOperationException("Unsupported operating system: " + LWJGLUtil.getPlatformName());
         }
 
-        System.setProperty("org.lwjgl.librarypath", path.toAbsolutePath().toString());
+        final String natives = path.toAbsolutePath().toString();
+        System.setProperty("org.lwjgl.librarypath", natives);
+        System.setProperty("net.java.games.input.librarypath", natives);  // libjinput
     }
 }
