@@ -16,10 +16,16 @@
  * limitations under the License.
  */
 
+in vec2 uv;
+
 out vec4 out_color;
 
-uniform vec3 color;
+uniform sampler2D texture_sampler;
 
 void main() {
-    out_color = vec4(color, 0.5);
+    out_color = texture(texture_sampler, uv);
+
+    if (out_color.a < 0.01) {
+        discard;
+    }
 }

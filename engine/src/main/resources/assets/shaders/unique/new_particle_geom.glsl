@@ -20,7 +20,7 @@ layout (points) in;
 layout (triangle_strip) out;
 layout (max_vertices = 4) out;
 
-out vec2 texture_coord;
+out vec2 uv;
 
 uniform mat4 view_projection;
 uniform vec3 camera_position;
@@ -34,23 +34,23 @@ void main() {
     position += right * 0.5;
     position.y -= 0.5;
     gl_Position = view_projection * vec4(position, 1);
-    texture_coord = vec2(0, 0);
+    uv = vec2(0, 0);
     EmitVertex();
 
     position.y += 1;
     gl_Position = view_projection * vec4(position, 1);
-    texture_coord = vec2(0, 1);
+    uv = vec2(0, 1);
     EmitVertex();
 
     position -= right;
     position.y -= 1;
     gl_Position = view_projection * vec4(position, 1);
-    texture_coord = vec2(1, 0);
+    uv = vec2(1, 0);
     EmitVertex();
 
     position.y += 1;
     gl_Position = view_projection * vec4(position, 1);
-    texture_coord = vec2(1, 1);
+    uv = vec2(1, 1);
     EmitVertex();
 
     EndPrimitive();

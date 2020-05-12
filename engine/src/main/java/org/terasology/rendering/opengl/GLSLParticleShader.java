@@ -16,9 +16,11 @@
 package org.terasology.rendering.opengl;
 
 import com.google.common.base.Charsets;
-import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
+import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 import org.slf4j.Logger;
@@ -38,7 +40,9 @@ import java.util.Collections;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glGetError;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_INFO_LOG_LENGTH;
 import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
@@ -58,6 +62,7 @@ public class GLSLParticleShader extends Shader {
     private int colorLocation;
     private int viewProjectionLocation;
     private int cameraPositionLocation;
+    private int textureLocation;
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     public GLSLParticleShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
@@ -81,18 +86,29 @@ public class GLSLParticleShader extends Shader {
         colorLocation = GL20.glGetUniformLocation(programHandle, "color");
         viewProjectionLocation = GL20.glGetUniformLocation(programHandle, "view_projection");
         cameraPositionLocation = GL20.glGetUniformLocation(programHandle, "camera_position");
+        textureLocation = GL20.glGetUniformLocation(programHandle, "texture_sampler");
+
+        bind();
+        GL20.glUniform1i(textureLocation, 0);
+        unbind();
     }
 
     public void setColor(float r, float g, float b) {
         GL20.glUniform3f(colorLocation, r, g, b);
     }
 
-    public void setCameraPosition(float x, float y, float z) {
-        GL20.glUniform3f(cameraPositionLocation, x, y, z);
+    public void setTexture(int handle) {
+        glActiveTexture(GL13.GL_TEXTURE0);
+        GL11.glBindTexture(GL_TEXTURE_2D, handle);
     }
 
-    public void setViewProjection(Matrix4f matrix) {
-        GL20.glUniformMatrix4(viewProjectionLocation, false, matrix.get(matrixBuffer));
+    public void setCameraPosition(Vector3fc position) {
+        GL20.glUniform3f(cameraPositionLocation, position.x(), position.y(), position.z());
+    }
+
+    public void setViewProjection(Matrix4fc matrix) {
+        matrix.get(matrixBuffer);
+        GL20.glUniformMatrix4(viewProjectionLocation, false, matrixBuffer);
     }
 
     private int createShaderProgram() {

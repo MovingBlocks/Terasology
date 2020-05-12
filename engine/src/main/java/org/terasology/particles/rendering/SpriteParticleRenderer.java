@@ -26,7 +26,6 @@ import org.terasology.particles.components.ParticleDataSpriteComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.opengl.GLSLParticleShader;
-import org.terasology.rendering.opengl.ParticleMaterial;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
 
@@ -49,7 +48,7 @@ import static org.lwjgl.opengl.GL11.glNewList;
 public class SpriteParticleRenderer implements RenderSystem {
 
     protected static final String PARTICLE_MATERIAL_URI = "engine:prog.particle";
-    private final ParticleMaterial material;
+    private final GLSLParticleShader shader;
 
     /**
      * Vertices of a unit quad on the xy plane, centered on the origin.
@@ -78,9 +77,7 @@ public class SpriteParticleRenderer implements RenderSystem {
     public SpriteParticleRenderer() {
         Optional<? extends GLSLParticleShader> shaderOptional = Assets.get("engine:new_particle", GLSLParticleShader.class);
         checkState(shaderOptional.isPresent(), "Failed to resolve %s", "engine:new_particle");
-
-        material = new ParticleMaterial(shaderOptional.get());
-        material.setColor(new org.joml.Vector3f(1f, 0f, 0f));
+        shader = shaderOptional.get();
     }
 
     public void finalize() throws Throwable {
@@ -97,6 +94,8 @@ public class SpriteParticleRenderer implements RenderSystem {
     }
 
     public void drawParticles(ParticleRenderingData<ParticleDataSpriteComponent> particleSystem) {
+        int textureHandle = particleSystem.particleData.texture.getId();
+        shader.setTexture(textureHandle);
         particleSystem.particlePool.draw();
     }
 
@@ -108,13 +107,14 @@ public class SpriteParticleRenderer implements RenderSystem {
     @Override
     public void renderAlphaBlend() {
         PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
-        material.setCameraPosition(camera.getPosition());
-        material.setViewProjectionMatrix(camera.viewProjectionTest);
+        shader.bind();
+        shader.setCameraPosition(camera.getPosition());
+        shader.setViewProjection(camera.viewProjectionTest);
 
-        material.enable();
         particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class)
                 .forEach(this::drawParticles);
-        material.disable();
+
+        shader.unbind();
     }
 
     @Override
