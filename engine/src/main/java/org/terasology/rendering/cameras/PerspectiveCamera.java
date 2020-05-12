@@ -53,8 +53,6 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private float cachedBobbingVerticalOffsetFactor;
     private DisplayDevice displayDevice;
 
-    public final Matrix4f viewProjectionTest = new Matrix4f();
-
     private Vector3f tempRightVector = new Vector3f();
 
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
@@ -150,13 +148,6 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         tempRightVector.mul(bobbingRotationOffsetFactor);
 
         projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar(),this.displayDevice);
-
-        float aspectRatio = (float) displayDevice.getDisplayWidth()/ displayDevice.getDisplayHeight();
-        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
-
-        Matrix4f viewTest = new Matrix4f().setLookAt(position, position.add(viewingDirection, new Vector3f()), new Vector3f(0, 1, 0));
-        Matrix4f projectionTest = new Matrix4f().setPerspective(fovY, aspectRatio, zNear, zFar);
-        viewProjectionTest.set(projectionTest).mul(viewTest);
 
         viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
                 viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);

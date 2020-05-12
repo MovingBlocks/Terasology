@@ -15,6 +15,8 @@
  */
 package org.terasology.particles.rendering;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
@@ -107,9 +109,14 @@ public class SpriteParticleRenderer implements RenderSystem {
     @Override
     public void renderAlphaBlend() {
         PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
+        Vector3f cameraPosition = camera.getPosition();
+
         shader.bind();
-        shader.setCameraPosition(camera.getPosition());
-        shader.setViewProjection(camera.viewProjectionTest);
+        shader.setCameraPosition(cameraPosition);
+        Matrix4f viewProjection = new Matrix4f(camera.getViewProjectionMatrix())
+                .transpose()
+                .translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+        shader.setViewProjection(viewProjection);
 
         particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class)
                 .forEach(this::drawParticles);
