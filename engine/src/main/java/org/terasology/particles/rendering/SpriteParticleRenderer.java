@@ -16,34 +16,31 @@
 package org.terasology.particles.rendering;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.particles.ParticlePool;
 import org.terasology.particles.ParticleSystemManager;
 import org.terasology.particles.components.ParticleDataSpriteComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.opengl.GLSLParticleShader;
+import org.terasology.rendering.opengl.ParticleMaterial;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
 
+import java.util.Optional;
+
+import static com.google.common.base.Preconditions.checkState;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
 import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glDeleteLists;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
 import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * ParticleRenderer for basic sprite particle systems.
@@ -52,6 +49,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 public class SpriteParticleRenderer implements RenderSystem {
 
     protected static final String PARTICLE_MATERIAL_URI = "engine:prog.particle";
+    private final ParticleMaterial material;
 
     /**
      * Vertices of a unit quad on the xy plane, centered on the origin.
@@ -77,6 +75,14 @@ public class SpriteParticleRenderer implements RenderSystem {
     private DisplayList drawUnitQuad;
 
 
+    public SpriteParticleRenderer() {
+        Optional<? extends GLSLParticleShader> shaderOptional = Assets.get("engine:new_particle", GLSLParticleShader.class);
+        checkState(shaderOptional.isPresent(), "Failed to resolve %s", "engine:new_particle");
+
+        material = new ParticleMaterial(shaderOptional.get());
+        material.setColor(new org.joml.Vector3f(1f, 0f, 0f));
+    }
+
     public void finalize() throws Throwable {
         super.finalize();
         if (null != drawUnitQuad) {
@@ -90,55 +96,8 @@ public class SpriteParticleRenderer implements RenderSystem {
         }
     }
 
-    //"BIG" TODO: Have all of the work done in this method be done on the GPU by a shader. Use GPU instancing to just send some particle data after particles are already instanced and have the whole cloud rendered at once.
-    public void drawParticles(Material material, ParticleRenderingData<ParticleDataSpriteComponent> particleSystem, Vector3f camera) {
-        ParticlePool particlePool = particleSystem.particlePool;
-
-        material.setBoolean("useTexture", particleSystem.particleData.texture != null);
-        if (particleSystem.particleData.texture != null) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            glBindTexture(GL11.GL_TEXTURE_2D, particleSystem.particleData.texture.getId());
-
-            material.setFloat2("texSize", particleSystem.particleData.textureSize.getX(), particleSystem.particleData.textureSize.getY());
-        }
-
-        glPushMatrix();
-        glTranslatef(-camera.x(), -camera.y(), -camera.z());
-
-        for (int i = 0; i < particlePool.livingParticles(); i++) {
-            final int i2 = i * 2;
-            final int i3 = i * 3;
-            final int i4 = i * 4;
-
-            material.setFloat3("position",
-                    particlePool.position[i3],
-                    particlePool.position[i3 + 1],
-                    particlePool.position[i3 + 2]
-            );
-
-            material.setFloat3("scale",
-                    particlePool.scale[i3],
-                    particlePool.scale[i3 + 1],
-                    particlePool.scale[i3 + 2]
-            );
-
-            material.setFloat4("color",
-                    particlePool.color[i4],
-                    particlePool.color[i4 + 1],
-                    particlePool.color[i4 + 2],
-                    particlePool.color[i4 + 3]
-            );
-
-
-            material.setFloat2("texOffset",
-                    particlePool.textureOffset[i2],
-                    particlePool.textureOffset[i2 + 1]
-            );
-
-            drawUnitQuad.call();
-        }
-
-        glPopMatrix();
+    public void drawParticles(ParticleRenderingData<ParticleDataSpriteComponent> particleSystem) {
+        particleSystem.particlePool.draw();
     }
 
     @Override
@@ -148,11 +107,13 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     @Override
     public void renderAlphaBlend() {
-        Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();
-        material.enable();
-        org.joml.Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
+        PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
+        material.setViewProjectionMatrix(camera.viewProjectionTest);
 
-        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, JomlUtil.from(camPos)));
+        material.enable();
+        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class)
+                .forEach(this::drawParticles);
+        material.disable();
     }
 
     @Override
