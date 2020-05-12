@@ -18,6 +18,7 @@ package org.terasology.rendering.opengl;
 import com.google.common.base.Charsets;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 import org.slf4j.Logger;
@@ -35,6 +36,8 @@ import java.nio.FloatBuffer;
 import java.util.Collections;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glGetError;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_INFO_LOG_LENGTH;
@@ -64,6 +67,7 @@ public class GLSLParticleShader extends Shader {
     }
 
     public void bind() {
+        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         GL20.glUseProgram(programHandle);
     }
 
@@ -80,7 +84,7 @@ public class GLSLParticleShader extends Shader {
     }
 
     public void setColor(float r, float g, float b) {
-        GL20.glUniform4f(colorLocation, r, g, b, 1f);
+        GL20.glUniform3f(colorLocation, r, g, b);
     }
 
     public void setCameraPosition(float x, float y, float z) {
