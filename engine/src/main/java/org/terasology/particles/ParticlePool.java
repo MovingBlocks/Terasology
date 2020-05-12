@@ -16,6 +16,23 @@
 package org.terasology.particles;
 
 import com.google.common.base.Preconditions;
+import org.lwjgl.BufferUtils;
+
+import java.nio.FloatBuffer;
+
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_POINTS;
+import static org.lwjgl.opengl.GL11.glDrawArrays;
+import static org.lwjgl.opengl.GL11.glPointSize;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 /**
  * Object to keep track of the state of the living particles in a particle system and
@@ -39,6 +56,7 @@ public final class ParticlePool {
 
     // Per particle 3d vectors
     public final float[] position;
+    public final FloatBuffer positionBuffer;
     public final float[] previousPosition;
     public final float[] velocity;
 
@@ -53,6 +71,9 @@ public final class ParticlePool {
 
     private int firstDeadParticleIndex;
     private final int rawSize;
+
+    private int vao;
+    private int positionsVbo;
 
     //== Constructors ===================================
 
@@ -70,16 +91,32 @@ public final class ParticlePool {
 
         // Per particle 3d vectors
         this.position = new float[size * 3];
+        positionBuffer = BufferUtils.createFloatBuffer(position.length);
         this.previousPosition = new float[size * 3];
         this.velocity = new float[size * 3];
         this.scale = new float[size * 3];
 
         // Per particle 4d vectors
         this.color = new float[size * 4];
+
+        initVao();
     }
 
     private ParticlePool() {
         throw new UnsupportedOperationException();
+    }
+
+    private void initVao() {
+        vao = glGenVertexArrays();
+
+        positionsVbo = glGenBuffers();
+        glBindVertexArray(vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, positionsVbo);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
     }
 
     //== public methods =================================
@@ -256,5 +293,23 @@ public final class ParticlePool {
         color[i4 + Y_OFFSET] = 1.0f;
         color[i4 + Z_OFFSET] = 1.0f;
         color[i4 + W_OFFSET] = 1.0f;
+    }
+
+    public void prepareRendering() {
+        positionBuffer.position(0).limit(position.length);
+        positionBuffer.put(position, 0, livingParticles());
+        positionBuffer.flip();
+
+        glBindBuffer(GL_ARRAY_BUFFER, positionsVbo);
+        glBufferData(GL_ARRAY_BUFFER, 0, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, positionBuffer, GL_STREAM_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    public void draw() {
+        glPointSize(10f);
+        glBindVertexArray(vao);
+        glDrawArrays(GL_POINTS, 0, livingParticles());
+        glBindVertexArray(0);
     }
 }
