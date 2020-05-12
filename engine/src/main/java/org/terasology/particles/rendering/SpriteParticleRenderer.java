@@ -108,6 +108,7 @@ public class SpriteParticleRenderer implements RenderSystem {
     @Override
     public void renderAlphaBlend() {
         PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
+        material.setCameraPosition(camera.getPosition());
         material.setViewProjectionMatrix(camera.viewProjectionTest);
 
         material.enable();

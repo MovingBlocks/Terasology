@@ -19,6 +19,7 @@ import com.google.common.base.Charsets;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
@@ -53,6 +54,7 @@ public class GLSLParticleShader extends Shader {
 
     private int colorLocation;
     private int viewProjectionLocation;
+    private int cameraPositionLocation;
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     public GLSLParticleShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
@@ -74,10 +76,15 @@ public class GLSLParticleShader extends Shader {
 
         colorLocation = GL20.glGetUniformLocation(programHandle, "color");
         viewProjectionLocation = GL20.glGetUniformLocation(programHandle, "view_projection");
+        cameraPositionLocation = GL20.glGetUniformLocation(programHandle, "camera_position");
     }
 
     public void setColor(float r, float g, float b) {
         GL20.glUniform4f(colorLocation, r, g, b, 1f);
+    }
+
+    public void setCameraPosition(float x, float y, float z) {
+        GL20.glUniform3f(cameraPositionLocation, x, y, z);
     }
 
     public void setViewProjection(Matrix4f matrix) {
@@ -86,10 +93,12 @@ public class GLSLParticleShader extends Shader {
 
     private int createShaderProgram() {
         int vertexShaderHandle = compileShader(shaderProgramBase.getVertexProgram(), GL_VERTEX_SHADER);
+        int geometryShaderHandle = compileShader(shaderProgramBase.getGeometryProgram(), GL32.GL_GEOMETRY_SHADER);
         int fragmentShaderHandle = compileShader(shaderProgramBase.getFragmentProgram(), GL20.GL_FRAGMENT_SHADER);
 
         int handle = GL20.glCreateProgram();
         glAttachShader(handle, vertexShaderHandle);
+        glAttachShader(handle, geometryShaderHandle);
         glAttachShader(handle, fragmentShaderHandle);
 
         GL20.glBindAttribLocation(handle, 0, "position_ws");
@@ -97,6 +106,7 @@ public class GLSLParticleShader extends Shader {
         GL20.glLinkProgram(handle);
 
         GL20.glDetachShader(handle, vertexShaderHandle);
+        GL20.glDetachShader(handle, geometryShaderHandle);
         GL20.glDetachShader(handle, fragmentShaderHandle);
 
         validateLinking(handle);

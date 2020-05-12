@@ -23,6 +23,7 @@ import org.joml.Vector3fc;
 public class ParticleMaterial {
 
     private final Vector3f color = new Vector3f();
+    private final Vector3f cameraPosition = new Vector3f();
     private final Matrix4f viewProjection = new Matrix4f();
     private final GLSLParticleShader shader;
 
@@ -33,6 +34,7 @@ public class ParticleMaterial {
     public void enable() {
         shader.bind();
         shader.setColor(color.x, color.y, color.z);
+        shader.setCameraPosition(cameraPosition.x, cameraPosition.y, cameraPosition.z);
         shader.setViewProjection(viewProjection);
     }
 
@@ -42,6 +44,10 @@ public class ParticleMaterial {
 
     public void setColor(Vector3fc newColor) {
         color.set(newColor);
+    }
+
+    public void setCameraPosition(Vector3fc position) {
+        cameraPosition.set(position);
     }
 
     public void setViewProjectionMatrix(Matrix4fc matrix) {

@@ -24,13 +24,19 @@ import java.util.List;
  */
 public class ShaderData implements AssetData {
 
-    private String vertexProgram;
-    private String fragmentProgram;
+    private final String vertexProgram;
+    private final String fragmentProgram;
+    private final String geometryProgram;
     private List<ShaderParameterMetadata> parameterMetadata;
 
     public ShaderData(String vertexProgram, String fragmentProgram, List<ShaderParameterMetadata> parameterMetadata) {
+        this(vertexProgram, fragmentProgram, null, parameterMetadata);
+    }
+
+    public ShaderData(String vertexProgram, String fragmentProgram, String geometryProgram, List<ShaderParameterMetadata> parameterMetadata) {
         this.vertexProgram = vertexProgram;
         this.fragmentProgram = fragmentProgram;
+        this.geometryProgram = geometryProgram;
         this.parameterMetadata = ImmutableList.copyOf(parameterMetadata);
     }
 
@@ -40,6 +46,10 @@ public class ShaderData implements AssetData {
 
     public String getFragmentProgram() {
         return fragmentProgram;
+    }
+
+    public String getGeometryProgram() {
+        return geometryProgram;
     }
 
     public List<ShaderParameterMetadata> getParameterMetadata() {
