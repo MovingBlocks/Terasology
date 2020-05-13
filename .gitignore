@@ -28,14 +28,10 @@ build/
 /gradle.properties
 /override.cfg
 
-# Ignore IntelliJ - could use "/**/*.iml" to catch all .iml files, but that requires a somewhat recent Git version
+# Ignore IntelliJ
+!/.idea
+!/.run
 /out/
-modules/BuilderSampleGameplay/BuilderSampleGameplay.iml
-facades/PC/PC.iml
-facades/TeraEd/TeraEd.iml
-engine/engine.iml
-engine-tests/engine-tests.iml
-/*.iml
 /*.ipr
 /*.iws
 /projectFilesBackup*

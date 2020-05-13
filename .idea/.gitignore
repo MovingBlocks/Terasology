@@ -1,0 +1,8 @@
+/shelf
+workspace.xml
+
+# managed by gradle sync
+/gradle.xml
+
+# too much churn with modules
+/vcs.xml
