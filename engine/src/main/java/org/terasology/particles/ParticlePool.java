@@ -23,7 +23,6 @@ import java.nio.FloatBuffer;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_POINTS;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL11.glPointSize;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
@@ -57,10 +56,11 @@ public final class ParticlePool {
     // Per particle 3d vectors
     public final float[] position;
     public final FloatBuffer positionBuffer;
+    public final float[] scale;
+    public final FloatBuffer scaleBuffer;
+
     public final float[] previousPosition;
     public final float[] velocity;
-
-    public final float[] scale;
 
     // Per particle 4d vectors
     public final float[] color;
@@ -73,7 +73,8 @@ public final class ParticlePool {
     private final int rawSize;
 
     private int vao;
-    private int positionsVbo;
+    private int positionVbo;
+    private int scaleVbo;
 
     //== Constructors ===================================
 
@@ -91,10 +92,12 @@ public final class ParticlePool {
 
         // Per particle 3d vectors
         this.position = new float[size * 3];
-        positionBuffer = BufferUtils.createFloatBuffer(position.length);
+        this.positionBuffer = BufferUtils.createFloatBuffer(position.length);
+        this.scale = new float[size * 3];
+        this.scaleBuffer = BufferUtils.createFloatBuffer(scale.length);
+
         this.previousPosition = new float[size * 3];
         this.velocity = new float[size * 3];
-        this.scale = new float[size * 3];
 
         // Per particle 4d vectors
         this.color = new float[size * 4];
@@ -108,13 +111,19 @@ public final class ParticlePool {
 
     private void initVao() {
         vao = glGenVertexArrays();
+        positionVbo = glGenBuffers();
+        scaleVbo = glGenBuffers();
 
-        positionsVbo = glGenBuffers();
         glBindVertexArray(vao);
 
-        glBindBuffer(GL_ARRAY_BUFFER, positionsVbo);
+        glBindBuffer(GL_ARRAY_BUFFER, positionVbo);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, scaleVbo);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
@@ -296,18 +305,28 @@ public final class ParticlePool {
     }
 
     public void prepareRendering() {
-        positionBuffer.position(0).limit(position.length);
-        positionBuffer.put(position, 0, livingParticles());
-        positionBuffer.flip();
+        refreshBuffer(positionBuffer, position);
+        refreshBuffer(scaleBuffer, scale);
 
-        glBindBuffer(GL_ARRAY_BUFFER, positionsVbo);
-        glBufferData(GL_ARRAY_BUFFER, 0, GL_STREAM_DRAW);
-        glBufferData(GL_ARRAY_BUFFER, positionBuffer, GL_STREAM_DRAW);
+        bufferData(positionBuffer, positionVbo);
+        bufferData(scaleBuffer, scaleVbo);
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
+    private void refreshBuffer(FloatBuffer buffer, float[] data) {
+        buffer.position(0).limit(data.length);
+        buffer.put(position, 0, livingParticles());
+        buffer.flip();
+    }
+
+    private void bufferData(FloatBuffer data, int vbo) {
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, 0, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, data, GL_STREAM_DRAW);
+    }
+
     public void draw() {
-        glPointSize(10f);
         glBindVertexArray(vao);
         glDrawArrays(GL_POINTS, 0, livingParticles());
         glBindVertexArray(0);

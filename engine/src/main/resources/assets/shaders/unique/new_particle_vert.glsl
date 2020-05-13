@@ -17,7 +17,11 @@
  */
 
 layout (location = 0) in vec3 position_ws;
+layout (location = 1) in vec3 scale;
+
+out vec3 scale_vs;
 
 void main() {
     gl_Position = vec4(position_ws, 1);
+    scale_vs = scale;
 }

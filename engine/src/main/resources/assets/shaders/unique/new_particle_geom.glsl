@@ -20,6 +20,8 @@ layout (points) in;
 layout (triangle_strip) out;
 layout (max_vertices = 4) out;
 
+in vec3 scale_vs;
+
 out vec2 uv;
 
 uniform mat4 view_projection;
@@ -31,24 +33,24 @@ void main() {
     vec3 to_camera = normalize(camera_position - position);
     vec3 right = cross(to_camera, vec3(0.0, 1.0, 0.0));
 
-    position += right * 0.5;
-    position.y -= 0.5;
+    position += right * 0.5 * scale_vs.x;
+    position.y -= 0.5 * scale_vs.y;
     gl_Position = view_projection * vec4(position, 1);
     uv = vec2(0, 0);
     EmitVertex();
 
-    position.y += 1;
+    position.y += scale_vs.y;
     gl_Position = view_projection * vec4(position, 1);
     uv = vec2(0, 1);
     EmitVertex();
 
-    position -= right;
-    position.y -= 1;
+    position -= right * scale_vs.x;
+    position.y -= scale_vs.y;
     gl_Position = view_projection * vec4(position, 1);
     uv = vec2(1, 0);
     EmitVertex();
 
-    position.y += 1;
+    position.y += scale_vs.y;
     gl_Position = view_projection * vec4(position, 1);
     uv = vec2(1, 1);
     EmitVertex();
