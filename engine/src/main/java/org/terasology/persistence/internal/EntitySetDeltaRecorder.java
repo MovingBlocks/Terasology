@@ -67,7 +67,9 @@ class EntitySetDeltaRecorder {
             EntityDelta entityDelta = getOrCreateEntityDeltaFor(entity);
             Component component = entity.getComponent(componentClass);
             Component componentSnapshot = componentLibrary.copy(component);
-            entityDelta.setChangedComponent(componentSnapshot);
+            if (componentSnapshot != null) {
+                entityDelta.setChangedComponent(componentSnapshot);
+            }
         }
     }
 

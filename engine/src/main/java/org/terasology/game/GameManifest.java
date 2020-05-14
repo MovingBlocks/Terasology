@@ -112,12 +112,12 @@ public class GameManifest {
         return worlds;
     }
 
-    public void addWorld(WorldInfo worldInfo) {
-        this.worlds.put(worldInfo.getTitle(), worldInfo);
-    }
-
     public Iterable<WorldInfo> getWorlds() {
         return this.worlds.values();
+    }
+
+    public void addWorld(WorldInfo worldInfo) {
+        this.worlds.put(worldInfo.getTitle(), worldInfo);
     }
 
     public static void save(Path toFile, GameManifest gameManifest) throws IOException {

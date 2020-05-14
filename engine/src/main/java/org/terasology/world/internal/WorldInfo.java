@@ -17,6 +17,7 @@
 package org.terasology.world.internal;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.world.generator.WorldConfigurator;
 
 /**
  * Summary information on a world.
@@ -29,6 +30,7 @@ public class WorldInfo {
     private String seed = "";
     private long time;
     private SimpleUri worldGenerator = new SimpleUri();
+    private WorldConfigurator configurator;
 
     public WorldInfo() {
     }
@@ -94,5 +96,13 @@ public class WorldInfo {
     @Override
     public String toString() {
         return title;
+    }
+
+    public WorldConfigurator getConfigurator() {
+        return configurator;
+    }
+
+    public void setConfigurator(WorldConfigurator configurator) {
+        this.configurator = configurator;
     }
 }

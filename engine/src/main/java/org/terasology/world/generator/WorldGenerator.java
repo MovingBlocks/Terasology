@@ -53,7 +53,8 @@ public interface WorldGenerator {
 
     /**
      * Generates all contents of given chunk
-     * @param chunk Chunk to generate
+     *
+     * @param chunk  Chunk to generate
      * @param buffer Buffer to queue entities to spawn to
      */
     void createChunk(CoreChunk chunk, EntityBuffer buffer);
@@ -67,6 +68,15 @@ public interface WorldGenerator {
      * @return Associated world configurator
      */
     WorldConfigurator getConfigurator();
+
+    /**
+     * Sets the configurator for this world generator.
+     * <p>
+     * This is typically user configuration as provided during the game setup screens.
+     *
+     * @param configurator the configurator for this world generator
+     */
+    void setWorldConfigurator(WorldConfigurator configurator);
 
     /**
      * @return Generated world

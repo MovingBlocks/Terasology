@@ -23,9 +23,9 @@ import org.terasology.world.generator.WorldGenerator;
 
 /**
  * Initialize the world generator.
- * <br><br>
+ * <p>
  * This is done after the world entity has been created/loaded so that
- * world generation config. is available at the time of initialization.
+ * world generation configuration is available at the time of initialization.
  */
 public class InitialiseWorldGenerator extends SingleStepLoadProcess {
 

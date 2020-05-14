@@ -87,6 +87,15 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         return "Initializing world...";
     }
 
+    private WorldInfo getWorldInfo(GameManifest manifest) {
+        WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
+        if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
+            FastRandom random = new FastRandom();
+            worldInfo.setSeed(random.nextString(16));
+        }
+        return worldInfo;
+    }
+
     @Override
     public boolean step() {
         BlockManager blockManager = context.get(BlockManager.class);
@@ -95,11 +104,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         context.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(environment, context));
 
-        WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
-        if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
-            FastRandom random = new FastRandom();
-            worldInfo.setSeed(random.nextString(16));
-        }
+        WorldInfo worldInfo = getWorldInfo(gameManifest);
 
         logger.info("World seed: \"{}\"", worldInfo.getSeed());
 
@@ -110,6 +115,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             worldGenerator = WorldGeneratorManager.createGenerator(worldInfo.getWorldGenerator(), context);
             // setting the world seed will create the world builder
             worldGenerator.setWorldSeed(worldInfo.getSeed());
+            worldGenerator.setWorldConfigurator(worldInfo.getConfigurator());
             context.put(WorldGenerator.class, worldGenerator);
         } catch (UnresolvedWorldGeneratorException e) {
             logger.error("Unable to load world generator {}. Available world generators: {}",

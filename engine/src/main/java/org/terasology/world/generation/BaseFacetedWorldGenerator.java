@@ -15,6 +15,7 @@
  */
 package org.terasology.world.generation;
 
+import com.google.common.base.Preconditions;
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.WorldConfigurator;
@@ -81,6 +82,15 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
             configurator = getWorldBuilder().createConfigurator();
         }
         return configurator;
+    }
+
+    @Override
+    public void setWorldConfigurator(WorldConfigurator configurator) {
+        //TODO: figure out what to do with other world configurator classes...
+        //      maybe this should not be exposed on WorldGenerator at all...
+        if (configurator instanceof FacetedWorldConfigurator) {
+            this.configurator = (FacetedWorldConfigurator) configurator;
+        }
     }
 
     @Override
