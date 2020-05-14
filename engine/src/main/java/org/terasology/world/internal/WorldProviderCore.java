@@ -180,6 +180,7 @@ public interface WorldProviderCore {
 
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
+     * You must not use this method with world gen code, call 'setExtraData' on chunk instead.
      *
      * @param index The index of the extra data field
      * @param pos
