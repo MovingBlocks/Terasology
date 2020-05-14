@@ -28,11 +28,10 @@ build/
 /gradle.properties
 /override.cfg
 
-# Ignore IntelliJ
+# Do share some IntelliJ settings (see .idea/.gitignore for specifics)
 !/.idea
-!/.run
+# But not build outputs, or things it will regenerate when it syncs with gradle.
 /out/
-/*.ipr
 /*.iws
 /projectFilesBackup*
 /**/*.iml
