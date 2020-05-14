@@ -3,7 +3,12 @@
     <module name="Terasology.engine-tests.test" />
     <shortenClasspath name="ARGS_FILE" />
     <useClassPathOnly />
-    <extension name="coverage" runner="jacoco" />
+    <extension name="coverage" runner="jacoco">
+      <pattern>
+        <option name="PATTERN" value="org.terasology.engine.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
     <option name="PACKAGE_NAME" value="org.terasology.engine" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
