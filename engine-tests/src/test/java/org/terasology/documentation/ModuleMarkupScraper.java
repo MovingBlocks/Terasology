@@ -31,9 +31,11 @@ import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.*;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
@@ -52,10 +54,7 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.lang.annotation.Annotation;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -86,52 +85,63 @@ public final class ModuleMarkupScraper {
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ModuleEnvironment environment = moduleManager.getEnvironment();
 
-        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!latestVersion.isOnClasspath()) {
+//        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
+//            Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
+//            if (!latestVersion.isOnClasspath()) {
+//
+//                System.out.println(latestVersion.getMetadata().getId());
+//
+//
+//
+//
+////                ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
+////                modulesLookup.put(info.getMetadata().getId(), info);
+////                sortedModules.add(info);
+//            }
+//        }
 
-                System.out.println(latestVersion.getMetadata().getId());
-
-
-
-
-//                ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
-//                modulesLookup.put(info.getMetadata().getId(), info);
-//                sortedModules.add(info);
-            }
-        }
-
-        Map<String, InputCategory> inputCategories = Maps.newHashMap();
-        Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
+//        Map<String, InputCategory> inputCategories = Maps.newHashMap();
+//        Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            if(moduleId.toString().equals("engine") )
-                continue;
+
+//            if(moduleId.toString().equals("engine") || moduleId.toString().equals("unittest") )
+//                continue;
 
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
             if (module.isCodeModule()) {
-                System.out.println("Examining: " + moduleId);
+                System.out.println("Examining Module: " + moduleId);
+
+//                if(!moduleId.toString().equals("BiomesAPI"))
+//                    continue;
+
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment2 = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        for (Class<? extends Component> componentType : environment2.getSubtypesOf(Component.class)) {
-                            String componentName = MetadataUtil.getComponentClassName(componentType);
-                            System.out.println("  Component: " + componentName + " | From Module: " + environment2.getModuleProviding(componentType));
-                        }
+//                        for (Class<? extends ComponentSystem> componentType : environment2.getSubtypesOf(ComponentSystem.class)) {
+//                            Name mod = environment2.getModuleProviding(componentType);
+//
+//                            if(!mod.toString().equals(moduleId.toString()))
+//                                continue;
+//                            //String componentName = MetadataUtil.getComponentClassName(componentType);
+//                            System.out.println("  Component: " + componentType.getName() + " | From Module: " + mod);
+//                        }
 
                         for (Class<? extends Event> type : environment2.getSubtypesOf(Event.class)) {
-                            System.out.println("  Event: " + type.getSimpleName() + " | From Module: " + environment2.getModuleProviding(type));
+
+                            Name mod = environment2.getModuleProviding(type);
+
+                            if(!mod.toString().equals(moduleId.toString()))
+                                continue;
+
+                            System.out.println("  Event: " + type.getSimpleName() + " | From Module: " + mod);
+
+                            // Are there any other classes derived from this class?
                             for (Class<? extends Object> eventType : environment2.getSubtypesOf(type)) {
                                 System.out.println("    " + eventType.getName() + " | Event Module: " + environment2.getModuleProviding(eventType));
                             }
                         }
 
-//                        for (Class<?> bindEvent : environment2.getTypesAnnotatedWith(RegisterBindButton.class, new FromModule(environment, moduleId))) {
-//                            if (BindButtonEvent.class.isAssignableFrom(bindEvent)) {
-//                                RegisterBindButton bindRegister = bindEvent.getAnnotation(RegisterBindButton.class);
-//                                inputsById.put(new SimpleUri(module.getId(), bindRegister.id()), bindRegister);
-//                            }
-//                        }
                     }
                 }
 
