@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectStartupSharedConfiguration">
     <configurations>
-      <configuration id="Gradle.extract configs" name="extract configs" />
+      <configuration id="Gradle.extract requirements" name="extract requirements" />
     </configurations>
   </component>
 </project>

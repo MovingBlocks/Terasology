@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="extract configs" type="GradleRunConfiguration" factoryName="Gradle" activateToolWindowBeforeRun="false">
+  <configuration default="false" name="extract requirements" type="GradleRunConfiguration" factoryName="Gradle" activateToolWindowBeforeRun="false">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -11,6 +11,7 @@
       <option name="taskNames">
         <list>
           <option value="extractConfig" />
+          <option value="extractNatives" />
         </list>
       </option>
       <option name="vmOptions" value="" />
