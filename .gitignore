@@ -34,7 +34,7 @@ build/
 out/
 /*.iws
 /projectFilesBackup*
-/**/*.iml
+*.iml
 
 # Ignore Eclipse
 .checkstyle

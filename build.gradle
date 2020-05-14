@@ -23,9 +23,7 @@ buildscript {
     }
 }
 
-// Customization of IDE options
-apply from: 'config/gradle/ide.gradle'
-
+apply plugin: 'idea'
 // Needed for extending the "clean" task to also delete custom stuff defined here like natives
 apply plugin: 'base'
 
@@ -178,7 +176,7 @@ configurations.all {
 clean.doLast {
     new File(dirNatives).deleteDir()
     new File(dirConfigMetrics).deleteDir()
-    println "Cleaned root - don't forget to re-extract stuff! 'gradlew extractNatives extractConfig' will do so, or 'gradlew idea' (or eclipse)"
+    println "Cleaned root - don't forget to re-extract stuff! 'gradlew extractNatives extractConfig' will do so"
 }
 
 task protobufCompileWindows(type: Exec) {
@@ -321,37 +319,6 @@ idea {
     module.excludeDirs += file('terasology-2ndclient')
 
     module.downloadSources = true
-
-    project {
-        // Set JDK
-        jdkName = '1.8'
-        wildcards -= '!?*.groovy'
-
-        ipr {
-            withXml { xmlProvider ->
-                // Apply a bunch of tweaks to IntelliJ config - all defined in ide.gradle
-                // Part reason for separate file was in case a module needs to define something it cannot do so in a project block
-                def iprNode = xmlProvider.asNode()
-                ideaActivateCheckstyle(iprNode)
-                ideaActivateCopyright(iprNode)
-                ideaActivateAnnotations(iprNode)
-                ideaActivateGit(iprNode)
-                ideaActivateGradle(iprNode)
-            }
-
-            // Sets sourceCompatibility within IntelliJ (without this root build having the Java plugin applied)
-            whenMerged { project ->
-                project.jdk.languageLevel = 'JDK_1_8'
-            }
-        }
-    }
-
-    // Tweaks to the .iws
-    workspace.iws.withXml { xmlProvider ->
-        def iwsNode = xmlProvider.asNode()
-        ideaMakeAutomatically(iwsNode)
-        ideaRunConfig(iwsNode)
-    }
 }
 
 cleanIdea.doLast {
