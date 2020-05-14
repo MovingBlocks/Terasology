@@ -12,6 +12,7 @@
         <list>
           <option value="extractConfig" />
           <option value="extractNatives" />
+          <option value="copyInMissingTemplates" />
         </list>
       </option>
       <option name="vmOptions" value="" />
