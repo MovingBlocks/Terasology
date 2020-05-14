@@ -31,7 +31,7 @@ build/
 # Do share some IntelliJ settings (see .idea/.gitignore for specifics)
 !/.idea
 # But not build outputs, or things it will regenerate when it syncs with gradle.
-/out/
+out/
 /*.iws
 /projectFilesBackup*
 /**/*.iml
