@@ -29,7 +29,7 @@ build/
 /override.cfg
 
 # Ignore IntelliJ - could use "/**/*.iml" to catch all .iml files, but that requires a somewhat recent Git version
-/out/
+out/
 modules/BuilderSampleGameplay/BuilderSampleGameplay.iml
 facades/PC/PC.iml
 facades/TeraEd/TeraEd.iml
