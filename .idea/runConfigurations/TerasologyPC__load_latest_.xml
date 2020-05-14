@@ -1,7 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="TerasologyPC (load latest)" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology" />
+    <module name="Terasology.facades.PC.main" />
     <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport -loadlastgame" />
+    <shortenClasspath name="ARGS_FILE" />
     <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m" />
     <extension name="coverage">
       <pattern>
