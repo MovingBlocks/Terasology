@@ -20,12 +20,16 @@ layout (points) in;
 layout (triangle_strip) out;
 layout (max_vertices = 4) out;
 
-in vec3 scale_vs;
+in vec3[] scale_vs;
+in vec4[] color_vs;
+in vec2[] texture_offset_vs;
 
+out vec4 color_gs;
 out vec2 uv;
 
 uniform mat4 view_projection;
 uniform vec3 camera_position;
+uniform vec2 texture_size;
 
 void main() {
     vec3 position = gl_in[0].gl_Position.xyz;
@@ -33,26 +37,30 @@ void main() {
     vec3 to_camera = normalize(camera_position - position);
     vec3 right = cross(to_camera, vec3(0.0, 1.0, 0.0));
 
-    position += right * 0.5 * scale_vs.x;
-    position.y -= 0.5 * scale_vs.y;
+    position += right * 0.5 * scale_vs[0].x;
+    position.y -= 0.5 * scale_vs[0].y;
     gl_Position = view_projection * vec4(position, 1);
-    uv = vec2(0, 0);
+    color_gs = color_vs[0];
+    uv = texture_offset_vs[0];
     EmitVertex();
 
-    position.y += scale_vs.y;
+    position.y += scale_vs[0].y;
     gl_Position = view_projection * vec4(position, 1);
-    uv = vec2(0, 1);
+    color_gs = color_vs[0];
+    uv = vec2(texture_offset_vs[0].x, texture_size.y);
     EmitVertex();
 
-    position -= right * scale_vs.x;
-    position.y -= scale_vs.y;
+    position -= right * scale_vs[0].x;
+    position.y -= scale_vs[0].y;
     gl_Position = view_projection * vec4(position, 1);
-    uv = vec2(1, 0);
+    color_gs = color_vs[0];
+    uv = vec2(texture_size.x, texture_offset_vs[0].y);
     EmitVertex();
 
-    position.y += scale_vs.y;
+    position.y += scale_vs[0].y;
     gl_Position = view_projection * vec4(position, 1);
-    uv = vec2(1, 1);
+    color_gs = color_vs[0];
+    uv = texture_size;
     EmitVertex();
 
     EndPrimitive();

@@ -96,8 +96,9 @@ public class SpriteParticleRenderer implements RenderSystem {
     }
 
     public void drawParticles(ParticleRenderingData<ParticleDataSpriteComponent> particleSystem) {
-        int textureHandle = particleSystem.particleData.texture.getId();
-        shader.setTexture(textureHandle);
+        ParticleDataSpriteComponent particleData = particleSystem.particleData;
+        shader.setTexture(particleData.texture.getId());
+        shader.setTextureSize(particleData.textureSize.x, particleData.textureSize.y);
         particleSystem.particlePool.draw();
     }
 

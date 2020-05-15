@@ -50,20 +50,18 @@ public final class ParticlePool {
     // Per particle scalars
     public final float[] energy;
 
-    // Per particle 2d vectors
-    public final float[] textureOffset;
-
     // Per particle 3d vectors
     public final float[] position;
-    public final FloatBuffer positionBuffer;
+    private final FloatBuffer positionBuffer;
     public final float[] scale;
-    public final FloatBuffer scaleBuffer;
+    private final FloatBuffer scaleBuffer;
+    public final float[] color;
+    private final FloatBuffer colorBuffer;
+    public final float[] textureOffset;
+    private final FloatBuffer textureOffsetBuffer;
 
     public final float[] previousPosition;
     public final float[] velocity;
-
-    // Per particle 4d vectors
-    public final float[] color;
 
     //== private attributes =============================
 
@@ -75,6 +73,8 @@ public final class ParticlePool {
     private int vao;
     private int positionVbo;
     private int scaleVbo;
+    private int colorVbo;
+    private int textureOffsetVbo;
 
     //== Constructors ===================================
 
@@ -87,20 +87,18 @@ public final class ParticlePool {
         // Per particle scalars
         this.energy = new float[size];
 
-        // Per particle 2d vectors
-        this.textureOffset = new float[size * 2];
-
         // Per particle 3d vectors
         this.position = new float[size * 3];
         this.positionBuffer = BufferUtils.createFloatBuffer(position.length);
         this.scale = new float[size * 3];
         this.scaleBuffer = BufferUtils.createFloatBuffer(scale.length);
+        this.color = new float[size * 4];
+        this.colorBuffer = BufferUtils.createFloatBuffer(color.length);
+        this.textureOffset = new float[size * 2];
+        this.textureOffsetBuffer = BufferUtils.createFloatBuffer(textureOffset.length);
 
         this.previousPosition = new float[size * 3];
         this.velocity = new float[size * 3];
-
-        // Per particle 4d vectors
-        this.color = new float[size * 4];
 
         initVao();
     }
@@ -113,6 +111,8 @@ public final class ParticlePool {
         vao = glGenVertexArrays();
         positionVbo = glGenBuffers();
         scaleVbo = glGenBuffers();
+        colorVbo = glGenBuffers();
+        textureOffsetVbo = glGenBuffers();
 
         glBindVertexArray(vao);
 
@@ -123,6 +123,14 @@ public final class ParticlePool {
         glBindBuffer(GL_ARRAY_BUFFER, scaleVbo);
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 4, GL_FLOAT, false, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, textureOffsetVbo);
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 2, GL_FLOAT, false, 0, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -305,18 +313,22 @@ public final class ParticlePool {
     }
 
     public void prepareRendering() {
-        refreshBuffer(positionBuffer, position);
-        refreshBuffer(scaleBuffer, scale);
+        refreshBuffer(positionBuffer, position, 3);
+        refreshBuffer(scaleBuffer, scale, 3);
+        refreshBuffer(colorBuffer, color, 4);
+        refreshBuffer(textureOffsetBuffer, textureOffset, 2);
 
         bufferData(positionBuffer, positionVbo);
         bufferData(scaleBuffer, scaleVbo);
+        bufferData(colorBuffer, colorVbo);
+        bufferData(textureOffsetBuffer, textureOffsetVbo);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    private void refreshBuffer(FloatBuffer buffer, float[] data) {
+    private void refreshBuffer(FloatBuffer buffer, float[] data, int typeSize) {
         buffer.position(0).limit(data.length);
-        buffer.put(position, 0, livingParticles());
+        buffer.put(data, 0, livingParticles() * typeSize);
         buffer.flip();
     }
 

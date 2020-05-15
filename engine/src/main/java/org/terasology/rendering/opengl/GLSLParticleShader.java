@@ -51,6 +51,7 @@ import static org.lwjgl.opengl.GL20.glAttachShader;
 import static org.lwjgl.opengl.GL20.glGetProgrami;
 import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
 import static org.lwjgl.opengl.GL20.glGetShaderi;
+import static org.lwjgl.opengl.GL20.glUniform1i;
 
 public class GLSLParticleShader extends Shader {
 
@@ -62,7 +63,8 @@ public class GLSLParticleShader extends Shader {
     private int colorLocation;
     private int viewProjectionLocation;
     private int cameraPositionLocation;
-    private int textureLocation;
+    private int useTextureFlagLocation;
+    private int textureSizeLocation;
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     public GLSLParticleShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
@@ -86,7 +88,10 @@ public class GLSLParticleShader extends Shader {
         colorLocation = GL20.glGetUniformLocation(programHandle, "color");
         viewProjectionLocation = GL20.glGetUniformLocation(programHandle, "view_projection");
         cameraPositionLocation = GL20.glGetUniformLocation(programHandle, "camera_position");
-        textureLocation = GL20.glGetUniformLocation(programHandle, "texture_sampler");
+        useTextureFlagLocation = GL20.glGetUniformLocation(programHandle, "use_texture");
+        textureSizeLocation = GL20.glGetUniformLocation(programHandle, "texture_size");
+
+        int textureLocation = GL20.glGetUniformLocation(programHandle, "texture_sampler");
 
         bind();
         GL20.glUniform1i(textureLocation, 0);
@@ -100,6 +105,11 @@ public class GLSLParticleShader extends Shader {
     public void setTexture(int handle) {
         glActiveTexture(GL13.GL_TEXTURE0);
         GL11.glBindTexture(GL_TEXTURE_2D, handle);
+        glUniform1i(useTextureFlagLocation, 1);
+    }
+
+    public void setTextureSize(float x, float y) {
+        GL20.glUniform2f(textureSizeLocation, x, y);
     }
 
     public void setCameraPosition(Vector3fc position) {
