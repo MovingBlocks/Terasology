@@ -16,6 +16,7 @@
 
 package org.terasology.world.internal;
 
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
@@ -145,6 +146,11 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
+    public void setLight(Vector3ic pos, byte light) {
+        setLight(pos.x(), pos.y(), pos.z(), light);
+    }
+
+    @Override
     public void setLight(int blockX, int blockY, int blockZ, byte light) {
         if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
@@ -157,6 +163,11 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     @Override
     public void setSunlight(Vector3i pos, byte light) {
         setSunlight(pos.x, pos.y, pos.z, light);
+    }
+
+    @Override
+    public void setSunlight(Vector3ic pos, byte light) {
+        setSunlight(pos.x(), pos.y(), pos.z(), light);
     }
 
     @Override
