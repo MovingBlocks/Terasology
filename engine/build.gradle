@@ -215,7 +215,7 @@ task cacheReflections {
 // Instructions for packaging a jar file for the engine
 jar {
     // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
-    duplicatesStrategy = 'exclude'
+    duplicatesStrategy = "EXCLUDE"
 
     from(sourceSets.dev.output)
     from(tasks.getByName("cacheReflections").outputs)
