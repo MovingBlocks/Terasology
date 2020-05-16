@@ -126,7 +126,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             EntityRef blockEntity = getBlockEntityAt(JomlUtil.from(pos));
             Block oldType = super.setBlock(pos, type);
             if (oldType != null) {
-                updateBlockEntity(blockEntity, JomlUtil.from(pos), oldType, type, false, Collections.<Class<? extends Component>>emptySet());
+                updateBlockEntity(blockEntity, pos, oldType, type, false, Collections.<Class<? extends Component>>emptySet());
             }
             return oldType;
         }
@@ -151,7 +151,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                             Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
                                     .map(retainComponentsComponent -> retainComponentsComponent.components)
                                     .orElse(Collections.emptySet());
-                    updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
+                    updateBlockEntity(blockEntity, JomlUtil.from(vec), oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
                 }
             }
             return oldBlocks;
@@ -172,14 +172,14 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             EntityRef blockEntity = getBlockEntityAt(position);
             Block oldType = super.setBlock(position, type);
             if (oldType != null) {
-                updateBlockEntity(blockEntity, JomlUtil.from(position), oldType, type, false, Sets.newHashSet(components));
+                updateBlockEntity(blockEntity, position, oldType, type, false, Sets.newHashSet(components));
             }
             return oldType;
         }
         return null;
     }
 
-    private void updateBlockEntity(EntityRef blockEntity, Vector3i pos, Block oldType, Block type,
+    private void updateBlockEntity(EntityRef blockEntity, Vector3ic pos, Block oldType, Block type,
                                    boolean forceEntityUpdate, Set<Class<? extends Component>> retainComponents) {
         if (type.isKeepActive()) {
             temporaryBlockEntities.remove(blockEntity);
@@ -190,8 +190,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             updateBlockEntityComponents(blockEntity, oldType, type, retainComponents);
         }
 
-        OnChangedBlock changedEvent = new OnChangedBlock(pos, type, oldType);
-        EntityRef regionEntity = blockRegionLookup.get(pos);
+        org.joml.Vector3i target = new org.joml.Vector3i(pos);
+        OnChangedBlock changedEvent = new OnChangedBlock(target, type, oldType);
+        EntityRef regionEntity = blockRegionLookup.get(JomlUtil.from(target));
         if (regionEntity != null) {
             regionEntity.send(changedEvent);
         }
@@ -236,7 +237,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             EntityRef blockEntity = getBlockEntityAt(position);
             Block oldType = super.setBlock(position, type);
             if (oldType != null) {
-                updateBlockEntity(blockEntity, JomlUtil.from(position), oldType, type, true, Collections.<Class<? extends Component>>emptySet());
+                updateBlockEntity(blockEntity, position, oldType, type, true, Collections.<Class<? extends Component>>emptySet());
             }
             return oldType;
         }

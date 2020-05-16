@@ -16,8 +16,9 @@
 
 package org.terasology.world;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
@@ -35,7 +36,7 @@ public class OnChangedBlock implements Event {
         this.newType = newType;
     }
 
-    public Vector3i getBlockPosition() {
+    public Vector3ic getBlockPosition() {
         return blockPosition;
     }
 

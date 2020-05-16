@@ -16,6 +16,7 @@
 package org.terasology.world.block.structure;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -23,6 +24,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DestroyEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -103,13 +105,13 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
         }
     }
 
-    private void validateSupportForBlockOnSide(Vector3i replacedBlockPosition, Side side) {
-        final Vector3i blockPosition = side.getAdjacentPos(replacedBlockPosition);
+    private void validateSupportForBlockOnSide(Vector3ic replacedBlockPosition, Side side) {
+        final org.joml.Vector3i blockPosition = side.getAdjacentPos(replacedBlockPosition, new org.joml.Vector3i());
         if (worldProvider.isBlockRelevant(blockPosition)) {
             final Side sideReverse = side.reverse();
 
             for (BlockStructuralSupport support : supports) {
-                if (support.shouldBeRemovedDueToChange(blockPosition, sideReverse)) {
+                if (support.shouldBeRemovedDueToChange(JomlUtil.from(blockPosition), sideReverse)) {
                     blockEntityRegistry.getBlockEntityAt(blockPosition).send(new DestroyEvent(gatheringEntity,
                             EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
                     break;

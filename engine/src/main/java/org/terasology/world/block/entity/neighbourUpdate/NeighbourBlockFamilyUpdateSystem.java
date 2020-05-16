@@ -24,6 +24,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
@@ -100,9 +101,9 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
     @ReceiveEvent(components = {BlockComponent.class})
     public void blockUpdate(OnChangedBlock event, EntityRef blockEntity) {
         if (largeBlockUpdateCount > 0) {
-            blocksUpdatedInLargeBlockUpdate.add(event.getBlockPosition());
+            blocksUpdatedInLargeBlockUpdate.add(JomlUtil.from(event.getBlockPosition()));
         } else {
-            Vector3i blockLocation = event.getBlockPosition();
+            Vector3i blockLocation = JomlUtil.from(event.getBlockPosition());
             processUpdateForBlockLocation(blockLocation);
         }
     }
