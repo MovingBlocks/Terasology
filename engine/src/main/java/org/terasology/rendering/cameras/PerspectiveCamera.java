@@ -196,7 +196,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         float aspectRatio = (float) displayDevice.getDisplayWidth()/ displayDevice.getDisplayHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
-        return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
+        return new Matrix4f().perspective(fovY,aspectRatio,zNear,zFar).transpose();
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
