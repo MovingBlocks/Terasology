@@ -30,7 +30,6 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
@@ -79,7 +78,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
+    private final Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
     private Block unloadedBlock;
@@ -201,9 +200,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = ChunkMath.calcBlockPos(JomlUtil.from(worldPos));
             Block oldBlockType = chunk.setBlock(blockPos, type);
             if (oldBlockType != type) {
-                BlockChange oldChange = blockChanges.get(worldPos);
+                BlockChange oldChange = blockChanges.get(JomlUtil.from(worldPos));
                 if (oldChange == null) {
-                    blockChanges.put(JomlUtil.from(worldPos), new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
+                    blockChanges.put(JomlUtil.from(worldPos), new BlockChange(worldPos, oldBlockType, type));
                 } else {
                     oldChange.setTo(type);
                 }
@@ -237,12 +236,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 if (oldBlockType != type) {
                     BlockChange oldChange = blockChanges.get(worldPos);
                     if (oldChange == null) {
-                        blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
+                        blockChanges.put(worldPos, new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
                     } else {
                         oldChange.setTo(type);
                     }
                     setDirtyChunksNear(worldPos);
-                    changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
+                    changedBlocks.add(new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
                 }
                 result.put(worldPos, oldBlockType);
             } else {
@@ -251,7 +250,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
 
         for (BlockChange change : changedBlocks) {
-            notifyBlockChanged(change.getPosition(), change.getTo(), change.getFrom());
+            notifyBlockChanged(JomlUtil.from(change.getPosition()), change.getTo(), change.getFrom());
         }
 
         return result;

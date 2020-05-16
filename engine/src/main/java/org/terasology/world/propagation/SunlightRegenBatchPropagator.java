@@ -17,6 +17,7 @@ package org.terasology.world.propagation;
 
 import com.google.common.collect.Sets;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
@@ -77,11 +78,12 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void reviewChangeToBottom(BlockChange blockChange) {
         PropagationComparison comparison = regenRules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), Side.BOTTOM);
+        Vector3i blockChangePosition = JomlUtil.from(blockChange.getPosition());
         if (comparison.isPermitting()) {
-            byte existingValue = regenWorld.getValueAt(blockChange.getPosition());
-            queueSpreadRegen(blockChange.getPosition(), existingValue);
+            byte existingValue = regenWorld.getValueAt(blockChangePosition);
+            queueSpreadRegen(blockChangePosition, existingValue);
         } else if (comparison.isRestricting()) {
-            Vector3i adjPos = Side.BOTTOM.getAdjacentPos(blockChange.getPosition());
+            Vector3i adjPos = Side.BOTTOM.getAdjacentPos(blockChangePosition);
             byte existingValue = regenWorld.getValueAt(adjPos);
             reduce(adjPos, existingValue);
         }
@@ -89,15 +91,16 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void reviewChangeToTop(BlockChange blockChange) {
         PropagationComparison comparison = regenRules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), Side.TOP);
+        Vector3i blockChangePosition = JomlUtil.from(blockChange.getPosition());
         if (comparison.isPermitting()) {
-            Vector3i adjPos = Side.TOP.getAdjacentPos(blockChange.getPosition());
+            Vector3i adjPos = Side.TOP.getAdjacentPos(blockChangePosition);
             byte adjValue = regenWorld.getValueAt(adjPos);
             if (adjValue != PropagatorWorldView.UNAVAILABLE) {
                 queueSpreadRegen(adjPos, adjValue);
             }
         } else if (comparison.isRestricting()) {
-            byte existingValue = regenWorld.getValueAt(blockChange.getPosition());
-            reduce(blockChange.getPosition(), existingValue);
+            byte existingValue = regenWorld.getValueAt(blockChangePosition);
+            reduce(blockChangePosition, existingValue);
         }
     }
 
