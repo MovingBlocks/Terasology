@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.joml.Matrix4f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -150,8 +151,8 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         }
 
         if (isMotionBlurEnabled) {
-            postMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
-            postMaterial.setMatrix4("prevViewProjMatrix", activeCamera.getPrevViewProjectionMatrix(), true);
+            postMaterial.setMatrix4("invViewProjMatrix", new Matrix4f(activeCamera.getInverseViewProjectionMatrix()).transpose(), true);
+            postMaterial.setMatrix4("prevViewProjMatrix", new Matrix4f(activeCamera.getPrevViewProjectionMatrix()).transpose(), true);
         }
 
         renderFullscreenQuad();
