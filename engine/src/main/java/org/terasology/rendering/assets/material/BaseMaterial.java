@@ -246,16 +246,13 @@ public abstract class BaseMaterial extends Material {
     }
 
     /**
-     * writes camera into material uniforms
-     *
-     * The uniforms below are set from camera: 
-     * <code>
+     * writes camera into the local material and they include the uniforms listed below:
+     * <pre>{@code
      * uniform mat4 viewMatrix;
      * uniform mat4 projMatrix;
      * uniform mat4 viewProjMatrix;
      * uniform mat4 invProjMatrix;
-     * </code>
-     *
+     * }</pre>
      * @param camera camera to write into material
      */
     @Override
