@@ -51,12 +51,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TFloatIterator;
+import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.VecMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -796,8 +800,18 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
+        public void applyImpulse(Vector3fc impulse) {
+            pendingImpulse.add(VecMath.to(JomlUtil.from(impulse)));
+        }
+
+        @Override
         public void applyForce(org.terasology.math.geom.Vector3f force) {
             pendingForce.add(VecMath.to(force));
+        }
+
+        @Override
+        public void applyForce(Vector3fc force) {
+            pendingForce.add(VecMath.to(JomlUtil.from(force)));
         }
 
         @Override
@@ -806,8 +820,21 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
+        public void translate(Vector3fc translation) {
+            rb.translate(VecMath.to(JomlUtil.from(translation)));
+        }
+
+        @Override
         public org.terasology.math.geom.Quat4f getOrientation(org.terasology.math.geom.Quat4f out) {
             Quat4f vm = VecMath.to(out);
+            rb.getOrientation(vm);
+            out.set(vm.x, vm.y, vm.z, vm.w);
+            return out;
+        }
+
+        @Override
+        public Quaternionf getOrientation(Quaternionf out) {
+            Quat4f vm = new Quat4f();
             rb.getOrientation(vm);
             out.set(vm.x, vm.y, vm.z, vm.w);
             return out;
@@ -822,8 +849,24 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
+        public org.joml.Vector3f getLocation(org.joml.Vector3f out) {
+            Vector3f vm = new Vector3f();
+            rb.getCenterOfMassPosition(vm);
+            out.set(vm.x, vm.y, vm.z);
+            return out;
+        }
+
+        @Override
         public org.terasology.math.geom.Vector3f getLinearVelocity(org.terasology.math.geom.Vector3f out) {
             Vector3f vm = VecMath.to(out);
+            rb.getLinearVelocity(vm);
+            out.set(vm.x, vm.y, vm.z);
+            return out;
+        }
+
+        @Override
+        public org.joml.Vector3f getLinearVelocity(org.joml.Vector3f out) {
+            Vector3f vm = new Vector3f();
             rb.getLinearVelocity(vm);
             out.set(vm.x, vm.y, vm.z);
             return out;
@@ -838,8 +881,21 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
+        public org.joml.Vector3f getAngularVelocity(org.joml.Vector3f out) {
+            Vector3f vm = new Vector3f();
+            rb.getAngularVelocity(vm);
+            out.set(vm.x, vm.y, vm.z);
+            return out;
+        }
+
+        @Override
         public void setLinearVelocity(org.terasology.math.geom.Vector3f value) {
             rb.setLinearVelocity(VecMath.to(value));
+        }
+
+        @Override
+        public void setLinearVelocity(Vector3fc value) {
+            rb.setLinearVelocity(VecMath.to(JomlUtil.from(value)));
         }
 
         @Override
@@ -848,9 +904,21 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
+        public void setAngularVelocity(Vector3fc value) {
+            rb.setAngularVelocity(VecMath.to(JomlUtil.from(value)));
+        }
+
+        @Override
         public void setOrientation(org.terasology.math.geom.Quat4f orientation) {
             rb.getWorldTransform(pooledTransform);
             pooledTransform.setRotation(VecMath.to(orientation));
+            rb.proceedToTransform(pooledTransform);
+        }
+
+        @Override
+        public void setOrientation(Quaternionfc orientation) {
+            rb.getWorldTransform(pooledTransform);
+            pooledTransform.setRotation(VecMath.to(JomlUtil.from(orientation)));
             rb.proceedToTransform(pooledTransform);
         }
 
@@ -862,9 +930,22 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
+        public void setLocation(Vector3fc location) {
+            rb.getWorldTransform(pooledTransform);
+            pooledTransform.origin.set(VecMath.to(JomlUtil.from(location)));
+            rb.proceedToTransform(pooledTransform);
+        }
+
+        @Override
         public void setVelocity(org.terasology.math.geom.Vector3f linear, org.terasology.math.geom.Vector3f angular) {
             rb.setLinearVelocity(VecMath.to(linear));
             rb.setAngularVelocity(VecMath.to(angular));
+        }
+
+        @Override
+        public void setVelocity(Vector3fc linear, Vector3fc angular) {
+            rb.setLinearVelocity(VecMath.to(JomlUtil.from(linear)));
+            rb.setAngularVelocity(VecMath.to(JomlUtil.from(angular)));
         }
 
         @Override
@@ -872,6 +953,14 @@ public class BulletPhysics implements PhysicsEngine {
             rb.getWorldTransform(pooledTransform);
             pooledTransform.origin.set(VecMath.to(location));
             pooledTransform.setRotation(VecMath.to(orientation));
+            rb.proceedToTransform(pooledTransform);
+        }
+
+        @Override
+        public void setTransform(Vector3fc location, Quaternionfc orientation) {
+            rb.getWorldTransform(pooledTransform);
+            pooledTransform.origin.set(VecMath.to(JomlUtil.from(location)));
+            pooledTransform.setRotation(VecMath.to(JomlUtil.from(orientation)));
             rb.proceedToTransform(pooledTransform);
         }
 
