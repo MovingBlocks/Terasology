@@ -15,9 +15,12 @@
  */
 package org.terasology.documentation;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
 import org.terasology.HeadlessEnvironment;
 import org.terasology.context.Context;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ExtraDataModuleExtension;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
@@ -28,10 +31,9 @@ import org.terasology.naming.Name;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public final class ModuleMarkupScraper {
@@ -39,6 +41,8 @@ public final class ModuleMarkupScraper {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String DEFAULT_GITHUB_MODULE_URL = "https://github.com/Terasology/";
     private static final List INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay", "BuilderSampleGameplay", "BiomesAPI");
+    private static final Comparator<? super Module> moduleInfoComparator = Comparator.comparing(o -> o.getMetadata()
+            .getDisplayName().toString());
 
     protected static Context context;
 
@@ -61,15 +65,43 @@ public final class ModuleMarkupScraper {
         context = env.getContext();
         moduleManager = context.get(ModuleManager.class);
 
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        // Request Remote Modules List...
+        Future<Void> remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor()
+                .submit(moduleManager.getInstallManager().updateRemoteRegistry());
+        remoteModuleRegistryUpdater.get(); // wait until remoteRegistry downloads
+
+        StringBuilder out = new StringBuilder();
+
+        List<Module> allModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
+            Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
+            if (!latestVersion.isOnClasspath()) {
+                allModules.add(latestVersion);
+                System.out.println("Found Game Module: " + latestVersion.getId());
+            }
+        }
+
+        Iterable<Module> remoteModuleRegistry = moduleManager.getInstallManager().getRemoteRegistry();
+        Set<Name> filtered = ImmutableSet.of(TerasologyConstants.ENGINE_MODULE, new Name("engine-test"));
+        for (Module remote : remoteModuleRegistry) {
+            allModules.add(remote);
+            System.out.println("Found Remote Module: " + remote.getId());
+        }
+
+        allModules.sort(moduleInfoComparator);
+
+        List<Module> allSortedModules;
+        allSortedModules = new ArrayList<>(allModules);
+
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        for (Module module : allSortedModules) {
+            Name moduleId = module.getId();
             if (module.isCodeModule()) {
-                System.out.println("Examining Module: " + moduleId);
+                out.append("Examining Module: " + moduleId);
+                out.append(System.getProperty("line.separator"));
 
                 String moduleDescription = getModuleDescription(moduleManager, module);
-
-                System.out.println("  Module Description: " + moduleDescription);
+                out.append("Module Description: " + moduleDescription);
 
                 Set<Module> modules = new HashSet<>();
                 ResolutionResult result = resolver.resolve(moduleId);
@@ -79,24 +111,46 @@ public final class ModuleMarkupScraper {
                     modules.add(module);
                 }
 
-                try (ModuleEnvironment environment2 = moduleManager.loadEnvironment(modules, false)) {
-                    for (Class<? extends Event> type : environment2.getSubtypesOf(Event.class)) {
-                        Name mod = environment2.getModuleProviding(type);
+                out.append(ExportEvents(moduleId, modules));
+            }
+            out.append(System.getProperty("line.separator"));
+        }
 
-                        if (!mod.toString().equals(moduleId.toString()))
-                            continue;
+        System.out.println(out);
+        env.close();
+    }
 
-                        System.out.println("  Event: " + type.getSimpleName() + " | From Module: " + mod);
+    private static String ExportEvents(Name moduleId, Set<Module> modules) {
+        StringBuilder events = new StringBuilder();
+        try (ModuleEnvironment environment2 = moduleManager.loadEnvironment(modules, false)) {
 
-                        // Are there any other classes derived from this class?
-                        for (Class<? extends Object> eventType : environment2.getSubtypesOf(type)) {
-                            System.out.println("    " + eventType.getName() + " | Event Module: " + environment2.getModuleProviding(eventType));
-                        }
-                    }
+            for (Class<? extends Event> type : environment2.getSubtypesOf(Event.class)) {
+                Name mod = environment2.getModuleProviding(type);
+
+                if (!mod.toString().equals(moduleId.toString()))
+                    continue;
+
+                events.append("  " + type.getName()); //  + " | From Module: " + mod
+                events.append(System.getProperty("line.separator"));
+
+                // Are there any other classes derived from this class?
+                for (Class<? extends Object> eventType : environment2.getSubtypesOf(type)) {
+                    events.append("    " + eventType.getName()); //  + " | Event Module: " + environment2.getModuleProviding(eventType)
+                    events.append(System.getProperty("line.separator"));
                 }
             }
         }
-        env.close();
+        StringBuilder out = new StringBuilder();
+        if (events.length() > 0) {
+            out.append("Module Events: ");
+            out.append(System.getProperty("line.separator"));
+            out.append(events);
+            out.append(System.getProperty("line.separator"));
+        } else {
+            out.append("Module Events: None");
+            out.append(System.getProperty("line.separator"));
+        }
+        return out.toString();
     }
 
     private static String getModuleDescription(final ModuleManager moduleManager, final Module module) {
@@ -105,39 +159,44 @@ public final class ModuleMarkupScraper {
         }
         final ModuleMetadata metadata = module.getMetadata();
 
-        StringBuilder dependenciesNames = new StringBuilder();
-        dependenciesNames.append(System.getProperty("line.separator"));
-        dependenciesNames.append("ID: " + metadata.getId());
-        dependenciesNames.append(System.getProperty("line.separator"));
-        dependenciesNames.append("Display Name: " + metadata.getDisplayName());
-        dependenciesNames.append(System.getProperty("line.separator"));
-        dependenciesNames.append("Version: " + metadata.getVersion());
-        dependenciesNames.append(System.getProperty("line.separator"));
-        dependenciesNames.append("Description: " + metadata.getDescription());
-        dependenciesNames.append(System.getProperty("line.separator"));
-        dependenciesNames.append("Permissions: " + String.join(", ", metadata.getRequiredPermissions()));
-        dependenciesNames.append(System.getProperty("line.separator"));
-        dependenciesNames.append("Github: " + getOriginModuleUrl(module));
-        dependenciesNames.append(System.getProperty("line.separator"));
-        dependenciesNames.append("Author: " + ExtraDataModuleExtension.getAuthor(module));
-        dependenciesNames.append(System.getProperty("line.separator"));
-        dependenciesNames.append("Categories: " + getModuleTags(module));
-        dependenciesNames.append(System.getProperty("line.separator"));
+        StringBuilder details = new StringBuilder();
+        details.append(System.getProperty("line.separator"));
+        details.append("ID: " + metadata.getId());
+        details.append(System.getProperty("line.separator"));
+        details.append("Display Name: " + metadata.getDisplayName());
+        details.append(System.getProperty("line.separator"));
+        details.append("Version: " + metadata.getVersion());
+        details.append(System.getProperty("line.separator"));
+        details.append("Description: " + metadata.getDescription());
+        details.append(System.getProperty("line.separator"));
+        details.append("Permissions: " + String.join(", ", metadata.getRequiredPermissions()));
+        details.append(System.getProperty("line.separator"));
+        details.append("Github: " + getOriginModuleUrl(module));
+        details.append(System.getProperty("line.separator"));
+        details.append("Author: " + ExtraDataModuleExtension.getAuthor(module));
+        details.append(System.getProperty("line.separator"));
+        details.append("Categories: " + getModuleTags(module));
+        details.append(System.getProperty("line.separator"));
+        details.append("Dependencies: ");
 
         final List<DependencyInfo> dependencies = metadata.getDependencies();
+        StringBuilder dependenciesNames = new StringBuilder();
         if (dependencies != null && !dependencies.isEmpty()) {
-            dependenciesNames.append("Dependencies: ");
             for (DependencyInfo dependency : dependencies) {
-                dependenciesNames
-                        .append("   ")
-                        .append(dependency.getId().toString())
-                        .append('\n');
+                if (dependenciesNames.length() > 0) {
+                    dependenciesNames
+                            .append(", ")
+                            .append(dependency.getId().toString());
+                } else {
+                    dependenciesNames.append(dependency.getId().toString());
+                }
             }
         } else {
-            dependenciesNames.append("Dependencies: None");
+            dependenciesNames.append("None");
         }
-        dependenciesNames.append(System.getProperty("line.separator"));
-        return dependenciesNames.toString();
+        details.append(dependenciesNames);
+        details.append(System.getProperty("line.separator"));
+        return details.toString();
     }
 
     private static String getOriginModuleUrl(Module module) {

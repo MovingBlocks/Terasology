@@ -24,6 +24,7 @@ import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataReader;
 import org.terasology.naming.Name;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
@@ -35,6 +36,15 @@ public final class ModuleManagerFactory {
 
     public static ModuleManager create() throws Exception {
         ModuleManager moduleManager = new ModuleManagerImpl("");
+        return LoadModuleEnvironment(moduleManager);
+    }
+
+    public static ModuleManager create(String masterServerAddress) throws Exception {
+        ModuleManager moduleManager = new ModuleManagerImpl(masterServerAddress);
+        return LoadModuleEnvironment(moduleManager);
+    }
+
+    private static ModuleManager LoadModuleEnvironment(ModuleManager moduleManager) throws Exception {
         try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
             moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));

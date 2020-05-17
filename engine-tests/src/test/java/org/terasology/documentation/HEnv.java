@@ -27,131 +27,36 @@ import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.Game;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleImpl;
+import org.terasology.module.DependencyResolver;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ModuleRegistry;
+import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.recording.*;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-
-import java.nio.file.FileSystem;
-import java.nio.file.Path;
-
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import org.codehaus.plexus.util.StringUtils;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.terasology.HeadlessEnvironment;
-import org.terasology.assets.AssetFactory;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
-import org.terasology.config.SelectModulesConfig;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.*;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
-import org.terasology.engine.module.ExtraDataModuleExtension;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.RemoteModuleExtension;
-import org.terasology.engine.module.StandardModuleExtension;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.headless.HeadlessAudio;
-import org.terasology.engine.subsystem.headless.HeadlessGraphics;
-import org.terasology.engine.subsystem.headless.HeadlessInput;
-import org.terasology.engine.subsystem.headless.HeadlessTimer;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.MetadataUtil;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
-import org.terasology.game.Game;
-import org.terasology.i18n.TranslationSystem;
-import org.terasology.i18n.TranslationSystemImpl;
-import org.terasology.input.*;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleImpl;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.module.*;
-import org.terasology.module.predicates.FromModule;
-import org.terasology.naming.Name;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.ReadWriteStorageManager;
-import org.terasology.recording.*;
-import org.terasology.reflection.TypeRegistry;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.layers.mainMenu.UniverseWrapper;
-import org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen.ModuleSelectionInfo;
-import org.terasology.rendering.nui.widgets.ResettableUIText;
-import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.testUtil.ModuleManagerFactory;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.block.BlockLifecycleEvent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.generator.internal.WorldGeneratorManager;
 
-import java.lang.annotation.Annotation;
-import java.nio.file.FileSystem;
-import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.nio.file.FileSystem;
+import java.util.Set;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Environment with a MapWorldProvider and BlockManager. Useful to get headless environment with a generated world.
  */
 public class HEnv extends HeadlessEnvironment {
-
     //protected static Context context;
-
-    private static ModuleManager moduleManager;
-
-    //private static HeadlessEnvironment env;
-
     protected static EngineTime mockTime;
+    //private static HeadlessEnvironment env;
+    private static ModuleManager moduleManager;
     //private static EngineEntityManager engineEntityManager;
 
     public HEnv(Name... modules) throws IOException {
@@ -170,7 +75,6 @@ public class HEnv extends HeadlessEnvironment {
         //env = new HeadlessEnvironment(new Name("engine"));
         //context = env.getContext();
         moduleManager = context.get(ModuleManager.class);
-
 
         context.put(ModuleManager.class, moduleManager);
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
@@ -197,7 +101,7 @@ public class HEnv extends HeadlessEnvironment {
 
         //Path savePath = PathManager.getInstance().getSavePath("world1");
         //context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-         //       engineEntityManager, mockBlockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+        //       engineEntityManager, mockBlockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
@@ -211,17 +115,38 @@ public class HEnv extends HeadlessEnvironment {
         context.get(ComponentSystemManager.class).initialise();
         context.put(Console.class, new ConsoleImpl(context));
 
-
         this.setupAssetManager();
-        //this.setupAssetManager();
+    }
+
+    @Override
+    protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
+        TypeRegistry typeRegistry = new TypeRegistry();
+        context.put(TypeRegistry.class, typeRegistry);
+
+        ModuleManager moduleManager = ModuleManagerFactory.create("meta.terasology.org");
+        ModuleRegistry registry = moduleManager.getRegistry();
+
+        DependencyResolver resolver = new DependencyResolver(registry);
+        ResolutionResult result = resolver.resolve(moduleNames);
+
+        if (result.isSuccess()) {
+            ModuleEnvironment modEnv = moduleManager.loadEnvironment(result.getModules(), true);
+            typeRegistry.reload(modEnv);
+            System.out.println("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
+        } else {
+            System.out.println("Could not resolve module dependencies for " + moduleNames);
+        }
+
+        context.put(ModuleManager.class, moduleManager);
+
+        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
     }
 
     public ModuleManager getModelManager() {
         return moduleManager;
     }
 
-    public Context getContext(){
+    public Context getContext() {
         return context;
     }
-
 }
