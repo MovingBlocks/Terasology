@@ -155,8 +155,8 @@ public class BlockItemSystem extends BaseComponentSystem {
         if (!block.isPenetrable()) {
             Physics physics = CoreRegistry.get(Physics.class);
             AABBf blockBounds = block.getBounds(JomlUtil.from(blockPos), new AABBf());
-            Vector3f min = new Vector3f(new Vector3f(blockBounds.minX,blockBounds.minY,blockBounds.minZ));
-            Vector3f max = new Vector3f(new Vector3f(blockBounds.maxX,blockBounds.maxY,blockBounds.maxZ));
+            Vector3f min = new Vector3f(blockBounds.minX,blockBounds.minY,blockBounds.minZ);
+            Vector3f max = new Vector3f(blockBounds.maxX,blockBounds.maxY,blockBounds.maxZ);
 
             /**
              * Characters can enter other solid objects/blocks for certain amount. This is does to detect collsion
