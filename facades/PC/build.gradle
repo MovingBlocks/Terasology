@@ -16,6 +16,10 @@
 
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
+plugins {
+    id "application"
+}
+
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/publish.gradle"
 
@@ -68,6 +72,10 @@ ext {
     versionFileName = 'VERSION'
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
+}
+
+application {
+    mainClassName project.ext.mainClassName
 }
 
 // Adjust as the Gradle 6 upgrade changed this path a bit
@@ -124,6 +132,11 @@ configurations {
     modules {
         transitive = false
     }
+}
+
+run {
+    jvmArgs "-Xmx1536m", "-XshowSettings:properties"
+    workingDir rootDir
 }
 
 task game(type:JavaExec) {
