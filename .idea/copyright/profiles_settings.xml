@@ -1,3 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="TerasologyEngine" />
+  <settings default="TerasologyEngine">
+    <LanguageOptions name="Properties">
+      <option name="fileTypeOverride" value="1" />
+    </LanguageOptions>
+  </settings>
 </component>
