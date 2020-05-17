@@ -15,6 +15,7 @@
  */
 package org.terasology.math;
 
+import org.joml.AABBf;
 import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
@@ -36,6 +37,7 @@ import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 
 public class JomlUtil {
 
@@ -109,5 +111,13 @@ public class JomlUtil {
 
     public static Quaternionf from(BaseQuat4f quat) {
         return new Quaternionf(quat.getX(), quat.getY(), quat.getZ(), quat.getW());
+    }
+
+    public static AABBf from(AABB aabb) {
+        return new AABBf(aabb.minX(),aabb.minY(),aabb.minZ(),aabb.maxX(),aabb.maxY(),aabb.maxZ());
+    }
+
+    public static AABB from(AABBf aabb) {
+        return AABB.createMinMax(new Vector3f(aabb.minX,aabb.minY,aabb.minZ),new Vector3f(aabb.maxX,aabb.maxY,aabb.maxZ));
     }
 }
