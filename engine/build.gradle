@@ -16,9 +16,12 @@
 
 // The engine build is the primary Java project and has the primary list of dependencies
 
+plugins {
+    id "java-library"
+}
+
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/publish.gradle"
-apply plugin: "java-library"
 
 import groovy.json.JsonSlurper
 import org.reflections.Reflections
