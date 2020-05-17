@@ -15,6 +15,7 @@
  */
 package org.terasology.physics.bullet;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.physics.bullet.shapes.BulletCollisionShape;
 import org.terasology.physics.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
@@ -54,7 +55,7 @@ public class PhysicsLiquidWrapper implements VoxelPhysicsWorld {
 
          LiquidVoxelInfo(Block block, Vector3i position) {
             this.shape = block.getCollisionShape();
-            this.offset = block.getCollisionOffset();
+            this.offset = JomlUtil.from(block.getCollisionOffset());
             this.colliding = block.isLiquid();
             this.blocking = false;
             this.position = position;

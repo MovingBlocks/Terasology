@@ -16,6 +16,7 @@
 
 package org.terasology.physics.bullet;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.physics.bullet.shapes.BulletCollisionShape;
 import org.terasology.physics.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
@@ -60,7 +61,7 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
 
          TeraVoxelInfo(Block block, boolean colliding, boolean blocking, Vector3i position) {
             this.shape = block.getCollisionShape();
-            this.offset = block.getCollisionOffset();
+            this.offset = JomlUtil.from(block.getCollisionOffset());
             this.colliding = shape != null && colliding;
             this.blocking = shape != null && blocking;
             this.position = position;

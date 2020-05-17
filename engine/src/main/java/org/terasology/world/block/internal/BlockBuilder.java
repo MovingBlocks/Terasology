@@ -17,6 +17,7 @@ package org.terasology.world.block.internal;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.terasology.math.JomlUtil;
 import org.terasology.utilities.Assets;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -118,7 +119,7 @@ public class BlockBuilder implements BlockBuilderHelper {
         block.setRotation(rotation);
         block.setPrimaryAppearance(createAppearance(shape, section.getBlockTiles(), rotation));
         setBlockFullSides(block, shape, rotation);
-        block.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation));
+        block.setCollision(JomlUtil.from(shape.getCollisionOffset(rotation)), shape.getCollisionShape(rotation));
 
         block.setUri(uri);
         block.setBlockFamily(blockFamily);
@@ -149,7 +150,7 @@ public class BlockBuilder implements BlockBuilderHelper {
         block.setShadowCasting(def.isShadowCasting());
         block.setWaving(def.isWaving());
         block.setLuminance(def.getLuminance());
-        block.setTint(def.getTint());
+        block.setTint(JomlUtil.from(def.getTint()));
         if (Strings.isNullOrEmpty(def.getDisplayName())) {
             block.setDisplayName(properCase(defaultName));
         } else {

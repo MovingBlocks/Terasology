@@ -16,18 +16,14 @@
 package org.terasology.math;
 
 import org.joml.AABBf;
-import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
-import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
-import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.terasology.math.geom.BaseMatrix3f;
 import org.terasology.math.geom.BaseMatrix4f;
@@ -63,8 +59,8 @@ public class JomlUtil {
     }
 
 
-    public static Matrix3f from(BaseMatrix3f mat) {
-        return new Matrix3f(mat.getM00(), mat.getM01(), mat.getM02(),
+    public static org.joml.Matrix3f from(BaseMatrix3f mat) {
+        return new org.joml.Matrix3f(mat.getM00(), mat.getM01(), mat.getM02(),
                 mat.getM10(), mat.getM11(), mat.getM12(),
                 mat.getM20(), mat.getM21(), mat.getM22());
     }
@@ -90,7 +86,7 @@ public class JomlUtil {
     }
 
     public static org.joml.Vector4f from(BaseVector4f vec) {
-        return new Vector4f(vec.x(), vec.y(), vec.z(), vec.w());
+        return new org.joml.Vector4f(vec.x(), vec.y(), vec.z(), vec.w());
     }
 
     public static org.joml.Vector3f from(BaseVector3f vec) {
@@ -108,6 +104,7 @@ public class JomlUtil {
     public static Quat4f from(Quaternionfc quat) {
         return new Quat4f(quat.x(), quat.y(), quat.z(), quat.w());
     }
+
 
     public static Quaternionf from(BaseQuat4f quat) {
         return new Quaternionf(quat.getX(), quat.getY(), quat.getZ(), quat.getW());

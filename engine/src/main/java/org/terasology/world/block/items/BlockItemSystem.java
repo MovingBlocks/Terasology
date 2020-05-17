@@ -15,6 +15,8 @@
  */
 package org.terasology.world.block.items;
 
+import org.joml.AABBf;
+import org.terasology.math.JomlUtil;
 import org.terasology.telemetry.GamePlayStatsComponent;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
@@ -152,9 +154,9 @@ public class BlockItemSystem extends BaseComponentSystem {
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
             Physics physics = CoreRegistry.get(Physics.class);
-            AABB blockBounds = block.getBounds(blockPos);
-            Vector3f min = new Vector3f(blockBounds.getMin());
-            Vector3f max = new Vector3f(blockBounds.getMax());
+            AABBf blockBounds = block.getBounds(JomlUtil.from(blockPos), new AABBf());
+            Vector3f min = new Vector3f(new Vector3f(blockBounds.minX,blockBounds.minY,blockBounds.minZ));
+            Vector3f max = new Vector3f(new Vector3f(blockBounds.maxX,blockBounds.maxY,blockBounds.maxZ));
 
             /**
              * Characters can enter other solid objects/blocks for certain amount. This is does to detect collsion

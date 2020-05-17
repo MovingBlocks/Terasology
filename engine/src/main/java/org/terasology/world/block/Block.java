@@ -18,7 +18,11 @@ package org.terasology.world.block;
 import com.google.common.collect.Maps;
 import org.joml.AABBf;
 import org.joml.Math;
+import org.joml.Quaternionf;
+import org.joml.RoundingMode;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -29,9 +33,8 @@ import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Transform;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.geom.BaseVector3f;
+import org.terasology.math.geom.BaseVector3i;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -46,7 +49,6 @@ import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.chunks.ChunkConstants;
 
-import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Optional;
 
@@ -593,7 +595,7 @@ public final class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        bounds = shape.getAABB(new Transform(offset, new Quat4f(0, 0, 0, 1), 1.0f));
+        bounds = shape.getAABB(new Transform(JomlUtil.from(offset), JomlUtil.from(new Quaternionf(0, 0, 0, 1)), 1.0f));
     }
 
     public CollisionShape getCollisionShape() {
@@ -602,31 +604,6 @@ public final class Block {
 
     public Vector3f getCollisionOffset() {
         return collisionOffset;
-    }
-
-    /**
-     * The Bounds of the block with a given position in the world
-     *
-     * @param pos The Position
-     * @return absolute bounds of the block
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getBounds(Vector3ic, AABBf)}.
-     */
-    @Deprecated
-    public AABB getBounds(Vector3i pos) {
-        return JomlUtil.from(bounds).move(pos.toVector3f());
-    }
-
-    /**
-     *  The Bounds of the block with a given position in the world rounded half up
-     * @param floatPos The Position
-     * @return absolute bounds of the block
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getBounds(Vector3fc, AABBf)}.
-     */
-    @Deprecated
-    public AABB getBounds(Vector3f floatPos) {
-        return getBounds(new Vector3i(floatPos, RoundingMode.HALF_UP));
     }
 
     /**
