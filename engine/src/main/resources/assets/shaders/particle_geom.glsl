@@ -47,20 +47,20 @@ void main() {
     position.y += scale_vs[0].y;
     gl_Position = view_projection * vec4(position, 1);
     color_gs = color_vs[0];
-    uv = vec2(texture_offset_vs[0].x, texture_size.y);
+    uv = vec2(0, texture_size.y) + texture_offset_vs[0];
     EmitVertex();
 
     position -= right * scale_vs[0].x;
     position.y -= scale_vs[0].y;
     gl_Position = view_projection * vec4(position, 1);
     color_gs = color_vs[0];
-    uv = vec2(texture_size.x, texture_offset_vs[0].y);
+    uv = vec2(texture_size.x, 0) + texture_offset_vs[0];
     EmitVertex();
 
     position.y += scale_vs[0].y;
     gl_Position = view_projection * vec4(position, 1);
     color_gs = color_vs[0];
-    uv = texture_size;
+    uv = texture_size + texture_offset_vs[0];
     EmitVertex();
 
     EndPrimitive();
