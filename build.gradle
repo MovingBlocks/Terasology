@@ -27,22 +27,25 @@ buildscript {
         // Needed for caching reflected data during builds
         classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
-
-        //Spotbugs
-        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
-
-        // SonarQube / Cloud scanning
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
     }
 }
 
 plugins {
     // Needed for extending the "clean" task to also delete custom stuff defined here like natives
     id "base"
+
+    // IDEs
+    // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
+    // id "eclipse" apply false
     id "idea"
 
-    // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
-    // id "eclipse"
+    // Analytics
+    id "project-report"
+    id "checkstyle"
+    id "pmd"
+    id "com.github.spotbugs" version "4.2.0"
+    id "jacoco"
+    id "org.sonarqube" version "2.8"
 }
 
 import java.nio.file.Files
@@ -54,6 +57,19 @@ assert org.gradle.api.JavaVersion.current().isJava8Compatible()
 
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 import static org.gradle.internal.logging.text.StyledTextOutput.Style
+
+subprojects {
+    apply plugin: "jacoco"
+    apply plugin: "idea"
+    apply plugin: "eclipse"
+
+    apply plugin: "project-report"
+    apply plugin: "checkstyle"
+    apply plugin: "pmd"
+    apply plugin: "com.github.spotbugs"
+    apply plugin: "jacoco"
+    apply plugin: "org.sonarqube"
+}
 
 // Check for Java 8
 if(JavaVersion.current() != JavaVersion.VERSION_1_8){

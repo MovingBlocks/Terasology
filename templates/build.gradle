@@ -13,12 +13,6 @@ buildscript {
         // Needed for caching reflected data during builds
         classpath 'org.reflections:reflections:0.9.10'
         classpath 'dom4j:dom4j:1.6.1'
-
-        //Spotbugs
-        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
-
-        // SonarQube / Cloud scanning
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
     }
 }
 
@@ -28,6 +22,10 @@ import org.reflections.util.FilterBuilder
 import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
+
+plugins {
+    id "java-library"
+}
 
 ext {
     // Read environment variables, including variables passed by jenkins continuous integration server

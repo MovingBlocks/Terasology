@@ -1,8 +1,11 @@
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
 
+plugins {
+    id "java-library"
+}
+
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/publish.gradle"
-apply plugin: "java-library"
 
 import groovy.json.JsonSlurper
 

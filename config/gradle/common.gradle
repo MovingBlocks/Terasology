@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-// language
-apply plugin: 'java'
-
-// IDEs
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-
-// Analytics
-apply plugin: 'project-report'
-apply plugin: 'checkstyle'
-apply plugin: 'pmd'
-apply plugin: 'com.github.spotbugs'
-apply plugin: 'jacoco'
-apply plugin: 'org.sonarqube'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -63,12 +49,6 @@ repositories {
             url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
         }
     }
-}
-
-dependencies {
-    pmd('net.sourceforge.pmd:pmd-core:6.15.0')
-    pmd('net.sourceforge.pmd:pmd-java:6.15.0')
-    // the FindBugs version is set in the configuration
 }
 
 task sourceJar(type: Jar) {
@@ -107,10 +87,6 @@ test {
         excludes = ["org.terasology.protobuf.*",
                     "*MethodAccess","*FieldAccess"]
     }
-}
-
-jacoco {
-    toolVersion = "0.8.5"
 }
 
 jacocoTestReport {

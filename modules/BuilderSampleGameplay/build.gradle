@@ -32,6 +32,10 @@ import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 
+plugins {
+    id "java-library"
+}
+
 ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
     env = System.getenv()
