@@ -20,21 +20,30 @@ import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
 import org.terasology.HeadlessEnvironment;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ExtraDataModuleExtension;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.module.*;
 import org.terasology.naming.Name;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+
+import static org.terasology.engine.module.StandardModuleExtension.IS_ASSET;
+import static org.terasology.engine.module.StandardModuleExtension.IS_WORLD;
 
 public final class ModuleMarkupScraper {
 
@@ -52,7 +61,6 @@ public final class ModuleMarkupScraper {
 
     private ModuleMarkupScraper() throws IOException {
         super();
-
     }
 
     /**
@@ -60,7 +68,6 @@ public final class ModuleMarkupScraper {
      * @throws Exception if the module environment cannot be loaded
      */
     public static void main(String[] args) throws Exception {
-
         env = new HEnv(new Name("engine"));
         context = env.getContext();
         moduleManager = context.get(ModuleManager.class);
@@ -73,21 +80,25 @@ public final class ModuleMarkupScraper {
         StringBuilder out = new StringBuilder();
 
         List<Module> allModules = Lists.newArrayList();
+
+        List<Module> gameModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
             if (!latestVersion.isOnClasspath()) {
-                allModules.add(latestVersion);
+                gameModules.add(latestVersion);
                 System.out.println("Found Game Module: " + latestVersion.getId());
             }
         }
 
+        List<Module> remoteModules = Lists.newArrayList();
         Iterable<Module> remoteModuleRegistry = moduleManager.getInstallManager().getRemoteRegistry();
         Set<Name> filtered = ImmutableSet.of(TerasologyConstants.ENGINE_MODULE, new Name("engine-test"));
         for (Module remote : remoteModuleRegistry) {
-            allModules.add(remote);
+            remoteModules.add(remote);
             System.out.println("Found Remote Module: " + remote.getId());
         }
-
+        allModules.addAll(gameModules);
+        allModules.addAll(remoteModules);
         allModules.sort(moduleInfoComparator);
 
         List<Module> allSortedModules;
@@ -97,11 +108,10 @@ public final class ModuleMarkupScraper {
         for (Module module : allSortedModules) {
             Name moduleId = module.getId();
             if (module.isCodeModule()) {
-                out.append("Examining Module: " + moduleId);
-                out.append(System.getProperty("line.separator"));
+                out.append("## Module: ").append(moduleId);
 
-                String moduleDescription = getModuleDescription(moduleManager, module);
-                out.append("Module Description: " + moduleDescription);
+                String moduleDescription = getModuleDescription(module);
+                out.append(moduleDescription);
 
                 Set<Module> modules = new HashSet<>();
                 ResolutionResult result = resolver.resolve(moduleId);
@@ -117,6 +127,14 @@ public final class ModuleMarkupScraper {
         }
 
         System.out.println(out);
+
+        String fileName = "API_file.md";
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(fileName)));
+        writer.write(out.toString());
+        writer.flush();
+        writer.close();
+        System.out.println("Module Wiki generation file is ready!");
+
         env.close();
     }
 
@@ -130,76 +148,197 @@ public final class ModuleMarkupScraper {
                 if (!mod.toString().equals(moduleId.toString()))
                     continue;
 
-                events.append("  " + type.getName()); //  + " | From Module: " + mod
+                events.append("  ").append(type.getName());
                 events.append(System.getProperty("line.separator"));
 
                 // Are there any other classes derived from this class?
                 for (Class<? extends Object> eventType : environment2.getSubtypesOf(type)) {
-                    events.append("    " + eventType.getName()); //  + " | Event Module: " + environment2.getModuleProviding(eventType)
+                    events.append("    ").append(eventType.getName());
                     events.append(System.getProperty("line.separator"));
                 }
             }
         }
         StringBuilder out = new StringBuilder();
         if (events.length() > 0) {
-            out.append("Module Events: ");
+            out.append("**Module Events:** ");
             out.append(System.getProperty("line.separator"));
             out.append(events);
             out.append(System.getProperty("line.separator"));
         } else {
-            out.append("Module Events: None");
+            out.append("**Module Events:** None");
             out.append(System.getProperty("line.separator"));
         }
         return out.toString();
     }
 
-    private static String getModuleDescription(final ModuleManager moduleManager, final Module module) {
-        if (module == null || module.getMetadata() == null) {
-            return "";
+    private static String getModuleDescription(final Module module) {
+        if (module == null) {
+            throw new IllegalArgumentException("ModuleMarkupScraper:getModuleDependencies() - Module must be valid.");
+        }
+
+        if (module.getMetadata() == null) {
+            throw new IllegalStateException("ModuleMarkupScraper:getModuleDependencies() - ModuleMetadata must be valid.");
         }
         final ModuleMetadata metadata = module.getMetadata();
 
         StringBuilder details = new StringBuilder();
         details.append(System.getProperty("line.separator"));
-        details.append("ID: " + metadata.getId());
+        details.append("- **ID:** ").append(metadata.getId());
         details.append(System.getProperty("line.separator"));
-        details.append("Display Name: " + metadata.getDisplayName());
+        details.append("- **Display Name:** ").append(metadata.getDisplayName());
         details.append(System.getProperty("line.separator"));
-        details.append("Version: " + metadata.getVersion());
+        details.append("- **Version:** ").append(metadata.getVersion());
         details.append(System.getProperty("line.separator"));
-        details.append("Description: " + metadata.getDescription());
+        details.append("- **Description:** ").append(metadata.getDescription());
         details.append(System.getProperty("line.separator"));
-        details.append("Permissions: " + String.join(", ", metadata.getRequiredPermissions()));
+        details.append("- **Permissions:** ").append(String.join(", ", metadata.getRequiredPermissions()));
         details.append(System.getProperty("line.separator"));
-        details.append("Github: " + getOriginModuleUrl(module));
+        details.append("- **Github:** ").append(getOriginModuleUrl(module));
         details.append(System.getProperty("line.separator"));
-        details.append("Author: " + ExtraDataModuleExtension.getAuthor(module));
+        details.append("- **Author:** ").append(ExtraDataModuleExtension.getAuthor(module));
         details.append(System.getProperty("line.separator"));
-        details.append("Categories: " + getModuleTags(module));
+        details.append("- **Categories:** ").append(getModuleTags(module));
         details.append(System.getProperty("line.separator"));
-        details.append("Dependencies: ");
 
-        final List<DependencyInfo> dependencies = metadata.getDependencies();
-        StringBuilder dependenciesNames = new StringBuilder();
-        if (dependencies != null && !dependencies.isEmpty()) {
-            for (DependencyInfo dependency : dependencies) {
-                if (dependenciesNames.length() > 0) {
-                    dependenciesNames
-                            .append(", ")
-                            .append(dependency.getId().toString());
-                } else {
-                    dependenciesNames.append(dependency.getId().toString());
-                }
-            }
-        } else {
-            dependenciesNames.append("None");
-        }
-        details.append(dependenciesNames);
+        details.append(getModuleExtensions(module));
+
+        details.append(getModuleDependencies(metadata));
+
         details.append(System.getProperty("line.separator"));
         return details.toString();
     }
 
+    private static String getModuleDependencies(ModuleMetadata metadata) {
+        if (metadata == null) {
+            throw new IllegalArgumentException("ModuleMarkupScraper:getModuleDependencies() - ModuleMetadata must be valid.");
+        }
+
+        StringBuilder out = new StringBuilder();
+        final List<DependencyInfo> dependencies = metadata.getDependencies();
+        StringBuilder dependenciesNames = new StringBuilder();
+        if (dependencies != null && !dependencies.isEmpty()) {
+            for (DependencyInfo dependency : dependencies) {
+
+                if (dependenciesNames.length() > 0) {
+                    dependenciesNames.append(", ");
+                }
+
+                dependenciesNames
+                        .append(System.getProperty("line.separator"))
+                        .append("|  _").append(dependency.getId()).append("_ |")
+                        .append(dependency.getMinVersion() == null ? "" : "  _").append(dependency.getMinVersion()).append("_ |")
+                        .append(dependency.getMaxVersion() == null ? "" : "  _").append(dependency.getMaxVersion()).append("_ |")
+                        .append(dependency.getMaxVersion() == null ? "" : "  _").append(!dependency.isOptional()).append("_ |");
+            }
+
+            out.append(System.getProperty("line.separator"));
+            out.append("**Dependencies:** ");
+            out.append(System.getProperty("line.separator"));
+            out.append("| Module | MinVersion | MaxVersion | Required |");
+            out.append(System.getProperty("line.separator"));
+            out.append("| -------- | ---------- | ---------- | ---------- |");
+            out.append(dependenciesNames);
+        } else {
+            out.append(System.getProperty("line.separator"));
+            out.append("**Dependencies:** _None_");
+        }
+        return out.toString();
+    }
+
+    private static String getModuleExtensions(Module module) {
+        if (module == null) {
+            throw new IllegalArgumentException("ModuleMarkupScraper:getModuleExtensions() - Module must be valid.");
+        }
+        ModuleMetadata metadata = module.getMetadata();
+        StringBuilder extensions = new StringBuilder();
+        URL downloadUri = RemoteModuleExtension.getDownloadUrl(metadata);
+        if (downloadUri != null) {
+            extensions.append("|  Download Uri: | _").append(downloadUri).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        Date lastUpdate = RemoteModuleExtension.getLastUpdated(metadata);
+        if (lastUpdate != null) {
+            extensions.append("|  Last Update: | _").append(lastUpdate).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        Long size = RemoteModuleExtension.getArtifactSize(metadata);
+        if (size != null) {
+            extensions.append("|  Artifact Size: | _").append(size).append(" bytes").append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        String author = ExtraDataModuleExtension.getAuthor(module);
+        if (author != null && StringUtils.isNotEmpty(author)) {
+            extensions.append("|  Author: | _").append(author).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        String origin = ExtraDataModuleExtension.getOrigin(module);
+        if (origin != null && StringUtils.isNotEmpty(origin)) {
+            extensions.append("|  Origin: | _").append(origin).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        Boolean serverSideOnly = StandardModuleExtension.isServerSideOnly(module);
+        if (serverSideOnly != null) {
+            extensions.append("|  serverSideOnly: | _").append(serverSideOnly).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        Boolean gameplayModule = StandardModuleExtension.isGameplayModule(module);
+        if (gameplayModule != null) {
+            extensions.append("|  gameplayModule: | _").append(gameplayModule).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        Boolean isAsset = (Boolean) metadata.getExtension(IS_ASSET.getKey(), Boolean.class);
+        if (isAsset != null) {
+            extensions.append("|  IS_ASSET: | _").append(isAsset).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        Boolean isWorld = (Boolean) metadata.getExtension(IS_WORLD.getKey(), Boolean.class);
+        if (isAsset != null) {
+            extensions.append("|  IS_WORLD: | _").append(isWorld).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        Boolean isLibrary = (Boolean) metadata.getExtension(StandardModuleExtension.IS_LIBRARY.getKey(), Boolean.class);
+        if (isAsset != null) {
+            extensions.append("|  IS_LIBRARY: | _").append(isLibrary).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        Boolean isSpecial = (Boolean) metadata.getExtension(StandardModuleExtension.IS_SPECIAL.getKey(), Boolean.class);
+        if (isAsset != null) {
+            extensions.append("|  IS_SPECIAL: | _").append(isSpecial).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        Boolean isAug = (Boolean) metadata.getExtension(StandardModuleExtension.IS_AUGMENTATION.getKey(), Boolean.class);
+        if (isAsset != null) {
+            extensions.append("|  IS_AUGMENTATION: | _").append(isAug).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+        SimpleUri defaultWorldGenerator = StandardModuleExtension.getDefaultWorldGenerator(module);
+        if (defaultWorldGenerator != null && defaultWorldGenerator.isValid()) {
+            extensions.append("|  Default World Generator: | _").append(defaultWorldGenerator).append("_ |");
+            extensions.append(System.getProperty("line.separator"));
+        }
+
+        StringBuilder out = new StringBuilder();
+        out.append(System.getProperty("line.separator"))
+        if (extensions.length() > 0) {
+            out.append(System.getProperty("line.separator"));
+            out.append("**Extensions:**");
+            out.append(System.getProperty("line.separator"));
+            out.append("| Extension | Value |");
+            out.append(System.getProperty("line.separator"));
+            out.append("| -------- | ---------- |");
+            out.append(System.getProperty("line.separator"));
+            out.append(extensions);
+        } else {
+            out.append(System.getProperty("line.separator"));
+            out.append("**Extensions:** _None_");
+        }
+        return out.toString();
+    }
+
     private static String getOriginModuleUrl(Module module) {
+        if (module == null) {
+            throw new IllegalArgumentException("ModuleMarkupScraper:getOriginModuleUrl() - Module must be valid.");
+        }
         final String origin = ExtraDataModuleExtension.getOrigin(module);
         if (StringUtils.isBlank(origin) && !INTERNAL_MODULES.contains(module.getId().toString())) {
             return DEFAULT_GITHUB_MODULE_URL + module.getId();
@@ -208,6 +347,12 @@ public final class ModuleMarkupScraper {
     }
 
     private static String getOnlineVersion(final ModuleManager moduleManager, final DependencyInfo dependencyInfo) {
+        if (moduleManager == null) {
+            throw new IllegalArgumentException("ModuleMarkupScraper:getOriginModuleUrl() - ModuleManager must be valid.");
+        }
+        if (dependencyInfo == null) {
+            throw new IllegalArgumentException("ModuleMarkupScraper:getOriginModuleUrl() - DependencyInfo must be valid.");
+        }
         return moduleManager.getInstallManager().getRemoteRegistry().stream()
                 .filter(module -> module.getId().equals(dependencyInfo.getId()))
                 .findFirst()
@@ -217,6 +362,9 @@ public final class ModuleMarkupScraper {
     }
 
     private static String getModuleTags(final Module module) {
+        if (module == null) {
+            throw new IllegalArgumentException("ModuleMarkupScraper:getOriginModuleUrl() - Module must be valid.");
+        }
         return StandardModuleExtension.booleanPropertySet().stream()
                 .filter(ext -> ext.isProvidedBy(module))
                 .map(StandardModuleExtension::getKey)
