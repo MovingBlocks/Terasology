@@ -69,6 +69,7 @@ group = 'org.terasology.facades'
 
 dependencies {
     implementation project(':engine')
+    implementation project(":modules")
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
@@ -124,8 +125,7 @@ task game(type:JavaExec) {
     group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
-    dependsOn rootProject.extractNatives
-    dependsOn rootProject.moduleClasses
+    dependsOn ":extractNatives"
     dependsOn classes
 
     // Run arguments
@@ -147,8 +147,7 @@ task profile(type:JavaExec) {
     group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
-    dependsOn rootProject.extractNatives
-    dependsOn rootProject.moduleClasses
+    dependsOn ":extractNatives"
     dependsOn classes
 
     // Run arguments
@@ -171,8 +170,7 @@ task debug(type:JavaExec) {
     group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
-    dependsOn rootProject.extractNatives
-    dependsOn rootProject.moduleClasses
+    dependsOn ":extractNatives"
     dependsOn classes
 
     // Run arguments
@@ -251,8 +249,7 @@ task server(type:JavaExec) {
     group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
-    dependsOn rootProject.extractNatives
-    dependsOn rootProject.moduleClasses
+    dependsOn ":extractNatives"
     dependsOn classes
     dependsOn setupServerConfig
     dependsOn setupServerModules
@@ -337,14 +334,14 @@ task distApp (type: Sync) {
 task distModules (type: Sync) {
     description = "Prepares local modules for distribution"
     dependsOn distApp
-    dependsOn rootProject.moduleJars
 
+    logger.error("FIXME")  // FIXME keturn broke this
     // So this is probably a hack, but it works ;-) It does not work if it is in distApp, default "into" quirk ?
-    into("$distsDirectory/app/modules")
-    rootProject.terasologyModules().each {
-        from "$rootDir/modules/${it.name}/build/libs"
-        include "*.jar"
-    }
+//    into("$distsDirectory/app/modules")
+//    rootProject.terasologyModules().each {
+//        from "$rootDir/modules/${it.name}/build/libs"
+//        include "*.jar"
+//    }
 }
 
 task distPCZip (type: Zip) {

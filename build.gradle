@@ -173,23 +173,6 @@ task extractConfig(type: Copy) {
     into "$rootDir/$dirConfigMetrics"
 }
 
-// Helper that returns a list of all local Terasology module projects
-def terasologyModules() {
-    subprojects.findAll { it.parent.name == 'modules' }
-}
-
-// Helpers that do magic things after having dependencies attached below
-task moduleClasses
-task moduleJars
-
-// This magically makes everything work - without this the desired module projects returned have no tasks :-(
-gradle.projectsEvaluated {
-    // Note how "classes" may indirectly trigger "jar" for module dependencies of modules (module compile dependency)
-    moduleClasses.dependsOn(terasologyModules().classes)
-
-    // This makes it work for a full jar task
-    moduleJars.dependsOn(terasologyModules().jar)
-}
 
 // This is a TEMPORARY tweak to make "changing" dependencies always ('0') check for newer snapshots available
 // TODO: Remove this when versioning and promotion works fully, then we shouldn't care about snapshots normally anyway
@@ -215,26 +198,11 @@ task protobufCompileLinux(type: Exec) {
 }
 
 
-
 // Magic for replace remote dependency on local project (source)
-// for Engine
 allprojects {
     configurations.all {
-        resolutionStrategy.dependencySubstitution {
-            substitute module("org.terasology.engine:engine") because "we have sources!" with project(":engine")
-            substitute module("org.terasology.engine:engine-tests") because "we have sources!" with project(":engine-tests")
-        }
-    }
-}
-
-// Magic for replace remote dependency on local project (source)
-// For exists modules
-project(":modules").subprojects.forEach { proj ->
-    project(":modules").subprojects {
-        configurations.all {
-            resolutionStrategy.dependencySubstitution {
-                substitute module("org.terasology.modules:${proj.name}") because "we have sources!" with project(":modules:${proj.name}")
-            }
+        resolutionStrategy {
+            preferProjectModules()
         }
     }
 }
