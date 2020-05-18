@@ -17,7 +17,9 @@ package org.terasology.particles.rendering;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -26,16 +28,16 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.particles.ParticleSystemManager;
 import org.terasology.particles.components.ParticleDataSpriteComponent;
 import org.terasology.registry.In;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.PerspectiveCamera;
-import org.terasology.rendering.opengl.GLSLParticleShader;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
 
-import java.util.Optional;
+import java.nio.FloatBuffer;
 
-import static com.google.common.base.Preconditions.checkState;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
 import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glDeleteLists;
 import static org.lwjgl.opengl.GL11.glEnd;
@@ -50,7 +52,9 @@ import static org.lwjgl.opengl.GL11.glNewList;
 public class SpriteParticleRenderer implements RenderSystem {
 
     protected static final String PARTICLE_MATERIAL_URI = "engine:prog.particle";
-    private final GLSLParticleShader shader;
+    private Material material;
+
+    private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     /**
      * Vertices of a unit quad on the xy plane, centered on the origin.
@@ -75,13 +79,6 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     private DisplayList drawUnitQuad;
 
-
-    public SpriteParticleRenderer() {
-        Optional<? extends GLSLParticleShader> shaderOptional = Assets.get("engine:new_particle", GLSLParticleShader.class);
-        checkState(shaderOptional.isPresent(), "Failed to resolve %s", "engine:new_particle");
-        shader = shaderOptional.get();
-    }
-
     public void finalize() throws Throwable {
         super.finalize();
         if (null != drawUnitQuad) {
@@ -97,8 +94,16 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     public void drawParticles(ParticleRenderingData<ParticleDataSpriteComponent> particleSystem) {
         ParticleDataSpriteComponent particleData = particleSystem.particleData;
-        shader.setTexture(particleData.texture.getId());
-        shader.setTextureSize(particleData.textureSize.x, particleData.textureSize.y);
+
+        if (particleSystem.particleData.texture != null) {
+            material.setBoolean("use_texture", true);
+            material.setFloat2("texture_size", particleData.textureSize.x, particleData.textureSize.y);
+            material.setInt("texture_sampler", 0);
+
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            glBindTexture(GL11.GL_TEXTURE_2D, particleData.texture.getId());
+        }
+
         particleSystem.particlePool.draw();
     }
 
@@ -111,18 +116,17 @@ public class SpriteParticleRenderer implements RenderSystem {
     public void renderAlphaBlend() {
         PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
         Vector3f cameraPosition = camera.getPosition();
-
-        shader.bind();
-        shader.setCameraPosition(cameraPosition);
         Matrix4f viewProjection = new Matrix4f(camera.getViewProjectionMatrix())
                 .transpose()
                 .translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
-        shader.setViewProjection(viewProjection);
+
+        material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();
+        material.enable();
+        material.setFloat3("camera_position", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+        material.setMatrix4("view_projection", viewProjection.get(matrixBuffer));
 
         particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class)
                 .forEach(this::drawParticles);
-
-        shader.unbind();
     }
 
     @Override
