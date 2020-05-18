@@ -56,7 +56,7 @@ publishing {
     }
 }
 
-def isMaster(gitBranch) {
+static def isMaster(gitBranch) {
     return gitBranch != null && gitBranch != "" && gitBranch.equals("master");
 }
 
