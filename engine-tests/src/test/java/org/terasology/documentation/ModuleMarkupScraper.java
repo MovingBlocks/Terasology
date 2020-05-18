@@ -113,7 +113,7 @@ public final class ModuleMarkupScraper {
         sortedRemoteModules.sort(moduleInfoComparator);
         moduleMapListing.append("| ");
         for (Module gModule : sortedGameModules) {
-            // | [AdditionalFruits](#AdditionalFruits)
+            // Add anchor tags, for example [AdditionalFruits](#AdditionalFruits)
             moduleMapListing.append("[").append(gModule.getId()).append("](#").append(gModule.getId()).append(") ");
         }
         moduleMapListing.append(" | ");
@@ -231,7 +231,7 @@ public final class ModuleMarkupScraper {
 
         StringBuilder details = new StringBuilder();
         details.append(System.getProperty("line.separator"));
-        details.append("# ").append(metadata.getId());
+        details.append("# ").append(metadata.getId()); // Used as anchor tag with in Module Table.
         details.append(System.getProperty("line.separator"));
         details.append("- **Display Name:** ").append(metadata.getDisplayName());
         details.append(System.getProperty("line.separator"));
