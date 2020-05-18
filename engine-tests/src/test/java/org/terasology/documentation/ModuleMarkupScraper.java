@@ -161,7 +161,7 @@ public final class ModuleMarkupScraper {
         for (Module module : allSortedModules) {
             Name moduleId = module.getId();
             if (module.isCodeModule()) {
-                out.append("## Module: ").append(moduleId);
+//                out.append("## Module: ").append(moduleId);
 
                 String moduleDescription = getModuleDescription(module);
                 out.append(moduleDescription);
@@ -205,7 +205,9 @@ public final class ModuleMarkupScraper {
                 }
             }
         }
+
         StringBuilder out = new StringBuilder();
+        out.append(System.getProperty("line.separator"));
         if (events.length() > 0) {
             out.append("**Module Events:** ");
             out.append(System.getProperty("line.separator"));
