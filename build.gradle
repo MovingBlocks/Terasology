@@ -39,12 +39,14 @@ buildscript {
     }
 }
 
-apply plugin: 'idea'
-// Needed for extending the "clean" task to also delete custom stuff defined here like natives
-apply plugin: 'base'
+plugins {
+    // Needed for extending the "clean" task to also delete custom stuff defined here like natives
+    id "base"
+    id "idea"
 
-// The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
-//apply plugin: 'eclipse'
+    // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
+    // id "eclipse"
+}
 
 import java.nio.file.Files
 import java.nio.file.Path
