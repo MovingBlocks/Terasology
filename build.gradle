@@ -20,10 +20,7 @@ buildscript {
         // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
         jcenter()
         mavenCentral()
-        // gradle plugins
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        gradlePluginPortal()
     }
 
     dependencies {
@@ -84,6 +81,7 @@ repositories {
 
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
+        name "Terasology Artifactory"
         url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
     }
 }
