@@ -18,13 +18,7 @@ package org.terasology.engine.subsystem.lwjgl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.ContextAttribs;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.opengl.KHRDebugCallback;
+import org.lwjgl.opengl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -64,12 +58,7 @@ import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
-import org.terasology.rendering.opengl.GLSLMaterial;
-import org.terasology.rendering.opengl.GLSLParticleShader;
-import org.terasology.rendering.opengl.GLSLShader;
-import org.terasology.rendering.opengl.OpenGLMesh;
-import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
-import org.terasology.rendering.opengl.OpenGLTexture;
+import org.terasology.rendering.opengl.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -79,20 +68,7 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.function.Consumer;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glDeleteTextures;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glTexParameterf;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 
 public class LwjglGraphics extends BaseLwjglSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
@@ -149,8 +125,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 }));
         assetTypeManager.registerCoreAssetType(Shader.class,
                 (AssetFactory<Shader, ShaderData>) GLSLShader::new, "shaders");
-        assetTypeManager.registerCoreAssetType(GLSLParticleShader.class,
-                (AssetFactory<GLSLParticleShader, ShaderData>) GLSLParticleShader::new, "shaders/unique");
         assetTypeManager.registerCoreAssetType(Material.class,
                 (AssetFactory<Material, MaterialData>) GLSLMaterial::new, "materials");
         assetTypeManager.registerCoreAssetType(Mesh.class, (AssetFactory<Mesh, MeshData>)

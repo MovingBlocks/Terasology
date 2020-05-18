@@ -52,7 +52,6 @@ import static org.lwjgl.opengl.GL11.glNewList;
 public class SpriteParticleRenderer implements RenderSystem {
 
     protected static final String PARTICLE_MATERIAL_URI = "engine:prog.particle";
-    private Material material;
 
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
@@ -92,7 +91,7 @@ public class SpriteParticleRenderer implements RenderSystem {
         }
     }
 
-    public void drawParticles(ParticleRenderingData<ParticleDataSpriteComponent> particleSystem) {
+    public void drawParticles(Material material, ParticleRenderingData<ParticleDataSpriteComponent> particleSystem) {
         ParticleDataSpriteComponent particleData = particleSystem.particleData;
 
         if (particleSystem.particleData.texture != null) {
@@ -120,13 +119,13 @@ public class SpriteParticleRenderer implements RenderSystem {
                 .transpose()
                 .translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
-        material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();
+        Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();
         material.enable();
         material.setFloat3("camera_position", cameraPosition.x, cameraPosition.y, cameraPosition.z);
         material.setMatrix4("view_projection", viewProjection.get(matrixBuffer));
 
         particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class)
-                .forEach(this::drawParticles);
+                .forEach(particleSystem -> drawParticles(material, particleSystem));
     }
 
     @Override

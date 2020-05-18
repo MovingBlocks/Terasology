@@ -17,21 +17,13 @@ package org.terasology.particles;
 
 import com.google.common.base.Preconditions;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_POINTS;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 /**
  * Object to keep track of the state of the living particles in a particle system and
@@ -99,41 +91,10 @@ public final class ParticlePool {
 
         this.previousPosition = new float[size * 3];
         this.velocity = new float[size * 3];
-
-        initVao();
     }
 
     private ParticlePool() {
         throw new UnsupportedOperationException();
-    }
-
-    private void initVao() {
-        vao = glGenVertexArrays();
-        positionVbo = glGenBuffers();
-        scaleVbo = glGenBuffers();
-        colorVbo = glGenBuffers();
-        textureOffsetVbo = glGenBuffers();
-
-        glBindVertexArray(vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, positionVbo);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, scaleVbo);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_FLOAT, false, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, textureOffsetVbo);
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, false, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
     }
 
     //== public methods =================================
@@ -279,6 +240,74 @@ public final class ParticlePool {
         }
     }
 
+    /**
+     * Initializes this particle pool for rendering.
+     * The method should be called right after object creation.
+     */
+    public void initRendering() {
+        vao = GL30.glGenVertexArrays();
+        positionVbo = GL15.glGenBuffers();
+        scaleVbo = GL15.glGenBuffers();
+        colorVbo = GL15.glGenBuffers();
+        textureOffsetVbo = GL15.glGenBuffers();
+
+        GL30.glBindVertexArray(vao);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionVbo);
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, scaleVbo);
+        GL20.glEnableVertexAttribArray(1);
+        GL20.glVertexAttribPointer(1, 3, GL11.GL_FLOAT, false, 0, 0);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, colorVbo);
+        GL20.glEnableVertexAttribArray(2);
+        GL20.glVertexAttribPointer(2, 4, GL11.GL_FLOAT, false, 0, 0);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, textureOffsetVbo);
+        GL20.glEnableVertexAttribArray(3);
+        GL20.glVertexAttribPointer(3, 2, GL11.GL_FLOAT, false, 0, 0);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL30.glBindVertexArray(0);
+    }
+
+    /**
+     * Renders the particles in the pool by doing an OpenGL draw call.
+     */
+    public void draw() {
+        GL30.glBindVertexArray(vao);
+        GL11.glDrawArrays(GL11.GL_POINTS, 0, livingParticles());
+        GL30.glBindVertexArray(0);
+    }
+
+    public void prepareRendering() {
+        refreshBuffer(positionBuffer, position, 3);
+        refreshBuffer(scaleBuffer, scale, 3);
+        refreshBuffer(colorBuffer, color, 4);
+        refreshBuffer(textureOffsetBuffer, textureOffset, 2);
+
+        bufferData(positionBuffer, positionVbo);
+        bufferData(scaleBuffer, scaleVbo);
+        bufferData(colorBuffer, colorVbo);
+        bufferData(textureOffsetBuffer, textureOffsetVbo);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+    }
+
+    private void refreshBuffer(FloatBuffer buffer, float[] data, int typeSize) {
+        buffer.position(0).limit(data.length);
+        buffer.put(data, 0, livingParticles() * typeSize);
+        buffer.flip();
+    }
+
+    private void bufferData(FloatBuffer data, int vbo) {
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, 0, GL15.GL_STREAM_DRAW);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, GL15.GL_STREAM_DRAW);
+    }
+
     private void resetParticleData(final int i) {
         final int i2 = i * 2;
         final int i3 = i * 3;
@@ -310,37 +339,5 @@ public final class ParticlePool {
         color[i4 + Y_OFFSET] = 1.0f;
         color[i4 + Z_OFFSET] = 1.0f;
         color[i4 + W_OFFSET] = 1.0f;
-    }
-
-    public void prepareRendering() {
-        refreshBuffer(positionBuffer, position, 3);
-        refreshBuffer(scaleBuffer, scale, 3);
-        refreshBuffer(colorBuffer, color, 4);
-        refreshBuffer(textureOffsetBuffer, textureOffset, 2);
-
-        bufferData(positionBuffer, positionVbo);
-        bufferData(scaleBuffer, scaleVbo);
-        bufferData(colorBuffer, colorVbo);
-        bufferData(textureOffsetBuffer, textureOffsetVbo);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    private void refreshBuffer(FloatBuffer buffer, float[] data, int typeSize) {
-        buffer.position(0).limit(data.length);
-        buffer.put(data, 0, livingParticles() * typeSize);
-        buffer.flip();
-    }
-
-    private void bufferData(FloatBuffer data, int vbo) {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, 0, GL_STREAM_DRAW);
-        glBufferData(GL_ARRAY_BUFFER, data, GL_STREAM_DRAW);
-    }
-
-    public void draw() {
-        glBindVertexArray(vao);
-        glDrawArrays(GL_POINTS, 0, livingParticles());
-        glBindVertexArray(0);
     }
 }
