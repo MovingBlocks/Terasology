@@ -6,10 +6,7 @@ buildscript {
         // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
         jcenter()
         mavenCentral()
-        // gradle plugins
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        gradlePluginPortal()
     }
 
     dependencies {
