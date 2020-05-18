@@ -25,8 +25,10 @@ import java.util.Iterator;
 
 /**
  * Describes an axis-aligned bounded space in 3D integer.
- *
+ * @deprecated This method is scheduled for removal in an upcoming version.
+ *             Use the JOML implementation instead: {@link org.terasology.world.block.BlockRegion}.
  */
+@Deprecated
 public final class Region3i implements Iterable<Vector3i> {
 
     /**
