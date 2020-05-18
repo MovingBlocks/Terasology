@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.internal;
 
-import org.lwjgl.glfw.GLFW;
+package org.terasology.engine.subsystem.lwjgl;
 
-public final class TimeLwjgl extends TimeBase {
+public class WindowSize {
+    private final int width;
+    private final int height;
 
-    public TimeLwjgl() {
-        super((long) (GLFW.glfwGetTime() * 1000));
+    public WindowSize(int width, int height) {
+        this.width = width;
+        this.height = height;
     }
 
-    @Override
-    public long getRawTimeInMs() {
-        return (long) (GLFW.glfwGetTime() * 1000);
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

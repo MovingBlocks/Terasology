@@ -20,13 +20,13 @@ import org.terasology.rendering.dag.StateChange;
 
 import java.util.Objects;
 
-import static org.lwjgl.opengl.GL11.GL_CONSTANT_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_CONSTANT_COLOR;
+import static org.lwjgl.opengl.GL14.GL_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL14.GL_CONSTANT_COLOR;
 import static org.lwjgl.opengl.GL11.GL_DST_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_DST_COLOR;
 import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_COLOR;
+import static org.lwjgl.opengl.GL14.GL_ONE_MINUS_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL14.GL_ONE_MINUS_CONSTANT_COLOR;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_COLOR;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;

@@ -17,8 +17,6 @@ package org.terasology.engine.subsystem.lwjgl;
 
 import java.awt.Canvas;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
 import org.terasology.context.Context;
 
 public class LwjglPortlet extends BaseLwjglSubsystem {
@@ -32,11 +30,13 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
     @Override
     public void postInitialise(Context context) {
-        try {
-            Display.setParent(customViewPort);
-        } catch (LWJGLException e) {
-            throw new RuntimeException("Can not initialize graphics device.", e);
-        }
+        // FIXME: LWJGL 3 - reimplement
+        throw new RuntimeException("after moving to lwjgl3 it is not implement"); //TODO FIXIT
+//        try {
+//            Display.setParent(customViewPort);
+//        } catch (LWJGLException e) {
+//            throw new RuntimeException("Can not initialize graphics device.", e);
+//        }
     }
 
     public void setCustomViewport(Canvas canvas) {

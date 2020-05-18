@@ -71,20 +71,20 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getProjectionMatrix()));
+        GL11.glLoadMatrixf(MatrixUtils.matrixToFloatBuffer(getProjectionMatrix()));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     @Override
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
+        GL11.glLoadMatrixf(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
     }
 
     @Override
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getNormViewMatrix()));
+        GL11.glLoadMatrixf(MatrixUtils.matrixToFloatBuffer(getNormViewMatrix()));
     }
 
     @Override

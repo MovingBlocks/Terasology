@@ -15,7 +15,6 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
-import org.lwjgl.opengl.KHRDebugCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,12 +41,12 @@ import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR;
 /**
  * Callback used by the OpenGL driver to output additional debug information about our use of the API.
  */
-class DebugCallback implements KHRDebugCallback.Handler {
+class DebugCallback implements org.lwjgl.opengl.GLDebugMessageCallbackI {
 
     private static final Logger logger = LoggerFactory.getLogger("OpenGL");
 
     @Override
-    public void handleMessage(int source, int type, int id, int severity, String message) {
+    public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
         String logFormat = "[{}] [{}] {}";
         Object[] args = new Object[]{getSourceString(source), getTypeString(type), message};
 

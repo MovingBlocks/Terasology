@@ -52,20 +52,20 @@ public class OrthographicCamera extends Camera {
     @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(projectionMatrix));
+        GL11.glLoadMatrixf(MatrixUtils.matrixToFloatBuffer(projectionMatrix));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     @Override
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(viewMatrix));
+        GL11.glLoadMatrixf(MatrixUtils.matrixToFloatBuffer(viewMatrix));
     }
 
     @Override
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(normViewMatrix));
+        GL11.glLoadMatrixf(MatrixUtils.matrixToFloatBuffer(normViewMatrix));
     }
 
     @Override

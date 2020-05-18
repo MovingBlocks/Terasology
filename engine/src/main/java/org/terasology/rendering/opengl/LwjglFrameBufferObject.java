@@ -16,7 +16,6 @@
 package org.terasology.rendering.opengl;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.terasology.utilities.Assets;
@@ -85,7 +84,7 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         glLoadIdentity();
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
+        glOrtho(0, 500,500, 0, 0, 2048f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
     }
@@ -93,7 +92,7 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
     @Override
     public void bindFrame() {
         vp = BufferUtils.createIntBuffer(16);
-        GL11.glGetInteger(GL11.GL_VIEWPORT, vp);
+        GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
         GL11.glViewport(0, 0, size.x(), size.y());

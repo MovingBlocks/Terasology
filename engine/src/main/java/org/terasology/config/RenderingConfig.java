@@ -16,8 +16,6 @@
 
 package org.terasology.config;
 
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.PixelFormat;
 import org.terasology.engine.subsystem.Resolution;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
@@ -80,7 +78,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String DUMP_SHADERS = "DumpShaders";
     public static final String VOLUMETRIC_FOG = "VolumetricFog";
 
-    private PixelFormat pixelFormat;
+//    private PixelFormat pixelFormat;
     private int windowPosX;
     private int windowPosY;
     private int windowWidth;
@@ -135,20 +133,20 @@ public class RenderingConfig extends AbstractSubscribable {
     public PerspectiveCameraSettings getCameraSettings() {
         return cameraSettings;
     }
-
-    public PixelFormat getPixelFormat() {
-        return pixelFormat;
-    }
-
-    public void setPixelFormat(PixelFormat pixelFormat) {
-        PixelFormat oldFormat = this.pixelFormat;
-        this.pixelFormat = pixelFormat;
-        propertyChangeSupport.firePropertyChange(PIXEL_FORMAT, oldFormat, this.pixelFormat);
-        // propertyChangeSupport fires only if oldObject != newObject.
-        // This method could theoretically use a better equality check then. In practice
-        // it's unlikely a new PixelFormat instance will ever be value-per-value identical
-        // to the previous one.
-    }
+// FIXME: LWJGL 3 - remove or replace
+//    public PixelFormat getPixelFormat() {
+//        return pixelFormat;
+//    }
+//
+//    public void setPixelFormat(PixelFormat pixelFormat) {
+//        PixelFormat oldFormat = this.pixelFormat;
+//        this.pixelFormat = pixelFormat;
+//        propertyChangeSupport.firePropertyChange(PIXEL_FORMAT, oldFormat, this.pixelFormat);
+//        // propertyChangeSupport fires only if oldObject != newObject.
+//        // This method could theoretically use a better equality check then. In practice
+//        // it's unlikely a new PixelFormat instance will ever be value-per-value identical
+//        // to the previous one.
+//    }
 
     public int getWindowPosX() {
         return windowPosX;
@@ -190,9 +188,10 @@ public class RenderingConfig extends AbstractSubscribable {
             propertyChangeSupport.firePropertyChange(WINDOW_HEIGHT, oldValue, this.windowHeight);
     }
 
-    public DisplayMode getDisplayMode() {
-        return new DisplayMode(windowWidth, windowHeight);
-    }
+// FIXME: LWJGL 3 - remove or replace
+//    public DisplayMode getDisplayMode() {
+//        return new DisplayMode(windowWidth, windowHeight);
+//    }
 
     public void setDisplayModeSetting(DisplayModeSetting displayModeSetting) {
         switch (displayModeSetting) {

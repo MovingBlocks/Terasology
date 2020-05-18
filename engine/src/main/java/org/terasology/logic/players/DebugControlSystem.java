@@ -16,7 +16,6 @@
 
 package org.terasology.logic.players;
 
-import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -140,7 +139,7 @@ public class DebugControlSystem extends BaseComponentSystem {
                 mouseGrabbed = !mouseGrabbed;
                 DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().getHUDElement("engine:DebugProperties");
                 debugProperties.setVisible(!mouseGrabbed);
-                Mouse.setGrabbed(mouseGrabbed);
+               // Mouse.setGrabbed(mouseGrabbed);
                 event.consume();
                 break;
             case Keyboard.KeyId.F3:

@@ -15,19 +15,19 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
-import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.terasology.engine.subsystem.Resolution;
 
 public final class LwjglResolution implements Resolution {
 
-    private final DisplayMode displayMode;
+    private final GLFWVidMode vidMode;
 
-    public LwjglResolution(DisplayMode displayMode) {
-        this.displayMode = displayMode;
+    public LwjglResolution(GLFWVidMode vidMode) {
+        this.vidMode = vidMode;
     }
 
-    public DisplayMode getDisplayMode() {
-        return displayMode;
+    public GLFWVidMode getVidMode() {
+        return vidMode;
     }
 
     @Override
@@ -41,16 +41,16 @@ public final class LwjglResolution implements Resolution {
 
         LwjglResolution that = (LwjglResolution) o;
 
-        return displayMode.equals(that.displayMode);
+        return vidMode.equals(that.vidMode);
     }
 
     @Override
     public int hashCode() {
-        return displayMode.hashCode();
+        return vidMode.hashCode();
     }
 
     @Override
     public String toString() {
-        return displayMode.toString();
+        return vidMode.toString();
     }
 }

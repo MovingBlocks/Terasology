@@ -16,7 +16,7 @@
 
 package org.terasology.utilities;
 
-import org.lwjgl.LWJGLUtil;
+import org.lwjgl.system.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
@@ -43,18 +43,18 @@ public final class LWJGLHelper {
 
     private static void initLibraryPaths() {
         final Path path;
-        switch (LWJGLUtil.getPlatform()) {
-            case LWJGLUtil.PLATFORM_MACOSX:
+        switch (Platform.get()) {
+            case MACOSX:
                 path = PathManager.getInstance().getNativesPath().resolve("macosx");
                 break;
-            case LWJGLUtil.PLATFORM_LINUX:
+            case LINUX:
                 path = PathManager.getInstance().getNativesPath().resolve("linux");
                 break;
-            case LWJGLUtil.PLATFORM_WINDOWS:
+            case WINDOWS:
                 path = PathManager.getInstance().getNativesPath().resolve("windows");
                 break;
             default:
-                throw new UnsupportedOperationException("Unsupported operating system: " + LWJGLUtil.getPlatformName());
+                throw new UnsupportedOperationException("Unsupported operating system: " + Platform.get().getName());
         }
 
         final String natives = path.toAbsolutePath().toString();

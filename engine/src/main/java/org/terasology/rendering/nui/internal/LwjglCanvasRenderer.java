@@ -18,13 +18,14 @@ package org.terasology.rendering.nui.internal;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.subsystem.lwjgl.LwjglUtil;
+import org.terasology.engine.subsystem.lwjgl.WindowSize;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
@@ -74,7 +75,7 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glLoadMatrix;
+import static org.lwjgl.opengl.GL11.glLoadMatrixf;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
@@ -136,7 +137,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
+        WindowSize windowSize = LwjglUtil.getWindowSize();
+        glOrtho(0, windowSize.getWidth(), windowSize.getHeight(), 0, 0, 2048f);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
 
@@ -145,12 +147,12 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         modelView.setTranslation(new Vector3f(0, 0, -1024f));
 
         MatrixUtils.matrixToFloatBuffer(modelView, matrixBuffer);
-        glLoadMatrix(matrixBuffer);
+        glLoadMatrixf(matrixBuffer);
         matrixBuffer.rewind();
 
         glScalef(uiScale, uiScale, uiScale);
 
-        requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight());
+        requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, windowSize.getWidth(), windowSize.getHeight());
         currentTextureCropRegion = requestedCropRegion;
         textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX(),
                 requestedCropRegion.minY(), requestedCropRegion.maxY());
@@ -203,7 +205,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
         Matrix4f translateTransform = new Matrix4f(BaseQuat4f.IDENTITY,
                 new Vector3f((drawRegion.minX() + drawRegion.width() / 2) * uiScale,
-                    (drawRegion.minY() + drawRegion.height() / 2) * uiScale, 0), 1);
+                        (drawRegion.minY() + drawRegion.height() / 2) * uiScale, 0), 1);
 
         userTransform.mul(centerTransform);
         translateTransform.mul(userTransform);
@@ -213,17 +215,17 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         MatrixUtils.matrixToFloatBuffer(finalMat, matrixBuffer);
 
         material.setFloat4(
-            CROPPING_BOUNDARIES_PARAM,
-            cropRegion.minX() * uiScale,
-            cropRegion.maxX() * uiScale,
-            cropRegion.minY() * uiScale,
-            cropRegion.maxY() * uiScale);
+                CROPPING_BOUNDARIES_PARAM,
+                cropRegion.minX() * uiScale,
+                cropRegion.maxX() * uiScale,
+                cropRegion.minY() * uiScale,
+                cropRegion.maxY() * uiScale);
         material.setMatrix4("posMatrix", translateTransform);
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL11.GL_MODELVIEW);
         glPushMatrix();
-        glLoadMatrix(matrixBuffer);
+        glLoadMatrixf(matrixBuffer);
 
         glScalef(this.uiScale, this.uiScale, this.uiScale);
         matrixBuffer.rewind();
@@ -245,7 +247,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
 
     @Override
     public Vector2i getTargetSize() {
-        return new Vector2i(Display.getWidth(), Display.getHeight());
+        WindowSize windowSize = LwjglUtil.getWindowSize();
+        return new Vector2i( windowSize.getWidth(),windowSize.getHeight());
     }
 
     @Override

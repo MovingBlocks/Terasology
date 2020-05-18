@@ -19,7 +19,7 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.ARBBufferObject.*;
+import static org.lwjgl.opengl.ARBVertexBufferObject.*; //TODO change this imports to GL15 (use above)
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT;
