@@ -48,9 +48,6 @@ plugins {
     id "org.sonarqube" version "2.8"
 }
 
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardCopyOption
 
 // Test for right version of Java in use for running this script
 assert org.gradle.api.JavaVersion.current().isJava8Compatible()
@@ -245,68 +242,6 @@ project(":modules").subprojects.forEach { proj ->
         }
     }
 }
-
-/**
- * Gathering remote modules files from remoteRepo to 'modules' for autoloading in game-time (tasks server, game etc)
- */
-class RemoteModuleGatherer implements DependencyResolutionListener {
-
-    private final Path modulesDir
-
-    RemoteModuleGatherer(Path  modulesDir) {
-        this.modulesDir = modulesDir
-    }
-
-    @Override
-    void beforeResolve(ResolvableDependencies dependencies) {
-        // nothing to do
-    }
-
-    @Override
-    void afterResolve(ResolvableDependencies dependencies) {
-        // We process only module dependencies
-        if (dependencies.path.startsWith(":modules:") &&
-                dependencies.name == "compileClasspath") {
-            def projectName = dependencies.path.split(":")[2]
-
-            if (!dependencies.artifacts.artifacts.empty) {
-                println "\nProcessing module '$projectName' in a multi-project workspace"
-            }
-
-            dependencies.artifacts.artifacts.each {
-                if (isRemoteTerasologyModule(it)) {
-                    println "$projectName resolved binary $it"
-                    def binaryModulePath = modulesDir.resolve(it.file.name)
-                    Files.copy(it.file.toPath(), binaryModulePath, StandardCopyOption.REPLACE_EXISTING)
-                } else if (isLocalTerasologyModule(it)) {
-                    println "*** Found module dependency $it in source form, not copying a runtime jar from Gradle"
-                } else {
-                    //ignore non terasology module
-                }
-            }
-        }
-    }
-
-    private static boolean isRemoteTerasologyModule(ResolvedArtifactResult artifact) {
-        def componentIdentifier = artifact.id.componentIdentifier
-        if (componentIdentifier instanceof ModuleComponentIdentifier) {
-            def module = componentIdentifier as ModuleComponentIdentifier
-            return module.group == 'org.terasology.modules'
-        }
-        return false
-    }
-
-    private static boolean isLocalTerasologyModule(ResolvedArtifactResult artifact) {
-        def componentIdentifier = artifact.id.componentIdentifier
-        if (componentIdentifier instanceof ProjectComponentIdentifier) {
-            def module = componentIdentifier as ProjectComponentIdentifier
-            return !(module.projectName in ['engine', 'engine-tests'])
-        }
-        return false
-    }
-}
-
-gradle.addListener(new RemoteModuleGatherer(rootDir.toPath().resolve("modules")))
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

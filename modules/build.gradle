@@ -1,0 +1,110 @@
+/*
+ * Copyright 2020 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id "java-library"
+}
+
+java {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+}
+
+evaluationDependsOnChildren()
+
+def deprecatedConfigs = [
+        "default", "apiElements", "archives", "compile", "compileClasspath", "runtime", "runtimeClasspath",
+        "runtimeElements", "testCompile", "testCompileClasspath", "testRuntime", "testRuntimeClasspath"]
+
+dependencies {
+    def addDep = { cfgName, dep -> dependencies.add(cfgName, dep) }
+    project.childProjects.forEach() { key, subProj ->
+        configurations.all { cfg ->
+            if (!(cfg.name in deprecatedConfigs)) {
+                addDep(cfg.name, subProj)
+            }
+        }
+    }
+}
+
+
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
+
+/**
+ * Gathering remote modules files from remoteRepo to 'modules' for autoloading in game-time (tasks server, game etc)
+ */
+class RemoteModuleGatherer implements DependencyResolutionListener {
+
+    private final java.nio.file.Path modulesDir
+
+    RemoteModuleGatherer(java.nio.file.Path  modulesDir) {
+        this.modulesDir = modulesDir
+    }
+
+    @Override
+    void beforeResolve(ResolvableDependencies dependencies) {
+        // nothing to do
+    }
+
+    @Override
+    void afterResolve(ResolvableDependencies dependencies) {
+        // We process only module dependencies
+        if (dependencies.path.startsWith(":modules:") &&
+                dependencies.name == "compileClasspath") {
+            def projectName = dependencies.path.split(":")[2]
+
+            if (!dependencies.artifacts.artifacts.empty) {
+                logger.debug("Processing module '{}' in a multi-project workspace", projectName)
+            }
+
+            dependencies.artifacts.artifacts.each {
+                if (isRemoteTerasologyModule(it)) {
+                    logger.debug("{} resolved binary {}", projectName, it)
+                    def binaryModulePath = modulesDir.resolve(it.file.name)
+                    Files.copy(it.file.toPath(), binaryModulePath, StandardCopyOption.REPLACE_EXISTING)
+                } else if (isLocalTerasologyModule(it)) {
+                    logger.debug("*** Found module dependency {} in source form, " +
+                            "not copying a runtime jar from Gradle", it)
+                } else {
+                    //ignore non terasology module
+                }
+            }
+        }
+    }
+
+    private static boolean isRemoteTerasologyModule(ResolvedArtifactResult artifact) {
+        def componentIdentifier = artifact.id.componentIdentifier
+        if (componentIdentifier instanceof ModuleComponentIdentifier) {
+            def module = componentIdentifier as ModuleComponentIdentifier
+            return module.group == 'org.terasology.modules'
+        }
+        return false
+    }
+
+    private static boolean isLocalTerasologyModule(ResolvedArtifactResult artifact) {
+        def componentIdentifier = artifact.id.componentIdentifier
+        if (componentIdentifier instanceof ProjectComponentIdentifier) {
+            def module = componentIdentifier as ProjectComponentIdentifier
+            println "What does this look like? $module"
+            return !(module.projectName in ['engine', 'engine-tests'])
+        }
+        return false
+    }
+}
+
+gradle.addListener(new RemoteModuleGatherer(rootDir.toPath().resolve("modules")))
