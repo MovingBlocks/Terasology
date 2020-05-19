@@ -61,7 +61,14 @@ repositories {
             // Our default is the main virtual repo containing everything except repos for testing Artifactory itself
             name "Terasology Artifactory"
             url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+            allowInsecureProtocol true  // 😱
         }
+    }
+
+    maven {
+        name "snowplow (pre-0.9)"
+        url "http://maven.snplow.com/releases"
+        allowInsecureProtocol true  // 😱
     }
 }
 
