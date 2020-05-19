@@ -208,6 +208,174 @@ allprojects {
 }
 
 
+class DebugMyStuff implements DependencyResolutionListener {
+
+    Logger logger
+    Project rootProj
+
+    DebugMyStuff(rootProj) {
+        this.rootProj = rootProj
+        logger = Logging.getLogger(this.class)
+    }
+
+    @Override
+    void beforeResolve(ResolvableDependencies resolvableDependencies) {
+
+    }
+
+    @Override
+    void afterResolve(ResolvableDependencies resolvableDependencies) {
+        def resolutions = resolvableDependencies.resolutionResult
+        def cfgPath = resolvableDependencies.path
+        def cfgName = cfgPath.substring(cfgPath.lastIndexOf(":") + 1)
+        def projPath = cfgPath.substring(0, cfgPath.lastIndexOf(":"))
+
+        logger.info("🌹 {}", resolvableDependencies.dependencies)
+//        logger.info("🌹 {}", resolvableDependencies.dependencyConstraints)
+        logger.info("🌹 {}", resolvableDependencies.attributes)
+
+        def first=true
+
+        resolutions.allDependencies.findAll { onlyEngine(it) }.forEach {
+            if (first) {
+                configDisplay(projPath, cfgName)
+                first = false
+            }
+            resultDisplay(it)
+        }
+    }
+
+    boolean resultFilter(ResolvedDependencyResult result) {
+        def requested = result.requested
+        switch (requested) {
+            case LibraryComponentSelector:
+                return true
+            case ModuleComponentSelector:
+                return requested.group.startsWith("org.terasology")
+            case ProjectComponentSelector:
+                return true
+            default:
+                logger.warn("🎴 ? {} {}", requested.displayName, requested)
+                return true
+        }
+    }
+
+    @SuppressWarnings("GrMethodMayBeStatic")
+    boolean onlyEngine(UnresolvedDependencyResult result) {
+        return true;
+    }
+
+    boolean onlyEngine(ResolvedComponentResult result) {
+        switch (result.id) {
+            case ProjectComponentIdentifier:
+                return result.id.projectPath.equals(":engine")
+            case ModuleComponentIdentifier:
+                return result.id.group.startsWith("org.terasology") && result.id.module.equals("engine")
+            default:
+                logger.warn("❓ {}", result)
+                return true
+        }
+    }
+
+    boolean onlyEngine(ResolvedDependencyResult result) {
+        def requested = result.requested
+        switch (requested) {
+            case LibraryComponentSelector:
+                return false
+            case ModuleComponentSelector:
+                return requested.group.startsWith("org.terasology") && requested.module.equals("engine")
+            case ProjectComponentSelector:
+                return requested.projectPath.startsWith(":engine")
+            default:
+                logger.warn("🎴 ? {} {}", requested.displayName, requested)
+                return true
+        }
+    }
+
+    void configDisplay(String projPath, String cfgName) {
+        def theProject = rootProj.findProject(projPath)
+        def theConfig = theProject.configurations.getByName(cfgName)
+        def strats = theConfig.resolutionStrategy
+
+        logger.info("📓 {} 👮{} 📕{}{}", strats.conflictResolution, strats.forcedModules, strats.componentSelection.rules,
+                b(strats.dependencySubstitution.hasRules()))
+
+        strats.capabilitiesResolution.all {
+            logger.info("📓 D {}", it)
+        }
+    }
+
+    void resultDisplay(UnresolvedDependencyResult result) {
+        def requested = result.requested
+
+        def selectedStr = '?'
+
+        switch (requested) {
+            case LibraryComponentSelector:
+                logger.info("🎴 L ▣{} {} {} ➙ 💥{}", b(result.constraint), requested.libraryName, requested.projectPath, selectedStr)
+                break
+            case ModuleComponentSelector:
+                logger.info("🎴 M ▣{} {} {} ➙ 💥{}", b(result.constraint), requested.moduleIdentifier, requested.versionConstraint, selectedStr)
+                break
+            case ProjectComponentSelector:
+                logger.info("🎴 P ▣{} {} {} ➙ 💥{}", b(result.constraint), requested.displayName, requested.projectPath, selectedStr)
+                break
+            default:
+                logger.warn("🎴 ? ▣{} {} {} ➙ 💥{}", b(result.constraint), requested.displayName, requested, selectedStr)
+        }
+    }
+
+    void resultDisplay(ResolvedDependencyResult result) {
+        def requested = result.requested
+        def selectedId = result.selected.id
+        def selectedStr
+
+        switch (selectedId) {
+            case ProjectComponentIdentifier:
+                selectedStr = "🌼 "
+                break
+            case ModuleComponentIdentifier:
+                selectedStr = "🧶 "
+                break
+            default:
+                selectedStr = "❓ "
+        }
+
+        selectedStr += "${result.selected} ${result.selected.variants}"
+
+        switch (requested) {
+            case LibraryComponentSelector:
+                logger.info("🎴 L ▣{} {} {} ➙ {}", b(result.constraint), requested.libraryName, requested.projectPath, selectedStr)
+                break
+            case ModuleComponentSelector:
+                logger.info("🎴 M ▣{} {} {} ➙ {}", b(result.constraint), requested.moduleIdentifier, requested.versionConstraint, selectedStr)
+                break
+            case ProjectComponentSelector:
+                logger.info("🎴 P ▣{} {} {} ➙ {}", b(result.constraint), requested.displayName, requested.projectPath, selectedStr)
+                break
+            default:
+                logger.warn("🎴 ? ▣{} {} {} ➙ {}", b(result.constraint), requested.displayName, requested, selectedStr)
+        }
+
+        def reason = result.selected.selectionReason
+
+        logger.info(" ╲   ▣{} ⚔{} 👮{} 📕{} {}", b(reason.constrained), b(reason.conflictResolution),
+                b(reason.forced), b(reason.selectedByRule), result.from)
+
+        for (desc in reason.descriptions.findAll { !(it.cause in [ComponentSelectionCause.ROOT]) }) {
+            logger.info("                   ┕ {}", desc)
+        }
+    }
+
+    static String b(boolean value) {
+        return value ? "✅" : "⎵"
+    }
+}
+
+
+gradle.addListener(new DebugMyStuff(rootProject))
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
