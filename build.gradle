@@ -242,9 +242,11 @@ project(":modules").subprojects.forEach { proj ->
 class RemoteModuleGatherer implements DependencyResolutionListener {
 
     private final Path modulesDir
+    private final Logger logger
 
     RemoteModuleGatherer(Path  modulesDir) {
         this.modulesDir = modulesDir
+        this.logger = Logging.getLogger(this.class)
     }
 
     @Override
@@ -260,7 +262,7 @@ class RemoteModuleGatherer implements DependencyResolutionListener {
             def projectName = dependencies.path.split(":")[2]
 
             if (!dependencies.artifacts.artifacts.empty) {
-                println "\nProcessing module '$projectName' in a multi-project workspace"
+                logger.debug("\nProcessing module '{}' in a multi-project workspace", projectName)
             }
 
             dependencies.artifacts.artifacts.each {
@@ -269,7 +271,7 @@ class RemoteModuleGatherer implements DependencyResolutionListener {
                     def binaryModulePath = modulesDir.resolve(it.file.name)
                     Files.copy(it.file.toPath(), binaryModulePath, StandardCopyOption.REPLACE_EXISTING)
                 } else if (isLocalTerasologyModule(it)) {
-                    println "*** Found module dependency $it in source form, not copying a runtime jar from Gradle"
+                    logger.info("*** Found module dependency {} in source form, not copying a runtime jar from Gradle", it)
                 } else {
                     //ignore non terasology module
                 }

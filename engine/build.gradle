@@ -173,7 +173,6 @@ dependencies {
     // Dependency on CrashReporter, conditionally either from source or via binary
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     File wouldBeSrcPath = new File(rootDir, 'libs/CrashReporter')
-    println "ENGINE Scanning for source CrashReporter at: " + wouldBeSrcPath.getAbsolutePath()
 
     if (wouldBeSrcPath.exists()) {
         println "*** Identified CrashReporter source, using that"
@@ -185,7 +184,7 @@ dependencies {
 
         implementation project(':libs:CrashReporter:cr-terasology')
     } else {
-        println "*** Setting a CrashReporter binary dependency, not present as source"
+        logger.debug("*** Setting a CrashReporter binary dependency, not present as source")
         implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
     }
 }
