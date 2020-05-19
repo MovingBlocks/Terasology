@@ -17,8 +17,15 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
+import org.joml.AABBf;
+import org.joml.AABBi;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.rendering.cameras.OpenVRStereoCamera;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionIterable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,21 +42,20 @@ public class Region3iTest {
 
     @Test
     public void testEmptyRegion() {
-        assertEquals(Region3i.empty().size(), Vector3i.zero());
-        assertTrue(Region3i.empty().isEmpty());
+        assertEquals(new BlockRegion().union(0,0,0).getSize(new Vector3i()), new Vector3i());
     }
 
     @Test
     public void testCreateRegionWithMinAndSize() {
         List<Vector3i> mins = Arrays.asList(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i(3, 4, 5));
         List<Vector3i> size = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(8, 5, 2));
-        List<Vector3i> expectedMax = Arrays.asList(new Vector3i(), new Vector3i(3, 3, 3), new Vector3i(10, 8, 6));
+        List<Vector3i> expectedMax = Arrays.asList(new Vector3i(1,1,1), new Vector3i(4, 4, 4), new Vector3i(11, 9, 7));
+
         for (int i = 0; i < mins.size(); ++i) {
-            Region3i region = Region3i.createFromMinAndSize(mins.get(i), size.get(i));
-            assertEquals(mins.get(i), region.min());
-            assertEquals(size.get(i), region.size());
-            assertEquals(expectedMax.get(i), region.max());
-            assertFalse(region.isEmpty());
+            BlockRegion region = new BlockRegion().union(mins.get(i)).setSize(size.get(i));
+            assertEquals(mins.get(i), region.getMin(new Vector3i()));
+            assertEquals(size.get(i), region.getSize(new Vector3i()));
+            assertEquals(expectedMax.get(i), region.getMax(new Vector3i()));
         }
     }
 
@@ -57,49 +63,48 @@ public class Region3iTest {
     public void testCreateRegionWithMinMax() {
         List<Vector3i> mins = Arrays.asList(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i(3, 4, 5));
         List<Vector3i> expectedSize = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(8, 5, 2));
-        List<Vector3i> max = Arrays.asList(new Vector3i(), new Vector3i(3, 3, 3), new Vector3i(10, 8, 6));
+        List<Vector3i> max = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(4, 4, 4), new Vector3i(11, 9, 7));
         for (int i = 0; i < mins.size(); ++i) {
-            Region3i region = Region3i.createFromMinMax(mins.get(i), max.get(i));
-            assertEquals(mins.get(i), region.min());
-            assertEquals(max.get(i), region.max());
-            assertEquals(expectedSize.get(i), region.size());
-            assertFalse(region.isEmpty());
+            BlockRegion region = new BlockRegion().union(mins.get(i)).union(max.get(i));
+            assertEquals(mins.get(i), region.getMin(new Vector3i()));
+            assertEquals(max.get(i), region.getMax(new Vector3i()));
+            assertEquals(expectedSize.get(i), region.getSize(new Vector3i()));
         }
     }
 
     @Test
     public void testCreateRegionWithBounds() {
-        Region3i expectedRegion = Region3i.createFromMinMax(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
+        BlockRegion expectedRegion = new BlockRegion(new Vector3i(-2, 4, -16), new Vector3i(5, 108, 1));
         List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107, -16), new Vector3i(-2, 4, 0),
                 new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
         List<Vector3i> vec2 = Arrays.asList(new Vector3i(4, 107, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 4, 0), new Vector3i(4, 107, -16),
                 new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
         for (int i = 0; i < vec1.size(); ++i) {
-            assertEquals(expectedRegion, Region3i.createBounded(vec1.get(i), vec2.get(i)));
+            assertEquals(expectedRegion, new BlockRegion().unionBlock(vec1.get(i)).unionBlock(vec2.get(i)));
         }
     }
 
     @Test
     public void testRegionEmptyIfMaxLessThanMin() {
-        Region3i region = Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(-1, 0, 0));
-        assertTrue(region.isEmpty());
+        BlockRegion region = new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(-1, 0, 0));
+        assertFalse(region.isValid());
     }
 
     @Test
     public void testRegionEmptyIfSizeZeroOrLess() {
-        Region3i region = Region3i.createFromMinAndSize(new Vector3i(1, 1, 1), new Vector3i(0, 1, 1));
-        assertTrue(region.isEmpty());
-        region = Region3i.createFromMinAndSize(new Vector3i(1, 1, 1), new Vector3i(1, -1, 1));
-        assertTrue(region.isEmpty());
+        BlockRegion region = new BlockRegion().union(new Vector3i(1,1,1)).setSize(new Vector3i(0,1,1));
+        assertFalse(region.isValid());
+        region = new BlockRegion().union(new Vector3i(1, 1, 1)).setSize(new Vector3i(1, -1, 1));
+        assertFalse(region.isValid());
     }
 
     @Test
     public void testIterateRegion() {
         Vector3i min = new Vector3i(2, 5, 7);
         Vector3i max = new Vector3i(10, 11, 12);
-        Region3i region = Region3i.createFromMinMax(min, max);
+        BlockRegion region = new BlockRegion().unionBlock(min).unionBlock( max);
 
-        Set<Vector3i> expected = Sets.newHashSet();
+        Set<Vector3ic> expected = Sets.newHashSet();
         for (int x = min.x; x <= max.x; ++x) {
             for (int y = min.y; y <= max.y; ++y) {
                 for (int z = min.z; z <= max.z; ++z) {
@@ -108,8 +113,9 @@ public class Region3iTest {
             }
         }
 
-        for (Vector3i pos : region) {
-            assertTrue(expected.contains(pos));
+
+        for (Vector3ic pos : BlockRegionIterable.region(region).build()) {
+            assertTrue(expected.contains(pos), "unexpected position: " + pos);
             expected.remove(pos);
         }
 
@@ -118,63 +124,45 @@ public class Region3iTest {
 
     @Test
     public void testSimpleIntersect() {
-        Region3i region1 = Region3i.createFromMinMax(new Vector3i(), new Vector3i(32, 32, 32));
-        Region3i region2 = Region3i.createFromMinMax(new Vector3i(1, 1, 1), new Vector3i(17, 17, 17));
-        assertEquals(region2, region1.intersect(region2));
+        BlockRegion region1 = new BlockRegion().unionBlock(new Vector3i()).unionBlock(new Vector3i(32, 32, 32));
+        BlockRegion region2 = new BlockRegion().unionBlock(new Vector3i(1, 1, 1)).unionBlock(new Vector3i(17, 17, 17));
+        assertEquals(region2, region1.intersection(region2, new BlockRegion()));
     }
 
     @Test
     public void testNonTouchingIntersect() {
-        Region3i region1 = Region3i.createFromMinMax(new Vector3i(), new Vector3i(32, 32, 32));
-        Region3i region2 = Region3i.createFromMinMax(new Vector3i(103, 103, 103), new Vector3i(170, 170, 170));
-        assertEquals(Region3i.empty(), region1.intersect(region2));
+        BlockRegion region1 = new BlockRegion().unionBlock(new Vector3i()).unionBlock(new Vector3i(32, 32, 32));
+        BlockRegion region2 = new BlockRegion().unionBlock(new Vector3i(103, 103, 103)).unionBlock(new Vector3i(170, 170, 170));
+        assertFalse(region1.intersection(region2, new BlockRegion()).isValid());
     }
 
     @Test
     public void testEncompasses() {
-        Region3i region = Region3i.createFromMinAndSize(new Vector3i(), new Vector3i(1, 1, 1));
-        assertTrue(region.encompasses(0, 0, 0));
+        BlockRegion region = new BlockRegion().union(new Vector3i()).setSize(new Vector3i(1, 1, 1));
+        assertTrue(region.testBlock(0, 0, 0));
 
-        assertFalse(region.encompasses(1, 0, 0));
-        assertFalse(region.encompasses(1, 0, 1));
-        assertFalse(region.encompasses(0, 0, 1));
-        assertFalse(region.encompasses(-1, 0, -1));
-        assertFalse(region.encompasses(-1, 0, 0));
-        assertFalse(region.encompasses(-1, 0, -1));
-        assertFalse(region.encompasses(0, 0, -1));
+        assertFalse(region.testBlock(1, 0, 0));
+        assertFalse(region.testBlock(1, 0, 1));
+        assertFalse(region.testBlock(0, 0, 1));
+        assertFalse(region.testBlock(-1, 0, -1));
+        assertFalse(region.testBlock(-1, 0, 0));
+        assertFalse(region.testBlock(-1, 0, -1));
+        assertFalse(region.testBlock(0, 0, -1));
 
-        assertFalse(region.encompasses(1, 1, 0));
-        assertFalse(region.encompasses(1, 1, 1));
-        assertFalse(region.encompasses(0, 1, 1));
-        assertFalse(region.encompasses(-1, 1, -1));
-        assertFalse(region.encompasses(-1, 1, 0));
-        assertFalse(region.encompasses(-1, 1, -1));
-        assertFalse(region.encompasses(0, 1, -1));
+        assertFalse(region.testBlock(1, 1, 0));
+        assertFalse(region.testBlock(1, 1, 1));
+        assertFalse(region.testBlock(0, 1, 1));
+        assertFalse(region.testBlock(-1, 1, -1));
+        assertFalse(region.testBlock(-1, 1, 0));
+        assertFalse(region.testBlock(-1, 1, -1));
+        assertFalse(region.testBlock(0, 1, -1));
 
-        assertFalse(region.encompasses(1, -1, 0));
-        assertFalse(region.encompasses(1, -1, 1));
-        assertFalse(region.encompasses(0, -1, 1));
-        assertFalse(region.encompasses(-1, -1, -1));
-        assertFalse(region.encompasses(-1, -1, 0));
-        assertFalse(region.encompasses(-1, -1, -1));
-        assertFalse(region.encompasses(0, -1, -1));
-    }
-
-    @Test
-    public void testNearestPointToWhenEncompasses() {
-        Region3i region = Region3i.createFromMinMax(new Vector3i(), new Vector3i(4, 4, 4));
-        assertEquals(new Vector3i(2, 1, 1), region.getNearestPointTo(new Vector3i(2, 1, 1)));
-    }
-
-    @Test
-    public void testNearestPointToAlongSide() {
-        Region3i region = Region3i.createFromMinMax(new Vector3i(), new Vector3i(4, 4, 4));
-        assertEquals(new Vector3i(4, 2, 1), region.getNearestPointTo(new Vector3i(15, 2, 1)));
-    }
-
-    @Test
-    public void testNearestPointToAwayFromCorner() {
-        Region3i region = Region3i.createFromMinMax(new Vector3i(), new Vector3i(4, 4, 4));
-        assertEquals(new Vector3i(4, 4, 4), region.getNearestPointTo(new Vector3i(15, 12, 7)));
+        assertFalse(region.testBlock(1, -1, 0));
+        assertFalse(region.testBlock(1, -1, 1));
+        assertFalse(region.testBlock(0, -1, 1));
+        assertFalse(region.testBlock(-1, -1, -1));
+        assertFalse(region.testBlock(-1, -1, 0));
+        assertFalse(region.testBlock(-1, -1, -1));
+        assertFalse(region.testBlock(0, -1, -1));
     }
 }
