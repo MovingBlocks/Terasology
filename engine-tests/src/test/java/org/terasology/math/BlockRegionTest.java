@@ -17,13 +17,9 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
-import org.joml.AABBf;
-import org.joml.AABBi;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;
-import org.terasology.rendering.cameras.OpenVRStereoCamera;
-import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionIterable;
 
@@ -38,18 +34,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  *
  */
-public class Region3iTest {
+public class BlockRegionTest {
 
     @Test
     public void testEmptyRegion() {
-        assertEquals(new BlockRegion().union(0,0,0).getSize(new Vector3i()), new Vector3i());
+        assertEquals(new BlockRegion().union(0, 0, 0).getSize(new Vector3i()), new Vector3i());
+        assertFalse(new BlockRegion().union(0, 0, 0).isValid());
     }
 
     @Test
     public void testCreateRegionWithMinAndSize() {
         List<Vector3i> mins = Arrays.asList(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i(3, 4, 5));
         List<Vector3i> size = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(8, 5, 2));
-        List<Vector3i> expectedMax = Arrays.asList(new Vector3i(1,1,1), new Vector3i(4, 4, 4), new Vector3i(11, 9, 7));
+        List<Vector3i> expectedMax = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(4, 4, 4), new Vector3i(11, 9, 7));
 
         for (int i = 0; i < mins.size(); ++i) {
             BlockRegion region = new BlockRegion().union(mins.get(i)).setSize(size.get(i));
@@ -76,9 +73,9 @@ public class Region3iTest {
     public void testCreateRegionWithBounds() {
         BlockRegion expectedRegion = new BlockRegion(new Vector3i(-2, 4, -16), new Vector3i(5, 108, 1));
         List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107, -16), new Vector3i(-2, 4, 0),
-                new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
+            new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
         List<Vector3i> vec2 = Arrays.asList(new Vector3i(4, 107, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 4, 0), new Vector3i(4, 107, -16),
-                new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
+            new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
         for (int i = 0; i < vec1.size(); ++i) {
             assertEquals(expectedRegion, new BlockRegion().unionBlock(vec1.get(i)).unionBlock(vec2.get(i)));
         }
@@ -92,7 +89,7 @@ public class Region3iTest {
 
     @Test
     public void testRegionEmptyIfSizeZeroOrLess() {
-        BlockRegion region = new BlockRegion().union(new Vector3i(1,1,1)).setSize(new Vector3i(0,1,1));
+        BlockRegion region = new BlockRegion().union(new Vector3i(1, 1, 1)).setSize(new Vector3i(0, 1, 1));
         assertFalse(region.isValid());
         region = new BlockRegion().union(new Vector3i(1, 1, 1)).setSize(new Vector3i(1, -1, 1));
         assertFalse(region.isValid());
@@ -102,7 +99,7 @@ public class Region3iTest {
     public void testIterateRegion() {
         Vector3i min = new Vector3i(2, 5, 7);
         Vector3i max = new Vector3i(10, 11, 12);
-        BlockRegion region = new BlockRegion().unionBlock(min).unionBlock( max);
+        BlockRegion region = new BlockRegion().unionBlock(min).unionBlock(max);
 
         Set<Vector3ic> expected = Sets.newHashSet();
         for (int x = min.x; x <= max.x; ++x) {
