@@ -56,6 +56,11 @@ import org.gradle.internal.logging.text.StyledTextOutputFactory
 import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 subprojects {
+    // Why use plugins {} block if we just list plugins again here?
+    // The idea is that the plugins block "resolves" them, makes sure they have their dependencies, etc.
+    // Then if they need to be applied to other things, the "apply plugin: x" syntax will use the
+    // previously resolved value.
+
     apply plugin: "jacoco"
     apply plugin: "idea"
     apply plugin: "eclipse"

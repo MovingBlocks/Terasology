@@ -15,6 +15,9 @@
  */
 
 plugins {
+    // Our child projects are java-libraries; applying the java-library plugin
+    // to this project will make sure we have the same configurations initialized.
+    // (TODO: does this really make sense if we don't have our own source sets?)
     id "java-library"
 }
 
@@ -23,14 +26,25 @@ java {
     targetCompatibility JavaVersion.VERSION_1_8
 }
 
+// gradle, set up all our module sub-projects before this one.
 evaluationDependsOnChildren()
 
+// These are configurations we _don't_ set to depend on all our modules. At first I started by listing the
+// ones we include, before thinking "oh, there are configs added by plugins and things that will be a pain
+// to list, so we'll just include all of them."
+// That gave a big pile of warnings about setting dependencies on deprecated configurations, so now there's
+// a list to exclude. I no longer know which is the shorter or more maintainable list.
+// (Is there a way to programmatically determine which are deprecated?)
 def deprecatedConfigs = [
         "default", "apiElements", "archives", "compile", "compileClasspath", "runtime", "runtimeClasspath",
         "runtimeElements", "testCompile", "testCompileClasspath", "testRuntime", "testRuntimeClasspath"]
 
+
 dependencies {
+    /** refers to the dependency handler of this project, for clarity in the nested closures */
     def addDep = { cfgName, dep -> dependencies.add(cfgName, dep) }
+
+    // All our configurations depend on the configurations of all our child projects.
     project.childProjects.forEach() { key, subProj ->
         configurations.all { cfg ->
             if (!(cfg.name in deprecatedConfigs)) {
