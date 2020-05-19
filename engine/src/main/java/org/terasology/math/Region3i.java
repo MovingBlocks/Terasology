@@ -65,7 +65,10 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param min the min point of the region
      * @param size the size of the region
      * @return a new region base on the min point and region size, empty if the size is negative
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link org.terasology.world.block.BlockRegionIterable}.
      */
+    @Deprecated
     public static Region3i createFromMinAndSize(BaseVector3i min, BaseVector3i size) {
         if (size.x() <= 0 || size.y() <= 0 || size.z() <= 0) {
             return empty();
@@ -235,7 +238,10 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * @param other
      * @return An iterator over the positions in this region that aren't in other
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link org.terasology.world.block.BlockRegionIterable}.
      */
+    @Deprecated
     public Iterator<Vector3i> subtract(Region3i other) {
         return new SubtractiveIterator(other);
     }
