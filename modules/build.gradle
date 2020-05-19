@@ -51,9 +51,11 @@ import java.nio.file.StandardCopyOption
 class RemoteModuleGatherer implements DependencyResolutionListener {
 
     private final java.nio.file.Path modulesDir
+    private final Logger logger
 
     RemoteModuleGatherer(java.nio.file.Path  modulesDir) {
         this.modulesDir = modulesDir
+        logger = Logging.getLogger(this.class)
     }
 
     @Override
@@ -78,7 +80,7 @@ class RemoteModuleGatherer implements DependencyResolutionListener {
                     def binaryModulePath = modulesDir.resolve(it.file.name)
                     Files.copy(it.file.toPath(), binaryModulePath, StandardCopyOption.REPLACE_EXISTING)
                 } else if (isLocalTerasologyModule(it)) {
-                    logger.debug("*** Found module dependency {} in source form, " +
+                    logger.info("*** Found module dependency {} in source form, " +
                             "not copying a runtime jar from Gradle", it)
                 } else {
                     //ignore non terasology module
@@ -100,7 +102,6 @@ class RemoteModuleGatherer implements DependencyResolutionListener {
         def componentIdentifier = artifact.id.componentIdentifier
         if (componentIdentifier instanceof ProjectComponentIdentifier) {
             def module = componentIdentifier as ProjectComponentIdentifier
-            println "What does this look like? $module"
             return !(module.projectName in ['engine', 'engine-tests'])
         }
         return false
