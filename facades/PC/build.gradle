@@ -140,6 +140,8 @@ run {
     args "-homedir"
     jvmArgs "-Xmx1536m", "-XshowSettings:properties"
     workingDir rootDir
+
+    dependsOn rootProject.moduleClasses
 }
 
 task game(type:JavaExec) {
