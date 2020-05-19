@@ -15,15 +15,15 @@
  */
 package org.terasology.logic.behavior.nui;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
  */
 @RegisterBindButton(id = "behavior_editor", description = "${engine:menu#binding-behavior-editor}", category = "behavior")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_F5)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F5)
 public class BTEditorButton extends BindButtonEvent {
 }
