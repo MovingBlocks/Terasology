@@ -17,6 +17,7 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
+import org.joml.AABBi;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;
@@ -36,17 +37,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class BlockRegionTest {
 
-    @Test
-    public void testEmptyRegion() {
-        assertEquals(new BlockRegion().union(0, 0, 0).getSize(new Vector3i()), new Vector3i());
-        assertFalse(new BlockRegion().union(0, 0, 0).isValid());
-    }
 
     @Test
     public void testCreateRegionWithMinAndSize() {
         List<Vector3i> mins = Arrays.asList(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i(3, 4, 5));
         List<Vector3i> size = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(8, 5, 2));
-        List<Vector3i> expectedMax = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(4, 4, 4), new Vector3i(11, 9, 7));
+        List<Vector3i> expectedMax = Arrays.asList(new Vector3i(), new Vector3i(3, 3, 3), new Vector3i(10, 8, 6));
 
         for (int i = 0; i < mins.size(); ++i) {
             BlockRegion region = new BlockRegion().union(mins.get(i)).setSize(size.get(i));
@@ -60,9 +56,9 @@ public class BlockRegionTest {
     public void testCreateRegionWithMinMax() {
         List<Vector3i> mins = Arrays.asList(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i(3, 4, 5));
         List<Vector3i> expectedSize = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(8, 5, 2));
-        List<Vector3i> max = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(4, 4, 4), new Vector3i(11, 9, 7));
+        List<Vector3i> max = Arrays.asList(new Vector3i(), new Vector3i(3, 3, 3), new Vector3i(10, 8, 6));
         for (int i = 0; i < mins.size(); ++i) {
-            BlockRegion region = new BlockRegion().union(mins.get(i)).union(max.get(i));
+            BlockRegion region = new BlockRegion(mins.get(i), max.get(i));
             assertEquals(mins.get(i), region.getMin(new Vector3i()));
             assertEquals(max.get(i), region.getMax(new Vector3i()));
             assertEquals(expectedSize.get(i), region.getSize(new Vector3i()));
@@ -71,13 +67,14 @@ public class BlockRegionTest {
 
     @Test
     public void testCreateRegionWithBounds() {
-        BlockRegion expectedRegion = new BlockRegion(new Vector3i(-2, 4, -16), new Vector3i(5, 108, 1));
+        BlockRegion expectedRegion = new BlockRegion(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
         List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107, -16), new Vector3i(-2, 4, 0),
             new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
         List<Vector3i> vec2 = Arrays.asList(new Vector3i(4, 107, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 4, 0), new Vector3i(4, 107, -16),
             new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
         for (int i = 0; i < vec1.size(); ++i) {
-            assertEquals(expectedRegion, new BlockRegion().unionBlock(vec1.get(i)).unionBlock(vec2.get(i)));
+            BlockRegion target = new BlockRegion().union(vec1.get(i)).union(vec2.get(i));
+            assertEquals(expectedRegion, target);
         }
     }
 
@@ -99,7 +96,7 @@ public class BlockRegionTest {
     public void testIterateRegion() {
         Vector3i min = new Vector3i(2, 5, 7);
         Vector3i max = new Vector3i(10, 11, 12);
-        BlockRegion region = new BlockRegion().unionBlock(min).unionBlock(max);
+        BlockRegion region = new BlockRegion(min,max);
 
         Set<Vector3ic> expected = Sets.newHashSet();
         for (int x = min.x; x <= max.x; ++x) {
@@ -121,45 +118,45 @@ public class BlockRegionTest {
 
     @Test
     public void testSimpleIntersect() {
-        BlockRegion region1 = new BlockRegion().unionBlock(new Vector3i()).unionBlock(new Vector3i(32, 32, 32));
-        BlockRegion region2 = new BlockRegion().unionBlock(new Vector3i(1, 1, 1)).unionBlock(new Vector3i(17, 17, 17));
+        BlockRegion region1 = new BlockRegion(new Vector3i(), new Vector3i(32, 32, 32));
+        BlockRegion region2 = new BlockRegion(new Vector3i(1, 1, 1), new Vector3i(17, 17, 17));
         assertEquals(region2, region1.intersection(region2, new BlockRegion()));
     }
 
     @Test
     public void testNonTouchingIntersect() {
-        BlockRegion region1 = new BlockRegion().unionBlock(new Vector3i()).unionBlock(new Vector3i(32, 32, 32));
-        BlockRegion region2 = new BlockRegion().unionBlock(new Vector3i(103, 103, 103)).unionBlock(new Vector3i(170, 170, 170));
+        BlockRegion region1 = new BlockRegion(new Vector3i(), new Vector3i(32, 32, 32));
+        BlockRegion region2 = new BlockRegion(new Vector3i(103, 103, 103), new Vector3i(170, 170, 170));
         assertFalse(region1.intersection(region2, new BlockRegion()).isValid());
     }
 
     @Test
     public void testEncompasses() {
         BlockRegion region = new BlockRegion().union(new Vector3i()).setSize(new Vector3i(1, 1, 1));
-        assertTrue(region.testBlock(0, 0, 0));
+        assertTrue(region.containsBlock(0, 0, 0));
 
-        assertFalse(region.testBlock(1, 0, 0));
-        assertFalse(region.testBlock(1, 0, 1));
-        assertFalse(region.testBlock(0, 0, 1));
-        assertFalse(region.testBlock(-1, 0, -1));
-        assertFalse(region.testBlock(-1, 0, 0));
-        assertFalse(region.testBlock(-1, 0, -1));
-        assertFalse(region.testBlock(0, 0, -1));
+        assertFalse(region.containsBlock(1, 0, 0));
+        assertFalse(region.containsBlock(1, 0, 1));
+        assertFalse(region.containsBlock(0, 0, 1));
+        assertFalse(region.containsBlock(-1, 0, -1));
+        assertFalse(region.containsBlock(-1, 0, 0));
+        assertFalse(region.containsBlock(-1, 0, -1));
+        assertFalse(region.containsBlock(0, 0, -1));
 
-        assertFalse(region.testBlock(1, 1, 0));
-        assertFalse(region.testBlock(1, 1, 1));
-        assertFalse(region.testBlock(0, 1, 1));
-        assertFalse(region.testBlock(-1, 1, -1));
-        assertFalse(region.testBlock(-1, 1, 0));
-        assertFalse(region.testBlock(-1, 1, -1));
-        assertFalse(region.testBlock(0, 1, -1));
+        assertFalse(region.containsBlock(1, 1, 0));
+        assertFalse(region.containsBlock(1, 1, 1));
+        assertFalse(region.containsBlock(0, 1, 1));
+        assertFalse(region.containsBlock(-1, 1, -1));
+        assertFalse(region.containsBlock(-1, 1, 0));
+        assertFalse(region.containsBlock(-1, 1, -1));
+        assertFalse(region.containsBlock(0, 1, -1));
 
-        assertFalse(region.testBlock(1, -1, 0));
-        assertFalse(region.testBlock(1, -1, 1));
-        assertFalse(region.testBlock(0, -1, 1));
-        assertFalse(region.testBlock(-1, -1, -1));
-        assertFalse(region.testBlock(-1, -1, 0));
-        assertFalse(region.testBlock(-1, -1, -1));
-        assertFalse(region.testBlock(0, -1, -1));
+        assertFalse(region.containsBlock(1, -1, 0));
+        assertFalse(region.containsBlock(1, -1, 1));
+        assertFalse(region.containsBlock(0, -1, 1));
+        assertFalse(region.containsBlock(-1, -1, -1));
+        assertFalse(region.containsBlock(-1, -1, 0));
+        assertFalse(region.containsBlock(-1, -1, -1));
+        assertFalse(region.containsBlock(0, -1, -1));
     }
 }
