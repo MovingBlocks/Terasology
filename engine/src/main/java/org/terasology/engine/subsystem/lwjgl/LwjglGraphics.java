@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -232,20 +231,15 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
         GLFW.glfwWindowHint(GLFW.GLFW_COCOA_GRAPHICS_SWITCHING, GLFW.GLFW_TRUE);
 
-
         if (!config.isVSync()) {
             GLFW.glfwSwapInterval(1);
         }
-
         if (config.getDebug().isEnabled()) {
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
-            try {
-                GL43.glDebugMessageCallback(new DebugCallback(), 0);
-            } catch (IllegalStateException e) {
-                logger.warn("Unable to specify DebugCallback to receive debugging messages from the GL.");
-            }
         }
-        GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err)); //TODO make non err;
+
+        GLFW.glfwSetErrorCallback(new GLFWErrorCallback());
+
         long window = GLFW.glfwCreateWindow(
                 config.getWindowWidth(), config.getWindowHeight(), "Terasology Alpha", 0, 0);
         if (window == 0) {
@@ -315,6 +309,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         WindowSize windowSize = LwjglUtil.getWindowSize();
         GL11.glViewport(0, 0, windowSize.getWidth(), windowSize.getHeight());
         initOpenGLParams();
+        if(config.getDebug().isEnabled()){
+            try {
+                GL43.glDebugMessageCallback(new DebugCallback(), MemoryUtil.NULL);
+            } catch (IllegalStateException e) {
+                logger.warn("Unable to specify DebugCallback to receive debugging messages from the GL.");
+            }
+        }
         currentContext.put(ShaderManager.class, new ShaderManagerLwjgl());
     }
 
