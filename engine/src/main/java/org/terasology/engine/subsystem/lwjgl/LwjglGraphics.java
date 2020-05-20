@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -166,7 +167,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     public void postInitialise(Context rootContext) {
         context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
 
-        initDisplay();
+        initGLFW();
+        initWindow();
         initOpenGL(context);
 
         context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
@@ -198,7 +200,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         long window = GLFW.glfwGetCurrentContext();
         if (window != MemoryUtil.NULL) {
             boolean isVisible = GLFW.glfwGetWindowAttrib(window, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE;
-            boolean isFullScreen = GLFW.glfwGetWindowMonitor(window) != MemoryUtil.NULL;
+            boolean isFullScreen = lwjglDisplay.isFullscreen();
             if (!isFullScreen && isVisible) {
                 int[] xBuffer = new int[1];
                 int[] yBuffer = new int[1];
@@ -220,9 +222,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         GLFW.glfwTerminate();
     }
 
-    private void initDisplay() {
-        logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your video card)");
-
+    private void initGLFW() {
         if (!GLFW.glfwInit()) {
             throw new RuntimeException("Failed to initialize GLFW");
         }
@@ -239,7 +239,11 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         }
 
         GLFW.glfwSetErrorCallback(new GLFWErrorCallback());
+    }
 
+
+    private void initWindow() {
+        logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your video card)");
         long window = GLFW.glfwCreateWindow(
                 config.getWindowWidth(), config.getWindowHeight(), "Terasology Alpha", 0, 0);
         if (window == 0) {
@@ -259,7 +263,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             buffer.put(1, convertToGLFWFormat(icon32));
             buffer.put(2, convertToGLFWFormat(icon64));
             buffer.put(3, convertToGLFWFormat(icon128));
-            GLFW.glfwSetWindowIcon(GLFW.glfwGetCurrentContext(), buffer);
+            GLFW.glfwSetWindowIcon(window, buffer);
 
         } catch (IOException | IllegalArgumentException e) {
             logger.warn("Could not set icon", e);
@@ -267,8 +271,14 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
         lwjglDisplay.setDisplayModeSetting(config.getDisplayModeSetting(), false);
 
-        GLFW.glfwShowWindow(window);
+        GLFW.glfwSetFramebufferSizeCallback(GLFW.glfwGetCurrentContext(), new GLFWFramebufferSizeCallback() {
+            @Override
+            public void invoke(long window, int width, int height) {
+                lwjglDisplay.updateViewport(width, height);
+            }
+        });
 
+        GLFW.glfwShowWindow(window);
     }
 
     /**
@@ -309,7 +319,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         WindowSize windowSize = LwjglUtil.getWindowSize();
         GL11.glViewport(0, 0, windowSize.getWidth(), windowSize.getHeight());
         initOpenGLParams();
-        if(config.getDebug().isEnabled()){
+        if (config.getDebug().isEnabled()) {
             try {
                 GL43.glDebugMessageCallback(new DebugCallback(), MemoryUtil.NULL);
             } catch (IllegalStateException e) {

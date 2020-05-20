@@ -47,7 +47,6 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     private final Supplier<List<Resolution>> availableResolutions = createAvailableResolutionSupplier();
 
     private RenderingConfig config;
-    private GLFWFramebufferSizeCallback framebufferSizeCallback;
 
     public LwjglDisplayDevice(Context context) {
         this.config = context.get(Config.class).getRendering();
@@ -65,7 +64,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public boolean isFullscreen() {
-        return false;
+        return MemoryUtil.NULL != GLFW.glfwGetWindowMonitor(GLFW.glfwGetCurrentContext());
     }
 
     @Override
@@ -173,15 +172,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     public void update() {
         processMessages();
-
         GLFW.glfwSwapBuffers(GLFW.glfwGetCurrentContext());
-        GLFW.glfwSetFramebufferSizeCallback(GLFW.glfwGetCurrentContext(),
-                (framebufferSizeCallback = new GLFWFramebufferSizeCallback() {
-                    @Override
-                    public void invoke(long window, int width, int height) {
-                        updateViewport(width, height);
-                    }
-                }));
     }
 
     private void updateViewport() {
@@ -191,7 +182,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
         updateViewport(widthBuffer.get(), heightBuffer.get());
     }
 
-    private void updateViewport(int width, int height) {
+    protected void updateViewport(int width, int height) {
         glViewport(0, 0, width, height);
         propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, 0, 1);
     }
