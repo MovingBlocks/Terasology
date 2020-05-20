@@ -26,6 +26,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL43;
 import org.lwjgl.opengl.GLCapabilities;
+import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -195,15 +196,24 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void preShutdown() {
-        // FIXME: LWJGL 3 - reimplement
-//        if (Display.isCreated() && !Display.isFullscreen() && Display.isVisible()) {
-//            config.setWindowPosX(Display.getX());
-//            config.setWindowPosY(Display.getY());
-//
-//            config.setWindowWidth(Display.getWidth());
-//            config.setWindowHeight(Display.getHeight());
-//
-//        }
+        long window = GLFW.glfwGetCurrentContext();
+        if (window != MemoryUtil.NULL) {
+            boolean isVisible = GLFW.glfwGetWindowAttrib(window, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE;
+            boolean isFullScreen = GLFW.glfwGetWindowMonitor(window) != MemoryUtil.NULL;
+            if (!isFullScreen && isVisible) {
+                int[] xBuffer = new int[1];
+                int[] yBuffer = new int[1];
+                GLFW.glfwGetWindowPos(window, xBuffer, yBuffer);
+                config.setWindowPosX(xBuffer[0]);
+                config.setWindowPosY(yBuffer[0]);
+
+                int[] widthBuffer = new int[1];
+                int[] heightBuffer = new int[1];
+                GLFW.glfwGetWindowSize(window, widthBuffer, heightBuffer);
+                config.setWindowWidth(widthBuffer[0]);
+                config.setWindowHeight(heightBuffer[0]);
+            }
+        }
     }
 
     @Override
@@ -223,7 +233,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         GLFW.glfwWindowHint(GLFW.GLFW_COCOA_GRAPHICS_SWITCHING, GLFW.GLFW_TRUE);
 
 
-        if (!config.isVSync()) { // TODO: black screen
+        if (!config.isVSync()) {
             GLFW.glfwSwapInterval(1);
         }
 
@@ -251,9 +261,9 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             BufferedImage icon64 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_64.png"));
             BufferedImage icon128 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_128.png"));
             GLFWImage.Buffer buffer = GLFWImage.create(4);
-            buffer.put(0,convertToGLFWFormat(icon16));
-            buffer.put(1,convertToGLFWFormat(icon32));
-            buffer.put(2,convertToGLFWFormat(icon64));
+            buffer.put(0, convertToGLFWFormat(icon16));
+            buffer.put(1, convertToGLFWFormat(icon32));
+            buffer.put(2, convertToGLFWFormat(icon64));
             buffer.put(3, convertToGLFWFormat(icon128));
             GLFW.glfwSetWindowIcon(GLFW.glfwGetCurrentContext(), buffer);
 
@@ -269,6 +279,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     /**
      * Converting BufferedImage to GLFWImage
+     *
      * @param image image to convert
      * @return convertedImage
      */
@@ -302,7 +313,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         logger.info("Initializing OpenGL");
         checkOpenGL();
         WindowSize windowSize = LwjglUtil.getWindowSize();
-        GL11.glViewport(0, 0, windowSize.getWidth(),windowSize.getHeight());
+        GL11.glViewport(0, 0, windowSize.getWidth(), windowSize.getHeight());
         initOpenGLParams();
         currentContext.put(ShaderManager.class, new ShaderManagerLwjgl());
     }
@@ -336,17 +347,17 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 "GL_ARB_half_float_pixel"};
 
         boolean canRunTheGame = true;
-        String missingCapabilitiesMessage = "";
+        StringBuilder missingCapabilitiesMessage = new StringBuilder();
 
         for (int index = 0; index < requiredCapabilities.length; index++) {
             if (!requiredCapabilities[index]) {
-                missingCapabilitiesMessage += "    - " + capabilityNames[index] + "\n";
+                missingCapabilitiesMessage.append("    - ").append(capabilityNames[index]).append("\n");
                 canRunTheGame = false;
             }
         }
 
         if (!canRunTheGame) {
-            String completeErrorMessage = completeErrorMessage(missingCapabilitiesMessage);
+            String completeErrorMessage = completeErrorMessage(missingCapabilitiesMessage.toString());
             throw new IllegalStateException(completeErrorMessage);
         }
     }
