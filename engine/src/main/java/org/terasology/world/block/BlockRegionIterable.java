@@ -41,12 +41,12 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
     public Iterator<Vector3ic> iterator() {
         return new Iterator<Vector3ic>() {
             private Vector3i current = null;
-            private final Vector3i next = new Vector3i(region.minX, region.minY, region.minZ);
+            private final Vector3i next = new Vector3i(region.aabb.minX, region.aabb.minY, region.aabb.minZ);
 
             public boolean isValid(Vector3ic test) {
                 if (subtract != null) {
                     for (BlockRegion blockRegion : subtract) {
-                        if (blockRegion.testBlock(test)) {
+                        if (blockRegion.containsBlock(test)) {
                             return false;
                         }
                     }
@@ -58,15 +58,15 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
                 if (current.equals(next)) {
                     do {
                         next.z++;
-                        if (next.z >= region.maxZ) {
-                            next.z = region.minZ;
+                        if (next.z >= region.aabb.maxZ) {
+                            next.z = region.aabb.minZ;
                             next.y++;
-                            if (next.y >= region.maxY) {
-                                next.y = region.minY;
+                            if (next.y >= region.aabb.maxY) {
+                                next.y = region.aabb.minY;
                                 next.x++;
                             }
                         }
-                        if (!region.testBlock(next)) {
+                        if (!region.containsBlock(next)) {
                             return false;
                         }
                     } while (!isValid(next));
@@ -84,7 +84,7 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
                 if (current.equals(next)) {
                     return findNext();
                 }
-                return !region.testBlock(next);
+                return !region.containsBlock(next);
             }
 
             @Override
