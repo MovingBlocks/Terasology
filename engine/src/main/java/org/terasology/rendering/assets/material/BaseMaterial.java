@@ -245,11 +245,21 @@ public abstract class BaseMaterial extends Material {
         setMatrix3(name, buffer, false);
     }
 
+    /**
+     * writes camera into the local material and they include the uniforms listed below:
+     * <pre>{@code
+     * uniform mat4 viewMatrix;
+     * uniform mat4 projMatrix;
+     * uniform mat4 viewProjMatrix;
+     * uniform mat4 invProjMatrix;
+     * }</pre>
+     * @param camera camera to write into material
+     */
     @Override
     public void setCamera(Camera camera) {
-        setMatrix4("viewMatrix", camera.getViewMatrix(), true);
-        setMatrix4("projMatrix", camera.getProjectionMatrix(), true);
-        setMatrix4("viewProjMatrix", camera.getViewProjectionMatrix(), true);
-        setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix(), true);
+        setMatrix4("viewMatrix", new org.joml.Matrix4f(camera.getViewMatrix()).transpose(), true);
+        setMatrix4("projMatrix", new org.joml.Matrix4f(camera.getProjectionMatrix()).transpose(), true);
+        setMatrix4("viewProjMatrix", new org.joml.Matrix4f(camera.getViewProjectionMatrix()).transpose(), true);
+        setMatrix4("invProjMatrix", new org.joml.Matrix4f(camera.getInverseProjectionMatrix()).transpose(), true);
     }
 }

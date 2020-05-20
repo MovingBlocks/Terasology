@@ -17,6 +17,7 @@ package org.terasology.math;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 
@@ -201,9 +202,20 @@ public enum Side {
 
     /**
      * @return The vector3i in the direction of the side. Do not modify.
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #direction()} .
      */
+    @Deprecated
     public Vector3i getVector3i() {
         return vector3iDir;
+    }
+
+    /**
+     * the normal vector in the direction of the side
+     * @return a normalized vector
+     */
+    public Vector3ic direction() {
+        return JomlUtil.from(vector3iDir);
     }
 
     /**
@@ -294,10 +306,30 @@ public enum Side {
         }
     }
 
+    /**
+     * 
+     * @param position
+     * @return
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #getAdjacentPos(Vector3ic, org.joml.Vector3i)} .
+     *      
+     **/
+    @Deprecated
     public Vector3i getAdjacentPos(Vector3i position) {
         Vector3i result = new Vector3i(position);
         result.add(vector3iDir);
         return result;
+    }
+
+    /**
+     * take the current pos and add the direction
+     *
+     * @param pos current position
+     * @param dest will hold the result
+     * @return dest
+     */
+    public org.joml.Vector3i getAdjacentPos(Vector3ic pos, org.joml.Vector3i dest){
+        return dest.set(pos).add(direction());
     }
 
     public Side getRelativeSide(Direction direction) {
