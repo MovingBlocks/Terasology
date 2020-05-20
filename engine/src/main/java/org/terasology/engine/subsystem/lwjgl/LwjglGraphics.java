@@ -271,13 +271,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
         lwjglDisplay.setDisplayModeSetting(config.getDisplayModeSetting(), false);
 
-        GLFW.glfwSetFramebufferSizeCallback(GLFW.glfwGetCurrentContext(), new GLFWFramebufferSizeCallback() {
-            @Override
-            public void invoke(long window, int width, int height) {
-                lwjglDisplay.updateViewport(width, height);
-            }
-        });
-
         GLFW.glfwShowWindow(window);
     }
 
@@ -316,8 +309,12 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     private void initOpenGL(Context currentContext) {
         logger.info("Initializing OpenGL");
         checkOpenGL();
-        WindowSize windowSize = LwjglUtil.getWindowSize();
-        GL11.glViewport(0, 0, windowSize.getWidth(), windowSize.getHeight());
+        GLFW.glfwSetFramebufferSizeCallback(GLFW.glfwGetCurrentContext(), new GLFWFramebufferSizeCallback() {
+            @Override
+            public void invoke(long window, int width, int height) {
+                lwjglDisplay.updateViewport(width, height);
+            }
+        });
         initOpenGLParams();
         if (config.getDebug().isEnabled()) {
             try {

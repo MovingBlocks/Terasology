@@ -17,6 +17,7 @@ package org.terasology.rendering.backdrop;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.context.Context;
+import org.terasology.rendering.primitives.Sphere;
 import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
@@ -81,19 +82,21 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         if (displayListSphere == -1) {
             displayListSphere = glGenLists(1);
 
-          //  Sphere sphere = new Sphere(); // FIXME: LWJGL 3 - reimplement
-          //  sphere.setTextureFlag(true);
+            Sphere sphere = new Sphere();
+            sphere.setTextureFlag(true);
 
             glNewList(displayListSphere, GL11.GL_COMPILE);
 
             float skyBoxDistance = (zFar > 1024 ? 1024.0f : zFar * 0.95f);
-         //   sphere.draw(skyBoxDistance, 16, 128);
+            sphere.draw(skyBoxDistance, 16, 128);
 
             glEndList();
         }
 
         glCallList(displayListSphere);
     }
+
+
 
     @Override
     public float getSunPositionAngle() {
