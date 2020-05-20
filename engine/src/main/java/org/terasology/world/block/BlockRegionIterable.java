@@ -21,7 +21,6 @@ import org.joml.Vector3ic;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class BlockRegionIterable implements Iterable<Vector3ic> {
 
@@ -104,11 +103,6 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
                 return next;
             }
         };
-    }
-
-    @Override
-    public void forEach(Consumer<? super Vector3ic> consumer) {
-
     }
 
     public static final class Builder {
