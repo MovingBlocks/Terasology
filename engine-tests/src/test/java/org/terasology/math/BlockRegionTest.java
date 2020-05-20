@@ -45,7 +45,7 @@ public class BlockRegionTest {
         List<Vector3i> expectedMax = Arrays.asList(new Vector3i(), new Vector3i(3, 3, 3), new Vector3i(10, 8, 6));
 
         for (int i = 0; i < mins.size(); ++i) {
-            BlockRegion region = new BlockRegion().union(mins.get(i)).setSize(size.get(i));
+            BlockRegion region = new BlockRegion().setMin(mins.get(i)).setSize(size.get(i));
             assertEquals(mins.get(i), region.getMin(new Vector3i()));
             assertEquals(size.get(i), region.getSize(new Vector3i()));
             assertEquals(expectedMax.get(i), region.getMax(new Vector3i()));
