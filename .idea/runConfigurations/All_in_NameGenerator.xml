@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="All in NameGenerator" type="JUnit" factoryName="JUnit">
     <module name="Terasology.modules.NameGenerator.test" />
-    <shortenClasspath name="ARGS_FILE" />
+    <shortenClasspath name="MANIFEST" />
     <useClassPathOnly />
     <option name="PACKAGE_NAME" value="org.terasology.namegenerator" />
     <option name="MAIN_CLASS_NAME" value="" />

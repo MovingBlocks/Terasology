@@ -3,7 +3,7 @@
     <option name="MAIN_CLASS_NAME" value="org.terasology.editor.TeraEd" />
     <module name="Terasology.facades.TeraEd.main" />
     <option name="PROGRAM_PARAMETERS" value="-homedir" />
-    <shortenClasspath name="ARGS_FILE" />
+    <shortenClasspath name="MANIFEST" />
     <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m" />
     <extension name="coverage">
       <pattern>

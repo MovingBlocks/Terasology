@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="engine-tests with JaCoCo" type="JUnit" factoryName="JUnit">
     <module name="Terasology.engine-tests.test" />
-    <shortenClasspath name="ARGS_FILE" />
+    <shortenClasspath name="MANIFEST" />
     <useClassPathOnly />
     <extension name="coverage" runner="jacoco">
       <pattern>
