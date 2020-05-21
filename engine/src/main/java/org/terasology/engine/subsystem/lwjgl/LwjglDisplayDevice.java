@@ -31,6 +31,8 @@ import org.terasology.utilities.subscribables.AbstractSubscribable;
 import java.nio.IntBuffer;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -43,8 +45,8 @@ import static org.lwjgl.opengl.GL11.glViewport;
 public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayDevice {
     public static final String DISPLAY_RESOLUTION_CHANGE = "displayResolutionChange";
 
-    private final Supplier<Resolution> desktopResolution = createDesktopResolutionSupplier();
-    private final Supplier<List<Resolution>> availableResolutions = createAvailableResolutionSupplier();
+    private final Supplier<LwjglResolution> desktopResolution = createDesktopResolutionSupplier();
+    private final Supplier<List<LwjglResolution>> availableResolutions = createAvailableResolutionSupplier();
 
     private RenderingConfig config;
 
@@ -95,7 +97,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
                 config.setFullscreen(true);
                 break;
             case WINDOWED_FULLSCREEN:
-                GLFWVidMode vidMode = ((LwjglResolution) getResolution()).getVidMode();
+                GLFWVidMode vidMode = desktopResolution.get().getSourceVidMode().get();
                 GLFW.glfwSetWindowMonitor(window,
                         MemoryUtil.NULL,
                         0,
@@ -132,17 +134,23 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public List<Resolution> getResolutions() {
-        return availableResolutions.get();
+        return availableResolutions.get().stream()
+                .map(r -> (Resolution) r)
+                .collect(Collectors.toList());
     }
 
     @Override
     public int getDisplayWidth() {
-        return ((LwjglResolution) getResolution()).getVidMode().width();
+        int[] width = new int[1];
+        GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), width, new int[1]);
+        return width[0];
     }
 
     @Override
     public int getDisplayHeight() {
-        return ((LwjglResolution) getResolution()).getVidMode().height();
+        int[] height = new int[1];
+        GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), new int[1], height);
+        return height[0];
     }
 
     @Override
@@ -190,14 +198,23 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     private GLFWVidMode getFullScreenDisplayMode() {
         Resolution resolution = config.getResolution();
         if (resolution instanceof LwjglResolution) {
-            return ((LwjglResolution) resolution).getVidMode();
+            Optional<GLFWVidMode> candidateVidMode = ((LwjglResolution) resolution).getSourceVidMode();
+            return candidateVidMode
+                    .orElseGet(() -> availableResolutions.get()
+                            .stream()
+                            .filter(Predicate.isEqual(candidateVidMode))
+                            .map(LwjglResolution::getSourceVidMode)
+                            .map(Optional::get)
+                            .findFirst()
+                            .orElse(desktopResolution.get()
+                                    .getSourceVidMode().get()));
         }
-        return GLFW.glfwGetVideoMode(0);
+        return null;
     }
 
     private void updateFullScreenDisplay() {
         long window = GLFW.glfwGetCurrentContext();
-        GLFWVidMode vidMode = ((LwjglResolution) getResolution()).getVidMode();
+        GLFWVidMode vidMode = getFullScreenDisplayMode();
         GLFW.glfwSetWindowMonitor(window,
                 GLFW.glfwGetPrimaryMonitor(),
                 0,
@@ -207,17 +224,17 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
                 vidMode.refreshRate());
     }
 
-    private static Supplier<Resolution> createDesktopResolutionSupplier() {
+
+    private static Supplier<LwjglResolution> createDesktopResolutionSupplier() {
         return Suppliers.memoize(() -> new LwjglResolution(GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())));
     }
 
-    private static Supplier<List<Resolution>> createAvailableResolutionSupplier() {
+    private static Supplier<List<LwjglResolution>> createAvailableResolutionSupplier() {
         return Suppliers.memoize(() -> GLFW.glfwGetVideoModes(GLFW.glfwGetPrimaryMonitor())
                 .stream() // FIXME possible npe
                 .sorted(Comparator
                         .comparing(GLFWVidMode::width)
                         .thenComparing(GLFWVidMode::width)
-                        //.thenComparing(DisplayMode::getBitsPerPixel) // DPI in other place
                         .thenComparing(GLFWVidMode::refreshRate)
                 )
                 .map(LwjglResolution::new)
