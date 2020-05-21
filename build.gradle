@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
     repositories {
@@ -23,14 +39,20 @@ buildscript {
     }
 }
 
-// Customization of IDE options
-apply from: 'config/gradle/ide.gradle'
 
-// Needed for extending the "clean" task to also delete custom stuff defined here like natives
-apply plugin: 'base'
+plugins {
+    // Needed for extending the "clean" task to also delete custom stuff defined here like natives
+    id "base"
 
-// The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
-//apply plugin: 'eclipse'
+    // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
+    //apply plugin: 'eclipse'
+    id "idea"
+    // For the "Build and run using: Intellij IDEA | Gradle" switch
+    id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
+}
+
+
+import org.jetbrains.gradle.ext.ActionDelegationConfig
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -178,7 +200,7 @@ configurations.all {
 clean.doLast {
     new File(dirNatives).deleteDir()
     new File(dirConfigMetrics).deleteDir()
-    println "Cleaned root - don't forget to re-extract stuff! 'gradlew extractNatives extractConfig' will do so, or 'gradlew idea' (or eclipse)"
+    println "Cleaned root - don't forget to re-extract stuff! 'gradlew extractNatives extractConfig' will do so"
 }
 
 task protobufCompileWindows(type: Exec) {
@@ -322,35 +344,9 @@ idea {
 
     module.downloadSources = true
 
-    project {
-        // Set JDK
-        jdkName = '1.8'
-        wildcards -= '!?*.groovy'
-
-        ipr {
-            withXml { xmlProvider ->
-                // Apply a bunch of tweaks to IntelliJ config - all defined in ide.gradle
-                // Part reason for separate file was in case a module needs to define something it cannot do so in a project block
-                def iprNode = xmlProvider.asNode()
-                ideaActivateCheckstyle(iprNode)
-                ideaActivateCopyright(iprNode)
-                ideaActivateAnnotations(iprNode)
-                ideaActivateGit(iprNode)
-                ideaActivateGradle(iprNode)
-            }
-
-            // Sets sourceCompatibility within IntelliJ (without this root build having the Java plugin applied)
-            whenMerged { project ->
-                project.jdk.languageLevel = 'JDK_1_8'
-            }
-        }
-    }
-
-    // Tweaks to the .iws
-    workspace.iws.withXml { xmlProvider ->
-        def iwsNode = xmlProvider.asNode()
-        ideaMakeAutomatically(iwsNode)
-        ideaRunConfig(iwsNode)
+    project.settings.delegateActions {
+        delegateBuildRunToGradle = false
+        testRunner = ActionDelegationConfig.TestRunner.PLATFORM
     }
 }
 

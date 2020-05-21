@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="All in NameGenerator" type="JUnit" factoryName="JUnit">
+    <module name="Terasology.modules.NameGenerator.test" />
+    <shortenClasspath name="ARGS_FILE" />
+    <useClassPathOnly />
+    <option name="PACKAGE_NAME" value="org.terasology.namegenerator" />
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="package" />
+    <option name="VM_PARAMETERS" />
+    <option name="PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <dir value="$PROJECT_DIR$/modules/NameGenerator/src/test" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
