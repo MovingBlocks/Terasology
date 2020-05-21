@@ -21,3 +21,7 @@ workspace.xml
 
 # too much churn with teresology-modules each having their own repo
 /vcs.xml
+
+#
+/misc.xml
+/jarRepositories.xml
