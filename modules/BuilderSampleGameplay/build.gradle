@@ -111,7 +111,7 @@ configurations.all {
 }
 configurations {
     terasologyModule
-    compile.extendsFrom terasologyModule
+    implementation.extendsFrom terasologyModule
 }
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
