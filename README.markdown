@@ -27,13 +27,18 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
 
 ## Playing
 
-Terasology not required Java, if use Launcher. Make sure that your graphics card driver is up to date.
+Make sure that your graphics card driver is up to date.
 
-For easy setup (recommended) you can use our launcher - [download it here.](https://github.com/MovingBlocks/TerasologyLauncher/releases)
-
-Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](http://jenkins.terasology.org/job/DistroOmega/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
+For easy game setup (recommended) you can use our launcher - [download it here.](https://github.com/MovingBlocks/TerasologyLauncher/releases)
 
 For more information about playing, like hot keys or server hosting, see the [dedicated page](docs/Playing.md) or check out the [modules.](docs/Modules.md)
+
+
+#### Alternate Install Method
+
+If you know you already have a Java Runtime Environment installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java versions 8 and 11 are supported.
+
+Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](http://jenkins.terasology.org/job/DistroOmega/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
 
 
 ## Developing
