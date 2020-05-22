@@ -1,7 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="engine-tests with JaCoCo" type="JUnit" factoryName="JUnit">
-    <module name="Terasology.engine-tests.test" />
-    <shortenClasspath name="ARGS_FILE" />
+    <shortenClasspath name="MANIFEST" />
     <useClassPathOnly />
     <extension name="coverage" runner="jacoco">
       <pattern>
@@ -9,7 +8,7 @@
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
-    <option name="PACKAGE_NAME" value="org.terasology.engine" />
+    <option name="PACKAGE_NAME" value="" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="package" />
@@ -17,7 +16,7 @@
     <option name="PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="TEST_SEARCH_SCOPE">
-      <value defaultName="moduleWithDependencies" />
+      <value defaultName="wholeProject" />
     </option>
     <method v="2">
       <option name="Make" enabled="true" />

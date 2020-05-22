@@ -27,21 +27,27 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
 
 ## Playing
 
-Terasology requires Java 8 - [download it here](https://www.java.com/en/download/). Also make sure that your graphics card driver is up to date.
+Make sure that your graphics card driver is up to date.
 
-For easy setup (recommended) you can use our launcher - [download it here.](https://github.com/MovingBlocks/TerasologyLauncher/releases)
-
-Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](http://jenkins.terasology.org/job/DistroOmega/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
+For easy game setup (recommended) you can use our launcher - [download it here.](https://github.com/MovingBlocks/TerasologyLauncher/releases)
 
 For more information about playing, like hot keys or server hosting, see the [dedicated page](docs/Playing.md) or check out the [modules.](docs/Modules.md)
+
+
+#### Alternate Install Method
+
+If you know you already have a Java Runtime Environment installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java versions 8 and 11 are supported.
+
+Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](http://jenkins.terasology.org/job/DistroOmega/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
 
 
 ## Developing
 
 We have gone to great lengths to make developing and modding Terasology as easy as possible. We use Gradle to automate just about everything. As long as you have a [Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) running from source is a two step process:
 
+* Using IntelliJ IDEA, [configure](https://www.jetbrains.com/help/idea/sdk.html) a JDK named "11"
 * Clone the code or download a zip.
-* Run `gradlew game` (on Unixes, including macOS, run `./gradlew` everywhere you see `gradlew`) in the root of the project directory. 
+* Run `TerasologyPC` in your IDEA's run configuration
 
 That's really it! If you want the project set up in [IntelliJ](https://www.jetbrains.com/idea/download/) (our favored IDE) you run `gradlew idea` then load the generated project config. Then you get a bunch of run configurations and other stuff for free!
 
