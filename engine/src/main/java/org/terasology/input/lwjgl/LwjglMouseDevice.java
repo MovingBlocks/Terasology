@@ -132,7 +132,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     private void scrollCallback(long windows, double xoffset, double yoffset) {
         if (yoffset != 0.0) {
             int id = (yoffset > 0) ? 1 : -1;
-            queue.offer(new MouseAction(InputType.MOUSE_WHEEL.getInput(id), (int) (id * yoffset / 120), getPosition()));
+            queue.offer(new MouseAction(InputType.MOUSE_WHEEL.getInput(id), 1, getPosition()));
         }
     }
 }
