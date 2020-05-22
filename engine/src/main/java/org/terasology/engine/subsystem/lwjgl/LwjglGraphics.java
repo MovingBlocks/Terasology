@@ -232,7 +232,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         GLFW.glfwWindowHint(GLFW.GLFW_COCOA_GRAPHICS_SWITCHING, GLFW.GLFW_TRUE);
 
         if (!config.isVSync()) {
-            GLFW.glfwSwapInterval(1);
+            GLFW.glfwSwapInterval(0);
         }
         if (config.getDebug().isEnabled()) {
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
