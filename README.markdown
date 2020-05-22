@@ -27,7 +27,7 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
 
 ## Playing
 
-Terasology requires Java 8 - [download it here](https://www.java.com/en/download/). Also make sure that your graphics card driver is up to date.
+Terasology not required Java, if use Launcher. Make sure that your graphics card driver is up to date.
 
 For easy setup (recommended) you can use our launcher - [download it here.](https://github.com/MovingBlocks/TerasologyLauncher/releases)
 
@@ -40,8 +40,9 @@ For more information about playing, like hot keys or server hosting, see the [de
 
 We have gone to great lengths to make developing and modding Terasology as easy as possible. We use Gradle to automate just about everything. As long as you have a [Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) running from source is a two step process:
 
+* Using IntelliJ IDEA, [configure](https://www.jetbrains.com/help/idea/sdk.html) a JDK named "11"
 * Clone the code or download a zip.
-* Run `gradlew game` (on Unixes, including macOS, run `./gradlew` everywhere you see `gradlew`) in the root of the project directory. 
+* Run `TerasologyPC` in your IDEA's run configuration
 
 That's really it! If you want the project set up in [IntelliJ](https://www.jetbrains.com/idea/download/) (our favored IDE) you run `gradlew idea` then load the generated project config. Then you get a bunch of run configurations and other stuff for free!
 
