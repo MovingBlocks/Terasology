@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,8 +27,8 @@ import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -174,13 +174,22 @@ public class StateMainMenu implements GameState {
 
     @Override
     public void dispose(boolean shuttingDown) {
-        eventSystem.process();
-
-        componentSystemManager.shutdown();
+        // Apparently this can be disposed of before it is completely initialized? Probably only during
+        // crashes, but crashing again during shutdown complicates the diagnosis.
+        if (eventSystem != null) {
+            eventSystem.process();
+        }
+        if (componentSystemManager != null) {
+            componentSystemManager.shutdown();
+        }
         stopBackgroundMusic();
-        nuiManager.clear();
 
-        entityManager.clear();
+        if (nuiManager != null) {
+            nuiManager.clear();
+        }
+        if (entityManager != null) {
+            entityManager.clear();
+        }
     }
 
     private void playBackgroundMusic() {

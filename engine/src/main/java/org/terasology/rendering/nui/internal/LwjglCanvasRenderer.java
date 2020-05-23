@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -113,7 +113,12 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
 
     public LwjglCanvasRenderer(Context context) {
         // TODO use context to get assets instead of static methods
-        this.textureMat = Assets.getMaterial("engine:UITexture").get();
+        try {
+            this.textureMat = Assets.getMaterial("engine:UITexture").get();
+        } catch (java.util.NoSuchElementException noSuch) {
+            // Some extra attention to how this is reported, because this is often the first asset we try to load.
+            throw new RuntimeException("Failing to find engine textures", noSuch);
+        }
         this.billboard = Assets.getMesh("engine:UIBillboard").get();
         this.fontMeshBuilder = new FontMeshBuilder(context.get(AssetManager.class).getAsset("engine:UIUnderline", Material.class).get());
         // failure to load these can be due to failing shaders or missing resources

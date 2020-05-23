@@ -63,6 +63,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
 /**
  * Class providing the main() method for launching Terasology as a PC app.
  * <br><br>
@@ -208,7 +210,7 @@ public final class Terasology {
         try {
             for (int index = 0; index < 5; index++) {
                 URL resource = Terasology.class.getResource("/splash/" + imgFiles[index]);
-                builder.add(new TriggerImageOverlay(resource)
+                builder.add(new TriggerImageOverlay(verifyNotNull(resource, "resource /splash/%s", imgFiles[index]))
                         .setTrigger(trigger[index].getDescription())
                         .setPosition(imgOffsets[index].x, imgOffsets[index].y));
             }
