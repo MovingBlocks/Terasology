@@ -106,14 +106,6 @@ public interface WorldRenderer {
     SubmersibleCamera getActiveCamera();
 
     /**
-     * Retrieves the camera positioned and oriented to look down on the world from the point of view
-     * of the main light source. This camera is used to produce the shadow map.
-     *
-     * @return a Camera object
-     */
-    // Camera getLightCamera();
-
-    /**
      * Called potentially multiple times per frame, this method allows the renderer to trigger the update
      * of any data it requires with a higher frequency than just once per frame.
      *

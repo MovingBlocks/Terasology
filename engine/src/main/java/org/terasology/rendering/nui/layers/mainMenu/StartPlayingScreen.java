@@ -65,7 +65,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-            setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()

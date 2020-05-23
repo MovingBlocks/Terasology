@@ -86,8 +86,7 @@ public class RenderingModuleRegistry {
      * @return list of ordered {@link ModuleRendering} instances
      */
     public List<ModuleRendering> updateRenderingModulesOrder(ModuleEnvironment moduleEnvironment, Context context) {
-        this.orderedModuleRenderingInstances = calculateModuleOrder(fetchRenderingModules(moduleEnvironment, context));
-        return this.orderedModuleRenderingInstances;
+        return calculateModuleOrder(fetchRenderingModules(moduleEnvironment, context));
     }
 
     /**
@@ -136,14 +135,7 @@ public class RenderingModuleRegistry {
         Set<ModuleRendering> moduleSet = new HashSet<>();
 
         for (Class<? extends ModuleRendering> renderingClass : moduleEnvironment.getSubtypesOf(ModuleRendering.class)) {
-            ModuleRendering moduleRenderingInstance = null;
-            for (ModuleRendering moduleRendering : orderedModuleRenderingInstances) {
-                if (renderingClass.isInstance(moduleRendering)) {
-                    moduleRenderingInstance = moduleRendering;
-                    // TODO there's marginal scenarios where you could have more instances of same class moduleRendering
-                    moduleSet.add(moduleRenderingInstance);
-                }
-            }
+            ModuleRendering moduleRenderingInstance = getModuleRenderingByClass(renderingClass);
             if (moduleRenderingInstance == null) {
                 try {
                     Constructor<?> constructor = renderingClass.getConstructor(Context.class);
@@ -151,9 +143,9 @@ public class RenderingModuleRegistry {
                 } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                if (moduleRenderingInstance != null) {
-                    moduleSet.add(moduleRenderingInstance);
-                }
+            }
+            if (moduleRenderingInstance != null) {
+                moduleSet.add(moduleRenderingInstance);
             }
         }
         return moduleSet;
