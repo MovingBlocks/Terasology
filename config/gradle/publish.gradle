@@ -36,7 +36,7 @@ publishing {
                     if (rootProject.hasProperty("publishRepo")) {
                         // This first option is good for local testing, you can set a full explicit target repo in gradle.properties
                         url = "http://artifactory.terasology.org/artifactory/$publishRepo"
-                        allowInsecureProtocol true
+                        allowInsecureProtocol true // 😱
                         logger.info("Changing PUBLISH repoKey set via Gradle property to {}", publishRepo)
                     } else {
                         // Support override from the environment to use a different target publish org
