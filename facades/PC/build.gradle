@@ -137,8 +137,8 @@ run {
     description = "Run 'Terasology' to play the game as a standard PC application"
     group = "terasology run"
 
-    args "-homedir"
-    jvmArgs "-Xmx1536m", "-XshowSettings:properties"
+    args "-homedir", "-noCrashReport"
+    jvmArgs "-Xmx1536m"
     workingDir rootDir
 
     dependsOn rootProject.moduleClasses
