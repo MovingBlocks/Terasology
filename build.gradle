@@ -89,6 +89,7 @@ repositories {
     maven {
         name "Terasology Artifactory"
         url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+        allowInsecureProtocol true  // 😱
     }
 }
 
