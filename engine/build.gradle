@@ -285,9 +285,11 @@ task createVersionInfoFile {
 task copyResourcesToClasses(type:Copy) {
     from sourceSets.main.output.resourcesDir
     into sourceSets.main.output.classesDirs.first()
-}
 
-jar.dependsOn copyResourcesToClasses
+    dependsOn processResources
+    mustRunAfter compileJava
+    classes.dependsOn copyResourcesToClasses
+}
 
 jar.dependsOn createVersionInfoFile
 jar.dependsOn cacheReflections
