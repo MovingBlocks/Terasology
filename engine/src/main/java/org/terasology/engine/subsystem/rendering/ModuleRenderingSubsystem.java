@@ -22,13 +22,13 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
-import org.terasology.engine.module.rendering.RenderingModuleManager;
+import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.engine.subsystem.EngineSubsystem;
 
 public class ModuleRenderingSubsystem implements EngineSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(ModuleRenderingSubsystem.class);
 
-    private RenderingModuleManager renderingModuleManager;
+    private RenderingModuleRegistry renderingModuleRegistry;
 
     @Override
     public String getName() {
@@ -42,8 +42,8 @@ public class ModuleRenderingSubsystem implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        this.renderingModuleManager = new RenderingModuleManager();
-        rootContext.put(RenderingModuleManager.class, this.renderingModuleManager);
+        this.renderingModuleRegistry = new RenderingModuleRegistry();
+        rootContext.put(RenderingModuleRegistry.class, this.renderingModuleRegistry);
     }
 
     @Override

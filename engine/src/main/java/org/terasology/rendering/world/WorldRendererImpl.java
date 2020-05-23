@@ -25,7 +25,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.rendering.RenderingModuleManager;
+import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
@@ -209,7 +209,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingModules() {
-        renderingModuleRegistry = context.get(RenderingModuleManager.class).getRegistry();
+        renderingModuleRegistry = context.get(RenderingModuleRegistry.class);
 
         // registry not populated by new ModuleRendering instances in UI, populate now
         if (renderingModuleRegistry.getOrderedRenderingModules().isEmpty()) {

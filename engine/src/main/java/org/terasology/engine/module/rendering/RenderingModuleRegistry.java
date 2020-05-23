@@ -18,6 +18,7 @@ package org.terasology.engine.module.rendering;
 import org.terasology.context.Context;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 import org.terasology.rendering.dag.ModuleRendering;
 
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@API
 public class RenderingModuleRegistry {
 
     private List<ModuleRendering> orderedModuleRenderingInstances = new ArrayList<>();

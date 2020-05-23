@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
-import org.terasology.engine.module.rendering.RenderingModuleManager;
 import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
@@ -72,7 +71,7 @@ public class RenderingModuleSettingScreen extends CoreScreenLayer implements UIS
     public void postInit() {
         moduleEnvironment = subContext.get(ModuleEnvironment.class);
 
-        renderingModuleRegistry = context.get(RenderingModuleManager.class).getRegistry();
+        renderingModuleRegistry = context.get(RenderingModuleRegistry.class);
 
         renderingModuleRegistry.updateRenderingModulesOrder(moduleEnvironment, subContext);
         orderedModuleRenderingInstances = renderingModuleRegistry.getOrderedRenderingModules();
