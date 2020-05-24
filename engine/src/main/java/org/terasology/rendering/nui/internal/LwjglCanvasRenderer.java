@@ -113,9 +113,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
 
     public LwjglCanvasRenderer(Context context) {
         // TODO use context to get assets instead of static methods
-        this.textureMat = 
-            Assets.getMaterial("engine:UITexture")
-                .orElseThrow(() -> new RuntimeException("Failing to find engine textures"));
+        this.textureMat = Assets.getMaterial("engine:UITexture").orElseThrow(
+                // Extra attention to how this is reported because it's often the first texture
+                // engine tries to load; the build is probably broken.
+                () -> new RuntimeException("Failing to find engine textures"));
         this.billboard = Assets.getMesh("engine:UIBillboard").get();
         this.fontMeshBuilder = new FontMeshBuilder(context.get(AssetManager.class).getAsset("engine:UIUnderline", Material.class).get());
         // failure to load these can be due to failing shaders or missing resources
