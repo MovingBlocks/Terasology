@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,39 +47,13 @@ public class RuntimeDelegatingTypeHandlerTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
 
     private final TypeHandlerContext context =
-        new TypeHandlerContext(typeHandlerLibrary, new ReflectionsSandbox(new Reflections(getClass().getClassLoader())));
+            new TypeHandlerContext(typeHandlerLibrary, new ReflectionsSandbox(new Reflections(getClass().getClassLoader())));
 
     private TypeHandler baseTypeHandler;
     private TypeHandler subTypeHandler;
     private Class<Sub> subType;
     private Type baseType;
     private RuntimeDelegatingTypeHandler<Base> runtimeDelegatingTypeHandler;
-
-    private static class Base {
-        int x;
-    }
-
-    private static class Sub extends Base {
-        float y;
-    }
-
-    private void setupHandlers() {
-        subType = Sub.class;
-        baseType = TypeInfo.of(Base.class).getType();
-
-        abstract class SubHandler extends TypeHandler<Sub> {}
-
-        baseTypeHandler = mockTypeHandler();
-        subTypeHandler = mockTypeHandler(SubHandler.class);
-
-        when(typeHandlerLibrary.getTypeHandler(eq(baseType)))
-            .thenReturn(Optional.of(baseTypeHandler));
-
-        when(typeHandlerLibrary.getTypeHandler(eq((Type) subType)))
-            .thenReturn(Optional.of(subTypeHandler));
-
-        runtimeDelegatingTypeHandler = new RuntimeDelegatingTypeHandler<Base>(baseTypeHandler, TypeInfo.of(Base.class), context);
-    }
 
     private static TypeHandler<?> mockTypeHandler(Class<? extends TypeHandler> subHandlerClass) {
         TypeHandler<?> mocked = mock(subHandlerClass);
@@ -98,11 +72,30 @@ public class RuntimeDelegatingTypeHandlerTest {
         return mockTypeHandler(TypeHandler.class);
     }
 
+    private void setupHandlers() {
+        subType = Sub.class;
+        baseType = TypeInfo.of(Base.class).getType();
+
+        abstract class SubHandler extends TypeHandler<Sub> {
+        }
+
+        baseTypeHandler = mockTypeHandler();
+        subTypeHandler = mockTypeHandler(SubHandler.class);
+
+        when(typeHandlerLibrary.getTypeHandler(eq(baseType)))
+                .thenReturn(Optional.of(baseTypeHandler));
+
+        when(typeHandlerLibrary.getTypeHandler(eq((Type) subType)))
+                .thenReturn(Optional.of(subTypeHandler));
+
+        runtimeDelegatingTypeHandler = new RuntimeDelegatingTypeHandler<Base>(baseTypeHandler, TypeInfo.of(Base.class), context);
+    }
+
     @Test
     public void testSerializeBase() {
         PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
         when(serializer.serialize(any(String.class)))
-            .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
+                .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
 
         setupHandlers();
 
@@ -115,9 +108,9 @@ public class RuntimeDelegatingTypeHandlerTest {
         verify(subTypeHandler, never()).serialize(any(), any());
 
         verify(serializer, never()).serialize(
-            argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> {
-                return argument.containsKey(RuntimeDelegatingTypeHandler.TYPE_FIELD);
-            })
+                argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> {
+                    return argument.containsKey(RuntimeDelegatingTypeHandler.TYPE_FIELD);
+                })
         );
     }
 
@@ -125,7 +118,7 @@ public class RuntimeDelegatingTypeHandlerTest {
     public void testSerializeSub() {
         PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
         when(serializer.serialize(any(String.class)))
-            .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
+                .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
 
         setupHandlers();
 
@@ -139,12 +132,12 @@ public class RuntimeDelegatingTypeHandlerTest {
         verify(subTypeHandler).serialize(any(), any());
 
         verify(serializer).serialize(
-            argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> {
-                return argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD)
-                           .getAsString()
-                           .equals(subType.getName()) &&
-                           argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD);
-            })
+                argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> {
+                    return argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD)
+                            .getAsString()
+                            .equals(subType.getName()) &&
+                            argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD);
+                })
         );
     }
 
@@ -167,12 +160,12 @@ public class RuntimeDelegatingTypeHandlerTest {
         setupHandlers();
 
         PersistedData persistedSub = new PersistedMap(
-            ImmutableMap.of(
-                RuntimeDelegatingTypeHandler.TYPE_FIELD,
-                new PersistedString(((Class<?>) subType).getName()),
-                RuntimeDelegatingTypeHandler.VALUE_FIELD,
-                new PersistedMap(ImmutableMap.of())
-            )
+                ImmutableMap.of(
+                        RuntimeDelegatingTypeHandler.TYPE_FIELD,
+                        new PersistedString(subType.getName()),
+                        RuntimeDelegatingTypeHandler.VALUE_FIELD,
+                        new PersistedMap(ImmutableMap.of())
+                )
         );
 
         runtimeDelegatingTypeHandler.deserialize(persistedSub);
@@ -189,12 +182,12 @@ public class RuntimeDelegatingTypeHandlerTest {
         setupHandlers();
 
         PersistedData persistedData = new PersistedMap(
-            ImmutableMap.of(
-                RuntimeDelegatingTypeHandler.TYPE_FIELD,
-                new PersistedString(Integer.class.getName()),
-                RuntimeDelegatingTypeHandler.VALUE_FIELD,
-                new PersistedMap(ImmutableMap.of())
-            )
+                ImmutableMap.of(
+                        RuntimeDelegatingTypeHandler.TYPE_FIELD,
+                        new PersistedString(Integer.class.getName()),
+                        RuntimeDelegatingTypeHandler.VALUE_FIELD,
+                        new PersistedMap(ImmutableMap.of())
+                )
         );
 
         Optional<Base> deserialized = runtimeDelegatingTypeHandler.deserialize(persistedData);
@@ -208,5 +201,13 @@ public class RuntimeDelegatingTypeHandlerTest {
         verify(subTypeHandler, never()).deserialize(any());
         // Serializes using base type handler
         verify(baseTypeHandler).deserialize(any());
+    }
+
+    private static class Base {
+        int x;
+    }
+
+    private static class Sub extends Base {
+        float y;
     }
 }
