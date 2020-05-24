@@ -15,9 +15,12 @@
  */
 package org.terasology.documentation;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import org.codehaus.plexus.util.StringUtils;
+import org.terasology.Environment;
 import org.terasology.HeadlessEnvironment;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
@@ -28,8 +31,11 @@ import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.i18n.I18nMap;
+import org.terasology.input.Input;
+import org.terasology.input.InputCategory;
 import org.terasology.module.*;
 import org.terasology.naming.Name;
+import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -54,24 +60,13 @@ public final class ModuleMarkupScraper {
     private static final Comparator<? super Module> moduleInfoComparator = Comparator.comparing(o -> o.getMetadata()
             .getDisplayName().toString());
 
-    protected static Context context;
-
-    private static ModuleManager moduleManager;
-
-    private static HeadlessEnvironment env;
-
-    private ModuleMarkupScraper() throws IOException {
-        super();
-    }
-
     /**
      * @param args (ignored)
      * @throws Exception if the module environment cannot be loaded
      */
     public static void main(String[] args) throws Exception {
-        env = new HEnv(new Name("engine"));
-        context = env.getContext();
-        moduleManager = context.get(ModuleManager.class);
+        ModuleManager moduleManager = ModuleManagerFactory.create("meta.terasology.org");
+        ModuleEnvironment env = moduleManager.getEnvironment();
 
         // Request Remote Modules List...
         Future<Void> remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor()
@@ -83,10 +78,8 @@ public final class ModuleMarkupScraper {
         List<Module> gameModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!latestVersion.isOnClasspath()) {
-                gameModules.add(latestVersion);
-                System.out.println("Found Game Module: " + latestVersion.getId());
-            }
+            gameModules.add(latestVersion);
+            System.out.println("Found Game Module: " + latestVersion.getId());
         }
 
         List<Module> remoteModules = Lists.newArrayList();
@@ -134,7 +127,7 @@ public final class ModuleMarkupScraper {
 
         wiki.append(moduleMap);
 
-        wiki.append(ScanModules(allSortedModules));
+        wiki.append(ScanModules(moduleManager, allSortedModules));
         System.out.println(wiki);
 
         String fileName = "Module_Wiki.md";
@@ -147,7 +140,7 @@ public final class ModuleMarkupScraper {
         env.close();
     }
 
-    private static String ScanModules(List<Module> allSortedModules) {
+    private static String ScanModules(ModuleManager moduleManager, List<Module> allSortedModules) {
         if (allSortedModules == null) {
             throw new IllegalArgumentException("ModuleMarkupScraper:ScanModules() - Module must be valid.");
         }
@@ -161,8 +154,6 @@ public final class ModuleMarkupScraper {
         for (Module module : allSortedModules) {
             Name moduleId = module.getId();
             if (module.isCodeModule()) {
-//                out.append("## Module: ").append(moduleId);
-
                 String moduleDescription = getModuleDescription(module);
                 out.append(moduleDescription);
 
@@ -174,14 +165,14 @@ public final class ModuleMarkupScraper {
                     modules.add(module);
                 }
 
-                out.append(ExportEvents(moduleId, modules));
+                out.append(ExportEvents(moduleManager, moduleId, modules));
             }
             out.append(System.getProperty("line.separator"));
         }
         return out.toString();
     }
 
-    private static String ExportEvents(Name moduleId, Set<Module> modules) {
+    private static String ExportEvents(ModuleManager moduleManager, Name moduleId, Set<Module> modules) {
         if (modules == null) {
             throw new IllegalArgumentException("ModuleMarkupScraper:ExportEvents() - Module must be valid.");
         }
