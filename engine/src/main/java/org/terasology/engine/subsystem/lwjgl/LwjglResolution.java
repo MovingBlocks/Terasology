@@ -19,18 +19,17 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.terasology.engine.subsystem.Resolution;
 
 import java.util.Objects;
-import java.util.Optional;
 
 public final class LwjglResolution implements Resolution {
 
-    private int width, height;
-    private int redBits, greenBits, blueBits;
+    private int width;
+    private int height;
+    private int redBits;
+    private int greenBits;
+    private int blueBits;
     private int refreshRate;
 
-    private transient GLFWVidMode sourceVidMode;
-
     public LwjglResolution(GLFWVidMode vidMode) {
-        this.sourceVidMode = vidMode;
         this.width = vidMode.width();
         this.height = vidMode.height();
         this.redBits = vidMode.redBits();
@@ -46,10 +45,6 @@ public final class LwjglResolution implements Resolution {
         this.greenBits = greenBits;
         this.blueBits = blueBits;
         this.refreshRate = refreshRate;
-    }
-
-    public Optional<GLFWVidMode> getSourceVidMode() {
-        return Optional.ofNullable(sourceVidMode);
     }
 
     public int getWidth() {
@@ -78,8 +73,17 @@ public final class LwjglResolution implements Resolution {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        } else if (o instanceof GLFWVidMode){
+            return equals(new LwjglResolution((GLFWVidMode) o));
+        }
+        if (getClass() != o.getClass()) {
+            return false;
+        }
         LwjglResolution that = (LwjglResolution) o;
         return width == that.width &&
                 height == that.height &&

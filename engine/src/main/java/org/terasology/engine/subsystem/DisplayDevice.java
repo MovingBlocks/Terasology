@@ -47,12 +47,12 @@ public interface DisplayDevice extends Subscribable {
     /**
      * @return display width
      */
-    int getDisplayWidth();
+    int getWidth();
 
     /**
      * @return display height
      */
-    int getDisplayHeight();
+    int getHeight();
 
     /**
      * Change currently active full-screen resolution.

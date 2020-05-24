@@ -193,7 +193,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     // TODO: Move the dependency on LWJGL (Display) elsewhere
     private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar, DisplayDevice displayDevice) {
-        float aspectRatio = (float) displayDevice.getDisplayWidth()/ displayDevice.getDisplayHeight();
+        float aspectRatio = (float) displayDevice.getWidth()/ displayDevice.getHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
         return new Matrix4f().perspective(fovY,aspectRatio,zNear,zFar).transpose();

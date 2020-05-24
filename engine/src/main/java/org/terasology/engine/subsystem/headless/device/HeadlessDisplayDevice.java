@@ -68,12 +68,12 @@ public class HeadlessDisplayDevice extends AbstractSubscribable implements Displ
     }
 
     @Override
-    public int getDisplayWidth() {
+    public int getWidth() {
         return 0;
     }
 
     @Override
-    public int getDisplayHeight() {
+    public int getHeight() {
         return 0;
     }
 
