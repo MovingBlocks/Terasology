@@ -90,24 +90,12 @@ configurations.all {
 
 // Primary dependencies definition
 dependencies {
-    // White list packages {@see ExternalApiWhiteList class}
+    // white list packages {@see ExternalApiWhiteList class} should use `api` config
+
+    // Storage and networking
     api group: 'com.google.guava', name: 'guava', version: '23.0'
     api group: 'com.google.code.gson', name: 'gson', version: '2.6.2'
     api group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
-    api group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
-    api(group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version: '0.9.0') {
-        exclude group: 'org.slf4j', module: 'slf4j-simple'
-    }
-    api group: 'org.joml', name: 'joml', version: '1.9.24'
-    api group: 'java3d', name: 'vecmath', version: '1.3.1'
-    // Light and Shadow use it
-    api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
-    api group: 'org.codehaus.plexus', name: 'plexus-utils', version: '1.5.6'
-
-    // Storage and networking
-    implementation group: 'com.google.guava', name: 'guava', version: '23.0'
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.6.2'
-    implementation group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
     implementation group: 'io.netty', name: 'netty', version: '3.10.5.Final'
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.6.1'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
@@ -117,7 +105,7 @@ dependencies {
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
     //Utilities
-    implementation group: 'org.codehaus.plexus', name: 'plexus-utils', version: '1.5.6'
+    api group: 'org.codehaus.plexus', name: 'plexus-utils', version: '1.5.6'
 
     // Java magic
     implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '4.2.2'
@@ -126,12 +114,12 @@ dependencies {
     implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.1'
 
     // Graphics, 3D, UI, etc
-    implementation group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
+    api group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
     implementation group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
-    implementation group: 'java3d', name: 'vecmath', version: '1.3.1'
-    implementation group: 'org.joml', name: 'joml', version: '1.9.24'
+    api group: 'java3d', name: 'vecmath', version: '1.3.1'
+    api group: 'org.joml', name: 'joml', version: '1.9.24'
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
-    implementation group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
+    api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
 
     // Assembly & Bytecode
@@ -142,12 +130,17 @@ dependencies {
 
     // Logging and audio
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
     implementation group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
 
     // Small-time 3rd party libs we've stored in our Artifactory for access
     implementation group: 'ec.util', name: 'MersenneTwister', version: '20'
     implementation group: 'org.eaxy', name: 'eaxy', version: '0.1'
+
+    // telemetry
+    implementation(group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version: '0.9.0') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
 
     // Discord RPC
     api 'com.jagrosh:DiscordIPC:0.4'
