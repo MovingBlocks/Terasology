@@ -1,14 +1,54 @@
+/*
+ * Copyright 2020 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/publish.gradle"
 
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.filters.FixCrLfFilter
 import java.text.SimpleDateFormat;
 import groovy.json.JsonBuilder
 
 def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+
+/**
+ * The subdirectory for this development environment.
+ *
+ * Only use this to run local processes. When building releases, you will be targeting other
+ * operating systems in addition to your own.
+ *
+ * @return
+ */
+def String nativeSubdirectoryName() {
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        return "windows"
+    } else if (Os.isFamily(Os.FAMILY_MAC)) {
+        return "macosx"
+    } else if (Os.isFamily(Os.FAMILY_UNIX)) {
+        return "linux"
+    } else {
+        logger.warn("What kind of libraries do you use on this? {}", System.properties["os.name"])
+        return "UNKNOWN"
+    }
+}
+
 
 ext {
     // Default path to store server data if running headless via Gradle
@@ -100,6 +140,8 @@ task game(type:JavaExec) {
     workingDir = rootDir
     args "-homedir"
     jvmArgs ["-Xmx1536m"]
+
+    systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDirs
