@@ -141,8 +141,6 @@ task game(type:JavaExec) {
     args "-homedir"
     jvmArgs ["-Xmx1536m"]
 
-    systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
-
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDirs
     classpath sourceSets.main.output.resourcesDir
@@ -190,6 +188,31 @@ task debug(type:JavaExec) {
     workingDir = rootDir
     String[] runArgs = ["-homedir"]
     args runArgs
+
+    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
+    classpath sourceSets.main.output.classesDirs
+    classpath sourceSets.main.output.resourcesDir
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').sourceSets.main.output.resourcesDir
+    classpath project(':engine').configurations.runtimeClasspath
+}
+
+task permissiveNatives(type:JavaExec) {
+    description = "Run 'Terasology' with security set to permissive and natives loading a second way (for KComputers)"
+    group = "terasology run"
+
+    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
+    dependsOn rootProject.extractNatives
+    dependsOn rootProject.moduleClasses
+    dependsOn classes
+
+    // Run arguments
+    main = mainClassName
+    workingDir = rootDir
+    args "-homedir", "-permissiveSecurity"
+    jvmArgs ["-Xmx1536m"]
+
+    systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDirs
