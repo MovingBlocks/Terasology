@@ -108,9 +108,7 @@ public class RuntimeDelegatingTypeHandlerTest {
         verify(subTypeHandler, never()).serialize(any(), any());
 
         verify(serializer, never()).serialize(
-                argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> {
-                    return argument.containsKey(RuntimeDelegatingTypeHandler.TYPE_FIELD);
-                })
+                argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> argument.containsKey(RuntimeDelegatingTypeHandler.TYPE_FIELD))
         );
     }
 
@@ -132,12 +130,10 @@ public class RuntimeDelegatingTypeHandlerTest {
         verify(subTypeHandler).serialize(any(), any());
 
         verify(serializer).serialize(
-                argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> {
-                    return argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD)
-                            .getAsString()
-                            .equals(subType.getName()) &&
-                            argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD);
-                })
+                argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD)
+                        .getAsString()
+                        .equals(subType.getName())
+                        && argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD))
         );
     }
 
