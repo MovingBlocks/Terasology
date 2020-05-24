@@ -187,8 +187,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         lwjglDisplay.update();
         int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
         if (frameLimit > 0) {
-            // FIXME: LWJGL 3 - reimplement framerate
-//            Display.sync(frameLimit);
+            Sync.sync(frameLimit);
         }
         if (lwjglDisplay.isCloseRequested()) {
             engine.shutdown();
