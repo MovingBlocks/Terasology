@@ -313,15 +313,14 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(DependencyInfo value, Canvas canvas) {
-                if (moduleManager.getRegistry().getLatestModuleVersion(value.getId()) == null) {
+                Module module = moduleManager.getRegistry().getLatestModuleVersion(value.getId());
+
+                if (module == null || !(value.versionRange().contains(module.getVersion()))) {
                     canvas.setMode("invalid");
                 } else {
                     canvas.setMode("available");
                 }
-                Version version = moduleManager.getRegistry().getLatestModuleVersion(value.getId()).getVersion();
-                if (!(value.versionRange().contains(version))) {
-                    canvas.setMode("invalid");
-                }
+
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
