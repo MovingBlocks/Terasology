@@ -16,6 +16,7 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Sets;
+import org.terasology.config.flexible.SettingChangeListener;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
@@ -39,6 +40,13 @@ public final class ModuleManagerFactory {
         return LoadModuleEnvironment(moduleManager);
     }
 
+    /**
+     * Creates a ModuleManager with ModuleInstallManager configured to reference masterServerAddress
+     *
+     * @param masterServerAddress the url for the master server address.
+     * @return a ModelManager
+     * @throws Exception if the module manager cannot be loaded
+     */
     public static ModuleManager create(String masterServerAddress) throws Exception {
         ModuleManager moduleManager = new ModuleManagerImpl(masterServerAddress);
         return LoadModuleEnvironment(moduleManager);
