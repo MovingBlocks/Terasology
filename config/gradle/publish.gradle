@@ -75,7 +75,7 @@ publishing {
 }
 
 static def isMaster(gitBranch) {
-    return gitBranch != null && gitBranch != "" && gitBranch.equals("master");
+    return gitBranch != null && gitBranch.equals("master");
 }
 
 // Mildly awkward: Modules aren't ready globally to accept master branch == release, so make it opt-in by checking a prop that defaults to bypass
