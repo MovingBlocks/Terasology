@@ -27,7 +27,6 @@ import org.terasology.engine.subsystem.Resolution;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.utilities.subscribables.AbstractSubscribable;
 
-import java.nio.IntBuffer;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -117,8 +116,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
                         config.getWindowPosY(),
                         config.getWindowWidth(),
                         config.getWindowHeight(),
-                       GLFW.GLFW_DONT_CARE);
-
+                        GLFW.GLFW_DONT_CARE);
                 config.setDisplayModeSetting(displayModeSetting);
                 config.setFullscreen(false);
                 break;
@@ -189,7 +187,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     private void updateViewport() {
-        updateViewport(getWidth(),getHeight());
+        updateViewport(getWidth(), getHeight());
     }
 
     protected void updateViewport(int width, int height) {
@@ -232,7 +230,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     private static Supplier<List<GLFWVidMode>> createAvailableResolutionSupplier() {
         return Suppliers.memoize(() -> GLFW.glfwGetVideoModes(GLFW.glfwGetPrimaryMonitor())
-                .stream() // FIXME possible npe
+                .stream()
                 .sorted(Comparator
                         .comparing(GLFWVidMode::width)
                         .thenComparing(GLFWVidMode::width)

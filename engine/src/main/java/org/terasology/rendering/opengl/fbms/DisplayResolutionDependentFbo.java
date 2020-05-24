@@ -18,8 +18,6 @@ package org.terasology.rendering.opengl.fbms;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.lwjgl.LwjglUtil;
-import org.terasology.engine.subsystem.lwjgl.WindowSize;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.opengl.AbstractFboManager;
 import org.terasology.rendering.opengl.FBO;
@@ -54,6 +52,7 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
 
     private FBO.Dimensions fullScale = new FBO.Dimensions();
     private RenderingConfig renderingConfig;
+    private DisplayDevice displayDevice;
     private ScreenGrabber screenGrabber;
 
     private boolean wasTakingScreenshotLastFrame;
@@ -77,7 +76,7 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
         this.screenGrabber = screenGrabber;
 
         renderingConfig.subscribe(FBO_SCALE, this);
-
+        this.displayDevice = displayDevice;
         displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
 
         updateFullScale();
@@ -111,8 +110,7 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
     }
 
     private void updateFullScale() {
-        WindowSize windowSize = LwjglUtil.getWindowSize();
-        fullScale.setDimensions(windowSize.getWidth(), windowSize.getHeight());
+        fullScale.setDimensions(displayDevice.getWidth(), displayDevice.getHeight());
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
     }
 
@@ -129,10 +127,9 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
             }
         } else {
             ScreenshotSize screenshotSize = renderingConfig.getScreenshotSize();
-            // TODO: Remove dependency on WindowSize
-            WindowSize windowSize = LwjglUtil.getWindowSize();
-            fullScale.setDimensions(screenshotSize.getWidth(windowSize.getWidth()),
-                    screenshotSize.getHeight(windowSize.getWidth()));
+
+            fullScale.setDimensions(screenshotSize.getWidth(displayDevice.getWidth()),
+                    screenshotSize.getHeight(displayDevice.getWidth()));
             regenerateFbos();
 
             wasTakingScreenshotLastFrame = true;

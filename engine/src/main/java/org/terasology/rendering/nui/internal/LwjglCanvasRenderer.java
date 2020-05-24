@@ -24,8 +24,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.subsystem.lwjgl.LwjglUtil;
-import org.terasology.engine.subsystem.lwjgl.WindowSize;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
@@ -84,6 +83,7 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
+ *
  */
 public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListener {
 
@@ -110,6 +110,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
 
     private Map<ResourceUrn, LwjglFrameBufferObject> fboMap = Maps.newHashMap();
     private RenderingConfig renderingConfig;
+    private DisplayDevice displayDevice;
     private float uiScale = 1f;
 
     public LwjglCanvasRenderer(Context context) {
@@ -123,6 +124,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         // failure to load these can be due to failing shaders or missing resources
 
         this.renderingConfig = context.get(Config.class).getRendering();
+        this.displayDevice = context.get(DisplayDevice.class);
         this.uiScale = this.renderingConfig.getUiScale() / 100f;
 
         this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
@@ -137,8 +139,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        WindowSize windowSize = LwjglUtil.getWindowSize();
-        glOrtho(0, windowSize.getWidth(), windowSize.getHeight(), 0, 0, 2048f);
+        glOrtho(0, displayDevice.getWidth(), displayDevice.getHeight(), 0, 0, 2048f);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
 
@@ -152,7 +153,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
 
         glScalef(uiScale, uiScale, uiScale);
 
-        requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, windowSize.getWidth(), windowSize.getHeight());
+        requestedCropRegion = Rect2i.createFromMinAndSize(0, 0,displayDevice.getWidth(), displayDevice.getHeight());
         currentTextureCropRegion = requestedCropRegion;
         textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX(),
                 requestedCropRegion.minY(), requestedCropRegion.maxY());
@@ -247,8 +248,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
 
     @Override
     public Vector2i getTargetSize() {
-        WindowSize windowSize = LwjglUtil.getWindowSize();
-        return new Vector2i( windowSize.getWidth(),windowSize.getHeight());
+        return new Vector2i(displayDevice.getWidth(), displayDevice.getHeight());
     }
 
     @Override
@@ -542,7 +542,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
     }
 
     /**
-     * A key that identifies an entry in the text cache. It contains the elements that affect the generation of mesh for text rendering.
+     * A key that identifies an entry in the text cache. It contains the elements that affect the generation of mesh for
+     * text rendering.
      */
     private static class TextCacheKey {
         private final String text;
@@ -585,7 +586,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
     }
 
     /**
-     * A key that identifies an entry in the texture cache. It contains the elements that affect the generation of mesh for texture rendering.
+     * A key that identifies an entry in the texture cache. It contains the elements that affect the generation of mesh
+     * for texture rendering.
      */
     private static class TextureCacheKey {
 
