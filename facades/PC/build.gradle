@@ -110,7 +110,7 @@ dependencies {
         implementation project(':libs:CrashReporter:cr-terasology')
     } else {
         logger.debug("*** Setting a CrashReporter binary dependency, not present as source")
-        implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.0.0'
+        implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
     }
 }
 
