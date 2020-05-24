@@ -37,7 +37,7 @@ public final class ModuleManagerFactory {
 
     public static ModuleManager create() throws Exception {
         ModuleManager moduleManager = new ModuleManagerImpl("");
-        return LoadModuleEnvironment(moduleManager);
+        return loadModuleEnvironment(moduleManager);
     }
 
     /**
@@ -49,10 +49,10 @@ public final class ModuleManagerFactory {
      */
     public static ModuleManager create(String masterServerAddress) throws Exception {
         ModuleManager moduleManager = new ModuleManagerImpl(masterServerAddress);
-        return LoadModuleEnvironment(moduleManager);
+        return loadModuleEnvironment(moduleManager);
     }
 
-    private static ModuleManager LoadModuleEnvironment(ModuleManager moduleManager) throws Exception {
+    private static ModuleManager loadModuleEnvironment(ModuleManager moduleManager) throws Exception {
         try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
             moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));
