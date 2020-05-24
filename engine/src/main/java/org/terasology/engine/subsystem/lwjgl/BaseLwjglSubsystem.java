@@ -37,8 +37,8 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
     @Override
     public void preInitialise(Context context) {
         if (!initialised) {
-            initLogger();
             LWJGLHelper.initNativeLibs();
+            initLogger();
             initialised = true;
         }
     }
