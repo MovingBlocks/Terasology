@@ -17,7 +17,7 @@ package org.terasology.engine.subsystem.lwjgl;
 
 import org.lwjgl.glfw.GLFW;
 
-class Lwjgl2Sync {
+public final class Lwjgl2Sync {
 
     private Lwjgl2Sync() {
     }
