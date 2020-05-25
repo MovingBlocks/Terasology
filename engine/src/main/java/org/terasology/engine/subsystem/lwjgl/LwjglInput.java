@@ -52,13 +52,6 @@ public class LwjglInput extends BaseLwjglSubsystem {
         currentState.handleInput(delta);
     }
 
-    @Override
-    public void shutdown() {
-        // FIXME: LWJGL 3 - investigate needness
-        //  Mouse.destroy();
-        // Keyboard.destroy();
-    }
-
     private void initControls() {
 
         InputSystem inputSystem = new InputSystem();

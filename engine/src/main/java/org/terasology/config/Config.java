@@ -214,8 +214,6 @@ public final class Config {
                 .registerTypeAdapter(Input.class, new InputHandler())
                 .registerTypeAdapter(Resolution.class, new ResolutionHandler())
                 //.registerTypeAdapter(UniverseConfig.class, new UniverseConfig.Handler())
-// FIXME: LWJGL 3 - Replace or remove this
-//                .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new UriTypeAdapterFactory())
                 .setPrettyPrinting().create();
@@ -286,20 +284,4 @@ public final class Config {
         }
         config.getModuleConfigs().put(generatorUri, map);
     }
-// FIXME: LWJGL 3 - remove or replace
-//    private static class PixelFormatHandler implements JsonSerializer<PixelFormat>, JsonDeserializer<PixelFormat> {
-//
-//        @Override
-//        public PixelFormat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-//            if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
-//                return new PixelFormat().withDepthBits(json.getAsInt());
-//            }
-//            return new PixelFormat().withDepthBits(24);
-//        }
-//
-//        @Override
-//        public JsonElement serialize(PixelFormat src, Type typeOfSrc, JsonSerializationContext context) {
-//            return new JsonPrimitive(src.getDepthBits());
-//        }
-//    }
 }

@@ -37,7 +37,7 @@ import java.util.Queue;
  */
 public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     private RenderingConfig renderingConfig;
-    private float uiScale; // FIXME: LWJGL 3 - test and reimplement  DPI
+    private float uiScale;
     private boolean mouseGrabbed;
     private Queue<MouseAction> queue = Lists.newLinkedList();
 

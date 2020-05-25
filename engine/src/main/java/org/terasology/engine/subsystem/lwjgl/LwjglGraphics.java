@@ -229,6 +229,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         GLFW.glfwDefaultWindowHints();
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
         GLFW.glfwWindowHint(GLFW.GLFW_COCOA_GRAPHICS_SWITCHING, GLFW.GLFW_TRUE);
+        GLFW.glfwWindowHint(GLFW.GLFW_DEPTH_BITS, config.getPixelFormat());
 
         if (!config.isVSync()) {
             GLFW.glfwSwapInterval(0);
@@ -242,7 +243,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
 
     private void initWindow() {
-        logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your video card)");
+        logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your " +
+                "video card)");
         long window = GLFW.glfwCreateWindow(
                 config.getWindowWidth(), config.getWindowHeight(), "Terasology Alpha", 0, 0);
         if (window == 0) {
@@ -281,7 +283,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
      */
     private GLFWImage convertToGLFWFormat(BufferedImage image) {
         if (image.getType() != BufferedImage.TYPE_INT_ARGB_PRE) {
-            final BufferedImage convertedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+            final BufferedImage convertedImage = new BufferedImage(image.getWidth(), image.getHeight(),
+                    BufferedImage.TYPE_INT_ARGB_PRE);
             final Graphics2D graphics = convertedImage.createGraphics();
             final int targetWidth = image.getWidth();
             final int targetHeight = image.getHeight();
@@ -409,7 +412,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         });
     }
 
-    public void reloadTexture3D(int id, ByteBuffer alignedBuffer, Texture.WrapMode wrapMode, Texture.FilterMode filterMode, int size) {
+    public void reloadTexture3D(int id, ByteBuffer alignedBuffer, Texture.WrapMode wrapMode,
+                                Texture.FilterMode filterMode, int size) {
         asynchToDisplayThread(() -> {
             glBindTexture(GL12.GL_TEXTURE_3D, id);
 
@@ -417,17 +421,21 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, LwjglGraphicsUtil.getGLMode(wrapMode));
             glTexParameterf(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_WRAP_R, LwjglGraphicsUtil.getGLMode(wrapMode));
 
-            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MIN_FILTER, LwjglGraphicsUtil.getGlMinFilter(filterMode));
-            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MAG_FILTER, LwjglGraphicsUtil.getGlMagFilter(filterMode));
+            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MIN_FILTER,
+                    LwjglGraphicsUtil.getGlMinFilter(filterMode));
+            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MAG_FILTER,
+                    LwjglGraphicsUtil.getGlMagFilter(filterMode));
 
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
             GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
 
-            GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, size, size, size, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, alignedBuffer);
+            GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, size, size, size, 0, GL11.GL_RGBA,
+                    GL11.GL_UNSIGNED_BYTE, alignedBuffer);
         });
     }
 
-    public void createTexture2D(ByteBuffer[] buffers, Texture.WrapMode wrapMode, Texture.FilterMode filterMode, int width, int height, Consumer<Integer> idConsumer) {
+    public void createTexture2D(ByteBuffer[] buffers, Texture.WrapMode wrapMode, Texture.FilterMode filterMode,
+                                int width, int height, Consumer<Integer> idConsumer) {
         asynchToDisplayThread(() -> {
             int id = glGenTextures();
             reloadTexture2D(id, buffers, wrapMode, filterMode, width, height);
@@ -435,23 +443,28 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         });
     }
 
-    public void reloadTexture2D(int id, ByteBuffer[] buffers, Texture.WrapMode wrapMode, Texture.FilterMode filterMode, int width, int height) {
+    public void reloadTexture2D(int id, ByteBuffer[] buffers, Texture.WrapMode wrapMode,
+                                Texture.FilterMode filterMode, int width, int height) {
         asynchToDisplayThread(() -> {
             glBindTexture(GL11.GL_TEXTURE_2D, id);
 
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, LwjglGraphicsUtil.getGLMode(wrapMode));
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, LwjglGraphicsUtil.getGLMode(wrapMode));
-            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, LwjglGraphicsUtil.getGlMinFilter(filterMode));
-            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, LwjglGraphicsUtil.getGlMagFilter(filterMode));
+            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER,
+                    LwjglGraphicsUtil.getGlMinFilter(filterMode));
+            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER,
+                    LwjglGraphicsUtil.getGlMagFilter(filterMode));
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, buffers.length - 1);
 
             if (buffers.length > 0) {
                 for (int i = 0; i < buffers.length; i++) {
-                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i, GL11.GL_RGBA, width >> i, height >> i, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffers[i]);
+                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i, GL11.GL_RGBA, width >> i, height >> i, 0, GL11.GL_RGBA,
+                            GL11.GL_UNSIGNED_BYTE, buffers[i]);
                 }
             } else {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA,
+                        GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
             }
         });
     }
