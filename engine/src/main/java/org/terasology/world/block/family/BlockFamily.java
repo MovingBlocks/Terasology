@@ -15,8 +15,6 @@
  */
 package org.terasology.world.block.family;
 
-import org.joml.Vector2fc;
-import org.joml.Vector3fc;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -42,14 +40,13 @@ public interface BlockFamily {
     String getDisplayName();
 
     /**
-     * Get the block that is appropriate for placement in the given situation
+     * Get the block that is appropriate for placement in the given situation,
+     * which is determined by the provided block placement data.
      *
-     * @param position          The block position, at which the block is going to be placed at.
-     * @param attachmentSide    The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
-     * @param relativeAttachmentPosition The position on the block surface that the user aimed at when placing the block. A value between (0, 0) and (1, 1).
+     * @param data block placement data
      * @return The appropriate block
      */
-    Block getBlockForPlacement(Vector3i position, Side attachmentSide, Vector3fc viewingDirection, Vector2fc relativeAttachmentPosition);
+    Block getBlockForPlacement(BlockPlacementData data);
 
     /**
      * Get the block that is appropriate for placement in the given situation
@@ -58,7 +55,7 @@ public interface BlockFamily {
      * @param attachmentSide      The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
      * @param direction           A secondary direction after the attachment side that determines the facing of the block.
      * @return The appropriate block
-     * @deprecated This method is scheduled for removal, use this one instead: {@link #getBlockForPlacement(Vector3i, Side, Vector3fc, Vector2fc)}.
+     * @deprecated This method is scheduled for removal, use this one instead: {@link #getBlockForPlacement(BlockPlacementData)}.
      */
     @Deprecated
     Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction);

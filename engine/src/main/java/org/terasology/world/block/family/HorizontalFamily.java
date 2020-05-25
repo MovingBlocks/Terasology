@@ -16,8 +16,6 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
-import org.joml.Vector2fc;
-import org.joml.Vector3fc;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -82,11 +80,11 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
     }
 
     @Override
-    public Block getBlockForPlacement(Vector3i position, Side attachmentSide, Vector3fc viewingDirection, Vector2fc relativeAttachmentPosition) {
-        if (attachmentSide.isHorizontal()) {
-            return blocks.get(attachmentSide);
+    public Block getBlockForPlacement(BlockPlacementData data) {
+        if (data.attachmentSide.isHorizontal()) {
+            return blocks.get(data.attachmentSide);
         } else {
-            Side secondaryDirection = Side.inDirection(-viewingDirection.x(), 0, -viewingDirection.z());
+            Side secondaryDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
             return blocks.get(secondaryDirection);
         }
     }

@@ -15,7 +15,6 @@
  */
 package org.terasology.world.block.items;
 
-import org.joml.Vector2f;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -44,6 +43,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockPlacementData;
 
 import java.util.Map;
 
@@ -90,9 +90,9 @@ public class BlockItemSystem extends BaseComponentSystem {
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
 
-        Block block = blockFamily.getBlockForPlacement(
-                placementPos, surfaceSide, JomlUtil.from(event.getDirection()), new Vector2f()
-        );
+        Block block = blockFamily.getBlockForPlacement(new BlockPlacementData(
+                JomlUtil.from(placementPos), surfaceSide, JomlUtil.from(event.getDirection())
+        ));
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.

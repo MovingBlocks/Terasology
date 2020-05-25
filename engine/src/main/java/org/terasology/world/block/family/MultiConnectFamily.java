@@ -18,10 +18,10 @@ package org.terasology.world.block.family;
 import com.google.common.collect.Sets;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import org.joml.Vector2fc;
-import org.joml.Vector3fc;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
@@ -161,10 +161,10 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * {@inheritDoc}
      */
     @Override
-    public Block getBlockForPlacement(Vector3i position, Side attachmentSide, Vector3fc viewingDirection, Vector2fc relativeAttachmentPosition) {
+    public Block getBlockForPlacement(BlockPlacementData data) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
-            if (this.connectionCondition(position, connectSide)) {
+            if (this.connectionCondition(JomlUtil.from(data.blockPosition), connectSide)) {
                 connections += SideBitFlag.getSide(connectSide);
             }
         }
@@ -176,7 +176,8 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      */
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        return getBlockForPlacement(location, null, null, null);
+        BlockPlacementData data = new BlockPlacementData(JomlUtil.from(location), null, new Vector3f());
+        return getBlockForPlacement(data);
     }
 
     /**
