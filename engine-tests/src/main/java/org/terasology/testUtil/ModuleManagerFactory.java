@@ -36,8 +36,7 @@ public final class ModuleManagerFactory {
     }
 
     public static ModuleManager create() throws Exception {
-        ModuleManager moduleManager = new ModuleManagerImpl("");
-        return loadModuleEnvironment(moduleManager);
+        return create("");
     }
 
     /**
