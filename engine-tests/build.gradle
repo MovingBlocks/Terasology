@@ -78,7 +78,8 @@ dependencies {
     // Test lib dependencies
     implementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     implementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
-    implementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.2.0'
+    implementation "org.mockito:mockito-core:3.3.3"
+    implementation "org.mockito:mockito-junit-jupiter:3.3.3"
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
 
