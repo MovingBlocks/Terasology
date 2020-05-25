@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CheckStyle-IDEA">
+    <option name="configuration">
+      <map>
+        <entry key="active-configuration" value="PROJECT_RELATIVE:/home/michaelpollind/drive/project/Terasology/config/metrics/checkstyle/checkstyle.xml:Terasology CheckStyle"/>
+        <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules"/>
+        <entry key="location-1" value="PROJECT_RELATIVE:/home/michaelpollind/drive/project/Terasology/config/metrics/checkstyle/checkstyle.xml:Terasology CheckStyle"/>
+        <entry key="property-1.samedir" value="config/metrics/checkstyle"/>
+        <entry key="scanscope" value="JavaOnlyWithTests"/>
+        <entry key="suppress-errors" value="false"/>
+        <entry key="thirdparty-classpath" value=""/>
+      </map>
+    </option>
+  </component>
+  <component name="CompilerConfiguration">
+    <resourceExtensions>
+      <entry name=".+\.(properties|xml|html|dtd|tld)"/>
+      <entry name=".+\.(gif|png|jpeg|jpg)"/>
+    </resourceExtensions>
+    <wildcardResourcePatterns>
+      <entry name="!?*.class"/>
+      <entry name="!?*.scala"/>
+      <entry name="!?*.java"/>
+      <entry name="!?*.groovy"/>
+    </wildcardResourcePatterns>
+    <bytecodeTargetLevel target="1.8"/>
+  </component>
+  <component name="CopyrightManager" default="TerasologyEngine">
+    <copyright>
+      <option name="notice" value="Copyright 2020 MovingBlocks&#10;&#10;Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);&#10;you may not use this file except in compliance with the License.&#10;You may obtain a copy of the License at&#10;&#10;     http://www.apache.org/licenses/LICENSE-2.0&#10;&#10;Unless required by applicable law or agreed to in writing, software&#10;distributed under the License is distributed on an &quot;AS IS&quot; BASIS,&#10;WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.&#10;See the License for the specific language governing permissions and&#10;limitations under the License."/>
+      <option name="keyword" value="Copyright"/>
+      <option name="allowReplaceKeyword" value=""/>
+      <option name="myName" value="TerasologyEngine"/>
+      <option name="myLocal" value="true"/>
+    </copyright>
+    <LanguageOptions name="__TEMPLATE__">
+      <option name="addBlankAfter" value="false"/>
+    </LanguageOptions>
+  </component>
+  <component name="DependencyValidationManager">
+    <option name="SKIP_IMPORT_STATEMENTS" value="false"/>
+  </component>
+  <component name="EntryPointsManager">
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="org.terasology.entitySystem.event.ReceiveEvent"/>
+      <item index="1" class="java.lang.String" itemvalue="org.terasology.registry.In"/>
+      <item index="2" class="java.lang.String" itemvalue="org.terasology.entitySystem.systems.RegisterSystem"/>
+      <item index="3" class="java.lang.String" itemvalue="org.terasology.logic.console.Command"/>
+    </list>
+    <writeAnnotations>
+      <writeAnnotation name="org.terasology.registry.In"/>
+    </writeAnnotations>
+  </component>
+  <component name="GradleMigrationSettings" migrationVersion="1"/>
+  <component name="GradleUISettings">
+    <setting name="root"/>
+  </component>
+  <component name="GradleUISettings2">
+    <setting name="root"/>
+  </component>
+  <component name="IdProvider" IDEtalkID="11DA1DB66DD62DDA1ED602B7079FE97C"/>
+  <component name="InspectionProjectProfileManager">
+    <profile version="1.0">
+      <option name="myName" value="Project Default"/>
+    </profile>
+    <version value="1.0"/>
+  </component>
+  <component name="JavadocGenerationManager">
+    <option name="OTHER_OPTIONS" value=""/>
+  </component>
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/modules/BasicRendering/BasicRendering.iml" filepath="$PROJECT_DIR$/modules/BasicRendering/BasicRendering.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/BiomesAPI/BiomesAPI.iml" filepath="$PROJECT_DIR$/modules/BiomesAPI/BiomesAPI.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/BuilderSampleGameplay/BuilderSampleGameplay.iml" filepath="$PROJECT_DIR$/modules/BuilderSampleGameplay/BuilderSampleGameplay.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CoreAdvancedAssets/CoreAdvancedAssets.iml" filepath="$PROJECT_DIR$/modules/CoreAdvancedAssets/CoreAdvancedAssets.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CoreAssets/CoreAssets.iml" filepath="$PROJECT_DIR$/modules/CoreAssets/CoreAssets.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CoreSampleGameplay/CoreSampleGameplay.iml" filepath="$PROJECT_DIR$/modules/CoreSampleGameplay/CoreSampleGameplay.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CoreWorlds/CoreWorlds.iml" filepath="$PROJECT_DIR$/modules/CoreWorlds/CoreWorlds.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Drops/Drops.iml" filepath="$PROJECT_DIR$/modules/Drops/Drops.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Furnishings/Furnishings.iml" filepath="$PROJECT_DIR$/modules/Furnishings/Furnishings.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Inventory/Inventory.iml" filepath="$PROJECT_DIR$/modules/Inventory/Inventory.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/facades/PC/PC.iml" filepath="$PROJECT_DIR$/facades/PC/PC.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/facades/TeraEd/TeraEd.iml" filepath="$PROJECT_DIR$/facades/TeraEd/TeraEd.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/Terasology.iml" filepath="$PROJECT_DIR$/Terasology.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/engine/engine.iml" filepath="$PROJECT_DIR$/engine/engine.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/engine-tests/engine-tests.iml" filepath="$PROJECT_DIR$/engine-tests/engine-tests.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Explosives/Explosives.iml" filepath="$PROJECT_DIR$/modules/Explosives/Explosives.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Health/Health.iml" filepath="$PROJECT_DIR$/modules/Health/Health.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/ModuleTestingEnvironment/ModuleTestingEnvironment.iml" filepath="$PROJECT_DIR$/modules/ModuleTestingEnvironment/ModuleTestingEnvironment.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/AdvancedRendering/AdvancedRendering.iml" filepath="$PROJECT_DIR$/modules/AdvancedRendering/AdvancedRendering.iml"/>
+    </modules>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11" project-jdk-type="JavaSDK" assert-keyword="true" assert-jdk-15="true">
+    <output url="file://$PROJECT_DIR$/out"/>
+  </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="mySupportsUserInfoFilter" value="true"/>
+  </component>
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/AdvancedRendering" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/BasicRendering" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/BiomesAPI" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/CoreAdvancedAssets" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/CoreAssets" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/CoreSampleGameplay" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/CoreWorlds" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/Drops" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/Furnishings" vcs="Git"/>
+    <mapping directory="$PROJECT_DIR$/modules/Inventory" vcs="Git"/>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <UIState>
+          <splitter-proportions>
+            <SplitterProportionsDataImpl/>
+          </splitter-proportions>
+          <settings/>
+        </UIState>
+      </state>
+      <state key="Copyright.UI">
+        <UIState>
+          <splitter-proportions>
+            <SplitterProportionsDataImpl/>
+          </splitter-proportions>
+        </UIState>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <UIState>
+          <splitter-proportions>
+            <SplitterProportionsDataImpl>
+              <option name="proportions">
+                <list>
+                  <option value="0.2"/>
+                </list>
+              </option>
+            </SplitterProportionsDataImpl>
+          </splitter-proportions>
+          <last-edited>1.6</last-edited>
+        </UIState>
+      </state>
+      <state key="ScopeChooserConfigurable.UI">
+        <UIState>
+          <splitter-proportions>
+            <SplitterProportionsDataImpl/>
+          </splitter-proportions>
+          <settings/>
+        </UIState>
+      </state>
+    </states>
+  </component>
+</project>

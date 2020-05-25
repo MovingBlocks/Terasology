@@ -153,23 +153,29 @@ switch (cleanerArgs[0]) {
         break
 
     case "list":
-        ListFormat listFormat = determineListFormat(cleanerArgs)
         String[] availableItems = common.retrieveAvailableItems()
         String[] localItems = common.retrieveLocalItems()
         String[] downloadableItems = availableItems.minus(localItems)
-        println "The following items are available for download:"
-        if (availableItems.size() == 0) {
-            println "No items available for download."
-        } else if (downloadableItems.size() == 0) {
-            println "All items are already downloaded."
-        } else {
-            printListItems(downloadableItems, listFormat)
-        }
-        println "\nThe following items are already downloaded:"
-        if (localItems.size() == 0) {
-            println "No items downloaded."
-        } else {
+
+        ListFormat listFormat = determineListFormat(cleanerArgs)
+
+        if (cleanerArgs.contains("--local")) {
             printListItems(localItems, listFormat)
+        } else {
+            println "The following items are available for download:"
+            if (availableItems.size() == 0) {
+                println "No items available for download."
+            } else if (downloadableItems.size() == 0) {
+                println "All items are already downloaded."
+            } else {
+                printListItems(downloadableItems, listFormat)
+            }
+            println "\nThe following items are already downloaded:"
+            if (localItems.size() == 0) {
+                println "No items downloaded."
+            } else {
+                printListItems(localItems, listFormat)
+            }
         }
         break
 
@@ -245,7 +251,7 @@ private void printListItems(String[] items, ListFormat listFormat) {
 
 private void printListItemsSimple(String[] items) {
     for (item in items.sort()) {
-        println "--$item"
+        println "$item"
     }
 }
 

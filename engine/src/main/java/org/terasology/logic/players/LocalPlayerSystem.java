@@ -58,6 +58,7 @@ import org.terasology.logic.characters.events.ScaleToRequest;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.event.LocalPlayerInitializedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
@@ -106,6 +107,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private BindsManager bindsManager;
 
     private Camera playerCamera;
+    private boolean localPlayerInitialized = false;
 
     private float bobFactor;
     private float lastStepDelta;
@@ -139,15 +141,18 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @Override
     public void update(float delta) {
-        if (!localPlayer.isValid()) {
-            return;
+        if (!localPlayerInitialized && localPlayer.isValid()) {
+            localPlayer.getClientEntity().send(new LocalPlayerInitializedEvent());
+            localPlayerInitialized = true;
         }
 
-        EntityRef entity = localPlayer.getCharacterEntity();
-        CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+        if (localPlayerInitialized) {
+            EntityRef entity = localPlayer.getCharacterEntity();
+            CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
 
-        processInput(entity, characterMovementComponent);
-        updateCamera(characterMovementComponent, localPlayer.getViewPosition(), JomlUtil.from(localPlayer.getViewRotation()));
+            processInput(entity, characterMovementComponent);
+            updateCamera(characterMovementComponent, localPlayer.getViewPosition(), JomlUtil.from(localPlayer.getViewRotation()));
+        }
     }
 
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {

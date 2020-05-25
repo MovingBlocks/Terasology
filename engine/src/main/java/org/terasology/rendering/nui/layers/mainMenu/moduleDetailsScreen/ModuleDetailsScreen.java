@@ -76,9 +76,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleDetailsScreen.class);
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String DEFAULT_GITHUB_MODULE_URL = "https://github.com/Terasology/";
-    private static final List INTERNAL_MODULES = Arrays.asList("engine", "BuilderSampleGameplay");
+    private static final List<String> INTERNAL_MODULES = Arrays.asList("engine", "BuilderSampleGameplay");
     @In
     private ModuleManager moduleManager;
     @In
@@ -166,7 +166,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
         if (!isScreenValid()) {
             final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.setMessage(
+                    translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
+                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
             popup.subscribeButton(e -> triggerBackAnimation());
             getManager().pushScreen(popup);
             // disable child widgets
@@ -313,15 +315,14 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(DependencyInfo value, Canvas canvas) {
-                if (moduleManager.getRegistry().getLatestModuleVersion(value.getId()) == null) {
+                Module module = moduleManager.getRegistry().getLatestModuleVersion(value.getId());
+
+                if (module == null || !(value.versionRange().contains(module.getVersion()))) {
                     canvas.setMode("invalid");
                 } else {
                     canvas.setMode("available");
                 }
-                Version version = moduleManager.getRegistry().getLatestModuleVersion(value.getId()).getVersion();
-                if (!(value.versionRange().contains(version))) {
-                    canvas.setMode("invalid");
-                }
+
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
@@ -488,7 +489,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 .findFirst()
                 .map(Module::getMetadata)
                 .map(RemoteModuleExtension::getLastUpdated)
-                .map(dateFormat::format)
+                .map(DATE_FORMAT::format)
                 .orElse("");
     }
 

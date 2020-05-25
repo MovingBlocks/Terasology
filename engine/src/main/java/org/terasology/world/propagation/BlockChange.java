@@ -15,7 +15,8 @@
  */
 package org.terasology.world.propagation;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.block.Block;
 
 /**
@@ -24,17 +25,17 @@ import org.terasology.world.block.Block;
  * A POJO hence no methods are documented.
  */
 public class BlockChange {
-    private Vector3i position;
-    private Block from;
+    private final Vector3i position = new Vector3i();
+    private final Block from;
     private Block to;
 
-    public BlockChange(Vector3i position, Block from, Block to) {
-        this.position = position;
+    public BlockChange(Vector3ic position, Block from, Block to) {
+        this.position.set(position);
         this.from = from;
         this.to = to;
     }
 
-    public Vector3i getPosition() {
+    public Vector3ic getPosition() {
         return position;
     }
 
@@ -49,5 +50,4 @@ public class BlockChange {
     public void setTo(Block block) {
         this.to = block;
     }
-
 }

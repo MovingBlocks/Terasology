@@ -27,6 +27,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
@@ -510,10 +511,12 @@ public class GLSLMaterial extends BaseMaterial {
         if (isDisposed()) {
             return;
         }
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        value.get(buffer);
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3(id, false, MatrixUtils.matrixToFloatBuffer(value));
+            GL20.glUniformMatrix3(id, false, buffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -521,7 +524,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3(id, false, MatrixUtils.matrixToFloatBuffer(value));
+                GL20.glUniformMatrix3(id, false, buffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -579,10 +582,12 @@ public class GLSLMaterial extends BaseMaterial {
         if (isDisposed()) {
             return;
         }
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        value.get(buffer);
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4(id, false, MatrixUtils.matrixToFloatBuffer(value));
+            GL20.glUniformMatrix4(id, false, buffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -590,7 +595,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4(id, false, MatrixUtils.matrixToFloatBuffer(value));
+                GL20.glUniformMatrix4(id, false, buffer);
             }
 
             restoreStateAfterUniformsSet();
