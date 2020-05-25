@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
@@ -6,10 +22,7 @@ buildscript {
         // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
         jcenter()
         mavenCentral()
-        // gradle plugins
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        gradlePluginPortal()
     }
 
     dependencies {
@@ -123,7 +136,28 @@ dependencies {
     for (dependency in moduleDepends) {
         terasologyModule(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
     }
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
+    testImplementation "org.mockito:mockito-junit-jupiter:3.2.0"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.2"
+
+    //backwards compatibility with modules tests
+    testImplementation "junit:junit:4.12"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.5.2"
 }
+
+
+if (project.name == "ModuleTestingEnvironment") {
+    dependencies {
+        // MTE is a special snowflake, it gets these things as non-test dependencies
+        implementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
+        implementation "org.mockito:mockito-junit-jupiter:3.2.0";
+        implementation "junit:junit:4.12"
+        //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
+        implementation "org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1"
+    }
+}
+
 
 // Generate the module directory structure if missing
 task createSkeleton() {

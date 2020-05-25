@@ -12,6 +12,7 @@
     </JavaCodeStyleSettings>
     <codeStyleSettings language="JAVA">
       <option name="WRAP_COMMENTS" value="true" />
+      <option name="WRAP_LONG_LINES" value="true" />
     </codeStyleSettings>
   </code_scheme>
 </component>

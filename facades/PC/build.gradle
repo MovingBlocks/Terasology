@@ -16,6 +16,10 @@
 
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
+plugins {
+    id "application"
+}
+
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/publish.gradle"
 
@@ -70,6 +74,10 @@ ext {
     displayVersion = versionBase
 }
 
+application {
+    mainClassName project.ext.mainClassName
+}
+
 // Adjust as the Gradle 6 upgrade changed this path a bit
 sourceSets {
     main.java.outputDir = new File("$buildDir/classes")
@@ -90,7 +98,6 @@ dependencies {
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     // Dependency on CrashReporter, conditionally either from source or via binary
     File wouldBeSrcPath = new File(rootDir, 'libs/CrashReporter')
-    println "Scanning for source CrashReporter at: " + wouldBeSrcPath.getAbsolutePath()
 
     if (wouldBeSrcPath.exists()) {
         println "*** Identified CrashReporter source, using that"
@@ -102,8 +109,8 @@ dependencies {
 
         implementation project(':libs:CrashReporter:cr-terasology')
     } else {
-        println "*** Setting a CrashReporter binary dependency, not present as source"
-        implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.0.0'
+        logger.debug("*** Setting a CrashReporter binary dependency, not present as source")
+        implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
     }
 }
 
@@ -124,6 +131,17 @@ configurations {
     modules {
         transitive = false
     }
+}
+
+run {
+    description = "Run 'Terasology' to play the game as a standard PC application"
+    group = "terasology run"
+
+    args "-homedir", "-noCrashReport"
+    jvmArgs "-Xmx1536m"
+    workingDir rootDir
+
+    dependsOn rootProject.moduleClasses
 }
 
 task game(type:JavaExec) {
@@ -333,7 +351,7 @@ task distApp (type: Sync) {
     dependsOn rootProject.extractNatives
     dependsOn jar
 
-    into ("$distsDir/app")
+    into ("$distsDirectory/app")
     from ("$rootDir/README.markdown") {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
         rename('README.markdown', 'README')
@@ -372,7 +390,7 @@ task distModules (type: Sync) {
     dependsOn rootProject.moduleJars
 
     // So this is probably a hack, but it works ;-) It does not work if it is in distApp, default "into" quirk ?
-    into("$distsDir/app/modules")
+    into("$distsDirectory/app/modules")
     rootProject.terasologyModules().each {
         from "$rootDir/modules/${it.name}/build/libs"
         include "*.jar"
@@ -383,8 +401,8 @@ task distPCZip (type: Zip) {
     group = "terasology dist"
     dependsOn distApp
     dependsOn distModules
-    from "$distsDir/app"
-    archiveName = "Terasology.zip"
+    from "$distsDirectory/app"
+    archiveFileName = "Terasology.zip"
 }
 
 task distForLauncher (type: Sync) {
