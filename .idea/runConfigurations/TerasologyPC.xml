@@ -1,5 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="TerasologyPC" type="Application" factoryName="Application">
+    <envs>
+      <env name="XLIB_SKIP_ARGB_VISUALS" value="1" />
+    </envs>
     <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology" />
     <module name="Terasology.facades.PC.main" />
     <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport" />

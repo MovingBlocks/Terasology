@@ -15,8 +15,11 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Locale;
 
 import static org.lwjgl.opengl.GL43.GL_DEBUG_SEVERITY_HIGH;
 import static org.lwjgl.opengl.GL43.GL_DEBUG_SEVERITY_LOW;
@@ -47,8 +50,13 @@ class DebugCallback implements org.lwjgl.opengl.GLDebugMessageCallbackI {
 
     @Override
     public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
-        String logFormat = "[{}] [{}] {}";
-        Object[] args = new Object[]{getSourceString(source), getTypeString(type), message};
+        String logFormat = "[{}] [{}] [{}] {}";
+        Object[] args = new Object[]{
+                "0x" + Integer.toHexString(id).toUpperCase(Locale.ROOT),
+                getSourceString(source),
+                getTypeString(type),
+                MemoryUtil.memASCII(message).trim()
+        };
 
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:
