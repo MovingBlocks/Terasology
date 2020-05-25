@@ -15,6 +15,7 @@
  */
 package org.terasology.documentation;
 
+import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
@@ -153,13 +154,8 @@ public final class ModuleMarkupScraper {
     }
 
     private static String scanModules(ModuleManager moduleManager, List<Module> allSortedModules) {
-        if (allSortedModules == null) {
-            throw new IllegalArgumentException("ModuleMarkupScraper:ScanModules() - Module must be valid.");
-        }
-
-        if (allSortedModules.isEmpty()) {
-            throw new IllegalStateException("ModuleMarkupScraper:ScanModules() - No modules found? Somethings very wrong.");
-        }
+        Preconditions.checkNotNull(moduleManager);
+        Preconditions.checkNotNull(allSortedModules);
 
         StringBuilder out = new StringBuilder();
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
@@ -185,9 +181,7 @@ public final class ModuleMarkupScraper {
     }
 
     private static String exportEvents(ModuleManager moduleManager, Name moduleId, Set<Module> modules) {
-        if (modules == null) {
-            throw new IllegalArgumentException("ModuleMarkupScraper:ExportEvents() - Module must be valid.");
-        }
+        Preconditions.checkNotNull(modules);
 
         StringBuilder events = new StringBuilder();
         try (ModuleEnvironment environment2 = moduleManager.loadEnvironment(modules, false)) {
@@ -225,13 +219,8 @@ public final class ModuleMarkupScraper {
     }
 
     private static String getModuleDescription(final Module module) {
-        if (module == null) {
-            throw new IllegalArgumentException("ModuleMarkupScraper:getModuleDescription() - Module must be valid.");
-        }
-
-        if (module.getMetadata() == null) {
-            throw new IllegalStateException("ModuleMarkupScraper:getModuleDescription() - ModuleMetadata must be valid.");
-        }
+        Preconditions.checkNotNull(module);
+        Preconditions.checkNotNull(module.getMetadata());
 
         final ModuleMetadata metadata = module.getMetadata();
 
@@ -280,9 +269,7 @@ public final class ModuleMarkupScraper {
     }
 
     private static String getModuleDependencies(ModuleMetadata metadata) {
-        if (metadata == null) {
-            throw new IllegalArgumentException("ModuleMarkupScraper:getModuleDependencies() - ModuleMetadata must be valid.");
-        }
+        Preconditions.checkNotNull(metadata);
 
         StringBuilder out = new StringBuilder();
         final List<DependencyInfo> dependencies = metadata.getDependencies();
@@ -317,9 +304,8 @@ public final class ModuleMarkupScraper {
     }
 
     private static String getModuleExtensions(Module module) {
-        if (module == null) {
-            throw new IllegalArgumentException("ModuleMarkupScraper:getModuleExtensions() - Module must be valid.");
-        }
+        Preconditions.checkNotNull(module);
+
         ModuleMetadata metadata = module.getMetadata();
         StringBuilder extensions = new StringBuilder();
         URL downloadUri = RemoteModuleExtension.getDownloadUrl(metadata);
@@ -398,9 +384,7 @@ public final class ModuleMarkupScraper {
     }
 
     private static String getOriginModuleUrl(Module module) {
-        if (module == null) {
-            throw new IllegalArgumentException("ModuleMarkupScraper:getOriginModuleUrl() - Module must be valid.");
-        }
+        Preconditions.checkNotNull(module);
         final String origin = ExtraDataModuleExtension.getOrigin(module);
         if (StringUtils.isBlank(origin) && !INTERNAL_MODULES.contains(module.getId().toString())) {
             return DEFAULT_GITHUB_MODULE_URL + module.getId();
@@ -409,9 +393,7 @@ public final class ModuleMarkupScraper {
     }
 
     private static String getModuleTags(final Module module) {
-        if (module == null) {
-            throw new IllegalArgumentException("ModuleMarkupScraper:getModuleTags() - Module must be valid.");
-        }
+        Preconditions.checkNotNull(module);
         return StandardModuleExtension.booleanPropertySet().stream()
                 .filter(ext -> ext.isProvidedBy(module))
                 .map(StandardModuleExtension::getKey)
