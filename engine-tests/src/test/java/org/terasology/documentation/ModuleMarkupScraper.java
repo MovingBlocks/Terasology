@@ -40,6 +40,7 @@ import org.terasology.naming.Name;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -387,7 +388,11 @@ public final class ModuleMarkupScraper {
         Preconditions.checkNotNull(module);
         final String origin = ExtraDataModuleExtension.getOrigin(module);
         if (StringUtils.isBlank(origin) && !INTERNAL_MODULES.contains(module.getId().toString())) {
-            return DEFAULT_GITHUB_MODULE_URL + module.getId();
+            try {
+                return new URL(DEFAULT_GITHUB_MODULE_URL + module.getId()).toString();
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
         return origin;
     }
