@@ -20,7 +20,6 @@ import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.terasology.HeadlessEnvironment;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;

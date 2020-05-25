@@ -259,9 +259,6 @@ public final class ModuleMarkupScraper {
         details.append("- **Github:** ").append(getOriginModuleUrl(module));
         details.append(System.getProperty("line.separator"));
 
-//        details.append("- **Online Version:** ").append(getOnlineVersion(moduleManager, module.getMetadata().getDependencyInfo(module.getId())));
-//        details.append(System.getProperty("line.separator"));
-
         String author = ExtraDataModuleExtension.getAuthor(module);
         if (!author.isEmpty()) {
             details.append("- **Author:** ").append(author);
@@ -340,11 +337,6 @@ public final class ModuleMarkupScraper {
             extensions.append("|  Artifact Size: | _").append(size).append(" bytes").append("_ |");
             extensions.append(System.getProperty("line.separator"));
         }
-//        String author = ExtraDataModuleExtension.getAuthor(module);
-//        if (author != null && StringUtils.isNotEmpty(author)) {
-//            extensions.append("|  Author: | _").append(author).append("_ |");
-//            extensions.append(System.getProperty("line.separator"));
-//        }
         String origin = ExtraDataModuleExtension.getOrigin(module);
         if (StringUtils.isNotEmpty(origin)) {
             extensions.append("|  Origin: | _").append(origin).append("_ |");
@@ -415,21 +407,6 @@ public final class ModuleMarkupScraper {
         }
         return origin;
     }
-
-//    private static String getOnlineVersion(final ModuleManager moduleManager, final DependencyInfo dependencyInfo) {
-//        if (moduleManager == null) {
-//            throw new IllegalArgumentException("ModuleMarkupScraper:getOnlineVersion() - ModuleManager must be valid.");
-//        }
-//        if (dependencyInfo == null) {
-//            throw new IllegalArgumentException("ModuleMarkupScraper:getOnlineVersion() - DependencyInfo must be valid.");
-//        }
-//        return moduleManager.getInstallManager().getRemoteRegistry().stream()
-//                .filter(module -> module.getId().equals(dependencyInfo.getId()))
-//                .findFirst()
-//                .map(Module::getVersion)
-//                .map(String::valueOf)
-//                .orElse("");
-//    }
 
     private static String getModuleTags(final Module module) {
         if (module == null) {
