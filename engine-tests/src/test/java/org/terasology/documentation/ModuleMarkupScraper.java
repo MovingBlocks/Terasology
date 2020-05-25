@@ -60,12 +60,9 @@ public final class ModuleMarkupScraper {
      * @throws Exception if the module environment cannot be loaded
      */
     public static void main(String[] args) throws Exception {
-         HeadlessEnvironment env = new HEnv(new Name("engine"));
+         HeadlessEnvironment env = new ModuleMetaDataProvidingHeadlessEnvironment(new Name("engine"));
          Context context = env.getContext();
          ModuleManager moduleManager = context.get(ModuleManager.class);
-
-//       ModuleManager moduleManager = ModuleManagerFactory.create("meta.terasology.org");
-//       ModuleEnvironment env = moduleManager.getEnvironment();
 
         // Request Remote Modules List...
         Future<Void> remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor()
@@ -97,34 +94,12 @@ public final class ModuleMarkupScraper {
 
         wiki.append(generateModuleTableOfContents(sortedGameModules, sortedRemoteModules));
 
-//        moduleMapListing.append("| ");
-//        for (Module gModule : sortedGameModules) {
-//            // Add anchor tags, for example [AdditionalFruits](#AdditionalFruits)
-//            moduleMapListing.append("[").append(gModule.getId()).append("](#").append(gModule.getId()).append(") ");
-//        }
-//        moduleMapListing.append(" | ");
-//        for (Module rModule : sortedRemoteModules) {
-//            moduleMapListing.append("[").append(rModule.getId()).append("](#").append(rModule.getId()).append(") ");
-//        }
-//        moduleMapListing.append(" | ");
-//
-//        String moduleMap = System.getProperty("line.separator") +
-//                "**Extensions:**" +
-//                System.getProperty("line.separator") +
-//                "| Installed | Remote |" +
-//                System.getProperty("line.separator") +
-//                "| -------- | ---------- |" +
-//                System.getProperty("line.separator") +
-//                moduleMapListing;
-//        wiki.append(moduleMap);
-
         wiki.append(scanModules(moduleManager, allModules));
 
         System.out.println(wiki);
 
         return wiki.toString();
     }
-
 
     private static String generateModuleTableOfContents(List<Module> sortedGameModules, List<Module> sortedRemoteModules) {
         StringBuilder moduleMapListing = new StringBuilder();
@@ -190,7 +165,7 @@ public final class ModuleMarkupScraper {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Module module : allSortedModules) {
             Name moduleId = module.getId();
-            //if (module.isCodeModule()) {
+            if (module.isCodeModule()) {
                 String moduleDescription = getModuleDescription(module);
                 out.append(moduleDescription);
 
@@ -203,7 +178,7 @@ public final class ModuleMarkupScraper {
                 }
 
                 out.append(exportEvents(moduleManager, moduleId, modules));
-            //}
+            }
             out.append(System.getProperty("line.separator"));
         }
         return out.toString();

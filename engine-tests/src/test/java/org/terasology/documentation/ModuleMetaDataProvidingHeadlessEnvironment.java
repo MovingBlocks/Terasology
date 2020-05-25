@@ -50,16 +50,16 @@ import java.util.Set;
 import static org.mockito.Mockito.mock;
 
 /**
- * Environment with a MapWorldProvider and BlockManager. Useful to get headless environment with a generated world.
+ * Environment with a ModuleManager, RemoteModuleRegistry, TypeRegistry, ComponentSystemManager and AssetManager.
+ * Used to generate a partial headless environment to access game module data including Events
+ * and assets.
  */
-public class HEnv extends HeadlessEnvironment {
-    //protected static Context context;
+public class ModuleMetaDataProvidingHeadlessEnvironment  extends HeadlessEnvironment {
     protected static EngineTime mockTime;
-    //private static HeadlessEnvironment env;
     private static ModuleManager moduleManager;
-    //private static EngineEntityManager engineEntityManager;
+    private static String masterServerAddress;
 
-    public HEnv(Name... modules) throws IOException {
+    public ModuleMetaDataProvidingHeadlessEnvironment(String masterServerAddress, Name... modules) throws IOException {
         super(modules);
         initialize();
     }
@@ -68,40 +68,9 @@ public class HEnv extends HeadlessEnvironment {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
-        /*
-         * Create at least for each class a new headless environemnt as it is fast and prevents side effects
-         * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
-         */
-        //env = new HeadlessEnvironment(new Name("engine"));
-        //context = env.getContext();
+
         moduleManager = context.get(ModuleManager.class);
-
         context.put(ModuleManager.class, moduleManager);
-        RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
-
-        mockTime = mock(EngineTime.class);
-        context.put(Time.class, mockTime);
-        NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, context);
-        context.put(Game.class, new Game());
-        context.put(NetworkSystem.class, networkSystem);
-        EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-        //engineEntityManager = context.get(EngineEntityManager.class);
-        BlockManager mockBlockManager = context.get(BlockManager.class); // 'mock' added to avoid hiding a field
-        ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
-        RecordedEventStore recordedEventStore = new RecordedEventStore();
-        RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
-        context.put(RecordAndReplayUtils.class, recordAndReplayUtils);
-        CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
-        context.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
-        DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        context.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
-        //RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
-        //context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
-
-        //Path savePath = PathManager.getInstance().getSavePath("world1");
-        //context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-        //       engineEntityManager, mockBlockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
@@ -123,7 +92,7 @@ public class HEnv extends HeadlessEnvironment {
         TypeRegistry typeRegistry = new TypeRegistry();
         context.put(TypeRegistry.class, typeRegistry);
 
-        ModuleManager moduleManager = ModuleManagerFactory.create("meta.terasology.org");
+        ModuleManager moduleManager = ModuleManagerFactory.create(masterServerAddress);
         ModuleRegistry registry = moduleManager.getRegistry();
 
         DependencyResolver resolver = new DependencyResolver(registry);
@@ -140,13 +109,5 @@ public class HEnv extends HeadlessEnvironment {
         context.put(ModuleManager.class, moduleManager);
 
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
-    }
-
-    public ModuleManager getModelManager() {
-        return moduleManager;
-    }
-
-    public Context getContext() {
-        return context;
     }
 }
