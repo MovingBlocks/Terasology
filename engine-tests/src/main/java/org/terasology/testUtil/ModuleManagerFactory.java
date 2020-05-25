@@ -41,11 +41,15 @@ public final class ModuleManagerFactory {
     }
 
     /**
-     * Creates a ModuleManager with ModuleInstallManager configured to reference masterServerAddress
+     * Creates a ModuleManager with a ModuleInstallManager instance configured to reference the masterServerAddress endpoint.
+     * The endpoint is a URL where a registry of modules should be found. The ModuleInstallManager accesses the remote
+     * modules via a ModuleListDownloader. The downloader pulls a JSON stream describing a collection of ModuleMetadata objects.
+     * Each ModuleMetadata object describes a module available via the registry.
      *
-     * @param masterServerAddress the url for the master server address.
-     * @return a ModelManager
-     * @throws Exception if the module manager cannot be loaded
+     * @param masterServerAddress the url to a remote module registry
+     * @return a ModuleManager containing an InstallationManager configured to access a remote module registry at URL masterServerAddress
+     * @throws Exception if the ModuleManager cannot be loaded because engine metadata (engine-module.txt) cannot be found or
+     * ModuleInstallManager is unable to resolve the masterServerAddress endpoint
      */
     public static ModuleManager create(String masterServerAddress) throws Exception {
         ModuleManager moduleManager = new ModuleManagerImpl(masterServerAddress);
