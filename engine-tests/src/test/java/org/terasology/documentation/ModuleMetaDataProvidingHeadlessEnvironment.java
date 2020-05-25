@@ -19,15 +19,12 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.terasology.HeadlessEnvironment;
-import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.game.Game;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleImpl;
 import org.terasology.module.DependencyResolver;
@@ -35,31 +32,37 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.recording.*;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.util.Set;
 
-import static org.mockito.Mockito.mock;
-
 /**
  * Environment with a ModuleManager, RemoteModuleRegistry, TypeRegistry, ComponentSystemManager and AssetManager.
- * Used to generate a partial headless environment to access game module data including Events
+ * Used to generate a partial headless ( = no graphics ) environment to access game module data including Events
  * and assets.
  */
 public class ModuleMetaDataProvidingHeadlessEnvironment  extends HeadlessEnvironment {
-    protected static EngineTime mockTime;
     private static ModuleManager moduleManager;
-    private static String masterServerAddress;
 
-    public ModuleMetaDataProvidingHeadlessEnvironment(String masterServerAddress, Name... modules) throws IOException {
+    /**
+     * Default master server address given game config default.
+     */
+    private static String masterServerAddress = "meta.terasology.org";
+
+    /**
+     * Environment with a ModuleManager, RemoteModuleRegistry, TypeRegistry, ComponentSystemManager and AssetManager.
+     * Used to generate a partial headless environment to access game module data including Events
+     * and assets. Uses default remote master server "meta.terasology.org".
+     *
+     * @param modules a set of module names that should be loaded (latest version)
+     * @return a ModuleManager containing an InstallationManager configured to access a remote module registry at URL masterServerAddress
+     * @throws Exception if a manager or registry cannot be loaded because engine metadata cannot be found or
+     * ModuleInstallManager is unable to resolve the masterRemoteServerAddress endpoint
+     */
+    public ModuleMetaDataProvidingHeadlessEnvironment(Name... modules) throws IOException {
         super(modules);
         initialize();
     }
