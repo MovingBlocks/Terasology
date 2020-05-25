@@ -24,7 +24,6 @@ import java.nio.file.Path;
 
 /**
  * Helper class to have LWJGL loading logic in a central spot
- *
  */
 public final class LWJGLHelper {
 
@@ -42,15 +41,18 @@ public final class LWJGLHelper {
 
     private static void initLibraryPaths() {
         final Path path;
-        String osName = System.getProperty("os.name");
-        if (osName.startsWith("Windows")) {
-            path = PathManager.getInstance().getNativesPath().resolve("windows");
-        } else if (osName.startsWith("Linux") || osName.startsWith("FreeBSD") || osName.startsWith("SunOS") || osName.startsWith("Unix")) {
-            path = PathManager.getInstance().getNativesPath().resolve("linux");
-        } else if (osName.startsWith("Mac OS X") || osName.startsWith("Darwin")) {
-            path = PathManager.getInstance().getNativesPath().resolve("macosx");
-        } else {
-            throw new LinkageError("Unknown platform: " + osName);
+        switch (OS.get()) {
+            case WINDOWS:
+                path = PathManager.getInstance().getNativesPath().resolve("windows");
+                break;
+            case MACOSX:
+                path = PathManager.getInstance().getNativesPath().resolve("macosx");
+                break;
+            case LINUX:
+                path = PathManager.getInstance().getNativesPath().resolve("linux");
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os.name"));
         }
         final String natives = path.toAbsolutePath().toString();
         System.setProperty("org.lwjgl.librarypath", natives);

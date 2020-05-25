@@ -31,9 +31,9 @@ import java.util.List;
 
 import javax.swing.JFileChooser;
 
-import org.lwjgl.system.Platform;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.utilities.OS;
 
 
 /**
@@ -166,7 +166,7 @@ public final class PathManager {
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     public void useDefaultHomePath() throws IOException {
-        switch (Platform.get()) {
+        switch (OS.get()) {
             case LINUX:
                 homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
                 break;
