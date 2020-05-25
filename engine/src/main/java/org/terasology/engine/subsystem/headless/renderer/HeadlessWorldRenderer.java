@@ -94,11 +94,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public Camera getLightCamera() {
-        return noCamera;
-    }
-
-    @Override
     public void update(float delta) {
 
         worldProvider.processPropagation();

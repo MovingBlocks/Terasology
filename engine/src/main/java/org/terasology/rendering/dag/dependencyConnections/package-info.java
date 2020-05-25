@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 @API
-package org.terasology.rendering.dag.nodes;
+ package org.terasology.rendering.dag.dependencyConnections;
 
-import org.terasology.module.sandbox.API;
+ import org.terasology.module.sandbox.API;

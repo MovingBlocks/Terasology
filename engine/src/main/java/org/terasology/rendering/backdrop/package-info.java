@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 @API
-package org.terasology.rendering.dag.nodes;
+package org.terasology.rendering.backdrop;
 
 import org.terasology.module.sandbox.API;

@@ -32,6 +32,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.RenderingModuleSettingScreen;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.world.WorldSetupWrapper;
@@ -60,6 +61,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
     private List<WorldSetupWrapper> worldSetupWrappers;
     private UniverseWrapper universeWrapper;
     private WorldSetupWrapper targetWorld;
+    private Context subContext;
 
     @Override
     public void initialise() {
@@ -77,7 +79,6 @@ public class StartPlayingScreen extends CoreScreenLayer {
             } else {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
             }
-
 
             SimpleUri uri;
             WorldInfo worldInfo;
@@ -100,6 +101,16 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "mainMenu", button -> {
             getManager().pushScreen("engine:mainMenuScreen");
+        });
+
+        WidgetUtil.trySubscribe(this, "renderingSettings", button -> {
+            RenderingModuleSettingScreen renderingModuleSettingScreen = (RenderingModuleSettingScreen) getManager().getScreen(RenderingModuleSettingScreen.ASSET_URI);
+            if (renderingModuleSettingScreen == null) {
+                renderingModuleSettingScreen = getManager().createScreen(RenderingModuleSettingScreen.ASSET_URI, RenderingModuleSettingScreen.class);
+                renderingModuleSettingScreen.setSubContext(this.subContext);
+                renderingModuleSettingScreen.postInit();
+            }
+            triggerForwardAnimation(renderingModuleSettingScreen);
         });
     }
 
@@ -125,6 +136,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
         worldSetupWrappers = worldSetupWrapperList;
         universeWrapper = context.get(UniverseWrapper.class);
         targetWorld = spawnWorld;
+        subContext = context;
     }
 
     @Override
