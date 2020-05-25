@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 @API
-package org.terasology.rendering.dag.nodes;
+package org.terasology.rendering.primitives;
 
 import org.terasology.module.sandbox.API;
