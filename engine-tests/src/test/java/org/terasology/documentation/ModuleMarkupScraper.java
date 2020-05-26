@@ -42,9 +42,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import static org.terasology.engine.module.StandardModuleExtension.IS_ASSET;
@@ -53,7 +56,7 @@ import static org.terasology.engine.module.StandardModuleExtension.IS_WORLD;
 public final class ModuleMarkupScraper {
 
     private static final String DEFAULT_GITHUB_MODULE_URL = "https://github.com/Terasology/";
-    private static final List INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay", "BuilderSampleGameplay", "BiomesAPI");
+    private static final List<String> INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay", "BuilderSampleGameplay", "BiomesAPI");
     private static final Comparator<? super Module> MODULE_INFO_COMPARATOR  = Comparator.comparing(o -> o.getMetadata()
             .getDisplayName().toString());
 
@@ -65,11 +68,6 @@ public final class ModuleMarkupScraper {
          HeadlessEnvironment env = new ModuleMetaDataProvidingHeadlessEnvironment(new Name("engine"));
          Context context = env.getContext();
          ModuleManager moduleManager = context.get(ModuleManager.class);
-
-        // Request Remote Modules List...
-        Future<Void> remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor()
-                .submit(moduleManager.getInstallManager().updateRemoteRegistry());
-        remoteModuleRegistryUpdater.get(); // wait until remoteRegistry downloads
 
         List<Module> sortedGameModules = getListOfGameModules(moduleManager);
         List<Module> sortedRemoteModules = getListofRemoteModules(moduleManager);
@@ -117,7 +115,7 @@ public final class ModuleMarkupScraper {
         }
         moduleMapListing.append(" | ");
 
-        String moduleMap = System.getProperty("line.separator") +
+        return System.getProperty("line.separator") +
                 "**Extensions:**" +
                 System.getProperty("line.separator") +
                 "| Installed | Remote |" +
@@ -125,8 +123,6 @@ public final class ModuleMarkupScraper {
                 "| -------- | ---------- |" +
                 System.getProperty("line.separator") +
                 moduleMapListing;
-
-        return moduleMap;
     }
 
     private static List<Module> getListofRemoteModules(ModuleManager moduleManager) {
@@ -199,7 +195,6 @@ public final class ModuleMarkupScraper {
                 // Are there any other classes derived from this class?
                 for (Class<?> eventType : environment2.getSubtypesOf(type)) {
                     events.append("    ").append(eventType.getName());
-                    events.append("    " + eventType.getName());
                     events.append(System.getProperty("line.separator"));
                 }
             }

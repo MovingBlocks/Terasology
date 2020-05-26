@@ -15,17 +15,9 @@
  */
 package org.terasology.documentation;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.terasology.HeadlessEnvironment;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleImpl;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleRegistry;
@@ -34,9 +26,10 @@ import org.terasology.naming.Name;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Environment with a ModuleManager, RemoteModuleRegistry, TypeRegistry, ComponentSystemManager and AssetManager.
@@ -44,8 +37,6 @@ import java.util.Set;
  * and assets.
  */
 public class ModuleMetaDataProvidingHeadlessEnvironment  extends HeadlessEnvironment {
-    private static ModuleManager moduleManager;
-
     /**
      * Default master server address given game config default.
      */
@@ -57,36 +48,21 @@ public class ModuleMetaDataProvidingHeadlessEnvironment  extends HeadlessEnviron
      * and assets. Uses default remote master server "meta.terasology.org".
      *
      * @param modules a set of module names that should be loaded (latest version)
-     * @return a ModuleManager containing an InstallationManager configured to access a remote module registry at URL masterServerAddress
-     * @throws Exception if a manager or registry cannot be loaded because engine metadata cannot be found or
+     * @throws ExecutionException if a manager or registry cannot be loaded because engine metadata cannot be found or
      * ModuleInstallManager is unable to resolve the masterRemoteServerAddress endpoint
+     * @throws InterruptedException if a the RemoteRegistry connection is interrupted
      */
-    public ModuleMetaDataProvidingHeadlessEnvironment(Name... modules) throws IOException {
+    public ModuleMetaDataProvidingHeadlessEnvironment(Name... modules) throws ExecutionException, InterruptedException {
         super(modules);
         initialize();
     }
 
-    private void initialize() throws IOException {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
-
-        moduleManager = context.get(ModuleManager.class);
-        context.put(ModuleManager.class, moduleManager);
-
-        ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
-        context.put(ComponentSystemManager.class, componentSystemManager);
-        LoadPrefabs prefabLoadStep = new LoadPrefabs(context);
-
-        boolean complete = false;
-        prefabLoadStep.begin();
-        while (!complete) {
-            complete = prefabLoadStep.step();
-        }
-        context.get(ComponentSystemManager.class).initialise();
-        context.put(Console.class, new ConsoleImpl(context));
-
-        this.setupAssetManager();
+    private void initialize() throws ExecutionException, InterruptedException {
+        // Request Remote Modules List...
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        Future<Void> remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor()
+                .submit(moduleManager.getInstallManager().updateRemoteRegistry());
+        remoteModuleRegistryUpdater.get(); // wait until remoteRegistry downloads
     }
 
     @Override
