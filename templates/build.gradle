@@ -27,8 +27,8 @@ buildscript {
 
     dependencies {
         // Needed for caching reflected data during builds
-        classpath 'org.reflections:reflections:0.9.10'
-        classpath 'dom4j:dom4j:1.6.1'
+        classpath "org.reflections:reflections:0.9.10"
+        classpath "dom4j:dom4j:1.6.1"
 
         //Spotbugs
         classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
@@ -60,7 +60,7 @@ ext {
 }
 
 def moduleDepends = [];
-def moduleFile = file('module.txt')
+def moduleFile = file("module.txt")
 
 // The module file should always exist if the module was correctly created or cloned using Gradle
 if (!moduleFile.exists()) {
@@ -72,7 +72,7 @@ if (!moduleFile.exists()) {
 def slurper = new JsonSlurper()
 def moduleConfig = slurper.parseText(moduleFile.text)
 for (dependency in moduleConfig.dependencies) {
-    if (dependency.id != 'engine') {
+    if (dependency.id != "engine") {
         moduleDepends += dependency.id
     }
 }
@@ -102,7 +102,7 @@ if (moduleConfig.isReleaseManaged && env.BRANCH_NAME == "master") {
 }
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-group = 'org.terasology.modules'
+group = "org.terasology.modules"
 
 println "Version for $project.name loaded as $version for group $group"
 
@@ -120,7 +120,7 @@ SourceSet mainSourceSet = convention.getSourceSets().getByName("main");
 
 // TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
 configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    resolutionStrategy.cacheChangingModulesFor 0, "seconds"
 }
 configurations {
     terasologyModule
@@ -130,11 +130,11 @@ configurations {
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
-    implementation(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
-    implementation(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
+    implementation(group: "org.terasology.engine", name: "engine", version: "+", changing: true)
+    implementation(group: "org.terasology.engine", name: "engine-tests", version: "+", changing: true)
 
     for (dependency in moduleDepends) {
-        terasologyModule(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
+        terasologyModule(group: "org.terasology.modules", name: dependency, version: "+", changing: true)
     }
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
@@ -162,34 +162,34 @@ if (project.name == "ModuleTestingEnvironment") {
 
 // Generate the module directory structure if missing
 task createSkeleton() {
-    mkdir('assets')
-    mkdir('assets/animations')
-    mkdir('assets/atlas')
-    mkdir('assets/behaviors')
-    mkdir('assets/blocks')
-    mkdir('assets/blockSounds')
-    mkdir('assets/blockTiles')
-    mkdir('assets/fonts')
-    mkdir('assets/i18n')
-    mkdir('assets/materials')
-    mkdir('assets/mesh')
-    mkdir('assets/music')
-    mkdir('assets/prefabs')
-    mkdir('assets/shaders')
-    mkdir('assets/shapes')
-    mkdir('assets/skeletalMesh')
-    mkdir('assets/skins')
-    mkdir('assets/sounds')
-    mkdir('assets/textures')
-    mkdir('assets/ui')
-    mkdir('overrides')
-    mkdir('deltas')
-    mkdir('src/main/java')
-    mkdir('src/test/java')
+    mkdir("assets")
+    mkdir("assets/animations")
+    mkdir("assets/atlas")
+    mkdir("assets/behaviors")
+    mkdir("assets/blocks")
+    mkdir("assets/blockSounds")
+    mkdir("assets/blockTiles")
+    mkdir("assets/fonts")
+    mkdir("assets/i18n")
+    mkdir("assets/materials")
+    mkdir("assets/mesh")
+    mkdir("assets/music")
+    mkdir("assets/prefabs")
+    mkdir("assets/shaders")
+    mkdir("assets/shapes")
+    mkdir("assets/skeletalMesh")
+    mkdir("assets/skins")
+    mkdir("assets/sounds")
+    mkdir("assets/textures")
+    mkdir("assets/ui")
+    mkdir("overrides")
+    mkdir("deltas")
+    mkdir("src/main/java")
+    mkdir("src/test/java")
 }
 
 task cacheReflections {
-    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
+    description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
     inputs.files mainSourceSet.output.classesDirs
     outputs.file new File(mainSourceSet.output.classesDirs.first(), "reflections.cache")
     dependsOn classes
@@ -208,23 +208,23 @@ task cacheReflections {
 }
 
 task cleanReflections(type: Delete) {
-    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
+    description = "Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration."
     delete cacheReflections.outputs.files
 }
 
 // This task syncs everything in the assets dir into the output dir, used when jarring the module
 task syncAssets(type: Sync) {
-    from 'assets'
+    from "assets"
     into "${mainSourceSet.output.classesDirs.first()}/assets"
 }
 
 task syncOverrides(type: Sync) {
-    from 'overrides'
+    from "overrides"
     into "${mainSourceSet.output.classesDirs.first()}/overrides"
 }
 
 task syncDeltas(type: Sync) {
-    from 'deltas'
+    from "deltas"
     into "${mainSourceSet.output.classesDirs.first()}/deltas"
 }
 
@@ -239,7 +239,7 @@ jar {
     // Jarring needs to copy module.txt and all the assets into the output
     doFirst {
         copy {
-            from 'module.txt'
+            from "module.txt"
             into mainSourceSet.output.classesDirs.first()
         }
     }
@@ -252,8 +252,8 @@ idea {
     module {
         // Change around the output a bit
         inheritOutputDirs = false
-        outputDir = file('build/classes')
-        testOutputDir = file('build/testClasses')
+        outputDir = file("build/classes")
+        testOutputDir = file("build/testClasses")
         downloadSources = true
     }
 }
@@ -261,6 +261,6 @@ idea {
 // For Eclipse just make sure the classpath is right
 eclipse {
     classpath {
-        defaultOutputDir = file('build/classes')
+        defaultOutputDir = file("build/classes")
     }
 }
