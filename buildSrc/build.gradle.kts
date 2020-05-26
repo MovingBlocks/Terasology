@@ -24,6 +24,6 @@ repositories {
 
 dependencies {
     // Needed for caching reflected data during builds
-    "implementation"("org.reflections:reflections:0.9.10")
-    "implementation"("dom4j:dom4j:1.6.1")
+    implementation("org.reflections:reflections:0.9.10")
+    implementation("dom4j:dom4j:1.6.1")
 }
