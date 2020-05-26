@@ -12,6 +12,7 @@ build.gradle
 bin/
 
 build/
+out/
 
 # MacOS Specific
 .DS_Store
