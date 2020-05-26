@@ -27,14 +27,14 @@ buildscript {
 
     dependencies {
         // Needed for caching reflected data during builds
-        classpath "org.reflections:reflections:0.9.10"
-        classpath "dom4j:dom4j:1.6.1"
+        classpath("org.reflections:reflections:0.9.10")
+        classpath("dom4j:dom4j:1.6.1")
 
         //Spotbugs
-        classpath "gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0"
+        classpath("gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0")
 
         // SonarQube / Cloud scanning
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8")
     }
 }
 
@@ -64,7 +64,7 @@ def moduleFile = file("module.txt")
 
 // The module file should always exist if the module was correctly created or cloned using Gradle
 if (!moduleFile.exists()) {
-    println "Y U NO EXIST MODULE.TXT!"
+    println("Y U NO EXIST MODULE.TXT!")
     throw new GradleException("Failed to find module.txt for " + project.name)
 }
 
@@ -86,7 +86,7 @@ import static org.gradle.internal.logging.text.StyledTextOutput.Style
 // Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
 def undesiredSnapshotTag = version.endsWith("-SNAPSHOT")
 if (undesiredSnapshotTag) {
-    println "Taking off undesired -SNAPSHOT"
+    println("Taking off undesired -SNAPSHOT")
     version -= "-SNAPSHOT"
     def out = services.get(StyledTextOutputFactory).create("an-ouput")
     out.withStyle(Style.FailureHeader).println("WARNING: Module " + project.name + " is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
@@ -104,11 +104,11 @@ if (moduleConfig.isReleaseManaged && env.BRANCH_NAME == "master") {
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = "org.terasology.modules"
 
-println "Version for $project.name loaded as $version for group $group"
+println("Version for $project.name loaded as $version for group $group")
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
 // Note that this statement is down a ways because it is affected by the stuff higher in this file like setting versioning
-apply from: "$rootDir/config/gradle/publish.gradle"
+apply(from: "$rootDir/config/gradle/publish.gradle")
 
 // Handle some logic related to where what is
 sourceSets {
@@ -120,11 +120,11 @@ SourceSet mainSourceSet = convention.getSourceSets().getByName("main");
 
 // TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
 configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }
 configurations {
     terasologyModule
-    implementation.extendsFrom terasologyModule
+    implementation.extendsFrom(terasologyModule)
 }
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
@@ -137,25 +137,25 @@ dependencies {
         terasologyModule(group: "org.terasology.modules", name: dependency, version: "+", changing: true)
     }
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.2"
-    testImplementation "org.mockito:mockito-junit-jupiter:3.2.0"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.2"
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
 
     //backwards compatibility with modules tests
-    testImplementation "junit:junit:4.12"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.5.2"
+    testImplementation("junit:junit:4.12")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.5.2")
 }
 
 
 if (project.name == "ModuleTestingEnvironment") {
     dependencies {
         // MTE is a special snowflake, it gets these things as non-test dependencies
-        implementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
+        implementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
         implementation "org.mockito:mockito-junit-jupiter:3.2.0";
-        implementation "junit:junit:4.12"
+        implementation("junit:junit:4.12")
         //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
-        implementation "org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1"
+        implementation("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
     }
 }
 
@@ -190,9 +190,9 @@ task createSkeleton() {
 
 task cacheReflections {
     description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
-    inputs.files mainSourceSet.output.classesDirs
-    outputs.file new File(mainSourceSet.output.classesDirs.first(), "reflections.cache")
-    dependsOn classes
+    inputs.files(mainSourceSet.output.classesDirs)
+    outputs.file(new File(mainSourceSet.output.classesDirs.first(), "reflections.cache"))
+    dependsOn(classes)
 
     doFirst {
         try {
@@ -209,43 +209,43 @@ task cacheReflections {
 
 task cleanReflections(type: Delete) {
     description = "Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration."
-    delete cacheReflections.outputs.files
+    delete(cacheReflections.outputs.files)
 }
 
 // This task syncs everything in the assets dir into the output dir, used when jarring the module
 task syncAssets(type: Sync) {
-    from "assets"
-    into "${mainSourceSet.output.classesDirs.first()}/assets"
+    from("assets")
+    into("${mainSourceSet.output.classesDirs.first()}/assets")
 }
 
 task syncOverrides(type: Sync) {
-    from "overrides"
-    into "${mainSourceSet.output.classesDirs.first()}/overrides"
+    from("overrides")
+    into("${mainSourceSet.output.classesDirs.first()}/overrides")
 }
 
 task syncDeltas(type: Sync) {
-    from "deltas"
-    into "${mainSourceSet.output.classesDirs.first()}/deltas"
+    from("deltas")
+    into("${mainSourceSet.output.classesDirs.first()}/deltas")
 }
 
 // Instructions for packaging a jar file - is a manifest even needed for modules?
 jar {
     // Make sure the assets directory is included
-    dependsOn cacheReflections
-    dependsOn syncAssets
-    dependsOn syncOverrides
-    dependsOn syncDeltas
+    dependsOn(cacheReflections)
+    dependsOn(syncAssets)
+    dependsOn(syncOverrides)
+    dependsOn(syncDeltas)
 
     // Jarring needs to copy module.txt and all the assets into the output
     doFirst {
         copy {
-            from "module.txt"
-            into mainSourceSet.output.classesDirs.first()
+            from("module.txt")
+            into(mainSourceSet.output.classesDirs.first())
         }
     }
 }
 
-jar.finalizedBy cleanReflections
+jar.finalizedBy(cleanReflections)
 
 // Prep an IntelliJ module for the Terasology module - yes, might want to read that twice :D
 idea {
