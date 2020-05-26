@@ -110,32 +110,32 @@ configurations.all {
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
-    "implementation"(group = "org.terasology.engine", name = "engine", version = "+") { isChanging = true }
-    "implementation"(group = "org.terasology.engine", name = "engine-tests", version = "+") { isChanging = true }
+    implementation(group = "org.terasology.engine", name = "engine", version = "+") { isChanging = true }
+    implementation(group = "org.terasology.engine", name = "engine-tests", version = "+") { isChanging = true }
 
     for (dependency in moduleDepends) {
-        "implementation"(group = "org.terasology.modules", name = dependency, version = "+") { isChanging = true }
+        implementation(group = "org.terasology.modules", name = dependency, version = "+") { isChanging = true }
     }
 
-    "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.6.2")
-    "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.6.2")
-    "testImplementation"("org.mockito:mockito-junit-jupiter:3.2.0")
-    "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
 
     //backwards compatibility with modules tests
-    "testImplementation"("junit:junit:4.12")
-    "testRuntimeOnly"("org.junit.vintage:junit-vintage-engine:5.5.2")
+    testImplementation("junit:junit:4.12")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.5.2")
 }
 
 
 if (project.name == "ModuleTestingEnvironment") {
     dependencies {
         // MTE is a special snowflake, it gets these things as non-test dependencies
-        "implementation"("org.junit.jupiter:junit-jupiter-api:5.6.2")
-        "implementation"("org.mockito:mockito-junit-jupiter:3.2.0")
-        "implementation"("junit:junit:4.12")
+        implementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
+        implementation("org.mockito:mockito-junit-jupiter:3.2.0")
+        implementation("junit:junit:4.12")
         //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
-        "implementation"("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
+        implementation("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
     }
 }
 
