@@ -15,7 +15,7 @@
  */
 package org.terasology.documentation;
 
-import com.google.api.client.repackaged.com.google.common.base.Preconditions;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
