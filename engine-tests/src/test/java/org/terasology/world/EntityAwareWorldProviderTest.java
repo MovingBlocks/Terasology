@@ -270,6 +270,16 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     }
 
     @Test
+    public void testEntityBecomesTemporaryWhenChangedFromAKeepActiveBlockJoml() {
+        worldProvider.setBlock(new org.joml.Vector3i(), keepActiveBlock);
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        worldProvider.setBlock(new org.joml.Vector3i(), airBlock);
+        worldProvider.update(1.0f);
+        assertFalse(blockEntity.isActive());
+    }
+
+
+    @Test
     public void testEntityBecomesTemporaryIfForceBlockActiveComponentRemoved() {
         EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
         blockEntity.addComponent(new ForceBlockActiveComponent());

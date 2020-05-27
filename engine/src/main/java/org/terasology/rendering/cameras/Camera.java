@@ -15,14 +15,18 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
+import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
+import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.math.MatrixUtils;
 
 /**
  * Provides global access to fonts.
@@ -35,10 +39,13 @@ import org.terasology.math.MatrixUtils;
  */
 public abstract class Camera {
 
+    protected static final Vector3fc FORWARD = JomlUtil.from(Direction.FORWARD.getVector3f());
+
     /* CAMERA PARAMETERS */
     protected final Vector3f position = new Vector3f(0, 0, 0);
-    protected final Vector3f up = new Vector3f(0, 1, 0);
-    protected Vector3f viewingDirection = new Vector3f(1, 0, 0);
+    protected final Vector3f up = JomlUtil.from(Direction.UP.getVector3f());
+    protected final Vector3f viewingDirection = new Vector3f(FORWARD);
+    protected final Vector3f viewingAxis = JomlUtil.from(Direction.LEFT.getVector3f());
     protected float viewingAngle;
 
     protected float zNear = 0.1f;
@@ -203,19 +210,18 @@ public abstract class Camera {
 
     /**
      * Get the orientation of the camera.
-     * @return the orientation direction, a quaternion.
+     * @return the orientation
      */
     public Quat4f getOrientation() {
-        return new Quat4f(JomlUtil.from(viewingDirection), viewingAngle);
+        return new Quat4f(JomlUtil.from(viewingAxis), viewingAngle);
     }
 
-    /**
-     Try to set the viewing direction.
-     * @param direction
-     */
-    public void setOrientation(Quat4f direction) {
-        viewingDirection = new Vector3f(direction.x,direction.y,direction.z);
-        viewingAngle = direction.getAngle();
+    public void setOrientation(Quat4f orientation) {
+        Quaternionf newOrientation = JomlUtil.from(orientation);
+        newOrientation.transform(FORWARD, viewingDirection);
+        AxisAngle4f axisAngle = new AxisAngle4f(newOrientation);
+        viewingAxis.set(axisAngle.x, axisAngle.y, axisAngle.z);
+        viewingAngle = axisAngle.angle;
     }
 
     public ViewFrustum getViewFrustum() {

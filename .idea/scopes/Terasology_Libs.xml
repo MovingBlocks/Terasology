@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Terasology Libs" pattern="lib:org.terasology..*" />
+</component>

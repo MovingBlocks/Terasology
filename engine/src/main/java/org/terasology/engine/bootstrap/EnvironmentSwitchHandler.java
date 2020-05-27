@@ -40,6 +40,7 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -85,8 +86,14 @@ public final class EnvironmentSwitchHandler {
             }
         }
 
-        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        //TODO: find a permanent fix over just creating a new typehandler
+        // https://github.com/Terasology/JoshariasSurvival/issues/31
+        // TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        // typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager,typeRegistry);
         typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         // Entity System Library
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
@@ -195,7 +202,7 @@ public final class EnvironmentSwitchHandler {
                 if (opt.isPresent()) {
                     TypeHandler instance = InjectionHelper.createWithConstructorInjection(handler, context);
                     InjectionHelper.inject(instance, context);
-                    library.addTypeHandler((Class) opt.get(), instance);
+                    library.addTypeHandler(TypeInfo.of(opt.get()), instance);
                 }
             }
         }

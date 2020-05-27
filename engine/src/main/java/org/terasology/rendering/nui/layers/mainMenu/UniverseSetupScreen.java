@@ -198,7 +198,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "addGenerator", button -> {
-            if (worldGenerator.getSelection().getUri().toString().equals("Core:heightMap")) {
+            //TODO: there should not be a reference from the engine to some module - the engine must be agnostic to what
+            //      modules may do
+            if (worldGenerator.getSelection().getUri().toString().equals("CoreWorlds:heightMap")) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(
                         "HeightMap not supported", "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
             } else {

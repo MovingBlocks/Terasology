@@ -17,7 +17,6 @@ package org.terasology.rendering.cameras;
 
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
@@ -85,22 +84,22 @@ public class OrthographicCamera extends Camera {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
 
         // Nothing to do...
-        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
-                && cachedZFar == zFar && cachedZNear == zNear) {
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
+            && cachedZFar == zFar && cachedZNear == zNear) {
             return;
         }
 
-        projectionMatrix = MatrixUtils.createOrthogonalProjectionMatrix(left, right, top, bottom, zNear, zFar);
+        projectionMatrix = new Matrix4f().ortho(left, right, bottom, top, zNear, zFar).transpose();
         viewMatrix = MatrixUtils.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
 
 
-        viewProjectionMatrix  = new Matrix4f(viewMatrix).mul(projectionMatrix);
+        viewProjectionMatrix = new Matrix4f(viewMatrix).mul(projectionMatrix);
         viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks
         cachedPosition.set(getPosition());
-        cachedViewigDirection.set(getViewingDirection());
+        cachedViewigDirection.set(viewingDirection);
         cachedZFar = zFar;
         cachedZNear = zNear;
 

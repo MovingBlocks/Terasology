@@ -16,6 +16,7 @@
 package org.terasology.world.internal;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
@@ -100,8 +101,21 @@ public interface WorldProviderCore {
      * @param pos  The world position to change
      * @param type The type of the block to set
      * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #setBlock(Vector3ic, Block)}.
      */
+    @Deprecated
     Block setBlock(Vector3i pos, Block type);
+
+
+    /**
+     * Places a block of a specific type at a given position
+     *
+     * @param pos  The world position to change
+     * @param type The type of the block to set
+     * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
+     */
+    Block setBlock(Vector3ic pos, Block type);
 
     /**
      * Places all given blocks of specific types at their corresponding positions
@@ -152,7 +166,7 @@ public interface WorldProviderCore {
     byte getSunlight(int x, int y, int z);
 
     byte getTotalLight(int x, int y, int z);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -163,9 +177,10 @@ public interface WorldProviderCore {
      * @return The (index)th extra-data value at the given position
      */
     int getExtraData(int index, int x, int y, int z);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
+     * You must not use this method with world gen code, call 'setExtraData' on chunk instead.
      *
      * @param index The index of the extra data field
      * @param pos
@@ -185,4 +200,5 @@ public interface WorldProviderCore {
      * @return an unmodifiable view on the generated relevant regions
      */
     Collection<Region3i> getRelevantRegions();
+
 }

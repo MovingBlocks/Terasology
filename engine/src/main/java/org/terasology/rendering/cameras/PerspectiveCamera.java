@@ -136,7 +136,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void updateMatrices(float fov) {
         // Nothing to do...
-        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
                 && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
                 && cachedFov == fov
                 && cachedZFar == getzFar() && cachedZNear == getzNear()
@@ -144,7 +144,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
             return;
         }
 
-        viewingDirection.cross(up,tempRightVector);
+        viewingDirection.cross(up, tempRightVector);
         tempRightVector.mul(bobbingRotationOffsetFactor);
 
         projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar(),this.displayDevice);
@@ -172,7 +172,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
         // Used for dirty checks
         cachedPosition.set(getPosition());
-        cachedViewigDirection.set(getViewingDirection());
+        cachedViewigDirection.set(viewingDirection);
         cachedBobbingVerticalOffsetFactor = bobbingVerticalOffsetFactor;
         cachedBobbingRotationOffsetFactor = bobbingRotationOffsetFactor;
         cachedFov = fov;
@@ -196,7 +196,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         float aspectRatio = (float) displayDevice.getDisplayWidth()/ displayDevice.getDisplayHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
-        return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
+        return new Matrix4f().perspective(fovY,aspectRatio,zNear,zFar).transpose();
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {

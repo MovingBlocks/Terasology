@@ -113,7 +113,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the" +
-            " commands, e.g.: \"listBlocks engine: CoreBlocks:\" will list all blocks from the engine and coreblocks module",
+            " commands, e.g.: \"listBlocks engine: core\" will list all blocks from the engine and modules starting with 'core'",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -148,7 +148,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Lists all available shapes\nYou can filter by adding the beginning of words after the" +
-            " commands, e.g.: \"listShapes engine: core:\" will list all shapes from the engine and core module",
+            " commands, e.g.: \"listShapes engine: core\" will list all shapes from the engine and modules starting with 'core'",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listShapes(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -171,7 +171,7 @@ public class BlockCommands extends BaseComponentSystem {
     @Command(shortDescription = "Lists available free shape blocks",
             helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.\n" +
                     "You can filter by adding the beginning of words after the commands, e.g.: \"listFreeShapeBlocks" +
-                    "engine: core:\" will list all free shape blocks from the engine and core module",
+                    "engine: core\" will list all free shape blocks from the engine and modules starting with 'core'",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listFreeShapeBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -192,7 +192,8 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Replaces a block in front of user",
-            helpText = "Replaces a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+            helpText = "Replaces a block in front of the user at the specified max distance",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public void replaceBlock(
             @Sender EntityRef sender,
             @CommandParam("blockName") String uri,
@@ -265,6 +266,7 @@ public class BlockCommands extends BaseComponentSystem {
     /**
      * Called by 'give' command in ItemCommands.java to attempt to put a block in the player's inventory when no item is found.
      * Called by 'giveBulkBlock' command in BlockCommands.java to put a block in the player's inventory.
+     *
      * @return Null if not found, otherwise success or warning message
      */
     public String giveBlock(
@@ -370,7 +372,8 @@ public class BlockCommands extends BaseComponentSystem {
 
     /**
      * Used to check if an item/prefab/etc name starts with a string that is in {@code uri}
-     * @param uri the name to be checked
+     *
+     * @param uri             the name to be checked
      * @param startsWithArray array of possible word to match at the beginning of {@code uri}
      * @return true if {@code startsWithArray} is null, empty or {@code uri} starts with one of the elements in it
      */

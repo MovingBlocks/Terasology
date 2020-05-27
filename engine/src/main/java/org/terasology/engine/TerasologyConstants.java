@@ -56,6 +56,8 @@ public final class TerasologyConstants {
     /**
      * Name of the core gameplay module. The core gameplay module adds a minimal environment for some basic gameplay.
      */
+    //TODO: CSG moved out of the engine repo, so this should either be removed or reference the Builder Sample Gameplay
+    //      which still lives in the engine repo.
     public static final Name CORE_GAMEPLAY_MODULE = new Name("coresamplegameplay");
     /**
      * Name of a module's assets directory.

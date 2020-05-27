@@ -57,7 +57,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * Core - mandatory content needed for normal game launch
 * [CoreAssets](https://github.com/Terasology/CoreAssets) - base assets extracted from Core
 * [CoreBlocks](https://github.com/Terasology/CoreBlocks) - base blocks extracted from Core
-* CoreSampleGameplay - gameplay front for Core - allows modules to depend on Core without the default starting inventory
+* [CoreSampleGameplay](https://github.com/Terasology/CoreSampleGameplay) - default gameplay with a few core modules enabled
 * [CustomOreGen](https://github.com/Terasology/CustomOreGen) - library containing an ore distribution algorithm based on [JRoush's CustomOreGen](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1282294-1-4-6-v2-custom-ore-generation-updated-jan-5th)
 * [DamagingBlocks](https://github.com/Terasology/DamagingBlocks) - allows blocks like lava to hurt the player
 * [Dialogs](https://github.com/Terasology/Dialogs) - supports opening dialogs for interactions with NPCs and such
