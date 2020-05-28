@@ -10,7 +10,7 @@
       "title": "main",
       "seed": "naqrhaKV1lUofG7PLIJcOfDlUiPs3Jmp",
       "time": 25538256,
-      "worldGenerator": "BuilderSampleGameplay:BuilderSampleWorld"
+      "worldGenerator": "Gooeys:World"
     }
   },
   "modules": []
