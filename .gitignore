@@ -16,7 +16,6 @@ extensions
 !/facades/TeraEd
 !/facades/subprojects.gradle
 /modules/*
-!/modules/BuilderSampleGameplay
 !/modules/subprojects.gradle
 /metas/*
 !/metas/subprojects.gradle
