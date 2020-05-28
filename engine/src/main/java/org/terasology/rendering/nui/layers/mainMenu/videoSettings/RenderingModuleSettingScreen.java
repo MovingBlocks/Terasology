@@ -1,11 +1,11 @@
 /*
- * Copyright 2019 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
@@ -75,6 +77,13 @@ public class RenderingModuleSettingScreen extends CoreScreenLayer implements UIS
 
         renderingModuleRegistry.updateRenderingModulesOrder(moduleEnvironment, subContext);
         orderedModuleRenderingInstances = renderingModuleRegistry.getOrderedRenderingModules();
+
+        if (orderedModuleRenderingInstances == null || orderedModuleRenderingInstances.isEmpty()) {
+            logger.error("No rendering module found!");
+            GameEngine gameEngine = context.get(GameEngine.class);
+            gameEngine.changeState(new StateMainMenu("No rendering module installed, unable to render. Try enabling CoreRendering."));
+            return;
+        }
 
         renderingModuleInfo = find("modulesInfo", UIText.class);
         recalculateOrder = find("update", UIButton.class);
