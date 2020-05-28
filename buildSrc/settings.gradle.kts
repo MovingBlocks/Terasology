@@ -14,6 +14,3 @@
  * limitations under the License.
  */
 
-plugins {
-    id("terasology-module")
-}
