@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,6 +43,7 @@ final class TaskProcessor<T extends Task> implements Runnable {
         boolean running = true;
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         Thread.currentThread().setName(name);
+        Thread.currentThread().setDaemon(true);
         while (running) {
             try {
                 T task = queue.take();
