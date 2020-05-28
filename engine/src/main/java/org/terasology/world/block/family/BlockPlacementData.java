@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+import com.google.common.base.Preconditions;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -66,9 +67,9 @@ public class BlockPlacementData {
      * @param relativeAttachmentPosition The position on the block surface that the user aimed at when placing the block. A vector in the range (0..1, 0..1)
      */
     public BlockPlacementData(Vector3ic blockPosition, Side attachmentSide, Vector3fc viewingDirection, Vector2fc relativeAttachmentPosition) {
-        this.blockPosition = new Vector3i(blockPosition);
-        this.attachmentSide = attachmentSide;
-        this.viewingDirection = new Vector3f(viewingDirection);
-        this.relativeAttachmentPosition = new Vector2f(relativeAttachmentPosition);
+        this.blockPosition = new Vector3i(Preconditions.checkNotNull(blockPosition));
+        this.attachmentSide = Preconditions.checkNotNull(attachmentSide);
+        this.viewingDirection = new Vector3f(Preconditions.checkNotNull(viewingDirection));
+        this.relativeAttachmentPosition = new Vector2f(Preconditions.checkNotNull(relativeAttachmentPosition));
     }
 }
