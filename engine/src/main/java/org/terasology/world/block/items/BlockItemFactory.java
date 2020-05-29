@@ -16,18 +16,19 @@
 package org.terasology.world.block.items;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.ComponentContainer;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.world.block.family.BlockFamily;
 
-import java.util.Optional;
+import java.util.Collections;
 
 /**
+ *
  */
 public class BlockItemFactory {
     private EntityManager entityManager;
@@ -38,43 +39,6 @@ public class BlockItemFactory {
 
     public EntityRef newInstance(BlockFamily blockFamily) {
         return newInstance(blockFamily, 1);
-    }
-
-    /**
-     * Use this method instead of {@link #newInstance(BlockFamily)} to modify entity properties like the persistence
-     * flag before it gets created.
-     *
-     * @param blockFamily must not be null
-     */
-    public EntityBuilder newBuilder(BlockFamily blockFamily, int quantity) {
-        EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
-        if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
-            builder.addComponent(new LightComponent());
-        }
-
-        // Copy the components from block prefab into the block item
-        Optional<Prefab> prefab = blockFamily.getArchetypeBlock().getPrefab();
-        if (prefab.isPresent()) {
-            for (Component component : prefab.get().iterateComponents()) {
-                if (component.getClass().getAnnotation(AddToBlockBasedItem.class) != null) {
-                    builder.addComponent(entityManager.getComponentLibrary().copy(component));
-                }
-            }
-        }
-
-        DisplayNameComponent displayNameComponent = builder.getComponent(DisplayNameComponent.class);
-        displayNameComponent.name = blockFamily.getDisplayName();
-
-        ItemComponent item = builder.getComponent(ItemComponent.class);
-        if (blockFamily.getArchetypeBlock().isStackable()) {
-            item.stackId = "block:" + blockFamily.getURI().toString();
-            item.stackCount = (byte) quantity;
-        }
-
-        BlockItemComponent blockItem = builder.getComponent(BlockItemComponent.class);
-        blockItem.blockFamily = blockFamily;
-
-        return builder;
     }
 
     public EntityRef newInstance(BlockFamily blockFamily, int quantity) {
@@ -90,32 +54,74 @@ public class BlockItemFactory {
             return EntityRef.NULL;
         }
 
+        return foo(blockFamily, blockEntity.iterateComponents(), (byte) 1).build();
+    }
+
+    /**
+     * Use this method instead of {@link #newInstance(BlockFamily)} to modify entity properties like the persistence
+     * flag before it gets created.
+     *
+     * @param blockFamily must not be null
+     */
+    public EntityBuilder newBuilder(BlockFamily blockFamily, int quantity) {
+        Iterable<Component> components =
+                blockFamily.getArchetypeBlock().getPrefab()
+                        .map(ComponentContainer::iterateComponents)
+                        .orElse(Collections.emptyList());
+
+        return foo(blockFamily, components, (byte) quantity);
+    }
+
+
+    private EntityBuilder foo(BlockFamily blockFamily, Iterable<Component> components, byte quantity) {
         EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
+
+        addComponents(builder, components);
+
+        setLightComponent(builder, blockFamily);
+        setDisplayNameComponent(builder, blockFamily);
+        setItemComponent(builder, blockFamily, (byte) quantity);
+        setBlockItemComponent(builder, blockFamily);
+
+        return builder;
+    }
+
+    private void setLightComponent(EntityBuilder builder, BlockFamily blockFamily) {
         if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
             builder.addComponent(new LightComponent());
         }
+    }
 
-        // Copy the components from block prefab into the block item
-        for (Component component : blockEntity.iterateComponents()) {
-            if (component.getClass().getAnnotation(AddToBlockBasedItem.class) != null) {
-                builder.addComponent(entityManager.getComponentLibrary().copy(component));
-            }
-        }
-
+    private void setDisplayNameComponent(EntityBuilder builder, BlockFamily blockFamily) {
         DisplayNameComponent displayNameComponent = builder.getComponent(DisplayNameComponent.class);
         if (displayNameComponent != null) {
             displayNameComponent.name = blockFamily.getDisplayName();
         }
+    }
 
+    private void addComponents(EntityBuilder builder, Iterable<Component> components) {
+
+        for (Component component : components) {
+            if (keepByAnnotation(component)) {
+                builder.addComponent(entityManager.getComponentLibrary().copy(component));
+            }
+        }
+    }
+
+    private void setItemComponent(EntityBuilder builder, BlockFamily blockFamily, byte quantity) {
         ItemComponent item = builder.getComponent(ItemComponent.class);
         if (blockFamily.getArchetypeBlock().isStackable()) {
             item.stackId = "block:" + blockFamily.getURI().toString();
-            item.stackCount = (byte) 1;
+            item.stackCount = quantity;
         }
+    }
 
+    private void setBlockItemComponent(EntityBuilder builder, BlockFamily blockFamily) {
         BlockItemComponent blockItem = builder.getComponent(BlockItemComponent.class);
         blockItem.blockFamily = blockFamily;
+    }
 
-        return builder.build();
+    private boolean keepByAnnotation(Component component) {
+        return component.getClass().getAnnotation(AddToBlockBasedItem.class) != null;
     }
 }
