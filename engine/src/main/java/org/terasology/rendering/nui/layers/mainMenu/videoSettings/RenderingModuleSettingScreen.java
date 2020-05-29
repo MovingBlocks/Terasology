@@ -75,10 +75,9 @@ public class RenderingModuleSettingScreen extends CoreScreenLayer implements UIS
 
         renderingModuleRegistry = context.get(RenderingModuleRegistry.class);
 
-        renderingModuleRegistry.updateRenderingModulesOrder(moduleEnvironment, subContext);
-        orderedModuleRenderingInstances = renderingModuleRegistry.getOrderedRenderingModules();
+        orderedModuleRenderingInstances = renderingModuleRegistry.updateRenderingModulesOrder(moduleEnvironment, subContext);
 
-        if (orderedModuleRenderingInstances == null || orderedModuleRenderingInstances.isEmpty()) {
+        if (orderedModuleRenderingInstances.isEmpty()) {
             logger.error("No rendering module found!");
             GameEngine gameEngine = context.get(GameEngine.class);
             gameEngine.changeState(new StateMainMenu("No rendering module installed, unable to render. Try enabling CoreRendering."));
