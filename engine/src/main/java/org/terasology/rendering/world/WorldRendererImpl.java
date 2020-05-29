@@ -216,7 +216,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderingModuleRegistry.updateRenderingModulesOrder(context.get(ModuleManager.class).getEnvironment(), context);
             if(renderingModuleRegistry.getOrderedRenderingModules().isEmpty()) {
                 GameEngine gameEngine = context.get(GameEngine.class);
-                gameEngine.changeState(new StateMainMenu("No rendering module loaded, unable to render. Try enabling BasicRendering."));
+                gameEngine.changeState(new StateMainMenu("No rendering module loaded, unable to render. Try enabling CoreRendering."));
             }
         } else { // registry populated by new ModuleRendering instances in UI
             // Switch module's context from gamecreation subcontext to gamerunning context
