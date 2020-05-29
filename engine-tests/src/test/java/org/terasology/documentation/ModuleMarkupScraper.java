@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
 import org.terasology.HeadlessEnvironment;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -27,6 +28,10 @@ import org.terasology.engine.module.ExtraDataModuleExtension;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.module.StandardModuleExtension;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityBuilder;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.i18n.I18nMap;
 import org.terasology.module.DependencyInfo;
@@ -36,10 +41,12 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
+import org.terasology.persistence.serializers.PrefabSerializer;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -65,9 +72,9 @@ public final class ModuleMarkupScraper {
      * @throws Exception if the module environment cannot be loaded
      */
     public static void main(String[] args) throws Exception {
-         HeadlessEnvironment env = new ModuleMetaDataProvidingHeadlessEnvironment(new Name("engine"));
-         Context context = env.getContext();
-         ModuleManager moduleManager = context.get(ModuleManager.class);
+        HeadlessEnvironment env = new ModuleMetaDataProvidingHeadlessEnvironment(new Name("engine"));
+        Context context = env.getContext();
+        ModuleManager moduleManager = context.get(ModuleManager.class);
 
         List<Module> sortedGameModules = getListOfGameModules(moduleManager);
         List<Module> sortedRemoteModules = getListofRemoteModules(moduleManager);
@@ -170,48 +177,85 @@ public final class ModuleMarkupScraper {
                     modules.add(module);
                 }
 
-                out.append(exportEvents(moduleManager, moduleId, modules));
+                out.append(exportClassOwnedByModule(Component.class, moduleManager, moduleId, modules));
+                out.append(exportClassOwnedByModule(Event.class, moduleManager, moduleId, modules));
             }
             out.append(System.getProperty("line.separator"));
         }
         return out.toString();
     }
 
-    private static String exportEvents(ModuleManager moduleManager, Name moduleId, Set<Module> modules) {
+    private static String  exportClassOwnedByModule(Class<?> target, ModuleManager moduleManager, Name moduleId, Set<Module> modules) {
         Preconditions.checkNotNull(modules);
 
-        StringBuilder events = new StringBuilder();
+        StringBuilder targets = new StringBuilder();
         try (ModuleEnvironment environment2 = moduleManager.loadEnvironment(modules, false)) {
 
-            for (Class<? extends Event> type : environment2.getSubtypesOf(Event.class)) {
+            for (Class<?> type : environment2.getSubtypesOf(target)) {
                 Name mod = environment2.getModuleProviding(type);
 
                 if (!mod.toString().equals(moduleId.toString()))
                     continue;
 
-                events.append("  ").append(type.getName());
-                events.append(System.getProperty("line.separator"));
+                StringBuffer annotationStr = new StringBuffer();
+                for (Annotation annotation : type.getAnnotations()) {
+                    annotationStr.append(" @_").append(annotation.annotationType().getSimpleName()).append("_");
+                }
 
+                StringBuffer subTypes = new StringBuffer();
                 // Are there any other classes derived from this class?
                 for (Class<?> eventType : environment2.getSubtypesOf(type)) {
-                    events.append("    ").append(eventType.getName());
-                    events.append(System.getProperty("line.separator"));
+                    subTypes.append(" _").append(eventType.getSimpleName()).append("_");
                 }
+
+                targets.append("| ");
+                targets.append("  ").append("_").append(type.getName()).append("_");
+                targets.append(" | ");
+                if(annotationStr.length() > 0)
+                    targets.append(annotationStr);
+
+                targets.append(" | ");
+                if(subTypes.length() > 0)
+                    targets.append(subTypes);
+
+                targets.append(" |");
+                targets.append(System.getProperty("line.separator"));
             }
         }
 
-        StringBuilder out = new StringBuilder();
-        out.append(System.getProperty("line.separator"));
-        if (events.length() > 0) {
-            out.append("**Module Events:** ");
-            out.append(System.getProperty("line.separator"));
-            out.append(events);
-            out.append(System.getProperty("line.separator"));
-        } else {
-            out.append("**Module Events:** None");
-            out.append(System.getProperty("line.separator"));
-        }
-        return out.toString();
+//        moduleMapListing.append("| ");
+//        for (Module gModule : sortedGameModules) {
+//            // Add anchor tags, for example [AdditionalFruits](#AdditionalFruits)
+//            moduleMapListing.append("[").append(gModule.getId()).append("](#").append(gModule.getId()).append(") ");
+//        }
+//        moduleMapListing.append(" | ");
+//        for (Module rModule : sortedRemoteModules) {
+//            moduleMapListing.append("[").append(rModule.getId()).append("](#").append(rModule.getId()).append(") ");
+//        }
+//        moduleMapListing.append(" | ");
+
+        return System.getProperty("line.separator") +
+                "**Extensions:**" +
+                System.getProperty("line.separator") +
+                "| "+ target.getSimpleName() +" | Annotation(s) | Subclass(s) |" +
+                System.getProperty("line.separator") +
+                "| -------- | ---------- | ---------- |" +
+                System.getProperty("line.separator") +
+                targets;
+
+
+//        StringBuilder out = new StringBuilder();
+//        out.append(System.getProperty("line.separator"));
+//        if (events.length() > 0) {
+//            out.append("**Module " + target.getSimpleName() +":** ");
+//            out.append(System.getProperty("line.separator"));
+//            out.append(events);
+//            out.append(System.getProperty("line.separator"));
+//        } else {
+//            out.append("**Module " + target.getSimpleName() +": None** ");
+//            out.append(System.getProperty("line.separator"));
+//        }
+//        return out.toString();
     }
 
     private static String getModuleDescription(final Module module) {
