@@ -21,11 +21,15 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  *
@@ -54,7 +58,14 @@ public class BlockItemFactory {
             return EntityRef.NULL;
         }
 
-        return foo(blockFamily, blockEntity.iterateComponents(), (byte) 1).build();
+        Iterable<Component> components = blockEntity.iterateComponents();
+
+        final Set<Class<? extends Component>> retainComponents =
+                Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
+                        .map(retain -> retain.components)
+                        .orElse(Collections.emptySet());
+
+        return foo(blockFamily, components, (byte) 1, retainComponents).build();
     }
 
     /**
@@ -69,14 +80,20 @@ public class BlockItemFactory {
                         .map(ComponentContainer::iterateComponents)
                         .orElse(Collections.emptyList());
 
-        return foo(blockFamily, components, (byte) quantity);
+        return foo(blockFamily, components, (byte) quantity, Collections.emptySet());
+    }
+
+    private EntityBuilder foo(BlockFamily blockFamily, Iterable<Component> components, byte quantity, Set<Class<?
+            extends Component>> retainComponents) {
+        return foo(blockFamily, components, quantity, Collections.emptyList());
     }
 
 
-    private EntityBuilder foo(BlockFamily blockFamily, Iterable<Component> components, byte quantity) {
+    private EntityBuilder foo(BlockFamily blockFamily, Iterable<Component> components, byte quantity, List<Class<?
+            extends Component>> retainComponents) {
         EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
 
-        addComponents(builder, components);
+        addComponents(builder, components, retainComponents);
 
         setLightComponent(builder, blockFamily);
         setDisplayNameComponent(builder, blockFamily);
@@ -99,10 +116,11 @@ public class BlockItemFactory {
         }
     }
 
-    private void addComponents(EntityBuilder builder, Iterable<Component> components) {
+    private void addComponents(EntityBuilder builder, Iterable<Component> components,
+                               List<Class<? extends Component>> retainComponents) {
 
         for (Component component : components) {
-            if (keepByAnnotation(component)) {
+            if (keepByAnnotation(component) || retainComponents.contains(component.getClass())) {
                 builder.addComponent(entityManager.getComponentLibrary().copy(component));
             }
         }
