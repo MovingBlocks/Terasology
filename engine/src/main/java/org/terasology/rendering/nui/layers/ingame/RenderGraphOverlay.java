@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.ingame.metrics;
+package org.terasology.rendering.nui.layers.ingame;
 
 import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.input.MouseInput;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.Node;
@@ -36,11 +37,14 @@ import org.terasology.rendering.world.WorldRenderer;
  * Displays the content of the WorldRenderer renderGraph.
  */
 public class RenderGraphOverlay extends CoreScreenLayer {
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:renderGraphOverlay");
+
     private static final Logger logger = LoggerFactory.getLogger(RenderGraphOverlay.class);
 
     @In
     private WorldRenderer worldRenderer;
-    
+
     private UITreeView<RenderNodeInfo> renderGraphTreeView;
 
     @Override
@@ -49,13 +53,13 @@ public class RenderGraphOverlay extends CoreScreenLayer {
         renderGraphTreeView = find("renderGraphTreeView", UITreeView.class);
         renderGraphTreeView.subscribeNodeClick((event, treeNode) -> {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-                RenderNodeInfo renderNodeInfo = (RenderNodeInfo)treeNode.getValue();
+                RenderNodeInfo renderNodeInfo = (RenderNodeInfo) treeNode.getValue();
                 Node renderNode = renderNodeInfo.getNode();
                 String uriString = renderNode.getUri().toString();
                 logger.info(uriString);
             }
         });
-        
+
         renderGraphTreeView.setItemRenderer(new StringTextRenderer<RenderNodeInfo>() {
             @Override
             public String getString(RenderNodeInfo renderNodeInfo) {
@@ -88,64 +92,64 @@ public class RenderGraphOverlay extends CoreScreenLayer {
             }
         });
 
-    	RenderGraph renderGraph = worldRenderer.getRenderGraph();
-    	RenderNodeInfoTree renderGraphTreeModel = new RenderNodeInfoTree(renderGraph);
-		renderGraphTreeView.setModel(renderGraphTreeModel);
+        RenderGraph renderGraph = worldRenderer.getRenderGraph();
+        RenderNodeInfoTree renderGraphTreeModel = new RenderNodeInfoTree(renderGraph);
+        renderGraphTreeView.setModel(renderGraphTreeModel);
     }
 
     private static class RenderNodeInfo {
-    	private Node node;
+        private Node node;
 
-		public RenderNodeInfo() {
-			super();
-		}
-		
-		public RenderNodeInfo(Node node) {
-			super();
-			this.node = node;
-		}
+        public RenderNodeInfo() {
+            super();
+        }
 
-		public Node getNode() {
-			return node;
-		}
-		
-		@Override
-		public String toString() {
-			if (null == node) {
-				return "ROOT";
-			}
-			return node.getUri().toString();
-		}
+        public RenderNodeInfo(Node node) {
+            super();
+            this.node = node;
+        }
+
+        public Node getNode() {
+            return node;
+        }
+
+        @Override
+        public String toString() {
+            if (null == node) {
+                return "ROOT";
+            }
+            return node.getUri().toString();
+        }
     }
-    
-	private static class RenderNodeInfoTree extends GenericTree<RenderNodeInfo> {
-		public RenderNodeInfoTree(RenderGraph renderGraph) {
-	    	super(new RenderNodeInfo());
-	    	
-	    	List<Node> nodes = renderGraph.getStartingNodes();
-	    	for (Node node : nodes) {
-	    		RenderNodeInfoTree child = new RenderNodeInfoTree(renderGraph, new RenderNodeInfo(node));
-	    		addChild(child);
-			}
-		}
 
-		private RenderNodeInfoTree(RenderGraph renderGraph, RenderNodeInfo renderNodeInfo) {
-	    	super(renderNodeInfo);
-	    	Node node = renderNodeInfo.getNode();
-	    	if (null == node) {
-	    		throw new NullPointerException("RenderNodeInfo.getNode()");
-	    	}
-	    	Set<Node> childNodeList = renderGraph.getOutgoingNodesForNode(node);
-	    	for (Node childNode : childNodeList) {
-	    		RenderNodeInfoTree child = new RenderNodeInfoTree(renderGraph, new RenderNodeInfo(childNode));
-	    		addChild(child);
-			}
-	    }
+    private static class RenderNodeInfoTree extends GenericTree<RenderNodeInfo> {
+        public RenderNodeInfoTree(RenderGraph renderGraph) {
+            super(new RenderNodeInfo());
+
+            List<Node> nodes = renderGraph.getStartingNodes();
+            for (Node node : nodes) {
+                RenderNodeInfoTree child = new RenderNodeInfoTree(renderGraph, new RenderNodeInfo(node));
+                addChild(child);
+            }
+        }
+
+        private RenderNodeInfoTree(RenderGraph renderGraph, RenderNodeInfo renderNodeInfo) {
+            super(renderNodeInfo);
+            Node node = renderNodeInfo.getNode();
+            if (null == node) {
+                throw new NullPointerException("RenderNodeInfo.getNode()");
+            }
+            Set<Node> childNodeList = renderGraph.getOutgoingNodesForNode(node);
+            for (Node childNode : childNodeList) {
+                RenderNodeInfoTree child = new RenderNodeInfoTree(renderGraph, new RenderNodeInfo(childNode));
+                addChild(child);
+            }
+        }
     }
 
     @Override
     public void update(float delta) {
-    	renderGraphTreeView.update(delta);
+        renderGraphTreeView.update(delta);
     }
 
     @Override

@@ -42,6 +42,7 @@ public class DevToolsMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "nuiEditor", button -> nuiEditorSystem.toggleEditor());
         WidgetUtil.trySubscribe(this, "nuiSkinEditor", button -> nuiSkinEditorSystem.toggleEditor());
         WidgetUtil.trySubscribe(this, "btEditor", button -> getManager().toggleScreen("engine:behaviorEditorScreen"));
+        WidgetUtil.trySubscribe(this, "renderGraphButton", widget -> getManager().toggleScreen(RenderGraphOverlay.ASSET_URI));
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
 

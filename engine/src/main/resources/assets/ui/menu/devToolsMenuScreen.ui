@@ -52,6 +52,11 @@
                         "text": "${engine:menu#dev-tools-bt-editor}"
                     },
                     {
+                        "type": "UIButton",
+                        "text": "RenderGraph",
+                        "id": "renderGraphButton"
+                    },
+                    {
                         "type": "UISpace",
                         "size": [
                             1,

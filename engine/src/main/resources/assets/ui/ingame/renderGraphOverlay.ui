@@ -1,6 +1,6 @@
 {
     "type": "renderGraphOverlay",
-    "skin": "renderGraphOverlay",
+    "skin": "mainmenu",
     "contents": {
         "type": "relativeLayout",
         "contents": [
