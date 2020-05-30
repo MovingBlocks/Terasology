@@ -15,12 +15,13 @@
  */
 package org.terasology.world.block.items;
 
+import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.logic.inventory.ItemComponent;
@@ -32,7 +33,21 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
+ * A factory to create new <emph>block items</emph> for a {@link BlockFamily}.
+ * <p>
+ * A <strong>block item</strong> is an entity guaranteed to have the following components.
+ * <ul>
+ *     <li>{@link BlockItemComponent}. the back-reference to the block family</li>
+ *     <li>{@link ItemComponent}. the item component with automatic stack id and quantity if block is stackable</li>
+ *     <li>{@link DisplayNameComponent}. the block family archetype display name</li>
+ * </ul>
+ * Components on the block prefab (or the reference block entity) will only be retained if the component class is
+ * annotated with {@link AddToBlockBasedItem} or the component class is listed in {@link RetainComponentsComponent}.
+ * <p>
+ * The created entity (builder) is based on the block item base prefab ({@code engine:blockItemBase}).
  *
+ * @see AddToBlockBasedItem
+ * @see RetainComponentsComponent
  */
 public class BlockItemFactory {
     private EntityManager entityManager;
@@ -62,27 +77,55 @@ public class BlockItemFactory {
     }
 
     /**
-     * Use this method instead of {@link #newInstance(BlockFamily)} to modify entity properties like the persistence
-     * flag before it gets created.
+     * Create a new block item builder for the given {@link BlockFamily} and item quantity, with {@code blockEntity} as
+     * reference entity to retain components from.
+     * <p>
+     * This method attempts to resolve the corresponding block prefab to retrieve a list of potential components to
+     * add.
+     * <p>
+     * Use this method if you want to modify the block item entity's properties before it gets created.
      *
-     * @param blockFamily must not be null
+     * @param blockFamily block family to create the block item builder for
+     * @param quantity item quantity (see {@link ItemComponent#stackCount}); constrained to [0...128)
+     * @return a pre-populated entity builder for a block item entity
      */
     public EntityBuilder newBuilder(BlockFamily blockFamily, int quantity) {
-        final Optional<Prefab> prefab = blockFamily.getArchetypeBlock().getPrefab();
+        final ComponentContainer components =
+                blockFamily.getArchetypeBlock().getPrefab()
+                        .map(p -> ((ComponentContainer) p))
+                        .orElse(EntityRef.NULL);
 
-        ComponentContainer components = prefab.map(p -> ((ComponentContainer) p)).orElse(EntityRef.NULL);
-
-        return createBuilder(blockFamily, components, (byte) quantity);
+        return createBuilder(blockFamily, components, (byte) Ints.constrainToRange(quantity, 0, Byte.MAX_VALUE));
     }
 
-    private EntityBuilder createBuilder(BlockFamily blockFamily, ComponentContainer components, byte quantity) {
-        EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
+    /**
+     * Create a new block item builder for the given {@link BlockFamily} and item quantity, with {@code blockEntity} as
+     * reference entity to retain components from.
+     * <p>
+     * Use this method if you want to modify the block item entity's properties before it gets created.
+     *
+     * @param blockFamily block family to create the block item builder for
+     * @param blockEntity reference block entity to retain components from
+     * @param quantity item quantity (see {@link ItemComponent#stackCount}); constrained to [0...128)
+     * @return a pre-populated entity builder for a block item entity
+     */
+    public EntityBuilder newBuilder(BlockFamily blockFamily, EntityRef blockEntity, int quantity) {
+        return createBuilder(blockFamily, blockEntity, (byte) Ints.constrainToRange(quantity, 0, Byte.MAX_VALUE));
+    }
 
-        final Set<Class<? extends Component>> retainComponents =
-                Optional.ofNullable(components.getComponent(RetainComponentsComponent.class))
-                        .map(retain -> retain.components)
-                        .orElse(Collections.emptySet());
-        addComponents(builder, components, retainComponents);
+    /**
+     * Create a new block item builder for the given {@link BlockFamily}.
+     *
+     * @param blockFamily block family to create the block item builder for
+     * @param components potential components to add to the block item entity
+     * @param quantity item quantity (see {@link ItemComponent#stackCount})
+     * @return a pre-populated entity builder for a block item entity
+     */
+    private EntityBuilder createBuilder(BlockFamily blockFamily, ComponentContainer components, byte quantity) {
+        Preconditions.checkNotNull(blockFamily, "Block family must not be null when creating block item");
+
+        EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
+        addComponents(builder, components);
 
         adjustLightComponent(builder, blockFamily);
         adjustDisplayNameComponent(builder, blockFamily);
@@ -92,8 +135,26 @@ public class BlockItemFactory {
         return builder;
     }
 
-    private void addComponents(EntityBuilder builder, ComponentContainer components,
-                               Set<Class<? extends Component>> retainComponents) {
+    /**
+     * Mutate the builder to add components from the given component container.
+     * <p>
+     * A component is only added to the builder if at least one of the following conditions holds:
+     * <ul>
+     *     <li>the component class is annotated with {@link AddToBlockBasedItem}</li>
+     *     <li>the container contains a {@link RetainComponentsComponent} and the component class is listed as
+     *     retained</li>
+     * </ul>
+     * <p>
+     * Components that should be added to the block item entity are <emph>copied</emph>.
+     *
+     * @param builder the builder to add the components to
+     * @param components the container with potential components to add
+     */
+    private void addComponents(EntityBuilder builder, ComponentContainer components) {
+        final Set<Class<? extends Component>> retainComponents =
+                Optional.ofNullable(components.getComponent(RetainComponentsComponent.class))
+                        .map(retain -> retain.components)
+                        .orElse(Collections.emptySet());
 
         for (Component component : components.iterateComponents()) {
             if (keepByAnnotation(component) || retainComponents.contains(component.getClass())) {
