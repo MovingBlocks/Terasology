@@ -93,7 +93,9 @@ public class PlayerFactory {
         EntityBuilder builder = entityManager.newBuilder("engine:player");
         float extraSpace = 0.5f;  // spawn a little bit above the ground
         float entityHeight = getHeightOf(builder) + extraSpace;
-        return findSpawnPos(JomlUtil.from(locationComponent.getWorldPosition()), entityHeight).get(); // TODO: Handle Optional being empty
+        return findSpawnPos(JomlUtil.from(locationComponent.getWorldPosition()), entityHeight)
+                // TODO: Handle Optional being empty
+                .orElseThrow(() -> new RuntimeException("Failed to find an acceptable spawn location."));
     }
 
     private float getHeightOf(ComponentContainer prefab) {
