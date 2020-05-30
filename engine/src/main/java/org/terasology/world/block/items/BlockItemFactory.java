@@ -33,7 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * A factory to create new <emph>block items</emph> for a {@link BlockFamily}.
+ * A factory to create new <em>block items</em> for a {@link BlockFamily}.
  * <p>
  * A <strong>block item</strong> is an entity guaranteed to have the following components.
  * <ul>
