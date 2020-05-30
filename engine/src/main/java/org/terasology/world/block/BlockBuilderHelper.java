@@ -31,22 +31,16 @@ import org.terasology.world.block.shapes.BlockShape;
 public interface BlockBuilderHelper {
 
     /**
-     * {@inheritDoc}
-     *
      * @see #constructSimpleBlock(BlockFamilyDefinition, BlockShape, String, BlockUri, BlockFamily)
      */
     Block constructSimpleBlock(BlockFamilyDefinition definition, BlockUri uri, BlockFamily blockFamily);
 
     /**
-     * {@inheritDoc}
-     *
      * @see #constructSimpleBlock(BlockFamilyDefinition, BlockShape, String, BlockUri, BlockFamily)
      */
     Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape, BlockUri uri, BlockFamily blockFamily);
 
     /**
-     * {@inheritDoc}
-     *
      * @see #constructSimpleBlock(BlockFamilyDefinition, BlockShape, String, BlockUri, BlockFamily)
      */
     Block constructSimpleBlock(BlockFamilyDefinition definition, String section, BlockUri uri, BlockFamily blockFamily);
@@ -67,22 +61,16 @@ public interface BlockBuilderHelper {
     Block constructSimpleBlock(BlockFamilyDefinition definition, BlockShape shape, String section, BlockUri uri, BlockFamily blockFamily);
 
     /**
-     * {@inheritDoc}
-     *
      * @see #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)
      */
     Block constructTransformedBlock(BlockFamilyDefinition definition, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
 
     /**
-     * {@inheritDoc}
-     *
      * @see #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)
      */
     Block constructTransformedBlock(BlockFamilyDefinition definition, String section, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
 
     /**
-     * {@inheritDoc}
-     *
      * @see #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)
      */
     Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
