@@ -56,10 +56,34 @@ public class BlockItemFactory {
         this.entityManager = entityManager;
     }
 
+    /**
+     * Create a new block item for the given {@link BlockFamily}.
+     * <p>
+     * Attempts to resolve the corresponding block prefab to retrieve a list of potential components to add. The item
+     * quantity defaults to 1.
+     * <p>
+     * Use {@link #newBuilder(BlockFamily, int)} if you want to modify the block item entity's properties
+     * before it gets created.
+     *
+     * @param blockFamily block family to create the block item builder for
+     * @return the block item entity
+     */
     public EntityRef newInstance(BlockFamily blockFamily) {
         return newInstance(blockFamily, 1);
     }
 
+    /**
+     * Create a new block item for the given {@link BlockFamily} and item quantity.
+     * <p>
+     * Attempts to resolve the corresponding block prefab to retrieve a list of potential components to add.
+     * <p>
+     * Use {@link #newBuilder(BlockFamily, int)} if you want to modify the block item entity's properties before it gets
+     * created.
+     *
+     * @param blockFamily block family to create the block item builder for
+     * @param quantity item quantity (see {@link ItemComponent#stackCount}); constrained to [0...128)
+     * @return the block item entity
+     */
     public EntityRef newInstance(BlockFamily blockFamily, int quantity) {
         if (blockFamily == null) {
             return EntityRef.NULL;
@@ -68,6 +92,19 @@ public class BlockItemFactory {
         return builder.build();
     }
 
+    /**
+     * Create a new block item for the given {@link BlockFamily}, with {@code blockEntity} as reference entity to retain
+     * components from.
+     * <p>
+     * The item quantity defaults to 1.
+     * <p>
+     * Use {@link #newBuilder(BlockFamily, EntityRef, int)} if you want to modify the block item entity's properties
+     * before it gets created.
+     *
+     * @param blockFamily block family to create the block item builder for
+     * @param blockEntity reference block entity to retain components from
+     * @return the block item entity
+     */
     public EntityRef newInstance(BlockFamily blockFamily, EntityRef blockEntity) {
         if (blockFamily == null) {
             return EntityRef.NULL;
@@ -77,11 +114,9 @@ public class BlockItemFactory {
     }
 
     /**
-     * Create a new block item builder for the given {@link BlockFamily} and item quantity, with {@code blockEntity} as
-     * reference entity to retain components from.
+     * Create a new block item builder for the given {@link BlockFamily} and item quantity.
      * <p>
-     * This method attempts to resolve the corresponding block prefab to retrieve a list of potential components to
-     * add.
+     * Attempts to resolve the corresponding block prefab to retrieve a list of potential components to add.
      * <p>
      * Use this method if you want to modify the block item entity's properties before it gets created.
      *
