@@ -58,14 +58,7 @@ public class BlockItemFactory {
             return EntityRef.NULL;
         }
 
-        Iterable<Component> components = blockEntity.iterateComponents();
-
-        final Set<Class<? extends Component>> retainComponents =
-                Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
-                        .map(retain -> retain.components)
-                        .orElse(Collections.emptySet());
-
-        return createBuilder(blockFamily, components, (byte) 1, retainComponents).build();
+        return createBuilder(blockFamily, blockEntity, (byte) 1).build();
     }
 
     /**
@@ -77,57 +70,52 @@ public class BlockItemFactory {
     public EntityBuilder newBuilder(BlockFamily blockFamily, int quantity) {
         final Optional<Prefab> prefab = blockFamily.getArchetypeBlock().getPrefab();
 
-        Iterable<Component> components =
-                prefab.map(ComponentContainer::iterateComponents)
-                        .orElse(Collections.emptyList());
+        ComponentContainer components = prefab.map(p -> ((ComponentContainer) p)).orElse(EntityRef.NULL);
 
-        final Set<Class<? extends Component>> retainComponents =
-                prefab.flatMap(p -> Optional.ofNullable(p.getComponent(RetainComponentsComponent.class)))
-                        .map(retain -> retain.components)
-                        .orElse(Collections.emptySet());
-
-
-        return createBuilder(blockFamily, components, (byte) quantity, retainComponents);
+        return createBuilder(blockFamily, components, (byte) quantity);
     }
 
-    private EntityBuilder createBuilder(BlockFamily blockFamily, Iterable<Component> components, byte quantity,
-                                        Set<Class<? extends Component>> retainComponents) {
+    private EntityBuilder createBuilder(BlockFamily blockFamily, ComponentContainer components, byte quantity) {
         EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
 
+        final Set<Class<? extends Component>> retainComponents =
+                Optional.ofNullable(components.getComponent(RetainComponentsComponent.class))
+                        .map(retain -> retain.components)
+                        .orElse(Collections.emptySet());
         addComponents(builder, components, retainComponents);
 
-        setLightComponent(builder, blockFamily);
-        setDisplayNameComponent(builder, blockFamily);
-        setItemComponent(builder, blockFamily, (byte) quantity);
-        setBlockItemComponent(builder, blockFamily);
+        adjustLightComponent(builder, blockFamily);
+        adjustDisplayNameComponent(builder, blockFamily);
+        adjustItemComponent(builder, blockFamily, quantity);
+        adjustBlockItemComponent(builder, blockFamily);
 
         return builder;
     }
 
-    private void setLightComponent(EntityBuilder builder, BlockFamily blockFamily) {
+    private void adjustLightComponent(EntityBuilder builder, BlockFamily blockFamily) {
         if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
             builder.addComponent(new LightComponent());
         }
     }
 
-    private void setDisplayNameComponent(EntityBuilder builder, BlockFamily blockFamily) {
+    private void adjustDisplayNameComponent(EntityBuilder builder, BlockFamily blockFamily) {
         DisplayNameComponent displayNameComponent = builder.getComponent(DisplayNameComponent.class);
         if (displayNameComponent != null) {
             displayNameComponent.name = blockFamily.getDisplayName();
         }
     }
 
-    private void addComponents(EntityBuilder builder, Iterable<Component> components,
+    private void addComponents(EntityBuilder builder, ComponentContainer components,
                                Set<Class<? extends Component>> retainComponents) {
 
-        for (Component component : components) {
+        for (Component component : components.iterateComponents()) {
             if (keepByAnnotation(component) || retainComponents.contains(component.getClass())) {
                 builder.addComponent(entityManager.getComponentLibrary().copy(component));
             }
         }
     }
 
-    private void setItemComponent(EntityBuilder builder, BlockFamily blockFamily, byte quantity) {
+    private void adjustItemComponent(EntityBuilder builder, BlockFamily blockFamily, byte quantity) {
         ItemComponent item = builder.getComponent(ItemComponent.class);
         if (blockFamily.getArchetypeBlock().isStackable()) {
             item.stackId = "block:" + blockFamily.getURI().toString();
@@ -135,7 +123,7 @@ public class BlockItemFactory {
         }
     }
 
-    private void setBlockItemComponent(EntityBuilder builder, BlockFamily blockFamily) {
+    private void adjustBlockItemComponent(EntityBuilder builder, BlockFamily blockFamily) {
         BlockItemComponent blockItem = builder.getComponent(BlockItemComponent.class);
         blockItem.blockFamily = blockFamily;
     }
