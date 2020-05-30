@@ -50,8 +50,14 @@ import java.util.Set;
  * @see RetainComponentsComponent
  */
 public class BlockItemFactory {
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
+    /**
+     * Instantiate new block item factory with the given entity manager.
+     *
+     * @param entityManager entity manager to create new {@link EntityBuilder}s and copy components from
+     *         reference entities or prefabs to the new block items
+     */
     public BlockItemFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
@@ -62,8 +68,8 @@ public class BlockItemFactory {
      * Attempts to resolve the corresponding block prefab to retrieve a list of potential components to add. The item
      * quantity defaults to 1.
      * <p>
-     * Use {@link #newBuilder(BlockFamily, int)} if you want to modify the block item entity's properties
-     * before it gets created.
+     * Use {@link #newBuilder(BlockFamily, int)} if you want to modify the block item entity's properties before it gets
+     * created.
      *
      * @param blockFamily block family to create the block item builder for
      * @return the block item entity
