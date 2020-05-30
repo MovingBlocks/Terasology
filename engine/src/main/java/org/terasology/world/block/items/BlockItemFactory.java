@@ -92,19 +92,6 @@ public class BlockItemFactory {
         return builder;
     }
 
-    private void adjustLightComponent(EntityBuilder builder, BlockFamily blockFamily) {
-        if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
-            builder.addComponent(new LightComponent());
-        }
-    }
-
-    private void adjustDisplayNameComponent(EntityBuilder builder, BlockFamily blockFamily) {
-        DisplayNameComponent displayNameComponent = builder.getComponent(DisplayNameComponent.class);
-        if (displayNameComponent != null) {
-            displayNameComponent.name = blockFamily.getDisplayName();
-        }
-    }
-
     private void addComponents(EntityBuilder builder, ComponentContainer components,
                                Set<Class<? extends Component>> retainComponents) {
 
@@ -115,20 +102,39 @@ public class BlockItemFactory {
         }
     }
 
-    private void adjustItemComponent(EntityBuilder builder, BlockFamily blockFamily, byte quantity) {
-        ItemComponent item = builder.getComponent(ItemComponent.class);
-        if (blockFamily.getArchetypeBlock().isStackable()) {
-            item.stackId = "block:" + blockFamily.getURI().toString();
-            item.stackCount = quantity;
+    private boolean keepByAnnotation(Component component) {
+        return component.getClass().getAnnotation(AddToBlockBasedItem.class) != null;
+    }
+
+    private void adjustLightComponent(EntityBuilder builder, BlockFamily blockFamily) {
+        //TODO: set properties of the LightComponent based on the archetype block?
+        if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !builder.hasComponent(LightComponent.class)) {
+            builder.addComponent(new LightComponent());
         }
     }
 
-    private void adjustBlockItemComponent(EntityBuilder builder, BlockFamily blockFamily) {
-        BlockItemComponent blockItem = builder.getComponent(BlockItemComponent.class);
-        blockItem.blockFamily = blockFamily;
+    private void adjustDisplayNameComponent(EntityBuilder builder, BlockFamily blockFamily) {
+        builder.updateComponent(DisplayNameComponent.class, displayName -> {
+            displayName.name = blockFamily.getDisplayName();
+            return displayName;
+        });
     }
 
-    private boolean keepByAnnotation(Component component) {
-        return component.getClass().getAnnotation(AddToBlockBasedItem.class) != null;
+    private void adjustItemComponent(EntityBuilder builder, BlockFamily blockFamily, byte quantity) {
+        builder.updateComponent(ItemComponent.class, item -> {
+            if (blockFamily.getArchetypeBlock().isStackable()) {
+                item.stackId = "block:" + blockFamily.getURI().toString();
+                //TODO: quantity may be greater than item.maxStackSize
+                item.stackCount = quantity;
+            }
+            return item;
+        });
+    }
+
+    private void adjustBlockItemComponent(EntityBuilder builder, BlockFamily blockFamily) {
+        builder.updateComponent(BlockItemComponent.class, blockItem -> {
+            blockItem.blockFamily = blockFamily;
+            return blockItem;
+        });
     }
 }
