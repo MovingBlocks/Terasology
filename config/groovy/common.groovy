@@ -216,7 +216,26 @@ class common {
             } else {
                 println color("updating $itemType $itemName", Ansi.GREEN)
                 try {
+                    def current_sha = itemGit.log(maxCommits: 1).find().getAbbreviatedId(8)
                     itemGit.pull remote: defaultRemote
+                    def post_update_sha = itemGit.log(maxCommits: 1).find().getAbbreviatedId(8)
+                        
+                    if (current_sha != post_update_sha){
+                        println color("Updating $current_sha..$post_update_sha", Ansi.GREEN)
+                        def commits = itemGit.log {range(current_sha, post_update_sha)}
+                        for (commit in commits){
+                            println("----${commit.getAbbreviatedId(8)}----")
+                            def diff = itemGit.show(commit: commit.id)
+                            print("added: ${diff.added.size()}, ")
+                            print("copied: ${diff.copied.size()}, ")
+                            print("modified: ${diff.modified.size()}, ")
+                            print("removed: ${diff.removed.size()}, ")
+                            println("renamed: ${diff.renamed.size()}")
+                        }
+                        print("\n")
+                    } else {
+                        println color ("No changes found\n", Ansi.YELLOW)
+                    }
                 } catch (GrgitException exception) {
                     println color("Unable to update $itemName, Skipping: ${exception.getMessage()}", Ansi.RED)
                 }
