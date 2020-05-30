@@ -22,8 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
+import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.LoggingContext;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.loadProcesses.AwaitCharacterSpawn;
 import org.terasology.engine.modes.loadProcesses.CreateRemoteWorldEntity;
@@ -243,8 +245,17 @@ public class StateLoading implements GameState {
         EngineTime time = (EngineTime) context.get(Time.class);
         long startTime = time.getRealTimeInMs();
         while (current != null && time.getRealTimeInMs() - startTime < 20 && !gameEngine.hasPendingState()) {
-            if (current.step()) {
-                popStep();
+            try {
+                if (current.step()) {
+                    popStep();
+                }
+            } catch (Exception e) {
+                logger.error("Error while loading {}", current, e);
+                String errorMessage = String.format("Failed to load game. There was an error during %s.",
+                        current == null ? "the last part" : current.getMessage());
+                gameEngine.changeState(new StateMainMenu(errorMessage));
+                CrashReporter.report(e, LoggingContext.getLoggingPath());
+                return;
             }
         }
         if (current == null) {
