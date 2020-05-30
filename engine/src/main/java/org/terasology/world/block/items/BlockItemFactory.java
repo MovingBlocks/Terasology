@@ -20,6 +20,7 @@ import org.terasology.entitySystem.ComponentContainer;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.logic.inventory.ItemComponent;
@@ -27,7 +28,6 @@ import org.terasology.rendering.logic.LightComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -65,7 +65,7 @@ public class BlockItemFactory {
                         .map(retain -> retain.components)
                         .orElse(Collections.emptySet());
 
-        return foo(blockFamily, components, (byte) 1, retainComponents).build();
+        return createBuilder(blockFamily, components, (byte) 1, retainComponents).build();
     }
 
     /**
@@ -75,22 +75,23 @@ public class BlockItemFactory {
      * @param blockFamily must not be null
      */
     public EntityBuilder newBuilder(BlockFamily blockFamily, int quantity) {
+        final Optional<Prefab> prefab = blockFamily.getArchetypeBlock().getPrefab();
+
         Iterable<Component> components =
-                blockFamily.getArchetypeBlock().getPrefab()
-                        .map(ComponentContainer::iterateComponents)
+                prefab.map(ComponentContainer::iterateComponents)
                         .orElse(Collections.emptyList());
 
-        return foo(blockFamily, components, (byte) quantity, Collections.emptySet());
+        final Set<Class<? extends Component>> retainComponents =
+                prefab.flatMap(p -> Optional.ofNullable(p.getComponent(RetainComponentsComponent.class)))
+                        .map(retain -> retain.components)
+                        .orElse(Collections.emptySet());
+
+
+        return createBuilder(blockFamily, components, (byte) quantity, retainComponents);
     }
 
-    private EntityBuilder foo(BlockFamily blockFamily, Iterable<Component> components, byte quantity, Set<Class<?
-            extends Component>> retainComponents) {
-        return foo(blockFamily, components, quantity, Collections.emptyList());
-    }
-
-
-    private EntityBuilder foo(BlockFamily blockFamily, Iterable<Component> components, byte quantity, List<Class<?
-            extends Component>> retainComponents) {
+    private EntityBuilder createBuilder(BlockFamily blockFamily, Iterable<Component> components, byte quantity,
+                                        Set<Class<? extends Component>> retainComponents) {
         EntityBuilder builder = entityManager.newBuilder("engine:blockItemBase");
 
         addComponents(builder, components, retainComponents);
@@ -117,7 +118,7 @@ public class BlockItemFactory {
     }
 
     private void addComponents(EntityBuilder builder, Iterable<Component> components,
-                               List<Class<? extends Component>> retainComponents) {
+                               Set<Class<? extends Component>> retainComponents) {
 
         for (Component component : components) {
             if (keepByAnnotation(component) || retainComponents.contains(component.getClass())) {
