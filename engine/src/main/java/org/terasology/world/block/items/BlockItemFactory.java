@@ -16,7 +16,7 @@
 package org.terasology.world.block.items;
 
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
+import com.google.common.primitives.SignedBytes;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
 import org.terasology.entitySystem.entity.EntityBuilder;
@@ -136,7 +136,7 @@ public class BlockItemFactory {
                         .map(p -> ((ComponentContainer) p))
                         .orElse(EntityRef.NULL);
 
-        return createBuilder(blockFamily, components, (byte) Ints.constrainToRange(quantity, 0, Byte.MAX_VALUE));
+        return createBuilder(blockFamily, components, SignedBytes.saturatedCast(quantity));
     }
 
     /**
@@ -151,7 +151,7 @@ public class BlockItemFactory {
      * @return a pre-populated entity builder for a block item entity
      */
     public EntityBuilder newBuilder(BlockFamily blockFamily, EntityRef blockEntity, int quantity) {
-        return createBuilder(blockFamily, blockEntity, (byte) Ints.constrainToRange(quantity, 0, Byte.MAX_VALUE));
+        return createBuilder(blockFamily, blockEntity, SignedBytes.saturatedCast(quantity));
     }
 
     /**
