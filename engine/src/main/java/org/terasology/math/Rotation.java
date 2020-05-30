@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import org.terasology.math.geom.Quat4f;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -218,19 +219,8 @@ public final class Rotation {
      * Returns all possible rotations for each yaw, pitch & roll combination, including duplicates.
      *
      * @return All possible rotations for each yaw, pitch & roll combination.
-     * @deprecated use `allRotations` instead
      */
-    @Deprecated
     public static Iterable<Rotation> allValues() {
-        return allRotations();
-    }
-
-    /**
-     * Returns all possible rotations for each yaw, pitch & roll combination, including duplicates.
-     *
-     * @return All possible rotations for each yaw, pitch & roll combination.
-     */
-    public static Iterable<Rotation> allRotations() {
         return Arrays.asList(ALL_ROTATIONS);
     }
 
