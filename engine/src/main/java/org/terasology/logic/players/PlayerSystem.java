@@ -178,7 +178,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             character.saveComponent(characterComp);
             character.setOwner(entity);
             if (!character.hasComponent(AliveCharacterComponent.class)) {
-                character.addComponent(new AliveCharacterComponent());
+                respawnPlayer(entity);
             }
             Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
         } else {

@@ -386,6 +386,10 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     private boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {
+        //TODO: need to work out better scheme for shadowMapCamera
+        if (shadowMapCamera == null) {
+            return false;
+        }
         return isChunkVisible(shadowMapCamera, chunk); //TODO: find an elegant way
     }
 
