@@ -51,7 +51,7 @@ import static org.gradle.internal.logging.text.StyledTextOutput.Style
 // Check for Java 8
 if(JavaVersion.current() != JavaVersion.VERSION_1_8){
     def out = services.get(StyledTextOutputFactory).create("an-ouput")
-    out.withStyle(Style.FailureHeader).println("WARNING: You're compiling with a JDK newer than Java 8, this may not be fully supported for Terasology, consider adjusting your JAVA_HOME accordingly")
+    out.withStyle(Style.FailureHeader).println("NOTE: You're compiling with a JDK newer than 8. While we believe Java 9-11 to be safe to use, newer versions than that may cause issues. If you encounter any oddities try to see if they persist with Java 8")
 }
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
