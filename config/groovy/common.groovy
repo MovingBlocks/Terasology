@@ -188,6 +188,24 @@ class common {
      */
     def updateItem(String itemName) {
         File targetDir = new File(targetDirectory, itemName)
+        def searchString = itemName
+        if (itemName.startsWith(".")){
+            // add literal slash for regex start with '.'
+            searchString = "\\$itemName"        
+        }
+        def inGitIgnore = false
+        new File(".gitignore").eachLine{ line -> 
+            // match if line is exactly same os itemName or has trailing '/' but
+            // not if has further subdirectories
+            if ((line ==~ searchString) || (line ==~ "$searchString/")){
+                inGitIgnore = true
+                return
+            }
+        }
+        if (inGitIgnore){
+            println color("Skipping update for $itemName: in gitignore", Ansi.YELLOW)
+            return
+        }
         if (!targetDir.exists()) {
             println color("$itemType \"$itemName\" not found", Ansi.RED)
             return
