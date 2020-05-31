@@ -248,7 +248,7 @@ class common {
                         }
                         print("\n")
                     } else {
-                        println color ("No changes found\n", Ansi.YELLOW)
+                        println color ("No changes found", Ansi.YELLOW)
                     }
                 } catch (GrgitException exception) {
                     println color("Unable to update $itemName, Skipping: ${exception.getMessage()}", Ansi.RED)
