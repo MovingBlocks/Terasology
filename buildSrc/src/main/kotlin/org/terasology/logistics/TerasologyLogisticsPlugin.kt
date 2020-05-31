@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-    `kotlin-dsl`
-}
+package org.terasology.logistics
 
-repositories {
-    jcenter()
-}
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
+import org.terasology.logistics.TaskInstaller.Companion.reflectionsForAllSourceSets
 
-dependencies {
-    // Needed for caching reflected data during builds
-    implementation("org.reflections:reflections:0.9.10")
-    implementation("dom4j:dom4j:1.6.1")
-}
 
-gradlePlugin {
-    plugins {
-        register("terasology-logistics") {
-            id = "terasology-logistics"
-            implementationClass = "org.terasology.logistics.TerasologyLogisticsPlugin"
-        }
+@Suppress("unused")  // a plugin is an entry point
+class TerasologyLogisticsPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        target.apply(plugin="java")  // without the java plugin there are no SourceSets
+        reflectionsForAllSourceSets(target)
     }
 }

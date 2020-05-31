@@ -17,6 +17,7 @@
 package org.terasology.logistics
 
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
@@ -27,17 +28,15 @@ import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
-import org.reflections.util.FilterBuilder
-import javax.inject.Inject
+
+const val TASK_GROUP_NAME = "Build"
 
 
 abstract class CacheReflectionsTask: SourceTask() {
     init {
-        description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
+        group = TASK_GROUP_NAME
+        description = "Caches reflection output to make regular startup faster."
     }
-
-    @get:Inject
-    protected abstract val layout: ProjectLayout
 
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
@@ -51,27 +50,34 @@ abstract class CacheReflectionsTask: SourceTask() {
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
-    fun fromSourceSet(sourceSet: SourceSet) {
-        outputDir.set(layout.buildDirectory.dir("reflections"))
-        outputFile.set(outputDir.file("reflections.cache"))
+    @get:Internal
+    internal var mySourceSet: SourceSet? = null
 
-        source(sourceSet.output.classesDirs)
-        sourceSet.output.dir(mapOf("builtBy" to this), outputDir)
+    fun configure() {
+        outputFile.set(outputDir.file("reflections.cache"))
     }
 
     @TaskAction
     fun reflect() {
         finalize()
         val reflectionBuilder = ConfigurationBuilder()
-        // TODO: Do we need to iterate through everything under `source`, or if it's a set of
-        //   directories, does the ConfigurationBuilder have an interface we can just feed those to?
-        reflectionBuilder.addUrls(source.mapNotNull { it.toURI().toURL() })
-        // TODO: Why is this filter here? It's in the copy of this I pulled from modules, but not
-        //   in engine's. And why is it only `org` instead of `org.terasology`?
-        reflectionBuilder.filterInputsBy(FilterBuilder.parsePackages("+org"))
         reflectionBuilder.setScanners(TypeAnnotationsScanner(), SubTypesScanner())
-        val reflections = Reflections(reflectionBuilder)
 
+        // There's some question of how much to include in here. Too much and we get
+        // a cache bloated with things we never use. But the docs also note:
+        //
+        // > Make sure to scan all the transitively relevant packages. For instance, given your
+        // > class C extends B extends A, and both B and A are located in another package than
+        // > C, when only the package of C is scanned - then querying for sub types of A returns
+        // > nothing (transitive), but querying for sub types of B returns C (direct). In that case
+        // > make sure to scan all relevant packages a priori.
+
+        mySourceSet?.also { sourceSet ->
+            val classesDirs = sourceSet.output.classesDirs
+            reflectionBuilder.addUrls(classesDirs.map { it.toURI().toURL() })
+        }
+
+        val reflections = Reflections(reflectionBuilder)
         reflections.save(outputFile.get().asFile.path)
         didWork = true
     }
@@ -83,32 +89,98 @@ abstract class CacheReflectionsTask: SourceTask() {
     }
 }
 
-open class CleanCachedReflections() : Delete() {
+
+fun TaskProvider<CacheReflectionsTask>.provideToSourceSet(
+    layout: ProjectLayout,
+    sourceSet: SourceSet
+) {
+    val outDir = layout.buildDirectory.dir("reflections/" + sourceSet.name)
+    preventSourceSetSelfDependency(sourceSet)
+
+    sourceSet.output.dir(mapOf("builtBy" to this), outDir)
+
+    configure {
+        source(sourceSet.output.classesDirs)
+        mySourceSet = sourceSet
+        outputDir.set(outDir)
+    }
+}
+
+
+/**
+ * Correct DefaultSourceSetOutput dependencies.
+ *
+ * [org.gradle.api.internal.tasks.DefaultSourceSetOutput] declares that its classesDirs are built
+ * by itself. Given that we want to _depend_ on the built classes and include our output _in_ the
+ * source set, this does not work for us. They even left a comment:
+ *
+ * > // TODO: This should be more specific to just the tasks that create the class files?
+ *
+ * Yes please.
+ *
+ * In the meantime, we yank out that dependency and hope everything still works.
+ *
+ * See [source](https://github.com/gradle/gradle/blob/v6.4.1/subprojects/plugins/src/main/java/org/gradle/api/internal/tasks/DefaultSourceSetOutput.java#L49-L51)
+ */
+private fun preventSourceSetSelfDependency(sourceSet: SourceSet) {
+    // SourceSetOutput's interface doesn't return classesDirs as mutable,
+    // but DefaultSourceSetOutput does. So this probably works.
+    (sourceSet.output.classesDirs as ConfigurableFileCollection).apply {
+        // It complains if we try to remove an element from the existing set,
+        // but we can replace it with a new set.
+        setBuiltBy(builtBy.minusElement(sourceSet.output))
+
+        // This is a guess. It isn't complete if there are non-Java languages contributing classes.
+        builtBy(sourceSet.compileJavaTaskName)
+    }
+}
+
+
+open class CleanCachedReflections : Delete() {
+    init {
+        group = TASK_GROUP_NAME
+    }
+
     fun fromTask(cacheTask: TaskProvider<CacheReflectionsTask>) {
         this.setDelete(cacheTask.map { it.outputDir })
     }
 }
 
 
-fun applyToProject(project: Project) {
-    project.configure<SourceSetContainer> {
-        all {
-            applyToSourceSet(project.tasks, this)
+class TaskInstaller(project: Project) {
+    private val layout: ProjectLayout = project.layout
+    private val tasks: TaskContainer = project.tasks
+
+    init {
+        project.configure<SourceSetContainer> {
+            configureEach {
+                configureSourceSet(this)
+            }
         }
     }
-}
+
+    fun configureSourceSet(sourceSet: SourceSet) {
+        val cacheTask = tasks.register<CacheReflectionsTask>("cacheReflections" + sourceSet.name.capitalize()) {
+            configure()
+        }
+        cacheTask.provideToSourceSet(layout, sourceSet)
 
 
-private fun applyToSourceSet(tasks: TaskContainer, sourceSet: SourceSet) {
-    val cacheTask = tasks.register<CacheReflectionsTask>(sourceSet.name + "CacheReflections") {
-        fromSourceSet(sourceSet)
+        // TODO: Is there some existing convention for creating and registering `clean*` tasks?
+        val cleanCacheTask = tasks.register<CleanCachedReflections>(
+            "cleanCacheReflections" + sourceSet.name.capitalize()
+        ) {
+            fromTask(cacheTask)
+        }
+
+        tasks.named("clean").configure {
+            dependsOn(cleanCacheTask)
+        }
     }
-    // TODO: Is there some existing convention for creating and registering `clean*` tasks?
-    tasks.register<CleanCachedReflections>(
-        "clean${sourceSet.name.capitalize()}CacheReflections"
-    ) {
-        fromTask(cacheTask)
-        val cleanTask = tasks.findByPath("clean")
-        cleanTask?.dependsOn(this)
+
+    companion object {
+        fun reflectionsForAllSourceSets(project: Project) {
+            TaskInstaller(project)
+        }
     }
 }
