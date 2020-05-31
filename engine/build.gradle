@@ -1,32 +1,31 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 MovingBlocks
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 // The engine build is the primary Java project and has the primary list of dependencies
 
 plugins {
-    id "java-library"
+    id("terasology-logistics")
+    id("java-library")
+    id("idea")
+    id("eclipse")
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/publish.gradle"
 
+
 import groovy.json.JsonSlurper
-import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.scanners.TypeAnnotationsScanner
 
 import java.text.SimpleDateFormat
 
@@ -64,8 +63,6 @@ def convertGitBranch = { gitBranch ->
 
 // Engine for now has two source sets
 sourceSets {
-    dev
-
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
 }
@@ -78,9 +75,6 @@ configurations {
         exclude module: 'lwjgl-platform'
         exclude module: 'jinput-platform'
     }
-
-    // Beyond the standard compile "configuration" we declare one called "devImplementation" specific to the "dev" source set
-    devImplementation.extendsFrom implementation
 }
 
 // TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
@@ -160,9 +154,6 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
 
-    // In addition to all the above the dev source set also needs to depend on what gets compiled in main
-    devImplementation sourceSets.main.output
-
     // Dependency on CrashReporter, conditionally either from source or via binary
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     File wouldBeSrcPath = new File(rootDir, 'libs/CrashReporter')
@@ -182,33 +173,32 @@ dependencies {
     }
 }
 
-task cacheReflections {
-    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
-    inputs.files sourceSets.main.output.classesDirs,
-            sourceSets.dev.output.classesDirs,
-            // getClassesDir from all sourceSets (for any jvm (seems) language)
-            configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
-
-    outputs.upToDateWhen(classes.outputs.upToDateSpec)
-    outputs.file("$buildDir/resources/main/reflections.cache")
-    dependsOn classes
-
-    doLast {
-        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
-        Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
-                .addUrls(inputs.files.collect { it.toURI().toURL() })
-                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-        reflections.save("$buildDir/classes/reflections.cache")
-    }
-}
+//task cacheReflections {
+//    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
+//    inputs.files sourceSets.main.output.classesDirs,
+//            sourceSets.dev.output.classesDirs,
+//            // getClassesDir from all sourceSets (for any jvm (seems) language)
+//            configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
+//
+//    outputs.upToDateWhen(classes.outputs.upToDateSpec)
+//    outputs.file("$buildDir/resources/main/reflections.cache")
+//    dependsOn classes
+//
+//    doLast {
+//        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
+//        Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
+//                .addUrls(inputs.files.collect { it.toURI().toURL() })
+//                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
+//        reflections.save("$buildDir/classes/reflections.cache")
+//    }
+//}
 
 // Instructions for packaging a jar file for the engine
-jar {
+tasks.named("jar").configure {
     // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
     duplicatesStrategy = "EXCLUDE"
 
-    from(sourceSets.dev.output)
-    from(tasks.getByName("cacheReflections").outputs)
+//    from(tasks.getByName("cacheReflections").outputs)
 
     manifest {
         def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
@@ -218,10 +208,10 @@ jar {
     }
 }
 
-task cleanReflections(type: Delete) {
-    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
-    delete cacheReflections.outputs.files
-}
+//task cleanReflections(type: Delete) {
+//    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
+//    delete cacheReflections.outputs.files
+//}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Version file stuff                                                                                                //
@@ -253,7 +243,7 @@ group = 'org.terasology.engine'
 println "Version for $project.name loaded as $version for group $group"
 
 // This version info file actually goes inside the built jar and can be used at runtime
-task createVersionInfoFile {
+def createVersionInfoFile = tasks.register("createVersionInfoFile") {
     inputs.property('dateTime', startDateTimeString)
     onlyIf { env.BUILD_URL != null }
     doLast {
@@ -275,17 +265,19 @@ task createVersionInfoFile {
 
 
 //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
-task copyResourcesToClasses(type:Copy) {
+def copyResourcesToClasses = tasks.register("copyResourcesToClasses", Copy) {
     from sourceSets.main.output.resourcesDir
     into sourceSets.main.output.classesDirs.first()
 
-    dependsOn processResources
-    mustRunAfter compileJava
-    classes.dependsOn copyResourcesToClasses
+    dependsOn(tasks.named("processResources"))
+    mustRunAfter(tasks.named("compileJava"))
 }
 
-jar.dependsOn createVersionInfoFile
-jar.dependsOn cacheReflections
+tasks.named("classes").configure {
+    dependsOn(copyResourcesToClasses)
+}
+
+//jar.dependsOn cacheReflections
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
@@ -293,9 +285,6 @@ jar.dependsOn cacheReflections
 
 idea {
     module {
-        // Add development "dev" dir
-        sourceDirs += sourceSets.dev.allJava.srcDirs
-
         // Change around the output a bit
         inheritOutputDirs = false
         outputDir = file('build/classes')
@@ -305,6 +294,6 @@ idea {
 }
 
 // Make sure our config file for code analytics get extracted (vulnerability: non-IDE execution of single analytic)
-ideaModule.dependsOn rootProject.extractConfig
-tasks.eclipse.dependsOn rootProject.extractConfig
-check.dependsOn rootProject.extractConfig
+tasks.named("idea").configure { dependsOn(":extractConfig") }
+tasks.named("eclipse").configure { dependsOn(":extractConfig") }
+tasks.named("check").configure { dependsOn(":extractConfig") }
