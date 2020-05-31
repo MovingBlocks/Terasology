@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.items;
 
+import org.joml.Vector2f;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -90,8 +91,16 @@ public class BlockItemSystem extends BaseComponentSystem {
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
 
+        Vector3f targetPosition = event.getTargetLocation();
+        Vector2f relativePlacementPosition;
+        if (targetPosition != null) {
+            relativePlacementPosition = getSideHitPosition(event.getHitPosition(), targetPosition);
+        } else {
+            relativePlacementPosition = new Vector2f();
+        }
+
         Block block = blockFamily.getBlockForPlacement(new BlockPlacementData(
-                JomlUtil.from(placementPos), surfaceSide, JomlUtil.from(event.getDirection())
+                JomlUtil.from(placementPos), surfaceSide, JomlUtil.from(event.getDirection()), relativePlacementPosition
         ));
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
@@ -109,6 +118,28 @@ public class BlockItemSystem extends BaseComponentSystem {
             event.getInstigator().send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));
         } else {
             event.consume();
+        }
+    }
+
+    /**
+     * Returns the position at which the block side was hit, relative to the side.
+     * <p/>
+     * Example: The front side was hit right in the center.
+     * The result will be (0.5, 0.5), representing the relative hit position on the side's surface.
+     * @param hitPosition the hit position
+     * @param blockPosition the block position relative to its center (block (0, 0, 0) has block position (0.5, 0.5, 0.5))
+     * @return the 2D hit position relative to the side that was hit
+     */
+    private Vector2f getSideHitPosition(Vector3f hitPosition, Vector3f blockPosition) {
+        float epsilon = 0.0001f;
+        Vector3f relativeHitPosition = new Vector3f(hitPosition).sub(blockPosition);
+
+        if (Math.abs(relativeHitPosition.x) > 0.5f - epsilon) {
+            return new Vector2f(relativeHitPosition.z, relativeHitPosition.y).add(0.5f, 0.5f);
+        } else if (Math.abs(relativeHitPosition.y) > 0.5f - epsilon) {
+            return new Vector2f(relativeHitPosition.x, relativeHitPosition.z).add(0.5f, 0.5f);
+        } else {
+            return new Vector2f(relativeHitPosition.x, relativeHitPosition.y).add(0.5f, 0.5f);
         }
     }
 
