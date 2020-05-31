@@ -5,18 +5,8 @@
         "type": "relativeLayout",
         "contents": [
             {
-                "type": "ScrollableArea",
-                "id": "area",
-                "verticalScrollbar": true,
-                "horizontalScrollbar": true,
-                "preferredWidth": 600,
-                "preferredHeight": 600,
-                "contents": [
-		            {
-		                "type": "UITreeView",
-		                "id": "renderGraphTreeView"
-		            }
-		        ],
+                "type": "GraphRenderer",
+                "id": "graph",
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,
