@@ -19,4 +19,3 @@
 ) package org.terasology.input.binds.inventory;
 
 import org.terasology.input.InputCategory;
-import org.terasology.module.sandbox.API;

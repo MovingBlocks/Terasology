@@ -16,15 +16,11 @@
 package org.terasology.persistence.typeHandling.extensionTypes.factories;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.SpecificTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.reflection.TypeInfo;
-
-import java.util.Optional;
 
 public class ComponentClassTypeHandlerFactory extends SpecificTypeHandlerFactory<Class<? extends Component>> {
 

@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.extensionTypes;
 
 import gnu.trove.list.TIntList;
-import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;

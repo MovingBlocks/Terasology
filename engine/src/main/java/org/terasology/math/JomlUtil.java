@@ -17,11 +17,9 @@ package org.terasology.math;
 
 import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
-import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
