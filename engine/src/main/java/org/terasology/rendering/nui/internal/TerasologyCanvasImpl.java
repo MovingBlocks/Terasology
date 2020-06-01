@@ -15,10 +15,7 @@
  */
 package org.terasology.rendering.nui.internal;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
+import org.joml.Rectanglei;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -27,52 +24,23 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.Time;
 import org.terasology.input.InputSystem;
-import org.terasology.input.MouseInput;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.input.device.MouseDevice;
-import org.terasology.nui.Border;
-import org.terasology.math.TeraMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.SubRegion;
+import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.canvas.CanvasImpl;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.nui.UITextureRegion;
-import org.terasology.nui.BaseInteractionListener;
-import org.terasology.nui.Color;
-import org.terasology.nui.HorizontalAlign;
-import org.terasology.nui.InteractionListener;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.nui.ScaleMode;
-import org.terasology.nui.SubRegion;
-import org.terasology.nui.TabbingManager;
-import org.terasology.nui.UIWidget;
-import org.terasology.nui.VerticalAlign;
-import org.terasology.nui.events.NUIMouseClickEvent;
-import org.terasology.nui.events.NUIMouseDoubleClickEvent;
-import org.terasology.nui.events.NUIMouseDragEvent;
-import org.terasology.nui.events.NUIMouseOverEvent;
-import org.terasology.nui.events.NUIMouseReleaseEvent;
-import org.terasology.nui.events.NUIMouseWheelEvent;
-import org.terasology.nui.skin.UISkin;
-import org.terasology.nui.skin.UIStyle;
-import org.terasology.nui.widgets.UILabel;
-import org.terasology.nui.widgets.UITooltip;
 import org.terasology.rendering.opengl.FrameBufferObject;
 import org.terasology.utilities.Assets;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  */
@@ -129,13 +97,13 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
     // NOTE: drawMaterial and drawMesh can now only be accessed through CanvasUtility
     public void drawMaterial(Material material, Rect2i region) {
         if (material.isRenderable()) {
-            Rect2i drawRegion = relativeToAbsolute(region);
-            if (!state.cropRegion.overlaps(drawRegion)) {
+            Rectanglei drawRegion = relativeToAbsolute(JomlUtil.from(region));
+            if (!state.cropRegion.intersects(drawRegion)) {
                 return;
             }
             material.setFloat("alpha", state.getAlpha());
             material.bindTextures();
-            ((TerasologyCanvasRenderer)renderer).drawMaterialAt(material, drawRegion);
+            ((TerasologyCanvasRenderer)renderer).drawMaterialAt(material, JomlUtil.from(drawRegion));
         }
     }
 
@@ -149,12 +117,14 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
             return;
         }
 
-        Rect2i drawRegion = relativeToAbsolute(region);
-        if (!state.cropRegion.overlaps(drawRegion)) {
+        Rectanglei drawRegion = relativeToAbsolute(JomlUtil.from(region));
+        if (!state.cropRegion.intersects(drawRegion)) {
             return;
         }
 
-        ((TerasologyCanvasRenderer)renderer).drawMesh(mesh, material, drawRegion, drawRegion.intersect(state.cropRegion), rotation, offset, scale, state.getAlpha());
+        ((TerasologyCanvasRenderer)renderer).drawMesh(
+                mesh, material, JomlUtil.from(drawRegion), JomlUtil.from(drawRegion.intersection(state.cropRegion)),
+                rotation, offset, scale, state.getAlpha());
     }
 
     public void drawMesh(Mesh mesh, UITextureRegion texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
@@ -177,7 +147,7 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
             previousState = state;
 
             fbo = ((TerasologyCanvasRenderer)renderer).getFBO(uri, size);
-            state = new CanvasState(state, Rect2i.createFromMinAndSize(new Vector2i(), size));
+            state = new CanvasState(state, new Rectanglei(0, 0, size.x(), size.y()));
             fbo.bindFrame();
         }
 

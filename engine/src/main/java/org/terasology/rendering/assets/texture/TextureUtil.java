@@ -17,9 +17,9 @@
 package org.terasology.rendering.assets.texture;
 
 import com.google.common.primitives.UnsignedBytes;
+import org.joml.Rectanglei;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.naming.Name;
 import org.terasology.nui.Color;
 
@@ -129,12 +129,12 @@ public final class TextureUtil {
         final int width = textureRegion.getWidth();
         final int height = textureRegion.getHeight();
 
-        final Rect2i pixelRegion = textureRegion.getPixelRegion();
+        final Rectanglei pixelRegion = textureRegion.getPixelRegion();
         final Texture texture = textureRegion.getTexture();
         ByteBuffer textureBytes = texture.getData().getBuffers()[0];
         int stride = texture.getWidth() * 4;
-        int posX = pixelRegion.minX();
-        int posY = pixelRegion.minY();
+        int posX = pixelRegion.minX;
+        int posY = pixelRegion.minY;
 
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         for (int y = 0; y < height; y++) {

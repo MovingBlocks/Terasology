@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.UITextureRegion;
@@ -46,7 +47,7 @@ public class ImageFlowRenderable implements FlowRenderable<ImageFlowRenderable> 
 
     @Override
     public void render(Canvas canvas, Rect2i bounds, TextRenderStyle defaultRenderStyle) {
-        canvas.drawTexture(textureRegion, bounds);
+        canvas.drawTexture(textureRegion, JomlUtil.from(bounds));
     }
 
     @Override
