@@ -15,11 +15,13 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
+import org.joml.Rectanglei;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.nui.Canvas;
-import org.terasology.nui.asset.font.Font;
 import org.terasology.nui.Color;
+import org.terasology.nui.asset.font.Font;
 import org.terasology.rendering.nui.widgets.browser.data.DocumentData;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
@@ -208,11 +210,11 @@ public final class DocumentRenderer {
                 position = containerRenderSpace.addRightFloat(yShift, paragraphWidth, height);
             }
 
-            Rect2i paragraphBorderRegion =
-                    Rect2i.createFromMinAndMax(position.minX() + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth),
-                            position.minY() + paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth),
-                            position.maxX() - paragraphRenderStyle.getParagraphMarginRight().getValue(containerWidth) - 1,
-                            position.maxY() - paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth) - 1);
+            Rectanglei paragraphBorderRegion = new Rectanglei(
+                    position.minX() + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth),
+                    position.minY() + paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth),
+                    position.maxX() - paragraphRenderStyle.getParagraphMarginRight().getValue(containerWidth) - 1,
+                    position.maxY() - paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth) - 1);
 
             Color paragraphBackground = paragraphRenderStyle.getParagraphBackground();
             if (paragraphBackground != null) {
@@ -252,12 +254,11 @@ public final class DocumentRenderer {
                     int backgroundAdvance = containerRenderSpace.getAdvanceForVerticalPosition(backgroundStart);
                     int maxSpace = containerRenderSpace.getNextWidthChange(backgroundStart);
 
-                    Rect2i backgroundRegion =
-                            Rect2i.createFromMinAndSize(
-                                    xShift + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth) + backgroundAdvance,
-                                    backgroundStart,
-                                    availableBackgroundWidth - 1,
-                                    Math.min(maxSpace, borderHeight - borderAdvance) - 1);
+                    Rectanglei backgroundRegion = JomlUtil.rectangleiFromMinAndSize(
+                            xShift + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth) + backgroundAdvance,
+                            backgroundStart,
+                            availableBackgroundWidth - 1,
+                            Math.min(maxSpace, borderHeight - borderAdvance) - 1);
 
                     canvas.drawFilledRectangle(backgroundRegion, paragraphBackground);
 

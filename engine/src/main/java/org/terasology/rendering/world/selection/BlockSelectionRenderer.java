@@ -17,7 +17,6 @@ package org.terasology.rendering.world.selection;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.JomlUtil;
-import org.terasology.utilities.Assets;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -32,6 +31,7 @@ import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
@@ -76,7 +76,7 @@ public class BlockSelectionRenderer {
 
     public void setEffectsTexture(TextureRegionAsset textureRegionAsset) {
         setEffectsTexture(textureRegionAsset.getTexture());
-        textureRegion = textureRegionAsset.getRegion();
+        textureRegion = JomlUtil.from(textureRegionAsset.getRegion());
         // reinitialize to recreate the mesh's UV coordinates for this textureRegion
         initialize();
     }
