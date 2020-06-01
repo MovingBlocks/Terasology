@@ -1,4 +1,4 @@
-// Copyright 2020 MovingBlocks
+// Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
