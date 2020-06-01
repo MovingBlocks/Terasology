@@ -33,7 +33,7 @@ plugins {
 }
 
 // Read environment variables, including variables passed by jenkins continuous integration server
-val env by extra { System.getenv( )}
+val env by extra { System.getenv() }
 // This is a fun one ... when versions switched to dynamic -SNAPSHOT or not based on branch existing modules using `master` would suddenly try publishing releases
 // This won't work without additionally doing constant version bumps (perhaps via Git tags) - but too much work to switch around all modules at once
 // Complicating things more the use of publish.gradle to centralize logic means modules and engine bits are treated the same, yet we need to vary modules
@@ -176,15 +176,20 @@ tasks.register("cacheReflections") {
 
     doFirst {
         try {
-            val reflections = Reflections(ConfigurationBuilder()
+            val reflections = Reflections(
+                ConfigurationBuilder()
                     .filterInputsBy(FilterBuilder.parsePackages("+org"))
                     .addUrls(inputs.getFiles().getSingleFile().toURI().toURL())
-                    .setScanners(TypeAnnotationsScanner(), SubTypesScanner()))
+                    .setScanners(TypeAnnotationsScanner(), SubTypesScanner())
+            )
             reflections.save(outputs.getFiles().getAsPath())
         } catch (e: java.net.MalformedURLException) {
             getLogger().error("Cannot parse input to url", e);
         }
     }
+}
+tasks.named("classes").configure {
+    finalizedBy(tasks.named("cacheReflections"))
 }
 
 tasks.register<Delete>("cleanReflections") {
@@ -224,7 +229,7 @@ tasks.named("jar") {
         }
     }
 
-    finalizedBy("cleanReflections")
+//    finalizedBy("cleanReflections")
 }
 
 // Prep an IntelliJ module for the Terasology module - yes, might want to read that twice :D

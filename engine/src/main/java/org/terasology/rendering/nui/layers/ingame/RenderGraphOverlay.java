@@ -15,15 +15,10 @@
  */
 package org.terasology.rendering.nui.layers.ingame;
 
-import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.input.MouseInput;
 import org.terasology.registry.In;
-import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.world.WorldRenderer;
@@ -43,78 +38,7 @@ public class RenderGraphOverlay extends CoreScreenLayer {
     @Override
     public void initialise() {
         WidgetUtil.trySubscribe(this, "close", widget -> getManager().closeScreen(RenderGraphOverlay.this));
-        find("graph", GraphRenderer.class).setRenderGraph(worldRenderer.getRenderGraph());
-//        renderGraphTreeView = find("renderGraphTreeView", UITreeView.class);
-//        renderGraphTreeView.subscribeNodeClick((event, treeNode) -> {
-//            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
-//                RenderNodeInfo renderNodeInfo = (RenderNodeInfo) treeNode.getValue();
-//                Node renderNode = renderNodeInfo.getNode();
-//                String uriString = renderNode.getUri().toString();
-//                logger.info(uriString);
-//            }
-//        });
-//
-//        renderGraphTreeView.setItemRenderer(new StringTextRenderer<RenderNodeInfo>() {
-//            @Override
-//            public String getString(RenderNodeInfo renderNodeInfo) {
-//                Node renderNode = renderNodeInfo.getNode();
-//                if (null == renderNode) {
-//                    return "ROOT";
-//                }
-//                String uriString = renderNode.getUri().toString();
-//                if (!renderNode.isEnabled()) {
-//                    return uriString + " -- DISABLED";
-//                }
-//
-//
-//                StringBuilder sb = new StringBuilder();
-//                sb.append(uriString);
-//                sb.append('\n');
-//                sb.append('\n');
-//
-//                // printing out individual desired state changes
-//                for (StateChange desiredStateChange : renderNode.getDesiredStateChanges()) {
-//                    sb.append(desiredStateChange.toString());
-//                    sb.append('\n');
-//                }
-//                sb.append('\n');
-//
-//                sb.append(renderNode);
-//                sb.append(": process()");
-//                sb.append('\n');
-//                return sb.toString();
-//            }
-//        });
-//
-//        RenderGraph renderGraph = worldRenderer.getRenderGraph();
-//        RenderNodeInfoTree renderGraphTreeModel = new RenderNodeInfoTree(renderGraph);
-//        renderGraphTreeView.setModel(renderGraphTreeModel);
-    }
-
-
-    private static class RenderNodeInfo {
-        private Node node;
-
-        public RenderNodeInfo() {
-            super();
-        }
-
-        public RenderNodeInfo(Node node) {
-            super();
-            this.node = node;
-        }
-
-        public Node getNode() {
-            return node;
-        }
-
-        @Override
-        public String toString() {
-            if (null == node) {
-                return "ROOT";
-            }
-            return node.getUri().toString();
-        }
+        find("graph", DAGGraphRenderer.class).setRenderGraph(worldRenderer.getRenderGraph());
     }
 
     @Override

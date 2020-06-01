@@ -211,10 +211,6 @@ public class RenderGraph {
         return nodesToExamine;
     }
 
-    public Set<Node> getOutgoingNodesForNode(Node currentNode) {
-        return graph.successors(currentNode);
-    }
-
     // TODO: Add `boolean isFullyFunctional(Node node)`
 
     // TODO: Add handler methods which the graph uses to communicate changes to a node.
@@ -401,7 +397,9 @@ public class RenderGraph {
             throw new RuntimeException("Node cannot be null.");
         }
         if (fromNode.addOutputRunOrderConnection(outputId)) {
-            if (!toNode.addInputRunOrderConnection(fromNode.getOutputRunOrderConnection(outputId), inputId)) {
+            if (toNode.addInputRunOrderConnection(fromNode.getOutputRunOrderConnection(outputId), inputId)) {
+                fromNode.getOutputRunOrderConnection(outputId).setConnectedConnection(toNode.getInputRunOrderConnection(inputId));
+            } else {
                 throw new RuntimeException("Could not add input RunOrder" + inputId + " connection to " + toNode + ". Connection probably already exists.");
             }
         } else {
