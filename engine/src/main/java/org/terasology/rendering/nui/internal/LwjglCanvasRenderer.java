@@ -17,6 +17,9 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Rectanglef;
+import org.joml.Rectanglei;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -26,7 +29,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.math.AABB;
-import org.terasology.nui.Border;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseQuat4f;
@@ -35,23 +38,21 @@ import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.nui.Border;
+import org.terasology.nui.Color;
+import org.terasology.nui.HorizontalAlign;
+import org.terasology.nui.ScaleMode;
+import org.terasology.nui.TextLineBuilder;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.VerticalAlign;
 import org.terasology.nui.asset.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.nui.UITextureRegion;
-import org.terasology.nui.Color;
-import org.terasology.nui.HorizontalAlign;
-import org.terasology.nui.ScaleMode;
-import org.terasology.nui.TextLineBuilder;
-import org.terasology.nui.VerticalAlign;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.opengl.FrameBufferObject;
 import org.terasology.rendering.opengl.LwjglFrameBufferObject;
 import org.terasology.utilities.Assets;
@@ -246,8 +247,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     @Override
-    public Vector2i getTargetSize() {
-        return new Vector2i(Display.getWidth(), Display.getHeight());
+    public org.joml.Vector2i getTargetSize() {
+        return new org.joml.Vector2i(Display.getWidth(), Display.getHeight());
     }
 
     @Override
@@ -265,8 +266,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     @Override
-    public void crop(Rect2i cropRegion) {
-        requestedCropRegion = cropRegion;
+    public void crop(Rectanglei cropRegion) {
+        requestedCropRegion = JomlUtil.from(cropRegion);
     }
 
     @Override
@@ -285,11 +286,13 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     @Override
-    public void drawTexture(UITextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
+    public void drawTexture(UITextureRegion texture, Color color, ScaleMode mode, Rectanglei absoluteRegionRectangle,
                             float ux, float uy, float uw, float uh, float alpha) {
         if (!((org.terasology.rendering.assets.texture.TextureRegion)texture).getTexture().isLoaded()) {
             return;
         }
+
+        Rect2i absoluteRegion = JomlUtil.from(absoluteRegionRectangle);
 
         if (!currentTextureCropRegion.equals(requestedCropRegion)
                 && !(currentTextureCropRegion.contains(absoluteRegion) && requestedCropRegion.contains(absoluteRegion))) {
@@ -298,17 +301,18 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             currentTextureCropRegion = requestedCropRegion;
         }
 
-        Vector2f scale = mode.scaleForRegion(absoluteRegion, texture.getWidth(), texture.getHeight());
-        Rect2f textureArea = texture.getRegion();
+        Vector2f scale = mode.scaleForRegion(absoluteRegionRectangle, texture.getWidth(), texture.getHeight());
+        Rect2f textureArea = JomlUtil.from(texture.getRegion());
         Mesh mesh = billboard;
         switch (mode) {
             case TILED: {
-                TextureCacheKey key = new TextureCacheKey(texture.size(), absoluteRegion.size());
+                Vector2i textureSize = JomlUtil.from(texture.size());
+                TextureCacheKey key = new TextureCacheKey(textureSize, absoluteRegion.size());
                 usedTextures.add(key);
                 mesh = cachedTextures.get(key);
                 if (mesh == null || mesh.isDisposed()) {
                     MeshBuilder builder = new MeshBuilder();
-                    addTiles(builder, absoluteRegion, FULL_REGION, texture.size(), FULL_REGION);
+                    addTiles(builder, absoluteRegion, FULL_REGION, textureSize, FULL_REGION);
                     mesh = builder.build();
                     cachedTextures.put(key, mesh);
                 }
@@ -352,8 +356,10 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     @Override
-    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion,
+    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rectanglei absoluteRegionRectangle,
                          Color color, Color shadowColor, float alpha, boolean underlined) {
+        Rect2i absoluteRegion = JomlUtil.from(absoluteRegionRectangle);
+
         TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign, color, shadowColor, underlined);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
@@ -385,10 +391,13 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     @Override
-    public void drawTextureBordered(UITextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
+    public void drawTextureBordered(UITextureRegion texture, Rectanglei regionRectangle, Border border, boolean tile,
+                                    float ux, float uy, float uw, float uh, float alpha) {
         if (!((org.terasology.rendering.assets.texture.TextureRegion)texture).getTexture().isLoaded()) {
             return;
         }
+
+        Rect2i region = JomlUtil.from(regionRectangle);
 
         if (!currentTextureCropRegion.equals(requestedCropRegion)
                 && !(currentTextureCropRegion.contains(region) && requestedCropRegion.contains(region))) {
@@ -487,9 +496,9 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         textureMat.setFloat2("scale", region.width(), region.height());
         textureMat.setFloat2("offset", region.minX(), region.minY());
 
-        Rect2f textureArea = texture.getRegion();
-        textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
-        textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
+        Rectanglef textureArea = texture.getRegion();
+        textureMat.setFloat2("texOffset", textureArea.minX + ux * textureArea.lengthX(), textureArea.minY + uy * textureArea.lengthY());
+        textureMat.setFloat2("texSize", uw * textureArea.lengthX(), uh * textureArea.lengthY());
 
         textureMat.setTexture("texture", ((org.terasology.rendering.assets.texture.TextureRegion)texture).getTexture());
         textureMat.setFloat4("color", 1, 1, 1, alpha);
