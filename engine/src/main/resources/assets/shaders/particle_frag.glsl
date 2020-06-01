@@ -1,5 +1,7 @@
+#version 330 core
+
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +16,22 @@
  * limitations under the License.
  */
 
+in vec4 color_gs;
+in vec2 uv;
 
-uniform sampler2D texAtlas;
+out vec4 out_color;
 
-uniform bool useTexture;
-
-uniform vec2 texOffset = vec2(0.0, 0.0);
-uniform vec2 texSize = vec2(1.0, 1.0);
+uniform bool use_texture = false;
+uniform sampler2D texture_sampler;
 
 void main() {
-    vec4 color = useTexture
-        ? texture2D(texAtlas, gl_TexCoord[0].xy * texSize.xy + texOffset.xy)
-        : vec4(1.0);
+    if (use_texture) {
+        out_color = texture(texture_sampler, uv);
+    } else {
+        out_color = color_gs;
+    }
 
-    color *= gl_Color;
-
-    gl_FragData[0].rgba = color;
-    gl_FragData[1].rgba = vec4(0.5, 1.0, 0.5, 1.0);
-    gl_FragData[2].rgba = vec4(0.0, 0.0, 0.0, 0.0);
+    if (out_color.a < 0.01) {
+        discard;
+    }
 }

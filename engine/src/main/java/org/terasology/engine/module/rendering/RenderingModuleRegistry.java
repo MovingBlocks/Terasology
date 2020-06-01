@@ -72,7 +72,6 @@ public class RenderingModuleRegistry {
      * For use everywhere to get last ordered list of {@link ModuleRendering} instances.
      * @return list of {@link ModuleRendering} instances
      */
-    @Nullable
     public List<ModuleRendering> getOrderedRenderingModules() {
         return this.orderedModuleRenderingInstances;
     }
