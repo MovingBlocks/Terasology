@@ -67,6 +67,7 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
         particleEmitterComponent.locationComponent = entity.getComponent(LocationComponent.class);
         if (particleEmitterComponent.particlePool == null) {
             particleEmitterComponent.particlePool = new ParticlePool(particleEmitterComponent.maxParticles);
+            particleEmitterComponent.particlePool.initRendering();
         }
         particleUpdater.addEmitter(entity);
         particleUpdater.configureEmitter(particleEmitterComponent);

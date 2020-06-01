@@ -16,6 +16,14 @@
 package org.terasology.particles;
 
 import com.google.common.base.Preconditions;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+
+import java.nio.FloatBuffer;
+
 
 /**
  * Object to keep track of the state of the living particles in a particle system and
@@ -34,18 +42,18 @@ public final class ParticlePool {
     // Per particle scalars
     public final float[] energy;
 
-    // Per particle 2d vectors
-    public final float[] textureOffset;
-
     // Per particle 3d vectors
     public final float[] position;
+    private final FloatBuffer positionBuffer;
+    public final float[] scale;
+    private final FloatBuffer scaleBuffer;
+    public final float[] color;
+    private final FloatBuffer colorBuffer;
+    public final float[] textureOffset;
+    private final FloatBuffer textureOffsetBuffer;
+
     public final float[] previousPosition;
     public final float[] velocity;
-
-    public final float[] scale;
-
-    // Per particle 4d vectors
-    public final float[] color;
 
     //== private attributes =============================
 
@@ -53,6 +61,12 @@ public final class ParticlePool {
 
     private int firstDeadParticleIndex;
     private final int rawSize;
+
+    private int vao;
+    private int positionVbo;
+    private int scaleVbo;
+    private int colorVbo;
+    private int textureOffsetVbo;
 
     //== Constructors ===================================
 
@@ -65,17 +79,18 @@ public final class ParticlePool {
         // Per particle scalars
         this.energy = new float[size];
 
-        // Per particle 2d vectors
-        this.textureOffset = new float[size * 2];
-
         // Per particle 3d vectors
         this.position = new float[size * 3];
+        this.positionBuffer = BufferUtils.createFloatBuffer(position.length);
+        this.scale = new float[size * 3];
+        this.scaleBuffer = BufferUtils.createFloatBuffer(scale.length);
+        this.color = new float[size * 4];
+        this.colorBuffer = BufferUtils.createFloatBuffer(color.length);
+        this.textureOffset = new float[size * 2];
+        this.textureOffsetBuffer = BufferUtils.createFloatBuffer(textureOffset.length);
+
         this.previousPosition = new float[size * 3];
         this.velocity = new float[size * 3];
-        this.scale = new float[size * 3];
-
-        // Per particle 4d vectors
-        this.color = new float[size * 4];
     }
 
     private ParticlePool() {
@@ -223,6 +238,74 @@ public final class ParticlePool {
             color[index4 + Z_OFFSET] = temporaryParticleData.color.z();
             color[index4 + W_OFFSET] = temporaryParticleData.color.w();
         }
+    }
+
+    /**
+     * Initializes this particle pool for rendering.
+     * The method should be called right after object creation.
+     */
+    public void initRendering() {
+        vao = GL30.glGenVertexArrays();
+        positionVbo = GL15.glGenBuffers();
+        scaleVbo = GL15.glGenBuffers();
+        colorVbo = GL15.glGenBuffers();
+        textureOffsetVbo = GL15.glGenBuffers();
+
+        GL30.glBindVertexArray(vao);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionVbo);
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, scaleVbo);
+        GL20.glEnableVertexAttribArray(1);
+        GL20.glVertexAttribPointer(1, 3, GL11.GL_FLOAT, false, 0, 0);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, colorVbo);
+        GL20.glEnableVertexAttribArray(2);
+        GL20.glVertexAttribPointer(2, 4, GL11.GL_FLOAT, false, 0, 0);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, textureOffsetVbo);
+        GL20.glEnableVertexAttribArray(3);
+        GL20.glVertexAttribPointer(3, 2, GL11.GL_FLOAT, false, 0, 0);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL30.glBindVertexArray(0);
+    }
+
+    /**
+     * Renders the particles in the pool by doing an OpenGL draw call.
+     */
+    public void draw() {
+        GL30.glBindVertexArray(vao);
+        GL11.glDrawArrays(GL11.GL_POINTS, 0, livingParticles());
+        GL30.glBindVertexArray(0);
+    }
+
+    public void prepareRendering() {
+        refreshBuffer(positionBuffer, position, 3);
+        refreshBuffer(scaleBuffer, scale, 3);
+        refreshBuffer(colorBuffer, color, 4);
+        refreshBuffer(textureOffsetBuffer, textureOffset, 2);
+
+        bufferData(positionBuffer, positionVbo);
+        bufferData(scaleBuffer, scaleVbo);
+        bufferData(colorBuffer, colorVbo);
+        bufferData(textureOffsetBuffer, textureOffsetVbo);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+    }
+
+    private void refreshBuffer(FloatBuffer buffer, float[] data, int typeSize) {
+        buffer.position(0).limit(data.length);
+        buffer.put(data, 0, livingParticles() * typeSize);
+        buffer.flip();
+    }
+
+    private void bufferData(FloatBuffer data, int vbo) {
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, 0, GL15.GL_STREAM_DRAW);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, GL15.GL_STREAM_DRAW);
     }
 
     private void resetParticleData(final int i) {
