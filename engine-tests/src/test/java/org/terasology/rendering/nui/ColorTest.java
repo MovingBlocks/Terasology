@@ -18,6 +18,7 @@ package org.terasology.rendering.nui;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.terasology.nui.Color;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

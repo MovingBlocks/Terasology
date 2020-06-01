@@ -16,8 +16,8 @@
 package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
 import org.terasology.math.geom.Rect2i;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.Canvas;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.asset.font.Font;
 import org.terasology.rendering.nui.widgets.browser.ui.style.FallbackTextRenderStyle;
 import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 

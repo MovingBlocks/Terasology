@@ -42,19 +42,20 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
+import org.terasology.nui.TabbingManager;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.layouts.ColumnLayout;
-import org.terasology.rendering.nui.layouts.RowLayout;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UICheckbox;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.nui.widgets.UISpace;
+import org.terasology.nui.databinding.BindHelper;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.layouts.ColumnLayout;
+import org.terasology.nui.layouts.RowLayout;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UICheckbox;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UISlider;
+import org.terasology.nui.widgets.UISpace;
 
 import java.util.Collections;
 import java.util.List;
@@ -304,6 +305,11 @@ public class InputSettingsScreen extends CoreScreenLayer {
     public void onClosed() {
         super.onClosed();
         bindsManager.registerBinds();
+
+        // TODO: Find a better place to do this in.
+        TabbingManager.tabForwardInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingUI")).get(0);
+        TabbingManager.tabBackInputModifier = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingModifier")).get(0);
+        TabbingManager.activateInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:activate")).get(0);
     }
 
     @Override

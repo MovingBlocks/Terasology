@@ -19,12 +19,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.nui.widgets.UpdateListener;
-import org.terasology.rendering.nui.widgets.treeView.JsonTree;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIDropdownScrollable;
+import org.terasology.nui.widgets.UpdateListener;
+import org.terasology.nui.widgets.treeView.JsonTree;
 
 import java.util.Arrays;
 import java.util.List;

@@ -19,13 +19,13 @@ import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
-import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.nui.InteractionListener;
+import org.terasology.nui.events.NUIMouseClickEvent;
+import org.terasology.nui.events.NUIMouseWheelEvent;
+import org.terasology.nui.widgets.UIList;
 
 import java.util.List;
 

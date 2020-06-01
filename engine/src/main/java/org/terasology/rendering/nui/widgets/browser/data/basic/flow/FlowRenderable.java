@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
 import org.terasology.math.geom.Rect2i;
-import org.terasology.rendering.nui.Canvas;
+import org.terasology.nui.Canvas;
 import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 
 public interface FlowRenderable<T extends FlowRenderable<T>> {

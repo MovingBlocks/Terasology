@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.console;
 
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 @FunctionalInterface
 public interface MessageType {

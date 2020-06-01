@@ -20,11 +20,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
-import org.terasology.rendering.nui.Color;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

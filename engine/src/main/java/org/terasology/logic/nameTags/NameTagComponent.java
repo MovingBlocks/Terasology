@@ -17,7 +17,7 @@ package org.terasology.logic.nameTags;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 /**
  * Will make the entity have a name tag overhead in the 3D view.
