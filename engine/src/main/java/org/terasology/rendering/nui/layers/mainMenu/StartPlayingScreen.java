@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -27,6 +28,7 @@ import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.Module;
 import org.terasology.network.NetworkMode;
+import org.terasology.nui.Canvas;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -142,5 +144,10 @@ public class StartPlayingScreen extends CoreScreenLayer {
     @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    @Override
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i vector2i) {
+        return vector2i;
     }
 }
