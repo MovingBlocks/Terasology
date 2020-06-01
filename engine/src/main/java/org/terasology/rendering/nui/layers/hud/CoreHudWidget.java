@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.hud;
 
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.ControlWidget;
 import org.terasology.nui.CoreWidget;

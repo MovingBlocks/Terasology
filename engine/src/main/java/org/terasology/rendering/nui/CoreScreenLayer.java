@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.nui;
 
+import org.joml.Rectanglei;
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
-import org.terasology.input.binds.general.TabbingUIButton;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.JomlUtil;
 import org.terasology.nui.AbstractWidget;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
@@ -30,15 +30,15 @@ import org.terasology.nui.TabbingManager;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.WidgetWithOrder;
 import org.terasology.nui.events.NUIBindButtonEvent;
-import org.terasology.nui.events.NUIMouseButtonEvent;
-import org.terasology.rendering.nui.animation.MenuAnimationSystem;
-import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
 import org.terasology.nui.layouts.ScrollableArea;
 import org.terasology.nui.widgets.UIRadialRing;
 import org.terasology.nui.widgets.UIRadialSection;
+import org.terasology.rendering.nui.animation.MenuAnimationSystem;
+import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -213,7 +213,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onDraw(Canvas canvas) {
-        Rect2i region = animationSystem.animateRegion(canvas.getRegion());
+        Rectanglei region = JomlUtil.from(animationSystem.animateRegion(JomlUtil.from(canvas.getRegion())));
         if (isModal()) {
             canvas.addInteractionRegion(getScreenListener(), region);
         }
@@ -329,7 +329,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public Vector2i getMaxContentSize(Canvas canvas) {
-        return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        return new Vector2i(Integer.MAX_VALUE);
     }
 
     @Override

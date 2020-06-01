@@ -16,12 +16,12 @@
 package org.terasology.rendering.nui.layers.hud;
 
 import com.google.common.collect.Lists;
+import org.joml.Vector2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.nui.Canvas;
-import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.CoreWidget;
 import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.DefaultBinding;
 
@@ -46,7 +46,7 @@ public class UICrosshair extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return Vector2i.zero();
+        return new Vector2i();
     }
 
     public void bindChargeAmount(Binding<Float> binding) {

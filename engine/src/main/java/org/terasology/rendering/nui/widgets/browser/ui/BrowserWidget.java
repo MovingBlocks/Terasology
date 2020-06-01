@@ -15,8 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
+import org.joml.Vector2i;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.CoreWidget;
@@ -46,7 +47,7 @@ public class BrowserWidget extends CoreWidget {
                     @Override
                     public boolean onMouseClick(NUIMouseClickEvent event) {
                         for (HyperlinkBox hyperlinkBox : hyperlinkBoxes) {
-                            if (hyperlinkBox.box.contains(event.getRelativeMousePosition())) {
+                            if (hyperlinkBox.box.contains(JomlUtil.from(event.getRelativeMousePosition()))) {
                                 for (BrowserHyperlinkListener browserHyperlinkListener : listenerList) {
                                     browserHyperlinkListener.hyperlinkClicked(hyperlinkBox.hyperlink);
                                 }
@@ -59,7 +60,10 @@ public class BrowserWidget extends CoreWidget {
                     }
                 });
         if (displayedPage != null) {
-            DocumentRenderer.drawDocumentInRegion(displayedPage, canvas, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(), canvas.size(), register);
+            DocumentRenderer.drawDocumentInRegion(
+                    displayedPage, canvas, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(),
+                    JomlUtil.from(canvas.size()), register
+            );
         }
     }
 
@@ -67,10 +71,12 @@ public class BrowserWidget extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         if (displayedPage != null) {
-            return DocumentRenderer.getDocumentPreferredSize(displayedPage, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(),
-                    canvas.getRegion().sizeX());
+            return JomlUtil.from(DocumentRenderer.getDocumentPreferredSize(
+                    displayedPage, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(),
+                    canvas.getRegion().lengthX()
+            ));
         } else {
-            return new Vector2i(0, 0);
+            return new Vector2i();
         }
     }
 

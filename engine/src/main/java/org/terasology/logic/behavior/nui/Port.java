@@ -15,6 +15,9 @@
  */
 package org.terasology.logic.behavior.nui;
 
+import org.joml.Vector2i;
+import org.terasology.math.geom.Rect2f;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.CoreWidget;
@@ -22,9 +25,6 @@ import org.terasology.nui.InteractionListener;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.utilities.Assets;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector2f;
 
 /**
  * Represents a port at a RenderableNode. There are several types of ports:

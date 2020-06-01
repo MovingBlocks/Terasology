@@ -20,6 +20,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -47,11 +48,17 @@ import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
+import org.terasology.nui.AbstractWidget;
+import org.terasology.nui.ControlWidget;
+import org.terasology.nui.TabbingManager;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.canvas.CanvasControl;
-import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.nui.events.NUIBindButtonEvent;
+import org.terasology.nui.events.NUIKeyEvent;
 import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
 import org.terasology.nui.widgets.UIButton;
@@ -60,18 +67,12 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
-import org.terasology.nui.AbstractWidget;
-import org.terasology.nui.ControlWidget;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 import org.terasology.rendering.nui.SortOrderSystem;
-import org.terasology.nui.TabbingManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.nui.UIWidget;
-import org.terasology.nui.asset.UIElement;
-import org.terasology.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.utilities.Assets;
@@ -546,7 +547,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void update(float delta) {
-        canvas.processMousePosition(mouse.getPosition());
+        canvas.processMousePosition(JomlUtil.from(mouse.getPosition()));
 
         // part of the update could be adding/removing screens
         // modifying a collection while iterating of it is typically not supported
@@ -626,18 +627,20 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         if (!mouse.isVisible()) {
             return;
         }
+
+        Vector2i mousePosition = JomlUtil.from(event.getMousePosition());
         if (focus != null) {
-            focus.onMouseButtonEvent(new NUIMouseButtonEvent(event.getButton(), event.getState(), event.getMousePosition()));
+            focus.onMouseButtonEvent(new NUIMouseButtonEvent(event.getButton(), event.getState(), mousePosition));
             if (event.isConsumed()) {
                 return;
             }
         }
         if (event.isDown()) {
-            if (canvas.processMouseClick(event.getButton(), event.getMousePosition())) {
+            if (canvas.processMouseClick(event.getButton(), mousePosition)) {
                 event.consume();
             }
         } else {
-            if (canvas.processMouseRelease(event.getButton(), event.getMousePosition())) {
+            if (canvas.processMouseRelease(event.getButton(), mousePosition)) {
                 event.consume();
             }
         }
@@ -653,8 +656,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             return;
         }
 
+        Vector2i mousePosition = JomlUtil.from(event.getMousePosition());
         if (focus != null) {
-            NUIMouseWheelEvent nuiEvent = new NUIMouseWheelEvent(mouse, keyboard, event.getMousePosition(), event.getWheelTurns());
+            NUIMouseWheelEvent nuiEvent = new NUIMouseWheelEvent(mouse, keyboard, mousePosition, event.getWheelTurns());
             focus.onMouseWheelEvent(nuiEvent);
             if (nuiEvent.isConsumed()) {
                 event.consume();
@@ -662,7 +666,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             }
         }
 
-        if (canvas.processMouseWheel(event.getWheelTurns(), mouse.getPosition())) {
+        if (canvas.processMouseWheel(event.getWheelTurns(), mousePosition)) {
             event.consume();
         }
         if (isReleasingMouse()) {
