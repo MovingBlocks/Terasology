@@ -16,7 +16,6 @@
 package org.terasology.engine.module.rendering;
 
 import org.terasology.context.Context;
-import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
@@ -73,7 +72,6 @@ public class RenderingModuleRegistry {
      * For use everywhere to get last ordered list of {@link ModuleRendering} instances.
      * @return list of {@link ModuleRendering} instances
      */
-    @Nullable
     public List<ModuleRendering> getOrderedRenderingModules() {
         return this.orderedModuleRenderingInstances;
     }
