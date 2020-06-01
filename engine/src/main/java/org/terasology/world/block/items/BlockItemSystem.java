@@ -91,16 +91,9 @@ public class BlockItemSystem extends BaseComponentSystem {
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
 
-        Vector3f targetPosition = event.getTargetLocation();
-        Vector2f relativePlacementPosition;
-        if (targetPosition != null) {
-            relativePlacementPosition = getSideHitPosition(event.getHitPosition(), targetPosition);
-        } else {
-            relativePlacementPosition = new Vector2f();
-        }
-
+        Vector2f relativeAttachmentPosition = getRelativeAttachmentPosition(event);
         Block block = blockFamily.getBlockForPlacement(new BlockPlacementData(
-                JomlUtil.from(placementPos), surfaceSide, JomlUtil.from(event.getDirection()), relativePlacementPosition
+                JomlUtil.from(placementPos), surfaceSide, JomlUtil.from(event.getDirection()), relativeAttachmentPosition
         ));
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
@@ -121,9 +114,19 @@ public class BlockItemSystem extends BaseComponentSystem {
         }
     }
 
+    private Vector2f getRelativeAttachmentPosition(ActivateEvent event) {
+        Vector3f targetPosition = event.getTargetLocation();
+        if (event.getHitPosition() != null && targetPosition != null) {
+            return getSideHitPosition(event.getHitPosition(), targetPosition);
+        } else {
+            return new Vector2f();
+        }
+    }
+
     /**
      * Returns the position at which the block side was hit, relative to the side.
      * <p/>
+     * The specified hit position is expected to be on the surface of the cubic block at the specified position.
      * Example: The front side was hit right in the center.
      * The result will be (0.5, 0.5), representing the relative hit position on the side's surface.
      * @param hitPosition the hit position

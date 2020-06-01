@@ -122,13 +122,9 @@ public class CeilingSupportingHorizontalFamily extends AbstractBlockFamily {
 
     @Override
     public Block getBlockForPlacement(BlockPlacementData data) {
-        Side mainSide = Side.TOP;
-
         boolean upsideDownPlacement = data.attachmentSide == Side.BOTTOM
                 || data.attachmentSide != Side.TOP && data.relativeAttachmentPosition.y() > 0.5;
-        if (upsideDownPlacement) {
-            mainSide = Side.BOTTOM;
-        }
+        final Side mainSide = upsideDownPlacement ? Side.BOTTOM : Side.TOP;
 
         Side blockDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
         return blocks.get(ExtendedSide.getExtendedSideFor(mainSide, blockDirection));
