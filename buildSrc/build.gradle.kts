@@ -14,3 +14,12 @@ dependencies {
     implementation("org.reflections:reflections:0.9.10")
     implementation("dom4j:dom4j:1.6.1")
 }
+
+gradlePlugin {
+    plugins {
+        register("terasology-logistics") {
+            id = "terasology-logistics"
+            implementationClass = "org.terasology.logistics.TerasologyLogisticsPlugin"
+        }
+    }
+}
