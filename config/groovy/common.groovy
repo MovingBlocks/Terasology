@@ -44,6 +44,9 @@ class common {
     /** For keeping a list of remote items that can be retrieved */
     String[] cachedItemList
 
+     /** For keeping a list of .gitignore files in the project */
+    def gitIgnoreFiles
+
     /**
      * Initialize defaults to match the target item type
      * @param type the type to be initialized
@@ -67,6 +70,7 @@ class common {
         githubTargetHome = githubDefaultHome
         targetDirectory = itemTypeScript.targetDirectory
         itemType = itemTypeScript.itemType
+        gitIgnoreFiles = getGitIgnoreFiles()
     }
 
     /**
@@ -183,26 +187,54 @@ class common {
     }
 
     /**
+     * Get a list of every .gitignore file
+     */
+    def getGitIgnoreFiles(){
+        def gitIgnoreFiles = []
+        new File('.').eachFileRecurse{ file -> 
+            if (file.getAbsolutePath() ==~ ".*\\.gitignore"){
+                gitIgnoreFiles.add(file)
+            }
+        }
+        return gitIgnoreFiles
+    }
+
+    /**
+     * Check if a given item is ignored in a .gitignore
+     * @param itemName the name of the item to check
+     */
+    def isInGitIgnore(String itemName){
+        def searchString = itemName
+        if (itemName.startsWith(".")){
+            // add literal slash for regex matching if itemName start with '.'
+            searchString = "\\$itemName"        
+        }
+        for (file in gitIgnoreFiles) {
+            def relPathString = file.relativePath(new File("."))
+            def relSearchString = searchString
+            if (relPathString.length() > 3){
+                // file.relativePath adds an extra ../ for what we need in the gitignore, trim it off
+                relSearchString = relPathString.substring(3) + '/' + searchString
+            }
+            def lines = file as String[]
+            for (line in lines){
+                if ((line ==~ relSearchString) || (line ==~ "$relSearchString/")){
+                    println("$itemName set to ignore in $file")
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    /**
      * Update a given item.
      * @param itemName the name of the item to update
      */
     def updateItem(String itemName) {
         File targetDir = new File(targetDirectory, itemName)
-        def searchString = itemName
-        if (itemName.startsWith(".")){
-            // add literal slash for regex start with '.'
-            searchString = "\\$itemName"        
-        }
-        def inGitIgnore = false
-        new File(".gitignore").eachLine{ line -> 
-            // match if line is exactly same os itemName or has trailing '/' but
-            // not if has further subdirectories
-            if ((line ==~ searchString) || (line ==~ "$searchString/")){
-                inGitIgnore = true
-                return
-            }
-        }
-        if (inGitIgnore){
+        
+        if (isInGitIgnore(itemName)){
             println color("Skipping update for $itemName: in gitignore", Ansi.YELLOW)
             return
         }
