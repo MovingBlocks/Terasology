@@ -210,15 +210,9 @@ class common {
             searchString = "\\$itemName"        
         }
         for (file in gitIgnoreFiles) {
-            def relPathString = file.relativePath(new File("."))
-            def relSearchString = searchString
-            if (relPathString.length() > 3){
-                // file.relativePath adds an extra ../ for what we need in the gitignore, trim it off
-                relSearchString = relPathString.substring(3) + '/' + searchString
-            }
             def lines = file as String[]
             for (line in lines){
-                if ((line ==~ relSearchString) || (line ==~ "$relSearchString/")){
+                if ((line ==~ searchString) || (line ==~ "$searchString/")){
                     println("$itemName set to ignore in $file")
                     return true
                 }
