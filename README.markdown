@@ -20,7 +20,7 @@ The [creators and maintainers](https://github.com/MovingBlocks/Terasology/blob/d
 
 Terasology is fully [open source](https://github.com/MovingBlocks/Terasology) and licensed [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) for code and [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/) for artwork (unless indicated otherwise - see [credits](docs/Credits.md) for minor exceptions.)
 
-We encourage contributions from anybody and try to keep a warm and friendly community and maintain a [code of conduct](https://github.com/MovingBlocks/Terasology/blob/develop/docs/CODE_OF_CONDUCT.md)
+We encourage contributions from anybody and try to keep a warm and friendly community and maintain a [code of conduct](https://github.com/MovingBlocks/Terasology/blob/develop/docs/CODE_OF_CONDUCT.md).
 
 ![Terasology](/docs/images/menuBackground.jpg "Terasology")
 
@@ -43,15 +43,7 @@ Direct download stable builds are uploaded to [our release section here on GitHu
 
 ## Developing
 
-We have gone to great lengths to make developing and modding Terasology as easy as possible. We use Gradle to automate just about everything. As long as you have a [Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) running from source is a two step process:
-
-* Using IntelliJ IDEA, [configure](https://www.jetbrains.com/help/idea/sdk.html) a JDK named "11"
-* Clone the code or download a zip.
-* Run `TerasologyPC` in your IDEA's run configuration
-
-That's really it! If you want the project set up in [IntelliJ](https://www.jetbrains.com/idea/download/) (our favored IDE) you run `gradlew idea` then load the generated project config. Then you get a bunch of run configurations and other stuff for free!
-
-For more on developing/modding see the [wiki!](https://github.com/MovingBlocks/Terasology/wiki)
+We strive to make developing and modding Terasology as easy as possible.  See our wiki for instructions on [setting up a development environment](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) and how to [develop modules](https://github.com/MovingBlocks/Terasology/wiki/Developing-Modules).
 
 
 ## Links

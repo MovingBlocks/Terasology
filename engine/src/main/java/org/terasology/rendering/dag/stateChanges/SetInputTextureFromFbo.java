@@ -19,7 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
 
 import java.beans.PropertyChangeEvent;
@@ -31,7 +31,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.terasology.rendering.dag.AbstractNode.getMaterial;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.POST_FBO_REGENERATION;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.POST_FBO_REGENERATION;
 
 // TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
 
@@ -68,11 +68,11 @@ public class SetInputTextureFromFbo implements StateChange, PropertyChangeListen
      * @param textureSlot an integer representing the number to add to GL_TEXTURE0 to identify a texture unit on the GPU.
      * @param fbo the FBO from which the texture attachment will be fetched.
      * @param textureType one of the types available through the FboTextureType enum.
-     * @param fboManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
+     * @param fboManager the BaseFboManager instance that will send change notifications via the update() method of this class.
      * @param materialUrn a URN identifying a Material instance.
      * @param shaderParameterName the name of a variable in the shader program used to sample the texture.
      */
-    public SetInputTextureFromFbo(int textureSlot, FBO fbo, FboTexturesTypes textureType, BaseFBOsManager fboManager,
+    public SetInputTextureFromFbo(int textureSlot, FBO fbo, FboTexturesTypes textureType, BaseFboManager fboManager,
                                   ResourceUrn materialUrn, String shaderParameterName) {
         this.textureSlot = textureSlot;
         this.textureType = textureType;
@@ -96,11 +96,11 @@ public class SetInputTextureFromFbo implements StateChange, PropertyChangeListen
      * @param textureSlot an integer representing the number to add to GL_TEXTURE0 to identify a texture unit on the GPU.
      * @param fboUri a SimpleUri identifying an FBO in the given fboManager, from which the texture attachment will be fetched.
      * @param textureType one of the types available through the FboTextureType enum.
-     * @param fboManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
+     * @param fboManager the BaseFboManager instance that will send change notifications via the update() method of this class.
      * @param materialUrn a ResourceUrn identifying a Material instance.
      * @param shaderParameterName the name of a variable in the shader program used to sample the texture.
      */
-    public SetInputTextureFromFbo(int textureSlot, SimpleUri fboUri, FboTexturesTypes textureType, BaseFBOsManager fboManager,
+    public SetInputTextureFromFbo(int textureSlot, SimpleUri fboUri, FboTexturesTypes textureType, BaseFboManager fboManager,
                                   ResourceUrn materialUrn, String shaderParameterName) {
         this(textureSlot, fboManager.get(fboUri), textureType, fboManager, materialUrn, shaderParameterName);
     }
@@ -148,7 +148,7 @@ public class SetInputTextureFromFbo implements StateChange, PropertyChangeListen
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // The only property we are subscribing to is DisplayResolutionDependentFBOs.POST_FBO_REGENERATION
+        // The only property we are subscribing to is DisplayResolutionDependentFbo.POST_FBO_REGENERATION
         textureId = fetchTextureId();
     }
 

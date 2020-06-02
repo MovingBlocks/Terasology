@@ -146,15 +146,21 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     // TODO: discuss having a `public removeShaderProgram`, to dispose shader programs no longer in use by any node
     public GLSLMaterial addShaderProgram(String title) {
-        String uri = "engine:" + title;
+        return addShaderProgram(title, "engine");
+    }
+
+    public GLSLMaterial addShaderProgram(String title, String providingModule) {
+
+        String uri = providingModule + ":" + title;
         Optional<? extends Shader> shader = Assets.getShader(uri);
         checkState(shader.isPresent(), "Failed to resolve %s", uri);
         shader.get().recompile();
-        GLSLMaterial material = (GLSLMaterial) Assets.generateAsset(new ResourceUrn("engine:prog." + title), new MaterialData(shader.get()), Material.class);
+        GLSLMaterial material = (GLSLMaterial) Assets.generateAsset(new ResourceUrn(providingModule + ":prog." + title), new MaterialData(shader.get()), Material.class);
         progamaticShaders.add(material);
 
         return material;
     }
+
 
     /**
      * Enables the default shader program.

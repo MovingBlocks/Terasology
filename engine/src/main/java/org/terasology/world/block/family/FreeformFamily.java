@@ -73,6 +73,19 @@ public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBl
         throw new UnsupportedOperationException("Shape expected");
     }
 
+    @Override
+    public Block getBlockForPlacement(BlockPlacementData data) {
+        if (archetypeBlock != null) {
+            return archetypeBlock;
+        }
+
+        if (data.attachmentSide.isHorizontal()) {
+            return blocks.get(data.attachmentSide);
+        } else {
+            Side blockDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
+            return blocks.get(blockDirection);
+        }
+    }
 
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {

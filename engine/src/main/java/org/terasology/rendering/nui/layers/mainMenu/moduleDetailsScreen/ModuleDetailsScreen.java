@@ -78,7 +78,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String DEFAULT_GITHUB_MODULE_URL = "https://github.com/Terasology/";
-    private static final List<String> INTERNAL_MODULES = Arrays.asList("engine", "BuilderSampleGameplay");
+    private static final List<String> INTERNAL_MODULES = Arrays.asList("engine");
     @In
     private ModuleManager moduleManager;
     @In
