@@ -224,15 +224,16 @@ switch (cleanerArgs[0]) {
         case "init":
             // TODO: Move most this code into module.groovy, leave an error here if you use it for something else
             if (cleanerArgs.length == 1) {
-                println "Doing a default module init - simply fetching CoreSampleGameplay without dependencies in source (same as `groovyw module get CoreSampleGameplay`)"
+                println "[init] Checkout default module distribution"
                 String[] targetMods = ["CoreSampleGameplay"]
                 common.retrieve(targetMods, false)
             } else if (cleanerArgs.length == 2) {
                 def targetModuleDistro = cleanerArgs[1]
-                println "Doing an init of a given module distro: " + targetModuleDistro
+                println "[init] Checkout module distribution: '$targetModuleDistro'"
                 def targetDistroURL = "https://raw.githubusercontent.com/Terasology/Index/master/distros/" + targetModuleDistro + "/gradle.properties"
                 if (!common.isUrlValid(targetDistroURL)) {
-                    println "Distro URL $targetDistroURL does not seem to be valid, typo? See https://github.com/Terasology/Index/tree/master/distros for available distros"
+                    println "[init] Invalid distribution name: '$targetModuleDistro'"
+                    println "[init]     See https://github.com/Terasology/Index/tree/master/distros for available distributions"
                     break
                 }
                 String distroContent = new URL(targetDistroURL).text
@@ -242,10 +243,11 @@ switch (cleanerArgs[0]) {
                     moduleLine = distroContent.substring((someIndex + moduleSnippet.length()), distroContent.indexOf("\n", someIndex))
                     common.retrieve(moduleLine.split(","), false)
                 } else {
-                    println "Found the distro definition, but it seemed invalid - did not contain snippet: $moduleSnippet"
+                    println "[init] ERROR: Distribution does not contain key: '$moduleSnippet'"
                 }
             } else {
-                println "Too many arguments! Init only does a single given module distro. Use `get` or `recurse` for multiple arbitrary modules. See `groovyw usage`"
+                println "[init] Too many arguments! Usage: 'grooyw module init [distribution]'"
+                println "[init]     See `groovyw usage` for more information."
             }
 
         break

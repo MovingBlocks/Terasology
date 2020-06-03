@@ -49,9 +49,9 @@ import org.gradle.internal.logging.text.StyledTextOutputFactory
 import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 // Check for Java 8
-if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+if(!(JavaVersion.current() == JavaVersion.VERSION_1_8 || JavaVersion.current() == JavaVersion.VERSION_11)) {
     def out = services.get(StyledTextOutputFactory).create("an-ouput")
-    out.withStyle(Style.FailureHeader).println("NOTE: You're compiling with a JDK newer than 8. While we believe Java 9-11 to be safe to use, newer versions than that may cause issues. If you encounter any oddities try to see if they persist with Java 8")
+    out.withStyle(Style.FailureHeader).println("WARNING: Compiling with a JDK not 8 nor 11. While some other Javas may be safe to use any newer than 11 may cause issues. If you encounter oddities try Java 8 or 11. See https://github.com/MovingBlocks/Terasology/issues/3976")
 }
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
