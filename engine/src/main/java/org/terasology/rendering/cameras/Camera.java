@@ -180,8 +180,10 @@ public abstract class Camera {
         return normViewMatrixReflected;
     }
 
+    //TODO: remove when projectionMatrix is corrected
+    private Matrix4f transposeProjectionMatrix = new Matrix4f();
     public Matrix4f getProjectionMatrix() {
-        return new Matrix4f(projectionMatrix).transpose();
+        return transposeProjectionMatrix.set(projectionMatrix).transpose();
     }
 
     public Matrix4f getViewProjectionMatrix() {
