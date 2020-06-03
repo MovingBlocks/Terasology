@@ -186,12 +186,15 @@ class common {
      * Update a given item.
      * @param itemName the name of the item to update
      */
-    def updateItem(String itemName) {
+    def updateItem(String itemName, boolean skipRecentUpdates = false) {
         File targetDir = new File(targetDirectory, itemName)
         def searchString = itemName
-        if (itemName.startsWith(".")){
-            // add literal slash for regex start with '.'
-            searchString = "\\$itemName"        
+        if (!Character.isLetterOrDigit(itemName.charAt(0))){   
+            println color ("Skipping update for $itemName: starts with non-alphanumeric symbol", Ansi.YELLOW)
+            return
+        }
+        if(skipRecentUpdates){
+            println color("Continue flag!", Ansi.RED)
         }
         def inGitIgnore = false
         new File(".gitignore").eachLine{ line -> 
