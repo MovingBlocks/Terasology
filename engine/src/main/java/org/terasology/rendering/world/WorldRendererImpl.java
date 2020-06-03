@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -42,22 +40,17 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-
 import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.engine.module.rendering.RenderingModuleRegistry;
-import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.ModuleRendering;
+import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
-
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
-
 import org.terasology.rendering.opengl.ScreenGrabber;
-
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
@@ -65,8 +58,9 @@ import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkProvider;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import java.util.List;
 
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glViewport;
 
@@ -213,8 +207,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         // registry not populated by new ModuleRendering instances in UI, populate now
         if (renderingModuleRegistry.getOrderedRenderingModules().isEmpty()) {
-            renderingModuleRegistry.updateRenderingModulesOrder(context.get(ModuleManager.class).getEnvironment(), context);
-            if(renderingModuleRegistry.getOrderedRenderingModules().isEmpty()) {
+            List<ModuleRendering> renderingModules = renderingModuleRegistry.updateRenderingModulesOrder(
+                    context.get(ModuleManager.class).getEnvironment(), context);
+            if (renderingModules.isEmpty()) {
                 GameEngine gameEngine = context.get(GameEngine.class);
                 gameEngine.changeState(new StateMainMenu("No rendering module loaded, unable to render. Try enabling CoreRendering."));
             }

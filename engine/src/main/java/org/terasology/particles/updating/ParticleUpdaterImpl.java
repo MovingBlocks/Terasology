@@ -335,6 +335,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
                 particleSystem.collisionUpdateIteration = (particleSystem.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
             }
 
+            particleSystem.particlePool.prepareRendering();
             updatedParticlePools.add(particleSystem.particlePool);
         }
     }

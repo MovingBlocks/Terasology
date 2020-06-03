@@ -28,3 +28,6 @@ workspace.xml
 /uiDesigner.xml
 /modules.xml
 /modules
+
+# Ignore Sonar linting, if set up locally
+/sonarlint/

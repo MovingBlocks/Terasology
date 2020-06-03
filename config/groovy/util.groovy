@@ -220,6 +220,38 @@ switch (cleanerArgs[0]) {
 
         break
 
+        // Makes sure a workspace has one or more modules matching user input, most useful for grabbing whole "module distros"
+        case "init":
+            // TODO: Move most this code into module.groovy, leave an error here if you use it for something else
+            if (cleanerArgs.length == 1) {
+                println "[init] Checkout default module distribution"
+                String[] targetMods = ["CoreSampleGameplay"]
+                common.retrieve(targetMods, false)
+            } else if (cleanerArgs.length == 2) {
+                def targetModuleDistro = cleanerArgs[1]
+                println "[init] Checkout module distribution: '$targetModuleDistro'"
+                def targetDistroURL = "https://raw.githubusercontent.com/Terasology/Index/master/distros/" + targetModuleDistro + "/gradle.properties"
+                if (!common.isUrlValid(targetDistroURL)) {
+                    println "[init] Invalid distribution name: '$targetModuleDistro'"
+                    println "[init]     See https://github.com/Terasology/Index/tree/master/distros for available distributions"
+                    break
+                }
+                String distroContent = new URL(targetDistroURL).text
+                String moduleSnippet = "extraModules="
+                int someIndex = distroContent.indexOf(moduleSnippet)
+                if (someIndex != -1) {
+                    moduleLine = distroContent.substring((someIndex + moduleSnippet.length()), distroContent.indexOf("\n", someIndex))
+                    common.retrieve(moduleLine.split(","), false)
+                } else {
+                    println "[init] ERROR: Distribution does not contain key: '$moduleSnippet'"
+                }
+            } else {
+                println "[init] Too many arguments! Usage: 'grooyw module init [distribution]'"
+                println "[init]     See `groovyw usage` for more information."
+            }
+
+        break
+
     default:
         println "UNRECOGNIZED COMMAND '" + cleanerArgs[0] + "' - please try again or use 'groovyw usage' for help"
 }
@@ -271,6 +303,7 @@ def printUsage() {
     println "- 'type' may be module,meta,lib or facade."
     println ""
     println "Available sub-commands:"
+    println "- 'init' - retrieves a given module distro, or a default sample source module (modules only)"
     println "- 'get' - retrieves one or more items in source form (separate with spaces)"
     println "- 'get-all' - retrieves all modules that can be found on the configured remote locations"
     println "- 'recurse' - retrieves the given item(s) *and* their dependencies in source form (really only for modules)"
@@ -290,6 +323,7 @@ def printUsage() {
     println "'-simple-list-format' to print one item per row for the 'list' sub-command, even for large numbers of items"
     println "'-condensed-list-format' to group items by starting letter for the 'list' sub-command (default with many items)"
     println ""
+    println "Example: 'groovyw module init iota' - retrieves all the modules in the Iota module distro from GitHub."
     println "Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub."
     println "Example: 'groovyw module get-all' - would retrieve all the modules in the Terasology organisation on GitHub."
     println "Example: 'groovyw module get Sa??l*' - would retrieve all the modules in the Terasology organisation on GitHub" +
