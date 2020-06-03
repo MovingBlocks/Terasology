@@ -181,7 +181,7 @@ public abstract class Camera {
     }
 
     public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
+        return new Matrix4f(projectionMatrix).transpose();
     }
 
     public Matrix4f getViewProjectionMatrix() {

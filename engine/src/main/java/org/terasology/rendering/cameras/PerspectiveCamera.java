@@ -18,6 +18,7 @@ package org.terasology.rendering.cameras;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -71,7 +72,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getProjectionMatrix()));
+        GL11.glLoadMatrix(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
@@ -137,23 +138,25 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     public void updateMatrices(float fov) {
         // Nothing to do...
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
-                && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
-                && cachedFov == fov
-                && cachedZFar == getzFar() && cachedZNear == getzNear()
-                && cachedReflectionHeight == getReflectionHeight()) {
+            && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
+            && cachedFov == fov
+            && cachedZFar == getzFar() && cachedZNear == getzNear()
+            && cachedReflectionHeight == getReflectionHeight()) {
             return;
         }
 
         viewingDirection.cross(up, tempRightVector);
         tempRightVector.mul(bobbingRotationOffsetFactor);
 
-        projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar(),this.displayDevice);
+        float aspectRatio = (float) displayDevice.getDisplayWidth() / displayDevice.getDisplayHeight();
+        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
+        projectionMatrix.identity().perspective(fovY, aspectRatio, getzNear(), getzFar()).transpose();
 
         viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
-                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+            viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
-                up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+            up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
         reflectionMatrix.setColumn(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
         reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
@@ -162,7 +165,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         reflectionMatrix.mul(viewMatrix, viewMatrixReflected);
 
         reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        reflectionMatrix.mul(normViewMatrix,normViewMatrixReflected);
+        reflectionMatrix.mul(normViewMatrix, normViewMatrixReflected);
 
 //        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
         viewProjectionMatrix = new Matrix4f(viewMatrix).mul(projectionMatrix);
@@ -189,14 +192,6 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     public void setBobbingVerticalOffsetFactor(float f) {
         bobbingVerticalOffsetFactor = f;
-    }
-
-    // TODO: Move the dependency on LWJGL (Display) elsewhere
-    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar, DisplayDevice displayDevice) {
-        float aspectRatio = (float) displayDevice.getDisplayWidth()/ displayDevice.getDisplayHeight();
-        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
-
-        return new Matrix4f().perspective(fovY,aspectRatio,zNear,zFar).transpose();
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
