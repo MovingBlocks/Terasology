@@ -236,6 +236,20 @@ class common {
                 println color("uncommitted changes. Skipping.", Ansi.YELLOW)
             } else {
                 println color("updating $itemType $itemName", Ansi.GREEN)
+                File targetDirFetchHead = new File("$targetDir/.git/FETCH_HEAD")
+                Date lastUpdate = new Date(targetDirFetchHead.lastModified())
+                def recentlyUpdated = use(groovy.time.TimeCategory){
+                    def timeElapsedSinceUpdate = new Date() - lastUpdate
+                    if (timeElapsedSinceUpdate < 2.minutes){
+                        println color("Skipping update for $itemName: updated within last 2 minutes", Ansi.YELLOW)
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                if (recentlyUpdated){
+                    return
+                }
                 try {
                     def current_sha = itemGit.log(maxCommits: 1).find().getAbbreviatedId(8)
                     itemGit.pull remote: defaultRemote
