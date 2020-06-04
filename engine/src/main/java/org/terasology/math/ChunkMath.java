@@ -148,9 +148,9 @@ public final class ChunkMath {
     }
 
     /**
-     * The position relative of the chunk with the given power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
-     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     * <p>default chunk size ({@link ChunkConstants#SIZE_X}, {@link ChunkConstants#SIZE_Y}, {@link ChunkConstants#SIZE_Z}) </p>
      *
      * @param pos absolute position of the block
      * @param dest will hold the result
@@ -161,9 +161,7 @@ public final class ChunkMath {
     }
 
     /**
-     * The position relative to the size of chunk with the given chunk power
-     *
-     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
      * @param pos absolute position of the block
      * @param chunkPower the size of the chunk in powers 2
@@ -176,9 +174,10 @@ public final class ChunkMath {
     }
 
     /**
-     * The position relative to the size of chunk with the given power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
+     * This uses the default power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
      *
-     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     * <p>default chunk size ({@link ChunkConstants#SIZE_X}, {@link ChunkConstants#SIZE_Y}, {@link ChunkConstants#SIZE_Z}) </p>
      *
      * @param pos absolute position of the block
      * @param dest will hold the result
@@ -189,13 +188,14 @@ public final class ChunkMath {
     }
 
     /**
-     * The position relative to the size of chunk with the given power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
+     * This uses the default power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
      *
-     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     * <p>default chunk size ({@link ChunkConstants#SIZE_X}, {@link ChunkConstants#SIZE_Y}, {@link ChunkConstants#SIZE_Z}) </p>
      *
-     * @param x absolute x component of the block
-     * @param y absolute y component of the block
-     * @param z absolute z component of the block
+     * @param x absolute x coordinate of the block
+     * @param y absolute y coordinate of the block
+     * @param z absolute z coordinate of the block
      * @param dest will hold the result
      * @return dest
      */
@@ -204,9 +204,7 @@ public final class ChunkMath {
     }
 
     /**
-     * The position relative to the size of chunk with the given chunk power
-     *
-     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
      * @param pos the absolute position of the block
      * @param chunkPower the size of the chunk in powers of 2
@@ -218,13 +216,11 @@ public final class ChunkMath {
     }
 
     /**
-     * The position relative to the size of chunk with the given chunk power
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
-     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
-     *
-     * @param x absolute x component of the block
-     * @param y absolute y component of the block
-     * @param z absolute z component of the block
+     * @param x absolute x coordinate of the block
+     * @param y absolute y coordinate of the block
+     * @param z absolute z coordinate of the block
      * @param chunkPower  the size of the chunk in powers of 2
      * @param dest will hold the result
      * @return dest
@@ -238,12 +234,12 @@ public final class ChunkMath {
      *
      * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
      *
-     * @param x the x component of the block
-     * @param y the y component of the block
-     * @param z the z component of the block
-     * @param chunkX the x component for the size of the chunk in powers of 2
-     * @param chunkY the y component for the size of the chunk in powers of 2
-     * @param chunkZ the z component for the size of the chunk in powers of 2
+     * @param x the x coordinate of the block
+     * @param y the y coordinate of the block
+     * @param z the z coordinate of the block
+     * @param chunkX the x unit size of the chunk in powers of 2
+     * @param chunkY the y unit size of the chunk in powers of 2
+     * @param chunkZ the z unit size of the chunk in powers of 2
      * @param dest will hold the result
      * @return dest
      */

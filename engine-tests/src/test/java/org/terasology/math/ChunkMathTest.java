@@ -48,4 +48,24 @@ public class ChunkMathTest {
         assertEquals(new Vector3i(0, 0, 0), chunks[0]);
         assertEquals(new Vector3i(1, 0, 0), chunks[1]);
     }
+
+    @Test
+    public void testConfiguredChunk() {
+        org.joml.Vector3i temp = new org.joml.Vector3i();
+        assertEquals(0, ChunkMath.calcChunkPosX(10, 6));
+        assertEquals(-1, ChunkMath.calcChunkPosX(-1, 6));
+        assertEquals(1, ChunkMath.calcChunkPosX(100, 6));
+        assertEquals(3, ChunkMath.calcChunkPosX(200, 6));
+
+        assertEquals(0, ChunkMath.calcChunkPosY(10, 6));
+        assertEquals(-1, ChunkMath.calcChunkPosY(-1, 6));
+        assertEquals(1, ChunkMath.calcChunkPosY(100, 6));
+        assertEquals(3, ChunkMath.calcChunkPosY(200, 6));
+
+        assertEquals(0, ChunkMath.calcChunkPosZ(10, 6));
+        assertEquals(-1, ChunkMath.calcChunkPosZ(-1, 6));
+        assertEquals(1, ChunkMath.calcChunkPosZ(100, 6));
+        assertEquals(3, ChunkMath.calcChunkPosZ(200, 6));
+
+    }
 }
