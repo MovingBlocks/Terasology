@@ -42,11 +42,6 @@ val moduleConfig = moduleFile.reader().use {
     ModuleMetadataJsonAdapter().read(it)!!
 }
 
-val moduleDepends : Collection<String> = moduleConfig.dependencies.mapNotNull {
-    val name = it.id.toString()
-    if (name.toLowerCase() != "engine") { name } else { null }
-}
-
 // Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
 if (moduleConfig.version.isSnapshot) {
     logger.warn("Module ${project.name} is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
@@ -93,14 +88,39 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }
 
+
+val deps = moduleConfig.dependencies.filterNotNull()
+val moduleDepends = deps.filterNot { it.id.toString() == "engine" }
+val engineVersion = deps.find { it.id.toString() == "engine" }?.versionRange()?.toString() ?: "+"
+
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
-    implementation(group = "org.terasology.engine", name = "engine", version = "+") { isChanging = true }
-    implementation(group = "org.terasology.engine", name = "engine-tests", version = "+") { isChanging = true }
+    implementation(group = "org.terasology.engine", name = "engine", version = engineVersion) { isChanging = true }
+    implementation(group = "org.terasology.engine", name = "engine-tests", version = engineVersion) { isChanging = true }
 
-    for (dependency in moduleDepends) {
-        implementation(group = "org.terasology.modules", name = dependency, version = "+") { isChanging = true }
+    for (gestaltDep in moduleDepends) {
+        if (!gestaltDep.minVersion.isSnapshot) {
+            // gestalt considers snapshots to satisfy a minimum requirement:
+            // https://github.com/MovingBlocks/gestalt/blob/fe1893821127c254cd135252de2676eff31d0152/gestalt-module/src/main/java/org/terasology/naming/VersionRange.java#L58-L59
+            gestaltDep.minVersion = gestaltDep.minVersion.snapshot
+            // (maybe there's some way to do that with a custom gradle resolver?
+            // but making a resolver that only works that way on gestalt modules specifically
+            // sounds complicated.)
+        }
+
+        val gradleDep = create(
+            group = "org.terasology.modules",
+            name = gestaltDep.id.toString(),
+            version = gestaltDep.versionRange().toString()
+        )
+
+        if (gestaltDep.isOptional) {
+            // and/or testImplementation?
+            compileOnly(gradleDep) { isChanging = true }
+        } else {
+            implementation(gradleDep) { isChanging = true }
+        }
     }
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
