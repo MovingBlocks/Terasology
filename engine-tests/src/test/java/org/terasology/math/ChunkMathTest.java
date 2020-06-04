@@ -23,6 +23,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ChunkMathTest {
 
@@ -50,22 +51,46 @@ public class ChunkMathTest {
     }
 
     @Test
-    public void testConfiguredChunk() {
-        org.joml.Vector3i temp = new org.joml.Vector3i();
-        assertEquals(0, ChunkMath.calcChunkPosX(10, 6));
-        assertEquals(-1, ChunkMath.calcChunkPosX(-1, 6));
-        assertEquals(1, ChunkMath.calcChunkPosX(100, 6));
-        assertEquals(3, ChunkMath.calcChunkPosX(200, 6));
-
-        assertEquals(0, ChunkMath.calcChunkPosY(10, 6));
-        assertEquals(-1, ChunkMath.calcChunkPosY(-1, 6));
-        assertEquals(1, ChunkMath.calcChunkPosY(100, 6));
-        assertEquals(3, ChunkMath.calcChunkPosY(200, 6));
-
-        assertEquals(0, ChunkMath.calcChunkPosZ(10, 6));
-        assertEquals(-1, ChunkMath.calcChunkPosZ(-1, 6));
-        assertEquals(1, ChunkMath.calcChunkPosZ(100, 6));
-        assertEquals(3, ChunkMath.calcChunkPosZ(200, 6));
-
+    public void testCalcChunk() {
+        assertEquals(0, ChunkMath.calcChunkPos(10, 6));
+        assertEquals(-1, ChunkMath.calcChunkPos(-1, 6));
+        assertEquals(1, ChunkMath.calcChunkPos(100, 6));
+        assertEquals(3, ChunkMath.calcChunkPos(200, 6));
     }
+
+    @Test
+    public void testCalcChunkPosX() {
+        assertEquals(0, ChunkMath.calcChunkPosX(10));
+        assertEquals(-1, ChunkMath.calcChunkPosX(-1));
+        assertEquals(3, ChunkMath.calcChunkPosX(100));
+        assertEquals(6, ChunkMath.calcChunkPosX(200));
+        assertEquals(21, ChunkMath.calcChunkPosX(700));
+    }
+
+    @Test
+    public void testCalcChunkPosY() {
+        assertEquals(0, ChunkMath.calcChunkPosY(10));
+        assertEquals(-1, ChunkMath.calcChunkPosY(-1));
+        assertEquals(1, ChunkMath.calcChunkPosY(100));
+        assertEquals(3, ChunkMath.calcChunkPosY(200));
+        assertEquals(10, ChunkMath.calcChunkPosY(700));
+    }
+
+    @Test
+    public void testCalcChunkPosZ() {
+        assertEquals(0, ChunkMath.calcChunkPosZ(10));
+        assertEquals(-1, ChunkMath.calcChunkPosZ(-1));
+        assertEquals(6, ChunkMath.calcChunkPosZ(200));
+        assertEquals(21, ChunkMath.calcChunkPosZ(700));
+    }
+
+    @Test
+    public void testCalcChunkPos() {
+        org.joml.Vector3i temp = new org.joml.Vector3i();
+        assertTrue(ChunkMath.calcChunkPos(700, 700, 700, temp).equals(21, 10, 21));
+        assertTrue(ChunkMath.calcChunkPos(200, 700, -1, temp).equals(6, 10, -1));
+        assertTrue(ChunkMath.calcChunkPos(200, 200, 200, temp).equals(6, 3, 6));
+        assertTrue(ChunkMath.calcChunkPos(10, 10, 10, temp).equals(0, 0, 0));
+    }
+
 }

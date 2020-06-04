@@ -37,43 +37,23 @@ public final class ChunkMath {
     /**
      * Returns the chunk position of a given coordinate.
      *
-     * @param x The X-coordinate of the block
-     * @return The X-coordinate of the chunk
+     * @param x The coordinate of the block
+     * @return The coordinate of the chunk
      */
-    public static int calcChunkPosX(int x, int chunkPowerX) {
-        return (x >> chunkPowerX);
-    }
-
-    /**
-     * Returns the chunk position of a given coordinate.
-     *
-     * @param y The Y-coordinate of the block
-     * @return The Y-coordinate of the chunk
-     */
-    public static int calcChunkPosY(int y, int chunkPowerY) {
-        return (y >> chunkPowerY);
-    }
-
-    /**
-     * Returns the chunk position of a given coordinate.
-     *
-     * @param z The Z-coordinate of the block
-     * @return The Z-coordinate of the chunk
-     */
-    public static int calcChunkPosZ(int z, int chunkPowerZ) {
-        return (z >> chunkPowerZ);
+    public static int calcChunkPos(int x, int chunkPower) {
+        return (x >> chunkPower);
     }
 
     public static int calcChunkPosX(int x) {
-        return calcChunkPosX(x, ChunkConstants.CHUNK_POWER.x);
+        return calcChunkPos(x, ChunkConstants.CHUNK_POWER.x);
     }
 
     public static int calcChunkPosY(int y) {
-        return calcChunkPosY(y, ChunkConstants.CHUNK_POWER.y);
+        return calcChunkPos(y, ChunkConstants.CHUNK_POWER.y);
     }
 
     public static int calcChunkPosZ(int z) {
-        return calcChunkPosZ(z, ChunkConstants.CHUNK_POWER.z);
+        return calcChunkPos(z, ChunkConstants.CHUNK_POWER.z);
     }
 
     /**
@@ -139,7 +119,7 @@ public final class ChunkMath {
      */
     @Deprecated
     public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
-        return new Vector3i(calcChunkPosX(x, chunkPower.x), calcChunkPosY(y, chunkPower.y), calcChunkPosZ(z, chunkPower.z));
+        return new Vector3i(calcChunkPos(x, chunkPower.x), calcChunkPos(y, chunkPower.y), calcChunkPos(z, chunkPower.z));
     }
 
     //TODO: can be replaced by region3i iterator
@@ -244,17 +224,17 @@ public final class ChunkMath {
      * @return dest
      */
     public static org.joml.Vector3i calcChunkPos(int x, int y, int z, int chunkX, int chunkY, int chunkZ, org.joml.Vector3i dest) {
-        return dest.set(calcChunkPosX(x, chunkX), calcChunkPosY(y, chunkY), calcChunkPosZ(z, chunkZ));
+        return dest.set(calcChunkPos(x, chunkX), calcChunkPos(y, chunkY), calcChunkPos(z, chunkZ));
     }
 
     public static Vector3i[] calcChunkPos(Region3i region, Vector3i chunkPower) {
-        int minX = calcChunkPosX(region.minX(), chunkPower.x);
-        int minY = calcChunkPosY(region.minY(), chunkPower.y);
-        int minZ = calcChunkPosZ(region.minZ(), chunkPower.z);
+        int minX = calcChunkPos(region.minX(), chunkPower.x);
+        int minY = calcChunkPos(region.minY(), chunkPower.y);
+        int minZ = calcChunkPos(region.minZ(), chunkPower.z);
 
-        int maxX = calcChunkPosX(region.maxX(), chunkPower.x);
-        int maxY = calcChunkPosY(region.maxY(), chunkPower.y);
-        int maxZ = calcChunkPosZ(region.maxZ(), chunkPower.z);
+        int maxX = calcChunkPos(region.maxX(), chunkPower.x);
+        int maxY = calcChunkPos(region.maxY(), chunkPower.y);
+        int maxZ = calcChunkPos(region.maxZ(), chunkPower.z);
 
         int size = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
 

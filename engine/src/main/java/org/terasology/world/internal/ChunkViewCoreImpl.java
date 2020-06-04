@@ -232,9 +232,9 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     protected int relChunkIndex(int x, int y, int z) {
-        return TeraMath.calculate3DArrayIndex(ChunkMath.calcChunkPosX(x, chunkPower.x) + offset.x,
-                ChunkMath.calcChunkPosY(y, chunkPower.y) + offset.y,
-                ChunkMath.calcChunkPosZ(z, chunkPower.z) + offset.z, chunkRegion.size());
+        return TeraMath.calculate3DArrayIndex(ChunkMath.calcChunkPos(x, chunkPower.x) + offset.x,
+                ChunkMath.calcChunkPos(y, chunkPower.y) + offset.y,
+                ChunkMath.calcChunkPos(z, chunkPower.z) + offset.z, chunkRegion.size());
     }
 
     public void setChunkSize(Vector3i chunkSize) {
