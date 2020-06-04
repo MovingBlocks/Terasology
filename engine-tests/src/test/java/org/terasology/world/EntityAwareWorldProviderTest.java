@@ -151,7 +151,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     public void testGetTemporaryBlockSendsNoEvent() {
         BlockEventChecker checker = new BlockEventChecker();
         entityManager.getEventSystem().registerEventHandler(checker);
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i());
         assertTrue(blockEntity.exists());
         assertFalse(checker.addedReceived);
         assertFalse(checker.activateReceived);
@@ -163,7 +163,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     public void testTemporaryCleanedUpWithNoEvent() {
         BlockEventChecker checker = new BlockEventChecker();
         entityManager.getEventSystem().registerEventHandler(checker);
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i());
         worldProvider.update(1.0f);
         assertFalse(blockEntity.exists());
         assertFalse(checker.addedReceived);
@@ -183,7 +183,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
         BlockEventChecker checker = new BlockEventChecker();
         entityManager.getEventSystem().registerEventHandler(checker);
 
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i());
         worldProvider.update(1.0f);
         assertTrue(blockEntity.exists());
         assertTrue(blockEntity.isActive());
@@ -212,7 +212,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
 
         worldProvider.setBlock(new Vector3i(), airBlock);
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i());
         assertTrue(blockEntity.exists());
 
         assertEquals(Lists.newArrayList(new EventInfo(BeforeDeactivateComponent.newInstance(), blockEntity), new EventInfo(BeforeRemoveComponent.newInstance(), blockEntity)),
@@ -227,7 +227,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
 
         worldProvider.setBlock(new Vector3i(), blockWithDifferentString);
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i());
         assertTrue(blockEntity.exists());
 
         assertEquals(Lists.newArrayList(new EventInfo(OnChangedComponent.newInstance(), blockEntity)), checker.receivedEvents);
@@ -236,14 +236,14 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     @Test
     public void testPrefabUpdatedWhenBlockChanged() {
         worldProvider.setBlock(new Vector3i(), blockWithString);
-        assertEquals(blockWithString.getPrefab().get().getName(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
+        assertEquals(blockWithString.getPrefab().get().getName(), worldProvider.getBlockEntityAt(new Vector3i()).getParentPrefab().getName());
         worldProvider.setBlock(new Vector3i(), blockWithDifferentString);
-        assertEquals(blockWithDifferentString.getPrefab().get().getName(), worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0)).getParentPrefab().getName());
+        assertEquals(blockWithDifferentString.getPrefab().get().getName(), worldProvider.getBlockEntityAt(new Vector3i()).getParentPrefab().getName());
     }
 
     @Test
     public void testEntityNotRemovedIfForceBlockActiveComponentAdded() {
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i());
         blockEntity.addComponent(new ForceBlockActiveComponent());
         worldProvider.update(1.0f);
         assertTrue(blockEntity.exists());
@@ -256,14 +256,14 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
         worldProvider.setBlock(new Vector3i(), keepActiveBlock);
         worldProvider.update(1.0f);
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
-        worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        worldProvider.getBlockEntityAt(new Vector3i());
         assertTrue(checker.receivedEvents.isEmpty());
     }
 
     @Test
     public void testEntityBecomesTemporaryWhenChangedFromAKeepActiveBlock() {
         worldProvider.setBlock(new Vector3i(), keepActiveBlock);
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i());
         worldProvider.setBlock(new Vector3i(), airBlock);
         worldProvider.update(1.0f);
         assertFalse(blockEntity.isActive());
@@ -272,7 +272,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     @Test
     public void testEntityBecomesTemporaryWhenChangedFromAKeepActiveBlockJoml() {
         worldProvider.setBlock(new org.joml.Vector3i(), keepActiveBlock);
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i());
         worldProvider.setBlock(new org.joml.Vector3i(), airBlock);
         worldProvider.update(1.0f);
         assertFalse(blockEntity.isActive());
@@ -281,7 +281,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testEntityBecomesTemporaryIfForceBlockActiveComponentRemoved() {
-        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef blockEntity = worldProvider.getBlockEntityAt(new Vector3i());
         blockEntity.addComponent(new ForceBlockActiveComponent());
         worldProvider.update(1.0f);
         blockEntity.removeComponent(ForceBlockActiveComponent.class);
@@ -292,7 +292,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testEntityExtraComponentsRemovedBeforeCleanUp() {
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i());
         entity.addComponent(new StringComponent("test"));
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
@@ -305,7 +305,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     @Test
     public void testEntityExtraComponentsRemovedBeforeCleanUpForBlocksWithPrefabs() {
         worldStub.setBlock(new Vector3i(), blockWithString);
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i());
         entity.addComponent(new IntegerComponent(1));
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), IntegerComponent.class);
@@ -318,7 +318,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     @Test
     public void testEntityMissingComponentsAddedBeforeCleanUp() {
         worldStub.setBlock(new Vector3i(), blockWithString);
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i());
         entity.removeComponent(StringComponent.class);
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), StringComponent.class);
@@ -331,7 +331,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     @Test
     public void testChangedComponentsRevertedBeforeCleanUp() {
         worldStub.setBlock(new Vector3i(), blockWithString);
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i());
         StringComponent comp = entity.getComponent(StringComponent.class);
         comp.value = "Moo";
         entity.saveComponent(comp);
@@ -345,7 +345,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     @Test
     public void testAllComponentsNotMarkedAsRetainedRemovedOnBlockChange() {
         worldStub.setBlock(new Vector3i(), blockWithString);
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i());
         entity.addComponent(new ForceBlockActiveComponent());
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
@@ -357,7 +357,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testRetainedComponentsNotAltered() {
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i());
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
         worldProvider.setBlock(new Vector3i(), blockWithRetainedComponent);
@@ -368,7 +368,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
     @Test
     public void testMetworkComponentAddedWhenChangedToNonTemporary() {
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), NetworkComponent.class);
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i());
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
         assertEquals(Lists.newArrayList(new EventInfo(OnAddedComponent.newInstance(), entity), new EventInfo(OnActivatedComponent.newInstance(), entity)),
@@ -378,7 +378,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testNetworkComponentRemovedWhenTemporaryCleanedUp() {
-        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i(0, 0, 0));
+        EntityRef entity = worldProvider.getBlockEntityAt(new Vector3i());
         entity.addComponent(new RetainedOnBlockChangeComponent(2));
 
         LifecycleEventChecker checker = new LifecycleEventChecker(entityManager.getEventSystem(), NetworkComponent.class);
