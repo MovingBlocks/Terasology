@@ -183,6 +183,23 @@ class common {
     }
 
     /**
+     * Check if an item was updated within the provided time limit
+     * @param fetchHead the item's FETCH_HEAD file in the .git directory
+     * @param timeLimit the time limit for considering something recently updated, for example: use(groovy.time.TimeCategory){ 10.minute }
+     */
+    def isRecentlyUpdated(File fetchHead, def timeLimit){
+        Date lastUpdate = new Date(fetchHead.lastModified())
+        def recentlyUpdated = use(groovy.time.TimeCategory){
+            def timeElapsedSinceUpdate = new Date() - lastUpdate
+            if (timeElapsedSinceUpdate < timeLimit){
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
+    /**
      * Update a given item.
      * @param itemName the name of the item to update
      */
@@ -192,9 +209,6 @@ class common {
         if (!Character.isLetterOrDigit(itemName.charAt(0))){   
             println color ("Skipping update for $itemName: starts with non-alphanumeric symbol", Ansi.YELLOW)
             return
-        }
-        if(skipRecentUpdates){
-            println color("Continue flag!", Ansi.RED)
         }
         def inGitIgnore = false
         new File(".gitignore").eachLine{ line -> 
@@ -237,17 +251,9 @@ class common {
             } else {
                 println color("updating $itemType $itemName", Ansi.GREEN)
                 File targetDirFetchHead = new File("$targetDir/.git/FETCH_HEAD")
-                Date lastUpdate = new Date(targetDirFetchHead.lastModified())
-                def recentlyUpdated = use(groovy.time.TimeCategory){
-                    def timeElapsedSinceUpdate = new Date() - lastUpdate
-                    if (timeElapsedSinceUpdate < 2.minutes){
-                        println color("Skipping update for $itemName: updated within last 2 minutes", Ansi.YELLOW)
-                        return true
-                    } else {
-                        return false
-                    }
-                }
-                if (recentlyUpdated){
+                def timeLimit = use(groovy.time.TimeCategory){ 10.minute }
+                if (skipRecentUpdates && isRecentlyUpdated(targetDirFetchHead, timeLimit)){
+                    println color("Skipping update for $itemName: updated within last $timeLimit", Ansi.YELLOW)
                     return
                 }
                 try {
