@@ -256,7 +256,10 @@ class common {
                     println color("Skipping update for $itemName: updated within last $timeLimit", Ansi.YELLOW)
                     return
                 }
-                targetDirFetchHead.setLastModified(new Date().getTime())
+                if (targetDirFetchHead.exists()){
+                    targetDirFetchHead.setLastModified(new Date().getTime())
+                }
+                
                 try {
                     def current_sha = itemGit.log(maxCommits: 1).find().getAbbreviatedId(8)
                     itemGit.pull remote: defaultRemote
