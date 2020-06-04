@@ -18,6 +18,9 @@ package org.terasology.math;
 
 import java.math.RoundingMode;
 
+import org.joml.Math;
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkConstants;
@@ -64,35 +67,188 @@ public final class ChunkMath {
     public static int calcChunkPosX(int x) {
         return calcChunkPosX(x, ChunkConstants.CHUNK_POWER.x);
     }
+
     public static int calcChunkPosY(int y) {
         return calcChunkPosY(y, ChunkConstants.CHUNK_POWER.y);
     }
+
     public static int calcChunkPosZ(int z) {
         return calcChunkPosZ(z, ChunkConstants.CHUNK_POWER.z);
     }
 
+    /**
+     *
+     * @param pos the absolute world position
+     * @param chunkPower the location of the chunk
+     * @return the relative block in the chunk
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #calcChunkPos(Vector3ic, Vector3ic, org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcChunkPos(Vector3i pos, Vector3i chunkPower) {
         return calcChunkPos(pos.x, pos.y, pos.z, chunkPower);
     }
 
+    /**
+     *
+     * @param pos
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #calcChunkPos(Vector3fc, org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcChunkPos(Vector3f pos) {
         return calcChunkPos(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
+    /**
+     *
+     * @param pos
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #calcChunkPos(Vector3ic, org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcChunkPos(Vector3i pos) {
         return calcChunkPos(pos.x, pos.y, pos.z);
     }
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #calcChunkPos(int, int, int, org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcChunkPos(int x, int y, int z) {
         return calcChunkPos(x, y, z, ChunkConstants.CHUNK_POWER);
     }
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param chunkPower
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #calcChunkPos(int, int, int, org.joml.Vector3i)}.
+     */
+    @Deprecated
+    public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
+        return new Vector3i(calcChunkPosX(x, chunkPower.x), calcChunkPosY(y, chunkPower.y), calcChunkPosZ(z, chunkPower.z));
+    }
+
+    //TODO: can be replaced by region3i iterator
     public static Vector3i[] calcChunkPos(Region3i region) {
         return calcChunkPos(region, ChunkConstants.CHUNK_POWER);
     }
 
-    public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
-        return new Vector3i(calcChunkPosX(x, chunkPower.x), calcChunkPosY(y, chunkPower.y), calcChunkPosZ(z, chunkPower.z));
+    /**
+     * The position relative of the chunk with the given power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
+     *
+     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     *
+     * @param pos absolute position of the block
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcChunkPos(Vector3fc pos, org.joml.Vector3i dest) {
+        return calcChunkPos(Math.roundHalfUp(pos.x()), Math.roundHalfUp(pos.y()), Math.roundHalfUp(pos.z()), ChunkConstants.POWER_X, ChunkConstants.POWER_Y, ChunkConstants.POWER_Z, dest);
+    }
+
+    /**
+     * The position relative to the size of chunk with the given chunk power
+     *
+     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     *
+     * @param pos absolute position of the block
+     * @param chunkPower the size of the chunk in powers 2
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcChunkPos(Vector3fc pos, Vector3ic chunkPower, org.joml.Vector3i dest) {
+        return calcChunkPos(Math.roundHalfUp(pos.x()), Math.roundHalfUp(pos.y()), Math.roundHalfUp(pos.z()),
+            chunkPower, dest);
+    }
+
+    /**
+     * The position relative to the size of chunk with the given power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
+     *
+     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     *
+     * @param pos absolute position of the block
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcChunkPos(Vector3ic pos, org.joml.Vector3i dest) {
+        return calcChunkPos(pos.x(), pos.y(), pos.z(), ChunkConstants.POWER_X, ChunkConstants.POWER_Y, ChunkConstants.POWER_Z, dest);
+    }
+
+    /**
+     * The position relative to the size of chunk with the given power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
+     *
+     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     *
+     * @param x absolute x component of the block
+     * @param y absolute y component of the block
+     * @param z absolute z component of the block
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcChunkPos(int x, int y, int z, org.joml.Vector3i dest) {
+        return calcChunkPos(x, y, z, ChunkConstants.POWER_X, ChunkConstants.POWER_Y, ChunkConstants.POWER_Z, dest);
+    }
+
+    /**
+     * The position relative to the size of chunk with the given chunk power
+     *
+     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     *
+     * @param pos the absolute position of the block
+     * @param chunkPower the size of the chunk in powers of 2
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcChunkPos(Vector3ic pos, Vector3ic chunkPower, org.joml.Vector3i dest) {
+        return calcChunkPos(pos.x(), pos.y(), pos.z(), chunkPower.x(), chunkPower.y(), chunkPower.z(), dest);
+    }
+
+    /**
+     * The position relative to the size of chunk with the given chunk power
+     *
+     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     *
+     * @param x absolute x component of the block
+     * @param y absolute y component of the block
+     * @param z absolute z component of the block
+     * @param chunkPower  the size of the chunk in powers of 2
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcChunkPos(int x, int y, int z, Vector3ic chunkPower, org.joml.Vector3i dest) {
+        return calcChunkPos(x, y, z, chunkPower.x(), chunkPower.y(), chunkPower.z(), dest);
+    }
+
+    /**
+     * The position relative to the size of chunk with the given chunk power
+     *
+     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     *
+     * @param x the x component of the block
+     * @param y the y component of the block
+     * @param z the z component of the block
+     * @param chunkX the x component for the size of the chunk in powers of 2
+     * @param chunkY the y component for the size of the chunk in powers of 2
+     * @param chunkZ the z component for the size of the chunk in powers of 2
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcChunkPos(int x, int y, int z, int chunkX, int chunkY, int chunkZ, org.joml.Vector3i dest) {
+        return dest.set(calcChunkPosX(x, chunkX), calcChunkPosY(y, chunkY), calcChunkPosZ(z, chunkZ));
     }
 
     public static Vector3i[] calcChunkPos(Region3i region, Vector3i chunkPower) {
@@ -224,8 +380,8 @@ public final class ChunkMath {
     }
 
     /**
-     * Populates a target array with the minimum value adjacent to each location, including the location itself.
-     * TODO: this is too specific for a general class like this. Move to a new class AbstractBatchPropagator
+     * Populates a target array with the minimum value adjacent to each location, including the location itself. TODO:
+     * this is too specific for a general class like this. Move to a new class AbstractBatchPropagator
      *
      * @param source
      * @param target
@@ -238,7 +394,7 @@ public final class ChunkMath {
         for (int y = 1; y < dimY - 1; ++y) {
             for (int x = 1; x < dimX - 1; ++x) {
                 target[x + y * dimX] = Math.min(Math.min(source[x + (y - 1) * dimX], source[x + (y + 1) * dimX]),
-                        Math.min(source[x + 1 + y * dimX], source[x - 1 + y * dimX]));
+                    Math.min(source[x + 1 + y * dimX], source[x - 1 + y * dimX]));
             }
         }
 
@@ -276,10 +432,10 @@ public final class ChunkMath {
 
     /**
      * Works out whether the given block resides inside the given chunk.
-     *
-     * Both positions must be given as world position, not local position. In addition, the chunk position must be
-     * given in chunk coordinates, not in block coordinates.
-     *
+     * <p>
+     * Both positions must be given as world position, not local position. In addition, the chunk position must be given
+     * in chunk coordinates, not in block coordinates.
+     * <p>
      * For example, using chunks of width 32, a block with x coordinate of 33 will be counted as inside a chunk with x
      * coordinate of 1.
      *
