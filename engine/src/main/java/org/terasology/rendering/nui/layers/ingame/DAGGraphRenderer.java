@@ -40,16 +40,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * DAG Renderer.
- * Render DAG nodes on screen with edge connections.
+ * DAG Renderer. Render DAG nodes on screen with edge connections.
  */
 public class DAGGraphRenderer extends ZoomableLayout {
 
-    private RenderGraph renderGraph;
-    private RenderNodeWidget selected;
     private final Map<Node, RenderNodeWidget> mapping = new HashMap<>();
     private final float nodeWidth = 20f;
     private final float nodeHeight = 3f;
+    private RenderGraph renderGraph;
+    private RenderNodeWidget selected;
 
     private static RenderGraph.ConnectionType getConnectionType(DependencyConnection connection) {
         RenderGraph.ConnectionType connectionType;
@@ -103,13 +102,13 @@ public class DAGGraphRenderer extends ZoomableLayout {
         Color color;
         switch (connection.getConnectionType()) {
             case FBO:
-                color = Color.MAGENTA;
+                color = Color.RED;
                 break;
             case BUFFER_PAIR:
-                color = Color.CYAN;
+                color = Color.RED.alterBlue(255);
                 break;
             case RUN_ORDER:
-                color = Color.YELLOW;
+                color = Color.BLUE.alterRed(40).alterGreen(40);
                 break;
             default:
                 color = Color.WHITE;

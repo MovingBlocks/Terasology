@@ -5,7 +5,7 @@
         "type": "relativeLayout",
         "contents": [
             {
-                "type": "GraphRenderer",
+                "type": "DAGGraphRenderer",
                 "id": "graph",
                 "layoutInfo": {
                     "use-content-width": true,
