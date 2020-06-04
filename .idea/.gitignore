@@ -31,3 +31,6 @@ workspace.xml
 
 # Ignore Sonar linting, if set up locally
 /sonarlint/
+
+# Discord preferences don't need sharing
+/discord.xml

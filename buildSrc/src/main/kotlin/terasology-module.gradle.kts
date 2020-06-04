@@ -1,22 +1,8 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
-import groovy.json.JsonSlurper
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.reflections.Reflections
@@ -24,7 +10,8 @@ import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
-
+import org.terasology.module.ModuleMetadataJsonAdapter
+import org.terasology.naming.Version
 
 plugins {
     id("java")
@@ -43,7 +30,6 @@ val env by extra { System.getenv( )}
 // Alternatively one more round of refactoring could switch to Git tags, a single `master` branch, and possible other things to help match snaps/PR builds somehow?
 val bypassModuleReleaseManagement by extra("true")
 
-val moduleDepends = mutableListOf<String>()
 val moduleFile = file("module.txt")
 
 // The module file should always exist if the module was correctly created or cloned using Gradle
@@ -52,39 +38,39 @@ if (!moduleFile.exists()) {
     throw GradleException("Failed to find module.txt for " + project.name)
 }
 
-//println "Scanning for dependencies in module.txt for " + project.name
-val slurper = JsonSlurper()  // 😂 using groovy's json parser in kotlin
-val moduleConfig: Map<String, Any> = slurper.parseText(moduleFile.readText())!! as Map<String, Any>
-for (dependency in moduleConfig["dependencies"] as List<Map<String, String>>) {
-    if (dependency["id"] != "engine") {
-        moduleDepends.add(dependency["id"]!!)
+val moduleConfig = moduleFile.reader().use {
+    ModuleMetadataJsonAdapter().read(it)!!
+}
+
+val moduleDepends : Collection<String> = moduleConfig.dependencies.mapNotNull {
+    val name = it.id.toString()
+    if (name.toLowerCase() != "engine") { name } else { null }
+}
+
+// Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
+if (moduleConfig.version.isSnapshot) {
+    logger.warn("Module ${project.name} is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
+
+    moduleConfig.version = with(moduleConfig.version) {
+        Version(major, minor, patch, false)
     }
 }
 
-// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
-version = moduleConfig["version"] as String
-
-// Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
-val undesiredSnapshotTag = version.toString().endsWith("-SNAPSHOT")
-if (undesiredSnapshotTag) {
-    println("Taking off undesired -SNAPSHOT")
-    version = version.toString().removeSuffix("-SNAPSHOT")
-    println("WARNING: Module ${project.name} is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
-}
-
 // The only case in which we make module non-snapshots is if release management is enabled and BRANCH_NAME is "master"
-if (moduleConfig["isReleaseManaged"].toString().toBoolean() && env["BRANCH_NAME"] == "master") {
+val isReleaseManaged = moduleConfig.getExtension("isReleaseManaged", Boolean::class.java) ?: false
+if (isReleaseManaged && env["BRANCH_NAME"] == "master") {
     // This is mildly awkward since we need to bypass by default, yet if release management is on (true) then we set the bypass to false ..
     val bypassModuleReleaseManagement by extra(false)
 } else {
     // In the case where we actually are building a snapshot we load -SNAPSHOT into the version variable, even if it wasn't there in module.txt
-    version = "${version}-SNAPSHOT"
+    moduleConfig.version = moduleConfig.version.snapshot
 }
 
+project.version = moduleConfig.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-group = "org.terasology.modules"
+project.group = "org.terasology.modules"
 
-println("Version for $project.name loaded as $version for group $group")
+logger.info("Version for {} loaded as {} for group {}", project.name, project.version, project.group)
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
 // Note that this statement is down a ways because it is affected by the stuff higher in this file like setting versioning
