@@ -33,11 +33,11 @@ public final class ChunkMath {
 
     private ChunkMath() {
     }
-
+    
     /**
      * Returns the chunk position of a given coordinate.
-     *
      * @param x The coordinate of the block
+     * @param chunkPower the size of the chunk in powers of 2
      * @return The coordinate of the chunk
      */
     public static int calcChunkPos(int x, int chunkPower) {
