@@ -34,8 +34,8 @@ import java.util.Map;
 /**
  * Rotates a block to either be upright or upside down and always face the player.
  * <p>
- * If the block is placed onto a BOTTOM side (i.e. the ceiling), the block will be upside down and face the player horizontally.
- * Placement on any other side will cause the block to simply face the player horizontally.
+ * The block will be placed upside down, if it's either being attached to a BOTTOM side (i.e. the ceiling),
+ * or if it's being attached to the upper half of any horizontal side (LEFT, RIGHT, FRONT, BACK).
  */
 @RegisterBlockFamily("ceilingSupportingHorizontal")
 public class CeilingSupportingHorizontalFamily extends AbstractBlockFamily {
@@ -122,13 +122,12 @@ public class CeilingSupportingHorizontalFamily extends AbstractBlockFamily {
 
     @Override
     public Block getBlockForPlacement(BlockPlacementData data) {
-        Side blockDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
+        boolean upsideDownPlacement = data.attachmentSide == Side.BOTTOM
+                || data.attachmentSide != Side.TOP && data.relativeAttachmentPosition.y() > 0.5;
+        final Side mainSide = upsideDownPlacement ? Side.BOTTOM : Side.TOP;
 
-        if (data.attachmentSide == Side.BOTTOM) {
-            return blocks.get(ExtendedSide.getExtendedSideFor(Side.BOTTOM, blockDirection));
-        } else {
-            return blocks.get(ExtendedSide.getExtendedSideFor(Side.TOP, blockDirection));
-        }
+        Side blockDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
+        return blocks.get(ExtendedSide.getExtendedSideFor(mainSide, blockDirection));
     }
 
     @Override
