@@ -38,8 +38,41 @@ if (!moduleFile.exists()) {
     throw GradleException("Failed to find module.txt for " + project.name)
 }
 
-val moduleConfig = moduleFile.reader().use {
-    ModuleMetadataJsonAdapter().read(it)!!
+class ModuleInfoException(
+    cause: Throwable,
+    @Suppress("MemberVisibilityCanBePrivate") val file: File? = null,
+    private val project: Project? = null
+) : RuntimeException(cause) {
+    override val message: String
+        get() {
+            // trying to get the fully-qualified-class-name-mess off the front and just show
+            // the useful part.
+            val detail = cause?.cause?.localizedMessage ?: cause?.localizedMessage
+            return "Error while reading module info from ${describeFile()}:\n  ${detail}"
+        }
+
+    private fun describeFile(): String {
+        return if (project != null && file != null) {
+            project.rootProject.relativePath(file)
+        } else if (file != null) {
+            file.toString()
+        } else {
+            "[unnamed file]"
+        }
+    }
+
+    override fun toString(): String {
+        val causeType = cause?.let { it::class.simpleName }
+        return "ModuleInfoException(file=${describeFile()}, cause=${causeType})"
+    }
+}
+
+val moduleConfig = try {
+    moduleFile.reader().use {
+        ModuleMetadataJsonAdapter().read(it)!!
+    }
+} catch (e: Exception) {
+    throw ModuleInfoException(e, moduleFile, project)
 }
 
 // Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
