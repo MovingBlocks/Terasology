@@ -20,7 +20,7 @@ plugins {
 }
 
 // Read environment variables, including variables passed by jenkins continuous integration server
-val env by extra { System.getenv( )}
+val env: MutableMap<String, String> by extra { System.getenv( )}
 // This is a fun one ... when versions switched to dynamic -SNAPSHOT or not based on branch existing modules using `master` would suddenly try publishing releases
 // This won't work without additionally doing constant version bumps (perhaps via Git tags) - but too much work to switch around all modules at once
 // Complicating things more the use of publish.gradle to centralize logic means modules and engine bits are treated the same, yet we need to vary modules
@@ -81,7 +81,7 @@ configure<SourceSetContainer> {
     }
 }
 val convention = project.getConvention().getPlugin(JavaPluginConvention::class)
-val mainSourceSet = convention.getSourceSets().getByName("main");
+val mainSourceSet = convention.getSourceSets().getByName("main")
 
 // TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
 configurations.all {
@@ -102,7 +102,7 @@ dependencies {
     for (gestaltDep in moduleDepends) {
         if (!gestaltDep.minVersion.isSnapshot) {
             // gestalt considers snapshots to satisfy a minimum requirement:
-            // https://github.com/MovingBlocks/gestalt/blob/fe1893821127c254cd135252de2676eff31d0152/gestalt-module/src/main/java/org/terasology/naming/VersionRange.java#L58-L59
+            // https://github.com/MovingBlocks/gestalt/blob/fe1893821127/gestalt-module/src/main/java/org/terasology/naming/VersionRange.java#L58-L59
             gestaltDep.minVersion = gestaltDep.minVersion.snapshot
             // (maybe there's some way to do that with a custom gradle resolver?
             // but making a resolver that only works that way on gestalt modules specifically
@@ -192,7 +192,7 @@ tasks.register("cacheReflections") {
                     .setScanners(TypeAnnotationsScanner(), SubTypesScanner()))
             reflections.save(outputs.getFiles().getAsPath())
         } catch (e: java.net.MalformedURLException) {
-            getLogger().error("Cannot parse input to url", e);
+            logger.error("Cannot parse input to url", e)
         }
     }
 }
