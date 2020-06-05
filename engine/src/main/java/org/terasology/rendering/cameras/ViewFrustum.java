@@ -20,6 +20,7 @@ import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 
@@ -149,48 +150,7 @@ public class ViewFrustum {
      *     {@link #intersects(AABBf)}.
      */
     public boolean intersects(AABB aabb) {
-
-        Vector3f[] aabbVertices = aabb.getVertices();
-
-        Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition();
-
-        for (int i = 0; i < 6; i++) {
-            if (planes[i].getA() * (aabbVertices[0].x - cp.x) + planes[i].getB() * (aabbVertices[0].y - cp.y)
-                + planes[i].getC() * (aabbVertices[0].z - cp.z) + planes[i].getD() > 0) {
-                continue;
-            }
-            if (planes[i].getA() * (aabbVertices[1].x - cp.x) + planes[i].getB() * (aabbVertices[1].y - cp.y)
-                + planes[i].getC() * (aabbVertices[1].z - cp.z) + planes[i].getD() > 0) {
-                continue;
-            }
-            if (planes[i].getA() * (aabbVertices[2].x - cp.x) + planes[i].getB() * (aabbVertices[2].y - cp.y)
-                + planes[i].getC() * (aabbVertices[2].z - cp.z) + planes[i].getD() > 0) {
-                continue;
-            }
-            if (planes[i].getA() * (aabbVertices[3].x - cp.x) + planes[i].getB() * (aabbVertices[3].y - cp.y)
-                + planes[i].getC() * (aabbVertices[3].z - cp.z) + planes[i].getD() > 0) {
-                continue;
-            }
-            if (planes[i].getA() * (aabbVertices[4].x - cp.x) + planes[i].getB() * (aabbVertices[4].y - cp.y)
-                + planes[i].getC() * (aabbVertices[4].z - cp.z) + planes[i].getD() > 0) {
-                continue;
-            }
-            if (planes[i].getA() * (aabbVertices[5].x - cp.x) + planes[i].getB() * (aabbVertices[5].y - cp.y)
-                + planes[i].getC() * (aabbVertices[5].z - cp.z) + planes[i].getD() > 0) {
-                continue;
-            }
-            if (planes[i].getA() * (aabbVertices[6].x - cp.x) + planes[i].getB() * (aabbVertices[6].y - cp.y)
-                + planes[i].getC() * (aabbVertices[6].z - cp.z) + planes[i].getD() > 0) {
-                continue;
-            }
-            if (planes[i].getA() * (aabbVertices[7].x - cp.x) + planes[i].getB() * (aabbVertices[7].y - cp.y)
-                + planes[i].getC() * (aabbVertices[7].z - cp.z) + planes[i].getD() > 0) {
-                continue;
-            }
-            return false;
-        }
-
-        return true;
+        return intersects(JomlUtil.from(aabb));
     }
 
     /**
