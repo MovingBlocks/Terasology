@@ -268,9 +268,7 @@ public class NewGameScreen extends CoreScreenLayer {
         if (defaultGameplayModule != null) {
             gameplay.setSelection(defaultGameplayModule);
 
-            if (configDefaultModuleName.equalsIgnoreCase(DEFAULT_GAME_TEMPLATE_NAME)) {
-                setDefaultGeneratorOfGameplayModule(defaultGameplayModule);
-            }
+            setDefaultGeneratorOfGameplayModule(defaultGameplayModule);
         } else {
             // Find the first gameplay module that is available.
             for (Module module : moduleManager.getRegistry()) {

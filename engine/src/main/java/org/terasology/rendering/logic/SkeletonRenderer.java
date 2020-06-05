@@ -248,7 +248,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.setFloat("blockLight", 1.0f, true);
             skeletalMesh.material.setFloat3("colorOffset", skeletalMesh.color.rf(), skeletalMesh.color.gf(), skeletalMesh.color.bf(), true);
 
-            skeletalMesh.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+            skeletalMesh.material.setMatrix4("projectionMatrix", new org.joml.Matrix4f(worldRenderer.getActiveCamera().getProjectionMatrix()).transpose());
             skeletalMesh.material.bindTextures();
 
 
@@ -309,7 +309,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             Material material = Assets.getMaterial("engine:white").get();
             material.setFloat("sunlight", 1.0f, true);
             material.setFloat("blockLight", 1.0f, true);
-            material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+            material.setMatrix4("projectionMatrix", new org.joml.Matrix4f(worldRenderer.getActiveCamera().getProjectionMatrix()).transpose());
             Vector3f worldPos = new Vector3f();
 
 
