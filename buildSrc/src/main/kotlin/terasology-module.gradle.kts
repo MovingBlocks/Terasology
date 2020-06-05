@@ -28,7 +28,7 @@ val env: MutableMap<String, String> by extra { System.getenv( )}
 // If a module actually wants release management simply include `"isReleaseManaged" : true` in module.txt - this is needed for the engine repo embedded modules
 // One option would be to slowly convert modulespace to default to a `develop` + `master` setup living in harmony with associated automation/github tweaks
 // Alternatively one more round of refactoring could switch to Git tags, a single `master` branch, and possible other things to help match snaps/PR builds somehow?
-val bypassModuleReleaseManagement by extra("true")
+extra["bypassModuleReleaseManagement"] = true
 
 val moduleFile = file("module.txt")
 
@@ -88,7 +88,7 @@ if (moduleConfig.version.isSnapshot) {
 val isReleaseManaged = moduleConfig.getExtension("isReleaseManaged", Boolean::class.java) ?: false
 if (isReleaseManaged && env["BRANCH_NAME"] == "master") {
     // This is mildly awkward since we need to bypass by default, yet if release management is on (true) then we set the bypass to false ..
-    val bypassModuleReleaseManagement by extra(false)
+    extra["bypassModuleReleaseManagement"] = false
 } else {
     // In the case where we actually are building a snapshot we load -SNAPSHOT into the version variable, even if it wasn't there in module.txt
     moduleConfig.version = moduleConfig.version.snapshot
