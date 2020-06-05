@@ -205,12 +205,7 @@ public class ViewFrustum {
      *     {@link #intersects(Vector3fc, float)}.
      */
     public boolean intersects(Vector3f position, float radius) {
-        for (int i = 0; i < 6; i++) {
-            if (planes[i].getA() * position.x + planes[i].getB() * position.y + planes[i].getC() * position.z + planes[i].getD() <= -radius) {
-                return false;
-            }
-        }
-        return true;
+        return intersects(JomlUtil.from(position), radius);
     }
 
     /**
