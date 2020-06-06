@@ -62,9 +62,13 @@ def convertGitBranch = { gitBranch ->
 // Java Section                                                                                                      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Engine for now has two source sets
 sourceSets {
-    dev
+    main.java {
+        // dev/ holds things that are neither unit tests nor application code.
+        // For notes about whether it should be its own source set, see
+        // see https://github.com/MovingBlocks/Terasology/pull/4021
+        srcDir("src/dev/java")
+    }
 
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
@@ -78,9 +82,6 @@ configurations {
         exclude module: 'lwjgl-platform'
         exclude module: 'jinput-platform'
     }
-
-    // Beyond the standard compile "configuration" we declare one called "devImplementation" specific to the "dev" source set
-    devImplementation.extendsFrom implementation
 }
 
 // TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
@@ -160,9 +161,6 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
 
-    // In addition to all the above the dev source set also needs to depend on what gets compiled in main
-    devImplementation sourceSets.main.output
-
     // Dependency on CrashReporter, conditionally either from source or via binary
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     File wouldBeSrcPath = new File(rootDir, 'libs/CrashReporter')
@@ -185,7 +183,6 @@ dependencies {
 task cacheReflections {
     description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
     inputs.files sourceSets.main.output.classesDirs,
-            sourceSets.dev.output.classesDirs,
             // getClassesDir from all sourceSets (for any jvm (seems) language)
             configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
 
@@ -207,7 +204,6 @@ jar {
     // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
     duplicatesStrategy = "EXCLUDE"
 
-    from(sourceSets.dev.output)
     from(tasks.getByName("cacheReflections").outputs)
 
     manifest {
@@ -293,9 +289,6 @@ jar.dependsOn cacheReflections
 
 idea {
     module {
-        // Add development "dev" dir
-        sourceDirs += sourceSets.dev.allJava.srcDirs
-
         // Change around the output a bit
         inheritOutputDirs = false
         outputDir = file('build/classes')

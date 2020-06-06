@@ -25,6 +25,9 @@ apply from: "$rootDir/config/gradle/publish.gradle"
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.filters.FixCrLfFilter
+import org.gradle.internal.logging.text.StyledTextOutput
+import org.gradle.internal.logging.text.StyledTextOutputFactory
+
 import java.text.SimpleDateFormat;
 import groovy.json.JsonBuilder
 
@@ -147,6 +150,12 @@ run {
 task game(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application"
     group = "terasology run"
+
+    // If there are no actual source modules let the user know, just in case ..
+    if (project(':modules').subprojects.size() == 0) {
+        def out = services.get(StyledTextOutputFactory).create("an-ouput")
+        out.withStyle(StyledTextOutput.Style.FailureHeader).println("NOTE: You're running the game from source without any source modules - that may be intentional (got jar modules?) but maybe not. Consider running `groovyw init` or a variant (see `groovyw usage`)")
+    }
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
