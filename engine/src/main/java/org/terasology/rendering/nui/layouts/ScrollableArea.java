@@ -26,7 +26,6 @@ import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
-import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.rendering.nui.widgets.UIScrollbar;
 
 import java.util.Collections;

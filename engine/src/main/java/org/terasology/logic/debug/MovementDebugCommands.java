@@ -24,7 +24,6 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.CharacterImpulseEvent;
 import org.terasology.logic.characters.MovementMode;
-import org.terasology.logic.characters.events.OnScaleEvent;
 import org.terasology.logic.characters.events.ScaleToRequest;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.Location;
