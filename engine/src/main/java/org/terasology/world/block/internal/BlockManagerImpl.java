@@ -114,6 +114,7 @@ public class BlockManagerImpl extends BlockManager {
         if (generateNewIds) {
             Set<ResourceUrn> availableFamilies = assetManager.getAvailableAssets(BlockFamilyDefinition.class);
             Set<ResourceUrn> availableShapes = assetManager.getAvailableAssets(BlockShape.class);
+            availableShapes.removeIf((ResourceUrn shapeUrn) -> !(assetManager.getAsset(shapeUrn, BlockShape.class).get().isFreeformUsable()));
             for (ResourceUrn familyUrn : availableFamilies) {
                 BlockFamily existingFamily = getBlockFamily(new BlockUri(familyUrn));
                 if (null == existingFamily) {
@@ -308,7 +309,13 @@ public class BlockManagerImpl extends BlockManager {
         if (uri.getShapeUrn().isPresent() && uri.getShapeUrn().get().equals(CUBE_SHAPE_URN)) {
             return getBlock(uri.getShapelessUri());
         }
-        return registeredBlockInfo.get().blocksByUri.get(uri);
+        Block block = registeredBlockInfo.get().blocksByUri.get(uri);
+        if (block == null) {
+            logger.error("Attempt to fetch block with unknown uri '{}'", uri);
+            return getAirBlock();
+        } else {
+            return block;
+        }
     }
 
     /**

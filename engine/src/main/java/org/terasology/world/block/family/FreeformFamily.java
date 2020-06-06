@@ -45,6 +45,10 @@ public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBl
 
     public FreeformFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
+        // This exception probably shouldn't ever occur, but it's to force consistency, just in case.
+        if(!shape.isFreeformUsable()) {
+            throw new IllegalArgumentException("Block shape "+shape.getDisplayName()+" not marked suitable for freeform families.");
+        }
         BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());

@@ -68,4 +68,10 @@ public abstract class BlockShape extends Asset<BlockShapeData> {
      * @return Is this block shape's collision symmetric when altering yaw.
      */
     public abstract boolean isCollisionYawSymmetric();
+    
+    
+    /**
+     * @return Is this shape useful for freeform families
+     */
+    public abstract boolean isFreeformUsable();
 }
