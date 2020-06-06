@@ -38,7 +38,8 @@ public class InitialiseBlockTypeEntities extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         BlockManagerImpl blockManager = (BlockManagerImpl) context.get(BlockManager.class);
-        blockManager.subscribe(new BlockTypeEntityGenerator(context.get(EntityManager.class), blockManager));
+        // It's the constructor that actually does all the work. Now that block registration is done all at once, this should be merged in.
+        new BlockTypeEntityGenerator(context.get(EntityManager.class), blockManager);
         return true;
     }
 

@@ -25,13 +25,13 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.internal.BlockRegistrationListener;
 
 import java.util.Optional;
 
 /**
+ * TODO: merge into engine.modes.loadProcesses.InitialiseBlockTypeEntities.
  */
-public class BlockTypeEntityGenerator implements BlockRegistrationListener {
+public class BlockTypeEntityGenerator {
 
     private EntityManager entityManager;
     private PrefabManager prefabManager;
@@ -66,13 +66,6 @@ public class BlockTypeEntityGenerator implements BlockRegistrationListener {
                     generateBlockTypeEntity(block);
                 }
             }
-        }
-    }
-
-    @Override
-    public void onBlockFamilyRegistered(BlockFamily family) {
-        for (Block block : family.getBlocks()) {
-            generateBlockTypeEntity(block);
         }
     }
 

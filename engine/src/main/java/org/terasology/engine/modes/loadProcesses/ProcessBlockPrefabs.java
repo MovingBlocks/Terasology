@@ -40,7 +40,8 @@ public class ProcessBlockPrefabs extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         BlockManagerImpl blockManager = (BlockManagerImpl) context.get(BlockManager.class);
-        blockManager.subscribe(new BlockPrefabManager(context.get(EntityManager.class), blockManager));
+        // TODO: just merge the BlockPrefabManager class into here.
+        new BlockPrefabManager(context.get(EntityManager.class), blockManager);
         return true;
     }
 

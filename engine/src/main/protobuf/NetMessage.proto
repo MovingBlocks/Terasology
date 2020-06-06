@@ -17,13 +17,12 @@ message NetMessage {
 
     optional ServerInfoRequest serverInfoRequest = 15;
     optional ServerInfoMessage serverInfo = 16;
-    repeated BlockFamilyRegisteredMessage blockFamilyRegistered = 17;
 
-    optional JoinMessage join = 18;
-    repeated ModuleRequest moduleRequest = 19;
-    optional ModuleDataHeader moduleDataHeader = 20;
-    optional ModuleData moduleData = 21;
-    optional JoinCompleteMessage joinComplete = 22;
+    optional JoinMessage join = 17;
+    repeated ModuleRequest moduleRequest = 18;
+    optional ModuleDataHeader moduleDataHeader = 19;
+    optional ModuleData moduleData = 20;
+    optional JoinCompleteMessage joinComplete = 21;
 
     // Authentication
     optional HandshakeHello handshakeHello = 100;
@@ -73,13 +72,6 @@ message Certificate {
     optional bytes modulus = 2;
     optional bytes exponent = 3;
     optional bytes signature = 4;
-
-    extensions 5000 to max;
-}
-
-message BlockFamilyRegisteredMessage {
-    repeated string blockUri = 1;
-    repeated int32 blockId = 2;
 
     extensions 5000 to max;
 }

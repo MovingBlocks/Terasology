@@ -27,7 +27,7 @@ import java.util.Optional;
 
 /**
  */
-public class BlockPrefabManager implements BlockRegistrationListener {
+public class BlockPrefabManager {
 
     private EntityManager entityManager;
     private BlockManager blockManager;
@@ -37,13 +37,6 @@ public class BlockPrefabManager implements BlockRegistrationListener {
         this.blockManager = blockManager;
 
         updateExistingBlocks();
-    }
-
-    @Override
-    public void onBlockFamilyRegistered(BlockFamily family) {
-        for (Block block : family.getBlocks()) {
-            updateBlock(block);
-        }
     }
 
     private void updateExistingBlocks() {
