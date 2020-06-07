@@ -11,7 +11,6 @@ import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
 import org.terasology.module.ModuleMetadataJsonAdapter
-import org.terasology.naming.Version
 
 plugins {
     id("java")
@@ -21,14 +20,6 @@ plugins {
 
 // Read environment variables, including variables passed by jenkins continuous integration server
 val env: MutableMap<String, String> by extra { System.getenv( )}
-// This is a fun one ... when versions switched to dynamic -SNAPSHOT or not based on branch existing modules using `master` would suddenly try publishing releases
-// This won't work without additionally doing constant version bumps (perhaps via Git tags) - but too much work to switch around all modules at once
-// Complicating things more the use of publish.gradle to centralize logic means modules and engine bits are treated the same, yet we need to vary modules
-// Temporary workaround: default modules to bypass release management: master branch builds will still make snapshot builds for the snapshot repo
-// If a module actually wants release management simply include `"isReleaseManaged" : true` in module.txt - this is needed for the engine repo embedded modules
-// One option would be to slowly convert modulespace to default to a `develop` + `master` setup living in harmony with associated automation/github tweaks
-// Alternatively one more round of refactoring could switch to Git tags, a single `master` branch, and possible other things to help match snaps/PR builds somehow?
-extra["bypassModuleReleaseManagement"] = true
 
 val moduleFile = file("module.txt")
 
@@ -75,25 +66,6 @@ val moduleConfig = try {
     throw ModuleInfoException(e, moduleFile, project)
 }
 
-// Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
-if (moduleConfig.version.isSnapshot) {
-    logger.warn("Module ${project.name} is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
-
-    moduleConfig.version = with(moduleConfig.version) {
-        Version(major, minor, patch, false)
-    }
-}
-
-// The only case in which we make module non-snapshots is if release management is enabled and BRANCH_NAME is "master"
-val isReleaseManaged = moduleConfig.getExtension("isReleaseManaged", Boolean::class.java) ?: false
-if (isReleaseManaged && env["BRANCH_NAME"] == "master") {
-    // This is mildly awkward since we need to bypass by default, yet if release management is on (true) then we set the bypass to false ..
-    extra["bypassModuleReleaseManagement"] = false
-} else {
-    // In the case where we actually are building a snapshot we load -SNAPSHOT into the version variable, even if it wasn't there in module.txt
-    moduleConfig.version = moduleConfig.version.snapshot
-}
-
 project.version = moduleConfig.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 project.group = "org.terasology.modules"
@@ -128,7 +100,6 @@ val engineVersion = deps.find { it.id.toString() == "engine" }?.versionRange()?.
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
     implementation(group = "org.terasology.engine", name = "engine", version = engineVersion) { isChanging = true }
     implementation(group = "org.terasology.engine", name = "engine-tests", version = engineVersion) { isChanging = true }
 
