@@ -17,7 +17,6 @@ package org.terasology.entitySystem.entity;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
