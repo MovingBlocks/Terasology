@@ -18,9 +18,6 @@ plugins {
     id("eclipse")
 }
 
-// Read environment variables, including variables passed by jenkins continuous integration server
-val env: MutableMap<String, String> by extra { System.getenv( )}
-
 val moduleFile = file("module.txt")
 
 // The module file should always exist if the module was correctly created or cloned using Gradle
