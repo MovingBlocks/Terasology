@@ -336,9 +336,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 capabilities.OpenGL15,
                 capabilities.OpenGL20,
                 capabilities.OpenGL21,   // needed as we use GLSL 1.20
-                capabilities.OpenGL30,
-                capabilities.OpenGL32,
-                capabilities.OpenGL33,
 
                 capabilities.GL_ARB_framebuffer_object,  // Extensions eventually included in
                 capabilities.GL_ARB_texture_float,       // OpenGl 3.0 according to
@@ -349,9 +346,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 "OpenGL15",
                 "OpenGL20",
                 "OpenGL21",
-                "OpenGL30",
-                "OpenGL32",
-                "OpenGL33",
                 "GL_ARB_framebuffer_object",
                 "GL_ARB_texture_float",
                 "GL_ARB_half_float_pixel"};

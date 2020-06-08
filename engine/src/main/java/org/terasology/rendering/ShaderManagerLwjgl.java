@@ -17,6 +17,7 @@ package org.terasology.rendering;
 
 import com.google.common.collect.Sets;
 import org.lwjgl.Version;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -102,7 +103,11 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("toneMapping");
         addShaderProgram("sky");
         addShaderProgram("chunk");
-        addShaderProgram("particle");
+        if (GL.createCapabilities().OpenGL33) { //TODO remove this "if" when rendering will use OpenGL3 by default
+            addShaderProgram("particle");
+        } else {
+            logger.warn("Your GPU or driver not supports OpenGL 3.3 , particles disabled");
+        }
         addShaderProgram("shadowMap");
         addShaderProgram("lightBufferPass");
         addShaderProgram("lightGeometryPass");
