@@ -117,14 +117,9 @@ switch (cleanerArgs[0]) {
     case "update-all":
         println "We're updating every $itemType"
         println "List of local entries: ${common.retrieveLocalItems()}"
-        if (cleanerArgs.contains("--continue")) {
-            for (item in common.retrieveLocalItems()) {
-                common.updateItem(item, true)
-            }
-        } else {
-            for (item in common.retrieveLocalItems()) {
-                common.updateItem(item)
-            }
+        def skipRecentlyUpdated = cleanerArgs.contains("--continue")
+        for (item in common.retrieveLocalItems()) {
+        	common.updateItem(item, skipRecentlyUpdated)
         }
         break
 
