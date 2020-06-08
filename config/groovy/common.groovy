@@ -254,7 +254,7 @@ class common {
                         
                     if (current_sha != post_update_sha){
                         // TODO this can be probably converted to do one composite diff of the full update 
-                        // once this PR is merged for gigit: https://github.com/ajoberstar/grgit/pull/318 
+                        // once this PR is merged for grgit: https://github.com/ajoberstar/grgit/pull/318 
                         println color("Updating $current_sha..$post_update_sha", Ansi.GREEN)
                         def commits = itemGit.log {range(current_sha, post_update_sha)}
                         for (commit in commits){
