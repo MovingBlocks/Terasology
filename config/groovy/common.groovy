@@ -238,12 +238,14 @@ class common {
                 println color("updating $itemType $itemName", Ansi.GREEN)
                 
                 File targetDirFetchHead = new File("$targetDir/.git/FETCH_HEAD")
-                def timeLimit = use(groovy.time.TimeCategory){ 10.minute }
                 if (targetDirFetchHead.exists()){
+                    // If the FETCH_HEAD has been modified within time limit and -skip-recently-updated flag was passed, skip updating
+                    def timeLimit = use(groovy.time.TimeCategory){ 10.minute }
                     if (skipRecentUpdates && isRecentlyUpdated(targetDirFetchHead, timeLimit)){
                         println color("Skipping update for $itemName: updated within last $timeLimit", Ansi.YELLOW)
                         return
                     }
+                    // Always update modified time for FETCH_HEAD if it exists
                     targetDirFetchHead.setLastModified(new Date().getTime())
                 }
                 
