@@ -16,15 +16,11 @@
 package org.terasology.persistence.typeHandling.extensionTypes.factories;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.SpecificTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
+import org.terasology.persistence.typeHandling.extensionTypes.ComponentClassTypeHandler;
 import org.terasology.reflection.TypeInfo;
-
-import java.util.Optional;
 
 public class ComponentClassTypeHandlerFactory extends SpecificTypeHandlerFactory<Class<? extends Component>> {
 
@@ -35,24 +31,5 @@ public class ComponentClassTypeHandlerFactory extends SpecificTypeHandlerFactory
     @Override
     protected TypeHandler<Class<? extends Component>> createHandler(TypeHandlerContext context) {
         return new ComponentClassTypeHandler(context);
-    }
-
-    class ComponentClassTypeHandler extends StringRepresentationTypeHandler<Class<? extends Component>> {
-
-        TypeHandlerContext context;
-
-        public ComponentClassTypeHandler(final TypeHandlerContext context) {
-            this.context = context;
-        }
-
-        @Override
-        public String getAsString(Class<? extends Component> item) {
-            return context.getSandbox().getSubTypeIdentifier(item, Component.class);
-        }
-
-        @Override
-        public Class<? extends Component> getFromString(String representation) {
-            return context.getSandbox().findSubTypeOf(representation, Component.class).orElse(null);
-        }
     }
 }

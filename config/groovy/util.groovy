@@ -221,6 +221,38 @@ switch (cleanerArgs[0]) {
 
         break
 
+        // Makes sure a workspace has one or more modules matching user input, most useful for grabbing whole "module distros"
+        case "init":
+            // TODO: Move most this code into module.groovy, leave an error here if you use it for something else
+            if (cleanerArgs.length == 1) {
+                println "[init] Checkout default module distribution"
+                String[] targetMods = ["CoreSampleGameplay"]
+                common.retrieve(targetMods, false)
+            } else if (cleanerArgs.length == 2) {
+                def targetModuleDistro = cleanerArgs[1]
+                println "[init] Checkout module distribution: '$targetModuleDistro'"
+                def targetDistroURL = "https://raw.githubusercontent.com/Terasology/Index/master/distros/" + targetModuleDistro + "/gradle.properties"
+                if (!common.isUrlValid(targetDistroURL)) {
+                    println "[init] Invalid distribution name: '$targetModuleDistro'"
+                    println "[init]     See https://github.com/Terasology/Index/tree/master/distros for available distributions"
+                    break
+                }
+                String distroContent = new URL(targetDistroURL).text
+                String moduleSnippet = "extraModules="
+                int someIndex = distroContent.indexOf(moduleSnippet)
+                if (someIndex != -1) {
+                    moduleLine = distroContent.substring((someIndex + moduleSnippet.length()), distroContent.indexOf("\n", someIndex))
+                    common.retrieve(moduleLine.split(","), false)
+                } else {
+                    println "[init] ERROR: Distribution does not contain key: '$moduleSnippet'"
+                }
+            } else {
+                println "[init] Too many arguments! Usage: 'grooyw module init [distribution]'"
+                println "[init]     See `groovyw usage` for more information."
+            }
+
+        break
+
     default:
         println "UNRECOGNIZED COMMAND '" + cleanerArgs[0] + "' - please try again or use 'groovyw usage' for help"
 }
@@ -266,49 +298,52 @@ private void printListItemsCondensed(String[] items) {
  * Simply prints usage information.
  */
 def printUsage() {
+
     println("""
-        Utility script for interacting with Terasology. General syntax:
-        groovyw (type) (sub-command)
-        - 'type' may be module,meta,lib or facade.
-        
-        Available sub-commands:
-        - 'get' - retrieves one or more items in source form (separate with spaces)
-        - 'get-all' - retrieves all modules that can be found on the configured remote locations
-        - 'recurse' - retrieves the given item(s) *and* their dependencies in source form (really only for modules)
-        - 'list' - lists items that are available for download or downloaded already.
-        - 'create' - creates a new item of the given type.
-        - 'update' - updates an item (git pulls latest from current origin, if workspace is clean
-        - 'update-all' - updates all local items of the given type.
-        - 'add-remote (item) (name)' - adds a remote (name) to (item) with the default URL.
-        - 'add-remote (item) (name) (URL)' - adds a remote with the given URL
-        - 'list-remotes (item)' - lists all remotes for (item) 
-        - 'refresh' - replaces the Gradle build file for all items of the given type from the latest template
-        - 'createDependencyDotFile' - creates a dot file recursively listing dependencies of given locally available module, can be visualized with e.g. graphviz
-        
-        Available flags:
-        '-remote [someRemote]' to clone from an alternative remote, also adding the upstream org (like MovingBlocks) repo as 'origin'
-            Note: 'get' + 'recurse' only. This will override an alternativeGithubHome set via gradle.properties.
-        '-simple-list-format' to print one item per row for the 'list' sub-command, even for large numbers of items
-        '-condensed-list-format' to group items by starting letter for the 'list' sub-command (default with many items)
-        '-skip-recently-updated' (Only for update-all) to skip updating modules that have already been updated within 10 minutes
-        
-        Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub.
-        Example: 'groovyw module get-all' - would retrieve all the modules in the Terasology organisation on GitHub.
-        Example: 'groovyw module get Sa??l*' - would retrieve all the modules in the Terasology organisation on GitHub" 
-        that start with \"Sa\", have any two characters after that, then an \"l\" and then end with anything else." 
-        This should retrieve the Sample repository from the Terasology organisation on GitHub.
-        
-        *NOTE*: On UNIX platforms (MacOS and Linux), the wildcard arguments must be escaped with single quotes e.g. groovyw module get '*'.
-        
-        Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source
-        Example: 'groovyw lib list' - would list library projects compatible with being embedded in a Terasology workspace
-        Example: 'groovyw module createDependencyDotFile JoshariasSurvival' - would create a dot file with JS' dependencies and all their dependencies - if locally available
-        
-        *NOTE*: Item names are case sensitive. If you add items then `gradlew idea` or similar may be needed to refresh your IDE
-        
-        If you omit further arguments beyond the sub-command you'll be prompted for details
-        
-        For advanced usage see project documentation. For instance you can provide an alternative GitHub home
-        A gradle.properties file (one exists under '/templates' in an engine workspace) can provide such overrides
-        """.stripIndent())
+    Utility script for interacting with Terasology. General syntax:
+      groovyw (type) (sub-command)
+    - 'type' may be module,meta,lib or facade.
+    
+    Available sub-commands:
+    - 'init' - retrieves a given module distro, or a default sample source module (modules only)
+    - 'get' - retrieves one or more items in source form (separate with spaces)
+    - 'get-all' - retrieves all modules that can be found on the configured remote locations
+    - 'recurse' - retrieves the given item(s) *and* their dependencies in source form (really only for modules)
+    - 'list' - lists items that are available for download or downloaded already.
+    - 'create' - creates a new item of the given type.
+    - 'update' - updates an item (git pulls latest from current origin, if workspace is clean
+    - 'update-all' - updates all local items of the given type.
+    - 'add-remote (item) (name)' - adds a remote (name) to (item) with the default URL.
+    - 'add-remote (item) (name) (URL)' - adds a remote with the given URL
+    - 'list-remotes (item)' - lists all remotes for (item) 
+    - 'refresh' - replaces the Gradle build file for all items of the given type from the latest template
+    - 'createDependencyDotFile' - creates a dot file recursively listing dependencies of given locally available module, can be visualized with e.g. graphviz
+    
+    Available flags:
+    '-remote [someRemote]' to clone from an alternative remote, also adding the upstream org (like MovingBlocks) repo as 'origin'
+           Note: 'get' + 'recurse' only. This will override an alternativeGithubHome set via gradle.properties.
+    '-simple-list-format' to print one item per row for the 'list' sub-command, even for large numbers of items
+    '-condensed-list-format' to group items by starting letter for the 'list' sub-command (default with many items)
+    '-skip-recently-updated' (Only for update-all) to skip updating modules that have already been updated within 10 minutes
+    
+    Example: 'groovyw module init iota' - retrieves all the modules in the Iota module distro from GitHub.
+    Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub.
+    Example: 'groovyw module get-all' - would retrieve all the modules in the Terasology organisation on GitHub.
+    Example: 'groovyw module get Sa??l*' - would retrieve all the modules in the Terasology organisation on GitHub" 
+     that start with \"Sa\", have any two characters after that, then an \"l\" and then end with anything else." 
+     This should retrieve the Sample repository from the Terasology organisation on GitHub.
+    
+    *NOTE*: On UNIX platforms (MacOS and Linux), the wildcard arguments must be escaped with single quotes e.g. groovyw module get '*'.
+    
+    Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source
+    Example: 'groovyw lib list' - would list library projects compatible with being embedded in a Terasology workspace
+    Example: 'groovyw module createDependencyDotFile JoshariasSurvival' - would create a dot file with JS' dependencies and all their dependencies - if locally available
+    
+    *NOTE*: Item names are case sensitive. If you add items then `gradlew idea` or similar may be needed to refresh your IDE
+    
+    If you omit further arguments beyond the sub-command you'll be prompted for details
+    
+    For advanced usage see project documentation. For instance you can provide an alternative GitHub home
+    A gradle.properties file (one exists under '/templates' in an engine workspace) can provide such overrides
+    """.stripIndent())
 }

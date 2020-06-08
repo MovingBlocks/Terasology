@@ -17,8 +17,6 @@ package org.terasology.physics.bullet.shapes;
 
 import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.util.ObjectArrayList;
-import org.terasology.math.AABB;
-import org.terasology.math.Transform;
 import org.terasology.math.VecMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;

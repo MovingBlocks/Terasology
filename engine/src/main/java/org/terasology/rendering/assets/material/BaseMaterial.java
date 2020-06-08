@@ -242,7 +242,7 @@ public abstract class BaseMaterial extends Material {
 
     @Override
     public void setMatrix4(String name, FloatBuffer buffer) {
-        setMatrix3(name, buffer, false);
+        setMatrix4(name, buffer, false);
     }
 
     /**
