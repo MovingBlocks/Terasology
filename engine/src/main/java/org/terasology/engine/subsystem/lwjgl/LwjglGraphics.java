@@ -269,9 +269,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 "OpenGL15",
                 "OpenGL20",
                 "OpenGL21",
-                "OpenGL30",
-                "OpenGL32",
-                "OpenGL33",
                 "GL_ARB_framebuffer_object",
                 "GL_ARB_texture_float",
                 "GL_ARB_half_float_pixel"};
