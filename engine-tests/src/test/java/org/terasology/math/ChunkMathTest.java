@@ -93,4 +93,14 @@ public class ChunkMathTest {
         assertTrue(ChunkMath.calcChunkPos(10, 10, 10, temp).equals(0, 0, 0));
     }
 
+
+    @Test
+    public void testFloatingPointCalcChunkPos() {
+        org.joml.Vector3i temp = new org.joml.Vector3i();
+        assertTrue(ChunkMath.calcChunkPos(31.9f, 64.1f, 32.5f, temp).equals(0, 1, 1), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(32.9f, 63.9f, 32.9f, temp).equals(1, 0, 1), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(31.3f, 63.9f, 31.9f, temp).equals(0, 0, 0), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(31.6f, 64.5f, 32.1f, temp).equals(0, 1, 1), temp.toString());
+    }
+
 }
