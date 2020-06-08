@@ -1,4 +1,4 @@
-node ("default-java") {
+node ("default-java || heavy-java") {
     stage('Checkout') {
         echo "Going to check out the things !"
         checkout scm
@@ -7,7 +7,7 @@ node ("default-java") {
     stage('Build') {
         // Jenkins sometimes doesn't run Gradle automatically in plain console mode, so make it explicit
         sh './gradlew --console=plain clean extractConfig extractNatives distForLauncher'
-        archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, build/resources/main/org/terasology/version/versionInfo.properties, natives/**'
+        archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, build/resources/main/org/terasology/version/versionInfo.properties, natives/**, buildSrc/src/**, buildSrc/*.kts'
     }
     stage('Publish') {
         if (env.BRANCH_NAME.equals("master") || env.BRANCH_NAME.equals("develop")) {
@@ -19,14 +19,14 @@ node ("default-java") {
         }
     }
     stage('Analytics') {
-        sh "./gradlew --console=plain check javadoc"
+        sh "./gradlew --console=plain check spotbugsmain javadoc"
     }
     stage('Record') {
         junit testResults: '**/build/test-results/test/*.xml',  allowEmptyResults: true
         recordIssues tool: javaDoc()
         step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
         recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
-        recordIssues tool: spotBugs(pattern: '**/build/reports/spotbugs/*.xml', useRankAsPriority: true)
+        recordIssues tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true)
         recordIssues tool: pmdParser(pattern: '**/build/reports/pmd/*.xml')
         recordIssues tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
     }
