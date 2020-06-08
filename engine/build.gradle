@@ -113,7 +113,7 @@ dependencies {
     implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.1'
 
     // Graphics, 3D, UI, etc
-    implementation platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
+    api platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
     api "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"
     implementation "org.lwjgl:lwjgl-glfw"

@@ -15,31 +15,32 @@
  */
 package org.terasology.rendering.primitives;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_QUAD_STRIP;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glNormal3f;
+import static org.lwjgl.opengl.GL11.glTexCoord2f;
+import static org.lwjgl.opengl.GL11.glVertex3f;
 
 /**
- * Optimized Sphere from LWJGL 2 glu package.
- * Removed unused code in Terasology.
- * Used for skysphere and it effects (normals - inside)
+ * Optimized Sphere from LWJGL 2 glu package. Removed unused code in Terasology. Used for skysphere and it effects
+ * (normals - inside)
  */
 public class Sphere {
 
     private boolean textureFlag = false;
 
     /**
-     * draws a sphere of the given	radius centered	around the origin.
-     * The sphere is subdivided around the z axis into slices and along the z axis
-     * into stacks (similar to lines of longitude and latitude).
+     * draws a sphere of the given	radius centered	around the origin. The sphere is subdivided around the z axis into
+     * slices and along the z axis into stacks (similar to lines of longitude and latitude).
      * <p>
-     * If the orientation is set to GLU.OUTSIDE (with glu.quadricOrientation), then
-     * any normals generated point away from the center of the sphere. Otherwise,
-     * they point toward the center of the sphere.
+     * If the orientation is set to GLU.OUTSIDE (with glu.quadricOrientation), then any normals generated point away
+     * from the center of the sphere. Otherwise, they point toward the center of the sphere.
      * <p>
-     * If texturing is turned on (with glu.quadricTexture), then texture
-     * coordinates are generated so that t ranges from 0.0 at z=-radius to 1.0 at
-     * z=radius (t increases linearly along longitudinal lines), and s ranges from
-     * 0.0 at the +y axis, to 0.25 at the +x axis, to 0.5 at the -y axis, to 0.75
-     * at the -x axis, and back to 1.0 at the +y axis.
+     * If texturing is turned on (with glu.quadricTexture), then texture coordinates are generated so that t ranges from
+     * 0.0 at z=-radius to 1.0 at z=radius (t increases linearly along longitudinal lines), and s ranges from 0.0 at the
+     * +y axis, to 0.25 at the +x axis, to 0.5 at the -y axis, to 0.75 at the -x axis, and back to 1.0 at the +y axis.
      */
     public void draw(float radius, int slices, int stacks) {
         float rho, drho, theta, dtheta;
@@ -125,12 +126,12 @@ public class Sphere {
         }
     }
 
-    public void setTextureFlag(boolean textureFlag) {
-        this.textureFlag = textureFlag;
-    }
-
     public boolean getTextureFlag() {
         return textureFlag;
+    }
+
+    public void setTextureFlag(boolean textureFlag) {
+        this.textureFlag = textureFlag;
     }
 
     private void TXTR_COORD(float x, float y) {

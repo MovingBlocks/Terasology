@@ -15,11 +15,13 @@
  */
 package org.terasology.engine.subsystem;
 
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.utilities.subscribables.Subscribable;
 
 import java.util.List;
 
+@API
 public interface DisplayDevice extends Subscribable {
 
     boolean hasFocus();
