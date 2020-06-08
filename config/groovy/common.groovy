@@ -184,11 +184,11 @@ class common {
 
     /**
      * Check if an item was updated within the provided time limit
-     * @param fetchHead the item's FETCH_HEAD file in the .git directory
+     * @param file the item's FETCH_HEAD file in the .git directory
      * @param timeLimit the time limit for considering something recently updated, for example: use(groovy.time.TimeCategory){ 10.minute }
      */
-    def isRecentlyUpdated(File fetchHead, def timeLimit){
-        Date lastUpdate = new Date(fetchHead.lastModified())
+    def isRecentlyUpdated(File file, def timeLimit){
+        Date lastUpdate = new Date(file.lastModified())
         def recentlyUpdated = use(groovy.time.TimeCategory){
             def timeElapsedSinceUpdate = new Date() - lastUpdate
             if (timeElapsedSinceUpdate < timeLimit){
@@ -205,22 +205,8 @@ class common {
      */
     def updateItem(String itemName, boolean skipRecentUpdates = false) {
         File targetDir = new File(targetDirectory, itemName)
-        def searchString = itemName
         if (!Character.isLetterOrDigit(itemName.charAt(0))){   
             println color ("Skipping update for $itemName: starts with non-alphanumeric symbol", Ansi.YELLOW)
-            return
-        }
-        def inGitIgnore = false
-        new File(".gitignore").eachLine{ line -> 
-            // match if line is exactly same os itemName or has trailing '/' but
-            // not if has further subdirectories
-            if ((line ==~ searchString) || (line ==~ "$searchString/")){
-                inGitIgnore = true
-                return
-            }
-        }
-        if (inGitIgnore){
-            println color("Skipping update for $itemName: in gitignore", Ansi.YELLOW)
             return
         }
         if (!targetDir.exists()) {
@@ -250,13 +236,14 @@ class common {
                 println color("uncommitted changes. Skipping.", Ansi.YELLOW)
             } else {
                 println color("updating $itemType $itemName", Ansi.GREEN)
+                
                 File targetDirFetchHead = new File("$targetDir/.git/FETCH_HEAD")
                 def timeLimit = use(groovy.time.TimeCategory){ 10.minute }
-                if (skipRecentUpdates && targetDirFetchHead.exists() && isRecentlyUpdated(targetDirFetchHead, timeLimit)){
-                    println color("Skipping update for $itemName: updated within last $timeLimit", Ansi.YELLOW)
-                    return
-                }
                 if (targetDirFetchHead.exists()){
+                    if (skipRecentUpdates && isRecentlyUpdated(targetDirFetchHead, timeLimit)){
+                        println color("Skipping update for $itemName: updated within last $timeLimit", Ansi.YELLOW)
+                        return
+                    }
                     targetDirFetchHead.setLastModified(new Date().getTime())
                 }
                 
@@ -266,6 +253,8 @@ class common {
                     def post_update_sha = itemGit.log(maxCommits: 1).find().getAbbreviatedId(8)
                         
                     if (current_sha != post_update_sha){
+                        // TODO this can be probably converted to do one composite diff of the full update 
+                        // once this PR is merged for gigit: https://github.com/ajoberstar/grgit/pull/318 
                         println color("Updating $current_sha..$post_update_sha", Ansi.GREEN)
                         def commits = itemGit.log {range(current_sha, post_update_sha)}
                         for (commit in commits){
