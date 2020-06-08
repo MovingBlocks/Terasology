@@ -1,4 +1,4 @@
-node ("default-java") {
+node ("default-java || heavy-java") {
     stage('Checkout') {
         echo "Going to check out the things !"
         checkout scm
