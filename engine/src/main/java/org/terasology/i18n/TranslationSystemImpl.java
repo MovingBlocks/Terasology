@@ -96,25 +96,26 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     @Override
     public String translate(String text, Locale otherLocale) {
-        TemplateEngine templateEngine = new TemplateEngineImpl(id -> {
-            ResourceUrn uri = new ResourceUrn(id);
-            SimpleUri projectUri = new SimpleUri(uri.getModuleName(), uri.getResourceName());
-            TranslationProject project = getProject(projectUri);
-            if (project != null) {
-                Optional<String> opt = project.translate(uri.getFragmentName(), otherLocale);
-                if (opt.isPresent()) {
-                    return opt.get();
-                } else {
-                    logger.warn("No translation for '{}'", id);
-                    return "?" + uri.getFragmentName() + "?";
-                }
+        TemplateEngine templateEngine = new TemplateEngineImpl(id -> translateFragment(otherLocale, id));
+        return templateEngine.transform(text);
+    }
+
+    private String translateFragment(Locale otherLocale, String id) {
+        ResourceUrn uri = new ResourceUrn(id);
+        SimpleUri projectUri = new SimpleUri(uri.getModuleName(), uri.getResourceName());
+        TranslationProject project = getProject(projectUri);
+        if (project != null) {
+            Optional<String> opt = project.translate(uri.getFragmentName(), otherLocale);
+            if (opt.isPresent()) {
+                return opt.get();
             } else {
-                logger.warn("Invalid project id '{}'", id);
+                logger.warn("No translation for '{}'", id);
                 return "?" + uri.getFragmentName() + "?";
             }
-        });
-
-        return templateEngine.transform(text);
+        } else {
+            logger.warn("Invalid project id '{}'", id);
+            return "?" + uri.getFragmentName() + "?";
+        }
     }
 
     @Override
