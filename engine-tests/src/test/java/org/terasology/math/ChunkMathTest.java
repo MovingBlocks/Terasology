@@ -101,6 +101,8 @@ public class ChunkMathTest {
         assertTrue(ChunkMath.calcChunkPos(32.9f, 63.9f, 32.9f, temp).equals(1, 0, 1), temp.toString());
         assertTrue(ChunkMath.calcChunkPos(31.3f, 63.9f, 31.9f, temp).equals(0, 0, 0), temp.toString());
         assertTrue(ChunkMath.calcChunkPos(31.6f, 64.5f, 32.1f, temp).equals(0, 1, 1), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(.1f, -.2f, -.8f, temp).equals(0, -1, -1), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(-.1f, -.99f, 2f, temp).equals(-1, -1, 0), temp.toString());
     }
 
 }
