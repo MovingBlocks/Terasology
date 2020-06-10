@@ -226,6 +226,7 @@
     "listed-servers": "Listed",
     "load-delay-warning": "WARNING: Long Loading Delay",
     "load-game": "Load",
+    "load-game-error": "Failed to load game. There was an error during \"{0}\".",
     "name-recording-title": "Name Recording",
     "name-recording-description": "Enter a unique name for this recording.",
     "name-recording-error-duplicate": "A recording with this name already exists! Enter a different name.",

@@ -56,6 +56,7 @@ public class StateMainMenu implements GameState {
     private StorageServiceWorker storageServiceWorker;
 
     private String messageOnLoad = "";
+    private Object[] messageOnLoadArguments;
 
 
     public StateMainMenu() {
@@ -63,6 +64,11 @@ public class StateMainMenu implements GameState {
 
     public StateMainMenu(String showMessageOnLoad) {
         messageOnLoad = showMessageOnLoad;
+    }
+
+    public StateMainMenu(String showMessageOnLoad, Object... messageArguments) {
+        messageOnLoad = showMessageOnLoad;
+        messageOnLoadArguments = messageArguments;
     }
 
     @Override
@@ -125,7 +131,7 @@ public class StateMainMenu implements GameState {
         if (!messageOnLoad.isEmpty()) {
             TranslationSystem translationSystem = context.get(TranslationSystem.class);
             MessagePopup popup = nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage("Error", translationSystem.translate(messageOnLoad));
+            popup.setMessage("Error", translationSystem.translate(messageOnLoad, messageOnLoadArguments));
         }
 
         // TODO: enable it when exposing the telemetry to users

@@ -221,6 +221,7 @@
     "listed-servers": "listed-servers",
     "load-delay-warning": "load-delay-warning",
     "load-game": "load-game",
+    "load-game-error": "load-game-error",
     "name-recording-title": "name-recording-title",
     "name-recording-description": "name-recording-description",
     "name-recording-error-duplicate": "name-recording-error-duplicate",
