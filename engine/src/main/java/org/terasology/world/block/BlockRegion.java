@@ -61,16 +61,6 @@ public class BlockRegion {
         this.setMin(minX, minY, minZ).setMax(maxX, maxY, maxZ);
     }
 
-    /**
-     * Get the minimum block coordinate of the given component.
-     *
-     * @param component the component, within <code>[0..2]</code>
-     * @return the maximum coordinate
-     * @throws IllegalArgumentException if <code>component</code> is not within <code>[0..2]</code>
-     */
-    public int getMin(int component) throws IllegalArgumentException {
-        return aabb.getMin(component);
-    }
 
     /**
      * get the minimum block coordinate
@@ -81,19 +71,7 @@ public class BlockRegion {
     public Vector3i getMin(Vector3i dest) {
         return dest.set(aabb.minX, aabb.minY, aabb.minZ);
     }
-
-
-    /**
-     * Get the maximum block coordinate of the given component.
-     *
-     * @param component the component, within <code>[0..2]</code>
-     * @return the maximum coordinate
-     * @throws IllegalArgumentException if <code>component</code> is not within <code>[0..2]</code>
-     */
-    public int getMax(int component) throws IllegalArgumentException {
-        return aabb.getMax(component) - 1;
-    }
-
+    
     /**
      * get the maximum block coordinate
      *
@@ -231,12 +209,12 @@ public class BlockRegion {
      */
     public BlockRegion union(int x, int y, int z, BlockRegion dest) {
         // a block is (x,y,z) and (x + 1, y + 1, z + 1)
-        dest.aabb.minX = this.aabb.minX < x ? this.aabb.minX : x;
-        dest.aabb.minY = this.aabb.minY < y ? this.aabb.minY : y;
-        dest.aabb.minZ = this.aabb.minZ < z ? this.aabb.minZ : z;
-        dest.aabb.maxX = this.aabb.maxX > (x + 1) ? this.aabb.maxX : (x + 1);
-        dest.aabb.maxY = this.aabb.maxY > (y + 1) ? this.aabb.maxY : (y + 1);
-        dest.aabb.maxZ = this.aabb.maxZ > (z + 1) ? this.aabb.maxZ : (z + 1);
+        dest.aabb.minX = Math.min(this.aabb.minX, x);
+        dest.aabb.minY = Math.min(this.aabb.minY, y);
+        dest.aabb.minZ = Math.min(this.aabb.minZ, z);
+        dest.aabb.maxX = Math.max(this.aabb.maxX, (x + 1));
+        dest.aabb.maxY = Math.max(this.aabb.maxY, (y + 1));
+        dest.aabb.maxZ = Math.max(this.aabb.maxZ, (z + 1));
         return dest;
     }
 
@@ -563,15 +541,10 @@ public class BlockRegion {
      * <code>(x - centerX)^2 + (y - centerY)^2 + (z - centerZ)^2 - radiusSquared = 0</code>.
      * <p>
      * Reference: <a href="http://stackoverflow.com/questions/4578967/cube-sphere-intersection-test#answer-4579069">http://stackoverflow.com</a>
-     *
-     * @param centerX
-     *          the x coordinate of the center of the sphere
-     * @param centerY
-     *          the y coordinate of the center of the sphere
-     * @param centerZ
-     *          the z coordinate of the center of the sphere
-     * @param radiusSquared
-     *          the square radius of the sphere
+     * @param centerX the x coordinate of the center of the sphere
+     * @param centerY the y coordinate of the center of the sphere
+     * @param centerZ the z coordinate of the center of the sphere
+     * @param radiusSquared the square radius of the sphere
      * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
      */
     public boolean intersectsSphere(float centerX, float centerY, float centerZ, float radiusSquared) {
@@ -583,8 +556,7 @@ public class BlockRegion {
      * <p>
      * Reference: <a href="http://stackoverflow.com/questions/4578967/cube-sphere-intersection-test#answer-4579069">http://stackoverflow.com</a>
      *
-     * @param sphere
-     *          the sphere
+     * @param sphere the sphere
      * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
      */
     public boolean intersectsSphere(Spheref sphere) {
@@ -599,18 +571,12 @@ public class BlockRegion {
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
-     * @param originX
-     *          the x coordinate of the ray's origin
-     * @param originY
-     *          the y coordinate of the ray's origin
-     * @param originZ
-     *          the z coordinate of the ray's origin
-     * @param dirX
-     *          the x coordinate of the ray's direction
-     * @param dirY
-     *          the y coordinate of the ray's direction
-     * @param dirZ
-     *          the z coordinate of the ray's direction
+     * @param originX the x coordinate of the ray's origin
+     * @param originY the y coordinate of the ray's origin
+     * @param originZ the z coordinate of the ray's origin
+     * @param dirX the x coordinate of the ray's direction
+     * @param dirY the y coordinate of the ray's direction
+     * @param dirZ the z coordinate of the ray's direction
      * @return <code>true</code> if this AABB and the ray intersect; <code>false</code> otherwise
      */
     public boolean intersectsRay(float originX, float originY, float originZ, float dirX, float dirY, float dirZ) {
@@ -624,8 +590,7 @@ public class BlockRegion {
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
-     * @param ray
-     *          the ray
+     * @param ray the ray
      * @return <code>true</code> if this AABB and the ray intersect; <code>false</code> otherwise
      */
     public boolean intersectsRay(Rayf ray) {
@@ -641,18 +606,12 @@ public class BlockRegion {
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
-     * @param p0X
-     *              the x coordinate of the line segment's first end point
-     * @param p0Y
-     *              the y coordinate of the line segment's first end point
-     * @param p0Z
-     *              the z coordinate of the line segment's first end point
-     * @param p1X
-     *              the x coordinate of the line segment's second end point
-     * @param p1Y
-     *              the y coordinate of the line segment's second end point
-     * @param p1Z
-     *              the z coordinate of the line segment's second end point
+     * @param p0X the x coordinate of the line segment's first end point
+     * @param p0Y the y coordinate of the line segment's first end point
+     * @param p0Z the z coordinate of the line segment's first end point
+     * @param p1X the x coordinate of the line segment's second end point
+     * @param p1Y the y coordinate of the line segment's second end point
+     * @param p1Z the z coordinate of the line segment's second end point
      * @param result
      *              a vector which will hold the resulting values of the parameter
      *              <i>t</i> in the ray equation <i>p(t) = p0 + t * (p1 - p0)</i> of the near and far point of intersection
@@ -674,8 +633,7 @@ public class BlockRegion {
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
-     * @param lineSegment
-     *              the line segment
+     * @param lineSegment the line segment
      * @param result
      *              a vector which will hold the resulting values of the parameter
      *              <i>t</i> in the ray equation <i>p(t) = p0 + t * (p1 - p0)</i> of the near and far point of intersection
@@ -696,19 +654,6 @@ public class BlockRegion {
      */
     public boolean isValid() {
         return aabb.isValid();
-    }
-
-    private BlockRegion validate() {
-        if (!isValid()) {
-            aabb.minX = Integer.MAX_VALUE;
-            aabb.minY = Integer.MAX_VALUE;
-            aabb.minZ = Integer.MAX_VALUE;
-
-            aabb.maxX = Integer.MIN_VALUE;
-            aabb.maxY = Integer.MIN_VALUE;
-            aabb.maxZ = Integer.MIN_VALUE;
-        }
-        return this;
     }
 
     /**
@@ -762,7 +707,7 @@ public class BlockRegion {
         dest.aabb.maxX = this.aabb.maxX + extentX;
         dest.aabb.maxY = this.aabb.maxY + extentY;
         dest.aabb.maxZ = this.aabb.maxZ + extentZ;
-        return dest.validate();
+        return dest;
     }
 
     /**
@@ -782,7 +727,7 @@ public class BlockRegion {
         dest.aabb.maxX = Math.roundUsing(this.aabb.maxX + extentX, RoundingMode.CEILING);
         dest.aabb.maxY = Math.roundUsing(this.aabb.maxY + extentY, RoundingMode.CEILING);
         dest.aabb.maxZ = Math.roundUsing(this.aabb.maxZ + extentZ, RoundingMode.CEILING);
-        return dest.validate();
+        return dest;
     }
 
     @Override

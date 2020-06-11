@@ -79,16 +79,8 @@ public class BlockRegionTest {
     }
 
     @Test
-    public void testRegionEmptyIfMaxLessThanMin() {
+    public void testRegionInvalidIfMaxLessThanMin() {
         BlockRegion region = new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(-1, 0, 0));
-        assertFalse(region.isValid());
-    }
-
-    @Test
-    public void testRegionEmptyIfSizeZeroOrLess() {
-        BlockRegion region = new BlockRegion().union(new Vector3i(1, 1, 1)).setSize(new Vector3i(0, 1, 1));
-        assertFalse(region.isValid());
-        region = new BlockRegion().union(new Vector3i(1, 1, 1)).setSize(new Vector3i(1, -1, 1));
         assertFalse(region.isValid());
     }
 
