@@ -71,7 +71,7 @@ public class BlockRegion {
     public Vector3i getMin(Vector3i dest) {
         return dest.set(aabb.minX, aabb.minY, aabb.minZ);
     }
-    
+
     /**
      * get the maximum block coordinate
      *
@@ -407,12 +407,9 @@ public class BlockRegion {
     /**
      * Test whether the block <code>(x, y, z)</code> lies inside this BlockRegion.
      *
-     * @param x
-     *          the x coordinate of the point
-     * @param y
-     *          the y coordinate of the point
-     * @param z
-     *          the z coordinate of the point
+     * @param x the x coordinate of the point
+     * @param y the y coordinate of the point
+     * @param z the z coordinate of the point
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsBlock(int x, int y, int z) {
@@ -422,12 +419,9 @@ public class BlockRegion {
     /**
      * Test whether the point <code>(x, y, z)</code> lies inside this BlockRegion.
      *
-     * @param x
-     *          the x coordinate of the point
-     * @param y
-     *          the y coordinate of the point
-     * @param z
-     *          the z coordinate of the point
+     * @param x the x coordinate of the point
+     * @param y the y coordinate of the point
+     * @param z the z coordinate of the point
      * @return <code>true</code> iff the given point lies inside this BlockRegion; <code>false</code> otherwise
      */
     public boolean containsPoint(float x, float y, float z) {
@@ -437,12 +431,9 @@ public class BlockRegion {
     /**
      * Test whether the point <code>(x, y, z)</code> lies inside this AABB.
      *
-     * @param x
-     *          the x coordinate of the point
-     * @param y
-     *          the y coordinate of the point
-     * @param z
-     *          the z coordinate of the point
+     * @param x the x coordinate of the point
+     * @param y the y coordinate of the point
+     * @param z the z coordinate of the point
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsPoint(int x, int y, int z) {
@@ -452,8 +443,7 @@ public class BlockRegion {
     /**
      * Test whether the given point lies inside this AABB.
      *
-     * @param point
-     *          the coordinates of the point
+     * @param point the coordinates of the point
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsPoint(Vector3ic point) {
@@ -463,8 +453,7 @@ public class BlockRegion {
     /**
      * Test whether the given point lies inside this AABB.
      *
-     * @param point
-     *          the coordinates of the point
+     * @param point the coordinates of the point
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsPoint(Vector3fc point) {
@@ -476,14 +465,10 @@ public class BlockRegion {
      * <p>
      * Reference: <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/">http://www.lighthouse3d.com</a> ("Geometric Approach - Testing Boxes II")
      *
-     * @param a
-     *          the x factor in the plane equation
-     * @param b
-     *          the y factor in the plane equation
-     * @param c
-     *          the z factor in the plane equation
-     * @param d
-     *          the constant in the plane equation
+     * @param a the x factor in the plane equation
+     * @param b the y factor in the plane equation
+     * @param c the z factor in the plane equation
+     * @param d the constant in the plane equation
      * @return <code>true</code> iff the plane intersects this AABB; <code>false</code> otherwise
      */
     public boolean intersectsPlane(float a, float b, float c, float d) {
@@ -495,8 +480,7 @@ public class BlockRegion {
      * <p>
      * Reference: <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/">http://www.lighthouse3d.com</a> ("Geometric Approach - Testing Boxes II")
      *
-     * @param plane
-     *          the plane
+     * @param plane the plane
      * @return <code>true</code> iff the plane intersects this AABB; <code>false</code> otherwise
      */
     public boolean intersectsPlane(Planef plane) {
@@ -506,8 +490,7 @@ public class BlockRegion {
     /**
      * Test whether <code>this</code> and <code>other</code> intersect.
      *
-     * @param other
-     *          the other BlockRegion
+     * @param other the other BlockRegion
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsBlockRegion(BlockRegion other) {
@@ -517,8 +500,7 @@ public class BlockRegion {
     /**
      * Test whether <code>this</code> and <code>other</code> intersect.
      *
-     * @param other
-     *          the other AABB
+     * @param other the other AABB
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsAABB(AABBi other) {
@@ -528,8 +510,7 @@ public class BlockRegion {
     /**
      * Test whether <code>this</code> and <code>other</code> intersect.
      *
-     * @param other
-     *          the other AABB
+     * @param other the other AABB
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsAABB(AABBf other) {
