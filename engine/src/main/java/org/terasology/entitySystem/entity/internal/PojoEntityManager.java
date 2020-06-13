@@ -24,6 +24,8 @@ import com.google.common.collect.Sets;
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
@@ -222,7 +224,22 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    public EntityRef create(Prefab prefab, Vector3fc position, Quaternionfc rotation) {
+        return getCurrentWorldPool().create(prefab, position, rotation);
+    }
+
+    @Override
     public EntityRef create(String prefab, Vector3f position) {
+        return getCurrentWorldPool().create(prefab, position);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab, Vector3fc position) {
+        return getCurrentWorldPool().create(prefab, position);
+    }
+
+    @Override
+    public EntityRef create(String prefab, Vector3fc position) {
         return getCurrentWorldPool().create(prefab, position);
     }
 

@@ -118,7 +118,7 @@ dependencies {
     api group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
     api group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
     api group: 'java3d', name: 'vecmath', version: '1.3.1'
-    api group: 'org.joml', name: 'joml', version: '1.9.24'
+    api group: 'org.joml', name: 'joml', version: '1.9.25'
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
@@ -193,8 +193,8 @@ task cacheReflections {
     doLast {
         // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
         Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
-                .addUrls(inputs.files.collect { it.toURI().toURL() })
-                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
+            .addUrls(inputs.files.collect { it.toURI().toURL() })
+            .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
         reflections.save("$buildDir/classes/reflections.cache")
     }
 }
