@@ -15,7 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
-import org.terasology.math.geom.Rect2i;
+import org.joml.Rectanglei;
+import org.terasology.nui.util.RectUtility;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
 import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 
@@ -24,8 +25,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class ContainerFlowContainerRenderSpace implements ContainerRenderSpace {
-    private Deque<Rect2i> leftFloats = new LinkedList<>();
-    private Deque<Rect2i> rightFloats = new LinkedList<>();
+    private Deque<Rectanglei> leftFloats = new LinkedList<>();
+    private Deque<Rectanglei> rightFloats = new LinkedList<>();
     private int containerWidth;
 
     public ContainerFlowContainerRenderSpace(int containerWidth) {
@@ -39,71 +40,71 @@ public class ContainerFlowContainerRenderSpace implements ContainerRenderSpace {
 
     @Override
     public int getNextWidthChange(int y) {
-        Rect2i lastLeftFloat = findLastAtYPosition(leftFloats, y);
-        Rect2i lastRightFloat = findLastAtYPosition(rightFloats, y);
+        Rectanglei lastLeftFloat = findLastAtYPosition(leftFloats, y);
+        Rectanglei lastRightFloat = findLastAtYPosition(rightFloats, y);
 
         if (lastLeftFloat != null && lastRightFloat != null) {
-            return Math.min(lastLeftFloat.maxY(), lastRightFloat.maxY());
+            return Math.min(lastLeftFloat.maxY, lastRightFloat.maxY);
         } else if (lastLeftFloat != null) {
-            return lastLeftFloat.maxY();
+            return lastLeftFloat.maxY;
         } else if (lastRightFloat != null) {
-            return lastRightFloat.maxY();
+            return lastRightFloat.maxY;
         } else {
             return Integer.MAX_VALUE;
         }
     }
 
     @Override
-    public Rect2i addLeftFloat(int y, int width, int height) {
+    public Rectanglei addLeftFloat(int y, int width, int height) {
         int posY = y;
         while (true) {
             int availableWidth = getAvailableWidthAt(posY);
             if (availableWidth >= width) {
                 int x = 0;
-                Rect2i lastLeft = findLastAtYPosition(leftFloats, posY);
+                Rectanglei lastLeft = findLastAtYPosition(leftFloats, posY);
                 if (lastLeft != null) {
-                    x = lastLeft.maxX();
+                    x = lastLeft.maxX;
                 }
-                Rect2i floatRect = Rect2i.createFromMinAndSize(x, posY, width, height);
+                Rectanglei floatRect = RectUtility.createFromMinAndSize(x, posY, width, height);
                 leftFloats.add(floatRect);
                 return floatRect;
             } else {
-                Rect2i lastLeft = findLastAtYPosition(leftFloats, posY);
-                Rect2i lastRight = findLastAtYPosition(rightFloats, posY);
+                Rectanglei lastLeft = findLastAtYPosition(leftFloats, posY);
+                Rectanglei lastRight = findLastAtYPosition(rightFloats, posY);
                 if (lastLeft != null && lastRight != null) {
-                    posY = Math.min(lastLeft.maxY(), lastRight.maxY());
+                    posY = Math.min(lastLeft.maxY, lastRight.maxY);
                 } else if (lastLeft != null) {
-                    posY = lastLeft.maxY();
+                    posY = lastLeft.maxY;
                 } else if (lastRight != null) {
-                    posY = lastRight.maxY();
+                    posY = lastRight.maxY;
                 }
             }
         }
     }
 
     @Override
-    public Rect2i addRightFloat(int y, int width, int height) {
+    public Rectanglei addRightFloat(int y, int width, int height) {
         int posY = y;
         while (true) {
             int availableWidth = getAvailableWidthAt(posY);
             if (availableWidth >= width) {
                 int x = 0;
-                Rect2i lastRight = findLastAtYPosition(rightFloats, posY);
+                Rectanglei lastRight = findLastAtYPosition(rightFloats, posY);
                 if (lastRight != null) {
-                    x = lastRight.minX();
+                    x = lastRight.minX;
                 }
-                Rect2i floatRect = Rect2i.createFromMinAndSize(x - width, posY, width, height);
+                Rectanglei floatRect = RectUtility.createFromMinAndSize(x - width, posY, width, height);
                 rightFloats.add(floatRect);
                 return floatRect;
             } else {
-                Rect2i lastLeft = findLastAtYPosition(leftFloats, posY);
-                Rect2i lastRight = findLastAtYPosition(rightFloats, posY);
+                Rectanglei lastLeft = findLastAtYPosition(leftFloats, posY);
+                Rectanglei lastRight = findLastAtYPosition(rightFloats, posY);
                 if (lastLeft != null && lastRight != null) {
-                    posY = Math.min(lastLeft.maxY(), lastRight.maxY());
+                    posY = Math.min(lastLeft.maxY, lastRight.maxY);
                 } else if (lastLeft != null) {
-                    posY = lastLeft.maxY();
+                    posY = lastLeft.maxY;
                 } else if (lastRight != null) {
-                    posY = lastRight.maxY();
+                    posY = lastRight.maxY;
                 }
             }
         }
@@ -114,14 +115,14 @@ public class ContainerFlowContainerRenderSpace implements ContainerRenderSpace {
         int maxY = 0;
         if (clearStyle == ParagraphRenderStyle.ClearStyle.LEFT
                 || clearStyle == ParagraphRenderStyle.ClearStyle.BOTH) {
-            for (Rect2i leftFloat : leftFloats) {
-                maxY = Math.max(maxY, leftFloat.maxY());
+            for (Rectanglei leftFloat : leftFloats) {
+                maxY = Math.max(maxY, leftFloat.maxY);
             }
         }
         if (clearStyle == ParagraphRenderStyle.ClearStyle.RIGHT
                 || clearStyle == ParagraphRenderStyle.ClearStyle.BOTH) {
-            for (Rect2i rightFloat : rightFloats) {
-                maxY = Math.max(maxY, rightFloat.maxY());
+            for (Rectanglei rightFloat : rightFloats) {
+                maxY = Math.max(maxY, rightFloat.maxY);
             }
         }
         return maxY;
@@ -134,9 +135,9 @@ public class ContainerFlowContainerRenderSpace implements ContainerRenderSpace {
 
     @Override
     public int getAdvanceForVerticalPosition(int y) {
-        Rect2i lastLeft = findLastAtYPosition(leftFloats, y);
+        Rectanglei lastLeft = findLastAtYPosition(leftFloats, y);
         if (lastLeft != null) {
-            return lastLeft.maxX();
+            return lastLeft.maxX;
         } else {
             return 0;
         }
@@ -144,22 +145,22 @@ public class ContainerFlowContainerRenderSpace implements ContainerRenderSpace {
 
     private int getAvailableWidthAt(int y) {
         int width = containerWidth;
-        Rect2i lastRight = findLastAtYPosition(rightFloats, y);
+        Rectanglei lastRight = findLastAtYPosition(rightFloats, y);
         if (lastRight != null) {
-            width = lastRight.minX();
+            width = lastRight.minX;
         }
-        Rect2i lastLeft = findLastAtYPosition(leftFloats, y);
+        Rectanglei lastLeft = findLastAtYPosition(leftFloats, y);
         if (lastLeft != null) {
-            width -= lastLeft.maxX();
+            width -= lastLeft.maxX;
         }
         return width;
     }
 
-    private Rect2i findLastAtYPosition(Deque<Rect2i> floats, int y) {
-        Iterator<Rect2i> iterator = floats.descendingIterator();
+    private Rectanglei findLastAtYPosition(Deque<Rectanglei> floats, int y) {
+        Iterator<Rectanglei> iterator = floats.descendingIterator();
         while (iterator.hasNext()) {
-            Rect2i rect = iterator.next();
-            if (rect.minY() <= y && rect.maxY() > y) {
+            Rectanglei rect = iterator.next();
+            if (rect.minY <= y && rect.maxY > y) {
                 return rect;
             }
         }

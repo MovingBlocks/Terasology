@@ -15,9 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
+import org.joml.Rectanglei;
 import org.joml.Vector2i;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.CoreWidget;
@@ -47,7 +46,7 @@ public class BrowserWidget extends CoreWidget {
                     @Override
                     public boolean onMouseClick(NUIMouseClickEvent event) {
                         for (HyperlinkBox hyperlinkBox : hyperlinkBoxes) {
-                            if (hyperlinkBox.box.contains(JomlUtil.from(event.getRelativeMousePosition()))) {
+                            if (hyperlinkBox.box.contains(event.getRelativeMousePosition())) {
                                 for (BrowserHyperlinkListener browserHyperlinkListener : listenerList) {
                                     browserHyperlinkListener.hyperlinkClicked(hyperlinkBox.hyperlink);
                                 }
@@ -62,7 +61,7 @@ public class BrowserWidget extends CoreWidget {
         if (displayedPage != null) {
             DocumentRenderer.drawDocumentInRegion(
                     displayedPage, canvas, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(),
-                    JomlUtil.from(canvas.size()), register
+                    canvas.size(), register
             );
         }
     }
@@ -71,10 +70,10 @@ public class BrowserWidget extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         if (displayedPage != null) {
-            return JomlUtil.from(DocumentRenderer.getDocumentPreferredSize(
+            return DocumentRenderer.getDocumentPreferredSize(
                     displayedPage, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(),
                     canvas.getRegion().lengthX()
-            ));
+            );
         } else {
             return new Vector2i();
         }
@@ -85,10 +84,10 @@ public class BrowserWidget extends CoreWidget {
     }
 
     private final class HyperlinkBox {
-        private Rect2i box;
+        private Rectanglei box;
         private String hyperlink;
 
-        private HyperlinkBox(Rect2i box, String hyperlink) {
+        private HyperlinkBox(Rectanglei box, String hyperlink) {
             this.box = box;
             this.hyperlink = hyperlink;
         }
@@ -96,7 +95,7 @@ public class BrowserWidget extends CoreWidget {
 
     private class HyperlinkRegisterImpl implements ParagraphRenderable.HyperlinkRegister {
         @Override
-        public void registerHyperlink(Rect2i region, String hyperlink) {
+        public void registerHyperlink(Rectanglei region, String hyperlink) {
             hyperlinkBoxes.add(new HyperlinkBox(region, hyperlink));
         }
     }
