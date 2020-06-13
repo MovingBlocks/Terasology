@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
 import org.joml.Matrix4f;
@@ -55,6 +42,9 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private DisplayDevice displayDevice;
 
     private Vector3f tempRightVector = new Vector3f();
+    //TODO: remove when projectionMatrix is corrected
+    private final Matrix4f transposeProjectionMatrix = new Matrix4f();
+
 
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
         super(worldProvider, renderingConfig);
@@ -150,7 +140,8 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
         float aspectRatio = (float) displayDevice.getDisplayWidth() / displayDevice.getDisplayHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
-        projectionMatrix.setPerspective(fovY, aspectRatio, getzNear(), getzFar()).transpose();
+        transposeProjectionMatrix.setPerspective(fovY, aspectRatio, getzNear(), getzFar());
+        transposeProjectionMatrix.transpose(projectionMatrix);
 
         viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
             viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
@@ -183,6 +174,12 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         cachedReflectionHeight = getReflectionHeight();
 
         updateFrustum();
+    }
+
+    @Override
+    public Matrix4f getProjectionMatrix() {
+        //TODO: can use default superclass implementation when projectionMatrix is corrected
+        return transposeProjectionMatrix;
     }
 
     public void setBobbingRotationOffsetFactor(float f) {
