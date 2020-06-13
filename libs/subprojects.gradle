@@ -1,22 +1,21 @@
-// This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
-new File(rootDir, 'libs').eachDir { possibleSubprojectDir ->
-    def subprojectName = 'libs:' + possibleSubprojectDir.name
-    println "Gradle is reviewing library $subprojectName for possible inclusion in the Gradle project tree"
-    File buildFile = new File(possibleSubprojectDir, "build.gradle")
-    if (buildFile.exists()) {
-        println "Library $subprojectName has a build file so counting it as integratable code and sub-projecting it"
-        include subprojectName
-        def subprojectPath = ':' + subprojectName
-        def subproject = project(subprojectPath)
-        subproject.projectDir = possibleSubprojectDir
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-        // Also look for a nested settings.gradle file in case of embedded libraries with their own sub projects
-        File settingsFile = new File(possibleSubprojectDir, "settings.gradle")
-        if (settingsFile.exists()) {
-            println "Library $subprojectName has a settings file so applying it expecting nested sub projects"
-            apply from: settingsFile
-        }
+// This magically allows subdirs to become included builds
+// https://docs.gradle.org/6.4.1/userguide/composite_builds.html
+file(".").eachDir { possibleIncludedBuildDirectory ->
+    File buildFile = new File(possibleIncludedBuildDirectory, "build.gradle")
+    File settingsFile = new File(possibleIncludedBuildDirectory, "settings.gradle")
+
+    if (buildFile.exists() && settingsFile.exists()) {
+        logger.info("{} will be included in the composite build.",
+            rootDir.relativePath(possibleIncludedBuildDirectory))
+        includeBuild(possibleIncludedBuildDirectory)
     } else {
-        println "Library dir found without a build.gradle, not including $subprojectName in the Gradle project tree"
+        logger.warn("{} REJECTED as an included build. build.gradle: {}, settings.gradle: {}",
+                rootDir.relativePath(possibleIncludedBuildDirectory),
+                buildFile.exists() ? "present" : "MISSING",
+                settingsFile.exists() ? "present" : "MISSING"
+        )
     }
 }
