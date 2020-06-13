@@ -15,7 +15,6 @@
  */
 package org.terasology.particles.functions;
 
-import org.terasology.entitySystem.Component;
 import org.terasology.module.sandbox.API;
 
 import java.lang.annotation.ElementType;

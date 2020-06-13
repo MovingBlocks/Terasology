@@ -1,5 +1,25 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+// Since SpotBugs and SonarQube in the legacy style have external dependencies we have to have this block here.
+// Alternatively we untangle and update the common.gradle / Kotlin Gradle plugin stuff or just remove these two
+buildscript {
+    repositories {
+        // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
+        jcenter()
+        mavenCentral()
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
+    }
+
+    dependencies {
+        //Spotbugs
+        classpath("gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.0.0")
+
+        // SonarQube / Cloud scanning
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8")
+    }
+}
 
 plugins {
     id("terasology-module")
