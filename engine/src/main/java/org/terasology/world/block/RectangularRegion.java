@@ -15,30 +15,30 @@ import org.joml.Vector3ic;
 
 /**
  * is a bounded rectangle describing squares contained within.
- * A {@link SquareRegion} is described and backed by an {@link org.joml.Rectanglei}
+ * A {@link RectangularRegion} is described and backed by an {@link org.joml.Rectanglei}
  */
-public class SquareRegion {
+public class RectangularRegion {
     /**
      * rectangle region that backs a SquareRegion
      */
     public final Rectanglei rectangle = new Rectanglei();
 
-    public SquareRegion() {
+    public RectangularRegion() {
     }
 
-    public SquareRegion(SquareRegion source) {
+    public RectangularRegion(RectangularRegion source) {
         RectangleUtility.set(rectangle, source.rectangle);
     }
 
-    public SquareRegion(Rectanglei source) {
+    public RectangularRegion(Rectanglei source) {
         RectangleUtility.set(rectangle, source);
     }
 
-    public SquareRegion(Vector2ic min, Vector2ic max) {
+    public RectangularRegion(Vector2ic min, Vector2ic max) {
         this(min.x(), min.y(), max.x(), max.y());
     }
 
-    public SquareRegion(int minX, int minY, int maxX, int maxY) {
+    public RectangularRegion(int minX, int minY, int maxX, int maxY) {
         this.setMin(minX, minY).setMax(maxX, maxY);
     }
 
@@ -105,7 +105,7 @@ public class SquareRegion {
      * @param min the first coordinate of the first block
      * @return this
      */
-    public SquareRegion setMin(Vector2ic min) {
+    public RectangularRegion setMin(Vector2ic min) {
         RectangleUtility.setMin(this.rectangle, min);
         return this;
     }
@@ -116,7 +116,7 @@ public class SquareRegion {
      * @param max the second coordinate of the second block
      * @return this
      */
-    public SquareRegion setMax(Vector2ic max) {
+    public RectangularRegion setMax(Vector2ic max) {
         this.setMax(max.x(), max.y());
         return this;
     }
@@ -128,7 +128,7 @@ public class SquareRegion {
      * @param maxY the y coordinate of the first block
      * @return this
      */
-    public SquareRegion setMax(int maxX, int maxY) {
+    public RectangularRegion setMax(int maxX, int maxY) {
         RectangleUtility.setMax(this.rectangle, maxX + 1, maxY + 1);
         return this;
     }
@@ -140,7 +140,7 @@ public class SquareRegion {
      * @param minY the y coordinate of the first block
      * @return this
      */
-    public SquareRegion setMin(int minX, int minY) {
+    public RectangularRegion setMin(int minX, int minY) {
         RectangleUtility.setMin(this.rectangle, minX, minY);
         return this;
     }
@@ -151,7 +151,7 @@ public class SquareRegion {
      * @param p the position of the block
      * @return this
      */
-    public SquareRegion union(Vector2ic p) {
+    public RectangularRegion union(Vector2ic p) {
         return union(p.x(), p.y(), this);
     }
 
@@ -164,7 +164,7 @@ public class SquareRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public SquareRegion union(int x, int y, SquareRegion dest) {
+    public RectangularRegion union(int x, int y, RectangularRegion dest) {
         // a block is (x,y,z) and (x + 1, y + 1, z + 1)
         dest.rectangle.minX = Math.min(this.rectangle.minX, x);
         dest.rectangle.minY = Math.min(this.rectangle.minY, y);
@@ -181,7 +181,7 @@ public class SquareRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public SquareRegion union(Vector3ic pos, SquareRegion dest) {
+    public RectangularRegion union(Vector3ic pos, RectangularRegion dest) {
         return this.union(pos.x(), pos.y(), dest);
     }
 
@@ -191,7 +191,7 @@ public class SquareRegion {
      * @param other {@link BlockRegion}
      * @return this
      */
-    public SquareRegion union(SquareRegion other) {
+    public RectangularRegion union(RectangularRegion other) {
         return this.union(other.rectangle);
     }
 
@@ -202,7 +202,7 @@ public class SquareRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public SquareRegion union(Rectanglei other, SquareRegion dest) {
+    public RectangularRegion union(Rectanglei other, RectangularRegion dest) {
         dest.union(other);
         return dest;
     }
@@ -213,7 +213,7 @@ public class SquareRegion {
      * @param other the other {@link AABBi}
      * @return this
      */
-    public SquareRegion union(Rectanglei other) {
+    public RectangularRegion union(Rectanglei other) {
         RectangleUtility.union(this.rectangle, other);
         return this;
     }
@@ -224,7 +224,7 @@ public class SquareRegion {
      *
      * @return this
      */
-    public SquareRegion correctBounds() {
+    public RectangularRegion correctBounds() {
         int tmp;
         if (this.rectangle.minX > this.rectangle.maxX) {
             tmp = this.rectangle.minX;
@@ -246,7 +246,7 @@ public class SquareRegion {
      * @param y the y coordinate to set the size
      * @return this
      */
-    public SquareRegion setSize(int x, int y) {
+    public RectangularRegion setSize(int x, int y) {
         this.rectangle.maxX = this.rectangle.minX + x;
         this.rectangle.maxY = this.rectangle.minY + y;
         return this;
@@ -258,7 +258,7 @@ public class SquareRegion {
      * @param size the size to set the {@link BlockRegion}
      * @return this
      */
-    public SquareRegion setSize(Vector2ic size) {
+    public RectangularRegion setSize(Vector2ic size) {
         return setSize(size.x(), size.y());
     }
 
@@ -297,7 +297,7 @@ public class SquareRegion {
      * @param y the y coordinate to translate by
      * @return this
      */
-    public SquareRegion translate(int x, int y) {
+    public RectangularRegion translate(int x, int y) {
         rectangle.translate(x, y);
         return this;
     }
@@ -309,7 +309,7 @@ public class SquareRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public SquareRegion translate(Vector2ic xy, SquareRegion dest) {
+    public RectangularRegion translate(Vector2ic xy, RectangularRegion dest) {
         rectangle.translate(xy, dest.rectangle);
         return dest;
     }
@@ -320,7 +320,7 @@ public class SquareRegion {
      * @param xy the vector to translate by
      * @return this
      */
-    public SquareRegion translate(Vector2ic xy) {
+    public RectangularRegion translate(Vector2ic xy) {
         this.rectangle.translate(xy);
         return this;
     }
@@ -396,7 +396,7 @@ public class SquareRegion {
      * @param other the other BlockRegion
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
-    public boolean intersectsBlockGrid(SquareRegion other) {
+    public boolean intersectsBlockGrid(RectangularRegion other) {
         return this.rectangle.intersectsRectangle(other.rectangle);
     }
 
@@ -436,7 +436,7 @@ public class SquareRegion {
      * @param dest holds the result
      * @return dest
      */
-    public SquareRegion intersection(SquareRegion other, SquareRegion dest) {
+    public RectangularRegion intersection(RectangularRegion other, RectangularRegion dest) {
         this.rectangle.intersection(other.rectangle, dest.rectangle);
         return dest;
     }
@@ -448,7 +448,7 @@ public class SquareRegion {
      * @param dest holds the result
      * @return dest
      */
-    public SquareRegion addExtents(int extent, SquareRegion dest) {
+    public RectangularRegion addExtents(int extent, RectangularRegion dest) {
         return addExtents(extent, extent, dest);
     }
 
@@ -459,7 +459,7 @@ public class SquareRegion {
      * @param extentY the y coordinate to grow the extents
      * @return this
      */
-    public SquareRegion addExtents(int extentX, int extentY) {
+    public RectangularRegion addExtents(int extentX, int extentY) {
         return addExtents(extentX, extentY, this);
     }
 
@@ -471,7 +471,7 @@ public class SquareRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public SquareRegion addExtents(int extentX, int extentY, SquareRegion dest) {
+    public RectangularRegion addExtents(int extentX, int extentY, RectangularRegion dest) {
         dest.rectangle.minX = this.rectangle.minX - extentX;
         dest.rectangle.minY = this.rectangle.minY - extentY;
 
@@ -488,7 +488,7 @@ public class SquareRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public SquareRegion addExtents(float extentX, float extentY, SquareRegion dest) {
+    public RectangularRegion addExtents(float extentX, float extentY, RectangularRegion dest) {
         dest.rectangle.minX = Math.roundUsing(this.rectangle.minX - extentX, RoundingMode.FLOOR);
         dest.rectangle.minY = Math.roundUsing(this.rectangle.minY - extentY, RoundingMode.FLOOR);
 
@@ -512,7 +512,7 @@ public class SquareRegion {
         if (getClass() != o.getClass()) {
             return false;
         }
-        SquareRegion region = (SquareRegion) o;
+        RectangularRegion region = (RectangularRegion) o;
         return rectangle.equals(region.rectangle);
     }
 
