@@ -16,6 +16,7 @@
 package org.terasology.rendering.primitives;
 
 import com.google.common.base.Preconditions;
+import org.terasology.math.JomlUtil;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Vector2f;
@@ -111,7 +112,7 @@ public class Tessellator {
 
     private void addMeshPart(BlockMeshPart part, boolean doubleSided) {
         for (int i = 0; i < part.size(); ++i) {
-            Vector3f vertex = part.getVertex(i);
+            Vector3f vertex = JomlUtil.from(part.getVertex(i));
             meshData.getVertices().add(vertex.x);
             meshData.getVertices().add(vertex.y);
             meshData.getVertices().add(vertex.z);
@@ -121,12 +122,12 @@ public class Tessellator {
             meshData.getColors().add(activeColor.z);
             meshData.getColors().add(activeColor.w);
 
-            Vector3f normal = part.getNormal(i);
+            Vector3f normal = JomlUtil.from(part.getNormal(i));
             meshData.getNormals().add(normal.x);
             meshData.getNormals().add(normal.y);
             meshData.getNormals().add(normal.z);
 
-            Vector2f uv = part.getTexCoord(i);
+            Vector2f uv = JomlUtil.from(part.getTexCoord(i));
             meshData.getTexCoord0().add(uv.x);
             meshData.getTexCoord0().add(uv.y);
 
@@ -186,6 +187,4 @@ public class Tessellator {
         meshData = new MeshData();
         return result;
     }
-
-
 }

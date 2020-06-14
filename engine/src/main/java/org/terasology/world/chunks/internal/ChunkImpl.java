@@ -17,6 +17,7 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
@@ -112,6 +113,11 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public org.joml.Vector3i getPosition(org.joml.Vector3i dest) {
+        return dest.set(chunkPos.x,chunkPos.y,chunkPos.z);
+    }
+
+    @Override
     public boolean isDirty() {
         return dirty;
     }
@@ -141,6 +147,12 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public Block getBlock(Vector3ic pos) {
+        short id = (short) blockData.get(pos.x(), pos.y(), pos.z());
+        return blockManager.getBlock(id);
+    }
+
+    @Override
     public final Block getBlock(int x, int y, int z) {
         short id = (short) blockData.get(x, y, z);
         return blockManager.getBlock(id);
@@ -161,6 +173,11 @@ public class ChunkImpl implements Chunk {
     @Override
     public Block setBlock(BaseVector3i pos, Block block) {
         return setBlock(pos.x(), pos.y(), pos.z(), block);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic pos, Block block) {
+        return setBlock(pos.x(),pos.y(),pos.z(),block);
     }
 
     @Override
@@ -237,11 +254,21 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public int getExtraData(int index, Vector3ic pos) {
+        return getExtraData(index, pos.x(), pos.y(), pos.z());
+    }
+
+    @Override
     public void setExtraData(int index, int x, int y, int z, int value) {
         if (extraDataSnapshots != null && extraData[index] == extraDataSnapshots[index]) {
             extraData[index] = extraData[index].copy();
         }
         extraData[index].set(x, y, z, value);
+    }
+
+    @Override
+    public void setExtraData(int index, Vector3ic pos, int value) {
+        setExtraData(index, pos.x(), pos.y(), pos.z(), value);
     }
 
     @Override
@@ -252,6 +279,11 @@ public class ChunkImpl implements Chunk {
     @Override
     public Vector3i getChunkWorldOffset() {
         return new Vector3i(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
+    }
+
+    @Override
+    public org.joml.Vector3i getChunkWorldOffset(org.joml.Vector3i dest) {
+        return dest.set(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
     }
 
     @Override
@@ -275,8 +307,18 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public org.joml.Vector3i chunkToWorldPosition(Vector3ic blockPos, org.joml.Vector3i dest) {
+        return chunkToWorldPosition(blockPos.x(), blockPos.y(), blockPos.z(), dest);
+    }
+
+    @Override
     public Vector3i chunkToWorldPosition(int x, int y, int z) {
         return new Vector3i(chunkToWorldPositionX(x), chunkToWorldPositionY(y), chunkToWorldPositionZ(z));
+    }
+
+    @Override
+    public org.joml.Vector3i chunkToWorldPosition(int x, int y, int z, org.joml.Vector3i dest) {
+        return dest.set(chunkToWorldPositionX(x), chunkToWorldPositionY(y), chunkToWorldPositionZ(z));
     }
 
     @Override
