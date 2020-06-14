@@ -16,11 +16,11 @@
 package org.terasology.rendering.nui.widgets.browser.data.html.basic.list;
 
 import org.joml.Rectanglei;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.util.RectUtility;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
 import org.terasology.rendering.nui.widgets.browser.data.html.basic.DefaultParagraphData;
@@ -90,7 +90,7 @@ public class OrderedListDecorator implements ListDecorator {
 
             String text = (index + 1) + ".";
 
-            Rectanglei bounds = JomlUtil.rectangleiFromMinAndSize(
+            Rectanglei bounds = RectUtility.createFromMinAndSize(
                     startPos.x + leftIndent + advance, startPos.y, font.getWidth(text), font.getLineHeight());
             canvas.drawTextRaw(text, font, fallbackStyle.getColor(false), bounds);
 

@@ -16,12 +16,11 @@
 package org.terasology.rendering.nui.widgets.browser.ui;
 
 import org.joml.Rectanglei;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.Color;
 import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.util.RectUtility;
 import org.terasology.rendering.nui.widgets.browser.data.DocumentData;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
@@ -108,11 +107,11 @@ public final class DocumentRenderer {
                         + paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth);
 
                 if (floatStyle == ParagraphRenderStyle.FloatStyle.LEFT) {
-                    Rect2i position = containerRenderSpace.addLeftFloat(yShift, paragraphMinWidth, height);
-                    yShift = position.minY();
+                    Rectanglei position = containerRenderSpace.addLeftFloat(yShift, paragraphMinWidth, height);
+                    yShift = position.minY;
                 } else {
-                    Rect2i position = containerRenderSpace.addRightFloat(yShift, paragraphMinWidth, height);
-                    yShift = position.minY();
+                    Rectanglei position = containerRenderSpace.addRightFloat(yShift, paragraphMinWidth, height);
+                    yShift = position.minY;
                 }
             } else {
                 yShift += paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth)
@@ -203,7 +202,7 @@ public final class DocumentRenderer {
             height += paragraphRenderStyle.getParagraphPaddingBottom().getValue(containerWidth)
                     + paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth);
 
-            Rect2i position;
+            Rectanglei position;
             if (floatStyle == ParagraphRenderStyle.FloatStyle.LEFT) {
                 position = containerRenderSpace.addLeftFloat(yShift, paragraphWidth, height);
             } else {
@@ -211,25 +210,25 @@ public final class DocumentRenderer {
             }
 
             Rectanglei paragraphBorderRegion = new Rectanglei(
-                    position.minX() + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth),
-                    position.minY() + paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth),
-                    position.maxX() - paragraphRenderStyle.getParagraphMarginRight().getValue(containerWidth) - 1,
-                    position.maxY() - paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth) - 1);
+                    position.minX + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth),
+                    position.minY + paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth),
+                    position.maxX - paragraphRenderStyle.getParagraphMarginRight().getValue(containerWidth) - 1,
+                    position.maxY - paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth) - 1);
 
             Color paragraphBackground = paragraphRenderStyle.getParagraphBackground();
             if (paragraphBackground != null) {
                 canvas.drawFilledRectangle(paragraphBorderRegion, paragraphBackground);
             }
 
-            Vector2i paragraphStart = new Vector2i(position.minX(),
-                    position.minY()
+            Vector2i paragraphStart = new Vector2i(position.minX,
+                    position.minY
                             + paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth)
                             + paragraphRenderStyle.getParagraphPaddingTop().getValue(containerWidth));
 
             paragraphContents.renderContents(canvas, paragraphStart, new ContainerFlowContainerRenderSpace(paragraphWidth),
                     leftParagraphIndent, rightParagraphIndent, paragraphRenderStyle, paragraphRenderStyle.getHorizontalAlignment(), register);
 
-            yShift = position.minY();
+            yShift = position.minY;
         } else {
             yShift += paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth);
 
@@ -254,7 +253,7 @@ public final class DocumentRenderer {
                     int backgroundAdvance = containerRenderSpace.getAdvanceForVerticalPosition(backgroundStart);
                     int maxSpace = containerRenderSpace.getNextWidthChange(backgroundStart);
 
-                    Rectanglei backgroundRegion = JomlUtil.rectangleiFromMinAndSize(
+                    Rectanglei backgroundRegion = RectUtility.createFromMinAndSize(
                             xShift + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth) + backgroundAdvance,
                             backgroundStart,
                             availableBackgroundWidth - 1,

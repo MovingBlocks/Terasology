@@ -145,7 +145,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         TabbingManager.setFocusManager(this);
 
         // NOTE: Fix for tests
-        if (bindsManager != null) {
+        if (bindsManager != null
+                && bindsManager.getBindsConfig().hasBinds(new SimpleUri("engine:tabbingUI"))
+                && bindsManager.getBindsConfig().hasBinds(new SimpleUri("engine:tabbingModifier"))
+                && bindsManager.getBindsConfig().hasBinds(new SimpleUri("engine:activate"))) {
             TabbingManager.tabForwardInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingUI")).get(0);
             TabbingManager.tabBackInputModifier = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingModifier")).get(0);
             TabbingManager.activateInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:activate")).get(0);
