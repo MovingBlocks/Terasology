@@ -731,7 +731,13 @@ public class BlockRegion {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null) {
+            return false;
+        }
+        if (aabb.getClass() == o.getClass()) {
+            return aabb.equals(o);
+        }
+        if (getClass() != o.getClass()) {
             return false;
         }
         BlockRegion region = (BlockRegion) o;
