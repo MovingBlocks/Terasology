@@ -72,6 +72,35 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
+     * @return local rotation of location component
+     * TODO: make this readonly Quaternionfc -- Michael Pollind
+     */
+    public Quat4f getLocalRotation() {
+        return rotation;
+    }
+
+
+    /**
+     * @param newQuat
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #setLocalRotation(Quaternionfc)}.
+     */
+    public void setLocalRotation(Quat4f newQuat) {
+        lastRotation.set(rotation);
+        rotation.set(newQuat);
+    }
+
+    /**
+     * set the current local rotation of the component
+     * @param newQuat local rotation
+     */
+    public void setLocalRotation(Quaternionfc newQuat) {
+        lastRotation.set(rotation);
+        rotation.set(JomlUtil.from(newQuat));
+    }
+
+
+    /**
      * @return The position of this component relative to any parent. Can be directly modified to update the component
      * TODO: make this readonly Vector3fc -- Michael Pollind
      */
@@ -89,6 +118,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         lastPosition.set(position);
         position.set(newPos);
     }
+
+
 
     /**
      * the local position of this location component
@@ -119,29 +150,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
         return dest.set(Direction.FORWARD.asVector3i()).rotate(JomlUtil.from(getLocalRotation()));
     }
 
-    // TODO: make this readonly Quaternionfc -- Michael Pollind
-    public Quat4f getLocalRotation() {
-        return rotation;
-    }
-
-    /**
-     * @param newQuat
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #setLocalRotation(Quaternionfc)}.
-     */
-    public void setLocalRotation(Quat4f newQuat) {
-        lastRotation.set(rotation);
-        rotation.set(newQuat);
-    }
-
-    /**
-     * set the current local rotation of the component
-     * @param newQuat local rotation
-     */
-    public void setLocalRotation(Quaternionfc newQuat) {
-        lastRotation.set(rotation);
-        rotation.set(JomlUtil.from(newQuat));
-    }
 
     public void setLocalScale(float value) {
         this.scale = value;
