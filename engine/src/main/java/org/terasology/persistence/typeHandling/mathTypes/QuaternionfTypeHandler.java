@@ -20,12 +20,13 @@ import org.joml.Quaternionf;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
+import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Optional;
 
 /**
  */
-public class QuaternionfTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Quaternionf> {
+public class QuaternionfTypeHandler extends TypeHandler<Quaternionf> {
 
     @Override
     public PersistedData serializeNonNull(Quaternionf value, PersistedDataSerializer serializer) {

@@ -34,7 +34,7 @@ public class Rect2fTypeHandler extends TypeHandler<Rect2f> {
     private static final String MIN_FIELD = "min";
     private static final String SIZE_FIELD = "size";
 
-    private TypeHandler<Vector2f> vector2fTypeHandler;
+    private final TypeHandler<Vector2f> vector2fTypeHandler;
 
     public Rect2fTypeHandler(TypeHandler<Vector2f> vector2fTypeHandler) {
         this.vector2fTypeHandler = vector2fTypeHandler;

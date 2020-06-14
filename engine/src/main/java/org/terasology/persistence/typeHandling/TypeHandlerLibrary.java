@@ -18,6 +18,8 @@ package org.terasology.persistence.typeHandling;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.AABBf;
+import org.joml.AABBi;
 import org.joml.Quaternionf;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -55,6 +57,9 @@ import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeH
 import org.terasology.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.ComponentClassTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.mathTypes.AABBfTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.AABBiTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.BlockRegionTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
@@ -80,6 +85,7 @@ import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
+import org.terasology.world.block.BlockRegion;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -211,6 +217,10 @@ public class TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(org.joml.Vector2f.class, new Vector2fTypeHandler());
         serializationLibrary.addTypeHandler(org.joml.Vector3i.class, new Vector3iTypeHandler());
         serializationLibrary.addTypeHandler(org.joml.Vector2i.class, new Vector2iTypeHandler());
+        serializationLibrary.addTypeHandler(AABBi.class, new AABBiTypeHandler());
+        serializationLibrary.addTypeHandler(AABBf.class, new AABBfTypeHandler());
+        serializationLibrary.addTypeHandler(BlockRegion.class, new BlockRegionTypeHandler());
+
 
         serializationLibrary.addTypeHandlerFactory(new Rect2iTypeHandlerFactory());
         serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());
