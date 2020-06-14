@@ -66,6 +66,20 @@ public class AABBTypeHandlerTest extends MathTypeAssert {
 
 
     @Test
+    public void testSerializeAABB1Missing() {
+        AABB3Test aabb3 = new AABB3Test();
+        aabb3.a1 = new AABBf(10.0f, 5.0f, 0, 5.3f, 2.0f, 2.2f);
+
+        JsonElement tree = gson.toJsonTree(aabb3);
+
+        JsonObject obj = tree.getAsJsonObject();
+        Assert.assertTrue(obj.has("a1"));
+        assertAABBf(obj.get("a1"), 10.0f, 5.0f, 0, 5.3f, 2.0f, 2.2f);
+        Assert.assertTrue(!obj.has("a2"));
+    }
+
+
+    @Test
     public void testSerializeAABBf() {
         AABB2Test aabb1 = new AABB2Test();
         aabb1.a1 = new AABBf(0, 2.0f, 1.5f, 10.0f, 5.0f, 10);
