@@ -17,7 +17,6 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
-import org.joml.AABBi;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;

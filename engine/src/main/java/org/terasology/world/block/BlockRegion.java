@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block;
 
+import org.joml.AABBd;
 import org.joml.AABBf;
 import org.joml.AABBi;
 import org.joml.Intersectionf;
@@ -475,6 +476,43 @@ public class BlockRegion {
         return this.aabb.containsPoint(point);
     }
 
+
+    /**
+     * Test whether the given aabb lies inside the {@link BlockRegion}
+     * @param region the region to test
+     * @return <code>true</code> iff the given value lies inside this {@link BlockRegion}; <code>false</code> otherwise
+     */
+    public boolean containsBlockRegion(BlockRegion region) {
+        return this.containsAABB(region.aabb);
+    }
+
+    /**
+     * Test whether the given {@link AABBi} lies inside the {@link BlockRegion}
+     * @param value the aabb to test
+     * @return <code>true</code> iff the given value lies inside this {@link BlockRegion}; <code>false</code> otherwise
+     */
+    public boolean containsAABB(AABBi value) {
+        return this.aabb.containsAABB(value);
+    }
+
+    /**
+     * Test whether the given {@link AABBf} lies inside the {@link BlockRegion}
+     * @param value the aabb to test
+     * @return <code>true</code> iff the given value lies inside this {@link BlockRegion}; <code>false</code> otherwise
+     */
+    public boolean containsAABB(AABBf value) {
+        return this.aabb.containsAABB(aabb);
+    }
+
+    /**
+     * Test whether the given {@link AABBd} lies inside the {@link BlockRegion}
+     * @param value the aabb to test
+     * @return <code>true</code> iff the given value lies inside this {@link BlockRegion}; <code>false</code> otherwise
+     */
+    public boolean containsAABB(AABBd value) {
+        return this.aabb.containsAABB(value);
+    }
+
     /**
      * Test whether the plane given via its plane equation <code>a*x + b*y + c*z + d = 0</code> intersects this AABB.
      * <p>
@@ -731,13 +769,7 @@ public class BlockRegion {
         if (this == o) {
             return true;
         }
-        if (o == null) {
-            return false;
-        }
-        if (aabb.getClass() == o.getClass()) {
-            return aabb.equals(o);
-        }
-        if (getClass() != o.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         BlockRegion region = (BlockRegion) o;

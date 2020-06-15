@@ -5,6 +5,7 @@ package org.terasology.world.block;
 
 import org.joml.AABBi;
 import org.joml.Math;
+import org.joml.Rectangled;
 import org.joml.Rectanglef;
 import org.joml.Rectanglei;
 import org.joml.RoundingMode;
@@ -332,8 +333,8 @@ public class RectangularRegion {
      * @param pos the coordinates of the block
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
-    public boolean containsBlock(Vector3ic pos) {
-        return containsBlock(pos.x(), pos.y(), pos.z());
+    public boolean containsSquare(Vector2ic pos) {
+        return containsSquare(pos.x(), pos.y());
     }
 
     /**
@@ -341,10 +342,9 @@ public class RectangularRegion {
      *
      * @param x the x coordinate of the point
      * @param y the y coordinate of the point
-     * @param z the z coordinate of the point
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
-    public boolean containsBlock(int x, int y, int z) {
+    public boolean containsSquare(int x, int y) {
         return x >= rectangle.minX && y >= rectangle.minY && x < rectangle.maxX && y < rectangle.maxY;
     }
 
@@ -391,6 +391,41 @@ public class RectangularRegion {
     }
 
     /**
+     * Test whether the given {@link RectangularRegion}  lies inside the {@link RectangularRegion}
+     * @param region the region to test
+     * @return <code>true</code> iff the given value lies inside this {@link RectangularRegion}; <code>false</code> otherwise
+     */
+    public boolean containsRectangularRegion(RectangularRegion region) {
+        return this.rectangle.containsRectangle(region.rectangle);
+    }
+
+    /**
+     * Test whether the given {@link Rectanglei}  lies inside the {@link RectangularRegion}
+     * @param rect the rectangle to test
+     * @return <code>true</code> iff the given value lies inside this {@link RectangularRegion}; <code>false</code> otherwise
+     */
+    public boolean containsRectangle(Rectanglei rect) {
+        return this.rectangle.containsRectangle(rect);
+    }
+    /**
+     * Test whether the given {@link Rectanglef}  lies inside the {@link RectangularRegion}
+     * @param rect the rectangle to test
+     * @return <code>true</code> iff the given value lies inside this {@link RectangularRegion}; <code>false</code> otherwise
+     */
+    public boolean containsRectangle(Rectanglef rect) {
+        return this.rectangle.containsRectangle(rect);
+    }
+    /**
+     * Test whether the given {@link Rectangled}  lies inside the {@link RectangularRegion}
+     * @param rect the rectangle to test
+     * @return <code>true</code> iff the given value lies inside this {@link RectangularRegion}; <code>false</code> otherwise
+     */
+    public boolean containsRectangle(Rectangled rect) {
+        return this.rectangle.containsRectangle(rect);
+    }
+
+
+    /**
      * Test whether <code>this</code> and <code>other</code> intersect.
      *
      * @param other the other BlockRegion
@@ -419,6 +454,17 @@ public class RectangularRegion {
     public boolean intersectsRectangle(Rectanglef other) {
         return this.rectangle.intersectsRectangle(other);
     }
+
+    /**
+     * Test whether <code>this</code> and <code>other</code> intersect.
+     *
+     * @param other the other AABB
+     * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
+     */
+    public boolean intersectsRegion(RectangularRegion other) {
+        return this.rectangle.intersectsRectangle(other.rectangle);
+    }
+
 
     /**
      * Check whether <code>this</code> BlockRegion represents a valid BlockRegion.
@@ -502,14 +548,7 @@ public class RectangularRegion {
         if (this == o) {
             return true;
         }
-        if (o == null) {
-            return false;
-        }
-        if (rectangle.getClass() == o.getClass()) {
-            return rectangle.equals(o);
-        }
-
-        if (getClass() != o.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         RectangularRegion region = (RectangularRegion) o;
