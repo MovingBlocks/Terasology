@@ -29,13 +29,13 @@ import java.util.List;
  */
 public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginLibrary {
 
-    private ClassLibrary<WorldGeneratorPlugin> library;
+    private final ClassLibrary<WorldGeneratorPlugin> library;
 
     public DefaultWorldGeneratorPluginLibrary(ModuleEnvironment moduleEnvironment, Context context) {
         library = new DefaultClassLibrary<>(context);
-        for (Class entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
+        for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
             if (WorldGeneratorPlugin.class.isAssignableFrom(entry)) {
-                library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry), entry.getSimpleName()), entry);
+                library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry), entry.getSimpleName()), entry.asSubclass(WorldGeneratorPlugin.class));
             }
         }
     }
@@ -43,7 +43,7 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
     @Override
     public <U extends WorldGeneratorPlugin> List<U> instantiateAllOfType(Class<U> ofType) {
         List<U> result = Lists.newArrayList();
-        for (ClassMetadata classMetadata : library) {
+        for (ClassMetadata<?, ?> classMetadata : library) {
             if (ofType.isAssignableFrom(classMetadata.getType()) && classMetadata.isConstructable() && classMetadata.getType().getAnnotation(RegisterPlugin.class) != null) {
                 U item = ofType.cast(classMetadata.newInstance());
                 if (item != null) {

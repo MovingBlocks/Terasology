@@ -49,7 +49,6 @@ import org.terasology.logic.console.suggesters.CommandNameSuggester;
 import org.terasology.logic.console.suggesters.ScreenSuggester;
 import org.terasology.logic.console.suggesters.SkinSuggester;
 import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;

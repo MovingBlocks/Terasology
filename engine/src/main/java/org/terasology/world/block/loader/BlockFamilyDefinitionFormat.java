@@ -41,7 +41,6 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.legacy.LegacyVector3fTypeAdapter;
-import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.utilities.gson.legacy.LegacyVector4fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.family.BlockFamily;
