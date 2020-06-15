@@ -23,6 +23,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.ChunkConstants;
 
 /**
@@ -120,12 +121,6 @@ public final class ChunkMath {
     @Deprecated
     public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
         return new Vector3i(calcChunkPos(x, chunkPower.x), calcChunkPos(y, chunkPower.y), calcChunkPos(z, chunkPower.z));
-    }
-
-    //TODO: can be replaced by region3i iterator
-    // https://github.com/MovingBlocks/Terasology/pull/4011
-    public static Vector3i[] calcChunkPos(Region3i region) {
-        return calcChunkPos(region, ChunkConstants.CHUNK_POWER);
     }
 
     /**
@@ -262,6 +257,66 @@ public final class ChunkMath {
         return dest.set(calcChunkPos(x, chunkX), calcChunkPos(y, chunkY), calcChunkPos(z, chunkZ));
     }
 
+    /**
+     * calculates a region that encasing a chunk
+     *
+     * @param region a bounding box that is contained
+     * @param chunkX the x unit size of the chunk in powers of 2
+     * @param chunkY the y unit size of the chunk in powers of 2
+     * @param chunkZ the z unit size of the chunk in powers of 2
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static BlockRegion calcChunkRegion(BlockRegion region, int chunkX, int chunkY, int chunkZ, BlockRegion dest) {
+        return dest.
+            setMin(calcChunkPos(region.getMinX(), chunkX), calcChunkPos(region.getMinY(), chunkY), calcChunkPos(region.getMinZ(), chunkZ)).
+            setMax(calcChunkPos(region.getMaxX(), chunkX), calcChunkPos(region.getMaxY(), chunkY), calcChunkPos(region.getMaxZ(), chunkZ));
+    }
+
+    /**
+     * calculates a region that encasing a chunk
+     *
+     * @param region a bounding box that is contained
+     * @param chunkPower  the size of the chunk in powers of 2
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static BlockRegion calcChunkRegion(BlockRegion region, Vector3ic chunkPower, BlockRegion dest) {
+        return calcChunkRegion(region, chunkPower.x(), chunkPower.y(), chunkPower.z(), dest);
+    }
+
+    /**
+     * calculates a region that encasing a chunk
+     * This uses the default power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
+     *
+     * @param region a bounding box that is contained
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static BlockRegion calcChunkRegion(BlockRegion region, BlockRegion dest) {
+        return calcChunkRegion(region, ChunkConstants.POWER_X, ChunkConstants.POWER_Y, ChunkConstants.POWER_Z, dest);
+    }
+
+    /**
+     *
+     * @param region
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #calcChunkRegion(BlockRegion, BlockRegion)}.
+     */
+    public static Vector3i[] calcChunkPos(Region3i region) {
+        return calcChunkPos(region, ChunkConstants.CHUNK_POWER);
+    }
+
+
+    /**
+     *
+     * @param region
+     * @param chunkPower
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #calcChunkRegion(BlockRegion,Vector3ic, BlockRegion)}.
+     */
     public static Vector3i[] calcChunkPos(Region3i region, Vector3i chunkPower) {
         int minX = calcChunkPos(region.minX(), chunkPower.x);
         int minY = calcChunkPos(region.minY(), chunkPower.y);
@@ -288,49 +343,37 @@ public final class ChunkMath {
     /**
      * Returns the internal position of a block within a chunk.
      *
-     * @param blockX The X-coordinate of the block in the world
-     * @return The X-coordinate of the block within the chunk
+     * @param pos the world position of the chunk
+     * @param filter the length of the chunk - 1
+     * @return the relative position of the chunk
      */
-    public static int calcBlockPosX(int blockX, int chunkPosFilterX) {
-        return blockX & chunkPosFilterX;
+    public static int calcRelativeBlockPos(int pos, int filter) {
+        return pos & filter;
     }
 
-    public static int calcBlockPosY(int blockY, int chunkPosFilterY) {
-        return blockY & chunkPosFilterY;
-    }
-
-    /**
-     * Returns the internal position of a block within a chunk.
-     *
-     * @param blockZ The Z-coordinate of the block in the world
-     * @return The Z-coordinate of the block within the chunk
-     */
-    public static int calcBlockPosZ(int blockZ, int chunkPosFilterZ) {
-        return blockZ & chunkPosFilterZ;
-    }
 
     public static int calcBlockPosX(int blockX) {
-        return calcBlockPosX(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x);
+        return calcRelativeBlockPos(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x);
     }
 
     public static int calcBlockPosY(int blockY) {
-        return calcBlockPosY(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y);
+        return calcRelativeBlockPos(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y);
     }
 
     public static int calcBlockPosZ(int blockZ) {
-        return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z);
+        return calcRelativeBlockPos(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z);
     }
 
-    public static Vector3i calcBlockPos(Vector3i worldPos) {
-        return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
+    public static Vector3i calcRelativeBlockPos(Vector3i worldPos) {
+        return calcRelativeBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
 
-    public static Vector3i calcBlockPos(int x, int y, int z) {
-        return calcBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER);
+    public static Vector3i calcRelativeBlockPos(int x, int y, int z) {
+        return calcRelativeBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
 
-    public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
-        return new Vector3i(calcBlockPosX(x, chunkFilterSize.x), calcBlockPosY(y, chunkFilterSize.y), calcBlockPosZ(z, chunkFilterSize.z));
+    public static Vector3i calcRelativeBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
+        return new Vector3i(calcRelativeBlockPos(x, chunkFilterSize.x), calcRelativeBlockPos(y, chunkFilterSize.y), calcRelativeBlockPos(z, chunkFilterSize.z));
     }
 
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {

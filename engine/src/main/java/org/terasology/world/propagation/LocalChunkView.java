@@ -53,7 +53,7 @@ public class LocalChunkView implements PropagatorWorldView {
     public byte getValueAt(Vector3i pos) {
         Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
-            return rules.getValue(chunk, ChunkMath.calcBlockPos(pos));
+            return rules.getValue(chunk, ChunkMath.calcRelativeBlockPos(pos));
         }
         return UNAVAILABLE;
     }
@@ -62,7 +62,7 @@ public class LocalChunkView implements PropagatorWorldView {
     public void setValueAt(Vector3i pos, byte value) {
         Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
-            rules.setValue(chunk, ChunkMath.calcBlockPos(pos), value);
+            rules.setValue(chunk, ChunkMath.calcRelativeBlockPos(pos), value);
         }
     }
 
@@ -71,7 +71,7 @@ public class LocalChunkView implements PropagatorWorldView {
         int index = chunkIndexOf(pos);
         Chunk chunk = chunks[index];
         if (chunk != null) {
-            return chunk.getBlock(ChunkMath.calcBlockPos(pos));
+            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos));
         }
         return null;
     }
