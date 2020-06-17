@@ -27,7 +27,7 @@ import org.terasology.utilities.random.FastRandom;
 public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
 
     private final int[] noisePermutations;
-    private int permCount;
+    private final int permCount;
 
     /**
      * Init. a new generator with a given seed value.
@@ -35,15 +35,14 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
      * @param seed The seed value
      */
     public PerlinNoise(long seed) {
-        this(seed, 8);
+        this(seed, 1 << 8);
     }
 
     public PerlinNoise(long seed, int permCountIn) {
         FastRandom rand = new FastRandom(seed);
 
-        permCount = 1<<permCountIn;
-
-        noisePermutations = new int[permCount*2];
+        permCount = permCountIn;
+        noisePermutations = new int[permCount * 2];
         int[] noiseTable = new int[permCount];
 
         // Init. the noise table
@@ -77,10 +76,10 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
      */
     @Override
     public float noise(float posX, float posY, float posZ) {
-        int mask = permCount-1;
-        int xInt = (int) TeraMath.fastFloor(posX) & mask;
-        int yInt = (int) TeraMath.fastFloor(posY) & mask;
-        int zInt = (int) TeraMath.fastFloor(posZ) & mask;
+        int mask = permCount;
+        int xInt = Math.floorMod((int) TeraMath.fastFloor(posX), mask);
+        int yInt = Math.floorMod((int) TeraMath.fastFloor(posY), mask);
+        int zInt = Math.floorMod((int) TeraMath.fastFloor(posZ), mask);
 
         float x = posX - TeraMath.fastFloor(posX);
         float y = posY - TeraMath.fastFloor(posY);
