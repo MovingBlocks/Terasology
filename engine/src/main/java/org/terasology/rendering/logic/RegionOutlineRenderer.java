@@ -111,7 +111,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
 
         Matrix4f matrixCameraSpace = new Matrix4f(new Quat4f(0, 0, 0, 1), worldPositionCameraSpace, 1.0f);
 
-        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
+        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
         material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);

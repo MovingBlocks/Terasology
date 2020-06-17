@@ -68,7 +68,7 @@ public abstract class Camera {
     protected float cachedReflectionHeight;
 
     /* (Water) Reflection */
-    private boolean reflected;
+    protected boolean reflected;
     private float reflectionHeight = 32;
 
     /**

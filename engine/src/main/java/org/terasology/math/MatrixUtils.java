@@ -18,6 +18,7 @@ package org.terasology.math;
 
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
+import org.joml.Vector3ic;
 import org.lwjgl.BufferUtils;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -123,10 +124,36 @@ public final class MatrixUtils {
         return fb;
     }
 
+    /**
+     *
+     * @param eyeX
+     * @param eyeY
+     * @param eyeZ
+     * @param centerX
+     * @param centerY
+     * @param centerZ
+     * @param upX
+     * @param upY
+     * @param upZ
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link org.joml.Matrix4f#setLookAt(float, float, float, float, float, float, float, float, float)}.
+     */
+    @Deprecated
     public static org.joml.Matrix4f createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
         return createViewMatrix(new org.joml.Vector3f(eyeX, eyeY, eyeZ), new org.joml.Vector3f(centerX, centerY, centerZ), new org.joml.Vector3f(upX, upY, upZ));
     }
 
+    /**
+     *
+     * @param eye
+     * @param center
+     * @param up
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link org.joml.Matrix4f#setLookAt(float, float, float, float, float, float, float, float, float)}.
+     */
+    @Deprecated
     public static org.joml.Matrix4f createViewMatrix(org.joml.Vector3f eye, org.joml.Vector3f center, org.joml.Vector3f up) {
         org.joml.Matrix4f m = new org.joml.Matrix4f();
 
@@ -171,6 +198,19 @@ public final class MatrixUtils {
     }
 
 
+    /**
+     *
+     * @param left
+     * @param right
+     * @param top
+     * @param bottom
+     * @param near
+     * @param far
+     * @return
+     *
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link org.joml.Matrix4f#setOrtho(float, float, float, float, float, float)}.
+     */
     public static org.joml.Matrix4f createOrthogonalProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
         org.joml.Matrix4f m = new org.joml.Matrix4f();
 
@@ -203,6 +243,17 @@ public final class MatrixUtils {
         return m;
     }
 
+    /**
+     *
+     * @param fovY
+     * @param aspectRatio
+     * @param zNear
+     * @param zFar
+     * @return
+     *
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link org.joml.Matrix4f#setPerspective(float, float, float, float)}.
+     */
     public static org.joml.Matrix4f createPerspectiveProjectionMatrix(float fovY, float aspectRatio, float zNear, float zFar) {
         org.joml.Matrix4f m = new org.joml.Matrix4f();
 
@@ -230,16 +281,50 @@ public final class MatrixUtils {
         return m;
     }
 
+    /**
+     *
+     * @param vm
+     * @param p
+     * @return
+     *
+     * @deprecated This is scheduled for removal in an upcoming version use JOML multiplication.
+     */
     public static org.joml.Matrix4f calcViewProjectionMatrix(org.joml.Matrix4f vm, org.joml.Matrix4f p) {
         return new org.joml.Matrix4f(p).mul(vm);
     }
 
+    /**
+     *
+     * @param m
+     * @param vm
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version use JOML multiplication.
+     */
     public static Matrix4f calcModelViewMatrix(Matrix4f m, Matrix4f vm) {
         Matrix4f result = new Matrix4f();
         result.mul(m, vm);
         return result;
     }
 
+    /**
+     *
+     * @param m
+     * @param vm
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version use JOML multiplication.
+     */
+    public static Matrix4f calcModelViewMatrix(Matrix4fc m, Matrix4f vm) {
+        Matrix4f result = new Matrix4f(JomlUtil.from(m));
+        result.transpose();
+        result.mul(vm);
+        return result;
+    }
+
+    /**
+     *
+     * @param mv
+     * @return This is scheduled for removal in an upcoming version use JOML get3x3 invert and transpose.
+     */
     public static Matrix3f calcNormalMatrix(Matrix4f mv) {
         Matrix3f result = new Matrix3f();
         result.m00 = mv.m00;

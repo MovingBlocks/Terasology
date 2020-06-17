@@ -197,7 +197,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     @Deprecated
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
+        GL11.glLoadMatrix(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
