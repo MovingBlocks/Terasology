@@ -38,7 +38,7 @@ public class UIIconBar extends CoreWidget {
     private HalfIconMode halfIconMode = HalfIconMode.SPLIT;
 
     @LayoutConfig
-    private int maxIcons = 10;
+    private int maxIcons = 5;
 
     @LayoutConfig
     private int spacing = 1;
@@ -78,7 +78,8 @@ public class UIIconBar extends CoreWidget {
                             halfSize.x /= 2;
                             halfSize.y /= 2;
                             canvas.drawTexture(icon,
-                                    Rect2i.createFromMinAndSize(new Vector2i(offset.x + halfSize.x / 2, offset.y + halfSize.y / 2), halfSize));
+                                    Rect2i.createFromMinAndSize(new Vector2i(offset.x + halfSize.x / 2,
+                                            offset.y + halfSize.y / 2), halfSize));
                             break;
                         case SPLIT:
                             canvas.drawTextureRaw(icon,
@@ -107,7 +108,8 @@ public class UIIconBar extends CoreWidget {
             int maxHorizontalIcons = sizeHint.x / iconSize.x;
             int rows = ((maxIcons - 1) / maxHorizontalIcons) + 1;
             int columns = Math.min(maxIcons, maxHorizontalIcons);
-            return new Vector2i(columns * iconSize.x + (columns - 1) * spacing, rows * iconSize.y + (rows - 1) * spacing);
+            return new Vector2i(columns * iconSize.x + (columns - 1) * spacing,
+                    rows * iconSize.y + (rows - 1) * spacing);
         } else {
             return Vector2i.zero();
         }
@@ -184,6 +186,13 @@ public class UIIconBar extends CoreWidget {
     }
 
     /**
+     * @param newValue The new max value for the number of icons.
+     */
+    public void setMaxIcons(int newValue) {
+        this.maxIcons = newValue;
+    }
+
+    /**
      * @return The current HalfIconMode used.
      */
     public HalfIconMode getHalfIconMode() {
@@ -202,6 +211,4 @@ public class UIIconBar extends CoreWidget {
         SPLIT,
         SHRINK,
     }
-
-
 }
