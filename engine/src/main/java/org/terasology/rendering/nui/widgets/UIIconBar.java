@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
@@ -38,7 +38,7 @@ public class UIIconBar extends CoreWidget {
     private HalfIconMode halfIconMode = HalfIconMode.SPLIT;
 
     @LayoutConfig
-    private int maxIcons = 5;
+    private int maxIcons = 10;
 
     @LayoutConfig
     private int spacing = 1;
