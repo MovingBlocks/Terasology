@@ -38,10 +38,17 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
         this(seed, 1 << 8);
     }
 
-    public PerlinNoise(long seed, int permCountIn) {
+    /**
+     * Init. a new generator with a given seed value and grid dimension.
+     * Supports tileable noise generation
+     *
+     * @param seed The seed value
+     * @param gridDim gridDim x gridDim will be the size of the perlin's grid of vectors, noise will be tiled if an input coordinate crosses a multiple of gridDim
+     */
+    public PerlinNoise(long seed, int gridDim) {
         FastRandom rand = new FastRandom(seed);
 
-        permCount = permCountIn;
+        permCount = gridDim;
         noisePermutations = new int[permCount * 2];
         int[] noiseTable = new int[permCount];
 
@@ -76,10 +83,9 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
      */
     @Override
     public float noise(float posX, float posY, float posZ) {
-        int mask = permCount;
-        int xInt = Math.floorMod((int) TeraMath.fastFloor(posX), mask);
-        int yInt = Math.floorMod((int) TeraMath.fastFloor(posY), mask);
-        int zInt = Math.floorMod((int) TeraMath.fastFloor(posZ), mask);
+        int xInt = Math.floorMod((int) TeraMath.fastFloor(posX), permCount);
+        int yInt = Math.floorMod((int) TeraMath.fastFloor(posY), permCount);
+        int zInt = Math.floorMod((int) TeraMath.fastFloor(posZ), permCount);
 
         float x = posX - TeraMath.fastFloor(posX);
         float y = posY - TeraMath.fastFloor(posY);

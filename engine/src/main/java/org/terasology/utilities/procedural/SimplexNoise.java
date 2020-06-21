@@ -62,26 +62,35 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
     private static final float F4 = ((float) Math.sqrt(5.0f) - 1.0f) / 4.0f;
     private static final float G4 = (5.0f - (float) Math.sqrt(5.0f)) / 20.0f;
 
-    private short[] perm;
-    private short[] permMod12;
-    private int permCount;
+    private final short[] perm;
+    private final short[] permMod12;
+    private final int permCount;
 
     /**
-     * Initialize permutations with a given seed
+     * Multiply this with the gridDim provided and noise(x,x) will give tileable 1D noise which will tile
+     * when x crosses a multiple of (this * gridDim)
+     */
+    public final float tileable1DMagicNumber = 0.5773502691896258f;
+
+    /**
+     * Initialize permutations with a given seed and grid dimension.
+     * Supports 1D tileable noise
+     * @see SimplexNoise#tileable1DMagicNumber
      *
      * @param seed a seed value used for permutation shuffling
+     * @param gridDim gridDim x gridDim will be the number of squares in the square grid formed after skewing the simplices belonging to once "tile"
      */
     public SimplexNoise(long seed) {
         this(seed, 8);
     }
 
-    public SimplexNoise(long seed, int permCountIn) {
+    public SimplexNoise(long seed, int girdDim) {
         FastRandom rand = new FastRandom(seed);
 
-        permCount = 1<<permCountIn;
+        permCount = girdDim;
 
-        perm = new short[permCount*2];
-        permMod12 = new short[permCount*2];
+        perm = new short[permCount * 2];
+        permMod12 = new short[permCount * 2];
         short[] p = new short[permCount];
 
         // Initialize with all values [0..(permCount-1)]
@@ -98,14 +107,11 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
             p[j] = swap;
         }
 
-        for (int i = 0; i < permCount*2; i++) {
-            perm[i] = p[i & (permCount-1)];
+        for (int i = 0; i < permCount * 2; i++) {
+            perm[i] = p[i % permCount];
             permMod12[i] = (short) (perm[i] % 12);
         }
     }
-
-    // This method is a *lot* faster than using (int)Math.floor(x)
-
 
     private static float dot(Grad g, float x, float y) {
         return g.x * x + g.y * y;
@@ -163,8 +169,8 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         float y2 = y0 - 1.0f + 2.0f * G2;
 
         // Work out the hashed gradient indices of the three simplex corners
-        int ii = i & (permCount-1);
-        int jj = j & (permCount-1);
+        int ii = i % permCount;
+        int jj = j % permCount;
         int gi0 = permMod12[ii + perm[jj]];
         int gi1 = permMod12[ii + i1 + perm[jj + j1]];
         int gi2 = permMod12[ii + 1 + perm[jj + 1]];
@@ -297,9 +303,9 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         float z3 = z0 - 1.0f + 3.0f * G3;
 
         // Work out the hashed gradient indices of the four simplex corners
-        int ii = i & (permCount-1);
-        int jj = j & (permCount-1);
-        int kk = k & (permCount-1);
+        int ii = i % permCount;
+        int jj = j % permCount;
+        int kk = k % permCount;
         int gi0 = permMod12[ii + perm[jj + perm[kk]]];
         int gi1 = permMod12[ii + i1 + perm[jj + j1 + perm[kk + k1]]];
         int gi2 = permMod12[ii + i2 + perm[jj + j2 + perm[kk + k2]]];
@@ -467,10 +473,10 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         float w4 = w0 - 1.0f + 4.0f * G4;
 
         // Work out the hashed gradient indices of the five simplex corners
-        int ii = i & (permCount-1);
-        int jj = j & (permCount-1);
-        int kk = k & (permCount-1);
-        int ll = l & (permCount-1);
+        int ii = i % permCount;
+        int jj = j % permCount;
+        int kk = k % permCount;
+        int ll = l % permCount;
         int gi0 = perm[ii + perm[jj + perm[kk + perm[ll]]]] % 32;
         int gi1 = perm[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]] % 32;
         int gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]] % 32;
