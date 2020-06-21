@@ -83,9 +83,9 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
      */
     @Override
     public float noise(float posX, float posY, float posZ) {
-        int xInt = Math.floorMod((int) TeraMath.fastFloor(posX), permCount);
-        int yInt = Math.floorMod((int) TeraMath.fastFloor(posY), permCount);
-        int zInt = Math.floorMod((int) TeraMath.fastFloor(posZ), permCount);
+        int xInt = Math.floorMod(TeraMath.floorToInt(posX), permCount);
+        int yInt = Math.floorMod(TeraMath.floorToInt(posY), permCount);
+        int zInt = Math.floorMod(TeraMath.floorToInt(posZ), permCount);
 
         float x = posX - TeraMath.fastFloor(posX);
         float y = posY - TeraMath.fastFloor(posY);
