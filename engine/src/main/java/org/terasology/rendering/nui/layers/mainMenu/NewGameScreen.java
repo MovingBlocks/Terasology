@@ -156,6 +156,11 @@ public class NewGameScreen extends CoreScreenLayer {
                 universeWrapper.setGameName(GameProvider.getNextGameName());
             }
             universeWrapper.setGameName(gameName.getText());
+            if (gameplay.getOptions().isEmpty()) {
+                logger.error("No gameplay modules present");
+                MessagePopup errorPopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                errorPopup.setMessage("Error", "Can't create new game without modules!");
+            }
             GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
             if (gameManifest != null) {
                 gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));

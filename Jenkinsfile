@@ -1,3 +1,8 @@
+// Needed due to the Copy Artifact plugin deciding to implement an obnoxious security feature that can't simply be turned off
+properties([
+    copyArtifactPermission('*')
+]);
+
 node ("default-java || heavy-java") {
     stage('Checkout') {
         echo "Going to check out the things !"
