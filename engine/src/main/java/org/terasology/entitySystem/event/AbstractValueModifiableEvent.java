@@ -20,6 +20,9 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
 
 /**
+ * A generic event for getting a value for a property.
+ *
+ * @see AbstractValueModifiableEvent
  */
 public abstract class AbstractValueModifiableEvent implements Event {
     private float baseValue;
@@ -48,10 +51,17 @@ public abstract class AbstractValueModifiableEvent implements Event {
         postModifiers.add(amount);
     }
 
+    /**
+     * Calculates the result value from the base value and given modifiers and multipliers.
+     * 
+     * The value is calculated base on the following formula:
+     * <pre>
+     * result = max(0, <baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>
+     * </pre>
+     *
+     * <emph>Note that the value range of result is not restricted!</emph>
+     */
     public float getResultValue() {
-        // For now, add all modifiers and multiply by all multipliers. Negative modifiers cap to zero, but negative
-        // multipliers remain.
-
         float result = baseValue;
         TFloatIterator modifierIter = modifiers.iterator();
         while (modifierIter.hasNext()) {
