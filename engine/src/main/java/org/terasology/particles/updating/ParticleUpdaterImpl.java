@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.module.ModuleEnvironment;
@@ -273,7 +274,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         );
 
         particleEmitter.particlePool.temporaryParticleData.position.add(
-            particleEmitter.locationComponent.getWorldPosition()
+            JomlUtil.from(particleEmitter.locationComponent.getWorldPosition())
         );
 
         particleEmitter.particlePool.storeTemporaryDataAt(index, ParticleDataMask.ALL.toInt());

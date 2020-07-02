@@ -1,23 +1,11 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -54,6 +42,9 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private DisplayDevice displayDevice;
 
     private Vector3f tempRightVector = new Vector3f();
+    //TODO: remove when projectionMatrix is corrected
+    private final Matrix4f transposeProjectionMatrix = new Matrix4f();
+
 
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
         super(worldProvider, renderingConfig);
@@ -71,7 +62,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrixf(MatrixUtils.matrixToFloatBuffer(getProjectionMatrix()));
+        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
@@ -137,23 +128,26 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     public void updateMatrices(float fov) {
         // Nothing to do...
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
-                && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
-                && cachedFov == fov
-                && cachedZFar == getzFar() && cachedZNear == getzNear()
-                && cachedReflectionHeight == getReflectionHeight()) {
+            && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
+            && cachedFov == fov
+            && cachedZFar == getzFar() && cachedZNear == getzNear()
+            && cachedReflectionHeight == getReflectionHeight()) {
             return;
         }
 
         viewingDirection.cross(up, tempRightVector);
         tempRightVector.mul(bobbingRotationOffsetFactor);
 
-        projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar(),this.displayDevice);
+        float aspectRatio = (float) displayDevice.getWidth() / displayDevice.getHeight();
+        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
+        transposeProjectionMatrix.setPerspective(fovY, aspectRatio, getzNear(), getzFar());
+        transposeProjectionMatrix.transpose(projectionMatrix);
 
         viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
-                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+            viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
         normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
-                up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+            up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
         reflectionMatrix.setColumn(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
         reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
@@ -162,10 +156,9 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         reflectionMatrix.mul(viewMatrix, viewMatrixReflected);
 
         reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        reflectionMatrix.mul(normViewMatrix,normViewMatrixReflected);
+        reflectionMatrix.mul(normViewMatrix, normViewMatrixReflected);
 
-//        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
-        viewProjectionMatrix = new Matrix4f(viewMatrix).mul(projectionMatrix);
+        viewProjectionMatrix.set(viewMatrix).mul(projectionMatrix);
 
         projectionMatrix.invert(inverseProjectionMatrix);
         viewProjectionMatrix.invert(inverseViewProjectionMatrix);
@@ -183,20 +176,18 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         updateFrustum();
     }
 
+    @Override
+    public Matrix4f getProjectionMatrix() {
+        //TODO: can use default superclass implementation when projectionMatrix is corrected
+        return transposeProjectionMatrix;
+    }
+
     public void setBobbingRotationOffsetFactor(float f) {
         bobbingRotationOffsetFactor = f;
     }
 
     public void setBobbingVerticalOffsetFactor(float f) {
         bobbingVerticalOffsetFactor = f;
-    }
-
-    // TODO: Move the dependency on LWJGL (Display) elsewhere
-    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar, DisplayDevice displayDevice) {
-        float aspectRatio = (float) displayDevice.getWidth()/ displayDevice.getHeight();
-        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
-
-        return new Matrix4f().perspective(fovY,aspectRatio,zNear,zFar).transpose();
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {

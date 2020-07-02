@@ -19,6 +19,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
@@ -188,7 +189,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     @Deprecated
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrixf(MatrixUtils.matrixToFloatBuffer(getProjectionMatrix()));
+        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
