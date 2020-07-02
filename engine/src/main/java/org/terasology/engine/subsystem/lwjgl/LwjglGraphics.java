@@ -107,6 +107,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     private GameEngine engine;
     private LwjglDisplayDevice lwjglDisplay;
 
+    public static void initOpenGLParams() {
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_NORMALIZE);
+        glDepthFunc(GL_LEQUAL);
+    }
+
     @Override
     public String getName() {
         return "Graphics";
@@ -231,16 +238,19 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         GLFW.glfwWindowHint(GLFW.GLFW_COCOA_GRAPHICS_SWITCHING, GLFW.GLFW_TRUE);
         GLFW.glfwWindowHint(GLFW.GLFW_DEPTH_BITS, config.getPixelFormat());
 
-        if (!config.isVSync()) {
-            GLFW.glfwSwapInterval(0);
-        }
+//        GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_OPENGL_API);
+//        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+//        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
+//        if (Platform.get() == Platform.MACOSX) {
+//            GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_COMPAT_PROFILE);
+//        }
+
         if (config.getDebug().isEnabled()) {
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
         }
 
         GLFW.glfwSetErrorCallback(new GLFWErrorCallback());
     }
-
 
     private void initWindow() {
         logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your " +
@@ -251,6 +261,11 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             throw new RuntimeException("Failed to create window");
         }
         GLFW.glfwMakeContextCurrent(window);
+
+        if (!config.isVSync()) {
+            GLFW.glfwSwapInterval(0);
+        }
+
         try {
             String root = "org/terasology/icons/";
             ClassLoader classLoader = getClass().getClassLoader();
@@ -380,13 +395,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 "\n" +
                 "Try updating the driver to the latest version available.\n" +
                 "If that fails you might need to use a different GPU (graphics card). Sorry!\n";
-    }
-
-    public static void initOpenGLParams() {
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_NORMALIZE);
-        glDepthFunc(GL_LEQUAL);
     }
 
     public void asynchToDisplayThread(Runnable action) {

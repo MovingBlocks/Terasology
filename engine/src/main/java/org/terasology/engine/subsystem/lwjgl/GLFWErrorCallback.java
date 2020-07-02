@@ -2,6 +2,7 @@ package org.terasology.engine.subsystem.lwjgl;
 
 
 import org.lwjgl.glfw.GLFWErrorCallbackI;
+import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,6 @@ public class GLFWErrorCallback implements GLFWErrorCallbackI {
 
     @Override
     public void invoke(int error, long description) {
-        logger.error("Recieved error. Code: {}, Description: {}", error, description);
+        logger.error("Recieved error. Code: {}, Description: {}", error, MemoryUtil.memASCII(description));
     }
 }

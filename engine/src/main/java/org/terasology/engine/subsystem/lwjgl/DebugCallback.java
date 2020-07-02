@@ -44,7 +44,7 @@ import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR;
 /**
  * Callback used by the OpenGL driver to output additional debug information about our use of the API.
  */
-class DebugCallback implements org.lwjgl.opengl.GLDebugMessageCallbackI {
+public class DebugCallback implements org.lwjgl.opengl.GLDebugMessageCallbackI {
 
     private static final Logger logger = LoggerFactory.getLogger("OpenGL");
 
