@@ -20,6 +20,9 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 
@@ -32,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,8 +46,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class GameProviderTest {
     private static final String GAME_1 = "Game 1";
-    private static final Path TMP_SAVES_FOLDER_PATH = Paths.get("out", "test", "engine-tests", "tmp", "saves").toAbsolutePath();
-    private static final Path TMP_RECORDS_FOLDER_PATH = Paths.get("out", "test", "engine-tests", "tmp", "records").toAbsolutePath();
+    private static final Path TMP_SAVES_FOLDER_PATH =
+            Paths.get("out", "test", "engine-tests", "tmp", "saves").toAbsolutePath();
+    private static final Path TMP_RECORDS_FOLDER_PATH =
+            Paths.get("out", "test", "engine-tests", "tmp", "records").toAbsolutePath();
     private static final Path TMP_SAVE_GAME_PATH = TMP_SAVES_FOLDER_PATH.resolve(GAME_1);
     private static final Path TMP_RECORD_GAME_PATH = TMP_RECORDS_FOLDER_PATH.resolve(GAME_1);
     private static final String GAME_MANIFEST_JSON = "gameManifest.json";
@@ -71,6 +77,16 @@ public class GameProviderTest {
         } catch (IOException e) {
             fail("Could not load input file");
         }
+    }
+
+    private static Stream<Arguments> nextGameNamesProvider() {
+        return Stream.of(
+                Arguments.arguments("Custom", "Custom 1"),
+                Arguments.arguments("Custom 1", "Custom 2"),
+                Arguments.arguments("Custom 2", "Custom 3"),
+                Arguments.arguments("Custom 9", "Custom 10"),
+                Arguments.arguments("Custom 19", "Custom 20")
+        );
     }
 
     @AfterEach
@@ -163,6 +179,15 @@ public class GameProviderTest {
     }
 
     @Test
+    public void getNextGameNameCustomNoSavesTest() {
+        String gameName = "Custom";
+        final String name = GameProvider.getNextGameName(gameName);
+
+        assertNotNull(name);
+        assertEquals(gameName, name);
+    }
+
+    @Test
     public void getNextGameNameNumberTest() throws IOException {
 
         Files.createDirectories(TMP_SAVE_GAME_PATH);
@@ -173,6 +198,21 @@ public class GameProviderTest {
 
         assertNotNull(name);
         assertEquals("Game 2", name);
+    }
+
+    @ParameterizedTest(name = "getNextGameName(\"{0}\") -> \"{1}\"")
+    @MethodSource("nextGameNamesProvider")
+    public void getNextGameNameNumberCustomNameTest(String gameName, String nextGameName) throws IOException {
+
+        Path customSaveFolder = TMP_SAVES_FOLDER_PATH.resolve(gameName);
+        Files.createDirectories(customSaveFolder);
+        Path manifestFilePath = customSaveFolder.resolve(GameManifest.DEFAULT_FILE_NAME);
+        writeToFile(manifestFilePath, MANIFEST_EXAMPLE.replace(GAME_1, gameName));
+
+        final String name = GameProvider.getNextGameName(gameName);
+
+        assertNotNull(name);
+        assertEquals(nextGameName, name);
     }
 
     @Test

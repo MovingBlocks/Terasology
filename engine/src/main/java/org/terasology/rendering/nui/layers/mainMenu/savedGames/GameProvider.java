@@ -63,7 +63,7 @@ public final class GameProvider {
             // Set the stream path in a try with resources construct first in order to close the stream.
             try (Stream<Path> stream = Files.list(savePath)
                     .filter(savedGameFolderPath -> Files.isDirectory(savedGameFolderPath)
-                                                   && Files.isRegularFile(savedGameFolderPath.resolve(GameManifest.DEFAULT_FILE_NAME)))) {
+                            && Files.isRegularFile(savedGameFolderPath.resolve(GameManifest.DEFAULT_FILE_NAME)))) {
                 return stream.collect(Collectors.toList()).isEmpty();
             } catch (IOException e) {
                 logger.warn("Can't read saves path {}", savePath, e);
@@ -100,7 +100,8 @@ public final class GameProvider {
                         result.add(new GameInfo(info, date, world.getValue()));
                     }
                 } catch (NullPointerException npe) {
-                    logger.error("The save file was corrupted for: " + world.toString() + ". The manifest can be found and restored at: " + gameManifest.toString(), npe);
+                    logger.error("The save file was corrupted for: " + world.toString() + ". The manifest can be " +
+                            "found and restored at: " + gameManifest.toString(), npe);
                 }
             } catch (IOException e) {
                 logger.error("Failed reading world data object.", e);
@@ -110,21 +111,42 @@ public final class GameProvider {
     }
 
     /**
-     * Generates the game name based on the game number of the last saved game
+     * Generates the game name based on the game number of the last saved game Uses {@link
+     * GameProvider#DEFAULT_GAME_NAME_PREFIX} for resolve.
      */
     public static String getNextGameName() {
+        String nextGameName = getNextGameName(DEFAULT_GAME_NAME_PREFIX);
+        if (nextGameName.equals(DEFAULT_GAME_NAME_PREFIX)) {
+            return nextGameName + 1;
+        }
+        return nextGameName;
+    }
+
+    /**
+     * Generates the game name based on the game number of the last saved game
+     *
+     * @param gameName will to use as game prefix, if saves contains this game name
+     * @return next game name with number. Example: "Game" -> "Game 1", "Game 1 -> Game 2"
+     */
+    public static String getNextGameName(String gameName) {
         int gameNumber = 1;
+        String name = gameName;
         for (GameInfo info : GameProvider.getSavedGames()) {
-            if (info.getManifest().getTitle().startsWith(DEFAULT_GAME_NAME_PREFIX)) {
-                String remainder = info.getManifest().getTitle().substring(DEFAULT_GAME_NAME_PREFIX.length());
+            if (info.getManifest().getTitle().startsWith(name)) {
+                String remainder = info.getManifest().getTitle().substring(name.length());
+                if (remainder.trim().isEmpty()) {
+                    remainder = name.replaceAll(".*?(\\d+)$", "$1");
+                    name = name.replaceAll("(\\d+)$", "");
+                }
                 try {
                     gameNumber = Math.max(gameNumber, Integer.parseInt(remainder) + 1);
                 } catch (NumberFormatException e) {
                     logger.trace("Could not parse {} as integer (not an error)", remainder, e);
                 }
+                return name.trim() + " " + gameNumber;
             }
         }
-        return DEFAULT_GAME_NAME_PREFIX + gameNumber;
+        return name;
     }
 
 }
