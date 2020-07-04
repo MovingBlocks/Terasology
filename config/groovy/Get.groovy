@@ -3,7 +3,8 @@
 
 import picocli.CommandLine.ParentCommand
 import picocli.CommandLine.Command
-import picocli.CommandLine.Mixin // Actually in use, annotation below may show syntax error due to Groovy's annotation by the same name. Works fine
+// Actually in use, annotation below may show syntax error due to Groovy's annotation by the same name. Works fine
+import picocli.CommandLine.Mixin
 import picocli.CommandLine.Parameters
 
 /**

@@ -3,7 +3,8 @@
 
 import picocli.CommandLine.Command
 import picocli.CommandLine.Help.Ansi
-import picocli.CommandLine.Mixin // Is in use, IDE may think the Groovy-supplied is in use below and mark this unused
+// Is in use, IDE may think the Groovy-supplied is in use below and mark this unused
+import picocli.CommandLine.Mixin
 import picocli.CommandLine.Parameters
 
 @Command(name = "init", description = "Initializes a workspace with some useful things")

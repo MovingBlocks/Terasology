@@ -1,3 +1,6 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 // Grab the Groovy extensions for PicoCLI - in IntelliJ Alt-ENTER on a `@Grab` to register contents for syntax highlighting
 @Grab('info.picocli:picocli-groovy:4.3.2')
 // TODO: Actually exists inside the Gradle Wrapper - gradle-6.4.1\lib\groovy-all-1.3-2.5.10.jar\groovyjarjarpicocli\
