@@ -48,7 +48,6 @@ import java.io.Reader;
 import java.lang.reflect.ReflectPermission;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Policy;
@@ -130,59 +129,56 @@ public class ModuleManagerImpl implements ModuleManager {
      * Overrides modules in modules/ with those specified via -classpath in the JVM
      */
     private void loadModulesFromClassPath() {
-        // Only attempt this if we're using the standard URLClassLoader
-        if (ClassLoader.getSystemClassLoader() instanceof URLClassLoader) {
-            URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            ModuleLoader loader = new ModuleLoader(metadataReader);
-            Enumeration<URL> moduleInfosInClassPath;
-            loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        ModuleLoader loader = new ModuleLoader(metadataReader);
+        Enumeration<URL> moduleInfosInClassPath;
+        loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
 
-            // We're looking for jars on the classpath with a module.txt
-            try {
-                moduleInfosInClassPath = urlClassLoader.findResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
-            } catch (IOException e) {
-                logger.warn("Failed to search for classpath modules: {}", e);
-                return;
+        // We're looking for jars on the classpath with a module.txt
+        try {
+            moduleInfosInClassPath = classLoader.getResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
+        } catch (IOException e) {
+            logger.warn("Failed to search for classpath modules: {}", e);
+            return;
+        }
+
+        for (URL url : Collections.list(moduleInfosInClassPath)) {
+            if (!url.getProtocol().equalsIgnoreCase("jar")) {
+                continue;
             }
 
-            for (URL url : Collections.list(moduleInfosInClassPath)) {
-                if (!url.getProtocol().equalsIgnoreCase("jar")) {
+            try (Reader reader = new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET)) {
+                ModuleMetadata metaData = metadataReader.read(reader);
+                String displayName = metaData.getDisplayName().toString();
+                Name id = metaData.getId();
+
+                // if the display name is empty or the id is null, this probably isn't a Terasology module
+                if (null == id || displayName.equalsIgnoreCase("")) {
+                    logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping");
+                    logger.warn("{}", url);
                     continue;
                 }
 
-                try (Reader reader = new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET)) {
-                    ModuleMetadata metaData = metadataReader.read(reader);
-                    String displayName = metaData.getDisplayName().toString();
-                    Name id = metaData.getId();
+                logger.info("Loading module {} from class path at {}", displayName, url.getFile());
 
-                    // if the display name is empty or the id is null, this probably isn't a Terasology module
-                    if (null == id || displayName.equalsIgnoreCase("")) {
-                        logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping");
-                        logger.warn("{}", url);
-                        continue;
-                    }
+                // the url contains a protocol, and points to the module.txt
+                // we need to trim both of those away to get the module's path
+                String targetFile = url.getFile()
+                        .replace("file:", "")
+                        .replace("!/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
+                        .replace("/" + TerasologyConstants.MODULE_INFO_FILENAME, "");
 
-                    logger.info("Loading module {} from class path at {}", displayName, url.getFile());
-
-                    // the url contains a protocol, and points to the module.txt
-                    // we need to trim both of those away to get the module's path
-                    String targetFile = url.getFile()
-                            .replace("file:", "")
-                            .replace("!/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
-                            .replace("/" + TerasologyConstants.MODULE_INFO_FILENAME, "");
-
-                    // Windows specific check - Path doesn't like /C:/... style Strings indicating files
-                    if (targetFile.matches("/[a-zA-Z]:.*")) {
-                        targetFile = targetFile.substring(1);
-                    }
-
-                    Path path = Paths.get(targetFile);
-
-                    Module module = loader.load(path);
-                    registry.add(module);
-                } catch (IOException e) {
-                    logger.warn("Failed to load module.txt for classpath module {}", url);
+                // Windows specific check - Path doesn't like /C:/... style Strings indicating files
+                if (targetFile.matches("/[a-zA-Z]:.*")) {
+                    targetFile = targetFile.substring(1);
                 }
+
+                Path path = Paths.get(targetFile);
+
+                Module module = loader.load(path);
+                registry.add(module);
+            } catch (IOException e) {
+                logger.warn("Failed to load module.txt for classpath module {}", url);
             }
         }
     }
