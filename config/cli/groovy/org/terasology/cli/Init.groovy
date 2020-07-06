@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.cli;
+package org.terasology.cli
 import picocli.CommandLine.Command
 import picocli.CommandLine.Help.Ansi
 // Is in use, IDE may think the Groovy-supplied is in use below and mark this unused

@@ -22,12 +22,12 @@ import picocli.CommandLine.HelpCommand
 
 // If using local groovy files the subcommands section may highlight as bad syntax in IntelliJ - that's OK
 @Command(name = "gw",
-        synopsisSubcommandLabel = "COMMAND", // Default is [COMMAND] indicating optional, but sub command here is required
-        subcommands = [
-                HelpCommand.class, // Adds standard help options (help as a subcommand, -h, and --help)
-                Module.class,
-                Init.class], // Note that these Groovy classes *must* start with a capital letter for some reason
-        description = "Utility system for interacting with a Terasology developer workspace")
+//    synopsisSubcommandLabel = "COMMAND", // Default is [COMMAND] indicating optional, but sub command here is required
+    subcommands = [
+        HelpCommand.class, // Adds standard help options (help as a subcommand, -h, and --help)
+        Module.class,
+        Init.class], // Note that these Groovy classes *must* start with a capital letter for some reason
+    description = "Utility system for interacting with a Terasology developer workspace")
 class GooeyCLI extends BaseCommand {
     static void main(String[] args) {
         AnsiConsole.systemInstall() // enable colors on Windows - TODO: Test on not-so-Windows systems, should those not run this?

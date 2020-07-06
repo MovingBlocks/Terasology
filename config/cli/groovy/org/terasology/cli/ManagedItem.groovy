@@ -1,9 +1,9 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.cli;
+package org.terasology.cli
 @GrabResolver(name = 'jcenter', root = 'http://jcenter.bintray.com/')
 @Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
-import org.ajoberstar.grgit.Grgit
+
 
 /**
  * Utility class for dealing with items managed in a developer workspace.
