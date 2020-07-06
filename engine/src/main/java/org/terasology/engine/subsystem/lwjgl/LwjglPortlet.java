@@ -30,13 +30,10 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
     @Override
     public void postInitialise(Context context) {
-        // FIXME: LWJGL 3 - reimplement
-        throw new RuntimeException("after moving to lwjgl3 it is not implement"); //TODO FIXIT
-//        try {
-//            Display.setParent(customViewPort);
-//        } catch (LWJGLException e) {
-//            throw new RuntimeException("Can not initialize graphics device.", e);
-//        }
+        // FIXME: LWJGL 3  haven't classes for working with awt.
+        // Used by TeraED facade only.
+        // Needs rework TeraED rendering part.
+        throw new RuntimeException("Not implemented");
     }
 
     public void setCustomViewport(Canvas canvas) {

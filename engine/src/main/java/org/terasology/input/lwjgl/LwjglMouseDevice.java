@@ -1,23 +1,12 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.input.lwjgl;
 
 import com.google.common.collect.Lists;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWVidMode;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -33,7 +22,9 @@ import java.beans.PropertyChangeListener;
 import java.util.Queue;
 
 /**
-
+ * Lwjgl 3's (GLFW) mouse device represenation.
+ * Handles mouse input via GLFW's callbacks
+ * Handles mouse state.
  */
 public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     private RenderingConfig renderingConfig;
@@ -41,11 +32,13 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     private boolean mouseGrabbed;
     private Queue<MouseAction> queue = Lists.newLinkedList();
 
-    private double xpos = 0.0;
-    private double ypos = 0.0;
+    private TIntSet buttonStates = new TIntHashSet();
 
-    private double xposDelta = 0.0;
-    private double yposDelta = 0.0;
+    private double xpos;
+    private double ypos;
+
+    private double xposDelta;
+    private double yposDelta;
 
     public LwjglMouseDevice(Context context) {
         this.renderingConfig = context.get(Config.class).getRendering();
@@ -62,7 +55,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
 
     @Override
     public Vector2i getPosition() {
-        return new Vector2i((int) (xpos / this.uiScale), (int)  (ypos/ this.uiScale));
+        return new Vector2i((int) (xpos / this.uiScale), (int)  (ypos / this.uiScale));
     }
 
     @Override
@@ -75,7 +68,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
 
     @Override
     public boolean isButtonDown(int button) {
-        return false; //FIXME: low priority unused method
+        return buttonStates.contains(button);
     }
 
     @Override
@@ -109,19 +102,21 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
         }
     }
 
-    private void cursorPosCallback(long window, double xpos, double ypos) {
-        xposDelta = xpos - this.xpos;
-        yposDelta = ypos - this.ypos;
-        this.xpos = xpos;
-        this.ypos = ypos;
+    private void cursorPosCallback(long window, double newX, double newY) {
+        xposDelta = newX - this.xpos;
+        yposDelta = newY - this.ypos;
+        this.xpos = newX;
+        this.ypos = newY;
     }
 
     private void mouseButtonCallback(long window, int button, int action, int mods) {
         ButtonState state;
         if (action == GLFW.GLFW_PRESS) {
             state = ButtonState.DOWN;
+            buttonStates.add(button);
         } else if (action == GLFW.GLFW_RELEASE) {
             state = ButtonState.UP;
+            buttonStates.remove(button);
         } else /*if (action == GLFW.GLFW_REPEAT)*/ {
             state = ButtonState.REPEAT;
         }

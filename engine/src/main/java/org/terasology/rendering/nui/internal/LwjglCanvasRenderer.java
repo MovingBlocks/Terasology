@@ -279,7 +279,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer, PropertyChangeListen
             if (frameBufferObject != null) {
                 frameBufferObject.dispose();
             }
-            frameBufferObject = new LwjglFrameBufferObject(urn, size);
+            frameBufferObject = new LwjglFrameBufferObject(displayDevice, urn, size);
             fboMap.put(urn, frameBufferObject);
         }
         return frameBufferObject;

@@ -238,13 +238,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         GLFW.glfwWindowHint(GLFW.GLFW_COCOA_GRAPHICS_SWITCHING, GLFW.GLFW_TRUE);
         GLFW.glfwWindowHint(GLFW.GLFW_DEPTH_BITS, config.getPixelFormat());
 
-//        GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_OPENGL_API);
-//        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
-//        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
-//        if (Platform.get() == Platform.MACOSX) {
-//            GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_COMPAT_PROFILE);
-//        }
-
         if (config.getDebug().isEnabled()) {
             GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
         }
@@ -297,15 +290,15 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
      * @return convertedImage
      */
     private GLFWImage convertToGLFWFormat(BufferedImage image) {
+        BufferedImage convertedImage;
         if (image.getType() != BufferedImage.TYPE_INT_ARGB_PRE) {
-            final BufferedImage convertedImage = new BufferedImage(image.getWidth(), image.getHeight(),
+           convertedImage = new BufferedImage(image.getWidth(), image.getHeight(),
                     BufferedImage.TYPE_INT_ARGB_PRE);
             final Graphics2D graphics = convertedImage.createGraphics();
             final int targetWidth = image.getWidth();
             final int targetHeight = image.getHeight();
             graphics.drawImage(image, 0, 0, targetWidth, targetHeight, null);
             graphics.dispose();
-            image = convertedImage;
         }
         final ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4);
         for (int i = 0; i < image.getHeight(); i++) {

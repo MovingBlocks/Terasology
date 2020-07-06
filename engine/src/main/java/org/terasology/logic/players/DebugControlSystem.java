@@ -25,6 +25,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.HideHUDButton;
+import org.terasology.input.device.MouseDevice;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
@@ -40,6 +41,8 @@ import org.terasology.world.WorldProvider;
 @RegisterSystem(RegisterMode.CLIENT)
 public class DebugControlSystem extends BaseComponentSystem {
 
+    private static final String DEBUG_INFO_URN = "engine:DebugInfo";
+
     @In
     private WorldProvider world;
     
@@ -48,6 +51,9 @@ public class DebugControlSystem extends BaseComponentSystem {
 
     @In
     private NUIManager nuiManager;
+
+    @In
+    private MouseDevice mouseDevice;
     
     private DebugOverlay overlay;
     
@@ -113,8 +119,7 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (debugEnabled) {
             switch (event.getKey().getId()) {
                 case Keyboard.KeyId.H:
-                    String DebugInfo = "engine:DebugInfo";
-                    nuiManager.toggleScreen(DebugInfo);
+                    nuiManager.toggleScreen(DEBUG_INFO_URN);
                     event.consume();
                     break;
                 case Keyboard.KeyId.F6:
@@ -139,7 +144,7 @@ public class DebugControlSystem extends BaseComponentSystem {
                 mouseGrabbed = !mouseGrabbed;
                 DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().getHUDElement("engine:DebugProperties");
                 debugProperties.setVisible(!mouseGrabbed);
-               // Mouse.setGrabbed(mouseGrabbed);
+                mouseDevice.setGrabbed(mouseGrabbed);
                 event.consume();
                 break;
             case Keyboard.KeyId.F3:
