@@ -22,7 +22,7 @@ import picocli.CommandLine.HelpCommand
 
 // If using local groovy files the subcommands section may highlight as bad syntax in IntelliJ - that's OK
 @Command(name = "gw",
-//    synopsisSubcommandLabel = "COMMAND", // Default is [COMMAND] indicating optional, but sub command here is required
+    synopsisSubcommandLabel = "COMMAND", // Default is [COMMAND] indicating optional, but sub command here is required
     subcommands = [
         HelpCommand.class, // Adds standard help options (help as a subcommand, -h, and --help)
         Module.class,

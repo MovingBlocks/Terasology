@@ -12,8 +12,9 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.5.4'
-    compile 'org.apache.ivy:ivy:2.4.0'
+    compile 'org.codehaus.groovy:groovy-all:3.0.4'
+    compile 'info.picocli:picocli-groovy:4.3.2'
+    compile 'org.fusesource.jansi:jansi:1.18'
 }
 
 sourceSets {
