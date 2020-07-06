@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.cli
 
+// Avoid some ugly warnings about logging itself - see http://www.slf4j.org/codes.html#StaticLoggerBinder
+@Grab(group = 'org.slf4j', module = 'slf4j-nop', version = '1.6.1')
+
 // Grab the Groovy extensions for PicoCLI - in IntelliJ Alt-ENTER on a `@Grab` to register contents for syntax highlighting
 @Grab('info.picocli:picocli-groovy:4.3.2')
 // TODO: Actually exists inside the Gradle Wrapper - gradle-6.4.1\lib\groovy-all-1.3-2.5.10.jar\groovyjarjarpicocli\

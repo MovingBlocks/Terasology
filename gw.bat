@@ -112,7 +112,7 @@ set CLASSPATH=%APP_HOME%gradle\wrapper\gradle-wrapper.jar;%APP_HOME%gradle\wrapp
 
 
 @rem Execute Groovy via the Gradle Wrapper
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -cp "%CLASSPATH%" org.gradle.wrapper.GroovyWrapperMain config/groovy/GooeyCLI.groovy %CMD_LINE_ARGS%
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -cp "%CLASSPATH%" org.gradle.wrapper.GroovyWrapperMain config/groovy/org/terasology/cli/GooeyCLI.groovy %CMD_LINE_ARGS%
 
 :end
 @rem End local scope for the variables with windows NT shell
