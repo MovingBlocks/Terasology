@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-
+package org.terasology.cli;
 /**
  * Simple command type class that indicates the command deals with "items" - nested Git roots representing application elements
  */

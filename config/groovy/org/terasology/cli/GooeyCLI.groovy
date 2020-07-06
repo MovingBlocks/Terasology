@@ -1,5 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+package org.terasology.cli
 
 // Grab the Groovy extensions for PicoCLI - in IntelliJ Alt-ENTER on a `@Grab` to register contents for syntax highlighting
 @Grab('info.picocli:picocli-groovy:4.3.2')

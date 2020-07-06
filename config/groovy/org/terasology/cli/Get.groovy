@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-
+package org.terasology.cli;
 import picocli.CommandLine.ParentCommand
 import picocli.CommandLine.Command
 // Actually in use, annotation below may show syntax error due to Groovy's annotation by the same name. Works fine
