@@ -44,7 +44,6 @@ public class LwjglInput extends BaseLwjglSubsystem {
         this.context = rootContext;
         initControls();
         updateInputConfig();
-        // Mouse.setGrabbed(false);
     }
 
     @Override
