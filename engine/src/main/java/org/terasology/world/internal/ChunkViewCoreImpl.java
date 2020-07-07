@@ -19,10 +19,12 @@ package org.terasology.world.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 
@@ -44,6 +46,14 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     public ChunkViewCoreImpl(Chunk[] chunks, Region3i chunkRegion, Vector3i offset, Block defaultBlock) {
         this.chunkRegion = chunkRegion;
+        this.chunks = chunks;
+        this.offset = offset;
+        setChunkSize(new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
+        this.defaultBlock = defaultBlock;
+    }
+
+    public ChunkViewCoreImpl(Chunk[] chunks, BlockRegion chunkRegion, Vector3i offset, Block defaultBlock) {
+        this.chunkRegion = JomlUtil.from(chunkRegion);
         this.chunks = chunks;
         this.offset = offset;
         setChunkSize(new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));

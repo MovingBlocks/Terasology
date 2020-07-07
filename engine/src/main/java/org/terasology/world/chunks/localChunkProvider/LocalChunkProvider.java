@@ -24,6 +24,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -32,6 +33,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -45,6 +47,8 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionIterable;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
@@ -122,13 +126,13 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
                               BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this(storageManager,
-                entityManager,
-                generator,
-                blockManager,
-                extraDataManager,
-                new LightMergingChunkFinalizer(),
-                LightMergingChunkFinalizer::new,
-                new ConcurrentMapChunkCache());
+            entityManager,
+            generator,
+            blockManager,
+            extraDataManager,
+            new LightMergingChunkFinalizer(),
+            LightMergingChunkFinalizer::new,
+            new ConcurrentMapChunkCache());
     }
 
     LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
@@ -164,6 +168,15 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
+    public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
+        BlockRegion region = new BlockRegion().setMin(centerChunkPos).addExtents(ChunkConstants.LOCAL_REGION_EXTENTS.x, ChunkConstants.LOCAL_REGION_EXTENTS.y, ChunkConstants.LOCAL_REGION_EXTENTS.z);
+        if (getChunk(centerChunkPos) != null) {
+            return createWorldView(region, Vector3i.one());
+        }
+        return null;
+    }
+
+    @Override
     public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
         Region3i region = ChunkMath.getChunkRegionAroundWorldPos(blockPos, extent);
         return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
@@ -176,6 +189,22 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
         }
         return null;
+    }
+
+    private ChunkViewCore createWorldView(BlockRegion region, Vector3i offset) {
+        Chunk[] chunks = new Chunk[region.getSizeX() * region.getSizeY() * region.getSizeZ()];
+        org.joml.Vector3i temp = new org.joml.Vector3i();
+        org.joml.Vector3i temp2 = new org.joml.Vector3i();
+        for (Vector3ic chunkPos : BlockRegionIterable.region(region).build()) {
+            Chunk chunk = chunkCache.get(JomlUtil.from(chunkPos));
+            if (chunk == null) {
+                return null;
+            }
+            temp.set(chunkPos).sub(region.getMinX(), region.getMinY(), region.getMinZ());
+            int index = ChunkMath.calculate3DArrayIndex(chunkPos, region.getSize(temp2));
+            chunks[index] = chunk;
+        }
+        return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
@@ -516,7 +545,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     private TShortObjectMap<TIntList> createBatchBlockEventMappings(Chunk chunk) {
         TShortObjectMap<TIntList> batchBlockMap = new TShortObjectHashMap<>();
         blockManager.listRegisteredBlocks().stream().filter(Block::isLifecycleEventsRequired).forEach(block ->
-                batchBlockMap.put(block.getId(), new TIntArrayList()));
+            batchBlockMap.put(block.getId(), new TIntArrayList()));
 
         ChunkBlockIterator i = chunk.getBlockIterator();
         while (i.next()) {
@@ -538,6 +567,15 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     @Override
     public Chunk getChunk(Vector3i pos) {
         Chunk chunk = chunkCache.get(pos);
+        if (isChunkReady(chunk)) {
+            return chunk;
+        }
+        return null;
+    }
+
+    @Override
+    public Chunk getChunk(Vector3ic chunkPos) {
+        Chunk chunk = chunkCache.get(JomlUtil.from(chunkPos));
         if (isChunkReady(chunk)) {
             return chunk;
         }
@@ -744,5 +782,4 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             return pos.gridDistance(regionCenter);
         }
     }
-
 }

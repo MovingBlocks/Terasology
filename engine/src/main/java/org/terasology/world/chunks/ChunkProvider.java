@@ -16,6 +16,7 @@
 
 package org.terasology.world.chunks;
 
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.internal.ChunkViewCore;
@@ -31,8 +32,19 @@ public interface ChunkProvider {
      *
      * @param centerChunkPos
      * @return A chunk view centered on the given chunk, with all of the surrounding chunks included.
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #getLocalView(org.joml.Vector3ic)}.
      */
+    @Deprecated
     ChunkViewCore getLocalView(Vector3i centerChunkPos);
+
+    /**
+     * A local view provides a
+     *
+     * @param centerChunkPos
+     * @return A chunk view centered on the given chunk, with all of the surrounding chunks included.
+     */
+    ChunkViewCore getLocalView(Vector3ic centerChunkPos);
 
     /**
      * @param blockPos
@@ -127,8 +139,19 @@ public interface ChunkProvider {
      *
      * @param chunkPos The position of the chunk to obtain
      * @return The chunk, or null if the chunk is not ready
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #getChunk(org.joml.Vector3ic)}.
      */
+    @Deprecated
     Chunk getChunk(Vector3i chunkPos);
+
+    /**
+     * Returns the chunk at the given position if possible.
+     *
+     * @param chunkPos The position of the chunk to obtain
+     * @return The chunk, or null if the chunk is not ready
+     */
+    Chunk getChunk(Vector3ic chunkPos);
 
     /**
      * Disposes the chunk provider, cleaning up all chunks and other assets it is using

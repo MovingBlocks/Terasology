@@ -24,6 +24,7 @@ import org.joml.Quaternionfc;
 import org.joml.Vector2fc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
@@ -36,6 +37,7 @@ import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.world.block.BlockRegion;
 
 public class JomlUtil {
 
@@ -112,10 +114,22 @@ public class JomlUtil {
     }
 
     public static AABB from(AABBf aabb) {
-        return AABB.createMinMax(new Vector3f(aabb.minX, aabb.minY, aabb.minZ), new Vector3f(aabb.maxX, aabb.maxY, aabb.maxZ));
+        return AABB.createMinMax(new Vector3f(aabb.minX, aabb.minY, aabb.minZ), new Vector3f(aabb.maxX, aabb.maxY,
+            aabb.maxZ));
     }
 
     public static AABBf from(AABB aabb) {
         return new AABBf(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
+    }
+
+    public static Region3i from(BlockRegion region) {
+        return Region3i.createFromMinMax(
+            JomlUtil.from(region.getMin(new Vector3i())),
+            JomlUtil.from(region.getMax(new Vector3i())));
+    }
+
+    public static BlockRegion from(Region3i region) {
+        return new BlockRegion(region.minX(), region.minY(), region.minZ(),
+            region.maxX(), region.maxY(), region.maxZ());
     }
 }

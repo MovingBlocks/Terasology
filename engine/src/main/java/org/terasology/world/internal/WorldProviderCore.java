@@ -22,6 +22,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.time.WorldTime;
 
 import java.util.Collection;
@@ -73,14 +74,33 @@ public interface WorldProviderCore {
     /**
      * @param chunkPos
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #getLocalView(org.joml.Vector3ic)}.
      */
+    @Deprecated
     ChunkViewCore getLocalView(Vector3i chunkPos);
+
+    /**
+     * @param chunkPos
+     * @return A world view centered on the desired chunk, with the surrounding chunks present.
+     */
+    ChunkViewCore getLocalView(Vector3ic chunkPos);
+
+
+    /**
+     * @param chunk
+     * @return A world view of the chunks around the desired chunk, uncentered.
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #getWorldViewAround(org.joml.Vector3ic)}.
+     */
+    @Deprecated
+    ChunkViewCore getWorldViewAround(Vector3i chunk);
 
     /**
      * @param chunk
      * @return A world view of the chunks around the desired chunk, uncentered.
      */
-    ChunkViewCore getWorldViewAround(Vector3i chunk);
+    ChunkViewCore getWorldViewAround(Vector3ic chunk);
 
 
     /**
@@ -93,7 +113,17 @@ public interface WorldProviderCore {
      */
     boolean isBlockRelevant(int x, int y, int z);
 
+    /**
+     *
+     * @param region
+     * @return
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #isRegionRelevant(BlockRegion)}.
+     */
+    @Deprecated
     boolean isRegionRelevant(Region3i region);
+
+    boolean isRegionRelevant(BlockRegion region);
 
     /**
      * Places a block of a specific type at a given position

@@ -484,6 +484,15 @@ public final class ChunkMath {
         }
     }
 
+
+    public static int calculate3DArrayIndex(Vector3ic pos, Vector3ic size) {
+        return calculate3DArrayIndex(pos.x(), pos.y(), pos.z(), size);
+    }
+
+    public static int calculate3DArrayIndex(int x, int y, int z, Vector3ic size) {
+        return x + size.x() * (z + size.z() * (y));
+    }
+
     /**
      * Works out whether the given block resides inside the given chunk.
      * <p>

@@ -25,6 +25,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
@@ -87,6 +88,11 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
+    public boolean isRegionRelevant(BlockRegion region) {
+        return false;
+    }
+
+    @Override
     public Block setBlock(Vector3i pos, Block type) {
         return blocks.put(pos, type);
     }
@@ -141,7 +147,17 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
+    public ChunkViewCore getLocalView(Vector3ic chunkPos) {
+        return null;
+    }
+
+    @Override
     public ChunkViewCore getWorldViewAround(Vector3i chunk) {
+        return null;
+    }
+
+    @Override
+    public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
         return null;
     }
 
