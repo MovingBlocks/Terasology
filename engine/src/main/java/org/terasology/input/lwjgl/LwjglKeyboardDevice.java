@@ -15,10 +15,10 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
-import org.terasology.input.device.KeyboardAction;
+import org.terasology.input.device.CharKeyboardAction;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.device.RawKeyboardAction;
 
-import java.util.Iterator;
 import java.util.Queue;
 
 /**
@@ -165,7 +165,8 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
 //        glfwToTeraMaps.put(GLFW.GLFW_KEY_SLEEP, Keyboard.KeyId.SLEEP);
     }
 
-    private Queue<KeyboardAction> queue = Lists.newLinkedList();
+    private Queue<RawKeyboardAction> rawKeyQueue = Lists.newLinkedList();
+    private Queue<CharKeyboardAction> charQueue = Lists.newLinkedList();
     private TIntSet buttonStates = new TIntHashSet();
 
     public LwjglKeyboardDevice() {
@@ -183,23 +184,7 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
      * @param chr recieved char, affected by keyboard layout and modifications.
      */
     private void glfwCharCallback(long window, int chr) {
-        KeyboardAction keyboardAction = null;
-
-        // Trying assing chr to key, which received previosly.
-        Iterator<KeyboardAction> iterator = queue.iterator();
-        while (iterator.hasNext()) {
-            KeyboardAction action = iterator.next();
-            if (action.getInputChar() != '\0') {
-                iterator.remove();
-                keyboardAction = new KeyboardAction(action.getInput(), action.getState(), (char) chr);
-            }
-        }
-        if (keyboardAction != null) {
-            queue.offer(keyboardAction);
-        } else {
-            logger.warn("Cannot map recived char [{}] to key", (char) chr);
-        }
-
+        charQueue.offer(new CharKeyboardAction((char) chr));
     }
 
     /**
@@ -228,11 +213,7 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
             state = ButtonState.REPEAT;
         }
 
-        String keyName = GLFW.glfwGetKeyName(key, scancode); // GLFW haven't cheching is printable method.
-        if (input == Keyboard.Key.SPACE) { // GLFW not detect SPACE keyName
-            keyName = " ";
-        }
-        queue.offer(new KeyboardAction(input, state, keyName == null ? 0 : keyName.charAt(0)));
+        rawKeyQueue.offer(new RawKeyboardAction(input, state));
     }
 
     @Override
@@ -241,12 +222,22 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
     }
 
     @Override
-    public Queue<KeyboardAction> getInputQueue() {
-        Queue<KeyboardAction> keyboardActions = Lists.newLinkedList();
-        KeyboardAction action;
-        while ((action = queue.poll()) != null) {
-            keyboardActions.add(action);
+    public Queue<RawKeyboardAction> getInputQueue() {
+        Queue<RawKeyboardAction> rawKeyboardActions = Lists.newLinkedList();
+        RawKeyboardAction action;
+        while ((action = rawKeyQueue.poll()) != null) {
+            rawKeyboardActions.add(action);
         }
-        return keyboardActions;
+        return rawKeyboardActions;
+    }
+
+    @Override
+    public Queue<CharKeyboardAction> getCharInputQueue() {
+        Queue<CharKeyboardAction> charActions = Lists.newLinkedList();
+        CharKeyboardAction action;
+        while ((action = charQueue.poll()) != null) {
+            charActions.add(action);
+        }
+        return charActions;
     }
 }
