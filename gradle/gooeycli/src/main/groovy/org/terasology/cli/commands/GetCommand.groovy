@@ -1,6 +1,9 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.cli
+package org.terasology.cli.commands
+
+import org.terasology.cli.options.GitOptions
+import org.terasology.cli.managers.ManagedItem
 import picocli.CommandLine.ParentCommand
 import picocli.CommandLine.Command
 // Actually in use, annotation below may show syntax error due to Groovy's annotation by the same name. Works fine
@@ -13,11 +16,11 @@ import picocli.CommandLine.Parameters
  * Distinct from the sibling command add-remote which does *not* mix in GitOptions since the command itself involves git remote
  */
 @Command(name = "get", description = "Gets one or more items directly")
-class Get extends BaseCommand implements Runnable {
+class GetCommand extends BaseCommandType implements Runnable {
 
     /** Reference to the parent item command so we can figure out what type it is */
     @ParentCommand
-    ItemCommand parent
+    ItemCommandType parent
 
     /** Mix in a variety of supported Git extras */
     @Mixin

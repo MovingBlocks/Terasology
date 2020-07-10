@@ -1,9 +1,10 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.cli
+package org.terasology.cli.managers
 @GrabResolver(name = 'jcenter', root = 'http://jcenter.bintray.com/')
 @Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
 import org.ajoberstar.grgit.Grgit
+import org.terasology.cli.helpers.PropHelper
 
 /**
  * Utility class for dealing with items managed in a developer workspace.
@@ -76,6 +77,44 @@ abstract class ManagedItem {
         return code.toString() == "200"
     }
 
+    List<String> recurse(List<String> items) {
+        def dependencies = []
+        println "Going to retrieve the following items (recursively): $items"
+        for (String item : items) {
+            // Check for circular dependencies - we should only ever act on a request to *retrieve* an item once
+            if (itemsRetrieved.contains(item)) {
+                println "Uh oh, we got told to re-retrieve the same thing for $item - somebody oopsed a circular dependency? Skipping"
+            } else {
+                // We didn't already try to retrieve this item: get it (if we already have it then getItem will just be a no-op)
+                getItem(item)
+                // Then goes and checks the item on disk and parses the thing to see if it has dependencies (even if we already had it)
+                dependencies << ((DependencyProvider) this).parseDependencies(item)
+            }
+            // Mark this item as retrieved just in case somebody made a whoops and introduced a circular dependency
+            itemsRetrieved << item
+        }
+
+        // If we parsed any dependencies, retrieve them recursively (and even if we already got them check them for dependencies as well)
+        if (!dependencies.isEmpty()) {
+            println "Got dependencies to fetch: " + dependencies
+            return recurse(dependencies)
+        }
+
+        println "Finally done recursing, both initial items and any parsed dependencies"
+        return null
+    }
+
+    def get(List<String> items) {
+        for (String itemName : items) {
+            getItem(itenName)
+        }
+    }
+
+    def  getItem(String item) {
+        println "Going to get $item do we already have it? <logic to look for the dir existing>"
+        // Logic for a single retrieve, no dependency parsing involved
+    }
+
     /**
      * Primary entry point for retrieving items, kicks off recursively if needed.
      * @param items the items we want to retrieve
@@ -121,23 +160,9 @@ abstract class ManagedItem {
                 Grgit.clone dir: itemDir, uri: targetUrl
             }
 /*
-            // This step allows the item type to check the newly cloned item and add in extra template stuff - TODO?
+            // This step allows the item type to check the newly cloned item and add in extra template stuff - TODO? Same as the recurse fix?
             //itemTypeScript.copyInTemplateFiles(itemDir)
-
-            // Handle also retrieving dependencies if the item type cares about that
-            if (recurse) {
-                def foundDependencies = itemTypeScript.findDependencies(itemDir)
-                if (foundDependencies.length == 0) {
-                    println "The $itemType $itemName did not appear to have any dependencies we need to worry about"
-                } else {
-                    println "The $itemType $itemName has the following $itemType dependencies we care about: $foundDependencies"
-                    String[] uniqueDependencies = foundDependencies - itemsRetrieved
-                    println "After removing dupes already retrieved we have the remaining dependencies left: $uniqueDependencies"
-                    if (uniqueDependencies.length > 0) {
-                        retrieve(uniqueDependencies, true)
-                    }
-                }
-            }*/
+*/
         }
     }
 }

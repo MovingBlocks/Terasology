@@ -8,10 +8,14 @@ repositories {
     jcenter()
 }
 
+// Important note: These need to be in sync with the @Grab entries in the Groovy scripts if both have to work
 dependencies {
+    // These are potentially available inside the Gradle/Groovy jar files already present
     compile 'org.codehaus.groovy:groovy-all:2.5.10'
     compile 'info.picocli:picocli-groovy:4.3.2'
     compile 'org.fusesource.jansi:jansi:1.18'
+
+    // Have to rely on these via 3rd party jars
     compile 'org.ajoberstar:grgit:1.9.3'
 }
 

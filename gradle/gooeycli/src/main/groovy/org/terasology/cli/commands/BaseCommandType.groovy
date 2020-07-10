@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.cli
+package org.terasology.cli.commands
 
 import picocli.CommandLine.Command
 
@@ -13,6 +13,6 @@ import picocli.CommandLine.Command
         parameterListHeading = "%n@|green Parameters:|@%n%n",
         optionListHeading    = "%n@|green Options:|@%n%n",
         commandListHeading   = "%n@|green Commands:|@%n%n")
-class BaseCommand {
+class BaseCommandType {
 
 }

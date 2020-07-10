@@ -1,20 +1,22 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.cli
+package org.terasology.cli.commands
 
+import org.terasology.cli.managers.ManagedItem
+import org.terasology.cli.managers.ManagedModule
 import picocli.CommandLine.Command
 import picocli.CommandLine.HelpCommand
 
-// If using local groovy files the subcommands section may highlight as bad syntax in IntelliJ - that's OK
+// If using local groovy files without Gradle the subcommands section may highlight as bad syntax in IntelliJ - that's OK
 @Command(name = "module",
         synopsisSubcommandLabel = "COMMAND", // Default is [COMMAND] indicating optional, but sub command here is required
         subcommands = [
                 HelpCommand.class, // Adds standard help options (help as a subcommand, -h, and --help)
-                Recurse.class,
-                Update.class,
-                Get.class], // Note that these Groovy classes *must* start with a capital letter for some reason
+                RecurseCommand.class,
+                UpdateCommand.class,
+                GetCommand.class], // Note that these Groovy classes *must* start with a capital letter for some reason
         description = "Sub command for interacting with modules")
-class Module extends ItemCommand {
+class ModuleCommand extends ItemCommandType {
     @Override
     ManagedItem getManager(String optionGitOrigin) {
         return new ManagedModule(optionGitOrigin)

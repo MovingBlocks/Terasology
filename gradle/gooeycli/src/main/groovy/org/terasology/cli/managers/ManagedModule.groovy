@@ -1,7 +1,8 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.cli
-class ManagedModule extends ManagedItem {
+package org.terasology.cli.managers
+
+class ManagedModule extends ManagedItem implements DependencyProvider {
     ManagedModule() {
         super()
     }
@@ -23,6 +24,15 @@ class ManagedModule extends ManagedItem {
     @Override
     String getDefaultItemGitOrigin() {
         return "Terasology"
+    }
+
+    @Override
+    List<String> parseDependencies(String itemToCheck) {
+        List<String> foundDependencies = []
+
+        // logic to parse module.txt for dependencies
+
+        return foundDependencies
     }
 
     /**

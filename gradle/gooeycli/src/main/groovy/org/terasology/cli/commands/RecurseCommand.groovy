@@ -1,6 +1,8 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.cli
+package org.terasology.cli.commands
+
+import org.terasology.cli.options.GitOptions
 import picocli.CommandLine.ParentCommand
 import picocli.CommandLine.Command
 import picocli.CommandLine.Mixin
@@ -11,10 +13,10 @@ import picocli.CommandLine.Parameters
 // Distinct from the sibling command add-remote which does *not* mix in GitOptions
 @Command(name = "recurse",
         description = "Gets one or more items and all their dependencies")
-class Recurse extends BaseCommand implements Runnable {
+class RecurseCommand extends BaseCommandType implements Runnable {
 
     @ParentCommand
-    ItemCommand parent
+    ItemCommandType parent
 
     /** Mix in a variety of supported Git extras */
     @Mixin
