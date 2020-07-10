@@ -21,7 +21,7 @@ public class NumberedGameName {
     final Optional<Integer> number;
 
     public NumberedGameName(String namePrefix, Optional<Integer> number) {
-        this.namePrefix = namePrefix;
+        this.namePrefix = namePrefix.trim();
         this.number = number;
     }
 
@@ -47,18 +47,20 @@ public class NumberedGameName {
         final Pattern p = Pattern.compile("^(.*?)(\\d+)?$");
         Matcher matcher = p.matcher(fullName.trim());
 
-        String prefix;
-        Optional<Integer> number;
+        if (matcher.find()) {
+            String prefix;
+            Optional<Integer> number;
 
-        if (matcher.start(2) > 0) {
-            prefix = matcher.group(1);
-            number = Optional.of(Integer.parseInt(matcher.group(2)));
-        } else {
-            prefix = matcher.group(0); // the whole string
-            number = Optional.empty();
+            if (matcher.start(2) > 0) {
+                prefix = matcher.group(1);
+                number = Optional.of(Integer.parseInt(matcher.group(2)));
+            } else {
+                prefix = matcher.group(0); // the whole string
+                number = Optional.empty();
+            }
+            return new NumberedGameName(prefix, number);
         }
-
-        return new NumberedGameName(prefix, number);
+        throw new IllegalArgumentException("Unexpected error: Cannot parse '" + fullName + "' as numbered game name.");
     }
 
     /**
