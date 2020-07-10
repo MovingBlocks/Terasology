@@ -107,11 +107,11 @@ SET CMD_LINE_ARGS=%CMD_LINE_ARGS:~1%
 
 :execute
 @rem Setup the command line
-set CLASSPATH=%APP_HOME%gradle\wrapper\gradle-wrapper.jar;%APP_HOME%gradle\wrapper\groovy-wrapper.jar;%APP_HOME%config\cli\groovy\;
+set CLASSPATH=%APP_HOME%gradle\wrapper\gradle-wrapper.jar;%APP_HOME%gradle\wrapper\groovy-wrapper.jar;%APP_HOME%gradle\gooeycli\src\main\groovy;
 
 
 @rem Execute Groovy via the Gradle Wrapper
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -cp "%CLASSPATH%" org.gradle.wrapper.GroovyWrapperMain config/cli/groovy/org/terasology/cli/GooeyCLI.groovy %CMD_LINE_ARGS%
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -cp "%CLASSPATH%" org.gradle.wrapper.GroovyWrapperMain gradle/gooeycli/src/main/groovy/org/terasology/cli/GooeyCLI.groovy %CMD_LINE_ARGS%
 
 :end
 @rem End local scope for the variables with windows NT shell
