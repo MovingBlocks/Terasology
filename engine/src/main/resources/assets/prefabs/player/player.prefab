@@ -20,11 +20,6 @@
   },
   "VisualCharacter": {
   },
-  // the CapsuleShape is used to detect item entities for pickup. The actual character collider is generated programmatically.
-  "CapsuleShape": {
-    "height" : 4,
-    "radius" : 1.5
-  },
   "Trigger": {
     "detectGroups": [
       "engine:debris",
