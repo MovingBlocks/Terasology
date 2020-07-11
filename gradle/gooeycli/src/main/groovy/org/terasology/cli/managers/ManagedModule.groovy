@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.cli.managers
 
+import groovy.json.JsonSlurper
+
 class ManagedModule extends ManagedItem implements DependencyProvider {
+    // TODO: Check these - why would they show up under modules/ ? Other than Index maybe?
+    def excludedItems = ["engine", "Index", "out", "build"]
+
     ManagedModule() {
         super()
     }
@@ -26,13 +31,30 @@ class ManagedModule extends ManagedItem implements DependencyProvider {
         return "Terasology"
     }
 
-    @Override
-    List<String> parseDependencies(String itemToCheck) {
-        List<String> foundDependencies = []
-
-        // logic to parse module.txt for dependencies
-
-        return foundDependencies
+    /**
+     * Reads a given module info file to figure out which if any dependencies it has. Filters out any already retrieved.
+     * This method is only for modules.
+     * @param targetModuleInfo the target file to check (a module.txt file or similar)
+     * @return a String[] containing the next level of dependencies, if any
+     */
+    List<String> parseDependencies(File targetDirectory, String itemName, boolean respectExcludedItems = true) {
+        def qualifiedDependencies = []
+        File targetModuleInfo = new File(targetDirectory, itemName + "/module.txt")
+        if (!targetModuleInfo.exists()) {
+            println "The module info file did not appear to exist - can't calculate dependencies"
+            return qualifiedDependencies
+        }
+        def slurper = new JsonSlurper()
+        def moduleConfig = slurper.parseText(targetModuleInfo.text)
+        for (dependency in moduleConfig.dependencies) {
+            if (respectExcludedItems && excludedItems.contains(dependency.id)) {
+                println "Skipping listed dependency $dependency.id as it is in the exclude list (shipped with primary project)"
+            } else {
+                println "Accepting listed dependency $dependency.id"
+                qualifiedDependencies << dependency.id
+            }
+        }
+        return qualifiedDependencies
     }
 
     /**

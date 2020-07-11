@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.cli.commands
 
+import org.terasology.cli.managers.ManagedItem
 import org.terasology.cli.options.GitOptions
 import picocli.CommandLine.ParentCommand
 import picocli.CommandLine.Command
@@ -27,6 +28,12 @@ class RecurseCommand extends BaseCommandType implements Runnable {
 
     void run() {
         println "Going to recurse $items! And from origin: " + gitOptions.origin
-        println "Command parent is: " + parent.getItemType()
+
+        // The parent should be a ManagedItem. Make an instance including the possible git origin option
+        ManagedItem mi = parent.getManager(gitOptions.origin)
+        println "Got a parent command, associated item is: " + mi.getDisplayName()
+
+        // Having prepared an instance of the logic class we call it to actually retrieve stuff
+        mi.recurse(items)
     }
 }

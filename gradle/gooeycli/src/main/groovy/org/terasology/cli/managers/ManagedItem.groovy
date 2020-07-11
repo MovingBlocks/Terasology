@@ -1,10 +1,12 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.cli.managers
-@GrabResolver(name = 'jcenter', root = 'http://jcenter.bintray.com/')
-@Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
-import org.ajoberstar.grgit.Grgit
+
 import org.terasology.cli.helpers.PropHelper
+import org.terasology.cli.scm.ScmGet
+
+import static org.terasology.cli.helpers.KitchenSink.green
+import static org.terasology.cli.helpers.KitchenSink.yellow
 
 /**
  * Utility class for dealing with items managed in a developer workspace.
@@ -25,32 +27,37 @@ abstract class ManagedItem {
     File targetDirectory
     abstract File getTargetDirectory()
 
-    String githubTargetHome
+    String targetGitOrigin
     abstract String getDefaultItemGitOrigin()
 
     ManagedItem() {
         displayName = getDisplayName()
         targetDirectory = getTargetDirectory()
-        githubTargetHome = calculateGitOrigin(null)
+        targetGitOrigin = calculateGitOrigin(null)
     }
 
     ManagedItem(String optionGitOrigin) {
         displayName = getDisplayName()
         targetDirectory = getTargetDirectory()
-        githubTargetHome = calculateGitOrigin(optionGitOrigin)
+        targetGitOrigin = calculateGitOrigin(optionGitOrigin)
     }
 
+    /**
+     * Initializer for the target origin to get resources from - option, workspace setting, or a default.
+     * @param optionOrigin an alternative if the user submitted a git option via CLI
+     * @return the highest priority override or the default
+     */
     String calculateGitOrigin(String optionOrigin) {
         // If the user indicated a target Git origin via option parameter then use that (primary choice)
         if (optionOrigin != null) {
-            println "We have an option set for Git origin so using that: " + optionOrigin
+            green "We have an option set for Git origin so using that: " + optionOrigin
             return optionOrigin
         }
 
         // Alternatively if the user has a global override set for Git origin then use that (secondary choice)
         String altOrigin = PropHelper.getGlobalProp("alternativeGithubHome")
         if (altOrigin != null) {
-            println "There was no option set but we have a global proper override for Git origin: " + altOrigin
+            green "There was no option set but we have a global proper override for Git origin: " + altOrigin
             return altOrigin
         }
 
@@ -59,110 +66,65 @@ abstract class ManagedItem {
         return getDefaultItemGitOrigin()
     }
 
-    // TODO: Likely everything below should just delegate to more specific classes to keep things tidy
-    // TODO: That would allow these methods to later just figure out exact required operations then delegate
-    // TODO: Should make it easier to hide the logic of (for instance) different Git adapters behind the next step
-
     /**
-     * Tests a URL via a HEAD request (no body) to see if it is valid
-     * @param url the URL to test
-     * @return boolean indicating whether the URL is valid (code 200) or not
+     * The Get command simply retrieves one or more resources in one go. Easy!
+     * @param items to retrieve
      */
-    boolean isUrlValid(String url) {
-        def code = new URL(url).openConnection().with {
-            requestMethod = 'HEAD'
-            connect()
-            responseCode
+    def get(List<String> items) {
+        for (String itemName : items) {
+            println "Going to retrieve $displayName $itemName"
+            getItem(itemName)
         }
-        return code.toString() == "200"
     }
 
+    /**
+     * More advanced version of the Get command that also retrieves any dependencies defined by the items.
+     * @param items to retrieve
+     * @return discovered dependencies from one round of processing (if used recursively)
+     */
     List<String> recurse(List<String> items) {
-        def dependencies = []
-        println "Going to retrieve the following items (recursively): $items"
+        List<String> dependencies = []
+        println "Going to retrieve the following $displayName item(s) recursively: $items"
         for (String item : items) {
             // Check for circular dependencies - we should only ever act on a request to *retrieve* an item once
             if (itemsRetrieved.contains(item)) {
-                println "Uh oh, we got told to re-retrieve the same thing for $item - somebody oopsed a circular dependency? Skipping"
+                yellow  "Uh oh, we got told to re-retrieve the same thing for $item - somebody wrote a circular dependency? Skipping"
             } else {
                 // We didn't already try to retrieve this item: get it (if we already have it then getItem will just be a no-op)
                 getItem(item)
                 // Then goes and checks the item on disk and parses the thing to see if it has dependencies (even if we already had it)
-                dependencies << ((DependencyProvider) this).parseDependencies(item)
+                def newDependencyCandidates = ((DependencyProvider) this).parseDependencies(targetDirectory, item)
+                println "Got new dependency candidates: " + newDependencyCandidates
+                dependencies += newDependencyCandidates - itemsRetrieved - dependencies
+                println "Storing them without those already retrieved: " + dependencies
             }
-            // Mark this item as retrieved just in case somebody made a whoops and introduced a circular dependency
+            // Mark this item as retrieved - that way we'll disqualify it if it comes up again in the future
             itemsRetrieved << item
         }
 
+        println "Finished recursively retrieving the following list: " + items
+        dependencies -= itemsRetrieved
+        println "After disqualifying any dependencies that were already in that list the following remains: " + dependencies
+
         // If we parsed any dependencies, retrieve them recursively (and even if we already got them check them for dependencies as well)
         if (!dependencies.isEmpty()) {
-            println "Got dependencies to fetch: " + dependencies
+            println "Got dependencies to fetch so we'll recurse and go again!"
             return recurse(dependencies)
         }
 
-        println "Finally done recursing, both initial items and any parsed dependencies"
+        green "Finally done recursing, both initial items and any parsed dependencies"
         return null
     }
 
-    def get(List<String> items) {
-        for (String itemName : items) {
-            getItem(itenName)
-        }
-    }
-
-    def  getItem(String item) {
-        println "Going to get $item do we already have it? <logic to look for the dir existing>"
-        // Logic for a single retrieve, no dependency parsing involved
-    }
-
     /**
-     * Primary entry point for retrieving items, kicks off recursively if needed.
-     * @param items the items we want to retrieve
-     * @param recurse whether to also retrieve dependencies of the desired items (only really for modules ...)
+     * Simple one-item execution point for attempting to get a resource.
+     * @param item the resource to get
      */
-    def retrieve(List<String> items, boolean recurse) {
-        println "Now inside retrieve, user (recursively? $recurse) wants: $items"
-        for (String itemName : items) {
-            println "Starting retrieval for $displayName $itemName, are we recursing? $recurse"
-            println "Retrieved so far: $itemsRetrieved"
-            retrieveItem(itemName, recurse)
-        }
-    }
+    void getItem(String item) {
+        println "Processing get request for $item via SCM"
+        // Logic for a single retrieve, no dependency parsing involved, nor Git origin tweaking - already handled
+        ScmGet.cloneRepo(item, targetGitOrigin, targetDirectory, displayName)
 
-    /**
-     * Retrieves a single item via Git Clone. Considers whether it exists locally first or if it has already been retrieved this execution.
-     * @param itemName the target item to retrieve
-     * @param recurse whether to also retrieve its dependencies (if so then recurse back into retrieve)
-     */
-    def retrieveItem(String itemName, boolean recurse) {
-        File itemDir = new File(targetDirectory, itemName)
-        println "Request to retrieve $displayName $itemName would store it at $itemDir - exists? " + itemDir.exists()
-        if (itemDir.exists()) {
-            println "That $displayName already had an existing directory locally. If something is wrong with it please delete and try again"
-            itemsRetrieved << itemName
-        } else if (itemsRetrieved.contains(itemName)) {
-            println "We already retrieved $itemName - skipping"
-        } else {
-            itemsRetrieved << itemName
-            def targetUrl = "https://github.com/${githubTargetHome}/${itemName}"
-            if (!isUrlValid(targetUrl)) {
-                println "Can't retrieve $displayName from $targetUrl - URL appears invalid. Typo? Not created yet?"
-                return
-            }
-            println "Retrieving $displayName $itemName from $targetUrl"
-            if (githubTargetHome != getDefaultItemGitOrigin()) {
-                println "Doing a retrieve from a custom remote: $githubTargetHome - will name it as such plus add the ${getDefaultItemGitOrigin()} remote as '$defaultRemote'"
-                Grgit.clone dir: itemDir, uri: targetUrl, remote: githubTargetHome
-                println "Primary clone operation complete, about to add the '$defaultRemote' remote for the ${getDefaultItemGitOrigin()} org address"
-                //addRemote(itemName, defaultRemote, "https://github.com/${getDefaultItemGitOrigin()}/${itemName}") //TODO: Add me :p
-            } else {
-                println "Cloning $targetUrl to $itemDir"
-                Grgit.clone dir: itemDir, uri: targetUrl
-            }
-/*
-            // This step allows the item type to check the newly cloned item and add in extra template stuff - TODO? Same as the recurse fix?
-            //itemTypeScript.copyInTemplateFiles(itemDir)
-*/
-        }
+        // TODO: Consider supporting copying in template files at this point if the type requests that
     }
 }

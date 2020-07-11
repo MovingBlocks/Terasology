@@ -7,7 +7,6 @@ import org.terasology.cli.managers.ManagedModule
 import picocli.CommandLine.Command
 import picocli.CommandLine.HelpCommand
 
-// If using local groovy files without Gradle the subcommands section may highlight as bad syntax in IntelliJ - that's OK
 @Command(name = "module",
         synopsisSubcommandLabel = "COMMAND", // Default is [COMMAND] indicating optional, but sub command here is required
         subcommands = [
@@ -17,6 +16,7 @@ import picocli.CommandLine.HelpCommand
                 GetCommand.class], // Note that these Groovy classes *must* start with a capital letter for some reason
         description = "Sub command for interacting with modules")
 class ModuleCommand extends ItemCommandType {
+
     @Override
     ManagedItem getManager(String optionGitOrigin) {
         return new ManagedModule(optionGitOrigin)

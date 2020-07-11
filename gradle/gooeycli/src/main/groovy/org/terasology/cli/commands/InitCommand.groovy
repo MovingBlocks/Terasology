@@ -10,6 +10,8 @@ import picocli.CommandLine.Help.Ansi
 import picocli.CommandLine.Mixin
 import picocli.CommandLine.Parameters
 
+import static org.terasology.cli.helpers.KitchenSink.green
+
 @Command(name = "init", description = "Initializes a workspace with some useful things")
 class InitCommand extends BaseCommandType implements Runnable {
 
@@ -26,6 +28,7 @@ class InitCommand extends BaseCommandType implements Runnable {
         System.out.println(str)
         println "Do we have a Git origin override? " + gitOptions.origin
         println "Can has desired global prop? " + PropHelper.getGlobalProp("alternativeGithubHome")
+        green "Some green text"
         // Call logic elsewhere
     }
 }

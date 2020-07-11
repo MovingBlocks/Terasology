@@ -6,7 +6,6 @@ import org.terasology.cli.options.GitOptions
 import org.terasology.cli.managers.ManagedItem
 import picocli.CommandLine.ParentCommand
 import picocli.CommandLine.Command
-// Actually in use, annotation below may show syntax error due to Groovy's annotation by the same name. Works fine
 import picocli.CommandLine.Mixin
 import picocli.CommandLine.Parameters
 
@@ -34,8 +33,9 @@ class GetCommand extends BaseCommandType implements Runnable {
 
         // The parent should be a ManagedItem. Make an instace including the possible git origin option
         ManagedItem mi = parent.getManager(gitOptions.origin)
+        println "Got a parent command, associated item is: " + mi.getDisplayName()
 
         // Having prepared an instance of the logic class we call it to actually retrieve stuff
-        mi.retrieve(items, false)
+        mi.get(items)
     }
 }
