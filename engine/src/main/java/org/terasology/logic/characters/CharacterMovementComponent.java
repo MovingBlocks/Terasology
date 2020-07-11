@@ -41,6 +41,8 @@ public final class CharacterMovementComponent implements Component {
     public float radius = 0.3f;
     public CollisionGroup collisionGroup = StandardCollisionGroup.CHARACTER;
     public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.WORLD, StandardCollisionGroup.SENSOR);
+    @Range(min = 0, max = 5)
+    public float pickupRadius = 1.5f;
 
     // Speed settings
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
