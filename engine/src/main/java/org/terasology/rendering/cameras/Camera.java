@@ -12,14 +12,8 @@ import org.terasology.config.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
-
-/**
- * Provides global access to fonts.
- *
- */
 
 /**
  * Camera base class.

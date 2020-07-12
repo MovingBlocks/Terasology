@@ -2,14 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.world.WorldProvider;
@@ -39,11 +37,12 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private float bobbingVerticalOffsetFactor;
     private float cachedBobbingRotationOffsetFactor;
     private float cachedBobbingVerticalOffsetFactor;
-    private DisplayDevice displayDevice;
+    private final DisplayDevice displayDevice;
 
     private Vector3f tempRightVector = new Vector3f();
 
-    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
+    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig,
+                             DisplayDevice displayDevice) {
         super(worldProvider, renderingConfig);
         this.displayDevice = displayDevice;
         this.cameraSettings = renderingConfig.getCameraSettings();
@@ -157,8 +156,8 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         normViewMatrix.mul(reflectionMatrix, normViewMatrixReflected);
 
         projectionMatrix.mul(viewMatrix, viewProjectionMatrix);
-
         projectionMatrix.invert(inverseProjectionMatrix);
+
         viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks
