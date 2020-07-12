@@ -42,13 +42,6 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private DisplayDevice displayDevice;
 
     private Vector3f tempRightVector = new Vector3f();
-    //TODO: remove when projectionMatrix is corrected
-    private final Matrix4f transposeProjectionMatrix = new Matrix4f();
-    private final Matrix4f transposeViewMatrix = new Matrix4f();
-    private final Matrix4f transposeViewMatrixReflected = new Matrix4f();
-    private final Matrix4f transposeNormViewMatrix = new Matrix4f();
-    private final Matrix4f transposeNormViewMatrixReflected = new Matrix4f();
-
 
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
         super(worldProvider, renderingConfig);
@@ -144,32 +137,28 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
         float aspectRatio = (float) displayDevice.getDisplayWidth() / displayDevice.getDisplayHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
-        transposeProjectionMatrix.setPerspective(fovY, aspectRatio, getzNear(), getzFar());
-        transposeProjectionMatrix.transpose(projectionMatrix);
+        projectionMatrix.setPerspective(fovY, aspectRatio, getzNear(), getzFar());
 
-
-        transposeViewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+        viewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x,
+            viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
             viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
-        transposeViewMatrix.transpose(viewMatrix);
 
-        transposeNormViewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+        normViewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x,
+            viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
             viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
-        transposeNormViewMatrix.transpose(normViewMatrix);
 
         reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
         reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
         reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
         reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-        transposeViewMatrix.mul(reflectionMatrix, transposeViewMatrixReflected);
-        transposeViewMatrixReflected.transpose(viewMatrixReflected);
+        viewMatrix.mul(reflectionMatrix, viewMatrixReflected);
 
         reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        transposeNormViewMatrix.mul(reflectionMatrix, transposeNormViewMatrixReflected);
-        transposeNormViewMatrixReflected.transpose(normViewMatrixReflected);
+        normViewMatrix.mul(reflectionMatrix, normViewMatrixReflected);
 
-        viewProjectionMatrix.set(viewMatrix).mul(projectionMatrix);
+        projectionMatrix.mul(viewMatrix, viewProjectionMatrix);
 
-        transposeProjectionMatrix.invert(inverseProjectionMatrix);
+        projectionMatrix.invert(inverseProjectionMatrix);
         viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks
@@ -183,30 +172,6 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         cachedReflectionHeight = getReflectionHeight();
 
         updateFrustum();
-    }
-
-    @Override
-    public Matrix4f getNormViewMatrix() {
-        if (!reflected) {
-            return transposeNormViewMatrix;
-        }
-
-        return transposeNormViewMatrixReflected;
-    }
-
-    @Override
-    public Matrix4f getViewMatrix() {
-        //TODO: can use default superclass implementation when viewMatrix is corrected
-        if (!reflected) {
-            return transposeViewMatrix;
-        }
-        return transposeViewMatrixReflected;
-    }
-
-    @Override
-    public Matrix4f getProjectionMatrix() {
-        //TODO: can use default superclass implementation when projectionMatrix is corrected
-        return transposeProjectionMatrix;
     }
 
     public void setBobbingRotationOffsetFactor(float f) {

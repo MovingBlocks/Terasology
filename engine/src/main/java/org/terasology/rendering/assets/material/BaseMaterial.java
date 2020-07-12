@@ -259,7 +259,7 @@ public abstract class BaseMaterial extends Material {
     public void setCamera(Camera camera) {
         setMatrix4("viewMatrix", camera.getViewMatrix(), true);
         setMatrix4("projMatrix", camera.getProjectionMatrix(), true);
-        setMatrix4("viewProjMatrix", new org.joml.Matrix4f(camera.getViewProjectionMatrix()).transpose(), true);
+        setMatrix4("viewProjMatrix", camera.getViewProjectionMatrix(), true);
         setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix(), true);
     }
 }
