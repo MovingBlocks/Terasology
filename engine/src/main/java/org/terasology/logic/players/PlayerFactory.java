@@ -99,7 +99,7 @@ public class PlayerFactory {
             return movementComponent.height;
         }
 
-        logger.warn("entity {} does not have any known extent specification - using default", prefab);
+        logger.warn("entity {} does not have a CharacterMovementComponent - using default height", prefab);
         return 1.0f;
     }
 
