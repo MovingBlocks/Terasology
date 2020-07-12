@@ -46,6 +46,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private final Matrix4f transposeProjectionMatrix = new Matrix4f();
     private final Matrix4f transposeViewMatrix = new Matrix4f();
     private final Matrix4f transposeViewMatrixReflected = new Matrix4f();
+    private final Matrix4f transposeNormViewMatrix = new Matrix4f();
 
 
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
@@ -150,19 +151,20 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
             viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
         transposeViewMatrix.transpose(viewMatrix);
 
-        normViewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
-            viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z).transpose();
+        transposeNormViewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+            viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+        transposeNormViewMatrix.transpose(normViewMatrix);
 
-
-        reflectionMatrix.setColumn(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
-        reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
-        reflectionMatrix.setColumn(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
-        reflectionMatrix.setColumn(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-        reflectionMatrix.mul(viewMatrix, viewMatrixReflected);
+        reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
+        reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
+        reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+        reflectionMatrix.mul(transposeViewMatrix, viewMatrixReflected);
         viewMatrixReflected.transpose(transposeViewMatrixReflected);
 
-        reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        reflectionMatrix.mul(normViewMatrix, normViewMatrixReflected);
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
+        reflectionMatrix.mul(transposeNormViewMatrix, normViewMatrixReflected);
+        normViewMatrixReflected.transpose();
 
         viewProjectionMatrix.set(viewMatrix).mul(projectionMatrix);
 
