@@ -47,6 +47,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private final Matrix4f transposeViewMatrix = new Matrix4f();
     private final Matrix4f transposeViewMatrixReflected = new Matrix4f();
     private final Matrix4f transposeNormViewMatrix = new Matrix4f();
+    private final Matrix4f transposeNormViewMatrixReflected = new Matrix4f();
 
 
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
@@ -78,7 +79,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getNormViewMatrix()));
+        GL11.glLoadMatrix(getNormViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
@@ -159,12 +160,12 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
         reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
         reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-        reflectionMatrix.mul(transposeViewMatrix, viewMatrixReflected);
-        viewMatrixReflected.transpose(transposeViewMatrixReflected);
+        transposeViewMatrix.mul(reflectionMatrix, transposeViewMatrixReflected);
+        transposeViewMatrixReflected.transpose(viewMatrixReflected);
 
         reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        reflectionMatrix.mul(transposeNormViewMatrix, normViewMatrixReflected);
-        normViewMatrixReflected.transpose();
+        transposeNormViewMatrix.mul(reflectionMatrix, transposeNormViewMatrixReflected);
+        transposeNormViewMatrixReflected.transpose(normViewMatrixReflected);
 
         viewProjectionMatrix.set(viewMatrix).mul(projectionMatrix);
 
@@ -182,6 +183,15 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         cachedReflectionHeight = getReflectionHeight();
 
         updateFrustum();
+    }
+
+    @Override
+    public Matrix4f getNormViewMatrix() {
+        if (!reflected) {
+            return transposeNormViewMatrix;
+        }
+
+        return transposeNormViewMatrixReflected;
     }
 
     @Override
