@@ -68,9 +68,14 @@ public class ObjectFieldMapTypeHandler<T> extends TypeHandler<T> {
 
             if (!Objects.equals(val, Defaults.defaultValue(field.getType()))) {
                 TypeHandler handler = entry.getValue();
-                PersistedData fieldValue = handler.serialize(val, serializer);
-                if (fieldValue != null) {
-                    mappedData.put(getFieldName(field), fieldValue);
+                try {
+                    PersistedData fieldValue = handler.serialize(val, serializer);
+                    if (fieldValue != null) {
+                        mappedData.put(getFieldName(field), fieldValue);
+                    }
+                } catch (StackOverflowError e) {
+                    logger.error("Likely circular reference in field {}.", field);
+                    throw e;
                 }
             }
         }

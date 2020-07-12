@@ -97,7 +97,7 @@ public class SpriteParticleRenderer implements RenderSystem {
 
         if (particleSystem.particleData.texture != null) {
             material.setBoolean("use_texture", true);
-            material.setFloat2("texture_size", particleData.textureSize.x, particleData.textureSize.y);
+            material.setFloat2("texture_size", particleData.textureSize);
             material.setInt("texture_sampler", 0);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0);

@@ -166,7 +166,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
         viewProjectionMatrix.set(viewMatrix).mul(projectionMatrix);
 
-        projectionMatrix.invert(inverseProjectionMatrix);
+        transposeProjectionMatrix.invert(inverseProjectionMatrix);
         viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks
