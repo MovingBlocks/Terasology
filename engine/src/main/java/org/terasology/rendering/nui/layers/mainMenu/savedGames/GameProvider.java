@@ -116,11 +116,7 @@ public final class GameProvider {
      * GameProvider#DEFAULT_GAME_NAME_PREFIX} for resolve.
      */
     public static String getNextGameName() {
-        String nextGameName = getNextGameName(DEFAULT_GAME_NAME_PREFIX);
-        if (nextGameName.equals(DEFAULT_GAME_NAME_PREFIX)) {
-            return nextGameName + 1;
-        }
-        return nextGameName;
+        return getNextGameName(DEFAULT_GAME_NAME_PREFIX);
     }
 
     /**
