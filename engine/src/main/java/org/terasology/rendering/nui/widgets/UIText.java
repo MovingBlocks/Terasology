@@ -372,18 +372,15 @@ public class UIText extends WidgetWithOrder {
                     if (event.getKey() == Keyboard.Key.V) {
                         removeSelection();
                         paste();
-                        eventHandled = true;
                     }
                 }
                 if (event.getKey() == Keyboard.Key.ENTER || event.getKey() == Keyboard.Key.NUMPAD_ENTER) {
                     for (ActivateEventListener listener : activationListeners) {
                         listener.onActivated(this);
                     }
-                    eventHandled = true;
                 }
             } else {
                 String fullText = text.get();
-
                 switch (event.getKey().getId()) {
                     case KeyId.LEFT: {
                         if (hasSelection() && !isSelectionModifierActive(event.getKeyboard())) {
@@ -391,7 +388,6 @@ public class UIText extends WidgetWithOrder {
                         } else if (getCursorPosition() > 0) {
                             decreaseCursorPosition(1, !isSelectionModifierActive(event.getKeyboard()));
                         }
-                        eventHandled = true;
                         break;
                     }
                     case KeyId.RIGHT: {
@@ -400,18 +396,15 @@ public class UIText extends WidgetWithOrder {
                         } else if (getCursorPosition() < fullText.length()) {
                             increaseCursorPosition(1, !isSelectionModifierActive(event.getKeyboard()));
                         }
-                        eventHandled = true;
                         break;
                     }
                     case KeyId.HOME: {
                         setCursorPosition(0, !isSelectionModifierActive(event.getKeyboard()));
                         offset = 0;
-                        eventHandled = true;
                         break;
                     }
                     case KeyId.END: {
                         setCursorPosition(fullText.length(), !isSelectionModifierActive(event.getKeyboard()));
-                        eventHandled = true;
                         break;
                     }
                     default: {
@@ -419,7 +412,6 @@ public class UIText extends WidgetWithOrder {
                                 || event.getKeyboard().isKeyDown(KeyId.RIGHT_CTRL)) {
                             if (event.getKey() == Keyboard.Key.C) {
                                 copySelection();
-                                eventHandled = true;
                                 break;
                             }
                         }
@@ -441,7 +433,6 @@ public class UIText extends WidgetWithOrder {
 
                                 setText(before + after);
                             }
-                            eventHandled = true;
                             break;
                         }
                         case KeyId.DELETE: {
@@ -452,7 +443,6 @@ public class UIText extends WidgetWithOrder {
                                 String after = fullText.substring(getCursorPosition() + 1);
                                 setText(before + after);
                             }
-                            eventHandled = true;
                             break;
                         }
                         case KeyId.ENTER:
@@ -467,7 +457,6 @@ public class UIText extends WidgetWithOrder {
                             for (ActivateEventListener listener : activationListeners) {
                                 listener.onActivated(this);
                             }
-                            eventHandled = true;
                             break;
                         }
                         default: {
@@ -476,12 +465,10 @@ public class UIText extends WidgetWithOrder {
                                 if (event.getKey() == Keyboard.Key.V) {
                                     removeSelection();
                                     paste();
-                                    eventHandled = true;
                                     break;
                                 } else if (event.getKey() == Keyboard.Key.X) {
                                     copySelection();
                                     removeSelection();
-                                    eventHandled = true;
                                     break;
                                 }
                             }
@@ -490,6 +477,7 @@ public class UIText extends WidgetWithOrder {
                     }
                 }
             }
+            eventHandled = true;
         }
         updateOffset();
         return eventHandled;
