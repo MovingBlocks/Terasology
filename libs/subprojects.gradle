@@ -5,17 +5,7 @@ new File(rootDir, 'libs').eachDir { possibleSubprojectDir ->
     File buildFile = new File(possibleSubprojectDir, "build.gradle")
     if (buildFile.exists()) {
         println "Library $subprojectName has a build file so counting it as integratable code and sub-projecting it"
-        include subprojectName
-        def subprojectPath = ':' + subprojectName
-        def subproject = project(subprojectPath)
-        subproject.projectDir = possibleSubprojectDir
-
-        // Also look for a nested settings.gradle file in case of embedded libraries with their own sub projects
-        File settingsFile = new File(possibleSubprojectDir, "settings.gradle")
-        if (settingsFile.exists()) {
-            println "Library $subprojectName has a settings file so applying it expecting nested sub projects"
-            apply from: settingsFile
-        }
+        includeBuild possibleSubprojectDir
     } else {
         println "Library dir found without a build.gradle, not including $subprojectName in the Gradle project tree"
     }
