@@ -21,6 +21,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -45,6 +46,7 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 /**
  * Renderer for an AABB.
  */
+@API
 public class AABBRenderer implements BlockOverlayRenderer {
     private int displayListWire = -1;
     private int displayListSolid = -1;

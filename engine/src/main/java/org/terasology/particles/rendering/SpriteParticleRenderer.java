@@ -20,6 +20,7 @@ import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GLContext;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -96,7 +97,7 @@ public class SpriteParticleRenderer implements RenderSystem {
 
         if (particleSystem.particleData.texture != null) {
             material.setBoolean("use_texture", true);
-            material.setFloat2("texture_size", particleData.textureSize.x, particleData.textureSize.y);
+            material.setFloat2("texture_size", particleData.textureSize);
             material.setInt("texture_sampler", 0);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -113,6 +114,9 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     @Override
     public void renderAlphaBlend() {
+        if(!GLContext.getCapabilities().OpenGL33) {
+            return;
+        }
         PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
         Vector3f cameraPosition = camera.getPosition();
         Matrix4f viewProjection = new Matrix4f(camera.getViewProjectionMatrix())

@@ -186,7 +186,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 material.enable();
                 material.setFloat("sunlight", 1.0f, true);
                 material.setFloat("blockLight", 1.0f, true);
-                material.setMatrix4("projectionMatrix", new org.joml.Matrix4f(worldRenderer.getActiveCamera().getProjectionMatrix()).transpose(), true);
+                material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix(), true);
                 material.bindTextures();
 
                 Set<EntityRef> entities = meshByMaterial.get(material);
@@ -227,7 +227,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         modelViewMatrix.get(tempMatrixBuffer44);
                         modelViewMatrix.get3x3(normalMatrix).invert().getTransposed(tempMatrixBuffer33);
 
-                        material.setMatrix4("projectionMatrix", new org.joml.Matrix4f(worldRenderer.getActiveCamera().getProjectionMatrix()).transpose(), true);
+                        material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix(), true);
                         material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
                         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 

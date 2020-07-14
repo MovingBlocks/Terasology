@@ -152,6 +152,15 @@ spotbugs {
     excludeFilter = new File(rootDir, "config/metrics/findbugs/findbugs-exclude.xml")
 }
 
+spotbugsMain {
+    reports {
+        xml {
+            enabled = true
+            destination = file("$buildDir/reports/spotbugs/main/spotbugs.xml")
+        }
+    }
+}
+
 // TODO: Temporary until javadoc has been fixed for Java 8 everywhere
 javadoc {
     failOnError = false

@@ -15,9 +15,9 @@
  */
 package org.terasology.particles;
 
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.terasology.module.sandbox.API;
 
 /**

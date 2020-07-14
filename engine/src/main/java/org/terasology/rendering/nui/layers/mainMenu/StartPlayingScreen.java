@@ -25,7 +25,6 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.module.Module;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
