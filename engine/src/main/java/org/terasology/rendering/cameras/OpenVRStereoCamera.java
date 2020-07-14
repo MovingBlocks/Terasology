@@ -77,10 +77,14 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     public void updateFrustum() {
         super.updateFrustum();
 
-        viewFrustumLeftEye.updateFrustum(viewMatrixLeftEye.get(BufferUtils.createFloatBuffer(16)), projectionMatrixLeftEye.get(BufferUtils.createFloatBuffer(16)));
-        viewFrustumRightEye.updateFrustum(viewMatrixRightEye.get(BufferUtils.createFloatBuffer(16)), projectionMatrixRightEye.get(BufferUtils.createFloatBuffer(16)));
-        viewFrustumReflectedLeftEye.updateFrustum(viewMatrixReflectedLeftEye.get(BufferUtils.createFloatBuffer(16)), projectionMatrixLeftEye.get(BufferUtils.createFloatBuffer(16)));
-        viewFrustumReflectedRightEye.updateFrustum(viewMatrixReflectedRightEye.get(BufferUtils.createFloatBuffer(16)), projectionMatrixRightEye.get(BufferUtils.createFloatBuffer(16)));
+        viewFrustumLeftEye.updateFrustum(viewMatrixLeftEye.get(BufferUtils.createFloatBuffer(16)),
+            projectionMatrixLeftEye.get(BufferUtils.createFloatBuffer(16)));
+        viewFrustumRightEye.updateFrustum(viewMatrixRightEye.get(BufferUtils.createFloatBuffer(16)),
+            projectionMatrixRightEye.get(BufferUtils.createFloatBuffer(16)));
+        viewFrustumReflectedLeftEye.updateFrustum(viewMatrixReflectedLeftEye.get(BufferUtils.createFloatBuffer(16)),
+            projectionMatrixLeftEye.get(BufferUtils.createFloatBuffer(16)));
+        viewFrustumReflectedRightEye.updateFrustum(viewMatrixReflectedRightEye.get(BufferUtils.createFloatBuffer(16))
+            , projectionMatrixRightEye.get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
@@ -204,7 +208,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     @Deprecated
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(normViewMatrix));
+        GL11.glLoadMatrix(normViewMatrix.get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
@@ -240,7 +244,8 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         rightEyePose = rightEyePose.invert();
 
 
-        if (Math.sqrt(Math.pow(leftEyePose.m30(), 2) + Math.pow(leftEyePose.m31(), 2) + Math.pow(leftEyePose.m32(), 2)) < 0.25) {
+        if (Math.sqrt(Math.pow(leftEyePose.m30(), 2) + Math.pow(leftEyePose.m31(), 2) + Math.pow(leftEyePose.m32(),
+            2)) < 0.25) {
             return;
         }
         projectionMatrixLeftEye.set(leftEyeProjection);
@@ -257,35 +262,28 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f)));
         reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
         reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-
-
         viewMatrix.mul(reflectionMatrix, viewMatrixReflected);
 
         reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+        normViewMatrix.mul(reflectionMatrix, normViewMatrixReflected);
 
         viewTranslationLeftEye.identity();
-        viewTranslationLeftEye.setTranslation(new Vector3f(halfIPD, 0.0f, 0.0f));
+        viewTranslationLeftEye.setTranslation(halfIPD, 0.0f, 0.0f);
 
         viewTranslationRightEye.identity();
-        viewTranslationRightEye.setTranslation(new Vector3f(-halfIPD, 0.0f, 0.0f));
+        viewTranslationRightEye.setTranslation(-halfIPD, 0.0f, 0.0f);
 
+        viewTranslationLeftEye.mul(viewMatrixReflected, viewMatrixReflectedLeftEye);
+        viewTranslationRightEye.mul(viewMatrixReflected, viewMatrixReflectedRightEye);
 
-        viewMatrixReflected.mul(viewTranslationLeftEye, viewMatrixReflectedLeftEye);
-        viewMatrixReflected.mul(viewTranslationRightEye, viewMatrixReflectedRightEye);
+        projectionMatrixLeftEye.mul(viewMatrixLeftEye, viewProjectionMatrixLeftEye);
+        projectionMatrixRightEye.mul(viewMatrixRightEye, viewProjectionMatrixRightEye);
 
-        viewProjectionMatrixLeftEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
-        viewProjectionMatrixRightEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
+        viewProjectionMatrixLeftEye.invert(inverseViewProjectionMatrixLeftEye);
+        viewProjectionMatrixRightEye.invert(inverseViewProjectionMatrixRightEye);
 
-        inverseViewProjectionMatrixLeftEye = new Matrix4f(viewProjectionMatrixLeftEye);
-        inverseViewProjectionMatrixRightEye = new Matrix4f(viewProjectionMatrixRightEye);
-        inverseViewProjectionMatrixLeftEye.invert(viewProjectionMatrixLeftEye);
-        inverseViewProjectionMatrixRightEye.invert(viewProjectionMatrixRightEye);
-
-        inverseProjectionMatrixLeftEye = new Matrix4f(projectionMatrixLeftEye);
-        inverseProjectionMatrixRightEye = new Matrix4f(projectionMatrixRightEye);
-        inverseProjectionMatrixLeftEye.invert(projectionMatrixLeftEye);
-        inverseProjectionMatrixRightEye.invert(projectionMatrixRightEye);
+        projectionMatrixLeftEye.invert(inverseProjectionMatrixLeftEye);
+        projectionMatrixRightEye.invert(inverseProjectionMatrixRightEye);
 
         updateFrustum();
     }
