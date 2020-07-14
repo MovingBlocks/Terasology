@@ -17,12 +17,10 @@
 package org.terasology.physics.engine;
 
 import org.joml.Vector3fc;
-import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.Physics;
-import org.terasology.world.block.Block;
 
 import java.util.Iterator;
 import java.util.List;
