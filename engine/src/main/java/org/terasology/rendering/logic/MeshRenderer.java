@@ -210,7 +210,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     Transform toWorldSpace = new Transform(JomlUtil.from(worldPos), JomlUtil.from(worldRot), worldScale);
 
                     Vector3f offsetFromCamera = worldPos.sub(cameraPosition, new Vector3f());
-                    matrixCameraSpace.identity().translationRotateScale(offsetFromCamera, worldRot, worldScale);
+                    matrixCameraSpace.translationRotateScale(offsetFromCamera, worldRot, worldScale);
 
 
                     AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
@@ -225,7 +225,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
                         modelViewMatrix.set(worldRenderer.getActiveCamera().getViewMatrix()).transpose().mul(matrixCameraSpace);
                         modelViewMatrix.get(tempMatrixBuffer44);
-                        modelViewMatrix.get3x3(normalMatrix).invert().getTransposed(tempMatrixBuffer33);
+                        modelViewMatrix.normal(normalMatrix).get(tempMatrixBuffer33);
 
                         material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix(), true);
                         material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
