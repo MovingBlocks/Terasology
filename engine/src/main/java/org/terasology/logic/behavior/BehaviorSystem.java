@@ -58,7 +58,7 @@ import java.util.Optional;
  * <p/>
  * Modifications made to a behavior tree will reflect to all entities using this tree.
  */
-@RegisterSystem(RegisterMode.AUTHORITY)
+@RegisterSystem(RegisterMode.ALWAYS)
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
