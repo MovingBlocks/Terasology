@@ -71,7 +71,6 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             canvas.drawWidget(widget, Rect2i.createFromMinAndSize(filledWidth, heightOffset, size.x, size.y));
             filledWidth += size.x;
             filledHeight = Math.max(filledHeight, size.y);
-            heightOffset += verticalSpacing;
         }
     }
 
