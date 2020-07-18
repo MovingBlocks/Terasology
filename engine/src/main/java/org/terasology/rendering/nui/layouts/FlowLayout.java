@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ *
  */
 public class FlowLayout extends CoreLayout<LayoutHint> {
 
@@ -61,7 +62,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         int heightOffset = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
-            if (filledWidth != 0 && filledWidth + size.x  > canvas.size().x) {
+            if (filledWidth != 0 && filledWidth + size.x > canvas.size().x) {
                 heightOffset += filledHeight;
                 filledWidth = 0;
                 filledHeight = 0;
@@ -80,7 +81,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         int filledHeight = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
-            if (filledWidth != 0 && filledWidth + size.x  > sizeHint.x) {
+            if (filledWidth != 0 && filledWidth + size.x > sizeHint.x) {
                 result.x = Math.max(result.x, filledWidth);
                 result.y += filledHeight;
                 filledWidth = size.x;
