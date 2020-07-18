@@ -20,6 +20,7 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
@@ -31,6 +32,12 @@ import java.util.List;
 public class FlowLayout extends CoreLayout<LayoutHint> {
 
     private List<UIWidget> contents = Lists.newArrayList();
+
+    /**
+     * The vertical spacing between adjacent widgets, in pixels
+     */
+    @LayoutConfig
+    private int verticalSpacing;
 
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
@@ -62,6 +69,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             canvas.drawWidget(widget, Rect2i.createFromMinAndSize(filledWidth, heightOffset, size.x, size.y));
             filledWidth += size.x;
             filledHeight = Math.max(filledHeight, size.y);
+            heightOffset += verticalSpacing;
         }
     }
 
@@ -83,7 +91,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             }
         }
         result.x = Math.max(result.x, filledWidth);
-        result.y += filledHeight;
+        result.y += filledHeight + verticalSpacing * (contents.size() - 1);
 
         return result;
     }
@@ -96,5 +104,25 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     @Override
     public Iterator<UIWidget> iterator() {
         return contents.iterator();
+    }
+
+    /**
+     * Retrieves the spacing between adjacent widgets in this {@code FlowLayout}.
+     *
+     * @return The spacing, in pixels
+     */
+    public int getVerticalSpacing() {
+        return verticalSpacing;
+    }
+
+    /**
+     * Sets the spacing betweeen adjacent widgets in this {@code FlowLayout}.
+     *
+     * @param spacing The spacing, in pixels
+     * @return This {@code FlowLayout}
+     */
+    public FlowLayout setVerticalSpacing(int spacing) {
+        this.verticalSpacing = spacing;
+        return this;
     }
 }
