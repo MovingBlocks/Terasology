@@ -64,6 +64,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             Vector2i size = canvas.calculatePreferredSize(widget);
             if (filledWidth != 0 && filledWidth + size.x > canvas.size().x) {
                 heightOffset += filledHeight;
+                heightOffset += verticalSpacing;
                 filledWidth = 0;
                 filledHeight = 0;
             }
