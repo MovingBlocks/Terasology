@@ -63,8 +63,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
             if (filledWidth != 0 && filledWidth + size.x > canvas.size().x) {
-                heightOffset += filledHeight;
-                heightOffset += verticalSpacing;
+                heightOffset += filledHeight + verticalSpacing;
                 filledWidth = 0;
                 filledHeight = 0;
             }
@@ -83,7 +82,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             Vector2i size = canvas.calculatePreferredSize(widget);
             if (filledWidth != 0 && filledWidth + size.x > sizeHint.x) {
                 result.x = Math.max(result.x, filledWidth);
-                result.y += filledHeight;
+                result.y += filledHeight + verticalSpacing;
                 filledWidth = size.x;
                 filledHeight = size.y;
             } else {
@@ -92,7 +91,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             }
         }
         result.x = Math.max(result.x, filledWidth);
-        result.y += filledHeight + verticalSpacing * (contents.size() - 1);
+        result.y += filledHeight;
 
         return result;
     }
