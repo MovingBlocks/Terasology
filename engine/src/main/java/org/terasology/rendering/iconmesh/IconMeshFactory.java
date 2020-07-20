@@ -16,9 +16,11 @@
 package org.terasology.rendering.iconmesh;
 
 import org.joml.Rectanglei;
+import org.joml.Vector4f;
+import org.terasology.math.JomlUtil;
+import org.terasology.utilities.Assets;
 import org.terasology.assets.Asset;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -26,7 +28,6 @@ import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.utilities.Assets;
 
 import java.nio.ByteBuffer;
 
@@ -92,7 +93,7 @@ public final class IconMeshFactory {
 
                 if (a > alphaLimit) {
                     Vector4f color = new Vector4f(r / 255f, g / 255f, b / 255f, a / 255f);
-                    TessellatorHelper.addBlockMesh(tessellator, color, 2f / textureSize, 1.0f, 0.5f,
+                    TessellatorHelper.addBlockMesh(tessellator, JomlUtil.from(color), 2f / textureSize, 1.0f, 0.5f,
                             2f / textureSize * x - 1f, 2f / textureSize * (tex.getHeight() - y - 1) - 1f, 0f);
 
                     if (withContour) {
@@ -141,7 +142,7 @@ public final class IconMeshFactory {
 
                             if (newA < alphaLimit) {
                                 Vector4f cColor = new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w);
-                                TessellatorHelper.addBlockMesh(tessellator, cColor, 0.125f, 1.0f, 0.5f, 2f * 0.0625f * newX - 0.5f, 0.125f * (15 - newY) - 1f, 0f);
+                                TessellatorHelper.addBlockMesh(tessellator, JomlUtil.from(cColor), 0.125f, 1.0f, 0.5f, 2f * 0.0625f * newX - 0.5f, 0.125f * (15 - newY) - 1f, 0f);
                             }
                         }
                     }

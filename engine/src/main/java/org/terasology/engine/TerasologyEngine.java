@@ -141,7 +141,7 @@ public class TerasologyEngine implements GameEngine {
     private ModuleAwareAssetTypeManager assetTypeManager;
 
     /**
-     * Contains objects that life for the duration of this engine.
+     * Contains objects that live for the duration of this engine.
      */
     private Context rootContext;
 
