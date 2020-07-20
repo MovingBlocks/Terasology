@@ -107,7 +107,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Retrieves the spacing between adjacent widgets in this {@code FlowLayout}.
+     * Retrieves the vertical spacing between adjacent widgets in this {@code FlowLayout}.
      *
      * @return The spacing, in pixels
      */
@@ -116,7 +116,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Sets the spacing betweeen adjacent widgets in this {@code FlowLayout}.
+     * Sets the vertical spacing between adjacent widgets in this {@code FlowLayout}.
      *
      * @param spacing The spacing, in pixels
      * @return This {@code FlowLayout}
