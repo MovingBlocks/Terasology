@@ -20,6 +20,7 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
@@ -37,6 +38,12 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         contents.add(element);
     }
 
+    /**
+     * The horizontal spacing between adjacent widgets, in pixels
+     */
+    @LayoutConfig
+    private int horizontalSpacing;
+
     @Override
     public void removeWidget(UIWidget element) {
         contents.remove(element);
@@ -51,16 +58,17 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     public void onDraw(Canvas canvas) {
         int filledWidth = 0;
         int filledHeight = 0;
+        int widthOffset = 0;
         int heightOffset = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
-            if (filledWidth != 0 && filledWidth + size.x  > canvas.size().x) {
+            if (filledWidth != 0 && filledWidth + size.x > canvas.size().x) {
                 heightOffset += filledHeight;
                 filledWidth = 0;
                 filledHeight = 0;
             }
             canvas.drawWidget(widget, Rect2i.createFromMinAndSize(filledWidth, heightOffset, size.x, size.y));
-            filledWidth += size.x;
+            filledWidth += size.x + horizontalSpacing;
             filledHeight = Math.max(filledHeight, size.y);
         }
     }
@@ -72,13 +80,13 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         int filledHeight = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
-            if (filledWidth != 0 && filledWidth + size.x  > sizeHint.x) {
+            if (filledWidth != 0 && filledWidth + size.x > sizeHint.x) {
                 result.x = Math.max(result.x, filledWidth);
                 result.y += filledHeight;
                 filledWidth = size.x;
                 filledHeight = size.y;
             } else {
-                filledWidth += size.x;
+                filledWidth += size.x + horizontalSpacing;
                 filledHeight = Math.max(filledHeight, size.y);
             }
         }
@@ -97,4 +105,25 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     public Iterator<UIWidget> iterator() {
         return contents.iterator();
     }
+
+    /**
+     * Retrieves the horizontal spacing between adjacent widgets in this {@code FlowLayout}.
+     *
+     * @return The spacing, in pixels
+     */
+    public int getHorizontalSpacingSpacing() {
+        return horizontalSpacing;
+    }
+
+    /**
+     * Sets the horizontal spacing between adjacent widgets in this {@code FlowLayout}.
+     *
+     * @param spacing The spacing, in pixels
+     * @return This {@code FlowLayout}
+     */
+    public FlowLayout setHorizontalSpacing(int spacing) {
+        this.horizontalSpacing = spacing;
+        return this;
+    }
+
 }
