@@ -20,6 +20,7 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
@@ -27,10 +28,17 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ *
  */
 public class FlowLayout extends CoreLayout<LayoutHint> {
 
     private List<UIWidget> contents = Lists.newArrayList();
+
+    /**
+     * The vertical spacing between adjacent widgets, in pixels
+     */
+    @LayoutConfig
+    private int verticalSpacing;
 
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
@@ -54,8 +62,8 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         int heightOffset = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
-            if (filledWidth != 0 && filledWidth + size.x  > canvas.size().x) {
-                heightOffset += filledHeight;
+            if (filledWidth != 0 && filledWidth + size.x > canvas.size().x) {
+                heightOffset += filledHeight + verticalSpacing;
                 filledWidth = 0;
                 filledHeight = 0;
             }
@@ -72,9 +80,9 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         int filledHeight = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
-            if (filledWidth != 0 && filledWidth + size.x  > sizeHint.x) {
+            if (filledWidth != 0 && filledWidth + size.x > sizeHint.x) {
                 result.x = Math.max(result.x, filledWidth);
-                result.y += filledHeight;
+                result.y += filledHeight + verticalSpacing;
                 filledWidth = size.x;
                 filledHeight = size.y;
             } else {
@@ -96,5 +104,25 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     @Override
     public Iterator<UIWidget> iterator() {
         return contents.iterator();
+    }
+
+    /**
+     * Retrieves the vertical spacing between adjacent widgets in this {@code FlowLayout}.
+     *
+     * @return The spacing, in pixels
+     */
+    public int getVerticalSpacing() {
+        return verticalSpacing;
+    }
+
+    /**
+     * Sets the vertical spacing between adjacent widgets in this {@code FlowLayout}.
+     *
+     * @param spacing The spacing, in pixels
+     * @return This {@code FlowLayout}
+     */
+    public FlowLayout setVerticalSpacing(int spacing) {
+        this.verticalSpacing = spacing;
+        return this;
     }
 }
