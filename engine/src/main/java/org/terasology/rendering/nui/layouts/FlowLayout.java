@@ -28,10 +28,17 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ *
  */
 public class FlowLayout extends CoreLayout<LayoutHint> {
 
     private List<UIWidget> contents = Lists.newArrayList();
+
+    /**
+     * The vertical spacing between adjacent widgets, in pixels
+     */
+    @LayoutConfig
+    private int verticalSpacing;
 
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
@@ -63,7 +70,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
             if (filledWidth != 0 && filledWidth + size.x > canvas.size().x) {
-                heightOffset += filledHeight;
+                heightOffset += filledHeight + verticalSpacing;
                 filledWidth = 0;
                 filledHeight = 0;
             }
@@ -82,8 +89,9 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             Vector2i size = canvas.calculatePreferredSize(widget);
             if (filledWidth != 0 && filledWidth + size.x > sizeHint.x) {
                 result.x = Math.max(result.x, filledWidth);
-                result.y += filledHeight;
+                result.y += filledHeight + verticalSpacing;
                 filledWidth = size.x + horizontalSpacing * (contents.size() - 1);
+
                 filledHeight = size.y;
             } else {
                 filledWidth += size.x;
@@ -115,8 +123,17 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         return horizontalSpacing;
     }
 
+     /**
+     * Retrieves the vertical spacing between adjacent widgets in this {@code FlowLayout}.
+     *
+     * @return The spacing, in pixels
+     */
+    public int getVerticalSpacing() {
+        return verticalSpacing;
+    }
+
     /**
-     * Sets the horizontal spacing between adjacent widgets in this {@code FlowLayout}.
+     * Sets the vertical spacing between adjacent widgets in this {@code FlowLayout}.
      *
      * @param spacing The spacing, in pixels
      * @return This {@code FlowLayout}
@@ -126,4 +143,14 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         return this;
     }
 
+    /**
+     * Sets the horizontal spacing between adjacent widgets in this {@code FlowLayout}.
+     *
+     * @param spacing The spacing, in pixels
+     * @return This {@code FlowLayout}
+     */
+    public FlowLayout setVerticalSpacing(int spacing) {
+        this.verticalSpacing = spacing;
+        return this;
+    }
 }
