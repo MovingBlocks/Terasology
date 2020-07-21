@@ -137,6 +137,7 @@ public class TerasologyEngine implements GameEngine {
     private TimeSubsystem timeSubsystem;
     private Deque<EngineSubsystem> allSubsystems;
     private ModuleAwareAssetTypeManager assetTypeManager;
+    private boolean initialisedAlready;
 
     /**
      * Contains objects that live for the duration of this engine.
@@ -201,40 +202,42 @@ public class TerasologyEngine implements GameEngine {
     public void initialize() {
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         Stopwatch totalInitTime = Stopwatch.createStarted();
-        try {
-            logger.info("Initializing Terasology...");
-            logEnvironmentInfo();
+        if (!initialisedAlready) {
+            try {
+                logger.info("Initializing Terasology...");
+                logEnvironmentInfo();
 
-            // TODO: Need to get everything thread safe and get rid of the concept of "GameThread" as much as possible.
-            GameThread.setToCurrentThread();
+                // TODO: Need to get everything thread safe and get rid of the concept of "GameThread" as much as possible.
+                GameThread.setToCurrentThread();
 
-            preInitSubsystems();
+                preInitSubsystems();
 
-            initManagers();
+                initManagers();
 
-            initSubsystems();
+                initSubsystems();
 
-            changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT);
-            initAssets();
+                changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT);
+                initAssets();
 
-            EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
-            rootContext.put(EnvironmentSwitchHandler.class, environmentSwitcher);
+                EnvironmentSwitchHandler environmentSwitcher = new EnvironmentSwitchHandler();
+                rootContext.put(EnvironmentSwitchHandler.class, environmentSwitcher);
 
-            environmentSwitcher.handleSwitchToGameEnvironment(rootContext);
+                environmentSwitcher.handleSwitchToGameEnvironment(rootContext);
 
-            postInitSubsystems();
+                postInitSubsystems();
 
-            verifyInitialisation();
+                verifyInitialisation();
 
-            /*
-             * Prevent objects being put in engine context after init phase. Engine states should use/create a
-             * child context.
-             */
-            CoreRegistry.setContext(null);
-        } catch (RuntimeException e) {
-            logger.error("Failed to initialise Terasology", e);
-            cleanup();
-            throw e;
+                /*
+                 * Prevent objects being put in engine context after init phase. Engine states should use/create a
+                 * child context.
+                 */
+                CoreRegistry.setContext(null);
+            } catch (RuntimeException e) {
+                logger.error("Failed to initialise Terasology", e);
+                cleanup();
+                throw e;
+            }
         }
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
@@ -599,5 +602,10 @@ public class TerasologyEngine implements GameEngine {
      */
     public <T> T getFromEngineContext(Class<? extends T> type) {
         return rootContext.get(type);
+    }
+
+    //this method just makes the boolean true in order for the initialization to happen only once
+    public void setInitialisedAlreadyStatus() {
+        initialisedAlready = true;
     }
 }
