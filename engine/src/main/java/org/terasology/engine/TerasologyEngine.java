@@ -233,6 +233,7 @@ public class TerasologyEngine implements GameEngine {
                  * child context.
                  */
                 CoreRegistry.setContext(null);
+                initialisedAlready = true;
             } catch (RuntimeException e) {
                 logger.error("Failed to initialise Terasology", e);
                 cleanup();
@@ -602,10 +603,5 @@ public class TerasologyEngine implements GameEngine {
      */
     public <T> T getFromEngineContext(Class<? extends T> type) {
         return rootContext.get(type);
-    }
-
-    //this method just makes the boolean true in order for the initialization to happen only once
-    public void setInitialisedAlreadyStatus() {
-        initialisedAlready = true;
     }
 }
