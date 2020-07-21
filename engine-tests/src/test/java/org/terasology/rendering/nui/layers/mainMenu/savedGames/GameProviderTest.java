@@ -232,6 +232,7 @@ public class GameProviderTest {
         mimicGameName("Custom 1");
         Thread.sleep(10); // there too
         mimicGameName("Custom 2");
+        Thread.sleep(10); // there too
         final String name = GameProvider.getNextGameName("Custom 1");
 
         assertNotNull(name);
