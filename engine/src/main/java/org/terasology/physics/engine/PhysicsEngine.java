@@ -16,6 +16,7 @@
 
 package org.terasology.physics.engine;
 
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.CollisionGroup;
@@ -38,8 +39,20 @@ public interface PhysicsEngine extends Physics {
      *
      * @param pos    The position around which to wake up objects.
      * @param radius the half-length of the sides of the square.
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #awakenArea(Vector3fc, float)}.
      */
+    @Deprecated
     void awakenArea(Vector3f pos, float radius);
+
+    /**
+     * Wakes up any rigid bodies that are in a box around the given position.
+     *
+     * @param pos    The position around which to wake up objects.
+     * @param radius the half-length of the sides of the square.
+     */
+    void awakenArea(Vector3fc pos, float radius);
+
 
     /**
      * Combines the flags of the given collision groups into a single flag.
