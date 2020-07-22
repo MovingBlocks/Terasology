@@ -64,7 +64,7 @@ public abstract class AbstractValueModifiableEvent implements Event {
      * <p>
      * The value is calculated based on the following formula:
      * <pre>
-     * result = max(0, <baseValue> + Σ <modifier> * Π <multiplier> + Σ <postModifier>)
+     * result = max(0, (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>)
      * </pre>
      *
      * <emph>The result value is guaranteed to be non-negative!</emph>
@@ -73,7 +73,7 @@ public abstract class AbstractValueModifiableEvent implements Event {
         //TODO(skaldarnar): Based on a discussion in https://github.com/MovingBlocks/Terasology/pull/4063 we may want
         // to lift the guarantee/restriction that the result value needs to be non-negative. Systems are still free to
         // apply this restriction if needed.
-        return Math.max(0, baseValue + modifiers.sum() * product(multipliers) + postModifiers.sum());
+        return Math.max(0, (baseValue + modifiers.sum()) * product(multipliers) + postModifiers.sum());
     }
 
     public TFloatList getModifiers() {
