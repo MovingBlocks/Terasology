@@ -3,10 +3,6 @@
 
 package org.terasology.utilities.modifiable;
 
-import gnu.trove.iterator.TFloatIterator;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.array.TFloatArrayList;
-
 /**
  * A helper type to get and modify the value of a component without changing its actual value
  * <p>
@@ -17,9 +13,9 @@ import gnu.trove.list.array.TFloatArrayList;
 public class ModifiableValue {
     private final float baseValue;
 
-    private TFloatList modifiers = new TFloatArrayList();
-    private TFloatList multipliers = new TFloatArrayList();
-    private TFloatList postModifiers = new TFloatArrayList();
+    private float modifiers;
+    private float multipliers;
+    private float postModifiers;
 
     public ModifiableValue(float baseValue) {
         this.baseValue = baseValue;
@@ -30,15 +26,15 @@ public class ModifiableValue {
     }
 
     public void multiply(float amount) {
-        this.multipliers.add(amount);
+        multipliers*=amount;
     }
 
     public void add(float amount) {
-        modifiers.add(amount);
+        modifiers+=amount;
     }
 
     public void postAdd(float amount) {
-        postModifiers.add(amount);
+        postModifiers+=amount;
     }
 
     /**
@@ -52,48 +48,6 @@ public class ModifiableValue {
      * <emph>The result value is guaranteed to be non-negative!</emph>
      */
     public float getValue() {
-        return Math.max(0, baseValue + modifiers.sum() * product(multipliers) + postModifiers.sum());
+        return baseValue + modifiers * multipliers + postModifiers;
     }
-
-    public TFloatList getModifiers() {
-        return modifiers;
-    }
-
-    public void setModifiers(TFloatList modifiers) {
-        this.modifiers = modifiers;
-    }
-
-    public TFloatList getMultipliers() {
-        return multipliers;
-    }
-
-    public void setMultipliers(TFloatList multipliers) {
-        this.multipliers = multipliers;
-    }
-
-    public TFloatList getPostModifiers() {
-        return postModifiers;
-    }
-
-    public void setPostModifiers(TFloatList postModifiers) {
-        this.postModifiers = postModifiers;
-    }
-
-    /**
-     * Calculate the product of all values in the given list.
-     * <p>
-     * A static helper dual to {@code TFloatList#sum()}.
-     *
-     * @param multipliers the list of multipliers to calculate the product of.
-     * @return the product of all values. 1 if the list is empty.
-     */
-    private static float product(TFloatList multipliers) {
-        float multiplierProduct = 1f;
-        TFloatIterator multiplierIter = multipliers.iterator();
-        while (multiplierIter.hasNext()) {
-            multiplierProduct *= multiplierIter.next();
-        }
-        return multiplierProduct;
-    }
-
 }
