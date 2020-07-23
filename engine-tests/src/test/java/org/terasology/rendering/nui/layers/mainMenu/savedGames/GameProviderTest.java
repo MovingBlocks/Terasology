@@ -226,13 +226,8 @@ public class GameProviderTest {
     @Test
     public void getNextGameNameWithNumber() throws IOException, InterruptedException {
         mimicGameName("Custom");
-        // special waiter... Savegames use Map with FileTime as key...
-        // then game saving there counts as one FileTime, and survive only one. too fast.
-        Thread.sleep(1000);
         mimicGameName("Custom 1");
-        Thread.sleep(1000); // there too
         mimicGameName("Custom 2");
-        Thread.sleep(1000); // there too
         final String name = GameProvider.getNextGameName("Custom 1");
 
         assertNotNull(name);
@@ -248,11 +243,16 @@ public class GameProviderTest {
         bw.close();
     }
 
+    /**
+     * Creates an empty folder with given name {@code gameName} to mimic a save game.
+     * At the end waits a bit to make sure save games don't clash due to equal timestamp.
+     */
     private void mimicGameName(String gameName) throws IOException {
         Path customSaveFolder = TMP_SAVES_FOLDER_PATH.resolve(gameName);
         Files.createDirectories(customSaveFolder);
         Path manifestFilePath = customSaveFolder.resolve(GameManifest.DEFAULT_FILE_NAME);
         writeToFile(manifestFilePath, MANIFEST_EXAMPLE.replace(DEFAULT_GAME_NAME, gameName));
+        Thread.sleep(50);
     }
 
 }
