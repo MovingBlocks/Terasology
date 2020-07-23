@@ -247,7 +247,7 @@ public class GameProviderTest {
      * Creates an empty folder with given name {@code gameName} to mimic a save game.
      * At the end waits a bit to make sure save games don't clash due to equal timestamp.
      */
-    private void mimicGameName(String gameName) throws IOException {
+    private void mimicGameName(String gameName) throws IOException, InterruptedException {
         Path customSaveFolder = TMP_SAVES_FOLDER_PATH.resolve(gameName);
         Files.createDirectories(customSaveFolder);
         Path manifestFilePath = customSaveFolder.resolve(GameManifest.DEFAULT_FILE_NAME);
