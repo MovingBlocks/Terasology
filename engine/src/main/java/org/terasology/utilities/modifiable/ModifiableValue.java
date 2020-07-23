@@ -20,7 +20,7 @@ public class ModifiableValue {
     public ModifiableValue(float baseValue) {
         preModifiers = 0f;
         multipliers = 1f;
-        postModifiers = 1f;
+        postModifiers = 0f;
         this.baseValue = baseValue;
     }
 
