@@ -228,11 +228,11 @@ public class GameProviderTest {
         mimicGameName("Custom");
         // special waiter... Savegames use Map with FileTime as key...
         // then game saving there counts as one FileTime, and survive only one. too fast.
-        Thread.sleep(10);
+        Thread.sleep(1000);
         mimicGameName("Custom 1");
-        Thread.sleep(10); // there too
+        Thread.sleep(1000); // there too
         mimicGameName("Custom 2");
-        Thread.sleep(10); // there too
+        Thread.sleep(1000); // there too
         final String name = GameProvider.getNextGameName("Custom 1");
 
         assertNotNull(name);
