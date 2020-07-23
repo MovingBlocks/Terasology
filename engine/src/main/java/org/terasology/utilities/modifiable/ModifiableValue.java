@@ -29,7 +29,7 @@ public class ModifiableValue {
     }
 
     public ModifiableValue multiply(float amount) {
-        multipliers += amount;
+        multipliers *= amount;
         return this;
     }
 
