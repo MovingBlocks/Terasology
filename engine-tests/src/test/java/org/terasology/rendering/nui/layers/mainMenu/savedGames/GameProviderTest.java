@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.platform.commons.logging.Logger;
+import org.junit.platform.commons.logging.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 
@@ -45,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 
 public class GameProviderTest {
+    private static final int TIMESTAMP_DELAY = 50;
     private static final String DEFAULT_GAME_NAME = "Game";
     private static final Path TMP_SAVES_FOLDER_PATH =
             Paths.get("out", "test", "engine-tests", "tmp", "saves").toAbsolutePath();
@@ -54,6 +57,8 @@ public class GameProviderTest {
     private static final Path TMP_RECORD_GAME_PATH = TMP_RECORDS_FOLDER_PATH.resolve(DEFAULT_GAME_NAME);
     private static final String GAME_MANIFEST_JSON = "gameManifest.json";
     private static String MANIFEST_EXAMPLE;
+
+    private static final Logger logger = LoggerFactory.getLogger(GameProviderTest.class);
 
     @BeforeAll
     public static void init()
@@ -226,8 +231,12 @@ public class GameProviderTest {
     @Test
     public void getNextGameNameWithNumber() throws IOException, InterruptedException {
         mimicGameName("Custom");
+        // wait to make sure save games don't clash due to equal timestamp
+        Thread.sleep(TIMESTAMP_DELAY);
         mimicGameName("Custom 1");
+        Thread.sleep(TIMESTAMP_DELAY);
         mimicGameName("Custom 2");
+        Thread.sleep(TIMESTAMP_DELAY);
         final String name = GameProvider.getNextGameName("Custom 1");
 
         assertNotNull(name);
@@ -245,14 +254,12 @@ public class GameProviderTest {
 
     /**
      * Creates an empty folder with given name {@code gameName} to mimic a save game.
-     * At the end waits a bit to make sure save games don't clash due to equal timestamp.
      */
-    private void mimicGameName(String gameName) throws IOException, InterruptedException {
+    private void mimicGameName(String gameName) throws IOException {
         Path customSaveFolder = TMP_SAVES_FOLDER_PATH.resolve(gameName);
         Files.createDirectories(customSaveFolder);
         Path manifestFilePath = customSaveFolder.resolve(GameManifest.DEFAULT_FILE_NAME);
         writeToFile(manifestFilePath, MANIFEST_EXAMPLE.replace(DEFAULT_GAME_NAME, gameName));
-        Thread.sleep(50);
     }
 
 }
