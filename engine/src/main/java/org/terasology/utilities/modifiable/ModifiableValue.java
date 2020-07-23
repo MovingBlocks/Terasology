@@ -6,14 +6,14 @@ package org.terasology.utilities.modifiable;
 /**
  * A helper type to get and modify the value of a component without changing its actual value
  * <p>
- * The result value is guaranteed to be greater or equal to zero.
- * Components using this type must mention so in their javadoc.
+ * The result value is guaranteed to be greater or equal to zero. Components using this type must mention so in their
+ * javadoc.
  * </p>
  */
 public class ModifiableValue {
     private final float baseValue;
 
-    private float modifiers;
+    private float preModifiers;
     private float multipliers;
     private float postModifiers;
 
@@ -25,16 +25,19 @@ public class ModifiableValue {
         return baseValue;
     }
 
-    public void multiply(float amount) {
-        multipliers*=amount;
+    public ModifiableValue multiply(float amount) {
+        multipliers += amount;
+        return this;
     }
 
-    public void add(float amount) {
-        modifiers+=amount;
+    public ModifiableValue preAdd(float amount) {
+        preModifiers += amount;
+        return this;
     }
 
-    public void postAdd(float amount) {
-        postModifiers+=amount;
+    public ModifiableValue postAdd(float amount) {
+        postModifiers += amount;
+        return this;
     }
 
     /**
@@ -48,6 +51,6 @@ public class ModifiableValue {
      * <emph>The result value is guaranteed to be non-negative!</emph>
      */
     public float getValue() {
-        return baseValue + modifiers * multipliers + postModifiers;
+        return (baseValue + preModifiers) * multipliers + postModifiers;
     }
 }
