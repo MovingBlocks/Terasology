@@ -4,10 +4,9 @@
 package org.terasology.utilities.modifiable;
 
 /**
- * A helper type to get and modify the value of a component without changing its actual value
+ * A helper type to get and modify the value of a component without changing its actual value.
  * <p>
- * The result value is guaranteed to be greater or equal to zero. Components using this type must mention so in their
- * javadoc.
+ * Components using this type must mention so in their javadoc so all modifiers are added correctly.
  * </p>
  */
 public class ModifiableValue {
@@ -48,10 +47,10 @@ public class ModifiableValue {
      * <p>
      * The value is calculated based on the following formula:
      * <pre>
-     * result = max(0, <baseValue> + Σ <modifier> * Π <multiplier> + Σ <postModifier>)
+     * result = (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>
      * </pre>
      *
-     * <emph>The result value is guaranteed to be non-negative!</emph>
+     * <emph>non-negativity of the value is not ensured and must be checked by the system if needed</emph>
      */
     public float getValue() {
         return (baseValue + preModifiers) * multipliers + postModifiers;
