@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 
 public class GameProviderTest {
-    private static final int TIMESTAMP_DELAY = 200;
+    private static final int TIMESTAMP_DELAY = 500;
     private static final String DEFAULT_GAME_NAME = "Game";
     private static final Path TMP_SAVES_FOLDER_PATH =
             Paths.get("out", "test", "engine-tests", "tmp", "saves").toAbsolutePath();
