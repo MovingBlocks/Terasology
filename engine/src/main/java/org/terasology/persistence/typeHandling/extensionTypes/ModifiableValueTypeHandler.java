@@ -3,9 +3,11 @@
 
 package org.terasology.persistence.typeHandling.extensionTypes;
 
+import gnu.trove.list.TFloatList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.RegisterTypeHandler;
 import org.terasology.utilities.modifiable.ModifiableValue;
@@ -19,11 +21,31 @@ public class ModifiableValueTypeHandler extends org.terasology.persistence.typeH
 
     @Override
     public PersistedData serializeNonNull(ModifiableValue value, PersistedDataSerializer serializer) {
-        return serializer.serialize(value.getValue());
+        return serializer.serialize(value.getBaseValue(), value.getPreModifiers(), value.getMultipliers(),
+                value.getPostModifiers());
     }
 
     @Override
     public Optional<ModifiableValue> deserialize(PersistedData data) {
-        return Optional.of(new ModifiableValue(data.getAsArray().getAsFloatArray().get(0)));
+        if (!data.isArray()) {
+            return Optional.empty();
+        }
+
+        PersistedDataArray vals = data.getAsArray();
+
+        if (!vals.isNumberArray() || (vals.size() != 3 && vals.size()!=1)) {
+            return Optional.empty();
+        }
+
+        TFloatList floatList = vals.getAsFloatArray();
+        ModifiableValue modifiableValue = new ModifiableValue(floatList.get(0));
+
+        if (vals.size() != 1) {
+            modifiableValue.setPreModifiers(floatList.get(1));
+            modifiableValue.setMultipliers(floatList.get(2));
+            modifiableValue.setPostModifiers(floatList.get(3));
+        }
+
+        return Optional.of(modifiableValue);
     }
 }

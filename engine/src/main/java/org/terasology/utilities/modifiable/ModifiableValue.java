@@ -20,10 +20,10 @@ public class ModifiableValue {
     private float postModifiers;
 
     public ModifiableValue(float baseValue) {
-        preModifiers = 0f;
-        multipliers = 1f;
-        postModifiers = 0f;
-        this.baseValue = baseValue;
+        preModifiers=0;
+        multipliers=1;
+        postModifiers=0;
+        this.baseValue=baseValue;
     }
 
     public float getBaseValue() {
@@ -57,5 +57,29 @@ public class ModifiableValue {
      */
     public float getValue() {
         return (baseValue + preModifiers) * multipliers + postModifiers;
+    }
+
+    public float getPreModifiers() {
+        return preModifiers;
+    }
+
+    public float getPostModifiers() {
+        return postModifiers;
+    }
+
+    public float getMultipliers() {
+        return multipliers;
+    }
+
+    public void setPreModifiers(float preModifiers){
+        this.preModifiers=preModifiers;
+    }
+
+    public void setMultipliers(float multipliers){
+        this.multipliers=multipliers;
+    }
+
+    public void setPostModifiers(float postModifiers){
+        this.postModifiers=postModifiers;
     }
 }
