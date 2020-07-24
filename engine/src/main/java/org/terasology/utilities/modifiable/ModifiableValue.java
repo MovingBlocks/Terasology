@@ -3,12 +3,15 @@
 
 package org.terasology.utilities.modifiable;
 
+import org.terasology.module.sandbox.API;
+
 /**
  * A helper type to get and modify the value of a component without changing its actual value.
  * <p>
  * Components using this type must mention so in their javadoc so all modifiers are added correctly.
  * </p>
  */
+@API
 public class ModifiableValue {
     private final float baseValue;
 
