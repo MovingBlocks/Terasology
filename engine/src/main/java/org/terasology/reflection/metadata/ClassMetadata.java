@@ -26,6 +26,7 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.Owns;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
@@ -100,7 +101,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            CopyStrategy<?> copyStrategy = copyStrategyLibrary.getStrategy(field.getGenericType());
+            CopyStrategy<?> copyStrategy = copyStrategyLibrary.getStrategy(field.getGenericType(), field.getAnnotation(Owns.class) != null);
 
             try {
                 FIELD metadata = createField(field, copyStrategy, factory);

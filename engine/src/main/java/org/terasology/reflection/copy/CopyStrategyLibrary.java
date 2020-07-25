@@ -18,6 +18,8 @@ package org.terasology.reflection.copy;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.reflection.copy.strategy.EntityCopyStrategy;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.MappedContainer;
@@ -49,6 +51,7 @@ public class CopyStrategyLibrary {
     private static final Logger logger = LoggerFactory.getLogger(CopyStrategyLibrary.class);
 
     private Map<Class<?>, CopyStrategy<?>> strategies = Maps.newHashMap();
+    private EntityCopyStrategy entityCopyStrategy = new EntityCopyStrategy(); // Stored separately because it's optional
     private CopyStrategy<?> defaultStrategy = new ReturnAsIsStrategy<>();
     private ReflectFactory reflectFactory;
 
@@ -83,7 +86,7 @@ public class CopyStrategyLibrary {
     }
 
     // TODO: Consider CopyStrategyFactory system for Collections and similar
-    public CopyStrategy<?> getStrategy(Type genericType) {
+    public CopyStrategy<?> getStrategy(Type genericType, boolean entityOwner) {
         Class<?> typeClass = ReflectionUtil.getRawType(genericType);
         if (typeClass == null) {
             logger.error("Cannot obtain class for type {}, using default strategy", genericType);
@@ -94,7 +97,7 @@ public class CopyStrategyLibrary {
             // For lists, create the handler for the contained type and wrap in a list type handler
             Type parameter = ReflectionUtil.getTypeParameter(genericType, 0);
             if (parameter != null) {
-                CopyStrategy<?> contentStrategy = getStrategy(parameter);
+                CopyStrategy<?> contentStrategy = getStrategy(parameter, entityOwner);
                 return new ListCopyStrategy<>(contentStrategy);
             }
             logger.error("List field is not parametrized - using default strategy");
@@ -104,7 +107,7 @@ public class CopyStrategyLibrary {
             // For sets:
             Type parameter = ReflectionUtil.getTypeParameter(genericType, 0);
             if (parameter != null) {
-                CopyStrategy<?> contentStrategy = getStrategy(parameter);
+                CopyStrategy<?> contentStrategy = getStrategy(parameter, entityOwner);
                 return new SetCopyStrategy<>(contentStrategy);
             }
             logger.error("Set field is not parametrized - using default strategy");
@@ -115,7 +118,7 @@ public class CopyStrategyLibrary {
             Type keyParameter = ReflectionUtil.getTypeParameter(genericType, 0);
             CopyStrategy<?> keyStrategy;
             if (keyParameter != null) {
-                keyStrategy = getStrategy(keyParameter);
+                keyStrategy = getStrategy(keyParameter, entityOwner);
             } else {
                 logger.error("Map field is missing key parameter - using default strategy");
                 keyStrategy = defaultStrategy;
@@ -124,7 +127,7 @@ public class CopyStrategyLibrary {
             Type valueParameter = ReflectionUtil.getTypeParameter(genericType, 1);
             CopyStrategy<?> valueStrategy;
             if (valueParameter != null) {
-                valueStrategy = getStrategy(valueParameter);
+                valueStrategy = getStrategy(valueParameter, entityOwner);
             } else {
                 logger.error("Map field is missing value parameter - using default strategy");
                 valueStrategy = defaultStrategy;
@@ -150,6 +153,8 @@ public class CopyStrategyLibrary {
                 logger.error("Unable to create copy strategy for field of type {}: no publicly accessible default constructor", typeClass.getSimpleName());
                 return defaultStrategy;
             }
+        } else if (typeClass == EntityRef.class && entityOwner) {
+            return entityCopyStrategy;
         } else {
             logger.debug("Using default copy strategy for {}", typeClass);
             strategies.put(typeClass, defaultStrategy);
