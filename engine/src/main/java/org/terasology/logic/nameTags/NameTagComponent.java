@@ -17,6 +17,7 @@ package org.terasology.logic.nameTags;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.module.sandbox.API;
+import org.terasology.network.Replicate;
 import org.terasology.rendering.nui.Color;
 
 /**
@@ -29,11 +30,15 @@ import org.terasology.rendering.nui.Color;
 @API
 public class NameTagComponent implements Component {
 
+    @Replicate
     public float yOffset = 0.3f;
 
+    @Replicate
     public String text;
 
+    @Replicate
     public Color textColor = Color.WHITE;
 
+    @Replicate
     public float scale = 1f;
 }

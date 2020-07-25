@@ -47,7 +47,7 @@ public class BlockAppearance {
         this.blockParts = blockParts;
         this.textureAtlasPos.putAll(textureAtlasPos);
         for (BlockPart part : BlockPart.values()) {
-            Preconditions.checkNotNull("Missing texture atlas position for part " + part, textureAtlasPos.get(part));
+            Preconditions.checkNotNull(textureAtlasPos.get(part), "Missing texture atlas position for part " + part);
         }
     }
 
