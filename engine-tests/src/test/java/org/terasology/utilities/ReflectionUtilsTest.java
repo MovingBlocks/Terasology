@@ -68,7 +68,7 @@ public class ReflectionUtilsTest {
     public void testGetTypeParameterForGenericSupertypeInGenericSubclass() {
         class SubInterface<T> implements CopyStrategy<T> {
             @Override
-            public T copy(T value) {
+            public T copy(T value, boolean copyEntities) {
                 return null;
             }
         }
@@ -271,7 +271,7 @@ public class ReflectionUtilsTest {
 
     class SubInterfaceImplementor implements GenericInterfaceSubInterface {
         @Override
-        public Integer copy(Integer value) {
+        public Integer copy(Integer value, boolean copyEntities) {
             return null;
         }
     }
@@ -279,7 +279,7 @@ public class ReflectionUtilsTest {
     public static class ParameterisedInterfaceImplementor implements CopyStrategy<Integer> {
 
         @Override
-        public Integer copy(Integer value) {
+        public Integer copy(Integer value, boolean copyEntities) {
             return null;
         }
     }
@@ -290,7 +290,7 @@ public class ReflectionUtilsTest {
     public static class UnboundInterfaceImplementor<T> implements CopyStrategy<T> {
 
         @Override
-        public T copy(T value) {
+        public T copy(T value, boolean copyEntities) {
             return null;
         }
     }

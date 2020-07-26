@@ -51,7 +51,6 @@ public class CopyStrategyLibrary {
     private static final Logger logger = LoggerFactory.getLogger(CopyStrategyLibrary.class);
 
     private Map<Class<?>, CopyStrategy<?>> strategies = Maps.newHashMap();
-    private EntityCopyStrategy entityCopyStrategy = new EntityCopyStrategy(); // Stored separately because it's optional
     private CopyStrategy<?> defaultStrategy = new ReturnAsIsStrategy<>();
     private ReflectFactory reflectFactory;
 
@@ -134,6 +133,8 @@ public class CopyStrategyLibrary {
             }
             return new MapCopyStrategy<>(keyStrategy, valueStrategy);
 
+        } else if (typeClass == EntityRef.class && entityOwner) {
+            return new EntityCopyStrategy((CopyStrategy<EntityRef>) getStrategy(genericType, false));
         } else if (strategies.containsKey(typeClass)) {
             // For known types, just use the handler
             return strategies.get(typeClass);
@@ -153,8 +154,6 @@ public class CopyStrategyLibrary {
                 logger.error("Unable to create copy strategy for field of type {}: no publicly accessible default constructor", typeClass.getSimpleName());
                 return defaultStrategy;
             }
-        } else if (typeClass == EntityRef.class && entityOwner) {
-            return entityCopyStrategy;
         } else {
             logger.debug("Using default copy strategy for {}", typeClass);
             strategies.put(typeClass, defaultStrategy);
@@ -179,7 +178,7 @@ public class CopyStrategyLibrary {
     private static class ReturnAsIsStrategy<T> implements CopyStrategy<T> {
 
         @Override
-        public T copy(T value) {
+        public T copy(T value, boolean copyEntities) {
             return value;
         }
     }

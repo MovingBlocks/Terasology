@@ -33,11 +33,11 @@ public class MapCopyStrategy<K, V> implements CopyStrategy<Map<K, V>> {
     }
 
     @Override
-    public Map<K, V> copy(Map<K, V> map) {
+    public Map<K, V> copy(Map<K, V> map, boolean copyEntities) {
         if (map != null) {
             Map<K, V> result = Maps.newLinkedHashMap();
             for (Map.Entry<K, V> entry : map.entrySet()) {
-                result.put(keyStrategy.copy(entry.getKey()), valueStrategy.copy(entry.getValue()));
+                result.put(keyStrategy.copy(entry.getKey(), copyEntities), valueStrategy.copy(entry.getValue(), copyEntities));
             }
             return result;
         }

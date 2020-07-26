@@ -25,8 +25,9 @@ public interface CopyStrategy<T> {
 
     /**
      * @param value The value to copy
+     * @param copyEntities Whether to make deep copies of EntityRefs that are owned by this object
      * @return A safe to use copy of the given value.
      */
-    T copy(T value);
+    T copy(T value, boolean copyEntities);
 
 }

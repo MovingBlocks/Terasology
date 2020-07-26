@@ -25,7 +25,7 @@ import org.terasology.reflection.copy.RegisterCopyStrategy;
 public class Vector4fCopyStrategy implements CopyStrategy<Vector4f> {
 
     @Override
-    public Vector4f copy(Vector4f value) {
+    public Vector4f copy(Vector4f value, boolean updateEntities) {
         if (value != null) {
             return new Vector4f(value);
         }

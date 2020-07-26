@@ -32,9 +32,9 @@ public class ListCopyStrategy<T> implements CopyStrategy<List<T>> {
     }
 
     @Override
-    public List<T> copy(List<T> value) {
+    public List<T> copy(List<T> value, boolean copyEntities) {
         if (value != null) {
-            return value.stream().map(contentStrategy::copy).collect(Collectors.toCollection(ArrayList::new));
+            return value.stream().map(v -> contentStrategy.copy(v, copyEntities)).collect(Collectors.toCollection(ArrayList::new));
         }
         return null;
     }

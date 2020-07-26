@@ -25,7 +25,7 @@ import org.terasology.reflection.copy.RegisterCopyStrategy;
 public class Vector2fCopyStrategy implements CopyStrategy<Vector2f> {
 
     @Override
-    public Vector2f copy(Vector2f value) {
+    public Vector2f copy(Vector2f value, boolean copyEntities) {
         if (value != null) {
             return new Vector2f(value);
         }

@@ -154,10 +154,11 @@ public class FieldMetadata<T, U> {
      * Otherwise it behaves the same as getValue
      *
      * @param from The object to copy the field from
+     * @param copyEntities Whether to make deep copies of EntityRefs that are owned by this object
      * @return A safe to use copy of the value of this field in the given object
      */
-    public U getCopyOfValue(Object from) {
-        return copyStrategy.copy(getValue(from));
+    public U getCopyOfValue(Object from, boolean copyEntities) {
+        return copyStrategy.copy(getValue(from), copyEntities);
     }
 
     /**
@@ -166,10 +167,11 @@ public class FieldMetadata<T, U> {
      * This method is checked to conform to the generic parameters of the FieldMetadata
      *
      * @param from The object to copy the field from
+     * @param copyEntities Whether to make deep copies of EntityRefs that are owned by this object
      * @return A safe to use copy of the value of this field in the given object
      */
-    public U getCopyOfValueChecked(T from) {
-        return getCopyOfValue(from);
+    public U getCopyOfValueChecked(T from, boolean copyEntities) {
+        return getCopyOfValue(from, copyEntities);
     }
 
     /**

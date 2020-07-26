@@ -32,7 +32,7 @@ class DelayedEntityRefCopyStrategy implements CopyStrategy<EntityRef> {
     }
 
     @Override
-    public EntityRef copy(EntityRef value) {
+    public EntityRef copy(EntityRef value, boolean copyEntities) {
         if (value != null) {
             if (value.exists() && value.isPersistent()) {
                 return delayedEntityRefFactory.createDelayedEntityRef(value.getId());

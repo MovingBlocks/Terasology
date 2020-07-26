@@ -31,9 +31,9 @@ public class SetCopyStrategy<T> implements CopyStrategy<Set<T>> {
     }
 
     @Override
-    public Set<T> copy(Set<T> value) {
+    public Set<T> copy(Set<T> value, boolean copyEntities) {
         if (value != null) {
-            return value.stream().map(contentStrategy::copy).collect(Collectors.toCollection(HashSet::new));
+            return value.stream().map(v -> contentStrategy.copy(v, copyEntities)).collect(Collectors.toCollection(HashSet::new));
         }
         return null;
     }

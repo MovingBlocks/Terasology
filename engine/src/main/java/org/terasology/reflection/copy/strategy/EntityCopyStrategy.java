@@ -22,11 +22,18 @@ import org.terasology.reflection.copy.CopyStrategy;
 * Provides a deep copy of an entity.
  */
 public class EntityCopyStrategy implements CopyStrategy<EntityRef> {
-    public EntityCopyStrategy() {
+    CopyStrategy<EntityRef> backup;
+
+    public EntityCopyStrategy(CopyStrategy<EntityRef> backup) {
+        this.backup = backup;
     }
 
     @Override
-    public EntityRef copy(EntityRef value) {
-        return value.copy();
+    public EntityRef copy(EntityRef value, boolean copyEntities) {
+        if (copyEntities) {
+            return value.copy();
+        } else {
+            return backup.copy(value, false);
+        }
     }
 }

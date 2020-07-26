@@ -169,13 +169,14 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
 
     /**
      * @param object The instance of this class to copy
+     * @param copyEntities Whether to make deep copies of EntityRefs that are owned by this object
      * @return A copy of the given object
      */
-    public T copy(T object) {
+    public T copy(T object, boolean copyEntities) {
         T result = constructor.construct();
         if (result != null) {
             for (FIELD field : fields.values()) {
-                field.setValue(result, field.getCopyOfValue(object));
+                field.setValue(result, field.getCopyOfValue(object, copyEntities));
             }
         }
         return result;
@@ -185,11 +186,12 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * This method is for use in situations where metadata is being used generically and the actual type of the value cannot be
      *
      * @param object The instance of this class to copy
+     * @param copyEntities Whether to make deep copies of EntityRefs that are owned by this object
      * @return A copy of the given object, or null if object is not of the type described by this metadata.
      */
-    public T copyRaw(Object object) {
+    public T copyRaw(Object object, boolean copyEntities) {
         if (getType().isInstance(object)) {
-            return copy(getType().cast(object));
+            return copy(getType().cast(object), copyEntities);
         }
         return null;
     }

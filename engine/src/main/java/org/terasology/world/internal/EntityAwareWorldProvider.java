@@ -357,7 +357,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private <T extends Component> void copyIntoPrefab(EntityRef blockEntity, T comp, Set<Class<? extends Component>> retainComponents) {
         ComponentMetadata<T> metadata = entityManager.getComponentLibrary().getMetadata((Class<T>) comp.getClass());
         if (!blockEntity.hasComponent(comp.getClass())) {
-            blockEntity.addComponent(metadata.copyRaw(comp));
+            blockEntity.addComponent(metadata.copyRaw(comp, false));
         } else if (!metadata.isRetainUnalteredOnBlockChange() && !retainComponents.contains(metadata.getType())) {
             updateComponent(blockEntity, metadata, comp);
         }
