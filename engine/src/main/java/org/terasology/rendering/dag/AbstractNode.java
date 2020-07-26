@@ -203,12 +203,12 @@ public abstract class AbstractNode implements Node {
 
             // set data for all connected connections
             if (!localBufferPairConnection.getConnectedConnections().isEmpty()) {
-                logger.info("Propagating bufferPair data to all connected connections of " + localBufferPairConnection + ": ");
+                logger.debug("Propagating bufferPair data to all connected connections of " + localBufferPairConnection + ": ");
                 localBufferPairConnection.getConnectedConnections().forEach((k, v) -> {
-                    logger.info("setting data for: " + v.toString() + " ,");
+                    logger.debug("setting data for: " + v.toString() + " ,");
                     v.setData(bufferPair);
                 });
-                logger.info("data propagated.\n");
+                logger.debug("data propagated.\n");
             }
 
             if(localBufferPairConnection.getData() != null) {

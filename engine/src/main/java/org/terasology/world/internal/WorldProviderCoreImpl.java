@@ -197,7 +197,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(JomlUtil.from(worldPos));
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(JomlUtil.from(worldPos));
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(JomlUtil.from(worldPos));
             Block oldBlockType = chunk.setBlock(blockPos, type);
             if (oldBlockType != type) {
                 BlockChange oldChange = blockChanges.get(JomlUtil.from(worldPos));
@@ -231,7 +231,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
             if (chunk != null) {
                 Block type = entry.getValue();
-                Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
+                Vector3i blockPos = ChunkMath.calcRelativeBlockPos(worldPos);
                 Block oldBlockType = chunk.setBlock(blockPos, type);
                 if (oldBlockType != type) {
                     BlockChange oldChange = blockChanges.get(worldPos);
@@ -298,7 +298,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(x, y, z);
             return chunk.getLight(blockPos);
         }
         return 0;
@@ -309,7 +309,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(x, y, z);
             return chunk.getSunlight(blockPos);
         }
         return 0;
@@ -320,7 +320,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(x, y, z);
             return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
         }
         return 0;
@@ -340,7 +340,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(worldPos);
             int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);
             chunk.setExtraData(index, blockPos.x, blockPos.y, blockPos.z, value);
             if (oldValue != value) {

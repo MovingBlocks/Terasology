@@ -39,6 +39,12 @@ import org.terasology.utilities.random.FastRandom;
  */
 public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
 
+    /**
+     * Multiply this with the gridDim provided and noise(x,x) will give tileable 1D noise which will tile
+     * when x crosses a multiple of (this * gridDim)
+     */
+    public static final float TILEABLE1DMAGICNUMBER = 0.5773502691896258f;
+
     private static Grad[] grad3 = {
             new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0),
             new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1),
@@ -62,41 +68,54 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
     private static final float F4 = ((float) Math.sqrt(5.0f) - 1.0f) / 4.0f;
     private static final float G4 = (5.0f - (float) Math.sqrt(5.0f)) / 20.0f;
 
-    private final short[] perm = new short[512];
-    private final short[] permMod12 = new short[512];
-
+    private final short[] perm;
+    private final short[] permMod12;
+    private final int permCount;
     /**
-     * Initialize permutations with a given seed
+     * Initialize permutations with a given seed and grid dimension.
      *
      * @param seed a seed value used for permutation shuffling
      */
     public SimplexNoise(long seed) {
+        this(seed, 256);
+    }
+
+    /**
+     * Initialize permutations with a given seed and grid dimension.
+     * Supports 1D tileable noise
+     * @see SimplexNoise#tileable1DMagicNumber
+     *
+     * @param seed a seed value used for permutation shuffling
+     * @param gridDim gridDim x gridDim will be the number of squares in the square grid formed after skewing the simplices belonging to once "tile"
+     */
+    public SimplexNoise(long seed, int gridDim) {
         FastRandom rand = new FastRandom(seed);
 
-        short[] p = new short[256];
+        permCount = gridDim;
 
-        // Initialize with all values [0..255]
-        for (short i = 0; i < 256; i++) {
+        perm = new short[permCount * 2];
+        permMod12 = new short[permCount * 2];
+        short[] p = new short[permCount];
+
+        // Initialize with all values [0..(permCount-1)]
+        for (short i = 0; i < permCount; i++) {
             p[i] = i;
         }
 
         // Shuffle the array
-        for (int i = 0; i < 256; i++) {
-            int j = rand.nextInt(256);
+        for (int i = 0; i < permCount; i++) {
+            int j = rand.nextInt(permCount);
 
             short swap = p[i];
             p[i] = p[j];
             p[j] = swap;
         }
 
-        for (int i = 0; i < 512; i++) {
-            perm[i] = p[i & 255];
+        for (int i = 0; i < permCount * 2; i++) {
+            perm[i] = p[i % permCount];
             permMod12[i] = (short) (perm[i] % 12);
         }
     }
-
-    // This method is a *lot* faster than using (int)Math.floor(x)
-
 
     private static float dot(Grad g, float x, float y) {
         return g.x * x + g.y * y;
@@ -154,8 +173,8 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         float y2 = y0 - 1.0f + 2.0f * G2;
 
         // Work out the hashed gradient indices of the three simplex corners
-        int ii = i & 255;
-        int jj = j & 255;
+        int ii = Math.floorMod(i, permCount);
+        int jj = Math.floorMod(j, permCount);
         int gi0 = permMod12[ii + perm[jj]];
         int gi1 = permMod12[ii + i1 + perm[jj + j1]];
         int gi2 = permMod12[ii + 1 + perm[jj + 1]];
@@ -288,9 +307,9 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         float z3 = z0 - 1.0f + 3.0f * G3;
 
         // Work out the hashed gradient indices of the four simplex corners
-        int ii = i & 255;
-        int jj = j & 255;
-        int kk = k & 255;
+        int ii = Math.floorMod(i, permCount);
+        int jj = Math.floorMod(j, permCount);
+        int kk = Math.floorMod(k, permCount);
         int gi0 = permMod12[ii + perm[jj + perm[kk]]];
         int gi1 = permMod12[ii + i1 + perm[jj + j1 + perm[kk + k1]]];
         int gi2 = permMod12[ii + i2 + perm[jj + j2 + perm[kk + k2]]];
@@ -458,10 +477,10 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         float w4 = w0 - 1.0f + 4.0f * G4;
 
         // Work out the hashed gradient indices of the five simplex corners
-        int ii = i & 255;
-        int jj = j & 255;
-        int kk = k & 255;
-        int ll = l & 255;
+        int ii = Math.floorMod(i, permCount);
+        int jj = Math.floorMod(j, permCount);
+        int kk = Math.floorMod(k, permCount);
+        int ll = Math.floorMod(l, permCount);
         int gi0 = perm[ii + perm[jj + perm[kk + perm[ll]]]] % 32;
         int gi1 = perm[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]] % 32;
         int gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]] % 32;
