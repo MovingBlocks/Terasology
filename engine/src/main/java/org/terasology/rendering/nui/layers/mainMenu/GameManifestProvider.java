@@ -58,7 +58,7 @@ public class GameManifestProvider {
     public static GameManifest createGameManifest(final UniverseWrapper universeWrapper, final ModuleManager moduleManager, final Config config) {
         GameManifest gameManifest = new GameManifest();
         if (StringUtils.isNotBlank(universeWrapper.getGameName())) {
-            gameManifest.setTitle(universeWrapper.getGameName());
+            gameManifest.setTitle(GameProvider.getNextGameName(universeWrapper.getGameName()));
         } else {
             gameManifest.setTitle(GameProvider.getNextGameName());
         }

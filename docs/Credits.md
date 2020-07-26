@@ -277,7 +277,8 @@ Contributors
  [agent-q1](https://github.com/agent-q1),
  [otradovec](https://github.com/otradovec),
  [jankeromnes](https://github.com/jankeromnes),
- [wytrem](https://github.com/wytrem)
+ [wytrem](https://github.com/wytrem),
+ [ayrustogaru](https://github.com/ayrustogaru)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

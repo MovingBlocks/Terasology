@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering;
 
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector2f;
+import org.joml.Vector3fc;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNodeProxy;
 
 /**
@@ -67,7 +67,7 @@ public final class RenderHelper {
         return time * 4000.0f * speed;
     }
 
-    public static float evaluateOceanHeightAtPosition(Vector3f position, float days) {
+    public static float evaluateOceanHeightAtPosition(Vector3fc position, float days) {
         float height = 0.0f;
 
         float waveSize = RefractiveReflectiveBlocksNodeProxy.waveSize;
@@ -76,7 +76,7 @@ public final class RenderHelper {
 
         for (int i = 0; i < OCEAN_OCTAVES; ++i) {
             height += (float) (smoothTriangleWave(timeToTick(days,
-                    timeFactor) + position.x * OCEAN_WAVE_DIRECTIONS[i].x * waveSize + position.z * OCEAN_WAVE_DIRECTIONS[i].y * waveSize) * 2.0 - 1.0) * waveIntensity;
+                    timeFactor) + position.x() * OCEAN_WAVE_DIRECTIONS[i].x * waveSize + position.z() * OCEAN_WAVE_DIRECTIONS[i].y * waveSize) * 2.0 - 1.0) * waveIntensity;
 
             waveSize *= RefractiveReflectiveBlocksNodeProxy.waveSizeFalloff;
             waveIntensity *= RefractiveReflectiveBlocksNodeProxy.waveIntensityFalloff;

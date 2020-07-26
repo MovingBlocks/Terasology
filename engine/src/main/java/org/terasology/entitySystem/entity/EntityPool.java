@@ -15,6 +15,8 @@
  */
 package org.terasology.entitySystem.entity;
 
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.geom.Quat4f;
@@ -88,18 +90,43 @@ public interface EntityPool {
 
     /**
      * @return A new entity, based on the given prefab, at the desired position
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #create(String,Vector3fc)}.
      */
+    @Deprecated
     EntityRef create(String prefab, Vector3f position);
 
     /**
      * @return A new entity, based on the given prefab, at the desired position
      */
+    EntityRef create(String prefab, Vector3fc position);
+
+    /**
+     * @return A new entity, based on the given prefab, at the desired position
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #create(Prefab,Vector3fc)}.
+     */
+    @Deprecated
     EntityRef create(Prefab prefab, Vector3f position);
+
+    /**
+     * @return A new entity, based on the given prefab, at the desired position
+     */
+    EntityRef create(Prefab prefab, Vector3fc position);
+
+    /**
+     * @return A new entity, based on the given prefab, at the desired position, and with the desired rotation
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #create(Prefab,Vector3fc,Quaternionfc)}.
+     */
+    @Deprecated
+    EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
+
 
     /**
      * @return A new entity, based on the given prefab, at the desired position, and with the desired rotation
      */
-    EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
+    EntityRef create(Prefab prefab, Vector3fc position, Quaternionfc rotation);
 
     /**
      * Creates an entity but doesn't send any lifecycle events.
