@@ -46,10 +46,10 @@ public class FieldMetadata<T, U> {
     private byte id;
 
     /**
-     * @param owner        The ClassMetadata that owns this field
-     * @param field        The field this metadata is for
-     * @param copyStrategy The CopyStrategy appropriate for the type of the field
-     * @param factory      The reflection provider
+     * @param owner               The ClassMetadata that owns this field
+     * @param field               The field this metadata is for
+     * @param copyStrategyLibrary Something to provide a CopyStrategy appropriate for the type of the field
+     * @param factory             The reflection provider
      */
     @SuppressWarnings("unchecked")
     public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
