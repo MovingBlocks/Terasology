@@ -26,7 +26,6 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.Owns;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
@@ -56,8 +55,8 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
 
     private final SimpleUri uri;
     private final Class<T> clazz;
-    private final ObjectConstructor<T> constructor;
-    private Map<String, FIELD> fields = Maps.newHashMap();
+    protected final ObjectConstructor<T> constructor;
+    protected Map<String, FIELD> fields = Maps.newHashMap();
     private TIntObjectMap<FIELD> fieldsById = new TIntObjectHashMap<>();
 
     /**
@@ -101,10 +100,9 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            CopyStrategy<?> copyStrategy = copyStrategyLibrary.getStrategy(field.getGenericType(), field.getAnnotation(Owns.class) != null);
 
             try {
-                FIELD metadata = createField(field, copyStrategy, factory);
+                FIELD metadata = createField(field, copyStrategyLibrary, factory);
                 if (metadata != null) {
                     fields.put(metadata.getName().toLowerCase(Locale.ENGLISH), metadata);
                 }
@@ -123,7 +121,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * @param factory      The reflection provider
      * @return A FieldMetadata describing the field, or null to ignore this field
      */
-    protected abstract <V> FIELD createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException;
+    protected abstract FIELD createField(Field field, CopyStrategyLibrary copyStrategy, ReflectFactory factory) throws InaccessibleFieldException;
 
     /**
      * @return The class described by this metadata
@@ -169,14 +167,13 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
 
     /**
      * @param object The instance of this class to copy
-     * @param copyEntities Whether to make deep copies of EntityRefs that are owned by this object
      * @return A copy of the given object
      */
-    public T copy(T object, boolean copyEntities) {
+    public T copy(T object) {
         T result = constructor.construct();
         if (result != null) {
             for (FIELD field : fields.values()) {
-                field.setValue(result, field.getCopyOfValue(object, copyEntities));
+                field.setValue(result, field.getCopyOfValue(object));
             }
         }
         return result;
@@ -186,12 +183,11 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * This method is for use in situations where metadata is being used generically and the actual type of the value cannot be
      *
      * @param object The instance of this class to copy
-     * @param copyEntities Whether to make deep copies of EntityRefs that are owned by this object
      * @return A copy of the given object, or null if object is not of the type described by this metadata.
      */
-    public T copyRaw(Object object, boolean copyEntities) {
+    public T copyRaw(Object object) {
         if (getType().isInstance(object)) {
-            return copy(getType().cast(object), copyEntities);
+            return copy(getType().cast(object));
         }
         return null;
     }

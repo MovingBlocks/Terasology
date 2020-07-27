@@ -29,9 +29,9 @@ public class MappedContainerCopyStrategy<T> implements CopyStrategy<T> {
     }
 
     @Override
-    public T copy(T value, boolean copyEntities) {
+    public T copy(T value) {
         if (value != null) {
-            return classMetadata.copy(value, copyEntities);
+            return classMetadata.copy(value);
         }
         return null;
     }

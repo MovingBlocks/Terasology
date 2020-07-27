@@ -121,16 +121,7 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
     public <TYPE extends T> TYPE copy(TYPE object) {
         ClassMetadata<TYPE, ?> info = getMetadata(object);
         if (info != null) {
-            return info.copy(object, false);
-        }
-        return null;
-    }
-
-    @Override
-    public <TYPE extends T> TYPE deepCopy(TYPE object) {
-        ClassMetadata<TYPE, ?> info = getMetadata(object);
-        if (info != null) {
-            return info.copy(object, true);
+            return info.copy(object);
         }
         return null;
     }

@@ -25,7 +25,7 @@ import org.terasology.reflection.copy.RegisterCopyStrategy;
 public class Quat4fCopyStrategy implements CopyStrategy<Quat4f> {
 
     @Override
-    public Quat4f copy(Quat4f value, boolean copyEntities) {
+    public Quat4f copy(Quat4f value) {
         if (value != null) {
             return new Quat4f(value);
         }

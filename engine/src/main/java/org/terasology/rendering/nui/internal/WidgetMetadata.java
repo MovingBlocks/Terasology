@@ -46,8 +46,8 @@ public class WidgetMetadata<T extends UIWidget> extends ClassMetadata<T, FieldMe
     }
 
     @Override
-    protected <V> FieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
-        return new FieldMetadata<>(this, field, copyStrategy, factory);
+    protected FieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
+        return new FieldMetadata<>(this, field, copyStrategyLibrary, factory);
     }
 
     private static class IsConfigField implements Predicate<Field> {

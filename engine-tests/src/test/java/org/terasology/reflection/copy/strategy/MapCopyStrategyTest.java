@@ -42,7 +42,7 @@ public class MapCopyStrategyTest {
         originalOrderedMap.put("four", 4L);
 
         MapCopyStrategy<String, Long> strategy = new MapCopyStrategy<>(keyStrategy, valueStrategy);
-        Map<String, Long> copiedMap = strategy.copy(originalOrderedMap, false);
+        Map<String, Long> copiedMap = strategy.copy(originalOrderedMap);
         Set<String> keySet = copiedMap.keySet();
         List<String> keyList = new ArrayList<>(keySet);
         assertEquals(4, keyList.size());
@@ -64,7 +64,7 @@ public class MapCopyStrategyTest {
     private static class ReturnAsIsStrategy<T> implements CopyStrategy<T> {
 
         @Override
-        public T copy(T value, boolean copyEntities) {
+        public T copy(T value) {
             return value;
         }
     }

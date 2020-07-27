@@ -80,8 +80,8 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
     }
 
     @Override
-    protected <U> ComponentFieldMetadata<T, U> createField(Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
-        return new ComponentFieldMetadata<>(this, field, copyStrategy, factory, false);
+    protected ComponentFieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
+        return new ComponentFieldMetadata<>(this, field, copyStrategyLibrary, factory, false);
     }
 
     /**
@@ -128,5 +128,32 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
 
     public T getAnnotation(final Class<T> type) {
         return Iterables.getOnlyElement(Iterables.filter(annotations, type), null);
+    }
+
+    /**
+     * @param object The instance of this class to copy
+     * @return A copy of the given object
+     */
+    public T copyWithOwnedEntities(T object) {
+        T result = constructor.construct();
+        if (result != null) {
+            for (ComponentFieldMetadata<T,?> field : fields.values()) {
+                field.setValue(result, field.getCopyOfValueWithOwnedEntities(object));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * This method is for use in situations where metadata is being used generically and the actual type of the value cannot be
+     *
+     * @param object The instance of this class to copy
+     * @return A copy of the given object, or null if object is not of the type described by this metadata.
+     */
+    public T copyWithOwnedEntitiesRaw(Object object) {
+        if (getType().isInstance(object)) {
+            return copyWithOwnedEntities(getType().cast(object));
+        }
+        return null;
     }
 }

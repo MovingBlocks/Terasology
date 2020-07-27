@@ -61,14 +61,6 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>>
     <TYPE extends T> TYPE copy(TYPE object);
 
     /**
-     * Copies the registered class, also making copies of any entities that it owns
-     *
-     * @param object The object to create a copy of
-     * @return A copy of the class, or null if not registered
-     */
-    <TYPE extends T> TYPE deepCopy(TYPE object);
-
-    /**
      * @param uri The uri identifying the class to look up
      * @return The metadata for the given class, or null if not registered.
      */

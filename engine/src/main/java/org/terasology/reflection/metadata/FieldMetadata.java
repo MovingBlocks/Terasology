@@ -18,6 +18,7 @@ package org.terasology.reflection.metadata;
 import com.google.common.base.Objects;
 import com.google.gson.annotations.SerializedName;
 import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.FieldAccessor;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -38,7 +39,7 @@ public class FieldMetadata<T, U> {
     private final Class<U> type;
     private final Field field;
     private final FieldAccessor<T, U> accessor;
-    private final CopyStrategy<U> copyStrategy;
+    protected final CopyStrategy<U> copyStrategy;
 
     private final String serializationName;
 
@@ -51,9 +52,9 @@ public class FieldMetadata<T, U> {
      * @param factory      The reflection provider
      */
     @SuppressWarnings("unchecked")
-    public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
+    public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
         this.owner = owner;
-        this.copyStrategy = copyStrategy;
+        copyStrategy = (CopyStrategy<U>) copyStrategyLibrary.getStrategy(field.getGenericType());
         this.type = (Class<U>) determineType(field, owner.getType());
         this.accessor = factory.createFieldAccessor(owner.getType(), field, type);
         this.field = field;
@@ -154,11 +155,10 @@ public class FieldMetadata<T, U> {
      * Otherwise it behaves the same as getValue
      *
      * @param from The object to copy the field from
-     * @param copyEntities Whether to make deep copies of EntityRefs that are owned by this object
      * @return A safe to use copy of the value of this field in the given object
      */
-    public U getCopyOfValue(Object from, boolean copyEntities) {
-        return copyStrategy.copy(getValue(from), copyEntities);
+    public U getCopyOfValue(Object from) {
+        return copyStrategy.copy(getValue(from));
     }
 
     /**
@@ -167,11 +167,10 @@ public class FieldMetadata<T, U> {
      * This method is checked to conform to the generic parameters of the FieldMetadata
      *
      * @param from The object to copy the field from
-     * @param copyEntities Whether to make deep copies of EntityRefs that are owned by this object
      * @return A safe to use copy of the value of this field in the given object
      */
-    public U getCopyOfValueChecked(T from, boolean copyEntities) {
-        return getCopyOfValue(from, copyEntities);
+    public U getCopyOfValueChecked(T from) {
+        return getCopyOfValue(from);
     }
 
     /**

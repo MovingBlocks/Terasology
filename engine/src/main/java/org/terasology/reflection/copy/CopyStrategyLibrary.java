@@ -85,7 +85,7 @@ public class CopyStrategyLibrary {
     }
 
     // TODO: Consider CopyStrategyFactory system for Collections and similar
-    public CopyStrategy<?> getStrategy(Type genericType, boolean entityOwner) {
+    public CopyStrategy<?> getStrategy(Type genericType) {
         Class<?> typeClass = ReflectionUtil.getRawType(genericType);
         if (typeClass == null) {
             logger.error("Cannot obtain class for type {}, using default strategy", genericType);
@@ -96,7 +96,7 @@ public class CopyStrategyLibrary {
             // For lists, create the handler for the contained type and wrap in a list type handler
             Type parameter = ReflectionUtil.getTypeParameter(genericType, 0);
             if (parameter != null) {
-                CopyStrategy<?> contentStrategy = getStrategy(parameter, entityOwner);
+                CopyStrategy<?> contentStrategy = getStrategy(parameter);
                 return new ListCopyStrategy<>(contentStrategy);
             }
             logger.error("List field is not parametrized - using default strategy");
@@ -106,7 +106,7 @@ public class CopyStrategyLibrary {
             // For sets:
             Type parameter = ReflectionUtil.getTypeParameter(genericType, 0);
             if (parameter != null) {
-                CopyStrategy<?> contentStrategy = getStrategy(parameter, entityOwner);
+                CopyStrategy<?> contentStrategy = getStrategy(parameter);
                 return new SetCopyStrategy<>(contentStrategy);
             }
             logger.error("Set field is not parametrized - using default strategy");
@@ -117,7 +117,7 @@ public class CopyStrategyLibrary {
             Type keyParameter = ReflectionUtil.getTypeParameter(genericType, 0);
             CopyStrategy<?> keyStrategy;
             if (keyParameter != null) {
-                keyStrategy = getStrategy(keyParameter, entityOwner);
+                keyStrategy = getStrategy(keyParameter);
             } else {
                 logger.error("Map field is missing key parameter - using default strategy");
                 keyStrategy = defaultStrategy;
@@ -126,15 +126,13 @@ public class CopyStrategyLibrary {
             Type valueParameter = ReflectionUtil.getTypeParameter(genericType, 1);
             CopyStrategy<?> valueStrategy;
             if (valueParameter != null) {
-                valueStrategy = getStrategy(valueParameter, entityOwner);
+                valueStrategy = getStrategy(valueParameter);
             } else {
                 logger.error("Map field is missing value parameter - using default strategy");
                 valueStrategy = defaultStrategy;
             }
             return new MapCopyStrategy<>(keyStrategy, valueStrategy);
 
-        } else if (typeClass == EntityRef.class && entityOwner) {
-            return new EntityCopyStrategy((CopyStrategy<EntityRef>) getStrategy(genericType, false));
         } else if (strategies.containsKey(typeClass)) {
             // For known types, just use the handler
             return strategies.get(typeClass);
@@ -178,7 +176,7 @@ public class CopyStrategyLibrary {
     private static class ReturnAsIsStrategy<T> implements CopyStrategy<T> {
 
         @Override
-        public T copy(T value, boolean copyEntities) {
+        public T copy(T value) {
             return value;
         }
     }
