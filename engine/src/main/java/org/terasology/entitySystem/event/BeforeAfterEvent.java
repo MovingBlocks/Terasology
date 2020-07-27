@@ -5,7 +5,13 @@ package org.terasology.entitySystem.event;
 
 /**
  * Immutable event to notify a change in a certain value.
- * NOTE: This is a generic event and a more specific Event extending this event should be fired and reacted to.
+ * <p>
+ * Send this event to notify interested systems about a change in a value. It is good practice to only sent this event
+ * if the {@code newValue} is different from the {@code oldValue}. The event should notify about a change that has
+ * already happened. The event can neither be consumed nor modified.
+ * <p>
+ * <strong>Note:</strong> This is a generic event and a more specific Event extending this event should be fired and
+ * reacted to.
  */
 public abstract class BeforeAfterEvent<T> implements Event {
     protected final T oldValue;
@@ -13,14 +19,19 @@ public abstract class BeforeAfterEvent<T> implements Event {
 
     /**
      * Creates a new notification event on change in value.
+     *
+     * @param oldValue the value prior to the change, may be {@code null}
+     * @param newValue the value after the the change, may be {@code null}
      */
-    BeforeAfterEvent(final T oldValue, final T newValue) {
+    public BeforeAfterEvent(final T oldValue, final T newValue) {
         this.oldValue = oldValue;
         this.newValue = newValue;
     }
 
     /**
      * Returns the value prior to change.
+     *
+     * @return the value prior to change, may be {@code null}
      */
     public T getOldValue() {
         return oldValue;
@@ -28,6 +39,8 @@ public abstract class BeforeAfterEvent<T> implements Event {
 
     /**
      * Returns the value after change.
+     *
+     * @return the value after the change, may be {@code null}
      */
     public T getNewValue() {
         return newValue;
