@@ -18,8 +18,6 @@ package org.terasology.reflection.copy;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.reflection.copy.strategy.EntityCopyStrategy;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.MappedContainer;

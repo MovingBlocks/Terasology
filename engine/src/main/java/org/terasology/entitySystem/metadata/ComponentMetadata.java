@@ -131,6 +131,8 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
     }
 
     /**
+     * Makes a copy, and if there are any entities owned by this component, copy those too recursively.
+     *
      * @param object The instance of this class to copy
      * @return A copy of the given object
      */
