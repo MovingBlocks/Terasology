@@ -27,25 +27,19 @@ public class ModifiableValueTypeHandler extends org.terasology.persistence.typeH
 
     @Override
     public Optional<ModifiableValue> deserialize(PersistedData data) {
-        if (!data.isArray()) {
-            return Optional.empty();
+        if (data.isArray()) {
+            PersistedDataArray vals = data.getAsArray();
+            if (vals.isNumberArray()) {
+                TFloatList floatList = vals.getAsFloatArray();
+                ModifiableValue modifiableValue = new ModifiableValue(floatList.get(0));
+                if (floatList.size() > 1) {
+                    modifiableValue.setPreModifiers(floatList.get(1));
+                    modifiableValue.setMultipliers(floatList.get(2));
+                    modifiableValue.setPostModifiers(floatList.get(3));
+                }
+                return Optional.of(modifiableValue);
+            }
         }
-
-        PersistedDataArray vals = data.getAsArray();
-
-        if (!vals.isNumberArray() || (vals.size() != 3 && vals.size()!=1)) {
-            return Optional.empty();
-        }
-
-        TFloatList floatList = vals.getAsFloatArray();
-        ModifiableValue modifiableValue = new ModifiableValue(floatList.get(0));
-
-        if (vals.size() != 1) {
-            modifiableValue.setPreModifiers(floatList.get(1));
-            modifiableValue.setMultipliers(floatList.get(2));
-            modifiableValue.setPostModifiers(floatList.get(3));
-        }
-
-        return Optional.of(modifiableValue);
+        return Optional.empty();
     }
 }
