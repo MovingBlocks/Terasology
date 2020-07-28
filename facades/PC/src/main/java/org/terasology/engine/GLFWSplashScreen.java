@@ -6,16 +6,16 @@ package org.terasology.engine;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
-import org.terasology.engine.splash.graphics.Color;
-import org.terasology.engine.splash.graphics.Renderer;
-import org.terasology.engine.splash.graphics.Texture;
-import org.terasology.engine.splash.graphics.Window;
-import org.terasology.engine.splash.widgets.ActivatableImage;
-import org.terasology.engine.splash.widgets.AnimatedBoxRow;
-import org.terasology.engine.splash.widgets.BorderedRectangle;
-import org.terasology.engine.splash.widgets.Image;
-import org.terasology.engine.splash.widgets.Widget;
 import org.terasology.splash.SplashScreen;
+import org.terasology.splash.glfw.graphics.Color;
+import org.terasology.splash.glfw.graphics.Renderer;
+import org.terasology.splash.glfw.graphics.Texture;
+import org.terasology.splash.glfw.graphics.Window;
+import org.terasology.splash.glfw.widgets.ActivatableImage;
+import org.terasology.splash.glfw.widgets.AnimatedBoxRow;
+import org.terasology.splash.glfw.widgets.BorderedRectangle;
+import org.terasology.splash.glfw.widgets.Image;
+import org.terasology.splash.glfw.widgets.Widget;
 import org.terasology.utilities.LWJGLHelper;
 
 import java.io.IOException;
@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-
 
 public class GLFWSplashScreen implements SplashScreen, Runnable {
 
@@ -72,18 +71,28 @@ public class GLFWSplashScreen implements SplashScreen, Runnable {
         pixel.uploadData(1, 1, bytes);
 
         try {
-            widgets.add(new Image("/splash/splash.png", 0, 0));
-            widgets.add(new ActivatableImage("/splash/splash_1.png", 0, 0,
-                    TerasologyEngineStatus.PREPARING_SUBSYSTEMS));
-            widgets.add(new ActivatableImage("/splash/splash_2.png", 150, 0,
-                    TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER));
-            widgets.add(new ActivatableImage("/splash/splash_3.png", 300, 0,
-                    TerasologyEngineStatus.INITIALIZING_ASSET_TYPES));
-            widgets.add(new ActivatableImage("/splash/splash_4.png", 450, 0,
-                    TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS));
-            widgets.add(new ActivatableImage("/splash/splash_5.png", 630, 0,
-                    TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT));
-            widgets.add(new Image("/splash/splash_text.png", 0, 0));
+            widgets.add(new Image(GLFWSplashScreen.class.getResource("/splash/splash.png"), 0, 0));
+            widgets.add(new ActivatableImage(
+                    GLFWSplashScreen.class.getResource("/splash/splash_1.png"),
+                    0, 0,
+                    TerasologyEngineStatus.PREPARING_SUBSYSTEMS.getDescription()));
+            widgets.add(new ActivatableImage(
+                    GLFWSplashScreen.class.getResource("/splash/splash_2.png"),
+                    150, 0,
+                    TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER.getDescription()));
+            widgets.add(new ActivatableImage(
+                    GLFWSplashScreen.class.getResource("/splash/splash_3.png"),
+                    300, 0,
+                    TerasologyEngineStatus.INITIALIZING_ASSET_TYPES.getDescription()));
+            widgets.add(new ActivatableImage(
+                    GLFWSplashScreen.class.getResource("/splash/splash_4.png"),
+                    450, 0,
+                    TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS.getDescription()));
+            widgets.add(new ActivatableImage(
+                    GLFWSplashScreen.class.getResource("/splash/splash_5.png"),
+                    630, 0,
+                    TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT.getDescription()));
+            widgets.add(new Image(GLFWSplashScreen.class.getResource("/splash/splash_text.png"), 0, 0));
             widgets.add(new BorderedRectangle(pixel, 20, 20, 600, 30));
             widgets.add(new AnimatedBoxRow(pixel, 20 + 450 + 10, 20, 600 - 450 - 20, 30));
         } catch (IOException e) {

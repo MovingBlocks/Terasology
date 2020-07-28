@@ -98,11 +98,6 @@ group = 'org.terasology.facades'
 dependencies {
     implementation project(':engine')
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
-    implementation platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
-    implementation 'org.lwjgl:lwjgl'
-    implementation 'org.lwjgl:lwjgl-opengl'
-    implementation 'org.lwjgl:lwjgl-glfw'
-    implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'

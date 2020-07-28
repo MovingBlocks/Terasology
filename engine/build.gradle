@@ -116,7 +116,7 @@ dependencies {
     api platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
     api "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"
-    implementation "org.lwjgl:lwjgl-glfw"
+    api "org.lwjgl:lwjgl-glfw"
     implementation "org.lwjgl:lwjgl-openal"
     api "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-stb"
@@ -157,7 +157,7 @@ dependencies {
     api group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.5'
     api group: 'org.terasology', name: 'TeraMath', version: '1.4.0'
     api group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.3.1'
-    api group: 'org.terasology', name: 'splash-screen', version: '1.0.2'
+    api group: 'org.terasology', name: 'splash-screen', version: '1.1.0'
     api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
