@@ -201,7 +201,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                 return null;
             }
             temp.set(chunkPos).sub(region.getMinX(), region.getMinY(), region.getMinZ());
-            int index = ChunkMath.calculate3DArrayIndex(chunkPos, region.getSize(temp2));
+            int index = ChunkMath.calculate3DArrayIndex(temp, region.getSize(temp2));
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));

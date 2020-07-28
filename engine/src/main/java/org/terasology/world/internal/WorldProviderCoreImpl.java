@@ -34,6 +34,7 @@ import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionIterable;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.CoreChunk;
@@ -196,7 +197,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public boolean isRegionRelevant(BlockRegion region) {
-        return false;
+        for (Vector3ic chunkPos : BlockRegionIterable.region(region).build()) {
+            if (!chunkProvider.isChunkReady(JomlUtil.from(chunkPos))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
