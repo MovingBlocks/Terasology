@@ -127,7 +127,11 @@ run {
     group = "terasology run"
 
     args "-homedir", "-noCrashReport"
-    jvmArgs "-Xmx1536m"
+    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
+        jvmArgs "-XstartOnFirstThread", "-Xmx1536m"
+    } else {
+        jvmArgs "-Xmx1536m"
+    }
     workingDir rootDir
 
     dependsOn rootProject.moduleClasses
@@ -152,7 +156,11 @@ task game(type: JavaExec) {
     main = mainClassName
     workingDir = rootDir
     args "-homedir"
-    jvmArgs["-Xmx1536m"]
+    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
+        jvmArgs "-XstartOnFirstThread", "-Xmx1536m"
+    } else {
+        jvmArgs "-Xmx1536m"
+    }
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDirs
@@ -172,7 +180,11 @@ task profile(type: JavaExec) {
     dependsOn classes
 
     // Run arguments
-    jvmArgs = ["-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"]
+    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
+        jvmArgs "-XstartOnFirstThread", "-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"
+    } else {
+        jvmArgs "-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"
+    }
     main = mainClassName
     workingDir = rootDir
     String[] runArgs = ["-homedir"]
@@ -196,7 +208,11 @@ task debug(type: JavaExec) {
     dependsOn classes
 
     // Run arguments
-    jvmArgs = ["-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"]
+    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
+        jvmArgs "-XstartOnFirstThread", "-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+    } else {
+        jvmArgs "-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+    }
     main = mainClassName
     workingDir = rootDir
     String[] runArgs = ["-homedir"]
@@ -223,7 +239,11 @@ task permissiveNatives(type: JavaExec) {
     main = mainClassName
     workingDir = rootDir
     args "-homedir", "-permissiveSecurity"
-    jvmArgs["-Xmx1536m"]
+    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
+        jvmArgs "-XstartOnFirstThread", "-Xmx1536m"
+    } else {
+        jvmArgs "-Xmx1536m"
+    }
 
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 
