@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,7 +64,7 @@ public final class GameProvider {
             // Set the stream path in a try with resources construct first in order to close the stream.
             try (Stream<Path> stream = Files.list(savePath)
                     .filter(savedGameFolderPath -> Files.isDirectory(savedGameFolderPath)
-                                                   && Files.isRegularFile(savedGameFolderPath.resolve(GameManifest.DEFAULT_FILE_NAME)))) {
+                            && Files.isRegularFile(savedGameFolderPath.resolve(GameManifest.DEFAULT_FILE_NAME)))) {
                 return stream.collect(Collectors.toList()).isEmpty();
             } catch (IOException e) {
                 logger.warn("Can't read saves path {}", savePath, e);
@@ -100,7 +101,8 @@ public final class GameProvider {
                         result.add(new GameInfo(info, date, world.getValue()));
                     }
                 } catch (NullPointerException npe) {
-                    logger.error("The save file was corrupted for: " + world.toString() + ". The manifest can be found and restored at: " + gameManifest.toString(), npe);
+                    logger.error("The save file was corrupted for: " + world.toString() + ". The manifest can be " +
+                            "found and restored at: " + gameManifest.toString(), npe);
                 }
             } catch (IOException e) {
                 logger.error("Failed reading world data object.", e);
@@ -110,21 +112,64 @@ public final class GameProvider {
     }
 
     /**
-     * Generates the game name based on the game number of the last saved game
+     * Generates the game name based on the game number of the last saved game Uses {@link
+     * GameProvider#DEFAULT_GAME_NAME_PREFIX} for resolve.
      */
     public static String getNextGameName() {
-        int gameNumber = 1;
-        for (GameInfo info : GameProvider.getSavedGames()) {
-            if (info.getManifest().getTitle().startsWith(DEFAULT_GAME_NAME_PREFIX)) {
-                String remainder = info.getManifest().getTitle().substring(DEFAULT_GAME_NAME_PREFIX.length());
-                try {
-                    gameNumber = Math.max(gameNumber, Integer.parseInt(remainder) + 1);
-                } catch (NumberFormatException e) {
-                    logger.trace("Could not parse {} as integer (not an error)", remainder, e);
-                }
-            }
+        return getNextGameName(DEFAULT_GAME_NAME_PREFIX);
+    }
+
+    /**
+     * Retrieve the next game name based on the game number of the last saved game.
+     * <p>
+     * This will append a game number or increment a given name number if the name prefix is already present as saved
+     * game.
+     *
+     * <pre>
+     *     1. "Game"    -> "Game"
+     *     2. "Game"    -> "Game 1"
+     *     3. "Game 1"  -> "Game 2"
+     * </pre>
+     * <p>
+     * When incrementing the number the currently highest number is incremented by one (i.e., "gaps" are not filled).
+     *
+     * <pre>
+     *     1. "Gooey 3"     -> "Gooey 3"
+     *     2. "Gooey"       -> "Gooey 4"
+     * </pre>
+     *
+     * @param gameName will to use as game prefix, if saves contains this game name
+     * @return next game name with number, or the given name if unique
+     */
+    public static String getNextGameName(String gameName) {
+        final NumberedGameName requestedName = NumberedGameName.fromString(gameName);
+
+        final Map<String, List<NumberedGameName>> savedGames = GameProvider.getSavedGames().stream()
+                .map(savedGame -> savedGame.getManifest().getTitle())
+                .map(NumberedGameName::fromString)
+                .collect(Collectors.groupingBy(numberedGameName -> numberedGameName.namePrefix));
+
+        if (savedGames.containsKey(requestedName.namePrefix)) {
+            final int nextNumber = highestGameNumber(savedGames.get(requestedName.namePrefix)) + 1;
+            return new NumberedGameName(requestedName.namePrefix, Optional.of(nextNumber)).toString();
+        } else {
+            return requestedName.toString();
         }
-        return DEFAULT_GAME_NAME_PREFIX + gameNumber;
+    }
+
+    /**
+     * Find the highest game number in the list of numbered game names.
+     *
+     * @param names a list of numbered game names
+     * @return the highest number associated with the a game name, or 0 if none was found
+     */
+    private static int highestGameNumber(final List<NumberedGameName> names) {
+        return names.stream()
+                .map(n -> n.number)
+                .filter(Optional::isPresent)
+                .mapToInt(Optional::get)
+                .max()
+                .orElse(0);
     }
 
 }

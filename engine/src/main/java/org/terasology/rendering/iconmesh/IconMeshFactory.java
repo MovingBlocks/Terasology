@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.iconmesh;
 
+import org.joml.Vector4f;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.Asset;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.mesh.Mesh;

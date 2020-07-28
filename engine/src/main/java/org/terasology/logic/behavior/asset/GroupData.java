@@ -17,8 +17,6 @@ package org.terasology.logic.behavior.asset;
 
 import org.terasology.assets.AssetData;
 
-import java.util.List;
-
 /**
  * Every Group asset is described by a GroupData class.
  * @see Group

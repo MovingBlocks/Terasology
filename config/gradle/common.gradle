@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // language
 apply plugin: 'java'
 
@@ -36,20 +52,23 @@ repositories {
         def repoViaEnv = System.getenv()["RESOLUTION_REPO"]
         if (rootProject.hasProperty("alternativeResolutionRepo")) {
             // If the user supplies an alternative repo via gradle.properties then use that
-            // println "Changing RESOLUTION repo set via gradle.properties to $alternativeResolutionRepo"
+            name "from alternativeResolutionRepo property"
             url alternativeResolutionRepo
         } else if (repoViaEnv != null && repoViaEnv != "") {
-            // println "Changing RESOLUTION repoKey set via env var to $repoViaEnv"
+            name "from \$RESOLUTION_REPO"
             url = repoViaEnv
         } else {
             // Our default is the main virtual repo containing everything except repos for testing Artifactory itself
+            name "Terasology Artifactory"
             url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+            allowInsecureProtocol true  // 😱
         }
     }
 
-    // snowplow for telemetry
     maven {
+        name "snowplow (pre-0.9)"
         url "http://maven.snplow.com/releases"
+        allowInsecureProtocol true  // 😱
     }
 }
 
@@ -131,6 +150,15 @@ spotbugs {
     toolVersion = '4.0.0'
     ignoreFailures = true
     excludeFilter = new File(rootDir, "config/metrics/findbugs/findbugs-exclude.xml")
+}
+
+spotbugsMain {
+    reports {
+        xml {
+            enabled = true
+            destination = file("$buildDir/reports/spotbugs/main/spotbugs.xml")
+        }
+    }
 }
 
 // TODO: Temporary until javadoc has been fixed for Java 8 everywhere

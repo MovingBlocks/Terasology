@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,7 +43,6 @@ import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.subsystem.openvr.OpenVRInput;
 import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.game.GameManifest;
-import org.terasology.logic.characters.CharacterSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
@@ -63,6 +62,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
@@ -209,7 +210,7 @@ public final class Terasology {
         try {
             for (int index = 0; index < 5; index++) {
                 URL resource = Terasology.class.getResource("/splash/" + imgFiles[index]);
-                builder.add(new TriggerImageOverlay(resource)
+                builder.add(new TriggerImageOverlay(verifyNotNull(resource, "resource /splash/%s", imgFiles[index]))
                         .setTrigger(trigger[index].getDescription())
                         .setPosition(imgOffsets[index].x, imgOffsets[index].y));
             }

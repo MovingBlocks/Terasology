@@ -17,22 +17,23 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
+import org.terasology.persistence.typeHandling.TypeHandlerContext;
 
 public class ComponentClassTypeHandler extends StringRepresentationTypeHandler<Class<? extends Component>> {
 
+    TypeHandlerContext context;
+
+    public ComponentClassTypeHandler(final TypeHandlerContext context) {
+        this.context = context;
+    }
+
     @Override
     public String getAsString(Class<? extends Component> item) {
-        return item.getName();
+        return context.getSandbox().getSubTypeIdentifier(item, Component.class);
     }
 
     @Override
     public Class<? extends Component> getFromString(String representation) {
-        try {
-            final Class<? extends Component> clazz = Class.forName(representation).asSubclass(Component.class);
-            return clazz;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return context.getSandbox().findSubTypeOf(representation, Component.class).orElse(null);
     }
 }

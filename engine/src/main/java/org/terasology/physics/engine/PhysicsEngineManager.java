@@ -15,7 +15,6 @@
  */
 package org.terasology.physics.engine;
 
-import com.bulletphysics.BulletGlobals;
 import org.terasology.context.Context;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.physics.bullet.shapes.BulletCollisionShapeFactory;

@@ -242,7 +242,7 @@ public abstract class BaseMaterial extends Material {
 
     @Override
     public void setMatrix4(String name, FloatBuffer buffer) {
-        setMatrix3(name, buffer, false);
+        setMatrix4(name, buffer, false);
     }
 
     /**
@@ -258,8 +258,8 @@ public abstract class BaseMaterial extends Material {
     @Override
     public void setCamera(Camera camera) {
         setMatrix4("viewMatrix", new org.joml.Matrix4f(camera.getViewMatrix()).transpose(), true);
-        setMatrix4("projMatrix", new org.joml.Matrix4f(camera.getProjectionMatrix()).transpose(), true);
+        setMatrix4("projMatrix", camera.getProjectionMatrix(), true);
         setMatrix4("viewProjMatrix", new org.joml.Matrix4f(camera.getViewProjectionMatrix()).transpose(), true);
-        setMatrix4("invProjMatrix", new org.joml.Matrix4f(camera.getInverseProjectionMatrix()).transpose(), true);
+        setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix(), true);
     }
 }

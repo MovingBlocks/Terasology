@@ -66,10 +66,10 @@ public class BlockSelectionRenderer {
 
     private void initialize() {
         Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), textureRegion.min(), textureRegion.size(), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new org.joml.Vector4f(1, 1, 1, 1f), JomlUtil.from(textureRegion.min()), JomlUtil.from(textureRegion.size()), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
         tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), textureRegion.min(), textureRegion.size(), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new org.joml.Vector4f(1, 1, 1, .2f), JomlUtil.from(textureRegion.min()), JomlUtil.from(textureRegion.size()), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh2 = tessellator.generateMesh();
         defaultTextured = Assets.getMaterial("engine:prog.defaultTextured").get();
     }

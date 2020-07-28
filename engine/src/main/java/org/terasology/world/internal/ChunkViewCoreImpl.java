@@ -80,9 +80,9 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
         return chunks[chunkIndex].getBlock(
-                ChunkMath.calcBlockPosX(blockX, chunkFilterSize.x),
-                ChunkMath.calcBlockPosY(blockY, chunkFilterSize.y),
-                ChunkMath.calcBlockPosZ(blockZ, chunkFilterSize.z));
+                ChunkMath.calcRelativeBlockPos(blockX, chunkFilterSize.x),
+                ChunkMath.calcRelativeBlockPos(blockY, chunkFilterSize.y),
+                ChunkMath.calcRelativeBlockPos(blockZ, chunkFilterSize.z));
     }
 
     @Override
@@ -112,7 +112,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getSunlight(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
+        return chunks[chunkIndex].getSunlight(ChunkMath.calcRelativeBlockPos(blockX, blockY, blockZ, chunkFilterSize));
     }
 
     @Override
@@ -122,7 +122,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getLight(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
+        return chunks[chunkIndex].getLight(ChunkMath.calcRelativeBlockPos(blockX, blockY, blockZ, chunkFilterSize));
     }
 
     @Override
@@ -134,7 +134,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void setBlock(int blockX, int blockY, int blockZ, Block type) {
         if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setBlock(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), type);
+            chunks[chunkIndex].setBlock(ChunkMath.calcRelativeBlockPos(blockX, blockY, blockZ, chunkFilterSize), type);
         } else {
             logger.warn("Attempt to modify block outside of the view");
         }
@@ -154,7 +154,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void setLight(int blockX, int blockY, int blockZ, byte light) {
         if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setLight(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
+            chunks[chunkIndex].setLight(ChunkMath.calcRelativeBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
         } else {
             logger.warn("Attempted to set light at a position not encompassed by the view");
         }
@@ -174,7 +174,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void setSunlight(int blockX, int blockY, int blockZ, byte light) {
         if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setSunlight(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
+            chunks[chunkIndex].setSunlight(ChunkMath.calcRelativeBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
         } else {
             throw new IllegalStateException("Attempted to modify sunlight though an unlocked view");
         }
@@ -192,7 +192,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getExtraData(index, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
+        return chunks[chunkIndex].getExtraData(index, ChunkMath.calcRelativeBlockPos(blockX, blockY, blockZ, chunkFilterSize));
     }
 
     @Override
@@ -204,7 +204,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void setExtraData(int index, int blockX, int blockY, int blockZ, int value) {
         if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setExtraData(index, ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), value);
+            chunks[chunkIndex].setExtraData(index, ChunkMath.calcRelativeBlockPos(blockX, blockY, blockZ, chunkFilterSize), value);
         } else {
             throw new IllegalStateException("Attempted to modify extra data though an unlocked view");
         }
@@ -243,9 +243,9 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     protected int relChunkIndex(int x, int y, int z) {
-        return TeraMath.calculate3DArrayIndex(ChunkMath.calcChunkPosX(x, chunkPower.x) + offset.x,
-                ChunkMath.calcChunkPosY(y, chunkPower.y) + offset.y,
-                ChunkMath.calcChunkPosZ(z, chunkPower.z) + offset.z, chunkRegion.size());
+        return TeraMath.calculate3DArrayIndex(ChunkMath.calcChunkPos(x, chunkPower.x) + offset.x,
+                ChunkMath.calcChunkPos(y, chunkPower.y) + offset.y,
+                ChunkMath.calcChunkPos(z, chunkPower.z) + offset.z, chunkRegion.size());
     }
 
     public void setChunkSize(Vector3i chunkSize) {

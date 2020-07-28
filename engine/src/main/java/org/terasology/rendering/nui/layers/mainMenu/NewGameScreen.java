@@ -155,7 +155,12 @@ public class NewGameScreen extends CoreScreenLayer {
             if (gameName.getText().isEmpty()) {
                 universeWrapper.setGameName(GameProvider.getNextGameName());
             }
-            universeWrapper.setGameName(gameName.getText());
+            universeWrapper.setGameName(GameProvider.getNextGameName(gameName.getText()));
+            if (gameplay.getOptions().isEmpty()) {
+                logger.error("No gameplay modules present");
+                MessagePopup errorPopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                errorPopup.setMessage("Error", "Can't create new game without modules!");
+            }
             GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
             if (gameManifest != null) {
                 gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
@@ -268,9 +273,7 @@ public class NewGameScreen extends CoreScreenLayer {
         if (defaultGameplayModule != null) {
             gameplay.setSelection(defaultGameplayModule);
 
-            if (configDefaultModuleName.equalsIgnoreCase(DEFAULT_GAME_TEMPLATE_NAME)) {
-                setDefaultGeneratorOfGameplayModule(defaultGameplayModule);
-            }
+            setDefaultGeneratorOfGameplayModule(defaultGameplayModule);
         } else {
             // Find the first gameplay module that is available.
             for (Module module : moduleManager.getRegistry()) {

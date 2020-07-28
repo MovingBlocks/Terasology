@@ -138,9 +138,11 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             seed.setText(new FastRandom().nextString(32));
         }
 
-        // skip loading module configs, unselect all checkboxes by default
+        // skip loading module configs, limit shown modules to locally present ones
         selectModulesConfig = new SelectModulesConfig();
-        selectModulesConfig.getSelectedStandardModuleExtensions().forEach(selectModulesConfig::unselectStandardModuleExtension);
+        selectModulesConfig.getSelectedStandardModuleExtensions()
+                .forEach(selectModulesConfig::unselectStandardModuleExtension);
+        selectModulesConfig.toggleIsLocalOnlySelected();
 
         dependencyResolver = new DependencyResolver(moduleManager.getRegistry());
 
