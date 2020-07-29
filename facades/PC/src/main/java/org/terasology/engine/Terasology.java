@@ -62,6 +62,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Random;
 
 import static com.google.common.base.Verify.verifyNotNull;
 
@@ -83,6 +84,7 @@ import static com.google.common.base.Verify.verifyNotNull;
  * <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
  * <tr><td>-headless</td><td>Start headless.</td></tr>
  * <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
+ * <tr><td>-createlastgame</td><td>Create the world of the latest game with a new save file on startup.</td></tr>
  * <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
  * <tr><td>-noCrashReport</td><td>Disable crash reporting.</td></tr>
  * <tr><td>-noSound</td><td>Disable sound.</td></tr>
@@ -104,6 +106,7 @@ public final class Terasology {
     private static final String USE_SPECIFIED_DIR_AS_HOME = "-homedir=";
     private static final String START_HEADLESS = "-headless";
     private static final String LOAD_LAST_GAME = "-loadlastgame";
+    private static final String CREATE_LAST_GAME = "-createlastgame";
     private static final String NO_CRASH_REPORT = "-noCrashReport";
     private static final String NO_SAVE_GAMES = "-noSaveGames";
     private static final String PERMISSIVE_SECURITY = "-permissiveSecurity";
@@ -119,7 +122,7 @@ public final class Terasology {
     private static boolean soundEnabled = true;
     private static boolean splashEnabled = true;
     private static boolean loadLastGame;
-
+    private static boolean createLastGame;
 
     private Terasology() {
     }
@@ -150,18 +153,30 @@ public final class Terasology {
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener(engine));
                 engine.run(new StateHeadlessSetup());
+            } else if (loadLastGame) {
+                engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                    GameManifest gameManifest = getLatestGameManifest();
+                    if (gameManifest != null) {
+                        engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
+                    }
+                });
             } else {
-                if (loadLastGame) {
-                    engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                if (createLastGame) {
+                    engine.initialize();
+                    engine.getFromEngineContext(ThreadManager.class).submitTask("createLastGame", () -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
-                            engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
+                            GameManifest newlyCreatedGM = gameManifest;
+                            Random random = new Random();
+                            String randomNumber = String.valueOf(random.nextInt());
+                            newlyCreatedGM.setTitle("New Created " + gameManifest.getSeed() + "(" + randomNumber + ")");
+                            engine.changeState(new StateLoading(newlyCreatedGM, NetworkMode.NONE));
                         }
                     });
                 }
+            }
 
                 engine.run(new StateMainMenu());
-            }
         } catch (Throwable e) {
             // also catch Errors such as UnsatisfiedLink, NoSuchMethodError, etc.
             splashScreen.close();
@@ -350,6 +365,8 @@ public final class Terasology {
                 splashEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
+            } else if (arg.equals(CREATE_LAST_GAME)) {
+                createLastGame = true;
             } else if (arg.startsWith(SERVER_PORT)) {
                 System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, arg.substring(SERVER_PORT.length()));
             } else if (arg.startsWith(OVERRIDE_DEFAULT_CONFIG)) {
