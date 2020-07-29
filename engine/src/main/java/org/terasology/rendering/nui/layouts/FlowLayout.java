@@ -45,6 +45,12 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         contents.add(element);
     }
 
+    /**
+     * The horizontal spacing between adjacent widgets, in pixels
+     */
+    @LayoutConfig
+    private int horizontalSpacing;
+
     @Override
     public void removeWidget(UIWidget element) {
         contents.remove(element);
@@ -68,7 +74,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
                 filledHeight = 0;
             }
             canvas.drawWidget(widget, Rect2i.createFromMinAndSize(filledWidth, heightOffset, size.x, size.y));
-            filledWidth += size.x;
+            filledWidth += size.x + horizontalSpacing;
             filledHeight = Math.max(filledHeight, size.y);
         }
     }
@@ -83,10 +89,10 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             if (filledWidth != 0 && filledWidth + size.x > sizeHint.x) {
                 result.x = Math.max(result.x, filledWidth);
                 result.y += filledHeight + verticalSpacing;
-                filledWidth = size.x;
+                filledWidth = size.x + horizontalSpacing;
                 filledHeight = size.y;
             } else {
-                filledWidth += size.x;
+                filledWidth += size.x + horizontalSpacing;
                 filledHeight = Math.max(filledHeight, size.y);
             }
         }
@@ -107,12 +113,32 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
+     * Retrieves the horizontal spacing between adjacent widgets in this {@code FlowLayout}.
+     *
+     * @return The spacing, in pixels
+     */
+    public int getHorizontalSpacing() {
+        return horizontalSpacing;
+    }
+
+     /**
      * Retrieves the vertical spacing between adjacent widgets in this {@code FlowLayout}.
      *
      * @return The spacing, in pixels
      */
     public int getVerticalSpacing() {
         return verticalSpacing;
+    }
+
+    /**
+     * Sets the horizontal spacing between adjacent widgets in this {@code FlowLayout}.
+     *
+     * @param spacing The spacing, in pixels
+     * @return This {@code FlowLayout}
+     */
+    public FlowLayout setHorizontalSpacing(int spacing) {
+        this.horizontalSpacing = spacing;
+        return this;
     }
 
     /**
