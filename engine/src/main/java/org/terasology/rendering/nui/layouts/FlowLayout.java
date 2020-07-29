@@ -28,7 +28,28 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * The Flow layout arranges its children in a directional flow that wraps at the layout's boundary, very much like words
+ * wrap at the end of a line when writing a text. The children are laid out in row in the flow direction, each widget
+ * sized by its preferred size. The individual elements are top-aligned, and wrapped at the first element that does not
+ * fit in the row.
+ * <p>
+ * Flow lays out each managed child regardless of the child's visible property value - invisible children won't be
+ * rendered but will take up space.
+ * <p>
+ * The layout may be styled as other widgets with {@link org.terasology.rendering.nui.skin.UISkin}.
  *
+ * The Flow layout can be configured in UI assets ({@code .ui} files):
+ * <pre>
+ * {@code
+ * {
+ *   "type": "FlowLayout",
+ *   "verticalSpacing": 8,
+ *   "horizontalSpacing": 24,
+ *   "contents": [...]
+ *   // all properties of AbstractWidget
+ * }
+ * }
+ * </pre>
  */
 public class FlowLayout extends CoreLayout<LayoutHint> {
 
