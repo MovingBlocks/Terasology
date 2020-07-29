@@ -90,7 +90,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             if (filledWidth != 0 && filledWidth + size.x > sizeHint.x) {
                 result.x = Math.max(result.x, filledWidth);
                 result.y += filledHeight + verticalSpacing;
-                filledWidth = size.x;
+                filledWidth = size.x + horizontalSpacing;
                 filledHeight = size.y;
             } else {
                 filledWidth += size.x + horizontalSpacing;
