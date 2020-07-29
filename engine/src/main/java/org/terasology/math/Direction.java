@@ -17,6 +17,8 @@
 package org.terasology.math;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 
@@ -116,13 +118,36 @@ public enum Direction {
 
     /**
      * @return The vector3i in the direction of the side. Do not modify.
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *     {@link #vector3i()} .
      */
+    @Deprecated
     public Vector3i getVector3i() {
         return new Vector3i(vector3iDir);
     }
 
+    /**
+     * @return
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *     {@link #vector3f()}.
+     */
+    @Deprecated
     public Vector3f getVector3f() {
         return new Vector3f(vector3fDir);
+    }
+
+    /**
+     * @return The {@link Vector3ic} in the direction of the side. Do not modify.
+     */
+    public Vector3ic vector3i() {
+        return JomlUtil.from(vector3iDir);
+    }
+
+    /**
+     * @return The {@link Vector3fc} in the direction of the side. Do not modify.
+     */
+    public Vector3fc vector3f() {
+        return JomlUtil.from(vector3fDir);
     }
 
     /**
@@ -131,5 +156,4 @@ public enum Direction {
     public Direction reverse() {
         return REVERSE_MAP.get(this);
     }
-
 }
