@@ -37,7 +37,7 @@ import java.util.List;
  * rendered but will take up space.
  * <p>
  * The layout may be styled as other widgets with {@link org.terasology.rendering.nui.skin.UISkin}.
- *
+ * <p>
  * The Flow layout can be configured in UI assets ({@code .ui} files):
  * <pre>
  * {@code
@@ -53,6 +53,9 @@ import java.util.List;
  */
 public class FlowLayout extends CoreLayout<LayoutHint> {
 
+    /**
+     * The ordered list of widgets to be arranged in the flow direction.
+     */
     private List<UIWidget> contents = Lists.newArrayList();
 
     /**
@@ -61,16 +64,16 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     @LayoutConfig
     private int verticalSpacing;
 
-    @Override
-    public void addWidget(UIWidget element, LayoutHint hint) {
-        contents.add(element);
-    }
-
     /**
      * The horizontal spacing between adjacent widgets, in pixels
      */
     @LayoutConfig
     private int horizontalSpacing;
+
+    @Override
+    public void addWidget(UIWidget element, LayoutHint hint) {
+        contents.add(element);
+    }
 
     @Override
     public void removeWidget(UIWidget element) {
