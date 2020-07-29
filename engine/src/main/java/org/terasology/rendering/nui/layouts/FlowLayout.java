@@ -65,7 +65,6 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     public void onDraw(Canvas canvas) {
         int filledWidth = 0;
         int filledHeight = 0;
-        int widthOffset = 0;
         int heightOffset = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
