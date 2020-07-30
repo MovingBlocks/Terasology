@@ -69,20 +69,28 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int filledWidth = 0;
+        int filledWidth = ((leftToRightAlign) ? canvas.size().x : 0);
         int filledHeight = 0;
         int heightOffset = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
-            if (filledWidth != 0 && filledWidth + size.x > canvas.size().x) {
+            if(leftToRightAlign) {
+                filledWidth -= size.x;
+            }
+            if (filledWidth != getInitializedWidgetWidth(canvas.size().x, size.x) &&
+                    (filledWidth + size.x > canvas.size().x || filledWidth < 0)) {
                 heightOffset += filledHeight + verticalSpacing;
-                filledWidth = 0;
+                filledWidth = getInitializedWidgetWidth(canvas.size().x, size.x);
                 filledHeight = 0;
             }
             canvas.drawWidget(widget, Rect2i.createFromMinAndSize(filledWidth, heightOffset, size.x, size.y));
-            filledWidth += size.x + horizontalSpacing;
+            filledWidth += ((leftToRightAlign) ? -horizontalSpacing : size.x + horizontalSpacing);
             filledHeight = Math.max(filledHeight, size.y);
         }
+    }
+
+    private int getInitializedWidgetWidth(int canvasSizeX, int widgetSizeX){
+        return (leftToRightAlign) ? canvasSizeX - widgetSizeX : 0;
     }
 
     @Override
