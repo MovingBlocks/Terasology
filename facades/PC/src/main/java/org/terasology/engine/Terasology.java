@@ -152,6 +152,7 @@ public final class Terasology {
                 engine.run(new StateHeadlessSetup());
             } else {
                 if (loadLastGame) {
+                    engine.initialize(); //initialize the managers first
                     engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
