@@ -35,7 +35,8 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     private List<UIWidget> contents = Lists.newArrayList();
 
     /**
-     * The alignment of widgets
+     * The alignment of widgets; true = left-to-right align, no change / false = right-to-left
+     * This variable shall be set true only within the ui file that the FlowLayout is used
      */
     @LayoutConfig
     private boolean leftToRightAlign = false;
