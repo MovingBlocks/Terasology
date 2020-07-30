@@ -35,6 +35,12 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     private List<UIWidget> contents = Lists.newArrayList();
 
     /**
+     * The alignment of widgets
+     */
+    @LayoutConfig
+    private boolean leftToRightAlign = false;
+
+    /**
      * The vertical spacing between adjacent widgets, in pixels
      */
     @LayoutConfig
