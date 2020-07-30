@@ -127,7 +127,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             if (widthOffset != 0 && widthOffset + horizontalSpacing + size.x <= boundingSize.x) {
                 // place widget in the current row
                 widthOffset += horizontalSpacing;
-            } else {
+            } else if (widthOffset != 0) {
                 // we need to wrap the row
                 result.x = Math.max(result.x, widthOffset);
                 result.y += rowHeight + verticalSpacing;
