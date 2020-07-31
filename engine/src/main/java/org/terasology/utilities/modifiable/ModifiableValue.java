@@ -15,15 +15,15 @@ import org.terasology.module.sandbox.API;
 public class ModifiableValue {
     private final float baseValue;
 
-    private float preModifiers;
-    private float multipliers;
-    private float postModifiers;
+    private float preModifier;
+    private float multiplier;
+    private float postModifier;
 
     public ModifiableValue(float baseValue) {
-        preModifiers=0;
-        multipliers=1;
-        postModifiers=0;
-        this.baseValue=baseValue;
+        preModifier = 0;
+        multiplier = 1;
+        postModifier = 0;
+        this.baseValue = baseValue;
     }
 
     public float getBaseValue() {
@@ -31,22 +31,22 @@ public class ModifiableValue {
     }
 
     public ModifiableValue multiply(float amount) {
-        multipliers *= amount;
+        multiplier *= amount;
         return this;
     }
 
     public ModifiableValue preAdd(float amount) {
-        preModifiers += amount;
+        preModifier += amount;
         return this;
     }
 
     public ModifiableValue postAdd(float amount) {
-        postModifiers += amount;
+        postModifier += amount;
         return this;
     }
 
     /**
-     * Calculates the result value from the base value and given modifiers and multipliers.
+     * Calculates the result value from the base value and given modifiers and multiplier.
      * <p>
      * The value is calculated based on the following formula:
      * <pre>
@@ -56,30 +56,48 @@ public class ModifiableValue {
      * <emph>non-negativity of the value is not ensured and must be checked by the system if needed</emph>
      */
     public float getValue() {
-        return (baseValue + preModifiers) * multipliers + postModifiers;
+        return (baseValue + preModifier) * multiplier + postModifier;
     }
 
-    public float getPreModifiers() {
-        return preModifiers;
+    public float getPreModifier() {
+        return preModifier;
     }
 
-    public float getPostModifiers() {
-        return postModifiers;
+    public float getPostModifier() {
+        return postModifier;
     }
 
-    public float getMultipliers() {
-        return multipliers;
+    public float getMultiplier() {
+        return multiplier;
     }
 
-    public void setPreModifiers(float preModifiers){
-        this.preModifiers=preModifiers;
+    /**
+     * Setter method used to set the preModifier at once.
+     * It is only used for setting the modifier during the Deserialization process.
+     * For any modification, use the preAdd() method instead.
+     * @param preModifier the preModifier to set for the component data.
+     */
+    public void setPreModifier(float preModifier) {
+        this.preModifier = preModifier;
     }
 
-    public void setMultipliers(float multipliers){
-        this.multipliers=multipliers;
+    /**
+     * Setter method used to set the multiplier at once.
+     * It is only used for setting the multiplier during the Deserialization process.
+     * For any modification, use the multiply() method instead.
+     * @param multiplier the multiplier to set for the component data.
+     */
+    public void setMultiplier(float multiplier) {
+        this.multiplier = multiplier;
     }
 
-    public void setPostModifiers(float postModifiers){
-        this.postModifiers=postModifiers;
+    /**
+     * Setter method used to set the postModifier at once.
+     * It is only used for setting the postModifier during the Deserialization process.
+     * For any modification, use the postAdd() method instead.
+     * @param postModifier the postModifier to set for the component data.
+     */
+    public void setPostModifier(float postModifier) {
+        this.postModifier = postModifier;
     }
 }
