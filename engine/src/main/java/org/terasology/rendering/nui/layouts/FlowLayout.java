@@ -35,8 +35,13 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     private List<UIWidget> contents = Lists.newArrayList();
 
     /**
-     * The alignment of widgets; true = left-to-right align, no change / false = right-to-left
-     * This variable shall be set true only within the ui file that the FlowLayout is used
+     * Whether the directional flow of this layout goes from left-to-right and right-to-left.
+     * <p>
+     * The children are laid out from left-to-right by default (false), aligned at the left border of the canvas. If
+     * this toggle is explicitly enabled (true) the children are laid out right-to-left, aligned at the right border of
+     * the canvas.
+     * <p>
+     * This toggle can be set programmatically or in {@code .ui} files that use the Flow layout.
      */
     @LayoutConfig
     private boolean rightToLeftAlign = false;
@@ -136,7 +141,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         return horizontalSpacing;
     }
 
-     /**
+    /**
      * Retrieves the vertical spacing between adjacent widgets in this {@code FlowLayout}.
      *
      * @return The spacing, in pixels
