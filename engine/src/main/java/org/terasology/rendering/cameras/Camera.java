@@ -7,18 +7,13 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.lwjgl.BufferUtils;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
-
-/**
- * Provides global access to fonts.
- *
- */
 
 /**
  * Camera base class.
@@ -68,7 +63,7 @@ public abstract class Camera {
     protected float cachedReflectionHeight;
 
     /* (Water) Reflection */
-    private boolean reflected;
+    protected boolean reflected;
     private float reflectionHeight = 32;
 
     /**
@@ -92,8 +87,8 @@ public abstract class Camera {
             return;
         }
 
-        viewFrustum.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrix), MatrixUtils.matrixToFloatBuffer(projectionMatrix));
-        viewFrustumReflected.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrixReflected), MatrixUtils.matrixToFloatBuffer(projectionMatrix));
+        viewFrustum.updateFrustum(viewMatrix.get(BufferUtils.createFloatBuffer(16)), projectionMatrix.get(BufferUtils.createFloatBuffer(16)));
+        viewFrustumReflected.updateFrustum(viewMatrixReflected.get(BufferUtils.createFloatBuffer(16)), projectionMatrix.get(BufferUtils.createFloatBuffer(16)));
     }
 
     public abstract boolean isBobbingAllowed();

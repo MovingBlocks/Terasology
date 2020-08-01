@@ -44,7 +44,7 @@ public class DefaultClassMetadata<T> extends ClassMetadata<T, FieldMetadata<T, ?
     }
 
     @Override
-    protected <V> FieldMetadata<T, V> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
-        return new FieldMetadata<>(this, field, copyStrategy, factory);
+    protected FieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
+        return new FieldMetadata<>(this, field, copyStrategyLibrary, factory);
     }
 }

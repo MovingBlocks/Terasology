@@ -86,7 +86,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
     }
 
     @Override
-    protected <V> ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
-        return new ReplicatedFieldMetadata<>(this, field, copyStrategy, factory, true);
+    protected ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
+        return new ReplicatedFieldMetadata<>(this, field, copyStrategyLibrary, factory, true);
     }
 }

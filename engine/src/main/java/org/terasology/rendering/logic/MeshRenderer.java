@@ -223,7 +223,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                             lastMesh.preRender();
                         }
 
-                        modelViewMatrix.set(worldRenderer.getActiveCamera().getViewMatrix()).transpose().mul(matrixCameraSpace);
+                        modelViewMatrix.set(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
                         modelViewMatrix.get(tempMatrixBuffer44);
                         modelViewMatrix.normal(normalMatrix).get(tempMatrixBuffer33);
 

@@ -18,6 +18,7 @@ package org.terasology.reflection.metadata;
 import com.google.common.base.Objects;
 import com.google.gson.annotations.SerializedName;
 import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.FieldAccessor;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -38,22 +39,22 @@ public class FieldMetadata<T, U> {
     private final Class<U> type;
     private final Field field;
     private final FieldAccessor<T, U> accessor;
-    private final CopyStrategy<U> copyStrategy;
+    protected final CopyStrategy<U> copyStrategy;
 
     private final String serializationName;
 
     private byte id;
 
     /**
-     * @param owner        The ClassMetadata that owns this field
-     * @param field        The field this metadata is for
-     * @param copyStrategy The CopyStrategy appropriate for the type of the field
-     * @param factory      The reflection provider
+     * @param owner               The ClassMetadata that owns this field
+     * @param field               The field this metadata is for
+     * @param copyStrategyLibrary Something to provide a CopyStrategy appropriate for the type of the field
+     * @param factory             The reflection provider
      */
     @SuppressWarnings("unchecked")
-    public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
+    public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
         this.owner = owner;
-        this.copyStrategy = copyStrategy;
+        copyStrategy = (CopyStrategy<U>) copyStrategyLibrary.getStrategy(field.getGenericType());
         this.type = (Class<U>) determineType(field, owner.getType());
         this.accessor = factory.createFieldAccessor(owner.getType(), field, type);
         this.field = field;
