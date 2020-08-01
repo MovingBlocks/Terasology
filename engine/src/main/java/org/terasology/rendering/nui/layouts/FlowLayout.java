@@ -39,7 +39,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
      * This variable shall be set true only within the ui file that the FlowLayout is used
      */
     @LayoutConfig
-    private boolean leftToRightAlign = false;
+    private boolean rightToLeftAlign = false;
 
     /**
      * The vertical spacing between adjacent widgets, in pixels
@@ -75,7 +75,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         int heightOffset = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
-            if(leftToRightAlign) {
+            if (rightToLeftAlign) {
                 filledWidth -= size.x;
             }
             if (filledWidth != getInitializedWidgetWidth(canvas.size().x, size.x) &&
@@ -85,13 +85,13 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
                 filledHeight = 0;
             }
             canvas.drawWidget(widget, Rect2i.createFromMinAndSize(filledWidth, heightOffset, size.x, size.y));
-            filledWidth += ((leftToRightAlign) ? -horizontalSpacing : size.x + horizontalSpacing);
+            filledWidth += ((rightToLeftAlign) ? -horizontalSpacing : size.x + horizontalSpacing);
             filledHeight = Math.max(filledHeight, size.y);
         }
     }
 
-    private int getInitializedWidgetWidth(int canvasSizeX, int widgetSizeX){
-        return (leftToRightAlign) ? canvasSizeX - widgetSizeX : 0;
+    private int getInitializedWidgetWidth(int canvasSizeX, int widgetSizeX) {
+        return (rightToLeftAlign) ? canvasSizeX - widgetSizeX : 0;
     }
 
     @Override
