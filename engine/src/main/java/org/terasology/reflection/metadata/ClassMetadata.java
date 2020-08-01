@@ -26,7 +26,6 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
-import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ObjectConstructor;
@@ -55,8 +54,8 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
 
     private final SimpleUri uri;
     private final Class<T> clazz;
-    private final ObjectConstructor<T> constructor;
-    private Map<String, FIELD> fields = Maps.newHashMap();
+    protected final ObjectConstructor<T> constructor;
+    protected Map<String, FIELD> fields = Maps.newHashMap();
     private TIntObjectMap<FIELD> fieldsById = new TIntObjectHashMap<>();
 
     /**
@@ -100,10 +99,9 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            CopyStrategy<?> copyStrategy = copyStrategyLibrary.getStrategy(field.getGenericType());
 
             try {
-                FIELD metadata = createField(field, copyStrategy, factory);
+                FIELD metadata = createField(field, copyStrategyLibrary, factory);
                 if (metadata != null) {
                     fields.put(metadata.getName().toLowerCase(Locale.ENGLISH), metadata);
                 }
@@ -122,7 +120,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * @param factory      The reflection provider
      * @return A FieldMetadata describing the field, or null to ignore this field
      */
-    protected abstract <V> FIELD createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException;
+    protected abstract FIELD createField(Field field, CopyStrategyLibrary copyStrategy, ReflectFactory factory) throws InaccessibleFieldException;
 
     /**
      * @return The class described by this metadata

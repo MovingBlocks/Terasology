@@ -34,8 +34,7 @@ public abstract class EntityRef implements MutableComponentContainer {
 
     /**
      * Copies this entity, creating a new entity with identical components.
-     * Note: You will need to be careful when copying entities, particularly around ownership - this method does nothing to prevent you ending up
-     * with multiple entities owning the same entities.
+     * Also copies any owned entities, recursively.
      *
      * @return A copy of this entity.
      */
