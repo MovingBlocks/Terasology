@@ -35,6 +35,18 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     private List<UIWidget> contents = Lists.newArrayList();
 
     /**
+     * Whether the directional flow of this layout goes from left-to-right and right-to-left.
+     * <p>
+     * The children are laid out from left-to-right by default (false), aligned at the left border of the canvas. If
+     * this toggle is explicitly enabled (true) the children are laid out right-to-left, aligned at the right border of
+     * the canvas.
+     * <p>
+     * This toggle can be set programmatically or in {@code .ui} files that use the Flow layout.
+     */
+    @LayoutConfig
+    private boolean rightToLeftAlign = false;
+
+    /**
      * The vertical spacing between adjacent widgets, in pixels
      */
     @LayoutConfig
@@ -63,20 +75,28 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int filledWidth = 0;
+        int filledWidth = getInitializedWidgetWidth(canvas.size().x, 0);
         int filledHeight = 0;
         int heightOffset = 0;
         for (UIWidget widget : contents) {
             Vector2i size = canvas.calculatePreferredSize(widget);
-            if (filledWidth != 0 && filledWidth + size.x > canvas.size().x) {
+            if (rightToLeftAlign) {
+                filledWidth -= size.x;
+            }
+            if (filledWidth != getInitializedWidgetWidth(canvas.size().x, size.x) &&
+                    (filledWidth + size.x > canvas.size().x || filledWidth < 0)) {
                 heightOffset += filledHeight + verticalSpacing;
-                filledWidth = 0;
+                filledWidth = getInitializedWidgetWidth(canvas.size().x, size.x);
                 filledHeight = 0;
             }
             canvas.drawWidget(widget, Rect2i.createFromMinAndSize(filledWidth, heightOffset, size.x, size.y));
-            filledWidth += size.x + horizontalSpacing;
+            filledWidth += ((rightToLeftAlign) ? -horizontalSpacing : size.x + horizontalSpacing);
             filledHeight = Math.max(filledHeight, size.y);
         }
+    }
+
+    private int getInitializedWidgetWidth(int canvasSizeX, int widgetSizeX) {
+        return (rightToLeftAlign) ? canvasSizeX - widgetSizeX : 0;
     }
 
     @Override
@@ -121,7 +141,7 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         return horizontalSpacing;
     }
 
-     /**
+    /**
      * Retrieves the vertical spacing between adjacent widgets in this {@code FlowLayout}.
      *
      * @return The spacing, in pixels
@@ -150,5 +170,34 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     public FlowLayout setVerticalSpacing(int spacing) {
         this.verticalSpacing = spacing;
         return this;
+    }
+
+    /**
+     * Whether the directional flow of this layout goes from left-to-right and right-to-left.
+     * <p>
+     * If false, the children are laid out from left-to-right and aligned at the left border of the canvas. If true, the
+     * children are laid out right-to-left and aligned at the right border of the canvas.
+     * <p>
+     * This toggle can be set programmatically or in {@code .ui} files that use the Flow layout.
+     *
+     * @return whether the children are laid out right-to-left and aligned to the right
+     */
+    public boolean isRightToLeftAlign() {
+        return rightToLeftAlign;
+    }
+
+    /**
+     * Set whether the directional flow of this layout goes from left-to-right and right-to-left.
+     * <p>
+     * The children are laid out from left-to-right by default (false), aligned at the left border of the canvas. If
+     * this toggle is explicitly enabled (true) the children are laid out right-to-left, aligned at the right border of
+     * the canvas.
+     * <p>
+     * This toggle can be set programmatically or in {@code .ui} files that use the Flow layout.
+     *
+     * @param rightToLeftAlign  whether the children are laid out right-to-left and aligned to the right
+     */
+    public void setRightToLeftAlign(boolean rightToLeftAlign) {
+        this.rightToLeftAlign = rightToLeftAlign;
     }
 }
