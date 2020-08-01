@@ -171,4 +171,33 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         this.verticalSpacing = spacing;
         return this;
     }
+
+    /**
+     * Whether the directional flow of this layout goes from left-to-right and right-to-left.
+     * <p>
+     * If false, the children are laid out from left-to-right and aligned at the left border of the canvas. If true, the
+     * children are laid out right-to-left and aligned at the right border of the canvas.
+     * <p>
+     * This toggle can be set programmatically or in {@code .ui} files that use the Flow layout.
+     *
+     * @return whether the children are laid out right-to-left and aligned to the right
+     */
+    public boolean isRightToLeftAlign() {
+        return rightToLeftAlign;
+    }
+
+    /**
+     * Set whether the directional flow of this layout goes from left-to-right and right-to-left.
+     * <p>
+     * The children are laid out from left-to-right by default (false), aligned at the left border of the canvas. If
+     * this toggle is explicitly enabled (true) the children are laid out right-to-left, aligned at the right border of
+     * the canvas.
+     * <p>
+     * This toggle can be set programmatically or in {@code .ui} files that use the Flow layout.
+     *
+     * @param rightToLeftAlign  whether the children are laid out right-to-left and aligned to the right
+     */
+    public void setRightToLeftAlign(boolean rightToLeftAlign) {
+        this.rightToLeftAlign = rightToLeftAlign;
+    }
 }
